@@ -544,12 +544,14 @@ export function AppLayout({
 
             <div className="relative" ref={notifRef}>
               <button
-                className="relative flex items-center justify-center w-9 h-9 rounded-lg hover:bg-hh-ui-50 transition-colors"
                 onClick={() => setNotifOpen(!notifOpen)}
+                style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', cursor: 'pointer', border: 'none', background: 'transparent', position: 'relative', padding: 0 }}
               >
-                <Bell style={{ width: '22px', height: '22px', strokeWidth: 2, display: 'block', minWidth: '22px', minHeight: '22px', opacity: 1, color: isAdmin ? '#9333ea' : (theme === 'dark' ? '#e2e8f0' : '#334155') }} />
+                <span style={{ display: 'inline-flex', width: '24px', height: '24px' }}>
+                  <Bell style={{ width: '24px', height: '24px', color: theme === 'dark' ? '#e2e8f0' : '#334155', stroke: theme === 'dark' ? '#e2e8f0' : '#334155', fill: 'none', strokeWidth: 2, display: 'block' }} />
+                </span>
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 text-white text-[10px] rounded-full flex items-center justify-center font-medium">
+                  <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '20px', height: '20px', backgroundColor: '#DC2626', color: 'white', fontSize: '10px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
