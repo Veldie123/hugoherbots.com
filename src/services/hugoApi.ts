@@ -10,6 +10,7 @@ export interface StartSessionRequest {
   mode?: "COACH_CHAT" | "ROLEPLAY";
   isExpert?: boolean;
   modality?: "chat" | "audio" | "video";
+  viewMode?: "admin" | "user";
 }
 
 export interface StartSessionResponse {

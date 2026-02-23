@@ -322,6 +322,7 @@ export function AdminChatExpertMode({
                 mode: "COACH_CHAT",
                 isExpert: true,
                 modality: "chat",
+                viewMode: 'admin',
               });
               if (cancelled) return;
               const response = await hugoApi.sendMessage(userMessage, true, systemContext);
@@ -693,6 +694,7 @@ export function AdminChatExpertMode({
         mode: "COACH_CHAT",
         isExpert: true,
         modality: chatMode,
+        viewMode: 'admin',
       });
       
       setHasActiveSession(true);
@@ -864,6 +866,7 @@ export function AdminChatExpertMode({
           mode: "COACH_CHAT",
           isExpert: true,
           modality: chatMode,
+          viewMode: 'admin',
         });
         setHasActiveSession(true);
         console.log("[Admin] Auto-started expert session");
