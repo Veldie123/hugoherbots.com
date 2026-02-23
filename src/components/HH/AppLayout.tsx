@@ -240,7 +240,7 @@ export function AppLayout({
           )}
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-2 pb-1 pt-2 min-h-0">
+        <nav className="flex-1 overflow-y-auto px-2 pt-2 min-h-0">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = isNavItemActive(item.id);
@@ -316,45 +316,45 @@ export function AppLayout({
               </div>
             );
           })}
-
-          <div className="border-t border-hh-border mt-3 pt-3 space-y-0.5">
-            {bottomNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentPage === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => navigate?.(item.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
-                    isActive
-                      ? "text-white font-medium"
-                      : "text-hh-text hover:bg-hh-ui-50"
-                  }`}
-                  style={isActive ? { backgroundColor: '#4F7396' } : undefined}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  {!collapsed && (
-                    <span className="text-[14px] leading-[20px] font-normal whitespace-nowrap">
-                      {item.label}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-
-            {isAdmin && (
-              <div className="mt-1">
-                <button
-                  onClick={() => navigate?.("admin-uploads")}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-purple-400 dark:border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-700 dark:hover:text-purple-300 transition-colors text-[14px] font-medium"
-                >
-                  <Shield className="w-4 h-4 flex-shrink-0" />
-                  {!collapsed && <span>Admin View</span>}
-                </button>
-              </div>
-            )}
-          </div>
         </nav>
+
+        <div className="px-2 pb-3 space-y-0.5 flex-shrink-0 border-t border-hh-border pt-3">
+          {bottomNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentPage === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => navigate?.(item.id)}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
+                  isActive
+                    ? "text-white font-medium"
+                    : "text-hh-text hover:bg-hh-ui-50"
+                }`}
+                style={isActive ? { backgroundColor: '#4F7396' } : undefined}
+              >
+                <Icon className="w-5 h-5 flex-shrink-0" />
+                {!collapsed && (
+                  <span className="text-[14px] leading-[20px] font-normal whitespace-nowrap">
+                    {item.label}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+
+          {isAdmin && (
+            <div className="mt-1">
+              <button
+                onClick={() => navigate?.("admin-uploads")}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
+              >
+                <Eye className="w-4 h-4 flex-shrink-0" />
+                {!collapsed && <span>Admin View</span>}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -476,16 +476,18 @@ export function AppLayout({
             })}
 
             {isAdmin && (
-              <button
-                onClick={() => {
-                  navigate?.("admin-uploads");
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-purple-400 dark:border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-700 dark:hover:text-purple-300 transition-colors text-[14px] font-medium"
-              >
-                <Shield className="w-4 h-4" />
-                <span>Admin View</span>
-              </button>
+              <div className="mt-1">
+                <button
+                  onClick={() => {
+                    navigate?.("admin-uploads");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Admin View</span>
+                </button>
+              </div>
             )}
           </div>
         </SheetContent>
