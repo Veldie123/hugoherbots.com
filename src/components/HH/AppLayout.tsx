@@ -546,7 +546,7 @@ export function AppLayout({
                 className="relative flex items-center justify-center w-9 h-9 rounded-lg hover:bg-hh-ui-50 transition-colors"
                 onClick={() => setNotifOpen(!notifOpen)}
               >
-                <Bell style={{ width: '22px', height: '22px', color: isAdmin ? '#7C3AED' : '#1C2535', stroke: isAdmin ? '#7C3AED' : '#1C2535', strokeWidth: 2, display: 'block', minWidth: '22px', minHeight: '22px' }} />
+                <Bell className={isAdmin ? 'text-purple-600' : 'text-hh-text'} style={{ width: '22px', height: '22px', strokeWidth: 2, display: 'block', minWidth: '22px', minHeight: '22px' }} />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 text-white text-[10px] rounded-full flex items-center justify-center font-medium">
                     {unreadCount > 9 ? "9+" : unreadCount}
