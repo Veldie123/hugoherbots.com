@@ -47,11 +47,16 @@ export function getOpenAIClientForEmbeddings(): OpenAI | null {
 
 // Use Replit AI Integrations for chat completions
 export function getOpenAIClient(): OpenAI | null {
+  const directKey = process.env.OPENAI_API_KEY;
+  if (directKey) {
+    return new OpenAI({ apiKey: directKey });
+  }
+
   const apiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
   const baseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
   
   if (!apiKey || !baseURL) {
-    console.log("[RAG] Chat completions not available (no AI Integrations configured)");
+    console.log("[RAG] Chat completions not available (no OpenAI key configured)");
     return null;
   }
   return new OpenAI({ apiKey, baseURL });
