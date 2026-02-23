@@ -777,7 +777,7 @@ export function AnalysisResults({
 
   if (loading || processingStep) {
     return wrapLayout(
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 5rem)' }}>
         <div className="text-center space-y-4">
           <Loader2 className={`w-8 h-8 ${adminColors ? 'text-purple-600' : 'text-hh-primary'} animate-spin mx-auto`} />
           <p className="text-hh-text font-medium">{processingStep || 'Resultaten laden...'}</p>
@@ -793,7 +793,7 @@ export function AnalysisResults({
 
   if (error || !result) {
     return wrapLayout(
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 5rem)' }}>
         <div className="text-center space-y-4">
           <AlertCircle className="w-8 h-8 text-hh-destructive mx-auto" />
           <p className="text-hh-text">{error || 'Geen resultaten gevonden'}</p>
@@ -816,7 +816,7 @@ export function AnalysisResults({
     const accentBgLight = adminColors ? 'rgba(153,16,250,0.08)' : 'rgba(60,154,110,0.08)';
     const accentBorder = adminColors ? 'rgba(153,16,250,0.2)' : 'rgba(60,154,110,0.2)';
     return wrapLayout(
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 5rem)' }}>
         <div className="text-center space-y-6 max-w-md">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ backgroundColor: accentBg }}>
             <MessageSquare className="w-8 h-8" style={{ color: accentColor }} />
