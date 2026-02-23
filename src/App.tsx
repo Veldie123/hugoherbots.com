@@ -130,7 +130,8 @@ export default function App() {
           const email = (session.user.email || '').toLowerCase();
           const isSuperAdmin = email === 'stephane@hugoherbots.com';
           const isHugoOnboarding = email === 'hugo@hugoherbots.com';
-          const userIsAdmin = isSuperAdmin;
+          const isHugobotsAdmin = email.endsWith('@hugoherbots.com') && !isHugoOnboarding;
+          const userIsAdmin = isSuperAdmin || isHugobotsAdmin;
           
           setIsAdmin(userIsAdmin);
           setOnboardingMode(isHugoOnboarding);
@@ -267,21 +268,21 @@ export default function App() {
           {currentPage === "preview" && <AppPreview navigate={navigate} />}
 
           {/* App pages - gebruik AppLayout's interne navigatie */}
-          {currentPage === "dashboard" && <Dashboard hasData={true} navigate={navigate} isAdmin={false} />}
-          {currentPage === "technieken" && <TechniqueLibrary navigate={navigate} isAdmin={false} />}
-          {currentPage === "roleplay" && <RolePlay navigate={navigate} isAdmin={false} />}
-          {currentPage === "roleplays" && <RolePlay navigate={navigate} isAdmin={false} />}
-          {currentPage === "roleplaychat" && <RolePlayChat navigate={navigate} isAdmin={false} />}
-          {currentPage === "roleplays-chat" && <RolePlayChat navigate={navigate} isAdmin={false} />}
-          {currentPage === "overviewprogress" && <OverviewProgress navigate={navigate} isAdmin={false} />}
-          {currentPage === "builder" && <ScenarioBuilder navigate={navigate} isAdmin={false} />}
-          {currentPage === "videos" && <VideoLibrary navigate={navigate} isAdmin={false} />}
-          {currentPage === "live" && <LiveCoaching navigate={navigate} isAdmin={false} />}
-          {currentPage === "team" && <TeamSessions navigate={navigate} isAdmin={false} />}
-          {currentPage === "analytics" && <Analytics navigate={navigate} isAdmin={false} />}
-          {currentPage === "settings" && <Settings navigate={navigate} initialSection={settingsSection} isAdmin={false} />}
-          {currentPage === "help" && <HelpCenter navigate={navigate} isAdmin={false} />}
-          {currentPage === "resources" && <Resources navigate={navigate} isAdmin={false} />}
+          {currentPage === "dashboard" && <Dashboard hasData={true} navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "technieken" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "roleplay" && <RolePlay navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "roleplays" && <RolePlay navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "roleplaychat" && <RolePlayChat navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "roleplays-chat" && <RolePlayChat navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "overviewprogress" && <OverviewProgress navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "builder" && <ScenarioBuilder navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "videos" && <VideoLibrary navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "live" && <LiveCoaching navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "team" && <TeamSessions navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "analytics" && <Analytics navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "settings" && <Settings navigate={navigate} initialSection={settingsSection} isAdmin={isAdmin} />}
+          {currentPage === "help" && <HelpCenter navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "resources" && <Resources navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "admin-dashboard" && <AdminDashboard navigate={navigate} />}
           {currentPage === "admin-videos" && <AdminVideoManagement navigate={navigate} />}
           {currentPage === "admin-live" && <AdminLiveSessions navigate={navigate} />}
@@ -304,16 +305,16 @@ export default function App() {
           {currentPage === "admin-analysis-results" && <AnalysisResults navigate={navigate} isAdmin={true} navigationData={navigationData} />}
           {currentPage === "admin-upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={true} />}
           {currentPage === "sso-validate" && <SSOValidate navigate={navigate} />}
-          {currentPage === "coaching" && <DigitalCoaching navigate={navigate} isAdmin={false} />}
-          {currentPage === "analysis" && <Analysis navigate={navigate} isAdmin={false} />}
-          {currentPage === "analysis-results" && <AnalysisResults navigate={navigate} isAdmin={false} navigationData={navigationData} />}
-          {currentPage === "upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={false} />}
-          {currentPage === "privacy-policy" && <PrivacyPolicy navigate={navigate} isAdmin={false} />}
-          {currentPage === "hugo-overview" && <HugoAIOverview navigate={navigate} isAdmin={false} />}
-          {currentPage === "talk-to-hugo" && <TalkToHugoAI navigate={navigate} isAdmin={false} />}
-          {currentPage === "techniques" && <TechniqueLibrary navigate={navigate} isAdmin={false} />}
-          {currentPage === "library" && <Library navigate={navigate} isAdmin={false} />}
-          {currentPage === "notifications" && <UserNotifications navigate={navigate} isAdmin={false} />}
+          {currentPage === "coaching" && <DigitalCoaching navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "analysis" && <Analysis navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "analysis-results" && <AnalysisResults navigate={navigate} isAdmin={isAdmin} navigationData={navigationData} />}
+          {currentPage === "upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "privacy-policy" && <PrivacyPolicy navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "hugo-overview" && <HugoAIOverview navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "talk-to-hugo" && <TalkToHugoAI navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "techniques" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "library" && <Library navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "notifications" && <UserNotifications navigate={navigate} isAdmin={isAdmin} />}
         </>
       )}
     </NotificationProvider>
