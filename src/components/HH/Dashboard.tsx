@@ -13,6 +13,7 @@ import {
   Loader2,
   CheckCircle,
   UserPlus,
+  Lock,
 } from "lucide-react";
 import { getDailyQuote } from "../../data/hugoQuotes";
 import { getTechniekByNummer } from "../../data/technieken-service";
@@ -69,7 +70,8 @@ const VideoCard = ({
   duration,
   progress,
   thumbnail,
-  onClick
+  onClick,
+  locked
 }: {
   title: string;
   techniqueNumber: string;
@@ -78,20 +80,21 @@ const VideoCard = ({
   progress: number;
   thumbnail?: string;
   onClick?: () => void;
+  locked?: boolean;
 }) => (
   <div 
-    className="flex-shrink-0 w-[200px] group cursor-pointer"
-    onClick={onClick}
+    className={`flex-shrink-0 w-[200px] group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+    onClick={locked ? undefined : onClick}
   >
     <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-ink to-hh-primary/80 aspect-video mb-2">
       {thumbnail ? (
-        <img src={thumbnail} alt={title} className="w-full h-full object-cover" loading="lazy" />
+        <img src={thumbnail} alt={title} className={`w-full h-full object-cover ${locked ? 'grayscale' : ''}`} loading="lazy" />
       ) : (
         <div className="w-full h-full flex items-center justify-center">
           <Play className="w-10 h-10 text-white/60" />
         </div>
       )}
-      {progress > 0 && (
+      {progress > 0 && !locked && (
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
           <div 
             className="h-full bg-hh-success" 
@@ -99,11 +102,17 @@ const VideoCard = ({
           />
         </div>
       )}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-        <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-          <Play className="w-6 h-6 text-hh-ink ml-0.5" />
+      {locked ? (
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <Lock className="w-6 h-6 text-white/80" />
         </div>
-      </div>
+      ) : (
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+          <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+            <Play className="w-6 h-6 text-hh-ink ml-0.5" />
+          </div>
+        </div>
+      )}
       <Badge className="absolute top-2 left-2 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
         {techniqueNumber}
       </Badge>
@@ -290,7 +299,26 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
   const { videos: realVideos, featuredVideo, loading: videosLoading } = useDashboardVideos();
   const { firstName, loginStreak, phaseProgress, totalCompleted, totalVideos } = useDashboardUserData();
   const displayName = isPreview ? "" : firstName;
-  
+
+  const getCompletedVideoIds = (): Set<string> => {
+    try {
+      const stored = localStorage.getItem('hh_completed_videos');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  };
+  const completedVideoIds = getCompletedVideoIds();
+  const allCompleted = completedVideoIds.size > 0 && realVideos.length > 0 && realVideos.every(v => completedVideoIds.has(v.id));
+
+  const isVideoUnlocked = (videoId: string): boolean => {
+    if (isAdmin || allCompleted) return true;
+    if (completedVideoIds.has(videoId)) return true;
+    if (realVideos.length === 0) return true;
+    if (realVideos[0].id === videoId) return true;
+    const idx = realVideos.findIndex(v => v.id === videoId);
+    if (idx <= 0) return true;
+    return completedVideoIds.has(realVideos[idx - 1].id);
+  };
+
   const upcomingWebinars = liveSessions
     .filter(s => s.status === "upcoming" || s.status === "live" || s.status === "scheduled")
     .slice(0, 5);
@@ -442,6 +470,7 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
             </div>
           ) : continueWatching.length > 0 ? (
             continueWatching.map((video, index) => {
+              const locked = !isVideoUnlocked(video.id);
               return (
               <VideoCard
                 key={video.id || index}
@@ -451,6 +480,7 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
                 duration={video.duration}
                 progress={video.progress || 0}
                 thumbnail={video.thumbnail}
+                locked={locked}
                 onClick={() => {
                   localStorage.setItem('currentVideoId', video.id);
                   navigate?.("videos");
