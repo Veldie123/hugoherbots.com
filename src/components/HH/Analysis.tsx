@@ -323,9 +323,9 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
             </div>
             <Button 
               className="gap-2 text-white shrink-0 hidden sm:flex"
-              style={{ backgroundColor: isAdmin ? '#7e22ce' : '#4F7396' }}
-              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#6b21a8' : '#3d6480')}
-              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#7e22ce' : '#4F7396')}
+              style={{ backgroundColor: isAdmin ? '#7e22ce' : '#059669' }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#6b21a8' : '#047857')}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#7e22ce' : '#059669')}
               onClick={() => navigate?.("upload-analysis")}
             >
               <Upload className="w-4 h-4 text-white" />
@@ -334,9 +334,9 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
           </div>
           <Button 
             className="gap-2 text-white w-full sm:hidden"
-            style={{ backgroundColor: isAdmin ? '#7e22ce' : '#4F7396' }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#6b21a8' : '#3d6480')}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#7e22ce' : '#4F7396')}
+            style={{ backgroundColor: isAdmin ? '#7e22ce' : '#059669' }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#6b21a8' : '#047857')}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#7e22ce' : '#059669')}
             onClick={() => navigate?.("upload-analysis")}
           >
             <Upload className="w-4 h-4 text-white" />
@@ -440,7 +440,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode("list")}
-                  style={viewMode === "list" ? { backgroundColor: isAdmin ? '#7e22ce' : '#4F7396', color: 'white' } : {}}
+                  style={viewMode === "list" ? { backgroundColor: isAdmin ? '#7e22ce' : '#059669', color: 'white' } : {}}
                   className={`hidden md:flex ${viewMode !== "list" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}`}
                 >
                   <List className="w-4 h-4 text-current" />
@@ -449,7 +449,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode("grid")}
-                  style={viewMode === "grid" ? { backgroundColor: isAdmin ? '#7e22ce' : '#4F7396', color: 'white' } : {}}
+                  style={viewMode === "grid" ? { backgroundColor: isAdmin ? '#7e22ce' : '#059669', color: 'white' } : {}}
                   className={`hidden md:flex ${viewMode !== "grid" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}`}
                 >
                   <LayoutGrid className="w-4 h-4 text-current" />
@@ -488,9 +488,9 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
               <p className="text-[14px] text-hh-muted mb-4">Upload een gesprek om je eerste analyse te starten</p>
               <Button 
                 className="gap-2 text-white"
-                style={{ backgroundColor: isAdmin ? '#7e22ce' : '#4F7396' }}
-                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#6b21a8' : '#3d6480')}
-                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#7e22ce' : '#4F7396')}
+                style={{ backgroundColor: isAdmin ? '#7e22ce' : '#059669' }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#6b21a8' : '#047857')}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#7e22ce' : '#059669')}
                 onClick={() => navigate?.("upload-analysis")}
               >
                 <Upload className="w-4 h-4 text-white" />
@@ -642,7 +642,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                             </DropdownMenuItem>
                             {conv.status === 'failed' && (
                               <DropdownMenuItem onClick={() => retryAnalysis(conv.id)}>
-                                <RotateCcw className="w-4 h-4 mr-2" style={{ color: isAdmin ? '#7e22ce' : '#4F7396' }} />
+                                <RotateCcw className="w-4 h-4 mr-2" style={{ color: isAdmin ? '#7e22ce' : '#059669' }} />
                                 Opnieuw proberen
                               </DropdownMenuItem>
                             )}
@@ -696,7 +696,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                         </DropdownMenuItem>
                         {conv.status === 'failed' && (
                           <DropdownMenuItem onClick={() => retryAnalysis(conv.id)}>
-                            <RotateCcw className="w-4 h-4 mr-2" style={{ color: isAdmin ? '#7e22ce' : '#4F7396' }} />
+                            <RotateCcw className="w-4 h-4 mr-2" style={{ color: isAdmin ? '#7e22ce' : '#059669' }} />
                             Opnieuw proberen
                           </DropdownMenuItem>
                         )}
@@ -759,7 +759,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                         </DropdownMenuItem>
                         {conv.status === 'failed' && (
                           <DropdownMenuItem onClick={() => retryAnalysis(conv.id)}>
-                            <RotateCcw className="w-4 h-4 mr-2" style={{ color: isAdmin ? '#7e22ce' : '#4F7396' }} />
+                            <RotateCcw className="w-4 h-4 mr-2" style={{ color: isAdmin ? '#7e22ce' : '#059669' }} />
                             Opnieuw proberen
                           </DropdownMenuItem>
                         )}
