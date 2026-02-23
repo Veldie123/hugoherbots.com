@@ -1470,7 +1470,7 @@ export function AdminChatExpertMode({
                               key={card.id}
                               onClick={() => {
                                 sessionStorage.setItem('analysisFromHugo', 'true');
-                                navigate?.(`analysis-results-${card.id}`);
+                                navigate?.('admin-analysis-results', { conversationId: card.id });
                               }}
                               className="w-full text-left p-3 rounded-lg border transition-all hover:shadow-sm"
                               style={{

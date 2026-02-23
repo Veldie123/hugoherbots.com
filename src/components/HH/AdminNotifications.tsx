@@ -482,7 +482,10 @@ export function AdminNotifications({ navigate }: AdminNotificationsProps) {
                             size="sm"
                             variant="outline"
                             className="h-6 text-[11px] px-2 border-purple-300 text-purple-700 hover:bg-purple-50"
-                            onClick={() => navigate(notification.action as string)}
+                            onClick={() => {
+                              const action = notification.action as string;
+                              navigate(action.startsWith('admin-') ? action : `admin-${action}`);
+                            }}
                           >
                             Bekijk
                           </Button>

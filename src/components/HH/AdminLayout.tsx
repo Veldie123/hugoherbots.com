@@ -310,7 +310,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                               if (historyType === "chat") {
                                 navigate?.('admin-chat-expert', { sessionId: histItem.id });
                               } else {
-                                navigate?.('analysis-results', { conversationId: histItem.id });
+                                navigate?.('admin-analysis-results', { conversationId: histItem.id });
                               }
                               setMobileMenuOpen(false);
                             }}
@@ -443,7 +443,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                           if (historyType === "chat") {
                             navigate?.('admin-chat-expert', { sessionId: histItem.id });
                           } else {
-                            navigate?.('analysis-results', { conversationId: histItem.id });
+                            navigate?.('admin-analysis-results', { conversationId: histItem.id });
                           }
                         }}
                         className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left hover:bg-purple-50 transition-colors group cursor-pointer"

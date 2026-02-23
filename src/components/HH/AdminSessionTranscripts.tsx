@@ -71,7 +71,7 @@ export function AdminSessionTranscripts({ navigate }: AdminSessionTranscriptsPro
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const openTranscriptDialog = (session: Session) => {
     if (navigate) {
-      navigate("analysis-results", { conversationId: session.id.toString(), fromAdmin: true });
+      navigate("admin-analysis-results", { conversationId: session.id.toString(), fromAdmin: true });
     }
   };
   const [sortField, setSortField] = useState<"user" | "score" | "date" | null>(null);
@@ -247,7 +247,7 @@ export function AdminSessionTranscripts({ navigate }: AdminSessionTranscriptsPro
 
   const viewTranscript = (session: any) => {
     if (navigate) {
-      navigate("analysis-results", { conversationId: session.id.toString(), fromAdmin: true });
+      navigate("admin-analysis-results", { conversationId: session.id.toString(), fromAdmin: true });
     }
   };
 

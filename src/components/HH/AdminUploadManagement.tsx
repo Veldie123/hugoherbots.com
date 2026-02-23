@@ -207,7 +207,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
 
   const openTranscript = (upload: UploadItem) => {
     if (upload.status === 'completed') {
-      navigate?.('analysis-results', { conversationId: upload.id, fromAdmin: true });
+      navigate?.('admin-analysis-results', { conversationId: upload.id, fromAdmin: true });
     }
   };
 

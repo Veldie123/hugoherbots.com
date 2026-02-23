@@ -53,7 +53,7 @@ import { AdminChatExpertMode } from "./components/HH/AdminChatExpertMode";
 import { AdminRAGReview } from "./components/HH/AdminRAGReview";
 import { AdminConflicts } from "./components/HH/AdminConflicts";
 import { SSOValidate } from "./components/HH/SSOValidate";
-type Page = "landing" | "pricing" | "about" | "login" | "signup" | "authcallback" | "preview" | "onboarding" | "dashboard" | "technieken" | "techniques" | "coaching" | "roleplay" | "roleplays" | "roleplaychat" | "roleplays-chat" | "overviewprogress" | "builder" | "videos" | "live" | "team" | "analytics" | "settings" | "analysis" | "analysis-results" | "upload-analysis" | "privacy-policy" | "help" | "resources" | "hugo-overview" | "talk-to-hugo" | "library" | "notifications" | "admin-dashboard" | "admin-videos" | "admin-live" | "admin-progress" | "admin-users" | "admin-techniques" | "admin-transcripts" | "admin-uploads" | "admin-content" | "admin-analytics" | "admin-settings" | "admin-help" | "admin-resources" | "admin-sessions" | "admin-config-review" | "admin-notifications" | "admin-chat-expert" | "admin-rag-review" | "admin-conflicts" | "admin-analysis-results" | "sso-validate";
+type Page = "landing" | "pricing" | "about" | "login" | "signup" | "authcallback" | "preview" | "onboarding" | "dashboard" | "technieken" | "techniques" | "coaching" | "roleplay" | "roleplays" | "roleplaychat" | "roleplays-chat" | "overviewprogress" | "builder" | "videos" | "live" | "team" | "analytics" | "settings" | "analysis" | "analysis-results" | "upload-analysis" | "privacy-policy" | "help" | "resources" | "hugo-overview" | "talk-to-hugo" | "library" | "notifications" | "admin-dashboard" | "admin-videos" | "admin-live" | "admin-progress" | "admin-users" | "admin-techniques" | "admin-transcripts" | "admin-uploads" | "admin-content" | "admin-analytics" | "admin-settings" | "admin-help" | "admin-resources" | "admin-sessions" | "admin-config-review" | "admin-notifications" | "admin-chat-expert" | "admin-rag-review" | "admin-conflicts" | "admin-analysis-results" | "admin-upload-analysis" | "sso-validate";
 
 export default function App() {
   // Development screenshot bypass: check URL path immediately (synchronously)
@@ -293,6 +293,7 @@ export default function App() {
           {currentPage === "admin-rag-review" && <AdminRAGReview navigate={navigate} currentPage={currentPage} />}
           {currentPage === "admin-conflicts" && <AdminConflicts navigate={navigate} />}
           {currentPage === "admin-analysis-results" && <AnalysisResults navigate={navigate} isAdmin={true} navigationData={navigationData} />}
+          {currentPage === "admin-upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={true} />}
           {currentPage === "sso-validate" && <SSOValidate navigate={navigate} />}
           {currentPage === "coaching" && <DigitalCoaching navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "analysis" && <Analysis navigate={navigate} isAdmin={isAdmin} />}

@@ -246,7 +246,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
               style={{ backgroundColor: '#7e22ce' }}
               onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#6b21a8')}
               onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#7e22ce')}
-              onClick={() => navigate?.("upload-analysis")}
+              onClick={() => navigate?.("admin-upload-analysis")}
             >
               <Upload className="w-4 h-4" />
               Analyseer gesprek
