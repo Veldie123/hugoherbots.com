@@ -101,7 +101,6 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
   useEffect(() => {
     // Lijst van "diepere" pagina's waar de sidebar automatisch inklapt
     const subPages = [
-      "admin-chat-expert",
       "admin-sessions-detail",
       "admin-video-detail",
       "admin-user-detail",
