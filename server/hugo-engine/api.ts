@@ -196,6 +196,7 @@ interface Session {
   createdAt: Date;
   userId?: string;
   userName?: string;
+  viewMode?: "admin" | "user";
 }
 
 const sessions = new Map<string, Session>();
@@ -215,7 +216,8 @@ async function saveSessionToDb(session: Session): Promise<void> {
       context: session.contextState.gathered,
       dialogue_state: { 
         questionsAsked: session.contextState.questionsAsked, 
-        questionsAnswered: session.contextState.questionsAnswered 
+        questionsAnswered: session.contextState.questionsAnswered,
+        viewMode: session.viewMode || 'user'
       },
       persona: { name: session.userName },
       turn_number: session.conversationHistory.length,
@@ -277,7 +279,8 @@ async function loadSessionFromDb(sessionId: string): Promise<Session | null> {
       isExpert: row.expert_mode === 1,
       createdAt: new Date(row.created_at),
       userId: row.user_id,
-      userName: row.persona?.name
+      userName: row.persona?.name,
+      viewMode: dialogueState.viewMode || 'user'
     };
   } catch (error: any) {
     console.error("[API] Error loading session from DB:", error.message);
@@ -333,7 +336,7 @@ app.get("/api/technieken", async (req, res) => {
 // Start a new session with FULL engine
 app.post("/api/v2/sessions", async (req, res) => {
   try {
-    const { techniqueId, mode = "COACH_CHAT", isExpert = false, userId, userName } = req.body;
+    const { techniqueId, mode = "COACH_CHAT", isExpert = false, userId, userName, viewMode } = req.body;
     
     if (!techniqueId) {
       return res.status(400).json({ error: "techniqueId is required" });
@@ -388,7 +391,6 @@ app.post("/api/v2/sessions", async (req, res) => {
       console.warn("[API] Could not load existing context:", contextError.message);
     }
     
-    // Create session - always start with context gathering
     const session: Session = {
       id: sessionId,
       mode: "CONTEXT_GATHERING",
@@ -399,7 +401,8 @@ app.post("/api/v2/sessions", async (req, res) => {
       isExpert,
       createdAt: new Date(),
       userId,
-      userName
+      userName,
+      viewMode: viewMode === 'admin' ? 'admin' : 'user'
     };
     
     sessions.set(sessionId, session);
@@ -409,14 +412,21 @@ app.post("/api/v2/sessions", async (req, res) => {
       userId,
       techniqueId,
       techniqueName,
-      userName
+      userName,
+      viewMode: viewMode === 'admin' ? 'admin' : 'user'
     };
     
-    // For context gathering, generate first question
-    const nextSlot = getNextSlotKey(contextState);
+    // For admin mode, skip context gathering entirely — go straight to COACH_CHAT
+    const isAdminSession = viewMode === 'admin';
+    const nextSlot = isAdminSession ? null : getNextSlotKey(contextState);
     let initialMessage: string;
     
-    if (nextSlot) {
+    if (isAdminSession) {
+      session.mode = "COACH_CHAT";
+      session.contextState.isComplete = true;
+      const openingResult = await generateCoachOpening(coachContext);
+      initialMessage = openingResult.message;
+    } else if (nextSlot) {
       const questionResult = await generateQuestionForSlot(
         nextSlot,
         contextState.gathered,
@@ -546,6 +556,7 @@ app.post("/api/v2/message", async (req, res) => {
             product: session.contextState.gathered.product,
             klantType: session.contextState.gathered.klant_type,
             sessionContext: session.contextState.gathered,
+            viewMode: session.viewMode || 'user',
             contextGatheringHistory: session.conversationHistory.map(m => ({
               role: m.role === 'user' ? 'seller' as const : 'customer' as const,
               content: m.content
@@ -611,7 +622,8 @@ app.post("/api/v2/message", async (req, res) => {
           sector: session.contextState.gathered.sector,
           product: session.contextState.gathered.product,
           klantType: session.contextState.gathered.klant_type,
-          sessionContext: session.contextState.gathered
+          sessionContext: session.contextState.gathered,
+          viewMode: session.viewMode || 'user'
         };
         
         const coachResult = await generateCoachResponse(
@@ -649,7 +661,8 @@ app.post("/api/v2/message", async (req, res) => {
           sector: session.contextState.gathered.sector,
           product: session.contextState.gathered.product,
           klantType: session.contextState.gathered.klant_type,
-          sessionContext: session.contextState.gathered
+          sessionContext: session.contextState.gathered,
+          viewMode: session.viewMode || 'user'
         };
         
         const roleplayResult = await generateCoachResponse(
@@ -780,7 +793,29 @@ app.post("/api/v2/session/message", async (req, res) => {
     };
     
     // Route to the correct engine based on mode
-    switch (session.mode) {
+    const isAdminView = session.viewMode === 'admin';
+
+    let msgIntentResult: ReturnType<typeof detectIntent> | null = null;
+    let hasTechniqueOrContentIntent = false;
+
+    msgIntentResult = detectIntent(
+      message,
+      session.conversationHistory.map(m => ({ role: m.role, content: m.content })),
+      session.techniqueId,
+      undefined
+    );
+
+    hasTechniqueOrContentIntent = !!(msgIntentResult.detectedTechniqueId || 
+      msgIntentResult.shouldSuggestVideo || 
+      msgIntentResult.contentSuggestions.some(s => s.type === 'webinar'));
+
+    if (hasTechniqueOrContentIntent) {
+      console.log(`[API] Intent detected (${isAdminView ? 'admin' : 'user'}): technique=${msgIntentResult.detectedTechniqueName} (${msgIntentResult.detectedTechniqueId}), wantsVideo=${msgIntentResult.shouldSuggestVideo}, mode=${session.mode}`);
+    }
+
+    const shouldShortCircuitToCoach = isAdminView && session.mode === 'CONTEXT_GATHERING' && hasTechniqueOrContentIntent;
+
+    switch (shouldShortCircuitToCoach ? 'COACH_SHORTCIRCUIT' : session.mode) {
       case "CONTEXT_GATHERING": {
         const currentSlot = session.contextState.currentQuestionKey;
         
@@ -805,6 +840,7 @@ app.post("/api/v2/session/message", async (req, res) => {
             product: session.contextState.gathered.product,
             klantType: session.contextState.gathered.klant_type,
             sessionContext: session.contextState.gathered,
+            viewMode: session.viewMode || 'user',
             contextGatheringHistory: session.conversationHistory.map(m => ({
               role: m.role === 'user' ? 'seller' as const : 'customer' as const,
               content: m.content
@@ -845,21 +881,32 @@ app.post("/api/v2/session/message", async (req, res) => {
         break;
       }
       
+      case "COACH_SHORTCIRCUIT":
       case "COACH_CHAT":
       case "ROLEPLAY": {
+        const effectiveTechId = msgIntentResult?.detectedTechniqueId || session.techniqueId;
+        const effectiveTechName = msgIntentResult?.detectedTechniqueName || session.techniqueName;
+
         const coachContext: CoachContext = {
           userId: session.userId,
-          techniqueId: session.techniqueId,
-          techniqueName: session.techniqueName,
+          techniqueId: effectiveTechId,
+          techniqueName: effectiveTechName,
           userName: session.userName,
           sector: session.contextState.gathered.sector,
           product: session.contextState.gathered.product,
           klantType: session.contextState.gathered.klant_type,
           sessionContext: session.contextState.gathered,
+          viewMode: session.viewMode || 'user',
           contextGatheringHistory: session.conversationHistory.map(m => ({
             role: m.role === 'user' ? 'seller' as const : 'customer' as const,
             content: m.content
-          }))
+          })),
+          ...(msgIntentResult ? {
+            detectedTechniqueId: msgIntentResult.detectedTechniqueId,
+            detectedTechniqueName: msgIntentResult.detectedTechniqueName,
+            userWantsVideo: msgIntentResult.shouldSuggestVideo,
+            userWantsWebinar: msgIntentResult.contentSuggestions.some(s => s.type === 'webinar'),
+          } : {}),
         };
         
         const coachHistory: CoachMessage[] = session.conversationHistory.map(m => ({
@@ -872,6 +919,11 @@ app.post("/api/v2/session/message", async (req, res) => {
         validatorInfo = coachResult.validatorInfo;
         promptsUsed = coachResult.promptsUsed;
         ragDocuments = coachResult.ragContext || [];
+
+        if (shouldShortCircuitToCoach) {
+          session.mode = "COACH_CHAT";
+          session.contextState.isComplete = true;
+        }
         break;
       }
       
@@ -888,9 +940,32 @@ app.post("/api/v2/session/message", async (req, res) => {
     // Save updated session
     await saveSessionToDb(session);
     
-    // Build rich content for COACH_CHAT mode
     let richContent: any[] = [];
-    if (session.mode === 'COACH_CHAT' || session.mode === 'ROLEPLAY') {
+
+    if (msgIntentResult && msgIntentResult.contentSuggestions.length > 0) {
+      const rcTechId = msgIntentResult.detectedTechniqueId || session.techniqueId;
+      const rcTechName = msgIntentResult.detectedTechniqueName || session.techniqueName;
+      try {
+        const richResponse = await buildRichResponse(
+          responseText,
+          msgIntentResult,
+          {
+            techniqueId: rcTechId,
+            techniqueName: rcTechName,
+            phase: session.mode,
+            userId: session.userId,
+            gatheredContext: session.contextState.gathered,
+          }
+        );
+        if (richResponse.richContent && richResponse.richContent.length > 0) {
+          richContent = richResponse.richContent;
+        }
+      } catch (err: any) {
+        console.log('[API] Rich content from intent skipped:', err.message);
+      }
+    }
+
+    if (richContent.length === 0 && (session.mode === 'COACH_CHAT' || session.mode === 'ROLEPLAY')) {
       try {
         const { buildEpicSlideRichContent } = await import('./v2/epic-slides-service');
         const slides = buildEpicSlideRichContent(
@@ -1523,7 +1598,8 @@ app.post("/api/session/:sessionId/message/stream", async (req, res) => {
       sector: session.contextState.gathered.sector,
       product: session.contextState.gathered.product,
       klantType: session.contextState.gathered.klant_type,
-      sessionContext: session.contextState.gathered
+      sessionContext: session.contextState.gathered,
+      viewMode: session.viewMode || 'user'
     };
     
     await generateCoachResponseStream(

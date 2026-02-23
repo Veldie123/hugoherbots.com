@@ -1,6 +1,41 @@
 import { contentAssetLibrary, type ContentAsset } from './content-assets';
 import { type IntentResult } from './intent-detector';
 import { getSlidesForTechnique, buildEpicSlideRichContent } from './epic-slides-service';
+import fs from 'fs';
+import path from 'path';
+
+let videoMappingCache: Record<string, any> | null = null;
+function getVideoMappingFallback(techniqueId: string): RichContentItem | null {
+  try {
+    if (!videoMappingCache) {
+      const raw = fs.readFileSync(path.resolve('config/video_mapping.json'), 'utf-8');
+      const parsed = JSON.parse(raw);
+      videoMappingCache = parsed.videos || {};
+    }
+    const normalizedId = techniqueId.replace(/\.\d+$/, '');
+    for (const [, video] of Object.entries(videoMappingCache!)) {
+      const v = video as any;
+      if (!v.techniek || v.status === 'deleted' || v.is_hidden || !v.has_mux) continue;
+      const vTech = String(v.techniek).replace(/\.\d+$/, '');
+      if (vTech === normalizedId) {
+        return {
+          type: 'video',
+          data: {
+            title: v.title || v.techniek_naam || 'Training video',
+            description: v.techniek_naam || '',
+            muxPlaybackId: v.mux_playback_id,
+            thumbnailUrl: `https://image.mux.com/${v.mux_playback_id}/thumbnail.webp?width=640`,
+            duration: v.duration_seconds,
+            techniqueId: techniqueId,
+          },
+        };
+      }
+    }
+  } catch (err) {
+    console.error('[RichResponse] video_mapping fallback error:', err);
+  }
+  return null;
+}
 
 export interface RichContentItem {
   type: 'card' | 'video' | 'slide' | 'webinar' | 'action' | 'roleplay' | 'epic_slide';
@@ -126,6 +161,14 @@ export async function buildRichResponse(
             techniqueId: targetTechnique,
             assetId: videoAssets[0].id,
           }));
+        } else {
+          const fallbackVideo = getVideoMappingFallback(targetTechnique);
+          if (fallbackVideo) {
+            richContent.push(fallbackVideo);
+            richContent.push(buildActionButton('Bekijk video', 'watch_video', {
+              techniqueId: targetTechnique,
+            }));
+          }
         }
         break;
       }

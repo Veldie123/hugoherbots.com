@@ -39,6 +39,7 @@ import {
   getVideosForTechnique
 } from "./prompt-context";
 import { mergeUserAndSessionContext, getRequiredSlotsForTechnique } from './context_engine';
+import { getVideoLibraryStats, buildVideoStatsPrompt } from './content-assets';
 import { storage } from '../storage';
 import { buildCoachingPrompt, buildFeedbackPrompt, getHugoIdentity, getHugoRole } from '../hugo-persona-loader';
 import { getHistoricalContext, type HistoricalContext } from './historical-context-service';
@@ -127,7 +128,7 @@ function buildBaseSystemPrompt(): string {
 }
 
 // Build system prompt for regular chat responses
-function buildSystemPrompt(ragContextStr: string, videoContextStr: string): string {
+async function buildSystemPrompt(ragContextStr: string, videoContextStr: string): Promise<string> {
   const hugoPrompt = buildCoachingPrompt(ragContextStr);
   
   let prompt = hugoPrompt + "\n\n";
@@ -138,7 +139,15 @@ function buildSystemPrompt(ragContextStr: string, videoContextStr: string): stri
   }
   
   prompt += INLINE_DEFAULTS.rag_context_header + "\n" + ragContextStr + "\n\n";
-  prompt += INLINE_DEFAULTS.video_context_header + "\n" + videoContextStr + "\n\n";
+  prompt += INLINE_DEFAULTS.video_context_header + "\n";
+
+  const videoStats = await getVideoLibraryStats();
+  prompt += buildVideoStatsPrompt(videoStats) + "\n";
+
+  if (videoContextStr && videoContextStr !== INLINE_DEFAULTS.no_videos_available) {
+    prompt += "Specifiek voor deze context:\n" + videoContextStr + "\n";
+  }
+  prompt += "\n";
   prompt += "Verwijs naar video's wanneer relevant, maar parafraseer of citeer niet letterlijk - het is jouw eigen kennis.";
   
   return prompt;
@@ -199,7 +208,9 @@ function buildNestedOpeningPrompt(
   videoContextStr: string,
   ragContextStr: string,
   userName?: string,
-  techniqueId?: string
+  techniqueId?: string,
+  videoStatsPromptStr?: string,
+  viewMode?: 'admin' | 'user'
 ): string {
   let prompt = "";
   
@@ -238,11 +249,13 @@ function buildNestedOpeningPrompt(
   prompt += "Waar je op let per techniek.\n";
   prompt += buildEvaluationCriteria(techniqueId) + "\n\n";
   
+  prompt += "── TRAININGSVIDEO'S ──\n";
+  prompt += (videoStatsPromptStr || "Je hebt trainingsvideo's beschikbaar per techniek.") + "\n";
   if (videoContextStr && videoContextStr !== INLINE_DEFAULTS.no_videos_available) {
-    prompt += "── TRAININGSVIDEO'S ──\n";
-    prompt += "Beschikbare video's per techniek.\n";
-    prompt += videoContextStr + "\n\n";
+    prompt += "Specifiek voor deze context:\n";
+    prompt += videoContextStr + "\n";
   }
+  prompt += "\n";
   
   if (ragContextStr && ragContextStr !== INLINE_DEFAULTS.no_context_found) {
     prompt += "── JOUW WOORDEN EN STIJL ──\n";
@@ -266,7 +279,10 @@ function buildNestedOpeningPrompt(
   prompt += "══════════════════════════════════════════════════════════════\n";
   prompt += "Dit is de concrete situatie waarin je je nu bevindt.\n\n";
   
-  if (coacheeContext) {
+  if (viewMode === 'admin') {
+    prompt += "── DE GEBRUIKER ──\n";
+    prompt += "Hugo Herbots — eigenaar, bedenker van EPIC sales methodologie, platformarchitect. GEEN coachee.\n\n";
+  } else if (coacheeContext) {
     prompt += "── DE COACHEE ──\n";
     prompt += coacheeContext + "\n\n";
   }
@@ -294,10 +310,32 @@ function buildNestedOpeningPrompt(
   const techName = technique?.naam || "de geselecteerde techniek";
   const displayName = userName || "de coachee";
   
-  prompt += `Je zit met ${displayName} aan tafel. Dit is een echt gesprek, een dialoog. Praat zoals je zou praten, niet zoals je zou schrijven.\n\n`;
+  if (viewMode === 'admin') {
+    prompt += `── ADMIN MODUS — JE SPREEKT MET HUGO HERBOTS ZELF ──
+Je spreekt nu met Hugo Herbots, de eigenaar en bedenker van dit platform én van de EPIC sales methodologie.
+Hugo Herbots is NIET een coachee, student of verkoper. Hij is jouw schepper — degene die deze methodologie heeft ontwikkeld.
+
+REGELS IN ADMIN MODUS:
+- Behandel Hugo als de eigenaar/architect van het platform. Hij kent de methodologie beter dan wie ook.
+- Vraag NOOIT naar zijn ervaringsniveau, sector, product, of klanttype. Dat is irrelevant.
+- Vraag NOOIT "wie ben je?" of "wat is je rol?". Je weet altijd dat je met Hugo Herbots spreekt.
+- Als Hugo vraagt om video's te tonen, toon ze gewoon. Geen onnodige vragen.
+- De video's volgen de EPIC volgorde: per fase (0 Pre-contact → 1 Opening → 2 Ontdekking → 3 Aanbeveling → 4 Beslissing), en binnen elke fase per techniek-nummer (bijv. 1.1, 1.2, 1.3, dan 2.1, 2.1.1, etc.).
+- Er IS een cursusvolgorde — die volgt exact de technieken-nummering in de EPIC methodologie.
+- Je bent een intelligente assistent voor de platformeigenaar. Help met vragen over content, technieken, video's, en platformfunctionaliteit.
+- Wees direct, efficiënt en to-the-point. Geen coaching-vragen, geen Socratische methode richting Hugo.
+
+Dit is een echt gesprek met de baas. Praat zoals je zou praten tegen je schepper.\n\n`;
+  } else {
+    prompt += `Je zit met ${displayName} aan tafel. Dit is een echt gesprek, een dialoog. Praat zoals je zou praten, niet zoals je zou schrijven.\n\n`;
+  }
   
   const doel = getDoel();
-  prompt += `── DOEL ──\n${doel.replace("{{techniek_naam}}", techName)}`;
+  if (viewMode !== 'admin') {
+    prompt += `── DOEL ──\n${doel.replace("{{techniek_naam}}", techName)}`;
+  } else {
+    prompt += `── DOEL ──\nHelp Hugo Herbots met wat hij vraagt. Wees direct en behulpzaam.`;
+  }
   
   return prompt;
 }
@@ -471,6 +509,11 @@ export interface CoachContext {
   klantType?: string;
   sessionContext?: Record<string, string>;
   contextGatheringHistory?: Array<{ role: 'seller' | 'customer'; content: string }>;
+  detectedTechniqueId?: string;
+  detectedTechniqueName?: string;
+  userWantsVideo?: boolean;
+  userWantsWebinar?: boolean;
+  viewMode?: 'admin' | 'user';
 }
 
 export interface CoachResponse {
@@ -503,17 +546,23 @@ async function prepareCoachPrompt(
   userMessage: string,
   conversationHistory: CoachMessage[],
   context: CoachContext = {}
-): Promise<{ messages: CoachMessage[]; enhancedSystemPrompt: string; ragResult: any; ragQuery: string }> {
+): Promise<{ messages: CoachMessage[]; enhancedSystemPrompt: string; ragResult: any; ragQuery: string; validatorHints: string[] }> {
+  const effectiveTechniqueId = context.detectedTechniqueId || context.techniqueId;
+  const effectiveTechniqueName = context.detectedTechniqueName || context.techniqueName;
+
   let ragQuery = userMessage;
-  if (context.techniqueName) {
+  if (effectiveTechniqueName) {
+    ragQuery = `${effectiveTechniqueName}: ${userMessage}`;
+  } else if (context.techniqueName) {
     ragQuery = `${context.techniqueName}: ${userMessage}`;
   }
 
   const [ragResult, videoContextStr] = await Promise.all([
     searchRag(ragQuery, { limit: 4, threshold: 0.3 }),
     (async () => {
-      if (context.techniqueId) {
-        const videos = getVideosForTechnique(context.techniqueId);
+      const techId = effectiveTechniqueId || context.techniqueId;
+      if (techId) {
+        const videos = getVideosForTechnique(techId);
         if (videos.length > 0) {
           return videos.map(v => `- "${v.title}": ${v.beschrijving}`).join("\n");
         }
@@ -531,16 +580,60 @@ async function prepareCoachPrompt(
     ragContextStr = INLINE_DEFAULTS.no_context_found;
   }
 
-  const systemPrompt = buildSystemPrompt(ragContextStr, videoContextStr);
+  const systemPrompt = await buildSystemPrompt(ragContextStr, videoContextStr);
 
   let enhancedSystemPrompt = systemPrompt;
+
+  if (context.viewMode === 'admin') {
+    enhancedSystemPrompt += `\n\n══ ADMIN MODUS ══
+Je spreekt met Hugo Herbots, de eigenaar en bedenker van dit platform en de EPIC sales methodologie.
+- Behandel Hugo als de eigenaar/architect. Hij kent de methodologie beter dan wie ook.
+- Vraag NOOIT naar ervaringsniveau, sector, product, klanttype, of "wie ben je?".
+- De video's volgen de EPIC volgorde: per fase (0→1→2→3→4), binnen elke fase per techniek-nummer.
+- Er IS een cursusvolgorde die exact de technieken-nummering volgt.
+- Wees direct, efficiënt en behulpzaam. Geen coaching-vragen richting Hugo.`;
+  }
   
-  if (context.techniqueName) {
+  if (context.detectedTechniqueId && context.detectedTechniqueName) {
+    enhancedSystemPrompt += `\n\n**HERKENDE TECHNIEK IN GEBRUIKERSBERICHT:**
+De gebruiker noemt "${context.detectedTechniqueName}" — dit is techniek ${context.detectedTechniqueId} uit jouw EPIC methodologie.`;
+    try {
+      const techData = getTechnique(context.detectedTechniqueId);
+      if (techData) {
+        const fase = parseInt(context.detectedTechniqueId.split('.')[0]);
+        const faseNamen: Record<number, string> = { 1: 'Openingsfase (E)', 2: 'Probleemanalyse (P)', 3: 'Implicatie/Aanbeveling (I)', 4: 'Beslissingsfase (C)' };
+        enhancedSystemPrompt += `
+Techniek: ${techData.naam} (${context.detectedTechniqueId})
+Fase: ${faseNamen[fase] || `Fase ${fase}`}`;
+        if (techData.doel) {
+          enhancedSystemPrompt += `\nDoel: ${techData.doel}`;
+        }
+        if (techData.wat) {
+          enhancedSystemPrompt += `\nWat: ${techData.wat}`;
+        }
+        if (techData.hoe) {
+          enhancedSystemPrompt += `\nHoe: ${techData.hoe}`;
+        }
+        if (techData.voorbeeld && techData.voorbeeld.length > 0) {
+          enhancedSystemPrompt += `\nVoorbeeld: "${techData.voorbeeld[0]}"`;
+        }
+      }
+    } catch (e) {}
+    enhancedSystemPrompt += `\nAntwoord inhoudelijk over deze techniek. Noem het nummer (${context.detectedTechniqueId}) en de naam. Leg kort uit wat het is en wanneer je het gebruikt.`;
+    if (context.userWantsVideo) {
+      enhancedSystemPrompt += `\nDe gebruiker vraagt ook om een VIDEO. Zeg: "Hier is een video over ${context.detectedTechniqueName}" — het systeem voegt de video automatisch toe aan je antwoord.`;
+    }
+  } else if (context.techniqueName) {
     enhancedSystemPrompt += `\n\nHuidige focus: ${context.techniqueName}`;
     if (context.techniqueId) {
       enhancedSystemPrompt += ` (${context.techniqueId})`;
     }
   }
+
+  if (context.userWantsWebinar) {
+    enhancedSystemPrompt += `\n\n**WEBINAR VERZOEK GEDETECTEERD:** De gebruiker vraagt over webinars. Er is momenteel GEEN webinar-agenda beschikbaar in het systeem. ANTWOORD DIRECT en EERLIJK: "Op dit moment heb ik geen webinar-agenda beschikbaar." Bied daarna aan om direct te helpen. Dit is GEEN moment om Socratisch door te vragen — de gebruiker stelt een feitelijke vraag die een feitelijk antwoord verdient.`;
+  }
+
   if (context.sector) {
     enhancedSystemPrompt += `\nSector van coachee: ${context.sector}`;
   }
@@ -555,7 +648,9 @@ async function prepareCoachPrompt(
 - Als de gebruiker een letter antwoordt (A, B, C, D) of een nummer (1, 2, 3), koppel dit aan de opties uit jouw VORIGE bericht. Reageer direct op die keuze zonder opnieuw te vragen wat ze bedoelen.
 - Houd antwoorden kort en concreet. Maximaal 3-4 zinnen tenzij uitleg echt nodig is. Geen lange opsommingen.
 - Als de gebruiker een audiobestand heeft bijgevoegd met een verzoek om te analyseren, zeg dan iets als: "Top, ik ga dat voor je analyseren!" Het systeem handelt de analyse automatisch af — jij hoeft de gebruiker NIET te verwijzen naar een ander menu of pagina. Jij BENT de agent die het regelt.
-- Als de gebruiker vraagt om een video of webinar te bekijken over een techniek, toon die dan inline. Het systeem voegt automatisch video's en webinars toe aan je antwoord wanneer relevant.`;
+- Als de gebruiker vraagt om een video te bekijken over een techniek, toon die dan inline. Het systeem voegt automatisch video's toe aan je antwoord wanneer relevant. Zeg NOOIT "ik kan geen video's afspelen" — het platform kan dat WEL. Zeg gewoon "Hier is een video over [techniek]" en het systeem regelt de rest.
+- TECHNIEK HERKENNING: Als de gebruiker een techniek noemt bij naam (bijv. "probe", "instapvraag", "gentleman's agreement", "OVB", "ABC", "koopklimaat", etc.), herken die dan METEEN als jouw eigen EPIC techniek. Noem het techniknummer en de naam. Antwoord inhoudelijk vanuit je methodologie — leg uit wat het is, wanneer je het gebruikt, en geef een concreet voorbeeld. Vraag NIET "wat bied jij aan?" of "wat is jouw product?" — dat is irrelevant als iemand over een specifieke techniek wil praten.
+- WEBINARS: Er is momenteel GEEN webinar-agenda in het systeem. Als de gebruiker vraagt over webinars, wees direct eerlijk: "Op dit moment heb ik geen webinar-agenda beschikbaar. Maar ik kan je nu al helpen met [het onderwerp] — zullen we er meteen mee aan de slag gaan?"`;
 
   const messages: CoachMessage[] = [
     { role: "system", content: enhancedSystemPrompt },
@@ -563,7 +658,18 @@ async function prepareCoachPrompt(
     { role: "user", content: userMessage },
   ];
 
-  return { messages, enhancedSystemPrompt, ragResult, ragQuery };
+  const validatorHints: string[] = [];
+  if (context.userWantsWebinar) {
+    validatorHints.push("UITZONDERING: De gebruiker stelt een feitelijke vraag over webinars. Een direct antwoord is CORRECT en mag NIET als TOO_DIRECTIVE worden gemarkeerd.");
+  }
+  if (context.detectedTechniqueId) {
+    validatorHints.push(`De gebruiker vraagt specifiek over techniek ${context.detectedTechniqueId} (${context.detectedTechniqueName}). Een inhoudelijk antwoord met uitleg is CORRECT.`);
+  }
+  if (context.userWantsVideo) {
+    validatorHints.push("De gebruiker vraagt om een video. Het vermelden dat er een video beschikbaar is, is CORRECT en mag NIET als TOO_DIRECTIVE worden gemarkeerd.");
+  }
+
+  return { messages, enhancedSystemPrompt, ragResult, ragQuery, validatorHints };
 }
 
 /**
@@ -582,7 +688,7 @@ export async function generateCoachResponse(
     };
   }
 
-  const { messages, enhancedSystemPrompt, ragResult, ragQuery } = await prepareCoachPrompt(
+  const { messages, enhancedSystemPrompt, ragResult, ragQuery, validatorHints } = await prepareCoachPrompt(
     userMessage, conversationHistory, context
   );
 
@@ -605,9 +711,14 @@ export async function generateCoachResponse(
 
     const rawMessage = assistantMessage || TECHNICAL_FALLBACKS.error_generic;
     
+    const validatorContext = validatorHints.length > 0
+      ? `VALIDATOR HINTS:\n${validatorHints.join('\n')}`
+      : undefined;
+    
     const repairResult = await validateAndRepair(rawMessage, "COACH_CHAT", {
       originalSystemPrompt: enhancedSystemPrompt,
       conversationHistory: conversationHistory.map(m => ({ role: m.role, content: m.content })),
+      conversationContext: validatorContext,
     });
     
     if (repairResult.wasRepaired) {
@@ -763,6 +874,9 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
     }
   }
   
+  const videoStats = await getVideoLibraryStats();
+  const videoStatsStr = buildVideoStatsPrompt(videoStats);
+
   const systemPrompt = buildNestedOpeningPrompt(
     coacheeContextStr, 
     fullTechniqueNarrative, 
@@ -770,20 +884,29 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
     videoContextStr,
     ragContextStr,
     context.userName,
-    context.techniqueId
+    context.techniqueId,
+    videoStatsStr,
+    context.viewMode
   );
   
-  // Build opening user prompt inline
-  let openingPrompt = "Begin een coachend gesprek met de coachee";
-  if (context.userName) {
-    openingPrompt = `Begin een coachend gesprek met ${context.userName}`;
-  }
-  if (techniqueName) {
-    openingPrompt += ` over de techniek '${techniqueName}'.`;
+  let openingPrompt = "";
+  if (context.viewMode === 'admin') {
+    openingPrompt = "Begroet Hugo Herbots kort en professioneel. Geef een beknopt overzicht van het platform en vraag waarmee je kunt helpen. Geen coaching-vragen, geen vragen over ervaring of achtergrond.";
+    if (techniqueName) {
+      openingPrompt += ` De huidige focus is de techniek '${techniqueName}'.`;
+    }
   } else {
-    openingPrompt += ".";
+    openingPrompt = "Begin een coachend gesprek met de coachee";
+    if (context.userName) {
+      openingPrompt = `Begin een coachend gesprek met ${context.userName}`;
+    }
+    if (techniqueName) {
+      openingPrompt += ` over de techniek '${techniqueName}'.`;
+    } else {
+      openingPrompt += ".";
+    }
+    openingPrompt += " Begroet warm, wees nieuwsgierig naar de situatie, en laat de coachee leiden.";
   }
-  openingPrompt += " Begroet warm, wees nieuwsgierig naar de situatie, en laat de coachee leiden.";
   
   // Build context gathering transcript if available
   if (context.contextGatheringHistory && context.contextGatheringHistory.length > 0) {

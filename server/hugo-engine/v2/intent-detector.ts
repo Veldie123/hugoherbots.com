@@ -1,7 +1,11 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 export interface ContentSuggestion {
   type: 'video' | 'slide' | 'webinar' | 'roleplay' | 'technique';
   reason: string;
   techniqueId?: string;
+  techniqueName?: string;
   priority: number;
 }
 
@@ -11,6 +15,8 @@ export interface IntentResult {
   shouldSuggestRoleplay: boolean;
   shouldSuggestVideo: boolean;
   shouldSuggestSlide: boolean;
+  detectedTechniqueId?: string;
+  detectedTechniqueName?: string;
   confidence: number;
 }
 
@@ -25,6 +31,78 @@ const EXPLORE_TRIGGERS = ['andere techniek', 'volgende', 'meer', 'wat kan ik nog
 
 const TECHNIQUE_PATTERN = /\b(\d\.\d)\b/;
 
+interface TechniqueNameEntry {
+  id: string;
+  name: string;
+  aliases: string[];
+}
+
+let techniqueNameMap: TechniqueNameEntry[] | null = null;
+
+function loadTechniqueNameMap(): TechniqueNameEntry[] {
+  if (techniqueNameMap) return techniqueNameMap;
+
+  const entries: TechniqueNameEntry[] = [];
+
+  const HARDCODED_ALIASES: Record<string, string[]> = {
+    '1.1': ['koopklimaat', 'gun-effect', 'guneffect', 'eerste indruk'],
+    '1.2': ["gentleman's agreement", 'gentlemans agreement', 'gentleman agreement', 'gespreksleiding'],
+    '1.3': ['firmavoorstelling', 'pop', 'reference story', 'referentiestory', 'referentieverhaal'],
+    '1.4': ['instapvraag'],
+    '2.1': ['explore', 'verken', 'vraagtechnieken', 'exploratie'],
+    '2.1.1': ['feitvragen', 'feitgerichte vragen', 'feitgericht'],
+    '2.1.2': ['meningsvragen', 'meningvraag'],
+    '2.1.3': ['alternatieve vragen', 'alternatieve vraag', 'keuzevraag'],
+    '2.1.4': ['ter zijde schuiven', 'parkeren'],
+    '2.1.5': ['pingpong', 'ping-pong', 'ping pong'],
+    '2.1.6': ['actief luisteren', 'empathisch luisteren'],
+    '2.2': ['probe', 'proben', 'hypothetisch', 'stel dat', 'wat als', 'storytelling'],
+    '2.3': ['impact', 'consequentievragen', 'gevolgen', 'impactvragen'],
+    '2.4': ['commitment', 'commit', 'bevestiging', 'commitment vragen'],
+    '3.1': ['ovb', 'o.v.b.', 'oplossing voordeel baat', 'oplossing-voordeel-baat'],
+    '3.2': ['usp', 'unique selling point', 'unique selling proposition'],
+    '3.3': ['baten samenvatten', 'batenoverzicht'],
+    '3.7': ['vat baten samen'],
+    '4.1': ['proefafsluiting', 'proef afsluiting', 'trial close'],
+    '4.2': ['abc', 'always be closing', 'abc-techniek', 'closing'],
+    '4.3': ['indien', 'indien-techniek', 'als-dan'],
+    '4.ABC': ['abc techniek', 'always be closing techniek'],
+    '4.INDIEN': ['indien techniek'],
+  };
+
+  try {
+    const indexPath = path.join(process.cwd(), 'config', 'ssot', 'technieken_index.json');
+    if (fs.existsSync(indexPath)) {
+      const data = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+      const technieken = data.technieken || {};
+
+      for (const [id, tech] of Object.entries(technieken) as [string, any][]) {
+        const name = tech.naam || '';
+        const tags = tech.tags || [];
+        const aliases = [
+          name.toLowerCase(),
+          ...tags.map((t: string) => t.toLowerCase()),
+          ...(HARDCODED_ALIASES[id] || []),
+        ].filter(Boolean);
+
+        entries.push({ id, name, aliases: [...new Set(aliases)] });
+      }
+      console.log(`[IntentDetector] Loaded ${entries.length} technique names from SSOT`);
+    }
+  } catch (err: any) {
+    console.error('[IntentDetector] Failed to load technique names:', err.message);
+  }
+
+  if (entries.length === 0) {
+    for (const [id, aliasList] of Object.entries(HARDCODED_ALIASES)) {
+      entries.push({ id, name: aliasList[0], aliases: aliasList });
+    }
+  }
+
+  techniqueNameMap = entries;
+  return entries;
+}
+
 function matchesTriggers(text: string, triggers: string[]): boolean {
   const lower = text.toLowerCase();
   return triggers.some(t => lower.includes(t));
@@ -35,9 +113,32 @@ function countTriggerMatches(text: string, triggers: string[]): number {
   return triggers.filter(t => lower.includes(t)).length;
 }
 
+function extractTechniqueByName(text: string): { id: string; name: string } | undefined {
+  const lower = text.toLowerCase();
+  const map = loadTechniqueNameMap();
+
+  let bestMatch: { id: string; name: string; aliasLen: number } | undefined;
+
+  for (const entry of map) {
+    for (const alias of entry.aliases) {
+      if (alias.length < 3) continue;
+      if (lower.includes(alias)) {
+        if (!bestMatch || alias.length > bestMatch.aliasLen) {
+          bestMatch = { id: entry.id, name: entry.name, aliasLen: alias.length };
+        }
+      }
+    }
+  }
+
+  return bestMatch ? { id: bestMatch.id, name: bestMatch.name } : undefined;
+}
+
 function extractTechniqueId(text: string): string | undefined {
   const match = text.match(TECHNIQUE_PATTERN);
-  return match ? match[1] : undefined;
+  if (match) return match[1];
+
+  const namedMatch = extractTechniqueByName(text);
+  return namedMatch?.id;
 }
 
 export function detectIntent(
@@ -62,6 +163,7 @@ export function detectIntent(
   const wantsExplore = matchesTriggers(userMessage, EXPLORE_TRIGGERS);
 
   const mentionedTechnique = extractTechniqueId(userMessage);
+  const namedTechnique = extractTechniqueByName(userMessage);
   const targetTechnique = mentionedTechnique || currentTechniqueId;
 
   let primaryIntent: IntentResult['primaryIntent'] = 'chat';
@@ -206,6 +308,18 @@ export function detectIntent(
     });
   }
 
+  if (namedTechnique && suggestions.length === 0 && !wantsVideo && !wantsRoleplay) {
+    primaryIntent = 'learn';
+    confidence = Math.max(confidence, 0.8);
+    suggestions.push({
+      type: 'technique',
+      reason: `Techniek "${namedTechnique.name}" (${namedTechnique.id}) herkend bij naam`,
+      techniqueId: namedTechnique.id,
+      techniqueName: namedTechnique.name,
+      priority: 6,
+    });
+  }
+
   suggestions.sort((a, b) => b.priority - a.priority);
 
   return {
@@ -214,6 +328,8 @@ export function detectIntent(
     shouldSuggestRoleplay,
     shouldSuggestVideo,
     shouldSuggestSlide,
+    detectedTechniqueId: namedTechnique?.id || mentionedTechnique,
+    detectedTechniqueName: namedTechnique?.name,
     confidence,
   };
 }
