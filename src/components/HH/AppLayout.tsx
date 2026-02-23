@@ -201,7 +201,8 @@ export function AppLayout({
     return currentPage === itemId;
   };
 
-  const getHistoryForItem = (historyType: "chat" | "analysis") => {
+  const getHistoryForItem = (historyType?: "chat" | "analysis") => {
+    if (!historyType) return [];
     return historyType === "chat" ? chatHistory : analysisHistory;
   };
 
@@ -266,7 +267,7 @@ export function AppLayout({
                   )}
                 </button>
 
-                {!collapsed && isActive && (() => {
+                {!collapsed && isActive && item.historyType && (() => {
                   const hiddenIds = getHiddenIds('user', item.historyType === 'chat' ? 'chat' : 'analysis');
                   const visibleHistory = history.filter(h => !hiddenIds.has(h.id));
                   return (
@@ -393,7 +394,7 @@ export function AppLayout({
                     </span>
                   </button>
 
-                  {isActive && (() => {
+                  {isActive && item.historyType && (() => {
                     const hiddenIds = getHiddenIds('user', item.historyType === 'chat' ? 'chat' : 'analysis');
                     const visibleHistory = history.filter(h => !hiddenIds.has(h.id));
                     return (
