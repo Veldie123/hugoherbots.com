@@ -1,0 +1,473 @@
+{
+  "_meta": {
+    "version": "2.4",
+    "type": "detection_overlay",
+    "ssot_note": "Dit bestand bevat ALLEEN detection metadata voor klanthoudingen. Alle techniek-gerelateerde content (beschrijving, stappenplan, wanneer) zit in config/ssot/technieken_index.json en wordt opgehaald via ssot-loader.ts.",
+    "allowed_fields": [
+      "id",
+      "naam",
+      "houding_beschrijving",
+      "fase_restrictie",
+      "semantic_markers",
+      "recommended_technique_ids",
+      "generation_examples",
+      "fallback_response",
+      "generation_examples_note"
+    ],
+    "forbidden_fields": [
+      "techniek_reactie",
+      "stappenplan",
+      "waarom",
+      "techniek_nummer",
+      "actie",
+      "beschrijving van technieken"
+    ],
+    "changelog": [
+      "2.2: Phase alignment for closing 'afrit' attitudes (twijfel/bezwaar/uitstel/angst) to fase 4 only; expanded Dutch semantic markers + style-variant examples; improved 'vraag' definition to cover both fase 2 (parkeren) and fase 4 (afrit); added trigger_techniques fallback (4.1 and 3.5).",
+      "2.3: Restore core semantics for H1/H2: 'positief/negatief' = fit vs misfit with solution constraints (not cooperativeness); remove lexical 'ja/nee' markers that caused misclassification; add 'schijninstemming' phrases to 'vaag'; remove phase-3 trigger_techniques from closing attitudes (phase 4 only) and add 4.INDIEN as optional trigger.",
+      "2.4: Redefined Positief/Negatief as (mis)alignment with aanbod/eigenschappen i.p.v. meewerkendheid; renamed 'vaag' to Schijninstemming and 'ontwijkend' to Te algemeen (labels only); updated semantic_markers accordingly; removed phase-3 technique triggers from fase-4 houdingen; adjusted detection priority ordering."
+    ],
+    "detection_note": "semantic_markers worden gebruikt door AI-based classifier. generation_examples worden gebruikt door customer_engine.ts om contextgevoelige responses te genereren.",
+    "last_updated": "2026-01-21"
+  },
+  "houdingen": {
+    "positief": {
+      "id": "H1",
+      "naam": "Positief antwoord",
+      "houding_beschrijving": "Positief antwoord = het klantantwoord is IN LIJN met de eigenschappen/voorwaarden van het aanbod (match op criteria/verwachting). Het gaat niet over 'meewerkendheid', maar over inhoudelijke fit: wat de klant benoemt ondersteunt een mogelijke 'ja' richting dit aanbod.",
+      "fase_restrictie": {
+        "allowed_phases": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "allowed_at_any_phase": true
+      },
+      "semantic_markers": [
+        "offer_fit",
+        "matches_offer_criteria",
+        "within_thresholds",
+        "desired_outcome_present",
+        "preference_aligns",
+        "dat is exact wat ik zoek",
+        "dat is belangrijk voor ons",
+        "precies dat",
+        "dat past",
+        "dat sluit aan",
+        "dat helpt",
+        "dat lost op",
+        "dat is voldoende",
+        "dat is oké"
+      ],
+      "recommended_technique_ids": [
+        "2.4",
+        "2.1.2",
+        "2.1.6"
+      ],
+      "fallback_response": "Oké, dat lijkt dan goed aan te sluiten.",
+      "generation_examples_note": "Voorbeelden van antwoorden die een FIT met het aanbod aangeven (inhoudelijk, criterium-gedreven).",
+      "generation_examples": [
+        "\"Dat is exact wat ik zoek.\"",
+        "\"Als het zo werkt, dan past dat voor ons.\"",
+        "\"Een stabiel rendement is voor mij het belangrijkste, dus dat is oké.\"",
+        "\"Als u dat kan garanderen, is dat voldoende voor mij.\"",
+        "\"3% netto vast is prima, ik hoef geen 6%.\"",
+        "[analyserend] \"Binnen die bandbreedte is dat aanvaardbaar.\"",
+        "[promoverend] \"Dat klinkt interessant, als het effectief zo is.\""
+      ]
+    },
+    "negatief": {
+      "id": "H2",
+      "naam": "Negatief antwoord",
+      "houding_beschrijving": "Negatief antwoord = het klantantwoord is NIET in lijn met de eigenschappen/voorwaarden van het aanbod (mismatch op criteria/verwachting). Dit kan een hogere eis, andere prioriteit of een expliciete afwijzing zijn. Het gaat niet primair over 'weerstand', maar over gebrek aan fit met dit aanbod.",
+      "fase_restrictie": {
+        "allowed_phases": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "allowed_at_any_phase": true
+      },
+      "semantic_markers": [
+        "offer_mismatch",
+        "outside_thresholds",
+        "expects_more_than_offer",
+        "missing_must_have",
+        "preference_conflicts",
+        "minstens",
+        "liefst hoger",
+        "dat is te weinig",
+        "dat voldoet niet",
+        "dat past niet",
+        "ik zoek iets anders",
+        "ik wil 6%",
+        "ik verwacht meer",
+        "niet interessant voor ons"
+      ],
+      "recommended_technique_ids": [
+        "2.1.4",
+        "2.2"
+      ],
+      "fallback_response": "Hm, dat lijkt niet te matchen met wat wij aanbieden.",
+      "generation_examples_note": "Voorbeelden van antwoorden die een MISMATCH met het aanbod aangeven (criteria/verwachting).",
+      "generation_examples": [
+        "\"Ik wil minstens 6% rendement; 3% is te weinig.\"",
+        "\"Wij zoeken iets met variabele upside, niet iets vast.\"",
+        "\"Zonder optie X is het voor ons geen oplossing.\"",
+        "\"Dat past niet binnen onze strategie.\"",
+        "\"De looptijd van 9 jaar is voor ons te lang.\"",
+        "[analyserend] \"Die doorlooptijd is niet compatibel met onze deadline.\"",
+        "[controlerend] \"Nee, dat voldoet niet.\""
+      ]
+    },
+    "vaag": {
+      "id": "H3",
+      "naam": "Schijninstemming",
+      "houding_beschrijving": "Schijninstemming = de klant klinkt positief of 'open', maar zonder concreet criterium/inhoud. Typische woorden: 'misschien', 'zou kunnen', 'we zullen zien'. Doel: betekenis concretiseren en interpretatie vermijden.",
+      "fase_restrictie": {
+        "allowed_phases": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "allowed_at_any_phase": true
+      },
+      "semantic_markers": [
+        "surface_agreement",
+        "noncommittal_positive",
+        "hedging",
+        "misschien",
+        "zou kunnen",
+        "in overweging nemen",
+        "hangt ervan af",
+        "dat klinkt goed",
+        "we zullen zien",
+        "lijkt interessant",
+        "eventueel"
+      ],
+      "recommended_technique_ids": [
+        "2.1.5",
+        "2.1.3"
+      ],
+      "fallback_response": "Misschien, ja…",
+      "generation_examples_note": "Antwoorden die positief lijken, maar (nog) geen concrete inhoud geven.",
+      "generation_examples": [
+        "\"Misschien.\"",
+        "\"Dat klinkt goed.\"",
+        "\"We zullen zien.\"",
+        "\"Dat lijkt interessant te zijn.\"",
+        "\"Zou kunnen, ja.\"",
+        "\"Hangt ervan af.\"",
+        "[faciliterend] \"Euh… ja, misschien.\"",
+        "[analyserend] \"In theorie wel, maar het hangt ervan af.\""
+      ]
+    },
+    "ontwijkend": {
+      "id": "H4",
+      "naam": "Te algemeen antwoord",
+      "houding_beschrijving": "Te algemeen antwoord = de klant geeft een algemeen antwoord zonder invulling op een (meningsgerichte) vraag; het 'kan alles betekenen' en zegt inhoudelijk weinig. Doel: richting geven met alternatieve/feitchoice vragen en concretiseren.",
+      "fase_restrictie": {
+        "allowed_phases": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "allowed_at_any_phase": true
+      },
+      "semantic_markers": [
+        "too_general",
+        "non_specific",
+        "generic_answer",
+        "tja",
+        "gewoon",
+        "zoals altijd",
+        "dat hangt er vanaf",
+        "moeilijk te zeggen",
+        "we doen maar wat",
+        "maakt niet uit",
+        "valt mee",
+        "oké"
+      ],
+      "recommended_technique_ids": [
+        "2.1.3",
+        "2.1.5"
+      ],
+      "fallback_response": "Tja… dat hangt er wat vanaf.",
+      "generation_examples_note": "Algemene antwoorden zonder concrete invulling.",
+      "generation_examples": [
+        "\"Dat is moeilijk te zeggen.\"",
+        "\"Dat hangt ervan af.\"",
+        "\"Dat varieert.\"",
+        "\"Dat is een goede vraag.\"",
+        "\"Goh, dat is gewoon oké.\"",
+        "\"Zoals bij iedereen zeker?\"",
+        "[faciliterend] \"Euh… ja… dat verschilt.\"",
+        "[controlerend] \"Dat maakt niet zoveel uit.\""
+      ]
+    },
+    "vraag": {
+      "id": "H5",
+      "naam": "Vraag",
+      "houding_beschrijving": "Klant stelt (tegen)vragen. Dit kan 2 vormen hebben:\n1) In fase 2 (ontdekken): een inhoudelijke informatieve vraag (vaak analyserende stijl) die je mag 'parkeren' om het gesprek te sturen.\n2) In fase 4 (afsluiten): een 'afrit' na proefafsluiting waarbij de klant via vragen eigenlijk nog zekerheid zoekt. Dan behandel je de vraag en ga je terug naar de afsluiting.",
+      "fase_restrictie": {
+        "allowed_phases": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "allowed_at_any_phase": true
+      },
+      "semantic_markers": [
+        "question",
+        "information_request",
+        "clarification",
+        "price question",
+        "clarification request",
+        "terms/conditions",
+        "what about",
+        "how does it work",
+        "Wat kost",
+        "Hoe zit dat",
+        "Kan u",
+        "Mag ik vragen",
+        "Wat bedoelt u",
+        "Hoeveel",
+        "Wanneer",
+        "Welke garantie",
+        "en dan?",
+        "wat als",
+        "inbegrepen",
+        "looptijd",
+        "opzeg"
+      ],
+      "recommended_technique_ids": [
+        "2.1.4",
+        "4.2.1"
+      ],
+      "fallback_response": "Mag ik vragen wat u precies wil weten, zodat ik u het juiste antwoord kan geven?",
+      "generation_examples_note": "Antwoord + tegenvraag",
+      "generation_examples": [
+        "[fase2/analyserend] \"Interessant. Hoe werkt dat praktisch in de onboarding?\"",
+        "[fase2/analyserend] \"Welke onderdelen zijn inbegrepen in die prijs?\"",
+        "[fase2] \"Oké, maar wat is de looptijd van het contract?\"",
+        "[fase2] \"Hoe snel kunnen jullie starten?\"",
+        "[fase4/afrit] \"Als we vandaag beslissen: wat gebeurt er als het toch niet oplevert?\"",
+        "[fase4/afrit] \"En welke garanties heb ik dat de levering op tijd is?\"",
+        "[fase4/afrit] \"Wat zijn de exacte voorwaarden?\"",
+        "[fase4/afrit] \"Kan u dat nog eens heel concreet uitleggen voor onze situatie?\"",
+        "[fase4/afrit] \"Wat komt er nog bij qua kosten?\""
+      ]
+    },
+    "twijfel": {
+      "id": "H6",
+      "naam": "Twijfel",
+      "houding_beschrijving": "Twijfel = de klant ziet de waarde, maar twijfelt of het in de praktijk ook echt zal lukken / of hij nadien geen spijt krijgt.\nBelangrijk: twijfel kan oprecht zijn, maar kan ook een 'verpakt bezwaar' zijn (zeker bij bepaalde gedragsstijlen).",
+      "fase_restrictie": {
+        "allowed_phases": [
+          4
+        ],
+        "allowed_at_any_phase": false,
+        "trigger_techniques": [
+          "4.1",
+          "4.INDIEN"
+        ]
+      },
+      "semantic_markers": [
+        "hesitation",
+        "doubt",
+        "uncertainty",
+        "ik twijfel",
+        "niet zeker",
+        "klinkt goed maar",
+        "gaat dat wel",
+        "zekerheid",
+        "spijt",
+        "twijfelachtig",
+        "onzeker",
+        "vertrouwen ontbreekt"
+      ],
+      "recommended_technique_ids": [
+        "4.2.2"
+      ],
+      "fallback_response": "Ik begrijp het. Waar zit uw twijfel precies: in de oplossing zelf, in de uitvoering, of in het risico dat het niet oplevert?",
+      "generation_examples_note": "Reacties na aanbod in fase 3/4 - twijfel over de beslissing",
+      "generation_examples": [
+        "[faciliterend] \"Het klinkt goed… maar ik ben nog niet helemaal zeker of dit voor ons gaat werken.\"",
+        "[analyserend] \"Ik zie het nut, maar ik twijfel of jullie die doorlooptijd echt halen.\"",
+        "[analyserend] \"We hebben dit ooit geprobeerd. Toen liep het mis. Hoe voorkomt u dat?\"",
+        "[controlerend] \"Ik wil wel, maar ik wil garanties. Wat als het niet levert wat u belooft?\"",
+        "[promoverend] \"Klinkt tof, maar ik wil niet de eerste zijn die ermee op zijn bek gaat.\"",
+        "\"Ik twijfel omdat onze situatie vrij complex is. Past dit wel?\"",
+        "\"Oké, maar hoe zeker is het resultaat?\"",
+        "\"Mijn grootste twijfel is: gaan we de implementatie wel rond krijgen intern?\""
+      ]
+    },
+    "bezwaar": {
+      "id": "H7",
+      "naam": "Bezwaar",
+      "houding_beschrijving": "Bezwaar = expliciete weerstand tegen een aspect van de oplossing (prijs, timing, scope, vergelijking met alternatief).\nHugo kader: een bezwaar is vaak een koopsignaal (niet klaar om 'ja' te zeggen), dus een kans om waarde te verhelderen.",
+      "fase_restrictie": {
+        "allowed_phases": [
+          4
+        ],
+        "allowed_at_any_phase": false,
+        "trigger_techniques": [
+          "4.1",
+          "4.INDIEN"
+        ]
+      },
+      "semantic_markers": [
+        "objection",
+        "counterargument",
+        "resistance",
+        "ja maar",
+        "te duur",
+        "prijs",
+        "budget",
+        "niet geïnteresseerd",
+        "concurrentie",
+        "alternatief",
+        "past niet",
+        "te veel",
+        "onaanvaardbaar",
+        "geen optie"
+      ],
+      "recommended_technique_ids": [
+        "4.2.4"
+      ],
+      "fallback_response": "Oké. Mag ik één ding scherp stellen: over welk punt gaat uw bezwaar precies (prijs, timing, inhoud), zodat we het concreet kunnen maken?",
+      "generation_examples_note": "Concrete bezwaren tegen het aanbod",
+      "generation_examples": [
+        "[analyserend] \"Te duur tegenover wat u concurrent aanbiedt.\"",
+        "[controlerend] \"Dit past niet binnen mijn budget. Punt.\"",
+        "[faciliterend] \"Ik hoor wat u zegt, maar… ik vind het wel veel geld.\"",
+        "[promoverend] \"Ja maar, dat is wel stevig geprijsd. Wat krijg ik extra?\"",
+        "\"We hebben al een leverancier; waarom zouden we switchen?\"",
+        "\"Uw oplossing mist feature X, dus het is niet compleet.\"",
+        "\"Ik hoor voordelen, maar de investering is te hoog.\"",
+        "\"Mijn bezwaar is de timing: wij kunnen pas over 6 maanden.\""
+      ]
+    },
+    "uitstel": {
+      "id": "H8",
+      "naam": "Uitstel",
+      "houding_beschrijving": "Uitstel = de klant ontwijkt de beslissing door een volgende stap te vragen (offerte, later bellen) of door 'ik moet het bespreken'.\nCruciaal onderscheid: voorwaarde (legitieme stap) vs voorwendsel (smoes).",
+      "fase_restrictie": {
+        "allowed_phases": [
+          4
+        ],
+        "allowed_at_any_phase": false,
+        "trigger_techniques": [
+          "4.1",
+          "4.INDIEN"
+        ]
+      },
+      "semantic_markers": [
+        "postponement",
+        "delay",
+        "deferral",
+        "later",
+        "volgende week",
+        "offerte",
+        "mail",
+        "stuur door",
+        "ik moet",
+        "bespreken met",
+        "nachtje over slapen",
+        "terugkomen",
+        "agenda"
+      ],
+      "recommended_technique_ids": [
+        "4.2.3"
+      ],
+      "fallback_response": "Dat kan. Wat precies wil u nog bespreken of aftoetsen, zodat we kunnen inschatten wat er nodig is om verder te gaan?",
+      "generation_examples_note": "Klant wil nu niet beslissen",
+      "generation_examples": [
+        "[faciliterend] \"Ik wil het eerst even bespreken met mijn partner.\"",
+        "[analyserend] \"Stuur mij alles op mail, dan bekijk ik het en kom ik erop terug.\"",
+        "[controlerend] \"Ik beslis dit niet vandaag. Plan maar iets in volgende maand.\"",
+        "[promoverend] \"Ik vind het interessant, maar ik heb nu geen tijd. Bel me later.\"",
+        "\"Maak eerst een offerte, dan zien we wel.\"",
+        "\"Ik wil er nog een nachtje over slapen.\"",
+        "\"We moeten intern nog afstemmen; kunnen we volgende week terugkomen?\"",
+        "\"Ik wil eerst nog met de boekhouder spreken.\""
+      ]
+    },
+    "angst": {
+      "id": "H9",
+      "naam": "Angst / Bezorgdheid",
+      "houding_beschrijving": "Angst/bezorgdheid = emotionele blokkade of schrik voor risico's (spijt, falen, reputatie, implementatieproblemen).\nSoms is dit rationele risico-inschatting; dan moet je de risico's expliciet kaderen en mitigeren.",
+      "fase_restrictie": {
+        "allowed_phases": [
+          4
+        ],
+        "allowed_at_any_phase": false,
+        "trigger_techniques": [
+          "4.1",
+          "4.INDIEN"
+        ]
+      },
+      "semantic_markers": [
+        "fear",
+        "anxiety",
+        "concern",
+        "risk_aversion",
+        "ik ben bang",
+        "bezorgd",
+        "risico",
+        "spijt",
+        "wat als",
+        "zekerheid",
+        "garantie",
+        "veiligheid",
+        "compliance",
+        "faalt",
+        "mislukt"
+      ],
+      "recommended_technique_ids": [
+        "4.2.5",
+        "4.2.6"
+      ],
+      "fallback_response": "Ik hoor u. Waar bent u precies bang voor: het resultaat, de implementatie, of het risico dat u nadien spijt krijgt?",
+      "generation_examples_note": "Angst en bezorgdheid over risico",
+      "generation_examples": [
+        "[faciliterend] \"Ik ben bang dat we dit intern niet gedragen krijgen.\"",
+        "[analyserend] \"Wat als we starten en het team het niet adopteert?\"",
+        "[controlerend] \"Ik wil geen risico lopen; wat als dit mislukt?\"",
+        "[promoverend] \"Ik wil niet de beslissing nemen waar ik later spijt van heb.\"",
+        "\"We hebben al eens een verkeerde keuze gemaakt; ik wil dat niet opnieuw.\"",
+        "\"Wat als de leverancier failliet gaat / stopt?\"",
+        "\"Ik ben bezorgd over compliance / veiligheid.\"",
+        "\"Wat als we na 3 maanden merken dat het niet werkt?\""
+      ]
+    }
+  },
+  "detection_config": {
+    "method": "ai_semantic",
+    "note": "Detection via AI classifier die context begrijpt: (verkoper vraag + klant antwoord + aanbod/eigenschappen) → houding. Positief/Negatief vereisen vergelijking met aanbod-criteria; semantic_markers zijn slechts hints.",
+    "priority_order": [
+      "bezwaar",
+      "angst",
+      "uitstel",
+      "twijfel",
+      "vraag",
+      "vaag",
+      "ontwijkend",
+      "negatief",
+      "positief"
+    ],
+    "priority_note": "Bezwaar/angst/uitstel/twijfel vereisen actieve behandeling. Ontwijkend voor vraag zodat eerst duidelijkheid gezocht wordt."
+  },
+  "expected_moves_scoring": {
+    "_note": "Bonus scoring wanneer verkoper de juiste techniek toepast na klant signaal. Werkt bovenop de basis detectie score.",
+    "recommended_match_bonus": 5,
+    "recommended_match_bonus_note": "Extra punten als gedetecteerde techniek overeenkomt met recommended_technique_ids",
+    "no_match_penalty": 0,
+    "no_match_penalty_note": "Geen strafpunten - basis detectie score blijft behouden"
+  }
+}

@@ -1,0 +1,229 @@
+/**
+ * DASHBOARD STYLES
+ * HugoHerbots.ai - Home Tab
+ * 
+ * Voeg deze CSS snippets toe aan je globals.css bestand
+ */
+
+/* ============================================
+   HH COLOR TOKENS
+   ============================================ */
+
+:root {
+  /* Primary Brand Colors */
+  --hh-text: #1C2535;         /* MIRAGE - Primary dark text */
+  --hh-ink: #2B3748;          /* INDIAN INK - Secondary dark */
+  --hh-primary: #6B7A92;      /* SLATE GRAY - Primary accent */
+  --hh-slate-gray: #6B7A92;   /* Alias for primary */
+  --hh-muted: #B1B2B5;        /* FRENCH GRAY - Muted text */
+  --hh-border: #E4E4E4;       /* PLATINUM - Borders/dividers */
+  --hh-bg: #FFFFFF;           /* WHITE - Backgrounds */
+  
+  /* UI Colors */
+  --hh-success: #00C389;      /* Success green */
+  --hh-warn: #FFB020;         /* Warning orange */
+  
+  /* UI Grays */
+  --hh-ui-50: #F9FAFB;        /* Light gray background */
+  --hh-ui-100: #F3F4F6;       /* Lighter gray */
+  --hh-ui-200: #E5E7EB;       /* Medium gray */
+  
+  /* Destructive (for Live Coaching badges) */
+  --destructive: hsl(0 84.2% 60.2%);
+}
+
+/* ============================================
+   SHADOW SYSTEM
+   ============================================ */
+
+.shadow-hh-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.shadow-hh-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-hh-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================
+   TYPOGRAPHY OVERRIDES
+   ============================================ */
+
+/* Dashboard uses specific heading sizes */
+h1 {
+  font-weight: 300; /* Light weight for main heading */
+}
+
+h3 {
+  font-weight: 600; /* Semibold for card titles */
+}
+
+h4 {
+  font-weight: 500; /* Medium for sub-titles */
+}
+
+/* ============================================
+   DASHBOARD SPECIFIC UTILITIES
+   ============================================ */
+
+/* Streak Card Gradient */
+.streak-card-gradient {
+  background: linear-gradient(135deg, 
+    hsl(var(--hh-primary) / 0.05) 0%, 
+    hsl(var(--hh-success) / 0.05) 100%);
+}
+
+/* Progress Bar Animation */
+.progress-bar-fill {
+  transition: width 0.5s ease-in-out;
+}
+
+/* Hover Arrow Animation */
+.hover-arrow {
+  transition: transform 0.2s ease-in-out;
+}
+
+.group:hover .hover-arrow {
+  transform: translateX(4px);
+}
+
+/* Pulse Animation for Live Badge */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ============================================
+   RESPONSIVE GRID
+   ============================================ */
+
+/* Dashboard 2x2 Grid */
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem; /* 24px */
+  }
+}
+
+@media (max-width: 1023px) {
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem; /* 16px */
+  }
+}
+
+/* ============================================
+   CARD HOVER EFFECTS
+   ============================================ */
+
+.dashboard-card {
+  transition: box-shadow 0.3s ease-in-out, 
+              transform 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================
+   BADGE VARIANTS (HH Specific)
+   ============================================ */
+
+.badge-success {
+  background-color: hsl(var(--hh-success) / 0.1);
+  color: var(--hh-success);
+  border-color: hsl(var(--hh-success) / 0.2);
+}
+
+.badge-warn {
+  background-color: hsl(var(--hh-warn) / 0.1);
+  color: var(--hh-warn);
+  border-color: hsl(var(--hh-warn) / 0.2);
+}
+
+.badge-destructive {
+  background-color: hsl(var(--destructive) / 0.1);
+  color: hsl(var(--destructive));
+  border-color: hsl(var(--destructive) / 0.2);
+}
+
+.badge-primary {
+  background-color: hsl(var(--hh-primary) / 0.1);
+  color: var(--hh-primary);
+  border-color: hsl(var(--hh-primary) / 0.2);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Subtle backgrounds */
+.bg-hh-primary\/5 {
+  background-color: hsl(var(--hh-primary) / 0.05);
+}
+
+.bg-hh-primary\/10 {
+  background-color: hsl(var(--hh-primary) / 0.1);
+}
+
+.bg-hh-success\/5 {
+  background-color: hsl(var(--hh-success) / 0.05);
+}
+
+.bg-hh-success\/10 {
+  background-color: hsl(var(--hh-success) / 0.1);
+}
+
+.bg-hh-warn\/10 {
+  background-color: hsl(var(--hh-warn) / 0.1);
+}
+
+/* Border utilities */
+.border-hh-primary\/20 {
+  border-color: hsl(var(--hh-primary) / 0.2);
+}
+
+.border-hh-success\/20 {
+  border-color: hsl(var(--hh-success) / 0.2);
+}
+
+.border-hh-warn\/20 {
+  border-color: hsl(var(--hh-warn) / 0.2);
+}
+
+/* Text colors */
+.text-hh-text {
+  color: var(--hh-text);
+}
+
+.text-hh-muted {
+  color: var(--hh-muted);
+}
+
+.text-hh-primary {
+  color: var(--hh-primary);
+}
+
+.text-hh-success {
+  color: var(--hh-success);
+}
+
+.text-hh-warn {
+  color: var(--hh-warn);
+}

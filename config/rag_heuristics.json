@@ -1,0 +1,1154 @@
+{
+  "version": "2.0",
+  "description": "SSOT-conforme RAG chunk tagging heuristics (primary + mentions) with explicit phase/overview vs sub-technique anchors.",
+  "_note": "Only technique IDs that exist in technieken_index.json are allowed. Loader should fail hard on unknown IDs. Patterns are intended for training/transcript text (Hugo-style meta language).",
+  "ssot": {
+    "source_file": "technieken_index.json",
+    "enforce_ids_exist": true
+  },
+  "normalization": {
+    "lowercase": true,
+    "strip_diacritics": true,
+    "remove_punctuation": true,
+    "collapse_whitespace": true
+  },
+  "matching": {
+    "mode": "substring",
+    "case_insensitive": true
+  },
+  "scoring": {
+    "anchor_weight": 5,
+    "support_weight": 1,
+    "min_score_to_consider": 5,
+    "leaf_dominance_margin": 6
+  },
+  "primary_policy": {
+    "_summary": "Choose a primary label and a mentions[] list. Overview/phase nodes become primary when multiple child mentions are present (or when explicit phase/overview anchors hit).",
+    "prefer_parent_primary_when": {
+      "min_distinct_child_mentions": 2,
+      "or_parent_anchor_hit": true
+    },
+    "parent_child_bonus_per_distinct_child": 2
+  },
+  "techniques": {
+    "0": {
+      "naam": "Pre-contactfase",
+      "kind": "phase",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "pre-contactfase",
+        "precontactfase",
+        "desktop research",
+        "one minute manager",
+        "crm-historiek",
+        "swot-analyse",
+        "swot analyse"
+      ],
+      "support": [
+        "wie zich vergeet voor te bereiden",
+        "bereidt zich voor om vergeten te worden",
+        "goede voorbereiding is"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 1,
+      "notes": "Phase-level. Prefer as primary when multiple 0.x items appear or when explicit phase marker is present."
+    },
+    "0.1": {
+      "naam": "Prospectanalyse",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "prospectanalyse",
+        "prospect analyse",
+        "prospect- en marktanalyse",
+        "marktanalyse",
+        "klantenanalyse"
+      ],
+      "support": [
+        "uw toekomstige klanten zijn de huidige klanten van uw concurrent"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "0.2": {
+      "naam": "SWOT-analyse prospect",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "swot",
+        "swot-analyse",
+        "sterktes zwaktes kansen bedreigingen"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "0.3": {
+      "naam": "CRM-historiek raadplegen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "crm-historiek",
+        "crm historiek",
+        "contacthistoriek",
+        "eerdere offertes",
+        "notities in crm"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "0.4": {
+      "naam": "One Minute Manager",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "one minute manager",
+        "durven te durven"
+      ],
+      "support": [
+        "mentale voorbereiding",
+        "attitude",
+        "enthousiasme"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "0.5": {
+      "naam": "Gespreksvoorbereiding",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "demo getest",
+        "presentatie klaar",
+        "visitekaartjes mee",
+        "materiaal klaar"
+      ],
+      "support": [
+        "test techniek"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "1": {
+      "naam": "Openingsfase",
+      "kind": "phase",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "openingsfase",
+        "plus één",
+        "plus-een",
+        "plus één fase",
+        "fase 1",
+        "fase één",
+        "fase een"
+      ],
+      "support": [
+        "koopklimaat",
+        "gun-effect",
+        "people buy people",
+        "gentleman's agreement",
+        "reference story",
+        "instapvraag",
+        "product organisatie persoon proces",
+        "pop"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 2,
+      "notes": "Primary when overview/listing of multiple 1.x steps. If chunk deep-dives only one step, leaf rule should dominate."
+    },
+    "1.1": {
+      "naam": "Koopklimaat creëren",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "koopklimaat",
+        "koop klimaat",
+        "kooplimaat",
+        "gun-effect",
+        "gun effect",
+        "people buy people"
+      ],
+      "support": [
+        "eerste indruk"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "1.2": {
+      "naam": "Gentleman's agreement",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "gentleman's agreement",
+        "gentlemans agreement",
+        "gentlemen's agreement"
+      ],
+      "support": [
+        "gesprek sturen",
+        "leiding nemen",
+        "afspreken hoe we het gesprek",
+        "gentleman agreement"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "1.3": {
+      "naam": "Firmavoorstelling + reference story",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "reference story",
+        "firmavoorstelling",
+        "firma voorstelling",
+        "product organisatie persoon proces",
+        "product, organisatie, persoon, proces"
+      ],
+      "support": [
+        "wereldwijd gekend",
+        "we hebben ondertussen"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "1.4": {
+      "naam": "Instapvraag",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "instapvraag"
+      ],
+      "support": [
+        "sta me toe om eens een paar vragen te stellen",
+        "voor ik daarover praat",
+        "mag ik u eens een paar vragen stellen"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2": {
+      "naam": "Ontdekkingsfase",
+      "kind": "phase",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "ontdekkingsfase",
+        "fase 2",
+        "fase twee",
+        "fase twee",
+        "we zitten in fase twee"
+      ],
+      "support": [
+        "epic",
+        "epic engine",
+        "exploratievragen",
+        "probing",
+        "impactvragen",
+        "commitment",
+        "spanningsveld"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 1,
+      "notes": "Phase-level. Primary when explicit phase marker or when multiple EPIC components are covered."
+    },
+    "2.1": {
+      "naam": "Explore",
+      "kind": "overview",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "exploratievragen",
+        "exploratievraag",
+        "explore vragen",
+        "explorevraag",
+        "explore vragen"
+      ],
+      "support": [
+        "feitgericht",
+        "meningsgericht",
+        "feitgericht onder een alternatieve vorm",
+        "terzijde schuiven",
+        "pingpong",
+        "actief luisteren"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0,
+      "notes": "Overview of Explore. Prefer as primary if >=2 explore sub-techniques are detected."
+    },
+    "2.1.1": {
+      "naam": "Feitgerichte vragen",
+      "kind": "overview",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "feitgerichte vraag",
+        "feitgerichte vragen"
+      ],
+      "support": [
+        "bron",
+        "motivatie",
+        "ervaring",
+        "verwachtingen",
+        "alternatieven",
+        "budget",
+        "timing",
+        "beslissingscriteria"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0,
+      "notes": "Overview of fact-based questions. Prefer as primary if multiple 2.1.1.x themes are detected."
+    },
+    "2.1.1.1": {
+      "naam": "Bron",
+      "kind": "theme",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "via welk kanaal",
+        "hoe bent u bij ons terechtgekomen",
+        "hoe heeft u ons gevonden",
+        "waar heeft u ons gevonden"
+      ],
+      "support": [
+        "via internet",
+        "via instagram",
+        "via linkedin"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.1.2": {
+      "naam": "Motivatie",
+      "kind": "theme",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "hoe bent u op het idee gekomen",
+        "wat sprak u daarin aan",
+        "waarom a en waarom b niet"
+      ],
+      "support": [
+        "motivatie",
+        "aanleiding"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.1.3": {
+      "naam": "Ervaring",
+      "kind": "theme",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "hebt u ervaring",
+        "heeft u ervaring",
+        "hebt u dit al eens",
+        "in het verleden al",
+        "eerder gedaan"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.1.4": {
+      "naam": "Verwachtingen",
+      "kind": "theme",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "wat verwacht u",
+        "welke verwachtingen",
+        "wat verwacht u dan"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.1.5": {
+      "naam": "Alternatieven",
+      "kind": "theme",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "alternatieven",
+        "welke alternatieven",
+        "andere opties",
+        "andere mogelijkheden"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.1.6": {
+      "naam": "Budget",
+      "kind": "theme",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "zonder indiscreet te willen zijn",
+        "welke grootorde van budget",
+        "budget in gedachten",
+        "budget bepaald",
+        "prijsverwachting",
+        "realistische investering"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.1.7": {
+      "naam": "Timing",
+      "kind": "theme",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "tegen wanneer",
+        "tijdslijn",
+        "deadline",
+        "tegen wanneer zou dat moeten"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.1.8": {
+      "naam": "Beslissingscriteria",
+      "kind": "theme",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "beslissingscriteria",
+        "op basis van welke criteria",
+        "op basis welke criteria",
+        "welke criteria zijn belangrijk"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.2": {
+      "naam": "Meningsgerichte vragen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "meningsgerichte vraag",
+        "meningsgerichte vragen",
+        "wat verstaat u daaronder",
+        "hoe bedoelt u",
+        "in welke zin bedoelt u"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.3": {
+      "naam": "Feitgerichte vragen onder alternatieve vorm",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "feitgericht onder een alternatieve vorm",
+        "feitgerichte vraag onder een alternatieve vorm",
+        "feitgerichte vragen onder alternatieve vorm"
+      ],
+      "support": [
+        "onder een alternatieve vorm"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.4": {
+      "naam": "Ter zijde schuiven",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "terzijde schuiven",
+        "ter zijde schuiven"
+      ],
+      "support": [
+        "onafgezien"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.5": {
+      "naam": "Pingpong techniek",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "pingpongtechniek",
+        "pingpong techniek"
+      ],
+      "support": [
+        "pingpong"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.1.6": {
+      "naam": "Actief en empathisch luisteren",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "actief luisteren",
+        "empathisch luisteren",
+        "actief en empathisch luisteren"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.2": {
+      "naam": "Probe",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "probing",
+        "probe vraag",
+        "probevragen",
+        "spanningsveld",
+        "reverse thinking",
+        "reverse-thinking",
+        "in welke concreet herkenbare situatie",
+        "in welke concrete situatie is het een voordeel",
+        "in welke concrete situatie is het een nadeel",
+        "verwerven van voordeel",
+        "vermijden van nadeel"
+      ],
+      "support": [
+        "neutraal formuleren",
+        "reverse thinking"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "2.3": {
+      "naam": "Impact / Gevolg vragen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "impactvragen",
+        "impact vraag",
+        "impactvragen",
+        "impactvraag",
+        "maximaliseren",
+        "specifiëren",
+        "concretiseren",
+        "kwantificeren"
+      ],
+      "support": [
+        "aan welke prijs",
+        "per maand",
+        "per jaar"
+      ],
+      "min_anchor_matches": 2,
+      "min_support_matches": 0
+    },
+    "2.4": {
+      "naam": "Commitment",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "commitmentvraag",
+        "commitment vragen",
+        "commitment",
+        "engagement",
+        "engagement vragen"
+      ],
+      "support": [
+        "dus als ik u goed begrijp",
+        "is het voor u belangrijk"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "3": {
+      "naam": "Aanbevelingsfase",
+      "kind": "phase",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "aanbevelingsfase",
+        "fase 3",
+        "fase drie",
+        "aanbevelings fase"
+      ],
+      "support": [
+        "ovb",
+        "oplossing voordeel baat",
+        "oplossing presenteren",
+        "voordeel benoemen",
+        "baten",
+        "gepersonaliseerde oplossing"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 1,
+      "notes": "Phase-level. Prefer as primary when explicit phase marker is present or multiple 3.x steps occur."
+    },
+    "3.1": {
+      "naam": "Empathie tonen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "empathie tonen",
+        "ik begrijp uw bezorgdheid",
+        "ik begrijp dat zekerheid",
+        "ik begrijp dat vertrouwen"
+      ],
+      "support": [
+        "ik hoor u"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "3.2": {
+      "naam": "Oplossing presenteren",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "ik kom met een oplossing",
+        "oplossing naar voren",
+        "daarom bieden wij",
+        "ik breng een oplossing",
+        "dat is de reden waarom wij"
+      ],
+      "support": [
+        "oplossing presenteren"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "3.3": {
+      "naam": "Voordeel benoemen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "wat is daar het voordeel van",
+        "het voordeel is",
+        "wat is daar het voordeel",
+        "het voordeel van"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "3.4": {
+      "naam": "Baat vertalen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "wat betekent dat voor u",
+        "wat betekent dat voor jou",
+        "baten komen van de impact",
+        "baten komen van"
+      ],
+      "support": [
+        "de baten"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "3.5": {
+      "naam": "Mening vragen + standpunt (of koopsignaal) onder alternatieve vorm uitlokken",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "koopsignaal",
+        "standpunt onder alternatieve vorm",
+        "onder alternatieve vorm uitlokken",
+        "zou het gaan om terugwerken",
+        "of dan toch liever"
+      ],
+      "support": [
+        "wat vindt u daarvan",
+        "wat vindt gij daarvan"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "3.6": {
+      "naam": "Technisch voorrekenen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "laat me dat even uitrekenen",
+        "roi",
+        "technisch voorrekenen",
+        "voorrekenen"
+      ],
+      "support": [
+        "bespaart u",
+        "besparing per week",
+        "besparing per jaar",
+        "€ per maand",
+        "x uur per week"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "3.7": {
+      "naam": "Vat baten samen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "vat baten samen",
+        "baten samenvatten",
+        "resumé van de baten",
+        "resumé maken van de baten"
+      ],
+      "support": [
+        "resumé brengen"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4": {
+      "naam": "Beslissingsfase",
+      "kind": "phase",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "beslissingsfase",
+        "fase 4",
+        "fase vier",
+        "we zitten in fase vier"
+      ],
+      "support": [
+        "proefafsluiting",
+        "afritten",
+        "definitieve afsluiting",
+        "twijfel",
+        "uitstel",
+        "bezwaren",
+        "abc",
+        "indien-techniek",
+        "finale closing"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 1,
+      "notes": "Phase-level. Prefer as primary when explicit phase marker is present or multiple 4.x substeps are present."
+    },
+    "4.1": {
+      "naam": "Proefafsluiting",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "proefafsluiting",
+        "testclose",
+        "trial close"
+      ],
+      "support": [
+        "onder een alternatieve vorm",
+        "autostrade"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.2": {
+      "naam": "Afritten behandelen",
+      "kind": "overview",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "afritten",
+        "afrit",
+        "autostrade",
+        "hesitation fase",
+        "hesitation"
+      ],
+      "support": [
+        "klant stelt vragen",
+        "twijfel",
+        "uitstel",
+        "bezwaren",
+        "angst",
+        "bezorgdheden"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0,
+      "notes": "Overview of 'afritten'. Prefer as primary if multiple 4.2.x are detected."
+    },
+    "4.2.1": {
+      "naam": "Klant stelt vragen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "wedervraag",
+        "houd die vraag bij",
+        "we komen daar later op terug",
+        "info plus standpunt",
+        "info plus proefafsluiting",
+        "over welke kosten hebt u het"
+      ],
+      "support": [
+        "productinformatie",
+        "tijdstip"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.2.2": {
+      "naam": "Twijfels behandelen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "oprechte twijfel",
+        "verdoken bezwaar",
+        "twijfel is",
+        "opleveringstermijn",
+        "slechte ervaringen"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.2.3": {
+      "naam": "Uitstel behandelen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "poging tot uitstel",
+        "pogen tot uitstel",
+        "uitstel",
+        "voorwendsel",
+        "voorwaarde",
+        "ik moet het bespreken",
+        "bespreken met de directie",
+        "bespreken met mijn partner",
+        "bespreken met de boekhouder",
+        "bespreken met de bankier"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.2.4": {
+      "naam": "Bezwaren behandelen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "bezwaar",
+        "bezwaren",
+        "pencil selling",
+        "afweegtechniek",
+        "pensumstelling",
+        "isoleren",
+        "neutraliseren",
+        "ontzenuwen"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.2.5": {
+      "naam": "Angst / Bezorgdheden",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "beslissingsangst",
+        "angst voor de risico's",
+        "angst voor de risico",
+        "bezorgdheden",
+        "bezorgdheden"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.2.6": {
+      "naam": "Risico-inschatting behandelen",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "risico-inschatting",
+        "risico inschatting",
+        "risk assessment",
+        "risicoanalyse"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.ABC": {
+      "naam": "ABC-techniek (Always Be Closing)",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "abc-techniek",
+        "abc techniek",
+        "always be closing"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.INDIEN": {
+      "naam": "Indien-techniek",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "indien-techniek",
+        "indien techniek",
+        "indien we tot een samenwerking komen",
+        "indien moesten"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.3": {
+      "naam": "Finale Closing",
+      "kind": "overview",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "finale closing",
+        "definitieve afsluiting",
+        "definitief afsluiten",
+        "order schrijven",
+        "de zaak finaliseren",
+        "de zaak afronden"
+      ],
+      "support": [
+        "samenvatten",
+        "verwachtingen-oplossing",
+        "cvp",
+        "alternatieve keuze"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0,
+      "notes": "Overview of final closing. Prefer as primary if multiple 4.3.x are detected."
+    },
+    "4.3.1": {
+      "naam": "Samenvatten in klantwoorden",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "samenvatten in klantwoorden",
+        "samenvatting in klantwoorden",
+        "resumé maken"
+      ],
+      "support": [
+        "resumé"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.3.2": {
+      "naam": "Verwachtingen-oplossing koppeling",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "verwachtingen-oplossing",
+        "verwachtingen oplossing",
+        "verwachtingen-oplossing koppeling",
+        "oplossing koppelen aan verwachtingen"
+      ],
+      "support": [],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.3.3": {
+      "naam": "CVP bevestigen (Customer Value Proposition)",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "cvp",
+        "customer value proposition",
+        "customer value proposition"
+      ],
+      "support": [
+        "waardepropositie"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.3.4": {
+      "naam": "Alternatieve keuze (finale)",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "alternatieve keuze",
+        "a of b",
+        "studio of kot",
+        "zes stuks of twaalf",
+        "uw notaris",
+        "onze notaris"
+      ],
+      "support": [
+        "onder een alternatieve vorm"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    },
+    "4.3.5": {
+      "naam": "Order schrijven",
+      "kind": "technique",
+      "emit": [
+        "primary",
+        "mention"
+      ],
+      "anchors": [
+        "order schrijven",
+        "ordertekenen",
+        "order tekenen",
+        "orderformulier",
+        "handtekening zetten",
+        "ondertekenen"
+      ],
+      "support": [
+        "tekenen",
+        "handtekening"
+      ],
+      "min_anchor_matches": 1,
+      "min_support_matches": 0
+    }
+  },
+  "global_excludes": []
+}

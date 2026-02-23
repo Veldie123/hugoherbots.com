@@ -1,0 +1,1714 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Single Source of Truth voor Hugo's verkooptechnieken",
+    "last_updated": "2026-01-06",
+    "EPIC_structure": {
+      "2.1": "Explore - Verken situatie met vraagtechnieken (2.1.1-2.1.6)",
+      "2.2": "Probe - Storytelling/hypothetische scenario's",
+      "2.3": "Impact - Vraag naar gevolgen en consequenties",
+      "2.4": "Commitment - Bevestiging van begrip, sleutel naar fase 3"
+    }
+  },
+  "technieken": {
+    "0": {
+      "nummer": "0",
+      "naam": "Pre-contactfase",
+      "fase": "0",
+      "is_fase": true,
+      "doel": "Alle voorbereidende stappen VÓÓR het eerste klantcontact. Een goede voorbereiding is 80% van het verkoopsucces.",
+      "themas": [],
+      "tags": [
+        "voorbereiding",
+        "research",
+        "planning"
+      ],
+      "context_requirements": ["prospect_info", "sector_analyse", "concurrenten_info", "crm_historiek", "mentale_voorbereiding"],
+      "hoe": "Doe desktop research: prospect- en marktanalyse, SWOT-analyse, CRM-historiek raadplegen, ChatGPT voor informatie. Daarna One Minute Manager: mentaal voorbereiden, gefocust zijn, attitude en enthousiasme uitstralen, durven te durven.",
+      "stappenplan": [
+        "Desktop Research: prospect- en marktanalyse uitvoeren",
+        "SWOT-analyse maken van de prospect",
+        "CRM-historiek raadplegen (notities, eerdere offertes, contacthistoriek)",
+        "Informatie ophalen via ChatGPT/online bronnen",
+        "One Minute Manager: mentaal voorbereiden vóór binnenkomst"
+      ],
+      "voorbeeld": [
+        "Goede voorbereiding is al 50% van uw succes",
+        "Wie zich vergeet voor te bereiden, bereidt zich voor om vergeten te worden",
+        "Uw toekomstige klanten zijn de huidige klanten van uw concurrent"
+      ]
+    },
+    "1": {
+      "nummer": "1",
+      "naam": "Openingsfase",
+      "fase": "1",
+      "is_fase": true,
+      "doel": "Volg deze volgorde, tenzij klant spontaan een stap aanbrengt (dan overslaan en terug oppakken waar je zat).",
+      "themas": [],
+      "tags": [
+        "eerste indruk",
+        "vertrouwen",
+        "klimaat"
+      ],
+      "hoe": "Creëer een koopklimaat (gun-effect), formuleer een gentleman's agreement, presenteer POP (Persoon, Organisatie, Proces), en stel de instapvraag om de klant te motiveren waarom het in zijn belang is om informatie te delen.",
+      "stappenplan": [
+        "Koopklimaat creëren (gun-effect, eerste indruk)",
+        "Gentleman's agreement formuleren (agenda afspreken)",
+        "POP presenteren: Persoon, Organisatie, Proces uitleggen",
+        "Instapvraag stellen naar Fase 2"
+      ],
+      "voorbeeld": [
+        "Koopklimaat: Observeer omgeving, vind aanknopingspunten",
+        "Gentleman's agreement: 'Als ik eerst een paar vragen mag stellen, kan ik u daarna een gepersonaliseerd voorstel doen. Is dat oké?'",
+        "Instapvraag: 'Mag ik u een paar vragen stellen om te begrijpen wat voor u belangrijk is?'"
+      ]
+    },
+    "2": {
+      "nummer": "2",
+      "naam": "Ontdekkingsfase",
+      "fase": "2",
+      "is_fase": true,
+      "doel": "Breng noden, te verwerven voordelen, te vermijden nadelen en vooral baten in kaart. Expliciete BAAT afleiden uit een VOORDEEL, bevestigen met COMMITMENT en pas dan naar fase 3.",
+      "themas": [
+        "Bron",
+        "Motivatie",
+        "Ervaring",
+        "Verwachtingen",
+        "Alternatieven",
+        "Budget",
+        "Timing",
+        "Beslissingscriteria"
+      ],
+      "tags": [
+        "EPIC",
+        "vraagtechnieken",
+        "behoefteanalyse"
+      ],
+      "hoe": "Gebruik het EPIC-model: Explore (feit-, mening- en alternatieve vragen over de 8 thema's), Probe (storytelling/hypothetische scenario's), Impact (consequentievragen), Commit (expliciete bevestiging van begrip). Creëer waarde door noden, voordelen, nadelen en vooral BATEN in kaart te brengen.",
+      "stappenplan": [
+        "Explore (2.1): Stel feit-, mening- en alternatieve vragen over de 8 thema's (Bron, Motivatie, Ervaring, Verwachtingen, Alternatieven, Budget, Timing, Beslissingscriteria)",
+        "Probe (2.2): Gebruik storytelling of hypothetische scenario's ('Stel dat...', 'Wat als...')",
+        "Impact (2.3): Vraag naar gevolgen en consequenties ('Wat betekent dat voor u?')",
+        "Commit (2.4): Vraag expliciete bevestiging van begrip voordat je naar Fase 3 gaat"
+      ],
+      "voorbeeld": [
+        "Explore: 'Hoe bent u bij ons terechtgekomen?' (Bron), 'Wat was de aanleiding?' (Motivatie)",
+        "Probe: 'Stel dat u dit probleem zou kunnen oplossen, wat zou dat betekenen voor uw dagelijkse werk?'",
+        "Impact: 'Wat zijn de gevolgen als dit zo blijft?'",
+        "Commit: 'Als ik het goed begrijp, is X voor u het belangrijkste. Klopt dat?'"
+      ]
+    },
+    "3": {
+      "nummer": "3",
+      "naam": "Aanbevelingsfase",
+      "fase": "3",
+      "is_fase": true,
+      "doel": "Verbind de baten uit fase 2 aan jouw concrete oplossing en USP's. Gebruik altijd O.V.B.: Oplossing → Voordeel → Baat. Vraag daarna naar de mening en lok een koopsignaal uit.",
+      "themas": [
+        "USP's"
+      ],
+      "tags": [
+        "O.V.B.",
+        "oplossing",
+        "voordeel",
+        "baat"
+      ],
+      "hoe": "Behandel de belangrijkste verwachting eerst met O.V.B., vraag dan of je andere verwachtingen mag bespreken. Bij te hoge verwachtingen: erken, vraag naar prioriteiten, focus op wat haalbaar is. Bij geen verwachtingen: ga terug naar fase 2.",
+      "stappenplan": [
+        "Behandel belangrijkste verwachting eerst met O.V.B.",
+        "Vraag: 'Wilt u dat ik ook uw andere verwachting bespreek?'",
+        "Te hoge verwachtingen: erken, vraag prioriteiten, focus op haalbaar",
+        "Geen verwachtingen: terug naar fase 2 voor Explore/Probe/Impact vragen"
+      ],
+      "voorbeeld": [
+        "Klant: 'Het is te duur.' → O: 'Onze service kost €400/maand.' V: 'Daarmee bespaart u 8 uur per week.' B: 'Dat betekent dat u niet meer wakker ligt van administratie.'"
+      ]
+    },
+    "4": {
+      "nummer": "4",
+      "naam": "Beslissingsfase",
+      "fase": "4",
+      "is_fase": true,
+      "doel": "Stuur naar beslissing, behandel resterende houdingen van de klant (afritten: vragen, twijfels, uitstel, bezwaren, risico's) en sluit af met de finale closing sequence. Gouden regel: vraag HOE, niet OF. Mindset: ga altijd uit van de koop.",
+      "themas": [
+        "beslissing"
+      ],
+      "tags": [
+        "closing",
+        "ABC",
+        "indien-techniek",
+        "bezwaren"
+      ],
+      "hoe": "Ga er altijd van uit dat de klant gaat kopen. Dit is vertrouwen in je product en waarde. Je lichaamstaal, toon en woordkeuze moeten 'koop' uitstralen. Behandel decision barriers: vragen (info), twijfels (onzekerheid), uitstel (niet nu), bezwaren (tegenargumenten), angst (emotioneel), risico-inschatting (rationeel).",
+      "stappenplan": [
+        "Proefafsluiting doen",
+        "ABC-techniek toepassen (Always Be Closing)",
+        "Indien-techniek gebruiken",
+        "Afritten behandelen (vragen, twijfels, uitstel, bezwaren, angst, risico)",
+        "Finale closing: samenvatten, verwachtingen-oplossing koppelen, CVP bevestigen, alternatieve keuze, order schrijven"
+      ],
+      "voorbeeld": [
+        "Niet: 'Als u zou willen kopen...' maar 'Wanneer u begint met...'",
+        "Niet: 'Wilt u dit?' maar 'Hoe wilt u dit?'",
+        "Niet: 'Mag ik u een offerte sturen?' maar 'Ik stuur u maandag de offerte, is dat oké?'"
+      ]
+    },
+    "0.1": {
+      "nummer": "0.1",
+      "naam": "Prospectanalyse",
+      "doel": "Inzicht krijgen in de prospect zodat je het gesprek kunt personaliseren en relevante vragen kunt stellen.",
+      "fase": "0",
+      "parent": "0",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Grondige analyse van de prospect vóór het eerste contact: bedrijfsinfo, sector, concurrenten, recente ontwikkelingen.",
+      "waarom": "Om voorbereid het gesprek in te gaan en relevante gespreksonderwerpen te hebben.",
+      "wanneer": "Altijd vóór het eerste contactmoment.",
+      "hoe": "Onderzoek website, LinkedIn, nieuwsartikelen, jaarverslagen, sociale media van de prospect.",
+      "voorbeeld": [
+        "Bedrijfsprofiel opzoeken op LinkedIn",
+        "Recente persberichten checken",
+        "Sector-trends onderzoeken"
+      ],
+      "stappenplan": [
+        "Zoek bedrijfsinformatie op",
+        "Analyseer sector en marktpositie",
+        "Identificeer beslissers",
+        "Noteer gesprekshaakjes"
+      ],
+      "context_requirements": ["prospect_info", "sector_analyse", "concurrenten_info", "beslissers", "gesprekshaakjes"],
+      "tags": [
+        "voorbereiding",
+        "analyse",
+        "research"
+      ],
+      "verkoper_intentie": [
+        "voorbereiden",
+        "informatie verzamelen"
+      ]
+    },
+    "0.2": {
+      "nummer": "0.2",
+      "naam": "SWOT-analyse prospect",
+      "doel": "Kansen en risico's identificeren om je aanpak strategisch af te stemmen op de situatie van de prospect.",
+      "fase": "0",
+      "parent": "0",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "SWOT-analyse maken van de prospect: Strengths, Weaknesses, Opportunities, Threats.",
+      "waarom": "Om te begrijpen waar de prospect staat en waar jouw oplossing kan helpen.",
+      "wanneer": "Na de prospectanalyse, vóór het gesprek.",
+      "hoe": "Maak een overzicht van sterke punten, zwaktes, kansen en bedreigingen van de prospect.",
+      "voorbeeld": [
+        "Sterkte: marktleider in regio",
+        "Zwakte: verouderde systemen",
+        "Kans: digitalisering",
+        "Bedreiging: nieuwe concurrenten"
+      ],
+      "stappenplan": [
+        "Lijst sterktes op",
+        "Identificeer zwaktes",
+        "Zoek kansen",
+        "Analyseer bedreigingen",
+        "Koppel aan jouw aanbod"
+      ],
+      "tags": [
+        "voorbereiding",
+        "analyse",
+        "SWOT"
+      ],
+      "verkoper_intentie": [
+        "analyseren",
+        "positioneren"
+      ]
+    },
+    "0.3": {
+      "nummer": "0.3",
+      "naam": "CRM-historiek raadplegen",
+      "doel": "Voorkomen dat je vragen stelt die al beantwoord zijn en voortbouwen op eerdere interacties.",
+      "fase": "0",
+      "parent": "0",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Bekijk alle eerdere contacten, notities, offertes en interacties met deze prospect in het CRM.",
+      "waarom": "Om te weten wat er al besproken is en geen informatie te herhalen of missen.",
+      "wanneer": "Altijd vóór elk contactmoment.",
+      "hoe": "Open CRM, lees alle notities, bekijk eerdere offertes, check contacthistoriek.",
+      "voorbeeld": [
+        "Vorige offerte bekijken",
+        "Notities van collega's lezen",
+        "Laatste contactdatum checken"
+      ],
+      "stappenplan": [
+        "Open CRM-record",
+        "Lees alle notities",
+        "Bekijk offertehistoriek",
+        "Noteer follow-up punten"
+      ],
+      "tags": [
+        "voorbereiding",
+        "CRM",
+        "historiek"
+      ],
+      "verkoper_intentie": [
+        "voorbereiden",
+        "context verzamelen"
+      ]
+    },
+    "0.4": {
+      "nummer": "0.4",
+      "naam": "One Minute Manager",
+      "doel": "Mentaal gefocust het gesprek ingaan met een duidelijk doel en voorbereide reacties op bezwaren.",
+      "fase": "0",
+      "parent": "0",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Korte mentale voorbereiding: wat is mijn doel, wat zijn mogelijke bezwaren, hoe ga ik die tackelen?",
+      "waarom": "Om gefocust en zelfverzekerd het gesprek in te gaan.",
+      "wanneer": "Direct vóór het contactmoment (1 minuut).",
+      "hoe": "Stel jezelf drie vragen: Wat is mijn doel? Wat kan de klant zeggen? Hoe reageer ik daarop?",
+      "voorbeeld": [
+        "Doel: afspraak maken",
+        "Bezwaar: geen tijd → Antwoord: '15 minuten volstaat'",
+        "Bezwaar: niet geïnteresseerd → Doorvragen naar reden"
+      ],
+      "stappenplan": [
+        "Bepaal je doel",
+        "Anticipeer op bezwaren",
+        "Formuleer je reacties",
+        "Visualiseer succes"
+      ],
+      "tags": [
+        "voorbereiding",
+        "mindset",
+        "focus"
+      ],
+      "verkoper_intentie": [
+        "voorbereiden",
+        "mentaal klaarmaken"
+      ]
+    },
+    "0.5": {
+      "nummer": "0.5",
+      "naam": "Gespreksvoorbereiding",
+      "doel": "Zorgen dat alle materialen klaar zijn zodat je professioneel en vlot kunt presenteren.",
+      "fase": "0",
+      "parent": "0",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Concrete voorbereiding: agenda, materialen, vragen, demo's klaarzetten.",
+      "waarom": "Om professioneel en voorbereid over te komen.",
+      "wanneer": "Vóór elk belangrijk klantcontact.",
+      "hoe": "Check alle materialen, bereid vragen voor, zorg dat techniek werkt.",
+      "voorbeeld": [
+        "Presentatie klaar",
+        "Demo getest",
+        "Visitekaartjes mee",
+        "Vragen geformuleerd"
+      ],
+      "stappenplan": [
+        "Check agenda en locatie",
+        "Bereid materialen voor",
+        "Formuleer gespreksvragen",
+        "Test techniek"
+      ],
+      "tags": [
+        "voorbereiding",
+        "materialen",
+        "professioneel"
+      ],
+      "verkoper_intentie": [
+        "voorbereiden",
+        "professioneel overkomen"
+      ]
+    },
+    "1.1": {
+      "nummer": "1.1",
+      "naam": "Koopklimaat creëren",
+      "doel": "Vertrouwen en sympathie opbouwen zodat de klant openstaat voor het gesprek.",
+      "fase": "1",
+      "parent": "1",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Gedrag, onderwerpkeuze en presentatie aanpassen aan interesses en sfeer van klant.",
+      "waarom": "Om vertrouwen en comfort te creëren zodat de klant je de verkoop gunt ('gun-effect').",
+      "wanneer": "Direct bij aanvang van gesprek.",
+      "hoe": "Gebruik observaties (omgeving, kledingstijl) en persoonlijke aanpassingen om aansluiting te vinden.",
+      "voorbeeld": [
+        "Kostuumvest uitdoen wanneer de klant duidelijk casual gekleed is."
+      ],
+      "stappenplan": [
+        "Observeer klant en omgeving.",
+        "Pas eigen gedrag/uiterlijk aan.",
+        "Begin met een persoonlijk of luchtig onderwerp, geen product."
+      ],
+      "tags": [
+        "vertrouwen",
+        "aanvang",
+        "klantgericht"
+      ],
+      "verkoper_intentie": [
+        "vertrouwen winnen",
+        "relatie opbouwen"
+      ],
+      "context_requirements": ["sector", "product", "verkoopkanaal", "locatie"],
+      "customer_dynamics_effect": {
+        "rapport": 0.15,
+        "valueTension": 0,
+        "commitReadiness": 0
+      }
+    },
+    "1.2": {
+      "nummer": "1.2",
+      "naam": "Gentleman's agreement",
+      "doel": "Gespreksleiding nemen en verwachtingen afstemmen zodat de klant weet wat komen gaat.",
+      "fase": "1",
+      "parent": "1",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Duidelijke afspraken maken over het verloop van gesprek (gespreksleiding nemen).",
+      "waarom": "Om controle te houden en het gesprek strategisch te sturen.",
+      "wanneer": "Altijd na het creëren van koopklimaat.",
+      "hoe": "Overloop agenda duidelijk en vraag expliciet akkoord.",
+      "voorbeeld": [
+        "'t Zal de bedoeling zijn vandaag om even kennis te maken. Enerzijds wie wij zijn, wat wij doen, anderzijds wat u precies verwacht. Iemand als u zal daar ongetwijfeld zijn idee over hebben. Als het niet past, verdoen we op die manier niet lang elkaars tijd; klikt het wel, dan overlopen we hoe we kunnen samenwerken. Is dat goed voor u als we zo te werk gaan?"
+      ],
+      "stappenplan": [
+        "Stel kort het doel en de structuur voor.",
+        "Vraag expliciet akkoord.",
+        "Zorg voor een vriendelijke en duidelijke toon."
+      ],
+      "tags": [
+        "vertrouwen",
+        "aanvang",
+        "klantgericht"
+      ],
+      "verkoper_intentie": [
+        "gespreksleiding",
+        "structuur aanbrengen"
+      ],
+      "context_requirements": ["klant_type", "afspraak_type"],
+      "customer_dynamics_effect": {
+        "rapport": 0.08,
+        "valueTension": 0,
+        "commitReadiness": 0.02
+      }
+    },
+    "1.3": {
+      "nummer": "1.3",
+      "naam": "Firmavoorstelling + reference story",
+      "doel": "Geloofwaardigheid opbouwen door concrete resultaten en referenties te tonen.",
+      "fase": "1",
+      "parent": "1",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Korte introductie van jezelf en bedrijf gekoppeld aan concrete referenties en prestaties.",
+      "waarom": "Interesse wekken en gesprek richten naar sterke punten (USP's) van jouw oplossing.",
+      "wanneer": "Na gentleman's agreement.",
+      "hoe": "Presenteer duidelijk, compact en met overtuigende cijfers en herkenbare klanttypes.",
+      "voorbeeld": [
+        "Ik werk voor projectontwikkelaar XYZ, we bestaan 20 jaar en hebben ondertussen 1400 appartementen, 1200 woningen, 3 publieke parkings, 10 hotels en 4 vakantieparken gebouwd..."
+      ],
+      "stappenplan": [
+        "Kies referentie die aansluit bij klanttype.",
+        "Geef beknopt aantal relevante cijfers.",
+        "Verbind je bedrijfspitch aan klantnoden."
+      ],
+      "tags": [
+        "USP",
+        "introductie",
+        "interesse"
+      ],
+      "verkoper_intentie": [
+        "interesse wekken",
+        "relevantie tonen"
+      ],
+      "context_requirements": ["usps_top3", "succesverhaal", "concurrenten_top3"],
+      "customer_dynamics_effect": {
+        "rapport": 0.05,
+        "valueTension": 0.05,
+        "commitReadiness": 0
+      }
+    },
+    "1.4": {
+      "nummer": "1.4",
+      "naam": "Instapvraag",
+      "doel": "De klant motiveren om informatie te delen door het belang voor hem te benadrukken.",
+      "fase": "1",
+      "parent": "1",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Open vraag die klant uitnodigt om situatie te beschrijven.",
+      "waarom": "Klant activeren en informatie verkrijgen over situatie en behoeften.",
+      "wanneer": "Direct na firmavoorstelling.",
+      "hoe": "Stel vraag op uitnodigende, open manier.",
+      "voorbeeld": [
+        "Vertel eens, meneer en mevrouw X, hoe mag ik jullie situatie inschatten?"
+      ],
+      "stappenplan": [
+        "Gebruik een neutrale open vraag.",
+        "Laat klant uitpraten.",
+        "Luister aandachtig en stel eventueel een vervolgvraag."
+      ],
+      "tags": [
+        "open vraag",
+        "informatie",
+        "activeren"
+      ],
+      "verkoper_intentie": [
+        "situatie verkennen",
+        "klant aan het woord laten"
+      ],
+      "context_requirements": ["twee_klanttypen", "typische_opening"],
+      "customer_dynamics_effect": {
+        "rapport": 0.10,
+        "valueTension": 0,
+        "commitReadiness": 0
+      }
+    },
+    "2.1": {
+      "nummer": "2.1",
+      "naam": "Explore",
+      "doel": "De situatie, behoeften en context van de klant verkennen om waarde te kunnen creëren.",
+      "fase": "2",
+      "parent": "2",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "De Explore-stap in de EPIC-methode: verken de situatie, behoeften en context van de klant door gerichte vraagtechnieken.",
+      "waarom": "Om voldoende informatie te verzamelen voordat je naar Probe, Impact en Commitment gaat. Zonder goede exploratie kun je geen gerichte impact maken.",
+      "wanneer": "Direct na de openingsfase (1.4 Instapvraag) - dit is het begin van fase 2.",
+      "hoe": "Gebruik een mix van feit-, mening- en alternatieve vragen om de situatie te verkennen. Luister actief en speel in op wat de klant zegt.",
+      "voorbeeld": [
+        "Start met feitvragen om de huidige situatie te begrijpen, wissel af met meningsvragen om drijfveren te ontdekken."
+      ],
+      "stappenplan": [
+        "Start met feitvragen (2.1.1) om situatie te begrijpen",
+        "Wissel af met meningsvragen (2.1.2) voor drijfveren",
+        "Gebruik alternatieve vragen (2.1.3) bij onduidelijkheid",
+        "Pas ter zijde schuiven (2.1.4) toe als de klant te vroeg zelf vragen begint te stellen",
+        "Gebruik pingpong (2.1.5) voor verduidelijking",
+        "Luister actief (2.1.6) en toon empathie"
+      ],
+      "tags": [
+        "exploratie",
+        "vraagtechniek",
+        "ontdekking",
+        "EPIC"
+      ],
+      "verkoper_intentie": [
+        "situatie verkennen",
+        "informatie verzamelen",
+        "rapport opbouwen"
+      ],
+      "context_requirements": ["gesprek_verloop", "gespreksduur", "gespreksdoel"]
+    },
+    "2.1.1": {
+      "nummer": "2.1.1",
+      "naam": "Feitgerichte vragen",
+      "doel": "Concrete feiten en cijfers verzamelen om een gepersonaliseerde oplossing te kunnen bouwen.",
+      "fase": "2",
+      "parent": "2.1",
+      "wat": "Gericht vragen naar feiten, cijfers of specifieke informatie rond de 8 Discovery-thema's.",
+      "waarom": "Om gesprek strategisch te sturen richting voordelen van jouw oplossing.",
+      "wanneer": "Tijdens begin ontdekkingsfase, om gesprek positief te beïnvloeden.",
+      "hoe": "Stel duidelijke, feitelijke vragen gericht op specifieke details binnen de thema's: Bron, Motivatie, Ervaring, Verwachtingen, Alternatieven, Budget, Timing, Beslissingscriteria.",
+      "voorbeeld": [
+        "Hoe bent u bij ons terechtgekomen?",
+        "Welke ervaring heeft u al met ...?",
+        "Wat verwacht u van ...?"
+      ],
+      "themas": [
+        "2.1.1.1",
+        "2.1.1.2",
+        "2.1.1.3",
+        "2.1.1.4",
+        "2.1.1.5",
+        "2.1.1.6",
+        "2.1.1.7",
+        "2.1.1.8"
+      ],
+      "context_requirements": ["thema_bron", "thema_motivatie", "thema_ervaring", "thema_verwachtingen", "thema_alternatieven", "thema_budget", "thema_timing", "thema_beslissingscriteria"]
+    },
+    "2.1.1.1": {
+      "nummer": "2.1.1.1",
+      "naam": "Bron",
+      "doel": "Begrijpen via welk kanaal de klant kwam om verwachtingen en context te begrijpen.",
+      "fase": "2",
+      "parent": "2.1.1",
+      "wat": "Feitgerichte vraag om te achterhalen hoe/via welk kanaal de klant bij jou is terechtgekomen.",
+      "waarom": "Om te begrijpen wat de klant heeft aangetrokken en welke marketingkanalen werken.",
+      "wanneer": "Aan het begin van de ontdekkingsfase.",
+      "hoe": "Stel een open vraag over hoe de klant jullie heeft gevonden.",
+      "voorbeeld": [
+        "Hoe bent u bij ons terechtgekomen?",
+        "Via welk kanaal hoorde u over ons?",
+        "Wat bracht u hier vandaag?"
+      ],
+      "thema_id": "bron"
+    },
+    "2.1.1.2": {
+      "nummer": "2.1.1.2",
+      "naam": "Motivatie",
+      "doel": "De trigger of aanleiding achterhalen om te begrijpen wat de klant drijft.",
+      "fase": "2",
+      "parent": "2.1.1",
+      "wat": "Feitgerichte vraag om te achterhalen waarom de klant nu op zoek is naar een oplossing.",
+      "waarom": "Om de drijfveer en urgentie te begrijpen.",
+      "wanneer": "Na de bronvraag of als opening van ontdekking.",
+      "hoe": "Vraag naar de aanleiding of trigger voor hun zoektocht.",
+      "voorbeeld": [
+        "Wat maakt dat u nu op zoek bent?",
+        "Wat is de aanleiding?",
+        "Waarom juist nu?"
+      ],
+      "thema_id": "motivatie"
+    },
+    "2.1.1.3": {
+      "nummer": "2.1.1.3",
+      "naam": "Ervaring",
+      "doel": "Eerdere ervaringen in kaart brengen om daarop in te spelen.",
+      "fase": "2",
+      "parent": "2.1.1",
+      "wat": "Feitgerichte vraag om te achterhalen welke ervaring de klant al heeft met dit type product/dienst.",
+      "waarom": "Om je uitleg en aanpak af te stemmen op het kennisniveau van de klant.",
+      "wanneer": "Vroeg in de ontdekkingsfase.",
+      "hoe": "Vraag concreet naar eerdere ervaringen of gebruik.",
+      "voorbeeld": [
+        "Welke ervaring heeft u al met ...?",
+        "Hoe lang werkt u al met ...?",
+        "Heeft u hier al eerder mee gewerkt?"
+      ],
+      "thema_id": "ervaring"
+    },
+    "2.1.1.4": {
+      "nummer": "2.1.1.4",
+      "naam": "Verwachtingen",
+      "doel": "Wensen en eisen helder krijgen om je aanbod daarop af te stemmen.",
+      "fase": "2",
+      "parent": "2.1.1",
+      "wat": "Feitgerichte vraag om te achterhalen wat de klant verwacht van de ideale oplossing.",
+      "waarom": "Om je voorstel af te stemmen op wat de klant écht wil.",
+      "wanneer": "Midden in de ontdekkingsfase.",
+      "hoe": "Vraag open naar wensen, eisen of ideale situatie.",
+      "voorbeeld": [
+        "Wat verwacht u van ...?",
+        "Hoe zou de ideale oplossing eruitzien?",
+        "Wat zijn uw belangrijkste wensen?"
+      ],
+      "thema_id": "verwachtingen"
+    },
+    "2.1.1.5": {
+      "nummer": "2.1.1.5",
+      "naam": "Alternatieven",
+      "doel": "Weten welke opties de klant overweegt om je te kunnen differentiëren.",
+      "fase": "2",
+      "parent": "2.1.1",
+      "wat": "Feitgerichte vraag om te achterhalen welke andere opties de klant bekijkt of heeft bekeken.",
+      "waarom": "Om je positionering te bepalen en concurrentie te begrijpen.",
+      "wanneer": "Midden tot laat in de ontdekkingsfase.",
+      "hoe": "Vraag open naar andere opties die de klant overweegt.",
+      "voorbeeld": [
+        "Heeft u al andere opties bekeken?",
+        "Wat heeft u al geprobeerd?",
+        "Met wie vergelijkt u ons?"
+      ],
+      "thema_id": "alternatieven"
+    },
+    "2.1.1.6": {
+      "nummer": "2.1.1.6",
+      "naam": "Budget",
+      "doel": "Het financiële kader kennen om een passend voorstel te kunnen doen.",
+      "fase": "2",
+      "parent": "2.1.1",
+      "wat": "Feitgerichte vraag om te achterhalen welk budget of prijsverwachting de klant heeft.",
+      "waarom": "Om je voorstel af te stemmen en tijd te besparen.",
+      "wanneer": "Midden tot laat in de ontdekkingsfase, nadat vertrouwen is opgebouwd.",
+      "hoe": "Vraag tactvol en respectvol naar budget of investering.",
+      "voorbeeld": [
+        "Zonder indiscreet te willen zijn, welke grootorde van budget heeft u in gedachten?",
+        "Wat is een realistische investering voor u?",
+        "Heeft u al een budget bepaald?"
+      ],
+      "thema_id": "budget"
+    },
+    "2.1.1.7": {
+      "nummer": "2.1.1.7",
+      "naam": "Timing",
+      "doel": "Het beslissingsmoment en de urgentie begrijpen om het proces te synchroniseren.",
+      "fase": "2",
+      "parent": "2.1.1",
+      "wat": "Feitgerichte vraag om te achterhalen wanneer de klant wil beslissen of starten.",
+      "waarom": "Om urgentie te begrijpen en je proces af te stemmen.",
+      "wanneer": "Laat in de ontdekkingsfase.",
+      "hoe": "Vraag concreet naar tijdlijn of deadline.",
+      "voorbeeld": [
+        "Wanneer wilt u hiermee starten?",
+        "Is er een deadline?",
+        "Wanneer moet dit rond zijn?"
+      ],
+      "thema_id": "timing"
+    },
+    "2.1.1.8": {
+      "nummer": "2.1.1.8",
+      "naam": "Beslissingscriteria",
+      "doel": "Weten waarop de klant zijn keuze baseert om daar je propositie op te richten.",
+      "fase": "2",
+      "parent": "2.1.1",
+      "wat": "Feitgerichte vraag om te achterhalen wie beslist en op basis van welke criteria.",
+      "waarom": "Om te weten wie je moet overtuigen en waarop je moet focussen.",
+      "wanneer": "Laat in de ontdekkingsfase.",
+      "hoe": "Vraag naar beslissers en beslissingscriteria.",
+      "voorbeeld": [
+        "Wie beslist hierover?",
+        "Wat zijn de belangrijkste criteria?",
+        "Hoe wordt deze beslissing genomen?",
+        "Zijn er anderen betrokken bij de beslissing?"
+      ],
+      "thema_id": "beslissingscriteria"
+    },
+    "2.1.2": {
+      "nummer": "2.1.2",
+      "naam": "Meningsgerichte vragen",
+      "doel": "Dieper inzicht krijgen in de motivatie achter de feiten.",
+      "fase": "2",
+      "parent": "2.1",
+      "wat": "Open vragen die klant stimuleren mening of gevoelens te delen.",
+      "waarom": "Om diepere inzichten te krijgen in behoeften en wensen.",
+      "wanneer": "Tijdens ontdekkingsfase om klant aan het praten te krijgen.",
+      "hoe": "Stel open vragen waarop niet met ja/nee geantwoord kan worden.",
+      "voorbeeld": [
+        "Waarom wel? Waarom niet? Hoe ziet u dat?",
+        "Wat vindt u belangrijk aan ...?"
+      ]
+    },
+    "2.1.3": {
+      "nummer": "2.1.3",
+      "naam": "Feitgerichte vragen onder alternatieve vorm",
+      "doel": "Concrete antwoorden verkrijgen van klanten die vaag of niet-communicatief zijn.",
+      "fase": "2",
+      "parent": "2.1",
+      "wat": "Duidelijke keuzevragen om standpunt klant helder te krijgen.",
+      "waarom": "Om twijfels of vaagheden op te helderen.",
+      "wanneer": "Bij onduidelijke of aarzelende antwoorden van klant.",
+      "hoe": "Geef klant expliciete keuze tussen twee opties.",
+      "voorbeeld": [
+        "Is het omdat ... of omdat u liever ...?",
+        "Zoekt u ... of eerder ...?"
+      ]
+    },
+    "2.1.4": {
+      "nummer": "2.1.4",
+      "naam": "Ter zijde schuiven",
+      "doel": "Verwachtingen of vragen parkeren zodat je eerst waarde kunt creëren.",
+      "fase": "2",
+      "parent": "2.1",
+      "wat": "Gesprek wegsturen van premature bezwaren om deze op later, strategischer moment aan bod te laten komen.",
+      "waarom": "Om eerst positief gesprek te richten op USP's voordat nadelen besproken worden.",
+      "wanneer": "Bij vroege bezwaren of vragen over nadelen.",
+      "hoe": "Erken bezwaar kort, schuif het tijdelijk opzij en leid gesprek naar positieve aspecten.",
+      "voorbeeld": [
+        "Onafgezien de prijs... wat vindt u nog belangrijk?",
+        "Goede vraag, hou dat even bij, maar laat mij eerst eens vragen..."
+      ]
+    },
+    "2.1.5": {
+      "nummer": "2.1.5",
+      "naam": "Pingpong techniek",
+      "doel": "De klant vragen teruggeven om hem aan het praten te krijgen.",
+      "fase": "2",
+      "parent": "2.1",
+      "wat": "Doorvragen op antwoorden van klant om volledige duidelijkheid te krijgen.",
+      "waarom": "Om misverstanden of vage antwoorden te vermijden.",
+      "wanneer": "Bij elk mogelijk misverstand of korte, vage antwoorden.",
+      "hoe": "Vraag direct verduidelijking of nadere uitleg.",
+      "voorbeeld": [
+        "Hoe bedoelt u?",
+        "Wat bedoelt u wanneer u zegt...?",
+        "Echt? Hoe zit dat precies?"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.06,
+        "valueTension": 0,
+        "commitReadiness": 0
+      }
+    },
+    "2.1.6": {
+      "nummer": "2.1.6",
+      "naam": "Actief en empathisch luisteren",
+      "doel": "Tonen dat je de klant begrijpt en hem aanmoedigen om door te praten.",
+      "fase": "2",
+      "parent": "2.1",
+      "wat": "Actief luisteren en empathie tonen zodat klant zich gehoord voelt.",
+      "waarom": "Omdat je dan leert wat echt belangrijk is voor de klant én vertrouwen opbouwt.",
+      "wanneer": "Gedurende hele ontdekkingsfase.",
+      "hoe": "Gebruik technieken als ondersteuning, aansporing, empathie tonen, herhalen/parafraseren.",
+      "voorbeeld": [
+        "Hm, hoofdknikken, interesse laten blijken",
+        "Dus u bedoelt ...",
+        "Dat begrijp ik, daar kan ik inkomen."
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.12,
+        "valueTension": 0,
+        "commitReadiness": 0
+      }
+    },
+    "2.2": {
+      "nummer": "2.2",
+      "naam": "Storytelling / Hypothetisch scenario",
+      "doel": "De klant laten nadenken over hypothetische scenario's om latente behoeften bloot te leggen.",
+      "fase": "2",
+      "parent": "2",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Suggestieve vraagstelling met behulp van storytelling.",
+      "waarom": "Om de prospect de ernst van een probleem beter te helpen begrijpen of van gedacht te doen veranderen zonder discussie.",
+      "wanneer": "Wanneer klant belang van een USP niet inziet of negatief reageert.",
+      "hoe": "Gebruik verhalen of hypothetische situaties: 'Stel dat…', 'Wat als…', en sluit af met een open mening-vraag.",
+      "voorbeeld": [
+        "Indien u met de ervaring die u hebt, die beslissing zou kunnen hernemen, wat zou u anders doen?",
+        "Stel dat u voor een vergelijkbare situatie komt te staan, hoe zou u dat aanpakken?"
+      ],
+      "stappenplan": [
+        "Bepaal het punt waarop klant vasthoudt aan een (onjuiste) overtuiging.",
+        "Vertel een kort, herkenbaar verhaal of schets een hypothetische situatie.",
+        "Stel daarna een mening-vraag aan klant."
+      ],
+      "tags": [
+        "storytelling",
+        "inzicht",
+        "overtuigen"
+      ],
+      "verkoper_intentie": [
+        "visie bijsturen",
+        "inzicht geven"
+      ],
+      "context_requirements": ["probe_verhalen", "pains", "emotionele_triggers"],
+      "customer_dynamics_effect": {
+        "rapport": 0.03,
+        "valueTension": 0.10,
+        "commitReadiness": 0
+      }
+    },
+    "2.3": {
+      "nummer": "2.3",
+      "naam": "Impact / Gevolg vragen",
+      "doel": "De klant bewust maken van de gevolgen van zijn huidige situatie of van niet-handelen.",
+      "fase": "2",
+      "parent": "2",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Vraag naar de consequenties of gevolgen van een situatie voor de klant.",
+      "waarom": "Om de klant bewust te maken van de impact en urgentie te creëren.",
+      "wanneer": "Na het identificeren van een probleem of behoefte.",
+      "hoe": "Stel vragen als 'Wat betekent dat voor u?', 'Wat zijn de gevolgen als...?'",
+      "voorbeeld": [
+        "Wat betekent dat concreet voor jullie?",
+        "Wat zijn de gevolgen als dit zo doorgaat?"
+      ],
+      "stappenplan": [
+        "Identificeer probleem of behoefte.",
+        "Vraag naar concrete gevolgen.",
+        "Laat klant reflecteren en impact benoemen."
+      ],
+      "tags": [
+        "impact",
+        "consequenties",
+        "urgentie"
+      ],
+      "verkoper_intentie": [
+        "gevolgen laten benoemen",
+        "urgentie creëren"
+      ],
+      "context_requirements": ["impact_gevolgen", "baten_top"],
+      "customer_dynamics_effect": {
+        "rapport": 0,
+        "valueTension": 0.18,
+        "commitReadiness": 0.05
+      }
+    },
+    "2.4": {
+      "nummer": "2.4",
+      "naam": "Commitment",
+      "doel": "Expliciete bevestiging krijgen dat de klant de behoefte erkent voordat je naar fase 3 gaat.",
+      "fase": "2",
+      "parent": "2",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Een controlevraag waarmee je bevestigt of je de visie, verwachtingen of pijnpunten van de klant goed begrepen hebt.",
+      "waarom": "Om na te gaan of je goed begrijpt wat de klant écht belangrijk vindt en om de klant in een 'ja-ritme' te brengen. Dit is de SLEUTEL om naar fase 3 te mogen gaan.",
+      "wanneer": "Tijdens de ganse ontdekkingsfase, telkens de klant zich positief uitlaat. ESSENTIEEL vóór overgang naar fase 3, NA impact is gemaximaliseerd.",
+      "hoe": "Herhaal of parafraseer wat de klant heeft gezegd. Vraag expliciet om bevestiging. Gebruik ZOWEL 'verwerven' (voor promotors) ALS 'vermijden' (voor analyseerders).",
+      "voorbeeld": [
+        "Dus als ik u goed begrijp, meneer, is het belangrijk voor u om [baat X] te verwerven én [pijnpunt Y] te vermijden?",
+        "Dus zekerheid is voor jullie de belangrijkste factor om te verwerven, en onverwachte kosten wilt u vermijden?",
+        "Als ik het samenvat: u wilt [voordeel] bereiken en [nadeel] voorkomen, klopt dat?"
+      ],
+      "stappenplan": [
+        "1. Herken een positief klantensignaal na impact-vraag.",
+        "2. Formuleer commitment met VERWERVEN: 'Dus u wilt [baat/voordeel] bereiken?'",
+        "3. Voeg VERMIJDEN toe: 'En [pijnpunt/nadeel] wilt u vermijden?'",
+        "4. Wacht op duidelijke 'ja' of bevestiging.",
+        "5. Bij JA: ga naar fase 3 met O.V.B.",
+        "6. Bij NEEN of twijfel: doorvragen met Explore/Probe/Impact."
+      ],
+      "tags": [
+        "controle",
+        "samenvatting",
+        "zekerheid",
+        "overgang fase 3",
+        "verwerven",
+        "vermijden"
+      ],
+      "verkoper_intentie": [
+        "begrip checken",
+        "voorbereiden aanbeveling",
+        "fase overgang valideren"
+      ],
+      "baat_definition": "Een BAAT is het bijzonder persoonlijke voordeel voor de klant: meer tijd om thuis bij gezin te zijn, minder wakker liggen 's nachts, meer gemoedsrust. Het is de emotionele/persoonlijke impact van een te vermijden nadeel of te verwerven voordeel. Commitment vraagt altijd een BAAT - zonder baat is commitment onmogelijk.",
+      "prerequisite": "Impact (2.3) moet eerst zijn toegepast - klant heeft persoonlijk gevolg erkend OF verkoper heeft voordeel naar baat vertaald",
+      "context_requirements": ["commitment_types", "baten_top"],
+      "customer_dynamics_effect": {
+        "rapport": 0.05,
+        "valueTension": 0.05,
+        "commitReadiness": 0.10
+      }
+    },
+    "3.1": {
+      "nummer": "3.1",
+      "naam": "Empathie tonen",
+      "doel": "De klant laten bevestigen dat je zijn situatie correct begrepen hebt.",
+      "fase": "3",
+      "parent": "3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Toon begrip voor wat de prospect belangrijk vindt.",
+      "waarom": "Om vertrouwen te versterken en klant te laten voelen dat je luistert.",
+      "wanneer": "Bij start van aanbevelingsfase.",
+      "hoe": "Verwijs naar wat klant eerder zei, toon dat je het begrepen hebt.",
+      "voorbeeld": [
+        "Ik begrijp dat zekerheid voor u heel belangrijk is."
+      ],
+      "stappenplan": [
+        "Herinner je wat klant zei in fase 2.",
+        "Toon dat je het begrijpt.",
+        "Maak overgang naar oplossing."
+      ],
+      "tags": [
+        "empathie",
+        "vertrouwen",
+        "luisteren"
+      ],
+      "verkoper_intentie": [
+        "vertrouwen versterken",
+        "klant erkennen"
+      ],
+      "context_requirements": ["empathie_zinnen"],
+      "customer_dynamics_effect": {
+        "rapport": 0.10,
+        "valueTension": 0,
+        "commitReadiness": 0
+      }
+    },
+    "3.2": {
+      "nummer": "3.2",
+      "naam": "Oplossing presenteren",
+      "doel": "De klantbehoeften expliciet verbinden aan kenmerken van je oplossing.",
+      "fase": "3",
+      "parent": "3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Presenteer je oplossing of product als antwoord op de klantbehoefte.",
+      "waarom": "Om de klant te laten zien dat jouw aanbod past bij wat hij zoekt.",
+      "wanneer": "Na empathie tonen.",
+      "hoe": "Verbind je product/dienst aan de behoefte die je hebt geïdentificeerd.",
+      "voorbeeld": [
+        "Daarom bieden wij ... aan, wat precies aansluit bij wat u zoekt."
+      ],
+      "stappenplan": [
+        "Verwijs naar behoefte.",
+        "Presenteer oplossing.",
+        "Check reactie."
+      ],
+      "tags": [
+        "oplossing",
+        "aanbod",
+        "presentatie"
+      ],
+      "verkoper_intentie": [
+        "aanbod presenteren",
+        "behoefte matchen"
+      ],
+      "context_requirements": ["oplossingen_per_pijn"],
+      "customer_dynamics_effect": {
+        "rapport": 0,
+        "valueTension": 0.08,
+        "commitReadiness": 0.05
+      }
+    },
+    "3.3": {
+      "nummer": "3.3",
+      "naam": "Voordeel benoemen",
+      "doel": "De baten voor de klant concreet en meetbaar maken.",
+      "fase": "3",
+      "parent": "3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Benoem expliciet het voordeel van je oplossing voor de klant.",
+      "waarom": "Klanten kopen voordelen, niet features.",
+      "wanneer": "Direct na presentatie van oplossing.",
+      "hoe": "Zeg wat het voordeel is van jouw oplossing ten opzichte van alternatief.",
+      "voorbeeld": [
+        "Het voordeel hiervan is dat u geen onverwachte kosten hebt."
+      ],
+      "stappenplan": [
+        "Benoem de feature.",
+        "Vertaal naar voordeel.",
+        "Check begrip."
+      ],
+      "tags": [
+        "voordeel",
+        "USP",
+        "waarde"
+      ],
+      "verkoper_intentie": [
+        "waarde tonen",
+        "overtuigen"
+      ],
+      "context_requirements": ["voordelen_lijst"],
+      "customer_dynamics_effect": {
+        "rapport": 0,
+        "valueTension": 0.10,
+        "commitReadiness": 0.05
+      }
+    },
+    "3.4": {
+      "nummer": "3.4",
+      "naam": "Baat vertalen",
+      "doel": "De klant helpen zich de toekomstige situatie met jouw oplossing voor te stellen.",
+      "fase": "3",
+      "parent": "3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Vertaal het voordeel naar een concreet resultaat voor de prospect.",
+      "waarom": "Klanten beslissen op basis van persoonlijke impact en baten.",
+      "wanneer": "Na benoemen van voordeel.",
+      "hoe": "Geef concreet aan wat de klant wint of voorkomt met jouw oplossing.",
+      "voorbeeld": [
+        "Concreet betekent dat voor u, dat u niet opnieuw wakker hoeft te liggen van de kosten."
+      ],
+      "stappenplan": [
+        "Kijk naar klantcontext.",
+        "Vertaal voordeel naar klant-impact.",
+        "Vraag daarna naar mening."
+      ],
+      "context_requirements": ["baaten_lijst"],
+      "tags": [
+        "concreet",
+        "impact",
+        "klantgericht"
+      ],
+      "verkoper_intentie": [
+        "persoonlijke relevantie",
+        "beslissen vergemakkelijken"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0,
+        "valueTension": 0.12,
+        "commitReadiness": 0.08
+      }
+    },
+    "3.5": {
+      "nummer": "3.5",
+      "naam": "Mening vragen + standpunt (of koopsignaal) onder alternatieve vorm uitlokken",
+      "doel": "Testen of de klant klaar is om te beslissen en eventuele bezwaren vroeg detecteren.",
+      "fase": "3",
+      "parent": "3",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Peil naar de mening van de klant over je voorstel en lok een koopsignaal uit door de klant een keuze voor te stellen",
+      "waarom": "Je activeert klant en krijgt expliciete feedback.",
+      "wanneer": "Na uitleg van baat, als brug naar afsluiten.",
+      "hoe": "Stel een open of alternatieve mening-vraag: 'Wat vindt u daarvan? en volg op met: zou u dan eerder voor x of y kiezen'",
+      "voorbeeld": [
+        "Wat vindt u van deze aanpak?",
+        "Ziet u dat zitten?"
+      ],
+      "stappenplan": [
+        "Vraag mening na baat.",
+        "Luister en vat samen.",
+        "Check of klant klaar is."
+      ],
+      "tags": [
+        "mening",
+        "alternatief",
+        "klantactivering"
+      ],
+      "verkoper_intentie": [
+        "feedback uitlokken",
+        "volgende stap bepalen"
+      ],
+      "context_requirements": ["mening_checkvraag", "koopsignaal_opties"],
+      "customer_dynamics_effect": {
+        "rapport": 0.08,
+        "valueTension": 0,
+        "commitReadiness": 0.15
+      }
+    },
+    "3.6": {
+      "nummer": "3.6",
+      "naam": "Technisch voorrekenen",
+      "doel": "De klant concreet laten zien wat de oplossing kost of oplevert in cijfers.",
+      "fase": "3",
+      "parent": "3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Concreet uitrekenen wat de oplossing kost of oplevert voor de klant.",
+      "waarom": "Klanten willen weten wat iets kost en wat het oplevert. Door dit voor te rekenen maak je de waarde tastbaar.",
+      "wanneer": "Na baat vertalen, als de klant vraagt naar kosten of ROI.",
+      "hoe": "Gebruik concrete cijfers, maak een simpele berekening, vergelijk met alternatieven.",
+      "voorbeeld": [
+        "Laat me dat even uitrekenen: als u nu €500/maand betaalt en wij €400, bespaart u €1.200 per jaar.",
+        "Stel dat u 10 uur per week kwijt bent aan administratie. Met ons systeem wordt dat 2 uur. Dat is 8 uur × €50 = €400 besparing per week.",
+        "Als u dit niet doet, kost dat u €X per maand aan gemiste kansen."
+      ],
+      "stappenplan": [
+        "1. Vraag klant naar huidige kosten/tijd/moeite.",
+        "2. Bereken wat jouw oplossing kost of bespaart.",
+        "3. Toon het verschil (ROI).",
+        "4. Check of klant het snapt: 'Ziet u het verschil?'"
+      ],
+      "tags": [
+        "voorrekenen",
+        "ROI",
+        "kosten",
+        "besparing",
+        "concreet"
+      ],
+      "verkoper_intentie": [
+        "waarde bewijzen",
+        "twijfel wegnemen",
+        "beslissing vergemakkelijken"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0,
+        "valueTension": 0.15,
+        "commitReadiness": 0.10
+      }
+    },
+    "3.7": {
+      "nummer": "3.7",
+      "naam": "Vat baten samen",
+      "doel": "Alle besproken baten samenvatten om momentum te creëren voor de afsluiting.",
+      "fase": "3",
+      "parent": "3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Vat alle besproken baten samen voordat je naar fase 4 gaat.",
+      "waarom": "Een samenvatting van baten herinnert de klant aan alle voordelen en creëert momentum voor de afsluiting.",
+      "wanneer": "Na alle O.V.B.-cycli, als brug naar fase 4.",
+      "hoe": "Herhaal de belangrijkste baten in klantwoorden en vraag bevestiging.",
+      "voorbeeld": [
+        "Dus samengevat: u krijgt zekerheid over uw kosten, u bespaart 8 uur per week, en u hoeft niet meer wakker te liggen van onverwachte facturen. Klopt dat?",
+        "Als ik het goed begrijp, zijn de belangrijkste punten voor u: [baat 1], [baat 2], en [baat 3]. Heb ik dat goed begrepen?"
+      ],
+      "stappenplan": [
+        "1. Verzamel de belangrijkste baten uit het gesprek.",
+        "2. Formuleer ze in klantwoorden.",
+        "3. Vat samen: 'Dus samengevat...'",
+        "4. Vraag bevestiging: 'Klopt dat?'"
+      ],
+      "tags": [
+        "samenvatting",
+        "baten",
+        "overgang fase 4",
+        "bevestiging"
+      ],
+      "verkoper_intentie": [
+        "momentum creëren",
+        "bevestiging krijgen",
+        "overgang naar closing"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.05,
+        "valueTension": 0.05,
+        "commitReadiness": 0.12
+      }
+    },
+    "4.1": {
+      "nummer": "4.1",
+      "naam": "Proefafsluiting",
+      "doel": "Signalen van twijfel, bezwaar, uitstel of angst tijdig detecteren.",
+      "fase": "4",
+      "parent": "4",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Een zachte test of de klant klaar is om te kopen door een instapvraag.",
+      "waarom": "Met een proefafsluiting test je of de klant mentaal klaar is voor de aankoop. Je spoort eventuele verborgen bezwaren op.",
+      "wanneer": "Wanneer je voelt dat de klant positief staat, maar nog niet expliciet 'ja' heeft gezegd.",
+      "hoe": "Je stelt een vraag die polst naar de bereidheid tot aankoop, zonder druk te zetten.",
+      "voorbeeld": [
+        "Als u vandaag zou moeten kiezen, zou u eerder voor een blauwe of een groene kiezen?",
+        "Indien u zou overgaan tot een aankoop, koopt u dan op naam van de kinderen of in eerste instantie op jullie eigen naam?",
+        "Als u vandaag zou moeten kiezen, waar zou uw voorkeur naar uitgaan?"
+      ],
+      "stappenplan": [
+        "Stel een zachte testvraag.",
+        "Observeer reactie.",
+        "Ga terug naar vorige fases bij twijfel.",
+        "Ga naar afsluiten bij akkoord."
+      ],
+      "tags": [
+        "proefafsluiting",
+        "koopsignaal",
+        "verkennend afsluiten"
+      ],
+      "verkoper_intentie": [
+        "bereidheid testen",
+        "verborgen bezwaren opsporen"
+      ],
+      "context_requirements": ["veelgestelde_vragen", "typische_twijfels"],
+      "customer_dynamics_effect": {
+        "rapport": 0.03,
+        "valueTension": 0,
+        "commitReadiness": 0.15
+      }
+    },
+    "4.2.1": {
+      "nummer": "4.2.1",
+      "naam": "Klant stelt vragen",
+      "doel": "Informatielacunes vullen zodat de klant geïnformeerd kan beslissen.",
+      "fase": "4",
+      "parent": "4.2",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Correct reageren op klantvragen in de beslissingsfase.",
+      "waarom": "Om te achterhalen wat de klant écht wil weten en om in te spelen op koopintentie.",
+      "wanneer": "Elke keer een klant een vraag stelt tijdens fase 4.",
+      "hoe": "Volg het stappenplan afhankelijk van de situatie (meerdere opties vs. één optie).",
+      "voorbeeld": [
+        "U vraagt naar de garantie: bedoelt u garantie op onderdelen of op afwerking?",
+        "Als u vandaag zou moeten kiezen tussen deze twee opties, wat zou het dan worden?"
+      ],
+      "stappenplan": [
+        "Bij meerdere opties: gebruik pingpongtechniek.",
+        "Bij één optie: geef antwoord, vraag mening/commitment/proefafsluiting.",
+        "Nooit terzijde schuiven in deze fase."
+      ],
+      "tags": [
+        "vragen",
+        "beslissingsfase",
+        "pingpong",
+        "commitment"
+      ],
+      "verkoper_intentie": [
+        "koopintentie peilen",
+        "twijfel opsporen",
+        "beslissing sturen"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.05,
+        "valueTension": 0,
+        "commitReadiness": 0.05
+      }
+    },
+    "4.2.2": {
+      "nummer": "4.2.2",
+      "naam": "Twijfels behandelen",
+      "doel": "De klant helpen zijn onzekerheid te overwinnen.",
+      "fase": "4",
+      "parent": "4.2",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Omgaan met twijfels van de klant in de beslissingsfase.",
+      "waarom": "Om onderliggende bezwaren te ontdekken en commitment te verkrijgen.",
+      "wanneer": "Zodra klant twijfelt of twijfels uit.",
+      "hoe": "EERST bepalen: is dit een OPRECHTE twijfel (slechte ervaringen, onzekerheid) of een VERDOKEN BEZWAAR? Dan pas behandelen.",
+      "voorbeeld": [
+        "Kunt u mij toelichten waar u precies over twijfelt?",
+        "Komt deze twijfel voort uit eerdere ervaringen, of speelt er iets anders?",
+        "Als we dat punt kunnen aantonen, zou u dan kunnen afronden?"
+      ],
+      "stappenplan": [
+        "1. Check: Is dit een OPRECHTE twijfel of een VERDOKEN BEZWAAR?",
+        "2. Bij oprechte twijfel (slechte ervaringen): Wedervraag 'Kunt u mij toelichten waar u over twijfelt?'",
+        "3. Commitment: 'Als ik dit punt kan aantonen, zou u dan kunnen beslissen?'",
+        "4. Bewijsvoering: Onderbouwen met externe referenties, cijfers, of testimonials.",
+        "5. Bij verdoken bezwaar: Doorverwijzen naar 4.2.4 Bezwaren behandelen.",
+        "6. Afsluiten: Proefafsluiting of definitieve afsluiting."
+      ],
+      "check_points": [
+        "Is dit een oprechte twijfel of een verdoken bezwaar?"
+      ],
+      "tags": [
+        "twijfel",
+        "beslissingsfase",
+        "commitment",
+        "bewijsvoering",
+        "oprecht",
+        "verdoken"
+      ],
+      "verkoper_intentie": [
+        "twijfels wegnemen",
+        "commitment verkrijgen"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.08,
+        "valueTension": -0.05,
+        "commitReadiness": 0.10
+      }
+    },
+    "4.2.3": {
+      "nummer": "4.2.3",
+      "naam": "Uitstel behandelen",
+      "doel": "Urgentie creëren en redenen voor uitstellen wegnemen.",
+      "fase": "4",
+      "parent": "4.2",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Omgaan met uitstelgedrag in de beslissingsfase. Klant zit op 11 uur buying clock, moet naar 12 uur.",
+      "waarom": "Om alsnog een beslissing af te dwingen en de échte reden voor uitstel te achterhalen.",
+      "wanneer": "Wanneer klant zegt: 'Ik moet nadenken', 'Ik moet dit bespreken', 'Stuur eerst een offerte', etc.",
+      "hoe": "EERST bepalen: is dit een VOORWAARDE (echt nodig) of een VOORWENDSEL (excuus voor onderliggend bezwaar/angst)?",
+      "voorbeeld": [
+        "Ik begrijp dat u dit wil bespreken. Is dat omdat u nog informatie mist, of speelt er iets anders?",
+        "Als u het zou moeten bespreken, wat denkt u dat het antwoord zou zijn?",
+        "Stel dat uw partner akkoord gaat, zou u dan vandaag kunnen beslissen?"
+      ],
+      "stappenplan": [
+        "1. Check: Is dit een VOORWAARDE of een VOORWENDSEL?",
+        "2. Bij voorwaarde (echt nodig): Empathie tonen en Action Plan maken.",
+        "3. Bij voorwendsel (excuus): Doorvragen 'Onafgezien [uitstelreden], wat zou u beslissing zijn?'",
+        "4. Analyseren: 'Wat houdt u eigenlijk tegen?' - zoek onderliggende angst of bezwaar.",
+        "5. Bij onderliggend bezwaar: Doorverwijzen naar 4.2.4 Bezwaren behandelen.",
+        "6. Bij onderliggende angst: Doorverwijzen naar 4.2.5 Angst behandelen.",
+        "7. Action Plan: Maak concrete follow-up met datum, tijd en wie wat doet."
+      ],
+      "check_points": [
+        "Is dit een voorwaarde of een voorwendsel?"
+      ],
+      "tags": [
+        "uitstel",
+        "beslissingsfase",
+        "actieplan",
+        "empathie",
+        "voorwaarde",
+        "voorwendsel"
+      ],
+      "verkoper_intentie": [
+        "beslissing forceren",
+        "uitstel tackelen",
+        "latente bezwaren zoeken"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.05,
+        "valueTension": 0,
+        "commitReadiness": 0.08
+      }
+    },
+    "4.2.4": {
+      "nummer": "4.2.4",
+      "naam": "Bezwaren behandelen",
+      "doel": "Concrete bezwaren ombuigen of weerleggen.",
+      "fase": "4",
+      "parent": "4.2",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Omgaan met bezwaren in de beslissingsfase. Een bezwaar = ontdekt nadeel van klant omtrent eigenschap van jouw oplossing. Een bezwaar is een KOOPSIGNAAL: 'an objection is not a rejection, but an opportunity to clarify value.'",
+      "waarom": "Om bezwaren te neutraliseren en toch tot afsluiting te komen door baten te maximaliseren en bezwaar te minimaliseren.",
+      "wanneer": "Wanneer klant expliciet bezwaar maakt (te duur, verkeerde specs, te lang, etc.).",
+      "hoe": "EPIC-vragen + Pencil Selling + Afweegtechniek. Maximaliseer baten, minimaliseer bezwaar.",
+      "voorbeeld": [
+        "U zegt te duur. Tegenover wie? Tegenover wat? Hoeveel precies?",
+        "Als ik u goed begrijp, is het dus ENKEL een kwestie van budget dat u weerhoudt?",
+        "Onafgezien budget, naar waar zou uw voorkeur uitgaan? Naar ons of naar concurrent X?",
+        "Wat betekent het voor u om [baat A, B, C] wel/niet te hebben gedurende 10 jaar?",
+        "€12.000 over 10 jaar = €100 per maand. Weegt dat op tegen [gemaximaliseerde baten]?"
+      ],
+      "stappenplan": [
+        "1. Empathie: 'Ik begrijp dat dit belangrijk voor u is.'",
+        "2. EPIC Analyseren: 'Tegenover wie? Tegenover wat? Hoeveel precies? Over welke periode?'",
+        "3. Isoleren: 'Als ik u goed begrijp, is het dus ENKEL een kwestie van [bezwaar] dat u weerhoudt?'",
+        "4. Neutraliseren: 'Onafgezien [bezwaar], naar waar zou uw voorkeur uitgaan? Waarom?'",
+        "5. Maximaliseren (Pencil Selling): 'Wat betekent [baat A, B, C] voor u?' - voor promotors: verwerven, voor analyseerders: vermijden.",
+        "6. Minimaliseren (Afweegtechniek): Bereken bezwaar per maand/jaar. 'Weegt €X per maand op tegen [baten]?'",
+        "7. Afsluiten: Ga terug naar proefafsluiting of indien-techniek."
+      ],
+      "subtechnieken": [
+        "Pencil Selling: Visueel voorstellen van baten vs. kosten",
+        "Afweegtechniek: Baten afwegen tegen bezwaar (max baten, min bezwaar)"
+      ],
+      "tags": [
+        "bezwaren",
+        "beslissingsfase",
+        "commitment",
+        "bewijsvoering",
+        "pencil selling",
+        "afweegtechniek",
+        "koopsignaal"
+      ],
+      "verkoper_intentie": [
+        "bezwaren wegnemen",
+        "commitment verkrijgen",
+        "echte bezwaren vinden"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.10,
+        "valueTension": -0.08,
+        "commitReadiness": 0.12
+      }
+    },
+    "4.2.5": {
+      "nummer": "4.2.5",
+      "naam": "Angst / Bezorgdheden",
+      "doel": "Emotionele blokkades overwinnen door risico's te minimaliseren.",
+      "fase": "4",
+      "parent": "4.2",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Omgaan met angst en bezorgdheden in de beslissingsfase.",
+      "waarom": "Om onderliggende emoties te adresseren en de klant gerust te stellen met bewijs en perspectief.",
+      "wanneer": "Wanneer klant zorgen of angsten uit over de beslissing.",
+      "hoe": "Referentieverhaal, Pro & Contra techniek, Up and Down Stairs techniek.",
+      "voorbeeld": [
+        "Ik begrijp uw bezorgdheid. Mag ik u een verhaal vertellen van een andere klant?",
+        "Laten we de voor- en nadelen eens op een rijtje zetten."
+      ],
+      "stappenplan": [
+        "Referentie Story: Deel een vergelijkbaar succesverhaal van een andere klant.",
+        "Pro & Contra techniek: Zet voordelen en nadelen samen op een rijtje.",
+        "Up and Down Stairs techniek: Laat klant scenario's zien van wel/niet beslissen."
+      ],
+      "tags": [
+        "bezorgdheid",
+        "angst",
+        "beslissingsfase",
+        "referentieverhaal"
+      ],
+      "verkoper_intentie": [
+        "angst wegnemen",
+        "geruststellen",
+        "perspectief geven"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.12,
+        "valueTension": -0.10,
+        "commitReadiness": 0.08
+      }
+    },
+    "4.2.6": {
+      "nummer": "4.2.6",
+      "naam": "Risico-inschatting behandelen",
+      "doel": "Risico-denken contextualiseren zodat de klant durft te beslissen.",
+      "fase": "4",
+      "parent": "4.2",
+      "kan_starten_op_klant_signaal": true,
+      "wat": "Omgaan met risico-denken en angst om fouten te maken in de beslissingsfase.",
+      "waarom": "Risico is de grootste reden waarom klanten NIET beslissen. Door risico's te benoemen en te contextualiseren, help je de klant beslissen.",
+      "wanneer": "Wanneer klant risico-signalen geeft: 'Wat als...?', 'Ik ben bang dat...', 'Ik wil geen fouten maken'.",
+      "hoe": "Erkennen → Reverse Thinking → Impact → Baten → Commitment → Proefafsluiting.",
+      "voorbeeld": [
+        "Ik begrijp uw bezorgdheid over het risico.",
+        "Stel dat u niets doet... wat dan?",
+        "Wat als het risico groter is door niets te doen?",
+        "Dus zekerheid is voor u belangrijker dan het risico, klopt dat?"
+      ],
+      "stappenplan": [
+        "Erkennen: 'Dat is een terechte vraag. Veel klanten hadden die zorg.'",
+        "Reverse Thinking: 'Stel dat u niets doet… wat dan?'",
+        "Impact: 'Hoeveel zou dat kosten? Wat betekent dat voor uw gemoedsrust?'",
+        "Baten: 'Wat dit voor u betekent, is dat u zekerheid krijgt.'",
+        "Commitment: 'Dus zekerheid is voor u belangrijker dan het risico, klopt dat?'",
+        "Proefafsluiting: 'Indien we die zekerheid kunnen bieden… kiest u dan voor A of B?'"
+      ],
+      "tags": [
+        "risico",
+        "beslissingsfase",
+        "reverse thinking",
+        "commitment"
+      ],
+      "verkoper_intentie": [
+        "risico contextualiseren",
+        "beslissing faciliteren"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.08,
+        "valueTension": -0.05,
+        "commitReadiness": 0.10
+      }
+    },
+    "4.ABC": {
+      "nummer": "4.ABC",
+      "naam": "ABC-techniek (Always Be Closing)",
+      "doel": "Continu kleine commitments verzamelen om de finale close natuurlijk te maken.",
+      "fase": "4",
+      "parent": "4",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Continu kleine afsluitmomenten inbouwen tijdens het hele verkoopgesprek.",
+      "waarom": "Je test voortdurend of de klant mee is, stuurt richting beslissing zonder druk, en voorkomt dat je te laat afsluit.",
+      "wanneer": "Doorheen het hele gesprek, maar vooral in fase 3 en 4.",
+      "hoe": "Bouw regelmatig 'mini-closes' in: check vragen, bevestigingen, alternatieve keuzes.",
+      "voorbeeld": [
+        "Hoe voelt dit voor u?",
+        "Is dit wat u bedoelde met zekerheid?",
+        "Kiest u dan voor A of B?",
+        "Zullen we dit zo voor u in orde maken?"
+      ],
+      "stappenplan": [
+        "Bouw check-vragen in na elk belangrijk punt.",
+        "Luister naar signalen.",
+        "Pas tempo aan op basis van klantreactie.",
+        "Sluit proef af wanneer klant positief reageert."
+      ],
+      "tags": [
+        "ABC",
+        "always be closing",
+        "mini-close",
+        "proefafsluiting"
+      ],
+      "verkoper_intentie": [
+        "richting geven",
+        "twijfels ontdekken",
+        "beslissing faciliteren"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.02,
+        "valueTension": 0.05,
+        "commitReadiness": 0.08
+      }
+    },
+    "4.INDIEN": {
+      "nummer": "4.INDIEN",
+      "naam": "Indien-techniek",
+      "doel": "Het commitment testen door de beslissing aan een voorwaarde te koppelen.",
+      "fase": "4",
+      "parent": "4",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "De ultieme afsluittechniek: koppel de beslissing aan een voorwaarde om commitment te testen.",
+      "waarom": "Je maakt de beslissing concreet, haalt verborgen twijfels naar boven, en krijgt een duidelijk JA of een duidelijk bezwaar.",
+      "wanneer": "Na O.V.B., bij proefafsluiting of finale afsluiting.",
+      "hoe": "Formuleer: 'Indien [voorwaarde die klant belangrijk vindt], dan hebben we een akkoord?'",
+      "voorbeeld": [
+        "Indien het % wordt uitbetaald zoals afgesproken, dan hebben we een akkoord?",
+        "Indien we de levering in week 12 kunnen garanderen, gaan we dan samen verder?",
+        "Indien we dat punt kunnen oplossen, kiest u dan voor ons?"
+      ],
+      "stappenplan": [
+        "Identificeer wat klant belangrijk vindt.",
+        "Formuleer indien-vraag.",
+        "Wacht op antwoord.",
+        "Bij JA: ga naar order schrijven.",
+        "Bij NEE/twijfel: behandel als bezwaar."
+      ],
+      "tags": [
+        "indien",
+        "conditional close",
+        "commitment",
+        "afsluiting"
+      ],
+      "verkoper_intentie": [
+        "commitment verkrijgen",
+        "verborgen bezwaren opsporen"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0,
+        "valueTension": 0.05,
+        "commitReadiness": 0.18
+      }
+    },
+    "4.3": {
+      "nummer": "4.3",
+      "naam": "Finale Closing",
+      "doel": "De verkoop definitief afronden.",
+      "fase": "4",
+      "parent": "4",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Het definitief afronden van de verkoop na verwerking van alle afritten.",
+      "waarom": "Dit is het moment om de deal te sluiten. 'Wie schrijft, die blijft.'",
+      "wanneer": "Pas wanneer ALLE voorwaarden vervuld zijn (zie checklist).",
+      "hoe": "Samenvatten → Koppelen → CVP bevestigen → Alternatieve keuze → Order schrijven.",
+      "voorbeeld": [],
+      "stappenplan": [],
+      "tags": [
+        "finale",
+        "closing",
+        "order",
+        "afsluiting"
+      ],
+      "verkoper_intentie": [
+        "deal sluiten",
+        "order schrijven"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0,
+        "valueTension": 0,
+        "commitReadiness": 0.15
+      }
+    },
+    "4.3.1": {
+      "nummer": "4.3.1",
+      "naam": "Samenvatten in klantwoorden",
+      "doel": "De klant zijn eigen motivatie laten herkennen in je samenvatting.",
+      "fase": "4",
+      "parent": "4.3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Vat alles samen wat de klant belangrijk vindt, in zijn eigen woorden.",
+      "waarom": "De klant hoort zijn eigen woorden terug, voelt dat je hem begrijpt, en voelt dat de beslissing logisch is.",
+      "wanneer": "Als eerste stap van de finale closing.",
+      "hoe": "Gebruik de woorden die de klant zelf gebruikte in fase 2 en 3.",
+      "voorbeeld": [
+        "Als ik alles goed samenvat, dan is voor u vooral belangrijk dat...",
+        "U wilt zekerheid, geen gedoe, geen risico's, en een stabiel rendement.",
+        "U wilt een oplossing die u ontzorgt en die op lange termijn rendeert."
+      ],
+      "stappenplan": [
+        "Herinner je de belangrijkste uitspraken van de klant.",
+        "Vat samen in 2-3 zinnen.",
+        "Gebruik zijn exacte woorden.",
+        "Kijk naar bevestiging."
+      ],
+      "tags": [
+        "samenvatten",
+        "klantwoorden",
+        "bevestiging"
+      ],
+      "verkoper_intentie": [
+        "bevestiging krijgen",
+        "vertrouwen versterken"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.08,
+        "valueTension": 0,
+        "commitReadiness": 0.08
+      }
+    },
+    "4.3.2": {
+      "nummer": "4.3.2",
+      "naam": "Verwachtingen-oplossing koppeling",
+      "doel": "Bevestigen dat jouw oplossing past bij wat de klant belangrijk vindt.",
+      "fase": "4",
+      "parent": "4.3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Koppel de verwachtingen van de klant expliciet aan jouw oplossing.",
+      "waarom": "Je maakt de brug tussen zijn noden en jouw aanbod. Je maakt de keuze vanzelfsprekend.",
+      "wanneer": "Direct na het samenvatten.",
+      "hoe": "Zeg: 'Op basis van wat u belangrijk vindt, is dit concept voor u het meest geschikt.'",
+      "voorbeeld": [
+        "Op basis van wat u belangrijk vindt, is dit concept voor u het meest geschikt.",
+        "Het sluit perfect aan bij uw behoefte aan zekerheid en zorgeloosheid.",
+        "Het biedt u precies de stabiliteit die u zoekt."
+      ],
+      "stappenplan": [
+        "Refereer aan de samenvatting.",
+        "Koppel aan jouw oplossing.",
+        "Zeg waarom het past.",
+        "Check reactie."
+      ],
+      "tags": [
+        "koppeling",
+        "verwachtingen",
+        "oplossing"
+      ],
+      "verkoper_intentie": [
+        "logische keuze maken",
+        "vertrouwen geven"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0,
+        "valueTension": 0.05,
+        "commitReadiness": 0.10
+      }
+    },
+    "4.3.3": {
+      "nummer": "4.3.3",
+      "naam": "CVP bevestigen (Customer Value Proposition)",
+      "doel": "De baten nog één keer concreet benoemen voor de finale beslissing.",
+      "fase": "4",
+      "parent": "4.3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Bevestig de baten nog één keer: wat de klant concreet wint met jouw oplossing.",
+      "waarom": "Klanten kopen baten, niet producten. Dit is het moment waarop de klant JA voelt.",
+      "wanneer": "Na de koppeling, vóór de alternatieve keuze.",
+      "hoe": "Zeg: 'Wat dit voor u betekent, is dat...'",
+      "voorbeeld": [
+        "Wat dit voor u betekent, is dat u geen huurdersproblemen meer hebt.",
+        "Dat u geen risico loopt op leegstand.",
+        "Dat u een stabiel rendement krijgt zonder zorgen.",
+        "Dat u eindelijk zorgeloos kunt investeren."
+      ],
+      "stappenplan": [
+        "Formuleer 'Wat dit voor u betekent...'",
+        "Benoem 2-3 concrete baten.",
+        "Kijk naar bevestiging.",
+        "Ga door naar alternatieve keuze."
+      ],
+      "tags": [
+        "CVP",
+        "baten",
+        "waarde",
+        "bevestiging"
+      ],
+      "verkoper_intentie": [
+        "emotionele beslissing triggeren",
+        "baten bevestigen"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.05,
+        "valueTension": 0.05,
+        "commitReadiness": 0.12
+      }
+    },
+    "4.3.4": {
+      "nummer": "4.3.4",
+      "naam": "Alternatieve keuze (finale)",
+      "doel": "Engagement krijgen zonder ja/nee vraag - de klant kiest tussen twee positieve opties.",
+      "fase": "4",
+      "parent": "4.3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Vraag engagement onder alternatieve vorm - NOOIT een ja/nee vraag.",
+      "waarom": "Je houdt de klant in beslissingsmodus en vermijdt dat hij terugvalt in twijfel.",
+      "wanneer": "Na CVP bevestigen, als finale vraag vóór order schrijven.",
+      "hoe": "Stel een keuzevraag tussen twee opties die beide positief zijn voor jou.",
+      "voorbeeld": [
+        "Indien u in dit concept zou investeren… kiest u dan eerder voor 1 unit of meteen 2?",
+        "Verkiest u een kot of toch liever een studio?",
+        "Wenst u dit kwartaal te starten of kijkt u eerder naar het volgende kwartaal?",
+        "Gaat uw voorkeur uit naar een investering rond €200.000 of eerder richting €300.000?"
+      ],
+      "stappenplan": [
+        "Kies twee relevante opties.",
+        "Formuleer de keuzevraag.",
+        "Wacht op antwoord.",
+        "Bij keuze: ga naar order schrijven.",
+        "Bij twijfel: behandel als afrit."
+      ],
+      "tags": [
+        "alternatieve keuze",
+        "keuzevraag",
+        "closing"
+      ],
+      "verkoper_intentie": [
+        "keuze forceren",
+        "beslissingsmodus behouden"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0,
+        "valueTension": 0.05,
+        "commitReadiness": 0.15
+      }
+    },
+    "4.3.5": {
+      "nummer": "4.3.5",
+      "naam": "Order schrijven",
+      "doel": "De deal vastleggen en de administratieve afhandeling starten.",
+      "fase": "4",
+      "parent": "4.3",
+      "kan_starten_op_klant_signaal": false,
+      "wat": "Het definitief vastleggen van de deal nadat de klant een keuze heeft gemaakt.",
+      "waarom": "'Wie schrijft, die blijft.' Je neemt de leiding, toont professionaliteit, en sluit af zonder drama.",
+      "wanneer": "Direct nadat de klant een alternatieve keuze heeft gemaakt.",
+      "hoe": "Neem de leiding, bevestig de keuze, en ga over tot administratieve afhandeling.",
+      "voorbeeld": [
+        "Perfect, dan zet ik dit voor u in orde.",
+        "Ik noteer uw keuze.",
+        "Dan maken we dit concreet.",
+        "Ik zorg dat alles administratief in orde komt."
+      ],
+      "stappenplan": [
+        "Bevestig de keuze van de klant.",
+        "Neem de leiding.",
+        "Start de administratieve afhandeling.",
+        "Bedank de klant."
+      ],
+      "tags": [
+        "order",
+        "afsluiting",
+        "administratie",
+        "deal"
+      ],
+      "verkoper_intentie": [
+        "deal vastleggen",
+        "professionaliteit tonen"
+      ],
+      "customer_dynamics_effect": {
+        "rapport": 0.05,
+        "valueTension": 0,
+        "commitReadiness": 0.20
+      }
+    }
+  }
+}

@@ -1,0 +1,480 @@
+[
+  {
+    "nummer": "1",
+    "naam": "Openingsfase",
+    "fase": "1",
+    "ai_eval_points": [
+      "Werd de openingsfase correct doorlopen?",
+      "Koopklimaat, gentleman's agreement, firmavoorstelling en instapvraag toegepast?"
+    ],
+    "detector_id": "fase_1",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Complete phase practice: coach discusses the phase structure first, then transitions to roleplay for practice."
+    }
+  },
+  {
+    "nummer": "2",
+    "naam": "Ontdekkingsfase",
+    "fase": "2",
+    "ai_eval_points": [
+      "Werden alle thema's bevraagd (Bron, Motivatie, Ervaring, Verwachtingen, Alternatieven, Budget, Timing, Beslissingscriteria)?",
+      "Werd actief en empathisch geluisterd?",
+      "Werd een expliciete baat afgeleid en bevestigd met COMMITMENT?"
+    ],
+    "detector_id": "fase_2",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Complete phase practice: coach discusses discovery techniques first, then transitions to roleplay for practice."
+    }
+  },
+  {
+    "nummer": "3",
+    "naam": "Aanbevelingsfase",
+    "fase": "3",
+    "ai_eval_points": [
+      "Werd empathie getoond voordat de oplossing werd gepresenteerd?",
+      "Werden voordelen vertaald naar baaten voor de klant?",
+      "Werd de mening van de klant gevraagd?"
+    ],
+    "detector_id": "fase_3",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Complete phase practice: coach discusses recommendation structure first, then transitions to roleplay for practice."
+    }
+  },
+  {
+    "nummer": "4",
+    "naam": "Beslissingsfase",
+    "fase": "4",
+    "ai_eval_points": [
+      "Werd een proefafsluiting gedaan?",
+      "Werden twijfels en bezwaren correct behandeld?",
+      "Werd uitstel voorkomen of omgebogen?"
+    ],
+    "detector_id": "fase_4",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Complete phase practice: coach discusses closing techniques first, then transitions to roleplay for practice."
+    }
+  },
+  {
+    "nummer": "1.1",
+    "naam": "Koopklimaat creëren",
+    "fase": "1",
+    "ai_eval_points": [
+      "Speelt de verkoper in op sfeer/interesse van klant?"
+    ],
+    "detector_id": "1.1",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "1.2",
+    "naam": "Gentleman's agreement",
+    "fase": "1",
+    "ai_eval_points": [
+      "Werd expliciet akkoord gevraagd?"
+    ],
+    "detector_id": "1.2",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "1.3",
+    "naam": "Firmavoorstelling + reference story",
+    "fase": "1",
+    "ai_eval_points": [
+      "Bondigheid & relevantie gecheckt?"
+    ],
+    "detector_id": "1.3",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "1.4",
+    "naam": "Instapvraag",
+    "fase": "1",
+    "ai_eval_points": [
+      "Is de vraag open en neutraal?"
+    ],
+    "detector_id": "1.4",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "A1",
+    "naam": "Antwoord op de vraag",
+    "fase": "*",
+    "ai_eval_points": [
+      "Werd de vraag beantwoord zonder afdwalen?"
+    ],
+    "detector_id": "A1",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "2.1.1",
+    "naam": "Feitgerichte vragen",
+    "fase": "2",
+    "parent": "2.1",
+    "wat": "Gericht vragen naar feiten, cijfers of specifieke informatie.",
+    "waarom": "Om gesprek strategisch te sturen richting voordelen van jouw oplossing.",
+    "wanneer": "Tijdens begin ontdekkingsfase, om gesprek positief te beïnvloeden.",
+    "hoe": "Stel duidelijke, feitelijke vragen gericht op specifieke details.",
+    "voorbeeld": ["Hoe bent u bij ons terechtgekomen?", "Welke ervaring heeft u al met ...?", "Wat verwacht u van ...?"],
+    "do's": ["Stel strategische feitvragen.", "Houd vragen eenvoudig en duidelijk."],
+    "dont's": ["Vermijd abstracte of vage vragen.", "Vermijd teveel feitvragen achter elkaar (ondervraging)."],
+    "ai_eval_points": ["Is de vraag helder en feitelijk?"],
+    "detector_id": "2.1.1",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": true,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "2.1.2",
+    "naam": "Meningsgerichte vragen",
+    "fase": "2",
+    "parent": "2.1",
+    "wat": "Open vragen die klant stimuleren mening of gevoelens te delen.",
+    "waarom": "Om diepere inzichten te krijgen in behoeften en wensen.",
+    "wanneer": "Tijdens ontdekkingsfase om klant aan het praten te krijgen.",
+    "hoe": "Stel open vragen waarop niet met ja/nee geantwoord kan worden.",
+    "voorbeeld": ["Waarom wel? Waarom niet? Hoe ziet u dat?", "Wat vindt u belangrijk aan ...?"],
+    "do's": ["Laat ruimte voor uitgebreide antwoorden.", "Luister aandachtig en reageer empathisch."],
+    "dont's": ["Stel geen gesloten of suggestieve vragen.", "Onderbreek klant niet snel."],
+    "ai_eval_points": ["Is de vraag echt open?"],
+    "detector_id": "2.1.2",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": true,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "2.1.3",
+    "naam": "Feitgerichte vragen onder alternatieve vorm",
+    "fase": "2",
+    "parent": "2.1",
+    "wat": "Duidelijke keuzevragen om standpunt klant helder te krijgen.",
+    "waarom": "Om twijfels of vaagheden op te helderen.",
+    "wanneer": "Bij onduidelijke of aarzelende antwoorden van klant.",
+    "hoe": "Geef klant expliciete keuze tussen twee opties.",
+    "voorbeeld": ["Is het omdat ... of omdat u liever ...?", "Zoekt u ... of eerder ...?"],
+    "do's": ["Formuleer vragen helder en concreet.", "Gebruik techniek als klant onzeker of onduidelijk lijkt."],
+    "dont's": ["Geef niet meer dan twee opties per vraag.", "Gebruik niet te vroeg (eerst open antwoorden stimuleren)."],
+    "ai_eval_points": ["Zijn alternatieven helder & relevant?"],
+    "detector_id": "2.1.3",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": true,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "2.1.4",
+    "naam": "Ter zijde schuiven",
+    "fase": "2",
+    "parent": "2.1",
+    "wat": "Gesprek wegsturen van premature bezwaren om deze op later, strategischer moment aan bod te laten komen.",
+    "waarom": "Om eerst positief gesprek te richten op USP's voordat nadelen besproken worden.",
+    "wanneer": "Bij vroege bezwaren of vragen over nadelen.",
+    "hoe": "Erken bezwaar kort, schuif het tijdelijk opzij en leid gesprek naar positieve aspecten.",
+    "voorbeeld": ["Onafgezien de prijs... wat vindt u nog belangrijk?", "Goede vraag, hou dat even bij, maar laat mij eerst eens vragen..."],
+    "do's": ["Erken bezwaar vriendelijk en duidelijk.", "Stuur gesprek terug naar strategische voordelen."],
+    "dont's": ["Negeer bezwaar nooit expliciet.", "Word niet defensief of onzeker."],
+    "ai_eval_points": ["Erkenning + sturing aanwezig?"],
+    "detector_id": "2.1.4",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": true,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "2.1.5",
+    "naam": "Pingpong techniek",
+    "fase": "2",
+    "parent": "2.1",
+    "wat": "Doorvragen op antwoorden van klant om volledige duidelijkheid te krijgen.",
+    "waarom": "Om misverstanden of vage antwoorden te vermijden.",
+    "wanneer": "Bij elk mogelijk misverstand of korte, vage antwoorden.",
+    "hoe": "Vraag direct verduidelijking of nadere uitleg.",
+    "voorbeeld": ["Hoe bedoelt u?", "Wat bedoelt u wanneer u zegt...?", "Echt? Hoe zit dat precies?"],
+    "do's": ["Blijf kalm en stel open vervolgvragen.", "Luister actief naar elk detail van antwoord."],
+    "dont's": ["Neem niet zomaar aan dat je klant direct begrijpt.", "Stel niet meerdere vragen tegelijk."],
+    "ai_eval_points": ["Zijn onduidelijkheden aangepakt?"],
+    "detector_id": "2.1.5",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": true,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "2.1.6",
+    "naam": "Actief en empathisch luisteren",
+    "fase": "2",
+    "parent": "2.1",
+    "wat": "Actief luisteren en empathie tonen zodat klant zich gehoord voelt.",
+    "waarom": "Omdat je dan leert wat echt belangrijk is voor de klant én vertrouwen opbouwt.",
+    "wanneer": "Gedurende hele ontdekkingsfase.",
+    "hoe": "Gebruik technieken als ondersteuning, aansporing, empathie tonen, herhalen/parafraseren.",
+    "voorbeeld": ["Hm, hoofdknikken, interesse laten blijken", "Dus u bedoelt ...", "Dat begrijp ik, daar kan ik inkomen."],
+    "do's": ["Probeer te begrijpen wat de klant bedoelt.", "Toon oprechte interesse, geef korte verbale signalen."],
+    "dont's": ["Klant onderbreken.", "Veronderstellen dat je het wel weet."],
+    "ai_eval_points": ["Empathie & actief luisteren gedetecteerd?"],
+    "detector_id": "2.1.6",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": true,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "2.2",
+    "naam": "Probe questioning (storytelling)",
+    "fase": "2",
+    "ai_eval_points": [
+      "Subtiele sturing via verhaal?"
+    ],
+    "detector_id": "2.2",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": true,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "2.3",
+    "naam": "Impact questioning",
+    "fase": "2",
+    "ai_eval_points": [
+      "Impact van de situatie helder gemaakt?"
+    ],
+    "detector_id": "2.3",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": true,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "2.4",
+    "naam": "Commitment questioning",
+    "fase": "2",
+    "ai_eval_points": [
+      "Timing & correct parafraseren?"
+    ],
+    "detector_id": "2.4",
+    "practice": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": true,
+      "roleplay_default": false,
+      "notes": "Primary exercise is a natural coach conversation about applying this technique in the user's real situation. Roleplay can be suggested as an optional drill when it would help."
+    }
+  },
+  {
+    "nummer": "3.1",
+    "naam": "Empathie tonen",
+    "fase": "3",
+    "ai_eval_points": [
+      "Echte empathie voor klant?"
+    ],
+    "detector_id": "3.1",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  },
+  {
+    "nummer": "3.2",
+    "naam": "Oplossing",
+    "fase": "3",
+    "ai_eval_points": [
+      "Past de oplossing bij behoeftes?"
+    ],
+    "detector_id": "3.2",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  },
+  {
+    "nummer": "3.3",
+    "naam": "Voordeel",
+    "fase": "3",
+    "ai_eval_points": [
+      "Voordeel duidelijk gemaakt?"
+    ],
+    "detector_id": "3.3",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  },
+  {
+    "nummer": "3.4",
+    "naam": "Baat",
+    "fase": "3",
+    "ai_eval_points": [
+      "Persoonlijke baat voor klant helder?"
+    ],
+    "detector_id": "3.4",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  },
+  {
+    "nummer": "3.5",
+    "naam": "Mening vragen / standpunt onder alternatieve vorm",
+    "fase": "3",
+    "ai_eval_points": [
+      "Expliciet mening gevraagd?"
+    ],
+    "detector_id": "3.5",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  },
+  {
+    "nummer": "4.1",
+    "naam": "Proefafsluiting",
+    "fase": "4",
+    "ai_eval_points": [
+      "Natuurlijke proefafsluiting?"
+    ],
+    "detector_id": "4.1",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  },
+  {
+    "nummer": "4.2.1",
+    "naam": "Klant stelt vragen",
+    "fase": "4",
+    "ai_eval_points": [
+      "Vragen goed beantwoord?"
+    ],
+    "detector_id": "4.2.1",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  },
+  {
+    "nummer": "4.2.2",
+    "naam": "Twijfels",
+    "fase": "4",
+    "ai_eval_points": [
+      "Twijfels weggenomen?"
+    ],
+    "detector_id": "4.2.2",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  },
+  {
+    "nummer": "4.2.3",
+    "naam": "Poging tot uitstel",
+    "fase": "4",
+    "ai_eval_points": [
+      "Urgentie gecreëerd?"
+    ],
+    "detector_id": "4.2.3",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  },
+  {
+    "nummer": "4.2.4",
+    "naam": "Bezwaren",
+    "fase": "4",
+    "ai_eval_points": [
+      "Bezwaar adequaat behandeld?"
+    ],
+    "detector_id": "4.2.4",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  },
+  {
+    "nummer": "4.2.5",
+    "naam": "Angst / Bezorgdheden",
+    "fase": "4",
+    "ai_eval_points": [
+      "Angsten/bezorgdheden weggenomen?"
+    ],
+    "detector_id": "4.2.5",
+    "practice": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "notes": "Start with a short coach conversation to clarify the user's context and intent, then switch into roleplay (Hugo as customer) when helpful, and finish with a conversational debrief."
+    }
+  }
+]

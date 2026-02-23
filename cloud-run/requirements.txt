@@ -1,0 +1,11 @@
+flask==3.0.0
+gunicorn==21.2.0
+google-cloud-storage==2.14.0
+google-cloud-tasks==2.16.0
+google-auth==2.27.0
+supabase==2.3.4
+mux-python==5.1.0
+openai==1.12.0
+elevenlabs==1.0.0
+requests==2.31.0
+numpy==1.26.4

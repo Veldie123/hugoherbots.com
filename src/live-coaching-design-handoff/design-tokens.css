@@ -1,0 +1,321 @@
+/* ==================================================
+   HugoHerbots.ai Design Tokens
+   Live Coaching Specific Styles
+   ================================================== */
+
+:root {
+  /* ===== Brand Colors (HH System) ===== */
+  --hh-ink: #1C2535;              /* Mirage - Darkest text */
+  --hh-ui-100: #2B3748;           /* Indian Ink - Dark backgrounds */
+  --hh-primary: #6B7A92;          /* Slate Gray - Primary accent, CTAs */
+  --hh-accent: #6B7A92;           /* Same as primary */
+  --hh-muted: #B1B2B5;            /* French Gray - Secondary text */
+  --hh-ui-200: #E4E4E4;           /* Platinum - Light gray backgrounds */
+  --hh-ui-50: #F7F7F8;            /* Lightest background */
+  --hh-white: #FFFFFF;            /* Pure white */
+  
+  /* Semantic colors */
+  --hh-text: var(--hh-ink);
+  --hh-border: var(--hh-ui-200);
+  
+  /* ===== Status Colors ===== */
+  --hh-success: #00C389;          /* Green - Positive states */
+  --hh-warn: #FFB020;             /* Yellow - Warnings */
+  --destructive: hsl(0, 84%, 60%); /* Red - Live badge, errors */
+  
+  /* ===== Shadows (HH Elevation System) ===== */
+  --shadow-hh-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-hh-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-hh-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* ===== Border Radius ===== */
+  --radius-card: 16px;
+  --radius-button: 8px;
+  --radius-badge: 6px;
+  --radius-input: 8px;
+  --radius-full: 9999px;
+  
+  /* ===== Spacing System ===== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+}
+
+/* ==================================================
+   Typography Scale
+   ================================================== */
+
+/* H1 - Page titles */
+h1 {
+  font-size: 48px;
+  line-height: 56px;
+  font-weight: 700;
+}
+
+@media (max-width: 1024px) {
+  h1 {
+    font-size: 40px;
+    line-height: 48px;
+  }
+}
+
+@media (max-width: 640px) {
+  h1 {
+    font-size: 32px;
+    line-height: 40px;
+  }
+}
+
+/* H2 - Section titles */
+h2 {
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  h2 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}
+
+/* H3 - Card titles */
+h3 {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  h3 {
+    font-size: 20px;
+    line-height: 28px;
+  }
+}
+
+/* H4 - Small headings */
+h4 {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+}
+
+/* Body text */
+body {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 300;
+  color: var(--hh-text);
+}
+
+/* Small text */
+.text-small {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 300;
+}
+
+/* Tiny text (timestamps, labels) */
+.text-tiny {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 300;
+}
+
+/* ==================================================
+   Custom Shadow Utilities
+   ================================================== */
+
+.shadow-hh-sm {
+  box-shadow: var(--shadow-hh-sm);
+}
+
+.shadow-hh-md {
+  box-shadow: var(--shadow-hh-md);
+}
+
+.shadow-hh-lg {
+  box-shadow: var(--shadow-hh-lg);
+}
+
+/* ==================================================
+   Live Coaching Specific Styles
+   ================================================== */
+
+/* Live Badge Pulse Animation */
+@keyframes live-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.live-badge-pulse {
+  animation: live-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Video Container Aspect Ratio */
+.video-container-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+/* Chat Message Hover State */
+.chat-message:hover {
+  background-color: rgba(107, 122, 146, 0.03);
+  transition: background-color 150ms ease;
+}
+
+/* Poll Option Progress Bar */
+.poll-option {
+  position: relative;
+  overflow: hidden;
+}
+
+.poll-option-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(107, 122, 146, 0.05);
+  transition: width 300ms ease;
+}
+
+/* Session Card Highlight Border (Next session) */
+.session-card-highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, var(--hh-primary), var(--hh-accent));
+}
+
+/* ==================================================
+   Tailwind Custom Classes (via @apply if needed)
+   ================================================== */
+
+/* Background Colors */
+.bg-hh-ink {
+  background-color: var(--hh-ink);
+}
+
+.bg-hh-ui-100 {
+  background-color: var(--hh-ui-100);
+}
+
+.bg-hh-primary {
+  background-color: var(--hh-primary);
+}
+
+.bg-hh-ui-200 {
+  background-color: var(--hh-ui-200);
+}
+
+.bg-hh-ui-50 {
+  background-color: var(--hh-ui-50);
+}
+
+.bg-hh-white {
+  background-color: var(--hh-white);
+}
+
+/* Text Colors */
+.text-hh-text {
+  color: var(--hh-text);
+}
+
+.text-hh-muted {
+  color: var(--hh-muted);
+}
+
+.text-hh-primary {
+  color: var(--hh-primary);
+}
+
+.text-hh-success {
+  color: var(--hh-success);
+}
+
+.text-hh-warn {
+  color: var(--hh-warn);
+}
+
+/* Border Colors */
+.border-hh-border {
+  border-color: var(--hh-border);
+}
+
+.border-hh-primary {
+  border-color: var(--hh-primary);
+}
+
+/* ==================================================
+   Responsive Utilities
+   ================================================== */
+
+/* Mobile: < 640px */
+@media (max-width: 639px) {
+  .mobile-stack {
+    flex-direction: column;
+  }
+  
+  .mobile-full-width {
+    width: 100%;
+  }
+}
+
+/* Tablet: 640px - 1023px */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .tablet-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop: >= 1024px */
+@media (min-width: 1024px) {
+  .desktop-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .desktop-sidebar-layout {
+    grid-template-columns: 1fr 380px;
+  }
+}
+
+/* ==================================================
+   Accessibility
+   ================================================== */
+
+/* Focus states */
+*:focus-visible {
+  outline: 2px solid var(--hh-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --hh-border: #000000;
+  }
+}

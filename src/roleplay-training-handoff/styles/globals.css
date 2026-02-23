@@ -1,0 +1,279 @@
+/* Import Hypatia Sans fonts - Replace with actual font files if available */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* HH Brand Colors - Hugo Herbots Rebranding */
+  --hh-mirage: #1C2535;        /* Primary dark - was ink */
+  --hh-indian-ink: #2B3748;    /* Secondary dark */
+  --hh-slate-gray: #6B7A92;    /* Primary accent */
+  --hh-french-gray: #B1B2B5;   /* Muted text */
+  --hh-platinum: #E4E4E4;      /* Light gray */
+  --hh-white: #FFFFFF;         /* Pure white */
+  
+  /* HH Design Tokens (mapped to brand colors) */
+  --hh-ink: var(--hh-mirage);
+  --hh-primary: var(--hh-slate-gray);
+  --hh-success: #00C389;
+  --hh-warn: #FFB020;
+  --hh-ui-50: #FAFAFA;
+  --hh-ui-100: #F5F5F5;
+  --hh-ui-200: var(--hh-platinum);
+  --hh-ui-300: var(--hh-french-gray);
+  --hh-ui-400: var(--hh-slate-gray);
+  --hh-ui-500: var(--hh-indian-ink);
+  --hh-bg: var(--hh-white);
+  --hh-text: var(--hh-ink);
+  --hh-muted: var(--hh-french-gray);
+  --hh-border: var(--hh-platinum);
+
+  /* Original Shadcn tokens */
+  --font-size: 16px;
+  --background: var(--hh-bg);
+  --foreground: var(--hh-ink);
+  --card: var(--hh-bg);
+  --card-foreground: var(--hh-ink);
+  --popover: var(--hh-bg);
+  --popover-foreground: var(--hh-ink);
+  --primary: var(--hh-primary);
+  --primary-foreground: #ffffff;
+  --secondary: var(--hh-ui-100);
+  --secondary-foreground: var(--hh-ink);
+  --muted: var(--hh-ui-100);
+  --muted-foreground: var(--hh-ui-500);
+  --accent: var(--hh-ui-100);
+  --accent-foreground: var(--hh-ink);
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: var(--hh-ui-200);
+  --input: transparent;
+  --input-background: var(--hh-ui-50);
+  --switch-background: var(--hh-ui-300);
+  --font-weight-medium: 600;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-normal: 400;
+  --ring: var(--hh-primary);
+  --chart-1: var(--hh-primary);
+  --chart-2: var(--hh-success);
+  --chart-3: var(--hh-warn);
+  --chart-4: #9D4EDD;
+  --chart-5: #FF6B9D;
+  --radius: 1rem;
+  --sidebar: var(--hh-bg);
+  --sidebar-foreground: var(--hh-ink);
+  --sidebar-primary: var(--hh-primary);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--hh-ui-50);
+  --sidebar-accent-foreground: var(--hh-ink);
+  --sidebar-border: var(--hh-ui-200);
+  --sidebar-ring: var(--hh-primary);
+}
+
+.dark {
+  --hh-bg: #0B0F19;
+  --hh-text: #F7F9FC;
+  --background: var(--hh-bg);
+  --foreground: var(--hh-text);
+  --card: #1A1F2E;
+  --card-foreground: var(--hh-text);
+  --popover: #1A1F2E;
+  --popover-foreground: var(--hh-text);
+  --primary: var(--hh-primary);
+  --primary-foreground: #ffffff;
+  --secondary: #1A1F2E;
+  --secondary-foreground: var(--hh-text);
+  --muted: #1A1F2E;
+  --muted-foreground: var(--hh-ui-400);
+  --accent: #1A1F2E;
+  --accent-foreground: var(--hh-text);
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: #2A3142;
+  --input: #1A1F2E;
+  --ring: var(--hh-primary);
+  --font-weight-medium: 600;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-normal: 400;
+  --chart-1: var(--hh-primary);
+  --chart-2: var(--hh-success);
+  --chart-3: var(--hh-warn);
+  --chart-4: #9D4EDD;
+  --chart-5: #FF6B9D;
+  --sidebar: var(--hh-bg);
+  --sidebar-foreground: var(--hh-text);
+  --sidebar-primary: var(--hh-primary);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1A1F2E;
+  --sidebar-accent-foreground: var(--hh-text);
+  --sidebar-border: #2A3142;
+  --sidebar-ring: var(--hh-primary);
+}
+
+@theme inline {
+  --color-hh-ink: var(--hh-ink);
+  --color-hh-primary: var(--hh-primary);
+  --color-hh-success: var(--hh-success);
+  --color-hh-warn: var(--hh-warn);
+  --color-hh-ui-50: var(--hh-ui-50);
+  --color-hh-ui-100: var(--hh-ui-100);
+  --color-hh-ui-200: var(--hh-ui-200);
+  --color-hh-ui-300: var(--hh-ui-300);
+  --color-hh-ui-400: var(--hh-ui-400);
+  --color-hh-ui-500: var(--hh-ui-500);
+  --color-hh-bg: var(--hh-bg);
+  --color-hh-text: var(--hh-text);
+  --color-hh-muted: var(--hh-muted);
+  --color-hh-border: var(--hh-border);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* Prevent horizontal scroll */
+    overflow-x: hidden;
+  }
+  
+  /* Prevent horizontal scroll globally */
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+}
+
+/**
+ * HH Typography System
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: 48px;
+      line-height: 56px;
+      /* font-weight removed - use explicit classes (font-normal/font-bold) in components */
+    }
+
+    h2 {
+      font-size: 32px;
+      line-height: 40px;
+      /* font-weight removed - use explicit classes (font-normal/font-bold) in components */
+    }
+
+    h3 {
+      font-size: 24px;
+      line-height: 32px;
+      /* font-weight removed - use explicit classes (font-normal/font-bold) in components */
+    }
+
+    h4 {
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: var(--font-weight-medium);
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 300; /* Hypatia Sans Light */
+    }
+
+    label {
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 400; /* Regular weight for labels */
+    }
+
+    button {
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 600; /* Semibold for buttons */
+    }
+
+    input {
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 300; /* Hypatia Sans Light */
+    }
+
+    small, .text-small {
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 300; /* Hypatia Sans Light */
+    }
+
+    .text-mono {
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 500;
+      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+  /* Hypatia Sans with Outfit fallback - Replace Outfit with Hypatia Sans when font files are available */
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* HH Elevation shadows */
+.shadow-hh-sm {
+  box-shadow: 0 1px 2px rgba(11, 15, 25, 0.05);
+}
+
+.shadow-hh-md {
+  box-shadow: 0 4px 8px rgba(11, 15, 25, 0.08), 0 2px 4px rgba(11, 15, 25, 0.04);
+}
+
+.shadow-hh-lg {
+  box-shadow: 0 12px 24px rgba(11, 15, 25, 0.12), 0 4px 8px rgba(11, 15, 25, 0.06);
+}
+
+/* HH Focus */
+.focus-hh {
+  outline: 2px solid var(--hh-primary);
+  outline-offset: 2px;
+}

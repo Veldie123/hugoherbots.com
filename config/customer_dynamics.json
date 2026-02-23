@@ -1,0 +1,228 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Customer Dynamics Model - Vervangt 4-assige geometric mean door 3 dynamische variabelen",
+    "architecture_note": "rapport/valueTension/commitReadiness evolueren per turn op basis van verkoper technieken uit SSOT"
+  },
+
+  "start_values": {
+    "rapport_base": 0.35,
+    "valueTension_base": 0.15,
+    "commitReadiness_base": 0.10,
+    
+    "behavior_style_modifiers": {
+      "promoverend": { "rapport": 0.10, "valueTension": 0, "commitReadiness": 0 },
+      "faciliterend": { "rapport": 0.10, "valueTension": 0, "commitReadiness": 0 },
+      "controlerend": { "rapport": -0.05, "valueTension": 0.05, "commitReadiness": 0 },
+      "analyserend": { "rapport": -0.05, "valueTension": 0, "commitReadiness": 0 }
+    },
+    
+    "difficulty_modifiers": {
+      "onbewuste_onkunde": { "rapport": 0.05, "valueTension": -0.05 },
+      "bewuste_onkunde": { "rapport": 0, "valueTension": 0 },
+      "bewuste_kunde": { "rapport": -0.05, "valueTension": 0.05 },
+      "onbewuste_kunde": { "rapport": -0.10, "valueTension": 0.10 }
+    }
+  },
+
+  "buying_clock_valueTension": {
+    "situation_as_is": 0.10,
+    "field_of_tension": 0.30,
+    "market_research": 0.40,
+    "hesitation": 0.60,
+    "decision": 0.75
+  },
+
+  "buying_clock_stage_factor": {
+    "_note": "Multiplier voor commitReadiness berekening",
+    "situation_as_is": 0.30,
+    "field_of_tension": 0.45,
+    "market_research": 0.60,
+    "hesitation": 0.75,
+    "decision": 0.90
+  },
+
+  "commitReadiness_formula": {
+    "_note": "commitReadiness = clamp(base + valueTension_weight*valueTension + rapport_weight*rapport) * stageFactor",
+    "base": 0.15,
+    "valueTension_weight": 0.70,
+    "rapport_weight": 0.15
+  },
+
+  "low_score_penalty": {
+    "_note": "DEPRECATED - vervangen door evaluation_effects",
+    "threshold": 0.35,
+    "rapport_penalty": -0.06
+  },
+
+  "evaluation_effects": {
+    "_note": "Hoe evaluatie kwaliteit de dynamics beïnvloedt per turn. Perfect/Goed = bouwt rapport en spanning.",
+    "perfect": {
+      "rapport": 0.07,
+      "valueTension": 0.05,
+      "commitReadiness": 0.03
+    },
+    "goed": {
+      "rapport": 0.05,
+      "valueTension": 0.03,
+      "commitReadiness": 0.02
+    },
+    "bijna": {
+      "rapport": 0.02,
+      "valueTension": 0.01,
+      "commitReadiness": 0.01
+    },
+    "niet": {
+      "rapport": -0.05,
+      "valueTension": -0.02,
+      "commitReadiness": -0.01
+    },
+    "gemist": {
+      "rapport": -0.03,
+      "valueTension": 0,
+      "commitReadiness": 0
+    }
+  },
+
+  "thema_effects": {
+    "_note": "Extra dynamics boost wanneer verkoper specifiek thema bevraagt (Explore phase)",
+    "Bron": { "rapport": 0.02 },
+    "Motivatie": { "valueTension": 0.04, "commitReadiness": 0.02 },
+    "Ervaring": { "rapport": 0.02 },
+    "Verwachtingen": { "valueTension": 0.03, "commitReadiness": 0.03 },
+    "Alternatieven": { "valueTension": 0.02 },
+    "Budget": { "commitReadiness": 0.04 },
+    "Timing": { "commitReadiness": 0.05 },
+    "Beslissingscriteria": { "commitReadiness": 0.05 }
+  },
+
+  "epic_phase_effects": {
+    "_note": "Extra dynamics boost per EPIC fase wanneer juiste techniek wordt gedetecteerd",
+    "explore": { "rapport": 0.02 },
+    "probe": { "valueTension": 0.03, "rapport": 0.01 },
+    "impact": { "valueTension": 0.05, "commitReadiness": 0.02 },
+    "commit": { "commitReadiness": 0.06 }
+  },
+
+  "attitude_weights": {
+    "_note": "Hoe dynamics de kans op elke houding beïnvloeden. Positief = verhoogt kans, negatief = verlaagt kans.",
+    "positief": { 
+      "base": 0.40, 
+      "rapport": 0.80, 
+      "valueTension": 0.25, 
+      "commitReadiness": 0,
+      "difficulty_penalty": -0.40
+    },
+    "negatief": { 
+      "base": 0.25, 
+      "rapport": -0.70, 
+      "valueTension": 0, 
+      "commitReadiness": 0,
+      "difficulty_bonus": 0.40
+    },
+    "vaag": { 
+      "base": 0.20, 
+      "rapport": 0, 
+      "valueTension": -0.60, 
+      "commitReadiness": 0,
+      "experience_penalty": -0.35
+    },
+    "ontwijkend": { 
+      "base": 0.15, 
+      "rapport": -0.45, 
+      "valueTension": 0, 
+      "commitReadiness": 0,
+      "difficulty_bonus": 0.25
+    },
+    "vraag": { 
+      "base": 0.15, 
+      "rapport": 0, 
+      "valueTension": 0.55, 
+      "commitReadiness": 0,
+      "experience_bonus": 0.40
+    },
+    "twijfel": { 
+      "base": 0.10, 
+      "rapport": -0.20, 
+      "valueTension": 0, 
+      "commitReadiness": 0.55,
+      "requires_trigger": true
+    },
+    "bezwaar": { 
+      "base": 0.08, 
+      "rapport": -0.35, 
+      "valueTension": 0, 
+      "commitReadiness": 0.65,
+      "difficulty_bonus": 0.25,
+      "requires_trigger": true
+    },
+    "uitstel": { 
+      "base": 0.08, 
+      "rapport": 0, 
+      "valueTension": -0.25, 
+      "commitReadiness": 0.55,
+      "risk_orientation_penalty": -0.20,
+      "requires_trigger": true
+    },
+    "angst": { 
+      "base": 0.05, 
+      "rapport": -0.30, 
+      "valueTension": 0, 
+      "commitReadiness": 0.60,
+      "risk_orientation_penalty": -0.30,
+      "requires_trigger": true
+    }
+  },
+
+  "buying_clock_transitions": {
+    "_note": "Automatische buying clock evolutie op basis van dynamics (optioneel maar aanbevolen)",
+    "situation_as_is": { 
+      "next": "field_of_tension", 
+      "valueTension_threshold": 0.25 
+    },
+    "field_of_tension": { 
+      "next": "market_research", 
+      "valueTension_threshold": 0.45 
+    },
+    "market_research": { 
+      "next": "hesitation", 
+      "commitReadiness_threshold": 0.65 
+    },
+    "hesitation": { 
+      "next": "decision", 
+      "commitReadiness_threshold": 0.80 
+    }
+  },
+
+  "experience_factor": {
+    "_note": "Hoe experience_level de vaag/vraag balance beïnvloedt",
+    "geen_ervaring": 0.20,
+    "enige_ervaring": 0.50,
+    "veel_ervaring": 0.80
+  },
+
+  "difficulty_factor": {
+    "_note": "Hoe difficulty_level negativiteit beïnvloedt",
+    "onbewuste_onkunde": 0.00,
+    "bewuste_onkunde": 0.25,
+    "bewuste_kunde": 0.50,
+    "onbewuste_kunde": 0.70
+  },
+
+  "prompt_instructions": {
+    "_note": "Instructies voor customer_engine.ts prompt",
+    "rapport_low": "Reageer kort en gereserveerd. Geef minder details. Houd afstand.",
+    "rapport_high": "Reageer warmer en vollediger. Deel context vrijwilliger.",
+    "valueTension_low": "Je bent tevreden met de huidige situatie. Geen urgentie.",
+    "valueTension_high": "Je voelt spanning en urgentie. Gebruik consequentie-taal.",
+    "commitReadiness_low": "Je bent nog niet klaar om te beslissen. Blijf oriënteren.",
+    "commitReadiness_high": "Je denkt na over criteria en volgende stappen. Beslissings-modus."
+  },
+
+  "level_labels": {
+    "_note": "Labels voor dynamics level display in debug UI",
+    "low": "laag",
+    "medium": "midden",
+    "high": "hoog"
+  }
+}

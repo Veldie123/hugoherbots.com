@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "answers": [
+    {
+      "techniqueId": "1.1",
+      "customerSignal": "positief",
+      "customerMessage": "Hallo, ik heb interesse in jullie product",
+      "sellerResponse": "Goedemorgen! Leuk dat u contact opneemt.",
+      "context": {
+        "sector": "IT"
+      },
+      "recordedBy": "admin",
+      "id": "ref-1768863528404-fip7cd98y",
+      "recordedAt": "2026-01-19T22:58:48.404Z"
+    }
+  ]
+}

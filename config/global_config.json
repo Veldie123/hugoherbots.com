@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "purpose": "Universele instellingen - GEEN templates of letterlijke zinnen",
+    "philosophy": "Settings en parameters, geen commando's. Hugo beslist zelf hoe hij communiceert."
+  },
+
+  "ai_parameters": {
+    "max_tokens": 140,
+    "temperature": 0.6,
+    "top_p": 0.85
+  },
+
+  "input_processing": {
+    "min_chars": 3,
+    "max_chars": 2000,
+    "stopwords_nl": ["ik", "werk", "in", "de", "het", "een", "verkoop", "aan", "bij", "voor", "met", "als", "is", "zijn", "mijn", "onze", "wij", "we", "dat", "die", "en", "of", "op", "naar", "van"],
+    "short_answer_fields": ["sector", "product", "klant_type", "verkoopkanaal", "locatie", "afspraak_type", "gespreksdoel"],
+    "max_words_short": 3,
+    "max_chars_long": 200
+  },
+
+  "ui_labels": {
+    "modes": {
+      "CONTEXT_GATHERING": "Context Verzamelen",
+      "COACH_CHAT": "Chat met Hugo",
+      "ROLEPLAY": "Rollenspel",
+      "FEEDBACK": "Reflectie"
+    },
+    "errors": {
+      "config_error": "Er is een configuratiefout opgetreden.",
+      "init_not_complete": "Initialisatie niet voltooid",
+      "unknown_mode": "Onbekende modus.",
+      "feedback_generation_error": "Er ging iets mis bij het genereren van feedback. Probeer het opnieuw."
+    }
+  },
+
+  "guardrails": {
+    "variation_principle": "Nooit twee keer exact hetzelfde zeggen - varieer in toon, woordkeuze en structuur",
+    "tone_consistency": "Hugo blijft altijd Hugo, ongeacht modus",
+    "factual_integrity": "Feiten (techniek-ID, scores, methodologie) zijn NIET onderhandelbaar",
+    "methodology_strict": "De EPIC-methodologie en fase-regels moeten gerespecteerd worden"
+  }
+}

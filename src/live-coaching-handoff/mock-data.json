@@ -1,0 +1,432 @@
+{
+  "sessions": {
+    "upcoming": [
+      {
+        "id": "session-upcoming-1",
+        "title": "Live Q&A: Discovery Technieken",
+        "description": "Leer de E.P.I.C. methode voor ontdekkingsgesprekken en hoe je de juiste vragen stelt om de echte pijnpunten te ontdekken.",
+        "scheduledDate": "2025-01-22T14:00:00Z",
+        "duration": 60,
+        "topic": "Fase 2 • Ontdekkingsfase",
+        "phaseId": 2,
+        "status": "upcoming",
+        "videoUrl": null,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800",
+        "viewerCount": 0,
+        "createdAt": "2025-01-10T10:00:00Z",
+        "updatedAt": "2025-01-10T10:00:00Z"
+      },
+      {
+        "id": "session-upcoming-2",
+        "title": "Live Coaching: Closing Mastery",
+        "description": "Masterclass in afsluittechnieken: hoe je de deal sluit zonder pushy te zijn. People buy people - leer hoe je vertrouwen omzet in commitment.",
+        "scheduledDate": "2025-01-29T14:00:00Z",
+        "duration": 60,
+        "topic": "Fase 4 • Afsluittechnieken",
+        "phaseId": 4,
+        "status": "upcoming",
+        "videoUrl": null,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800",
+        "viewerCount": 0,
+        "createdAt": "2025-01-10T10:00:00Z",
+        "updatedAt": "2025-01-10T10:00:00Z"
+      },
+      {
+        "id": "session-upcoming-3",
+        "title": "Live Coaching: Value Selling",
+        "description": "Hoe verkoop je waarde in plaats van features? Leer de technieken om ROI te communiceren en business cases te bouwen.",
+        "scheduledDate": "2025-02-05T14:00:00Z",
+        "duration": 60,
+        "topic": "Fase 3 • Aanbevelingsfase",
+        "phaseId": 3,
+        "status": "upcoming",
+        "videoUrl": null,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800",
+        "viewerCount": 0,
+        "createdAt": "2025-01-10T10:00:00Z",
+        "updatedAt": "2025-01-10T10:00:00Z"
+      },
+      {
+        "id": "session-upcoming-4",
+        "title": "Live Q&A: Opening & Koopklimaat",
+        "description": "De eerste 30 seconden bepalen het gesprek. Leer hoe je een koopklimaat creëert en rapport opbouwt met technieken die 40 jaar bewezen zijn.",
+        "scheduledDate": "2025-02-12T14:00:00Z",
+        "duration": 60,
+        "topic": "Fase 1 • Openingsfase",
+        "phaseId": 1,
+        "status": "upcoming",
+        "videoUrl": null,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800",
+        "viewerCount": 0,
+        "createdAt": "2025-01-10T10:00:00Z",
+        "updatedAt": "2025-01-10T10:00:00Z"
+      },
+      {
+        "id": "session-upcoming-5",
+        "title": "Live Coaching: Bezwaarhandeling Masterclass",
+        "description": "Prijsbezwaren, timing, budget, technisch - alle bezwaren hebben dezelfde basis. Leer de psychologie achter bezwaren en hoe je ze omzet in kansen.",
+        "scheduledDate": "2025-02-19T14:00:00Z",
+        "duration": 60,
+        "topic": "Fase 4 • Beslissingsfase",
+        "phaseId": 4,
+        "status": "upcoming",
+        "videoUrl": null,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800",
+        "viewerCount": 0,
+        "createdAt": "2025-01-10T10:00:00Z",
+        "updatedAt": "2025-01-10T10:00:00Z"
+      }
+    ],
+    "live": [
+      {
+        "id": "session-live-1",
+        "title": "Live Coaching: Bezwaarhandeling",
+        "description": "Vandaag bespreken we hoe je omgaat met de meest voorkomende bezwaren in B2B sales.",
+        "scheduledDate": "2025-01-15T14:00:00Z",
+        "duration": 60,
+        "topic": "Fase 4 • Beslissingsfase",
+        "phaseId": 4,
+        "status": "live",
+        "videoUrl": "https://www.youtube.com/embed/LIVE_STREAM_ID",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800",
+        "viewerCount": 127,
+        "createdAt": "2025-01-08T10:00:00Z",
+        "updatedAt": "2025-01-15T14:00:00Z"
+      }
+    ],
+    "past": [
+      {
+        "id": "session-past-1",
+        "title": "Opening & Koopklimaat",
+        "description": "Opname van de sessie over het creëren van een koopklimaat en de eerste 30 seconden van een gesprek.",
+        "scheduledDate": "2025-01-08T14:00:00Z",
+        "duration": 60,
+        "topic": "Fase 1 • Openingsfase",
+        "phaseId": 1,
+        "status": "ended",
+        "videoUrl": "https://www.youtube.com/embed/RECORDING_ID_1",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800",
+        "viewerCount": 142,
+        "createdAt": "2025-01-01T10:00:00Z",
+        "updatedAt": "2025-01-08T15:00:00Z"
+      },
+      {
+        "id": "session-past-2",
+        "title": "SPIN & Lock Questioning",
+        "description": "Deep dive in SPIN selling en lock questioning technieken om commitment te krijgen tijdens discovery.",
+        "scheduledDate": "2024-12-18T14:00:00Z",
+        "duration": 60,
+        "topic": "Fase 2 • Ontdekkingsfase",
+        "phaseId": 2,
+        "status": "ended",
+        "videoUrl": "https://www.youtube.com/embed/RECORDING_ID_2",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800",
+        "viewerCount": 156,
+        "createdAt": "2024-12-11T10:00:00Z",
+        "updatedAt": "2024-12-18T15:00:00Z"
+      },
+      {
+        "id": "session-past-3",
+        "title": "ROI Calculation & Business Cases",
+        "description": "Hoe bouw je overtuigende business cases en communiceer je ROI effectief naar C-level stakeholders.",
+        "scheduledDate": "2024-12-11T14:00:00Z",
+        "duration": 60,
+        "topic": "Fase 3 • Aanbevelingsfase",
+        "phaseId": 3,
+        "status": "ended",
+        "videoUrl": "https://www.youtube.com/embed/RECORDING_ID_3",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800",
+        "viewerCount": 134,
+        "createdAt": "2024-12-04T10:00:00Z",
+        "updatedAt": "2024-12-11T15:00:00Z"
+      }
+    ]
+  },
+  "chatMessages": [
+    {
+      "id": "msg-1",
+      "sessionId": "session-live-1",
+      "userId": "hugo-herbots",
+      "userName": "Hugo Herbots",
+      "userInitials": "HH",
+      "message": "Welkom allemaal! Vandaag gaan we het hebben over bezwaarhandeling in fase 4.",
+      "isHost": true,
+      "createdAt": "2025-01-15T14:02:00Z"
+    },
+    {
+      "id": "msg-2",
+      "sessionId": "session-live-1",
+      "userId": "user-1",
+      "userName": "Sarah van Dijk",
+      "userInitials": "SV",
+      "message": "Dank je Hugo! Ik heb hier echt moeite mee.",
+      "isHost": false,
+      "createdAt": "2025-01-15T14:03:00Z"
+    },
+    {
+      "id": "msg-3",
+      "sessionId": "session-live-1",
+      "userId": "user-2",
+      "userName": "Mark Peters",
+      "userInitials": "MP",
+      "message": "Hoe ga je om met prijsbezwaren bij enterprise deals?",
+      "isHost": false,
+      "createdAt": "2025-01-15T14:04:00Z"
+    },
+    {
+      "id": "msg-4",
+      "sessionId": "session-live-1",
+      "userId": "hugo-herbots",
+      "userName": "Hugo Herbots",
+      "userInitials": "HH",
+      "message": "Goede vraag Mark! Ik kom daar zo op terug met een concreet voorbeeld.",
+      "isHost": true,
+      "createdAt": "2025-01-15T14:05:00Z"
+    },
+    {
+      "id": "msg-5",
+      "sessionId": "session-live-1",
+      "userId": "user-3",
+      "userName": "Lisa de Jong",
+      "userInitials": "LJ",
+      "message": "Kunnen we een voorbeeld zien van lock questioning?",
+      "isHost": false,
+      "createdAt": "2025-01-15T14:06:00Z"
+    },
+    {
+      "id": "msg-6",
+      "sessionId": "session-live-1",
+      "userId": "hugo-herbots",
+      "userName": "Hugo Herbots",
+      "userInitials": "HH",
+      "message": "Absoluut Lisa, dat komt in het tweede deel!",
+      "isHost": true,
+      "createdAt": "2025-01-15T14:07:00Z"
+    },
+    {
+      "id": "msg-7",
+      "sessionId": "session-live-1",
+      "userId": "user-4",
+      "userName": "Jan de Vries",
+      "userInitials": "JV",
+      "message": "Wat doe je als ze zeggen: we hebben geen budget?",
+      "isHost": false,
+      "createdAt": "2025-01-15T14:08:00Z"
+    },
+    {
+      "id": "msg-8",
+      "sessionId": "session-live-1",
+      "userId": "user-5",
+      "userName": "Emma Jansen",
+      "userInitials": "EJ",
+      "message": "Ik loop hier ook tegenaan! Vaak vals bezwaar denk ik.",
+      "isHost": false,
+      "createdAt": "2025-01-15T14:09:00Z"
+    },
+    {
+      "id": "msg-9",
+      "sessionId": "session-live-1",
+      "userId": "hugo-herbots",
+      "userName": "Hugo Herbots",
+      "userInitials": "HH",
+      "message": "Jan en Emma - 'geen budget' is zelden het echte bezwaar. Let op: ik ga nu live een voorbeeld doen.",
+      "isHost": true,
+      "createdAt": "2025-01-15T14:10:00Z"
+    },
+    {
+      "id": "msg-10",
+      "sessionId": "session-live-1",
+      "userId": "user-6",
+      "userName": "Tom Bakker",
+      "userInitials": "TB",
+      "message": "Dit is goud! Ik noteer alles mee.",
+      "isHost": false,
+      "createdAt": "2025-01-15T14:11:00Z"
+    },
+    {
+      "id": "msg-11",
+      "sessionId": "session-live-1",
+      "userId": "user-7",
+      "userName": "Sophie Visser",
+      "userInitials": "SV",
+      "message": "Vraag: werkt dit ook bij SaaS producten of alleen bij consulting?",
+      "isHost": false,
+      "createdAt": "2025-01-15T14:12:00Z"
+    },
+    {
+      "id": "msg-12",
+      "sessionId": "session-live-1",
+      "userId": "hugo-herbots",
+      "userName": "Hugo Herbots",
+      "userInitials": "HH",
+      "message": "Sophie - deze principes werken overal. People buy people. Het product maakt niet uit.",
+      "isHost": true,
+      "createdAt": "2025-01-15T14:13:00Z"
+    },
+    {
+      "id": "msg-13",
+      "sessionId": "session-live-1",
+      "userId": "user-8",
+      "userName": "Kevin Mulder",
+      "userInitials": "KM",
+      "message": "Geweldige sessie Hugo! Deze technieken ga ik morgen meteen toepassen.",
+      "isHost": false,
+      "createdAt": "2025-01-15T14:14:00Z"
+    },
+    {
+      "id": "msg-14",
+      "sessionId": "session-live-1",
+      "userId": "user-2",
+      "userName": "Mark Peters",
+      "userInitials": "MP",
+      "message": "Dank je! Het voorbeeld was heel duidelijk.",
+      "isHost": false,
+      "createdAt": "2025-01-15T14:15:00Z"
+    },
+    {
+      "id": "msg-15",
+      "sessionId": "session-live-1",
+      "userId": "hugo-herbots",
+      "userName": "Hugo Herbots",
+      "userInitials": "HH",
+      "message": "Mooi! Nu gaan we naar de poll - stem allemaal even waar jullie het meest tegenaan lopen.",
+      "isHost": true,
+      "createdAt": "2025-01-15T14:16:00Z"
+    }
+  ],
+  "polls": [
+    {
+      "id": "poll-1",
+      "sessionId": "session-live-1",
+      "question": "Waar loop je het meest tegenaan bij bezwaarhandeling?",
+      "isActive": true,
+      "options": [
+        {
+          "id": "option-1",
+          "pollId": "poll-1",
+          "text": "Prijsbezwaren",
+          "voteCount": 34
+        },
+        {
+          "id": "option-2",
+          "pollId": "poll-1",
+          "text": "Timing bezwaren (uitstel)",
+          "voteCount": 28
+        },
+        {
+          "id": "option-3",
+          "pollId": "poll-1",
+          "text": "Technische bezwaren",
+          "voteCount": 15
+        },
+        {
+          "id": "option-4",
+          "pollId": "poll-1",
+          "text": "Budgetbezwaren",
+          "voteCount": 42
+        }
+      ],
+      "totalVotes": 119,
+      "userVoted": false,
+      "userVoteOptionId": null,
+      "createdAt": "2025-01-15T14:16:00Z"
+    },
+    {
+      "id": "poll-2",
+      "sessionId": "session-live-1",
+      "question": "Hoe vaak oefen je deze technieken per week?",
+      "isActive": true,
+      "options": [
+        {
+          "id": "option-5",
+          "pollId": "poll-2",
+          "text": "Dagelijks",
+          "voteCount": 23
+        },
+        {
+          "id": "option-6",
+          "pollId": "poll-2",
+          "text": "2-3 keer per week",
+          "voteCount": 51
+        },
+        {
+          "id": "option-7",
+          "pollId": "poll-2",
+          "text": "1 keer per week",
+          "voteCount": 32
+        },
+        {
+          "id": "option-8",
+          "pollId": "poll-2",
+          "text": "Minder dan 1x per week",
+          "voteCount": 11
+        }
+      ],
+      "totalVotes": 117,
+      "userVoted": false,
+      "userVoteOptionId": null,
+      "createdAt": "2025-01-15T14:25:00Z"
+    }
+  ],
+  "reminders": [
+    {
+      "id": "reminder-1",
+      "sessionId": "session-upcoming-1",
+      "userId": "user-1",
+      "createdAt": "2025-01-14T10:00:00Z"
+    },
+    {
+      "id": "reminder-2",
+      "sessionId": "session-upcoming-2",
+      "userId": "user-1",
+      "createdAt": "2025-01-14T10:05:00Z"
+    },
+    {
+      "id": "reminder-3",
+      "sessionId": "session-upcoming-1",
+      "userId": "user-2",
+      "createdAt": "2025-01-14T11:00:00Z"
+    }
+  ],
+  "websocketEvents": {
+    "examples": {
+      "chatMessage": {
+        "type": "chat:message",
+        "data": {
+          "id": "msg-new",
+          "sessionId": "session-live-1",
+          "userId": "user-9",
+          "userName": "Anne Smit",
+          "userInitials": "AS",
+          "message": "Geweldige tips, Hugo!",
+          "isHost": false,
+          "createdAt": "2025-01-15T14:20:00Z"
+        }
+      },
+      "pollUpdate": {
+        "type": "poll:update",
+        "data": {
+          "pollId": "poll-1",
+          "optionId": "option-4",
+          "voteCount": 43,
+          "totalVotes": 120
+        }
+      },
+      "sessionStatus": {
+        "type": "session:status",
+        "data": {
+          "sessionId": "session-upcoming-1",
+          "status": "live",
+          "viewerCount": 85
+        }
+      },
+      "viewerCount": {
+        "type": "viewer:count",
+        "data": {
+          "sessionId": "session-live-1",
+          "viewerCount": 132
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1247 @@
+{
+  "version": "6.2",
+  "description": "Pure detector overlay - technique detection patterns only. Added detectors for 4.INDIEN + finale closing sub-technieken (4.3.1-4.3.5). Reduced overlap between 4.1 and 4.INDIEN by removing generic 'indien' from 4.1 patterns.",
+  "_ssot_note": "SSOT ARCHITECTURE: This file contains ONLY detection patterns. All technique names, descriptions (wat/doel/hoe) come from server/ssot-loader.ts. NEVER add naam, success_indicators, anti_patterns, verkoper_intentie, or letterlijke_verwoording fields.",
+  "lexicon": {
+    "context_markers": [
+      "context",
+      "situatie",
+      "achtergrond",
+      "aanleiding",
+      "reden"
+    ],
+    "feeling_markers": [
+      "voel",
+      "emotie",
+      "gevoel",
+      "beleving",
+      "ervaring"
+    ],
+    "benefit_markers": [
+      "belangrijk",
+      "waardevol",
+      "voordelig",
+      "winst",
+      "resultaat",
+      "rust",
+      "gemoedsrust",
+      "zekerheid",
+      "veilig",
+      "betrouwbaar"
+    ],
+    "objection_markers": [
+      "maar",
+      "echter",
+      "toch",
+      "probleem",
+      "bezwaar",
+      "twijfel"
+    ],
+    "confirmation_markers": [
+      "ja",
+      "klopt",
+      "inderdaad",
+      "precies",
+      "correct",
+      "akkoord"
+    ],
+    "rejection_markers": [
+      "nee",
+      "niet",
+      "onjuist",
+      "anders",
+      "fout"
+    ],
+    "summary_markers": [
+      "dus",
+      "kortom",
+      "samengevat",
+      "concluderend"
+    ],
+    "transition_markers": [
+      "daarom",
+      "vandaar",
+      "hierdoor",
+      "waardoor"
+    ],
+    "commitment_intro": [
+      "als ik het goed begrijp",
+      "dus u wilt",
+      "voor u is belangrijk",
+      "mag ik noteren"
+    ],
+    "impact_markers": [
+      "wat betekent dat voor u",
+      "welke gevolgen",
+      "wat zou dat opleveren",
+      "wat kost het u nu"
+    ],
+    "empathy_words": [
+      "begrijp",
+      "snap",
+      "herken",
+      "voorstel",
+      "mee eens"
+    ],
+    "solution_intro": [
+      "ik heb",
+      "wij bieden",
+      "onze oplossing",
+      "wat wij doen"
+    ],
+    "advantage_connectors": [
+      "daardoor",
+      "hierdoor",
+      "dit betekent",
+      "het gevolg"
+    ],
+    "benefit_question": [
+      "wat betekent dit voor u",
+      "wat levert dit op",
+      "welke waarde"
+    ],
+    "opinion_request": [
+      "wat vindt u",
+      "hoe kijkt u",
+      "uw mening",
+      "hoe belangrijk"
+    ]
+  },
+  "semantics": {
+    "question_type": {
+      "open": [
+        "wie",
+        "wat",
+        "waar",
+        "wanneer",
+        "waarom",
+        "hoe",
+        "welke"
+      ],
+      "closed": [
+        "is",
+        "bent",
+        "heeft",
+        "kun",
+        "wil",
+        "zal",
+        "mag",
+        "moet"
+      ],
+      "probing": [
+        "kunt u meer vertellen",
+        "wat bedoelt u",
+        "hoe precies",
+        "bijvoorbeeld"
+      ],
+      "reflective": [
+        "als ik het goed begrijp",
+        "u zegt dus",
+        "bedoelt u dat"
+      ]
+    },
+    "sentence_type": {
+      "interrogative": "ends_with_?",
+      "declarative": "ends_with_.",
+      "exclamatory": "ends_with_!",
+      "imperative": "starts_with_verb"
+    },
+    "semantic_roles": {
+      "fact_request": "open_question + context_marker",
+      "opinion_request": "what_think + feeling_marker",
+      "benefit_ref": "contains_benefit_marker + personal_pronoun",
+      "objection_handle": "acknowledgment + but_reversal",
+      "commitment_attempt": "summary + confirmation_request",
+      "impact_probe": "consequence_question + personal_relevance"
+    }
+  },
+  "techniques": {
+    "1.1": {
+      "patterns": [
+        "welkom",
+        "fijn dat u",
+        "goed u te",
+        "leuk om",
+        "prettig",
+        "aangename",
+        "blij u",
+        "bedankt voor uw tijd",
+        "blij dat u er bent"
+      ],
+      "semantic": [
+        "warm_reception",
+        "rapport_building"
+      ],
+      "confidence_threshold": 0.6
+    },
+    "1.2": {
+      "patterns": [
+        "agenda",
+        "overlopen",
+        "verloop van gesprek",
+        "afspreken",
+        "akkoord dat",
+        "akkoord om",
+        "goedvinden",
+        "als het voor u past",
+        "hoe wilt u",
+        "mijn voorstel is"
+      ],
+      "semantic": [
+        "agenda_setting",
+        "structure"
+      ],
+      "confidence_threshold": 0.7
+    },
+    "1.3": {
+      "patterns": [
+        "ik ben",
+        "mijn naam",
+        "vertegenwoordig",
+        "ons bedrijf",
+        "wij zijn",
+        "ik werk voor",
+        "wij doen",
+        "onze specialiteit",
+        "referentie",
+        "recent nog"
+      ],
+      "semantic": [
+        "introduction",
+        "company_presentation"
+      ],
+      "confidence_threshold": 0.6
+    },
+    "1.4": {
+      "patterns": [
+        "vertel eens",
+        "wat brengt u",
+        "aanleiding",
+        "reden van",
+        "hoe komt het dat",
+        "wat maakt dat u hier bent",
+        "waarom bent u hier"
+      ],
+      "semantic": [
+        "opening_question",
+        "situation_inquiry"
+      ],
+      "confidence_threshold": 0.7
+    },
+    "2.1.1": {
+      "patterns": [
+        "hoeveel",
+        "wanneer",
+        "waar komt",
+        "waar werk",
+        "waar bent",
+        "welke",
+        "wat voor",
+        "wat zoek",
+        "wat precies",
+        "vertel eens",
+        "wat doen jullie",
+        "hoe werkt",
+        "wat is",
+        "wie",
+        "hoe ziet",
+        "kunt u vertellen",
+        "leg eens uit",
+        "beschrijf",
+        "wat bedoel",
+        "hoe ben",
+        "hoe bent",
+        "terecht gekomen",
+        "via welk",
+        "via wat",
+        "hoelang",
+        "sinds wanneer",
+        "hoe vaak",
+        "hoe groot",
+        "hoe lang",
+        "hoe oud",
+        "waarom overweegt",
+        "waarom wilt",
+        "waarom zoekt",
+        "wat maakt dat",
+        "wat doet u",
+        "wat gebruikt u",
+        "wat ziet u",
+        "wat heeft u",
+        "waar haalt u",
+        "hoe gaat",
+        "hoe doet u",
+        "hoe heeft u",
+        "hoe kiest"
+      ],
+      "semantic": [
+        "fact_request",
+        "open_question"
+      ],
+      "semantic_must": [
+        "question_type.open"
+      ],
+      "semantic_cannot": [
+        "benefit_ref",
+        "opinion"
+      ],
+      "confidence_threshold": 0.5,
+      "context_window": 1,
+      "priority": 1,
+      "themas": [
+        "2.1.1.1",
+        "2.1.1.2",
+        "2.1.1.3",
+        "2.1.1.4",
+        "2.1.1.5",
+        "2.1.1.6",
+        "2.1.1.7",
+        "2.1.1.8"
+      ]
+    },
+    "2.1.1.1": {
+      "thema_id": "bron",
+      "patterns": [
+        "terecht gekomen",
+        "gevonden",
+        "gehoord over",
+        "ontdekt",
+        "via welk",
+        "via wat",
+        "hoe bent u bij",
+        "waar komt u vandaan",
+        "bron",
+        "kanaal",
+        "hoe hebt u ons"
+      ],
+      "semantic": [
+        "source_inquiry",
+        "lead_source"
+      ],
+      "confidence_threshold": 0.6,
+      "context_window": 1,
+      "priority": 1
+    },
+    "2.1.1.2": {
+      "thema_id": "motivatie",
+      "patterns": [
+        "aanleiding",
+        "waarom nu",
+        "reden",
+        "trigger",
+        "wat maakt dat",
+        "waarom zoekt",
+        "waarom overweegt",
+        "noodzaak",
+        "urgentie",
+        "wat bracht u"
+      ],
+      "semantic": [
+        "motivation_inquiry",
+        "trigger_discovery"
+      ],
+      "confidence_threshold": 0.6,
+      "context_window": 1,
+      "priority": 1
+    },
+    "2.1.1.3": {
+      "thema_id": "ervaring",
+      "patterns": [
+        "ervaring met",
+        "eerder gewerkt",
+        "hoelang",
+        "hoe lang",
+        "al geprobeerd",
+        "bekend met",
+        "gewend aan",
+        "gebruikte u",
+        "werkte u met",
+        "kent u"
+      ],
+      "semantic": [
+        "experience_inquiry",
+        "knowledge_level"
+      ],
+      "confidence_threshold": 0.6,
+      "context_window": 1,
+      "priority": 1
+    },
+    "2.1.1.4": {
+      "thema_id": "verwachtingen",
+      "patterns": [
+        "wat verwacht",
+        "wat hoopt",
+        "ideale",
+        "wensen",
+        "eisen",
+        "moet het",
+        "belangrijkste",
+        "criteria",
+        "hoe zou",
+        "wat wilt u",
+        "wat zoek je",
+        "wat zoekt u",
+        "waar let u op",
+        "waar let je op",
+        "wat is belangrijk"
+      ],
+      "semantic": [
+        "expectation_inquiry",
+        "requirements_discovery"
+      ],
+      "confidence_threshold": 0.6,
+      "context_window": 1,
+      "priority": 1
+    },
+    "2.1.1.5": {
+      "thema_id": "alternatieven",
+      "patterns": [
+        "andere opties",
+        "al bekeken",
+        "vergelijkt",
+        "concurrenten",
+        "alternatieven",
+        "wat heeft u al",
+        "geprobeerd",
+        "overwogen",
+        "elders",
+        "met wie vergelijkt"
+      ],
+      "semantic": [
+        "alternatives_inquiry",
+        "competitive_landscape"
+      ],
+      "confidence_threshold": 0.6,
+      "context_window": 1,
+      "priority": 1
+    },
+    "2.1.1.6": {
+      "thema_id": "budget",
+      "patterns": [
+        "budget",
+        "hoeveel wilt u besteden",
+        "welk bedrag",
+        "grootorde",
+        "financieel kader",
+        "middelen beschikbaar",
+        "wat wilt u uitgeven",
+        "prijsklasse",
+        "investering voorzien"
+      ],
+      "semantic": [
+        "budget_inquiry",
+        "financial_discovery"
+      ],
+      "confidence_threshold": 0.7,
+      "context_window": 1,
+      "priority": 1
+    },
+    "2.1.1.7": {
+      "thema_id": "timing",
+      "patterns": [
+        "wanneer",
+        "deadline",
+        "tijdlijn",
+        "termijn",
+        "starten",
+        "beslissen",
+        "snel",
+        "dringend",
+        "planning",
+        "moet dit rond zijn"
+      ],
+      "semantic": [
+        "timing_inquiry",
+        "timeline_discovery"
+      ],
+      "confidence_threshold": 0.6,
+      "context_window": 1,
+      "priority": 1
+    },
+    "2.1.1.8": {
+      "thema_id": "beslissingscriteria",
+      "patterns": [
+        "wie beslist",
+        "beslissingsproces",
+        "criteria",
+        "betrokkenen",
+        "goedkeuring",
+        "andere beslissers",
+        "aankoop goedkeuren",
+        "hoe wordt besloten",
+        "beslissingscriteria"
+      ],
+      "semantic": [
+        "decision_inquiry",
+        "stakeholder_discovery"
+      ],
+      "confidence_threshold": 0.6,
+      "context_window": 1,
+      "priority": 1
+    },
+    "2.1.2": {
+      "patterns": [
+        "wat vindt u",
+        "wat vind je",
+        "hoe belangrijk",
+        "uw mening",
+        "jouw mening",
+        "hoe kijkt u",
+        "hoe kijk je",
+        "wat spreekt aan",
+        "hoe ervaart u",
+        "hoe ervaar je",
+        "wat trekt u aan",
+        "wat trekt je aan",
+        "bevalt",
+        "voorkeur",
+        "wat denkt u",
+        "wat denk je",
+        "waarom wel",
+        "waarom niet",
+        "hoe ziet u dat",
+        "waarom hebt u",
+        "waarom heeft u",
+        "waarom heb je",
+        "waarom koos",
+        "waarom gekozen",
+        "waarom aanvaard",
+        "waarom besloten",
+        "wat maakt dat u"
+      ],
+      "semantic": [
+        "opinion_request",
+        "feeling_marker"
+      ],
+      "semantic_must": [
+        "question_type.open",
+        "feeling_marker"
+      ],
+      "confidence_threshold": 0.75,
+      "context_window": 1,
+      "priority": 2
+    },
+    "2.1.3": {
+      "patterns": [
+        "is het omdat",
+        "of omdat",
+        "zoekt u",
+        "of eerder",
+        "bedoelt u dat",
+        "of bedoelt u",
+        "is het ... of",
+        "wilt u ... of",
+        "kiest u ... of",
+        "gaat het om ... of"
+      ],
+      "semantic": [
+        "alternative_choice",
+        "clarification"
+      ],
+      "confidence_threshold": 0.7,
+      "context_window": 1,
+      "priority": 3
+    },
+    "2.1.4": {
+      "patterns": [
+        "daar komen we op terug",
+        "straks meer",
+        "later bespreken",
+        "eerst even",
+        "hou dat even bij",
+        "goede vraag",
+        "onafgezien"
+      ],
+      "semantic": [
+        "deflection",
+        "postponement"
+      ],
+      "confidence_threshold": 0.8,
+      "allowed_phases": [
+        2
+      ],
+      "forbidden_in_phase": [
+        4
+      ]
+    },
+    "2.1.5": {
+      "patterns": [
+        "wat bedoelt u",
+        "wat bedoel je",
+        "hoe bedoelt u",
+        "hoe bedoel je",
+        "wat verstaat u onder",
+        "kunt u dat toelichten",
+        "leg eens uit",
+        "hoe zit dat precies",
+        "echt",
+        "wat verstaat u daaronder",
+        "hoe precies"
+      ],
+      "semantic": [
+        "clarification",
+        "probing"
+      ],
+      "confidence_threshold": 0.7,
+      "context_window": 1,
+      "priority": 4
+    },
+    "2.1.6": {
+      "patterns": [
+        "ik begrijp wat u bedoelt",
+        "ik snap wat u zegt",
+        "dat begrijp ik",
+        "daar kan ik inkomen",
+        "dus u bedoelt",
+        "als ik het goed begrijp",
+        "dat klinkt",
+        "ik hoor dat",
+        "vertel verder",
+        "ga gerust door",
+        "interessant dat u dat zegt",
+        "u zegt dus"
+      ],
+      "semantic": [
+        "empathy",
+        "acknowledgment",
+        "active_listening"
+      ],
+      "confidence_threshold": 0.7,
+      "context_window": 1,
+      "priority": 5
+    },
+    "2.2": {
+      "patterns": [
+        "stel dat",
+        "wat als",
+        "in een situatie waar",
+        "bij andere klanten zien we"
+      ],
+      "semantic": [
+        "hypothetical_probe",
+        "storytelling"
+      ],
+      "semantic_must": [
+        "conditional",
+        "example_context"
+      ],
+      "confidence_threshold": 0.75,
+      "context_window": 2
+    },
+    "2.3": {
+      "patterns": [
+        "wat betekent dat voor u",
+        "welke gevolgen heeft dat",
+        "wat kost het u nu",
+        "wat zou dat opleveren"
+      ],
+      "semantic": [
+        "impact_probe",
+        "consequence_question"
+      ],
+      "semantic_must": [
+        "impact_markers",
+        "personal_relevance"
+      ],
+      "confidence_threshold": 0.8,
+      "context_window": 2
+    },
+    "2.4": {
+      "patterns": [
+        "als ik het goed begrijp",
+        "dus u wilt",
+        "mag ik noteren",
+        "voor u is belangrijk"
+      ],
+      "semantic": [
+        "commitment_attempt",
+        "benefit_ref"
+      ],
+      "semantic_must": [
+        "benefit_ref",
+        "confirmation_request"
+      ],
+      "semantic_cannot": [
+        "objection",
+        "negative"
+      ],
+      "confidence_threshold": 0.8,
+      "context_window": 2,
+      "requires_confirmation": true
+    },
+    "3.1": {
+      "patterns": [
+        "ik begrijp",
+        "ik snap",
+        "logisch dat",
+        "herkenbaar",
+        "begrijp ik het goed dat"
+      ],
+      "semantic": [
+        "empathy",
+        "acknowledgment"
+      ],
+      "semantic_must": [
+        "empathy_words"
+      ],
+      "confidence_threshold": 0.7,
+      "allowed_phases": [
+        3
+      ]
+    },
+    "3.2": {
+      "patterns": [
+        "dat is de reden dat wij",
+        "onze oplossing",
+        "wat wij doen",
+        "ons product"
+      ],
+      "semantic": [
+        "solution_presentation"
+      ],
+      "semantic_must": [
+        "solution_intro"
+      ],
+      "confidence_threshold": 0.7,
+      "allowed_phases": [
+        3
+      ]
+    },
+    "3.3": {
+      "patterns": [
+        "het voordeel daarvan is",
+        "wat dit doet is",
+        "het gevolg is",
+        "hierdoor krijgt u"
+      ],
+      "semantic": [
+        "advantage_explanation"
+      ],
+      "semantic_must": [
+        "advantage_connectors",
+        "consequence"
+      ],
+      "confidence_threshold": 0.75,
+      "allowed_phases": [
+        3
+      ]
+    },
+    "3.4": {
+      "patterns": [
+        "voor u betekent dit concreet",
+        "u krijgt",
+        "dit zou voor u specifiek kunnen betekenen",
+        "in uw situatie zou dat willen zeggen dat"
+      ],
+      "semantic": [
+        "benefit_translation"
+      ],
+      "semantic_must": [
+        "benefit_ref",
+        "personal_pronoun"
+      ],
+      "confidence_threshold": 0.75,
+      "allowed_phases": [
+        3
+      ]
+    },
+    "3.5": {
+      "patterns": [
+        "wat vindt u",
+        "hoe ziet u",
+        "is dit waardevol",
+        "spreekt dit aan"
+      ],
+      "semantic": [
+        "opinion_check"
+      ],
+      "semantic_must": [
+        "opinion_request",
+        "question_type.open"
+      ],
+      "confidence_threshold": 0.7,
+      "allowed_phases": [
+        3
+      ]
+    },
+    "4.2.1": {
+      "patterns": [
+        "mag ik vragen",
+        "over welke",
+        "wat bedoelt u precies",
+        "als ik u kan antwoorden",
+        "als ik u kan uitleggen",
+        "stel dat ik dat kan",
+        "zou u dan",
+        "als dat zo is",
+        "helpt dat",
+        "kunnen we dan afronden"
+      ],
+      "semantic": [
+        "question_handling",
+        "counter_question",
+        "answer_plus_commitment"
+      ],
+      "semantic_must": [
+        "question_type.open"
+      ],
+      "confidence_threshold": 0.72,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.2.2": {
+      "patterns": [
+        "waar zit uw twijfel",
+        "wat maakt u onzeker",
+        "wat is precies uw twijfel",
+        "waar komt die twijfel vandaan",
+        "waarom denkt u dat",
+        "wat heeft u meegemaakt",
+        "wat zou u geruststellen"
+      ],
+      "semantic": [
+        "doubt_probe",
+        "root_cause_question"
+      ],
+      "semantic_must": [
+        "question_type.open"
+      ],
+      "confidence_threshold": 0.7,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.2.3": {
+      "patterns": [
+        "ik begrijp dat u dat wil bespreken",
+        "is dat een voorwaarde",
+        "of een voorwendsel",
+        "onafgezien",
+        "wat zou u beslissing zijn",
+        "wat denkt u dat het antwoord zou zijn",
+        "wanneer kunnen we",
+        "actieplan",
+        "plan vast"
+      ],
+      "semantic": [
+        "postponement_handling",
+        "condition_vs_excuse",
+        "action_plan"
+      ],
+      "semantic_must": [
+        "question_type.open"
+      ],
+      "confidence_threshold": 0.7,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.2.4": {
+      "patterns": [
+        "te duur tegenover",
+        "tegenover wie",
+        "tegenover wat",
+        "pencil",
+        "afweeg",
+        "weegschaal",
+        "laat ons dat analyseren",
+        "mag ik scherp stellen",
+        "wat bedoelt u met te duur",
+        "buiten de prijs"
+      ],
+      "semantic": [
+        "objection_analysis",
+        "pencil_selling",
+        "weighing_technique"
+      ],
+      "semantic_must": [
+        "question_type.open"
+      ],
+      "confidence_threshold": 0.72,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.2.5": {
+      "patterns": [
+        "ik begrijp uw bezorgdheid",
+        "ik hoor uw bezorgdheid",
+        "ik begrijp dat u bang bent",
+        "mag ik u een verhaal vertellen",
+        "referentie",
+        "andere klant",
+        "pro en contra",
+        "voor en nadelen",
+        "up and down",
+        "wat als u het wel doet",
+        "wat als u het niet doet"
+      ],
+      "semantic": [
+        "fear_handling",
+        "reference_story",
+        "pro_contra",
+        "scenario_thinking"
+      ],
+      "semantic_must": [
+        "acknowledgment"
+      ],
+      "confidence_threshold": 0.7,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.1": {
+      "patterns": [
+        "als ik u kan aantonen",
+        "als ik kan bewijzen",
+        "stel dat ik",
+        "als we vandaag",
+        "zou u dan",
+        "eerder",
+        "of",
+        "optie",
+        "blauw of groen",
+        "A of B",
+        "welke van de twee"
+      ],
+      "semantic": [
+        "trial_close",
+        "alternative_choice",
+        "commitment_test"
+      ],
+      "semantic_must": [
+        "question_type.open",
+        "sentence_type.interrogative"
+      ],
+      "confidence_threshold": 0.72,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.2.6": {
+      "patterns": [
+        "risico",
+        "kans",
+        "impact",
+        "wat is het ergste",
+        "wat is de kans dat",
+        "laten we inschatten",
+        "worst case",
+        "best case",
+        "mitigeren",
+        "maatregel",
+        "backup",
+        "plan B"
+      ],
+      "semantic": [
+        "risk_assessment",
+        "probability_impact",
+        "mitigation"
+      ],
+      "semantic_must": [
+        "question_type.open"
+      ],
+      "confidence_threshold": 0.7,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.INDIEN": {
+      "patterns": [
+        "indien",
+        "als we",
+        "als wij",
+        "als ik",
+        "dan hebben we een akkoord",
+        "dan is het oké",
+        "gaan we dan samen verder",
+        "dan gaat u akkoord",
+        "dan kiest u",
+        "als ... dan",
+        "indien ... dan",
+        "als dat punt opgelost is"
+      ],
+      "semantic": [
+        "conditional_close",
+        "if_then",
+        "commitment_test"
+      ],
+      "semantic_must": [
+        "conditional",
+        "sentence_type.interrogative"
+      ],
+      "confidence_threshold": 0.76,
+      "context_window": 2,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.3.1": {
+      "patterns": [
+        "als ik alles goed samenvat",
+        "als ik het goed begrijp",
+        "dus als ik",
+        "samengevat",
+        "kortom",
+        "concluderend",
+        "mag ik even samenvatten"
+      ],
+      "semantic": [
+        "closing_summary",
+        "reflect_back"
+      ],
+      "semantic_must": [
+        "summary_markers",
+        "confirmation_request"
+      ],
+      "confidence_threshold": 0.72,
+      "context_window": 2,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.3.2": {
+      "patterns": [
+        "op basis van wat u belangrijk vindt",
+        "daarom past",
+        "dat sluit aan bij",
+        "vandaar dat",
+        "omdat u zei dat",
+        "dus voor u is belangrijk",
+        "dit concept sluit perfect aan"
+      ],
+      "semantic": [
+        "expectation_solution_link",
+        "fit_argument"
+      ],
+      "semantic_must": [
+        "transition_markers",
+        "benefit_ref"
+      ],
+      "confidence_threshold": 0.74,
+      "context_window": 2,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.3.3": {
+      "patterns": [
+        "wat dit voor u betekent",
+        "dat betekent voor u",
+        "concreet betekent dat",
+        "u hoeft niet meer",
+        "u voorkomt",
+        "u wint",
+        "u krijgt"
+      ],
+      "semantic": [
+        "cvp_confirmation",
+        "benefit_ref"
+      ],
+      "semantic_must": [
+        "benefit_ref",
+        "personal_pronoun"
+      ],
+      "confidence_threshold": 0.74,
+      "context_window": 2,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.3.4": {
+      "patterns": [
+        "kiest u dan voor",
+        "verkiest u",
+        "eerder",
+        "of",
+        "welke van de twee",
+        "1 of 2",
+        "A of B",
+        "optie A",
+        "optie B"
+      ],
+      "semantic": [
+        "final_alternative_choice",
+        "closing_choice"
+      ],
+      "semantic_must": [
+        "sentence_type.interrogative"
+      ],
+      "confidence_threshold": 0.72,
+      "context_window": 1,
+      "allowed_phases": [
+        4
+      ]
+    },
+    "4.3.5": {
+      "patterns": [
+        "perfect",
+        "dan zet ik dit in orde",
+        "ik noteer",
+        "ik maak de offerte",
+        "ik stuur u",
+        "we plannen",
+        "we prikken",
+        "we tekenen",
+        "order",
+        "contract",
+        "handtekening",
+        "ik zet het in de agenda"
+      ],
+      "semantic": [
+        "order_writing",
+        "next_steps"
+      ],
+      "semantic_must": [
+        "commitment_attempt"
+      ],
+      "confidence_threshold": 0.7,
+      "context_window": 2,
+      "allowed_phases": [
+        4
+      ]
+    }
+  },
+  "themes": {
+    "bron": {
+      "patterns": [
+        "hoe bent u bij ons",
+        "hoe ben je bij ons",
+        "waar heeft u over ons",
+        "hoe hoorde u",
+        "hoe hoorde je",
+        "via wie",
+        "wie heeft u doorverwezen",
+        "wie heeft je doorverwezen",
+        "waar komt u vandaan",
+        "waar kom je vandaan",
+        "hoe kent u ons",
+        "hoe ken je ons",
+        "referentie",
+        "doorverwezen",
+        "terecht gekomen",
+        "gevonden",
+        "ontdekt"
+      ],
+      "confidence_threshold": 0.6
+    },
+    "motivatie": {
+      "patterns": [
+        "waarom nu",
+        "waarom zoekt u",
+        "waarom zoek je",
+        "wat is de aanleiding",
+        "wat brengt u hier",
+        "wat drijft u",
+        "wat maakt dat u",
+        "wat is uw motivatie",
+        "waardoor bent u",
+        "aanleiding",
+        "beweegreden",
+        "reden dat u"
+      ],
+      "confidence_threshold": 0.6
+    },
+    "ervaring": {
+      "patterns": [
+        "ervaring",
+        "eerder gehad",
+        "al eens",
+        "bekend met",
+        "gewerkt met",
+        "gebruikt",
+        "in het verleden",
+        "voorheen",
+        "vroeger"
+      ],
+      "confidence_threshold": 0.6
+    },
+    "verwachtingen": {
+      "patterns": [
+        "wat verwacht",
+        "wat hoopt",
+        "ideale",
+        "wat zou u willen",
+        "hoe ziet u",
+        "droompicture",
+        "perfecte situatie",
+        "wensen"
+      ],
+      "confidence_threshold": 0.6
+    },
+    "alternatieven": {
+      "patterns": [
+        "andere opties",
+        "alternatieven",
+        "andere partijen",
+        "concurrenten",
+        "elders gekeken",
+        "vergelijken",
+        "ook gesproken met",
+        "andere leveranciers"
+      ],
+      "confidence_threshold": 0.6
+    },
+    "budget": {
+      "patterns": [
+        "budget",
+        "investering",
+        "prijs",
+        "kosten",
+        "wat wilt u besteden",
+        "financieel",
+        "middelen beschikbaar",
+        "hoeveel",
+        "bedrag"
+      ],
+      "confidence_threshold": 0.6
+    },
+    "timing": {
+      "patterns": [
+        "wanneer",
+        "tijdlijn",
+        "deadline",
+        "planning",
+        "termijn",
+        "hoelang",
+        "startdatum",
+        "tegen wanneer",
+        "wanneer moet",
+        "urgentie"
+      ],
+      "confidence_threshold": 0.6
+    },
+    "beslissingscriteria": {
+      "patterns": [
+        "criteria",
+        "belangrijk voor u",
+        "waar let u op",
+        "doorslaggevend",
+        "prioriteiten",
+        "eisen",
+        "voorwaarden",
+        "wat moet",
+        "waar kijkt u naar"
+      ],
+      "confidence_threshold": 0.6
+    }
+  },
+  "telemetry_schema": {
+    "detected": "string (technique ID or null)",
+    "confidence": "number (0-1)",
+    "semantic_matches": "array of matched semantic patterns",
+    "committed_benefit": "string or null (the confirmed benefit)",
+    "themes_touched": "array of theme IDs detected in this turn",
+    "customer_state": {
+      "attitude": "string (geïnteresseerd|neutraal|sceptisch|weerstand)",
+      "revealed_count": "number of facts/opinions given this turn",
+      "topics_discussed": "array of theme names"
+    },
+    "progression": {
+      "phase_ready": "boolean (ready for next phase)",
+      "success": "boolean (customer satisfied/bought)",
+      "blocking_objection": "string or null"
+    }
+  }
+}

@@ -1,0 +1,304 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "description": "Practice mode configuratie per techniek + flow regels",
+    "source": "Geëxtraheerd uit technieken_catalog.json",
+    "activated_in": "V2 engine (coach-engine.ts)"
+  },
+
+  "flow_rules": {
+    "_philosophy": "Elke sessie begint met context verzamelen. Dan naar default_mode. Feedback alleen na roleplay.",
+    
+    "always_start_with": "CONTEXT_GATHERING",
+    
+    "context_gathering_purpose": {
+      "before_roleplay": "Verzamel verkoper situatie zodat klant-persona relevant en realistisch is",
+      "before_coach_chat": "Verzamel verkoper context zodat coaching persoonlijk en praktisch is"
+    },
+    
+    "after_context": {
+      "rule": "Ga naar default_mode zoals gedefinieerd per techniek",
+      "COACH_CHAT": "Direct naar coaching dialoog",
+      "COACH_CHAT_THEN_ROLEPLAY": "Eerst coaching, dan aanbieden om te oefenen via roleplay"
+    },
+    
+    "feedback_trigger": {
+      "when": "only_after_roleplay",
+      "never_after": ["COACH_CHAT", "CONTEXT_GATHERING"],
+      "reason": "Feedback reflecteert op gedrag in rollenspel. Bij coaching is de dialoog zelf al reflectief."
+    }
+  },
+
+  "technieken": {
+    "0": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "1": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "2": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "3": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "0.1": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "0.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "0.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "0.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "0.5": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "1.1": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "1.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "1.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "1.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "2.1.1": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.1.1": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.1.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.1.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.1.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.1.5": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.1.6": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.1.7": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.1.8": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.5": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.1.6": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "2.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "3.1": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "3.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "3.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "3.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "3.5": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "3.6": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "3.7": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false
+    },
+    "4.1": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.2.1": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.2.2": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.2.3": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.2.4": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.2.5": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.2.6": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.ABC": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.INDIEN": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.3": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.3.1": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.3.2": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.3.3": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.3.4": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    },
+    "4.3.5": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true
+    }
+  }
+}

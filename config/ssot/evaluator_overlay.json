@@ -1,0 +1,299 @@
+{
+  "_meta": {
+    "description": "Evaluator overlay - referenties naar SSOT stappenplan en voorbeeld",
+    "source": "Alle techniekinhoud komt uit technieken_index.json",
+    "evaluation_method": "AI vergelijkt seller-uitspraak met stappenplan-stappen en voorbeeld-zinnen uit SSOT",
+    "ownership": "ALL evaluator prompts and templates must be in this file - ZERO hardcoding in server/v2/evaluator.ts",
+    "scoring_rubric": {
+      "perfect": { "score": 10, "label": "Alle stappen correct gevolgd" },
+      "goed": { "score": 5, "label": "Meeste stappen gevolgd" },
+      "bijna": { "score": 2, "label": "Juiste richting, stappen incompleet" },
+      "gemist": { "score": 0, "label": "Techniek niet toegepast" }
+    },
+    "eval_instruction": "Gebruik ALTIJD stappenplan en voorbeeld uit technieken_index.json als evaluatiecriteria. Vergelijk de seller-uitspraak met de voorbeeldzinnen en check of de stappenplan-stappen worden gevolgd."
+  },
+  "summary_templates": {
+    "no_evaluations": "Geen evaluaties uitgevoerd.",
+    "score_summary": "Score: {{totalScore}} punten. {{detected}}/{{total}} technieken correct toegepast ({{percentage}}%)."
+  },
+  "prompt_template": {
+    "_note": "Template for evaluator prompt - placeholders: {{rag_context}}, {{golden_examples}}, {{ssot_reference}}, {{customer_signal}}, {{epic_phase}}, {{customer_message}}, {{seller_message}}",
+    "system": "Je bent een sales training evaluator voor de EPIC-methodiek van Hugo Herbots.",
+    "context_sections": {
+      "rag": "=== HUGO'S TRAINING CONTEXT ===\n{{rag_context}}",
+      "ssot": "{{ssot_reference}}",
+      "golden": "{{golden_examples}}"
+    },
+    "evaluation_method": "=== EVALUATIE METHODE ===\n1. Vergelijk de verkoper-uitspraak met het STAPPENPLAN - zijn de juiste stappen gevolgd?\n2. Vergelijk met de VOORBEELD-ZINNEN - lijkt het op correcte toepassing?\n3. Scoring: perfect = stappenplan volledig gevolgd, goed = meeste stappen, bijna = juiste richting",
+    "situation": "=== HUIDIGE SITUATIE ===\nKLANT ATTITUDE: {{customer_signal}}\nEPIC FASE: {{epic_phase}}\n\nLAATSTE KLANT REACTIE: \"{{customer_message}}\"\n\nVERKOPER ZEGT NU: \"{{seller_message}}\"",
+    "rules": "=== EVALUATIE REGELS ===\n1. Detecteer MAXIMAAL 2 technieken per turn - wees selectief\n2. Alleen technieken die EXPLICIET en DUIDELIJK worden toegepast\n3. Check of STAPPENPLAN-stappen zijn gevolgd (indien aanwezig)\n4. Vergelijk met VOORBEELD-ZINNEN uit de SSOT",
+    "format": "=== ANTWOORD FORMAT ===\nGeef JSON:\n{\n  \"techniques\": [\n    {\"id\": \"2.1.1.6\", \"naam\": \"Budgetvraag\", \"quality\": \"goed\", \"stappen_gevolgd\": [\"stap 1\", \"stap 2\"]}\n  ],\n  \"overall_quality\": \"perfect\" | \"goed\" | \"bijna\" | \"gemist\",\n  \"rationale\": \"Korte uitleg - welke stappen gevolgd/gemist (max 2 zinnen)\"\n}\n\nAls GEEN techniek herkend: techniques = [], overall_quality = \"gemist\"\nAlleen JSON, geen andere tekst."
+  },
+  "technieken": {
+    "0": {
+      "eval_type": "stappenplan_check",
+      "eval_note": "Check of voorbereidende stappen zijn gedaan (niet observeerbaar in gesprek)"
+    },
+    "1": {
+      "eval_type": "stappenplan_check",
+      "eval_note": "Check of openingsfase-stappen zijn gevolgd: koopklimaat, gentleman's agreement, firmavoorstelling, instapvraag"
+    },
+    "2": {
+      "eval_type": "stappenplan_check",
+      "eval_note": "Check EPIC-flow: Explore (thema's bevragen) → Probe (verdieping) → Impact (consequenties) → Commit (bevestiging)"
+    },
+    "3": {
+      "eval_type": "stappenplan_check",
+      "eval_note": "Check O.V.B.-techniek: Oplossing → Voordeel → Baat, met empathie vooraf"
+    },
+    "4": {
+      "eval_type": "stappenplan_check",
+      "eval_note": "Check afsluiting: proefafsluiting, behandeling van reacties, definitieve afsluiting"
+    },
+    "0.1": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Vergelijk met stappenplan-stappen voor prospectanalyse"
+    },
+    "0.2": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Check SWOT-analyse volledigheid"
+    },
+    "0.3": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Check CRM-raadpleging"
+    },
+    "0.4": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Check mentale voorbereiding"
+    },
+    "0.5": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Check materiaalvoorbereiding"
+    },
+    "1.1": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Vergelijk seller-opening met voorbeeld-zinnen voor koopklimaat"
+    },
+    "1.2": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Check of expliciet akkoord gevraagd wordt zoals in voorbeeld"
+    },
+    "1.3": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "1.3 Firmavoorstelling vereist dat de verkoper DAADWERKELIJK de firma presenteert met concrete feiten: naam bedrijf, wat ze doen, referenties, resultaten. Alleen het AANKONDIGEN dat men de firma zal voorstellen ('ik stel voor dat ik kort mezelf als ook de firma voorstel') is GEEN firmavoorstelling maar hoort bij 1.2 Gentleman's Agreement. Detecteer 1.3 ALLEEN als de verkoper echte bedrijfsinformatie deelt."
+    },
+    "1.4": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Vergelijk instapvraag met voorbeeld-zinnen"
+    },
+    "2.1": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld", "themas"],
+      "eval_note": "Check welke thema's bevraagd zijn (8 thema's in SSOT)"
+    },
+    "2.1.1": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Vergelijk feitgerichte vraag met voorbeeld-zinnen"
+    },
+    "2.1.1.1": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["voorbeeld"],
+      "eval_note": "Thema BRON: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.1.2": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["voorbeeld"],
+      "eval_note": "Thema MOTIVATIE: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.1.3": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["voorbeeld"],
+      "eval_note": "Thema ERVARING: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.1.4": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["voorbeeld"],
+      "eval_note": "Thema VERWACHTINGEN: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.1.5": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["voorbeeld"],
+      "eval_note": "Thema ALTERNATIEVEN: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.1.6": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["voorbeeld"],
+      "eval_note": "Thema BUDGET: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.1.7": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["voorbeeld"],
+      "eval_note": "Thema TIMING: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.1.8": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["voorbeeld"],
+      "eval_note": "Thema BESLISSINGSCRITERIA: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.2": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Mening-vraag: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.3": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Alternatieve vraag: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.4": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Ter zijde schuiven: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.5": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Ping-pong: vergelijk met voorbeeld-zinnen"
+    },
+    "2.1.6": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Actief luisteren: vergelijk met voorbeeld-zinnen"
+    },
+    "2.2": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Probe: check of verhaal/hypothetisch scenario gebruikt wordt zoals in voorbeeld"
+    },
+    "2.3": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Consequentievragen: vergelijk met voorbeeld-zinnen voor impact-vraag"
+    },
+    "2.4": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Commitment: check samenvatting + bevestigingsvraag + wachten op JA"
+    },
+    "3.1": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Empathie tonen: vergelijk met voorbeeld-zinnen"
+    },
+    "3.2": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Oplossing presenteren: check stappenplan (verwijs naar behoefte → presenteer oplossing → check reactie)"
+    },
+    "3.3": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Voordeel benoemen: vergelijk met voorbeeld-zinnen"
+    },
+    "3.4": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Baat vertalen: check of generiek voordeel vertaald wordt naar persoonlijke impact (zie voorbeeld)"
+    },
+    "3.5": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Mening vragen: vergelijk met voorbeeld-zinnen"
+    },
+    "3.6": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Rekenvoorbeeld: check of met klantcijfers gerekend wordt"
+    },
+    "3.7": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "OVB samenvatten: check samenvatting + bevestigingsvraag"
+    },
+    "4.1": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Proefafsluiting: vergelijk met voorbeeld-zinnen"
+    },
+    "4.2.1": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Vraag behandelen: check stappenplan-stappen"
+    },
+    "4.2.2": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Twijfel behandelen: volg stappenplan-stappen in volgorde"
+    },
+    "4.2.3": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Uitstel behandelen: volg stappenplan-stappen (Empathie → Analyseren → Neutraliseren → Action Plan)"
+    },
+    "4.2.4": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Bezwaar behandelen: volg 6 stappenplan-stappen (Empathie → Analyseren → Isoleren → Neutraliseren → Ontzenuwen → Afsluiten)"
+    },
+    "4.2.5": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Angst behandelen: volg stappenplan-stappen"
+    },
+    "4.2.6": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Reverse Thinking: check of risico van NIET-handelen zichtbaar gemaakt wordt"
+    },
+    "4.ABC": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "ABC-check: vergelijk met voorbeeld-zinnen"
+    },
+    "4.INDIEN": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Indien-techniek: vergelijk met voorbeeld-zinnen"
+    },
+    "4.3": {
+      "eval_type": "stappenplan_check",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Definitieve afsluiting: check gouden regel (HOE niet OF)"
+    },
+    "4.3.1": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Behoefte herhalen: check of klantwoorden gebruikt worden"
+    },
+    "4.3.2": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Verwachting koppelen: vergelijk met voorbeeld-zinnen"
+    },
+    "4.3.3": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Baten samenvatten: check 'voor u' constructie"
+    },
+    "4.3.4": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Alternatieve afsluiting: check keuzevraag (niet ja/nee)"
+    },
+    "4.3.5": {
+      "eval_type": "voorbeeld_match",
+      "ssot_fields": ["stappenplan", "voorbeeld"],
+      "eval_note": "Leiding nemen: vergelijk met voorbeeld-zinnen"
+    }
+  }
+}

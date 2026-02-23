@@ -1,0 +1,1287 @@
+{
+  "_meta": {
+    "version": "3.0",
+    "description": "Practice + Orchestrator configuratie per techniek (met context packs, artifacts en roleplay gates)",
+    "source": "Geëxtraheerd uit technieken_catalog.json",
+    "activated_in": "V3 engine (roleplay-engine.ts + coach-engine.ts)"
+  },
+  "flow_rules": {
+    "_philosophy": "Elke sessie begint met context verzamelen. Dan naar default_mode. Feedback alleen na roleplay.",
+    "always_start_with": "CONTEXT_GATHERING",
+    "context_gathering_purpose": {
+      "before_roleplay": "Verzamel verkoper situatie zodat klant-persona relevant en realistisch is",
+      "before_coach_chat": "Verzamel verkoper context zodat coaching persoonlijk en praktisch is"
+    },
+    "after_context": {
+      "rule": "Ga naar default_mode zoals gedefinieerd per techniek",
+      "COACH_CHAT": "Direct naar coaching dialoog",
+      "COACH_CHAT_THEN_ROLEPLAY": "Eerst coaching, dan aanbieden om te oefenen via roleplay"
+    },
+    "feedback_trigger": {
+      "when": "only_after_roleplay",
+      "never_after": [
+        "COACH_CHAT",
+        "CONTEXT_GATHERING"
+      ],
+      "reason": "Feedback reflecteert op gedrag in rollenspel. Bij coaching is de dialoog zelf al reflectief."
+    }
+  },
+  "technieken": {
+    "0": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE0_PRECONTACT",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "1": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "PHASE1_OPENING_FULL",
+        "learning_function": "ROLEPLAY_INTEGRATED",
+        "context_depth": "STANDARD",
+        "context_layers_required": [
+          "base",
+          "scenario"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "explore",
+          "default_attitude": null,
+          "persona_policy": "session_random",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "2": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "PHASE2_FULL_EPIC",
+        "learning_function": "ROLEPLAY_INTEGRATED",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [
+          "scenario_snapshot",
+          "discovery_brief"
+        ],
+        "roleplay": {
+          "initial_epic_phase": "explore",
+          "default_attitude": null,
+          "persona_policy": "session_random",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "3": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "PHASE3_RECOMMEND_FULL",
+        "learning_function": "ROLEPLAY_INTEGRATED",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [
+          "discovery_brief"
+        ],
+        "artifacts_out": [
+          "offer_brief"
+        ],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "PHASE4_CLOSING_FULL",
+        "learning_function": "ROLEPLAY_INTEGRATED",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [
+          "offer_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "0.1": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE0_PREP_SUB",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "0.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE0_PREP_SUB",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "0.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE0_PREP_SUB",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "0.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE0_PREP_SUB",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "0.5": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE0_PREP_SUB",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "1.1": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE1_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "1.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE1_MICRO",
+        "learning_function": "MICRO_DRILL",
+        "context_depth": "STANDARD",
+        "context_layers_required": [
+          "base",
+          "scenario"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "1.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE1_MICRO",
+        "learning_function": "MICRO_DRILL",
+        "context_depth": "STANDARD",
+        "context_layers_required": [
+          "base",
+          "scenario"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "1.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE1_MICRO",
+        "learning_function": "MICRO_DRILL",
+        "context_depth": "STANDARD",
+        "context_layers_required": [
+          "base",
+          "scenario"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "EXPLORE_BUNDLE",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "STANDARD",
+        "context_layers_required": [
+          "base",
+          "scenario"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "explore",
+          "default_attitude": null,
+          "persona_policy": "session_random",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "2.1.1": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "DISCOVERY_THEME_DRILL",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.1.1": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "DISCOVERY_THEME_DRILL",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.1.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "DISCOVERY_THEME_DRILL",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.1.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "DISCOVERY_THEME_DRILL",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.1.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "DISCOVERY_THEME_DRILL",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.1.5": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "DISCOVERY_THEME_DRILL",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.1.6": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "DISCOVERY_THEME_DRILL",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.1.7": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "DISCOVERY_THEME_DRILL",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.1.8": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "DISCOVERY_THEME_DRILL",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "EXPLORE_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "EXPLORE_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "EXPLORE_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.5": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "EXPLORE_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.1.6": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "EXPLORE_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "2.1",
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PROBE",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "STANDARD",
+        "context_layers_required": [
+          "base",
+          "scenario"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "IMPACT",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "STANDARD",
+        "context_layers_required": [
+          "base",
+          "scenario"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "2.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "COMMIT",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "STANDARD",
+        "context_layers_required": [
+          "base",
+          "scenario"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "3.1": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE3_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "3",
+        "artifacts_in": [
+          "discovery_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "3.2": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE3_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "3",
+        "artifacts_in": [
+          "discovery_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "3.3": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE3_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "3",
+        "artifacts_in": [
+          "discovery_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "3.4": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE3_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "3",
+        "artifacts_in": [
+          "discovery_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "3.5": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE3_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "3",
+        "artifacts_in": [
+          "discovery_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "3.6": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE3_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "3",
+        "artifacts_in": [
+          "discovery_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "3.7": {
+      "default_mode": "COACH_CHAT",
+      "roleplay_capable": false,
+      "roleplay_default": false,
+      "orchestrator": {
+        "practice_unit": "PHASE3_MICRO",
+        "learning_function": "COACH_TRANSLATE",
+        "context_depth": "LIGHT",
+        "context_layers_required": [
+          "base"
+        ],
+        "recommended_bundle": "3",
+        "artifacts_in": [
+          "discovery_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": null
+      }
+    },
+    "4.1": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "PHASE4_MISC",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.2.1": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "AFRITTEN",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": "4.2",
+        "artifacts_in": [
+          "offer_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": "vraag",
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.2.2": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "AFRITTEN",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": "4.2",
+        "artifacts_in": [
+          "offer_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": "twijfel",
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.2.3": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "AFRITTEN",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": "4.2",
+        "artifacts_in": [
+          "offer_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": "uitstel",
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.2.4": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "AFRITTEN",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": "4.2",
+        "artifacts_in": [
+          "offer_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": "bezwaar",
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.2.5": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "AFRITTEN",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": "4.2",
+        "artifacts_in": [
+          "offer_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": "angst",
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.2.6": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "AFRITTEN",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": "4.2",
+        "artifacts_in": [
+          "offer_brief"
+        ],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.ABC": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "PHASE4_MISC",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.INDIEN": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "PHASE4_MISC",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.3": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "PHASE4_MISC",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.3.1": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "CLOSING_TECHNIQUES",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.3.2": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "CLOSING_TECHNIQUES",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.3.3": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "CLOSING_TECHNIQUES",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.3.4": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "CLOSING_TECHNIQUES",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    },
+    "4.3.5": {
+      "default_mode": "COACH_CHAT_THEN_ROLEPLAY",
+      "roleplay_capable": true,
+      "roleplay_default": true,
+      "orchestrator": {
+        "practice_unit": "CLOSING_TECHNIQUES",
+        "learning_function": "ROLEPLAY_DRILL",
+        "context_depth": "DEEP",
+        "context_layers_required": [
+          "base",
+          "scenario",
+          "value_map",
+          "objection_bank"
+        ],
+        "recommended_bundle": null,
+        "artifacts_in": [],
+        "artifacts_out": [],
+        "roleplay": {
+          "initial_epic_phase": "commit",
+          "default_attitude": null,
+          "persona_policy": "reuse_scenario_snapshot_if_available",
+          "offer_policy": "auto_offer"
+        }
+      }
+    }
+  },
+  "orchestrator": {
+    "concepts": {
+      "learning_functions": {
+        "COACH_TRANSLATE": "Uitleg + vertaalslag naar eigen context; geen rollenspel.",
+        "MICRO_DRILL": "Korte oefening op micro-vaardigheid (kan zonder full roleplay).",
+        "ROLEPLAY_DRILL": "Rollenspel op 1 vaardigheid/techniek met vooraf ingestelde klant-houding.",
+        "ROLEPLAY_INTEGRATED": "Rollenspel over meerdere technieken (bundle/fase) met EPIC progressie en feedback."
+      },
+      "context_depth_levels": {
+        "LIGHT": "Minimale context (voldoende voor coaching).",
+        "STANDARD": "Context + scenario (voldoende voor geloofwaardige micro-roleplay).",
+        "DEEP": "Scenario + waardekaart + bezwaarbank + (optioneel) artifacts voor cross-fase roleplay."
+      }
+    },
+    "context_layers": {
+      "base": {
+        "persist": "user_context",
+        "keys": [
+          "sector",
+          "product",
+          "klant_type",
+          "verkoopkanaal",
+          "ervaring"
+        ],
+        "purpose": "Universele basiscontext voor personalisatie en klant-persona."
+      },
+      "scenario": {
+        "persist": "user_context.additionalContext",
+        "keys": [
+          "afspraak_type",
+          "gespreksdoel",
+          "beslisser_rol",
+          "typische_context",
+          "lastige_openingsvragen"
+        ],
+        "purpose": "Meeting-situatie en typische start van het gesprek."
+      },
+      "value_map": {
+        "persist": "user_context.additionalContext",
+        "keys": [
+          "pains",
+          "baten",
+          "koopredenen_recent",
+          "success_stories_kort",
+          "usp_naar_baat_map"
+        ],
+        "purpose": "Inputs om Probe/Impact/OVB geloofwaardig te maken."
+      },
+      "objection_bank": {
+        "persist": "user_context.additionalContext",
+        "keys": [
+          "bezwaren_typisch",
+          "twijfels_typisch",
+          "uitstelredenen_typisch",
+          "angsten_typisch",
+          "concurrentie_typisch"
+        ],
+        "purpose": "Inputs voor afritten, bezwarenbehandeling en closing rollenspellen."
+      },
+      "offer_map": {
+        "persist": "technique_session_or_user_context.additionalContext",
+        "keys": [
+          "oplossing_kern",
+          "voordelen",
+          "baten_per_voordeel",
+          "bewijsvoering",
+          "prijsrange"
+        ],
+        "purpose": "Inputs om fase 3/4 rollenspellen te kunnen spelen met consistente oplossing."
+      }
+    },
+    "artifacts": {
+      "scenario_snapshot": {
+        "purpose": "Bewaar klant-persona parameters + scenario zodat je over fase 2→3 dezelfde klant kan blijven spelen.",
+        "recommended_fields": [
+          "persona_params",
+          "buying_clock_stage",
+          "difficulty_level",
+          "seed",
+          "summary"
+        ]
+      },
+      "discovery_brief": {
+        "purpose": "Samenvatting van discovery output (pains/baten/criteria/urgentie) die fase 3 voedt.",
+        "recommended_fields": [
+          "pains",
+          "baten",
+          "criteria",
+          "budget",
+          "timing",
+          "alternatieven",
+          "stakeholders",
+          "commitment_zin"
+        ]
+      },
+      "offer_brief": {
+        "purpose": "Samenvatting van OVB pitch (oplossing→voordeel→baat + next step) die fase 4 voedt.",
+        "recommended_fields": [
+          "oplossing",
+          "ovb_map",
+          "price",
+          "next_step",
+          "assumpties"
+        ]
+      }
+    },
+    "roleplay_gates": {
+      "global": {
+        "requires_layers_by_depth": {
+          "LIGHT": [
+            "base"
+          ],
+          "STANDARD": [
+            "base",
+            "scenario"
+          ],
+          "DEEP": [
+            "base",
+            "scenario",
+            "value_map",
+            "objection_bank"
+          ]
+        },
+        "requires_artifacts_for_phase": {
+          "3": [
+            "discovery_brief"
+          ],
+          "4": [
+            "offer_brief"
+          ]
+        }
+      }
+    },
+    "roleplay_offer_policy": {
+      "for_mode_COACH_CHAT_THEN_ROLEPLAY": {
+        "auto_offer_after_coach_turns": 2,
+        "also_offer_when_user_says_ready": true,
+        "user_can_decline": true
+      }
+    }
+  }
+}

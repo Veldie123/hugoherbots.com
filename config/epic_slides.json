@@ -1,0 +1,338 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "purpose": "EPIC Sales Engine slide content mapped to technique IDs for inline chat display",
+    "source": "E.P.I.C_Sales_Engine_Optimized.pptx",
+    "total_slides": 87
+  },
+  "slides": [
+    {
+      "id": "slide_intro_waarde",
+      "techniqueIds": ["0.1"],
+      "phase": "intro",
+      "titel": "Waarde Creatie",
+      "kernboodschap": "Het gaat niet om wat u kunt aanbieden, maar hoe u waarde kunt creëren voor uw prospect.",
+      "bulletpoints": [
+        "Uw concurrenten hebben ook goede producten en marktconforme prijzen",
+        "U moet zich anders positioneren voor betere resultaten",
+        "Klanten kopen het verwacht resultaat van uw oplossing",
+        "If you do what you always did, you will get what you always got"
+      ],
+      "visual_type": "quote",
+      "personalisatie_slots": ["product", "sector"]
+    },
+    {
+      "id": "slide_buying_clock",
+      "techniqueIds": ["0.2"],
+      "phase": "intro",
+      "titel": "The Buying Clock",
+      "kernboodschap": "Het psychologisch aankoopproces verloopt in 4 fasen die bepalen waar uw prospect zich bevindt.",
+      "bulletpoints": [
+        "00u-06u: Situation 'As it is' — Prospect is tevreden",
+        "06u-08u: Field of Tension — Klant ervaart problemen",
+        "08u-11u: Market Research — Prospect vergelijkt aanbieders",
+        "11u-12u: Hesitation — Prospect aarzelt, angst, bezorgdheden"
+      ],
+      "visual_type": "diagram",
+      "personalisatie_slots": ["sector", "klant_type"]
+    },
+    {
+      "id": "slide_sociale_stijlen",
+      "techniqueIds": ["0.3"],
+      "phase": "intro",
+      "titel": "Sociale Gedragstijlen",
+      "kernboodschap": "Pas uw aanpak aan op de gedragstijl van uw prospect.",
+      "bulletpoints": [
+        "Analyserend — Zaakgericht & Controlerend",
+        "Dominerend — Zaakgericht & Dominerend",
+        "Faciliterend — Mensgericht & Meegaand",
+        "Promoverend — Mensgericht & Dominerend",
+        "Verwerven voordelen vs. Vermijden nadelen"
+      ],
+      "visual_type": "matrix",
+      "personalisatie_slots": ["klant_type"]
+    },
+    {
+      "id": "slide_reverse_engineering",
+      "techniqueIds": ["0.4"],
+      "phase": "intro",
+      "titel": "Waarom Kopen Klanten?",
+      "kernboodschap": "Voor elke prospect moet u deze vraag beantwoorden: waarom zou uw prospect voor u kiezen en niet voor de concurrent?",
+      "bulletpoints": [
+        "In B2C: teveel prospects annuleren hun vervolgesprek",
+        "In B2B: teveel offertes zonder opvolging",
+        "Kent u de echte koopredenen van uw laatste 10 klanten?",
+        "Reverse engineering: werk terug vanuit het resultaat"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["koopredenen_baten", "koopredenen_pijnpunten", "product"]
+    },
+    {
+      "id": "slide_precontact",
+      "techniqueIds": ["0.5"],
+      "phase": "pre",
+      "titel": "Desktop Research & Voorbereiding",
+      "kernboodschap": "Wie zich niet voorbereidt, bereidt zich voor om vergeten te worden. Goede voorbereiding is 50% van uw succes.",
+      "bulletpoints": [
+        "Prospect & marktanalyse",
+        "One Minute Manager: mentale voorbereiding",
+        "Herlees je sales reminder",
+        "Durven te durven"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["bedrijfsnaam", "company_profile"]
+    },
+    {
+      "id": "slide_opening_koopklimaat",
+      "techniqueIds": ["1.1"],
+      "phase": "E",
+      "titel": "Fase 1: Openingsfase — Koopklimaat Creëren",
+      "kernboodschap": "Creëer een koopklimaat door uw gedrag aan te passen aan de gedragsstijl van uw gesprekspartner.",
+      "bulletpoints": [
+        "People skills: pas aan aan het gedrag van uw gesprekspartner",
+        "Koopsfeer: praat over wat u observeert in de omgeving",
+        "Gentleman's Agreement: agenda om het gesprek te leiden",
+        "Firma voorstelling + Referentie Story"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["verkoopkanaal", "klant_type"]
+    },
+    {
+      "id": "slide_opening_gentleman",
+      "techniqueIds": ["1.2"],
+      "phase": "E",
+      "titel": "Gentleman's Agreement",
+      "kernboodschap": "Gebruik een agenda-afspraak om het gesprek te leiden en te sturen.",
+      "bulletpoints": [
+        "De bedoeling van ons onderhoud is:",
+        "Firma en uzelf voorstellen",
+        "Luisteren naar uw situatie",
+        "Onze visie/oplossing presenteren",
+        "Samen bekijken of er een match is"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["product", "bedrijfsnaam"]
+    },
+    {
+      "id": "slide_opening_refstory",
+      "techniqueIds": ["1.3"],
+      "phase": "E",
+      "titel": "Referentie Story & Instapvraag",
+      "kernboodschap": "Schets een algemene gekende behoefte waarom bestaande klanten kochten, en formuleer een instapvraag.",
+      "bulletpoints": [
+        "Omschrijf een algemene behoefte/probleem van uw klanten",
+        "Uit uw ervaring weet u waarom bestaande klanten kochten",
+        "Ze willen méér duidelijkheid/eenvoud/zekerheid",
+        "Ze willen minder risico/kosten/complexiteit",
+        "Formuleer instapvraag: 'Herkent u zich hierin?'"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["koopredenen_baten", "koopredenen_pijnpunten", "sector"]
+    },
+    {
+      "id": "slide_explore",
+      "techniqueIds": ["2.1"],
+      "phase": "P",
+      "titel": "Fase 2: Exploratie — Verkenningsronde",
+      "kernboodschap": "Verzamel objectieve info over de huidige situatie van de klant via feitgerichte, meningsgerichte en alternatieve vragen.",
+      "bulletpoints": [
+        "Feitgerichte vragen: 'Welke ervaringen hebt u met...?'",
+        "Meningsgerichte vragen: 'Wat vindt u daarvan?'",
+        "Vragen onder alternatieve vorm: 'Is het eerder X of Y?'",
+        "Inzicht bekomen in situatie 'As it is' & 'To Be'"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["product", "klant_type", "sector"]
+    },
+    {
+      "id": "slide_probing",
+      "techniqueIds": ["2.2"],
+      "phase": "P",
+      "titel": "Probing — Doorvragen",
+      "kernboodschap": "Blijf doorvragen zodat je ontdekt wat écht belangrijk is. Vermijd dat jij invult wat de klant misschien bedoelt.",
+      "bulletpoints": [
+        "'Hoe bedoelt u dat precies?'",
+        "'Wat moet ik mij daarbij voorstellen?'",
+        "Luister bewust naar wat de klant zegt én bedoelt",
+        "Expertise + Enthusiasm = Your worst enemy",
+        "Verkopers die vooral praten worden als opdringerig ervaren"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["product", "klant_type"]
+    },
+    {
+      "id": "slide_reverse_thinking",
+      "techniqueIds": ["2.2"],
+      "phase": "P",
+      "titel": "Reverse Thinking",
+      "kernboodschap": "Keer het denkkader van de klant om: laat hen zelf nadenken over de gevolgen van NIET kiezen voor uw oplossing.",
+      "bulletpoints": [
+        "Niet direct overtuigen van voordelen",
+        "Klant zelf laten nadenken over consequenties",
+        "Storytelling als krachtige techniek",
+        "'Wat als u niets verandert aan de huidige situatie?'"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["verliesredenen_bezwaren", "product"]
+    },
+    {
+      "id": "slide_impact",
+      "techniqueIds": ["2.3"],
+      "phase": "P",
+      "titel": "Impact-vragen",
+      "kernboodschap": "Vertrek vanuit het antwoord op je Probing-vraag en maak het tastbaar. Laat de prospect zelf de impact benoemen.",
+      "bulletpoints": [
+        "Financieel verlies of gemiste winst",
+        "Operationeel: tijdverlies, inefficiëntie",
+        "Strategisch: gemiste kansen, concurrentievoordeel",
+        "Persoonlijk: stress, reputatie, verantwoordelijkheid",
+        "Kwantificeer: 'Hoeveel zou dat op jaarbasis betekenen?'"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["product", "koopredenen_baten", "dealgrootte"]
+    },
+    {
+      "id": "slide_commitment",
+      "techniqueIds": ["2.4"],
+      "phase": "P",
+      "titel": "Commitment-vragen (Need Lock)",
+      "kernboodschap": "Gebruik een herformulering van wat de klant belangrijk vindt om commitment te verkrijgen.",
+      "bulletpoints": [
+        "'Als ik u goed begrijp, mijnheer X, dan is het belangrijk voor u om...'",
+        "Bevestig de noodzaak tot verandering",
+        "Klant laat zelf de behoefte uitspreken",
+        "Na commitment → naar fase 3 Aanbeveling"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["klant_type", "product"]
+    },
+    {
+      "id": "slide_aanbeveling_ovb",
+      "techniqueIds": ["3.1"],
+      "phase": "I",
+      "titel": "Fase 3: Aanbevelingsfase — OVB Techniek",
+      "kernboodschap": "Stem in, benoem USP, leg voordeel uit en concretiseer de baten voor de klant.",
+      "bulletpoints": [
+        "1° Stem in met uw klant (Toon empathie)",
+        "2° Oplossing: Benoem een passende USP",
+        "3° Voordeel: Leg uit wat het algemeen voordeel is",
+        "4° Baten: Concretiseer de persoonlijke baten",
+        "Baten = Impact van fase 2"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["product", "koopredenen_baten", "company_profile"]
+    },
+    {
+      "id": "slide_deelverkoop",
+      "techniqueIds": ["3.2"],
+      "phase": "I",
+      "titel": "Deelverkoop & Pencil Selling",
+      "kernboodschap": "Behandel elke verwachting apart: Explore → Probing → Impact → Commitment → OVB. Één voor één.",
+      "bulletpoints": [
+        "Lijst verwachtingen op: A, B, C...",
+        "Per verwachting de volledige EPIC cyclus doorlopen",
+        "Pencil Selling: reken het voor op papier",
+        "Maximaliseer impact per verwachting",
+        "'Wat verstaat u daaronder precies?'"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["product", "dealgrootte"]
+    },
+    {
+      "id": "slide_proefafsluiting",
+      "techniqueIds": ["4.1"],
+      "phase": "C",
+      "titel": "Fase 4: Proefafsluiting",
+      "kernboodschap": "Ga ervan uit dat de koop gesloten is. Vat voordelen en baten samen en vraag engagement onder alternatieve vorm.",
+      "bulletpoints": [
+        "Uitgaan dat de koop gesloten is",
+        "Voordelen en baten samenvatten",
+        "ABC techniek: Alternatieve keuze aanbieden",
+        "'Men kan morgen niet zeilen met de wind van vandaag'",
+        "Duizenden orders gaan verloren door niet durven af te sluiten"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["product", "dealgrootte"]
+    },
+    {
+      "id": "slide_vragen_afhandelen",
+      "techniqueIds": ["4.2"],
+      "phase": "C",
+      "titel": "Omgaan met Gestelde Vragen",
+      "kernboodschap": "Wanneer de klant vragen stelt, gebruik wedervragen, informatie + commitment, of de indien-techniek.",
+      "bulletpoints": [
+        "Stel een wedervraag",
+        "Informatie geven + peilen naar klantenstandpunt + Commitment",
+        "Informatie geven + Proefafsluiting",
+        "Indien-techniek + Alternatieve keuze",
+        "Onderscheid vragen van bezwaren"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["product", "verliesredenen_bezwaren"]
+    },
+    {
+      "id": "slide_twijfel",
+      "techniqueIds": ["4.3"],
+      "phase": "C",
+      "titel": "Omgaan met Twijfel",
+      "kernboodschap": "Twijfel = de klant heeft geen bezwaar, maar durft de beslissing niet te nemen. Laat reflecteren over gevolgen van twijfelen.",
+      "bulletpoints": [
+        "Twijfel ≠ bezwaar: de klant vindt het voordeel belangrijk",
+        "Onzekerheid over of u het kunt waarmaken",
+        "EPIC toepassen: Explore → Probing → Impact → Commitment",
+        "'Stel dat die twijfel blijft… wat betekent dat dan?'",
+        "Na commitment → referenties, garanties, bewijs leveren"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["verliesredenen_twijfels", "product"]
+    },
+    {
+      "id": "slide_uitstel",
+      "techniqueIds": ["4.4"],
+      "phase": "C",
+      "titel": "Omgaan met Uitstel",
+      "kernboodschap": "Uitstel ≠ bezwaar, tot het bezwaar wordt uitgesproken. Luister niet naar de formulering maar naar wat er ontbreekt om te beslissen.",
+      "bulletpoints": [
+        "3 koopvoorwaarden: verwachtingen vervuld, beste manier, geen spijt",
+        "Vraag: 'Voldoet dit aan uw verwachtingen?'",
+        "Stel geen waarom-vragen, maar één vraag die helpt beslissen",
+        "Bij 'alles is duidelijk' → bezinkingsfase voorstellen",
+        "Bij concreet bezwaar → EPIC toepassen"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["verliesredenen_uitstel", "product"]
+    },
+    {
+      "id": "slide_bezwaar",
+      "techniqueIds": ["4.5"],
+      "phase": "C",
+      "titel": "Omgaan met Bezwaren",
+      "kernboodschap": "Een bezwaar is een vermeend nadeel van een kenmerk van uw oplossing. An objection is not a rejection — it's an opportunity to clarify value!",
+      "bulletpoints": [
+        "1° Explore: Empathie + Analyse + 'Hoe bedoelt u?'",
+        "2° Probing: 'Wat betekent het om onze OVB wél/niet te hebben?'",
+        "3° Impact: 'Weegt dat niet op tegenover het verschil?'",
+        "4° Commitment: Bevestig het belangrijkste criterium",
+        "Pencil Selling bij prijsbezwaar: reken het voor"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["verliesredenen_bezwaren", "product", "dealgrootte"]
+    },
+    {
+      "id": "slide_te_duur",
+      "techniqueIds": ["4.5"],
+      "phase": "C",
+      "titel": "Universele Houding: Te Duur",
+      "kernboodschap": "Price is what you pay! Value is what you get! — Warren Buffet. Het is een OF/OF keuze.",
+      "bulletpoints": [
+        "'Tegenover wie of wat vergelijkt u dit?'",
+        "'Over welk verschil spreken we dan?'",
+        "Minimaliseren: 'Weegt dat niet op tegenover...?'",
+        "Maximaliseren: Focus on long term Value/Impact",
+        "OF/OF techniek + Psychologische Stilte"
+      ],
+      "visual_type": "lijst",
+      "personalisatie_slots": ["verliesredenen_bezwaren", "dealgrootte", "product"]
+    }
+  ]
+}

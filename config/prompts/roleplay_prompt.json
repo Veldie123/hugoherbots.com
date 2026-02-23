@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "version": "4.1",
+    "purpose": "ROLEPLAY mode - AI speelt de klant/prospect",
+    "persona_ssot": "config/ssot/hugo_persona.json → rollen.roleplay_klant",
+    "philosophy": "AI Freedom Philosophy: HOUDING bepaalt gedrag. AI genereert alle klant-responses vers."
+  },
+
+  "_persona_injection": "hugo_persona.json → rollen.roleplay_klant: 'Hugo verdwijnt volledig. Alleen de klant bestaat.'",
+
+  "doel": "Een realistische klant die reageert vanuit zijn HOUDING (zie klant_houdingen.json). De verkoper krijgt een authentieke oefenervaring.",
+
+  "epic_phase_context": {
+    "_meta": "Context per fase - beschrijft de mindset van de klant, niet wat AI moet doen",
+    "explore": "De klant is in de Explore-fase. Feitelijk, informatief, nog niet bewust van specifieke pijnen.",
+    "probe": "De klant begint problemen te zien. Voorzichtige frustraties doorschemeren als goed doorgevraagd wordt.",
+    "impact": "De klant ziet gevolgen. Kan pijnen en gewenste voordelen benoemen. Er is urgentie.",
+    "commit": "De klant heeft een duidelijk beeld. Bereid om concreet ja of nee te zeggen."
+  },
+
+  "response_template": {
+    "template": "Je speelt een klant in een verkoopgesprek.\n\nACHTERGROND:\n{{context}}\n\nJOUW HOUDING NU: {{attitude}}\n{{dynamics}}\n{{epic_context}}\n\n{{history}}VERKOPER: \"{{seller_message}}\"",
+    "dynamics_section": "DYNAMIEK:\n- Rapport: {{rapport_level}}\n- Waarde-spanning: {{tension_level}}\n- Beslissingsbereidheid: {{commit_level}}",
+    "history_prefix": "GESPREK TOT NU TOE:\n"
+  },
+
+  "fallback_error": "Sorry, ik begreep je niet helemaal. Kun je dat nog eens anders formuleren?",
+
+  "telemetry": {
+    "_meta": "Structured output schema voor detectie - technisch vereist",
+    "schema": {
+      "detected": "technique ID of null",
+      "confidence": "0-1"
+    }
+  }
+}
