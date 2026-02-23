@@ -519,7 +519,7 @@ export function AdminSessionTranscripts({ navigate }: AdminSessionTranscriptsPro
                   <tr
                     key={session.id}
                     className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50 transition-colors ${
-                      index % 2 === 0 ? "bg-white" : "bg-hh-ui-50/30"
+                      index % 2 === 0 ? "bg-card" : "bg-hh-ui-50/30"
                     }`}
                   >
                     <td className="py-3 px-4">

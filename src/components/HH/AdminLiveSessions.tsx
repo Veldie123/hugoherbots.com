@@ -517,11 +517,11 @@ ${platformUrl}`;
                   className="flex flex-col h-full"
                 >
                   <div className="border-b px-4 pt-4 flex-shrink-0">
-                    <TabsList className="w-full bg-gray-100">
+                    <TabsList className="w-full bg-hh-ui-100">
                       <TabsTrigger
                         value="chat"
                         className="flex-1"
-                        style={{ color: activeTab === "chat" ? "white" : "#374151", backgroundColor: activeTab === "chat" ? "#9333ea" : "transparent" }}
+                        style={{ color: activeTab === "chat" ? "white" : undefined, backgroundColor: activeTab === "chat" ? "#9333ea" : "transparent" }}
                       >
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Chat
@@ -529,7 +529,7 @@ ${platformUrl}`;
                       <TabsTrigger
                         value="polls"
                         className="flex-1"
-                        style={{ color: activeTab === "polls" ? "white" : "#374151", backgroundColor: activeTab === "polls" ? "#9333ea" : "transparent" }}
+                        style={{ color: activeTab === "polls" ? "white" : undefined, backgroundColor: activeTab === "polls" ? "#9333ea" : "transparent" }}
                       >
                         <ThumbsUp className="w-4 h-4 mr-2" />
                         Polls ({polls.length})
@@ -541,10 +541,10 @@ ${platformUrl}`;
                     <ScrollArea className="flex-1 p-4" ref={chatScrollRef}>
                       {chatLoading ? (
                         <div className="flex items-center justify-center py-8">
-                          <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                          <Loader2 className="w-6 h-6 animate-spin text-hh-muted" />
                         </div>
                       ) : chatMessages.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-hh-muted">
                           <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
                           <p>Nog geen berichten</p>
                         </div>
@@ -555,14 +555,14 @@ ${platformUrl}`;
                               <Avatar className="flex-shrink-0 w-8 h-8">
                                 <AvatarFallback
                                   style={msg.isHost ? { backgroundColor: '#9333ea', color: 'white' } : {}}
-                                  className={msg.isHost ? "text-[12px]" : "bg-gray-200 text-gray-700 text-[12px]"}
+                                  className={msg.isHost ? "text-[12px]" : "bg-hh-ui-200 text-hh-ink text-[12px]"}
                                 >
                                   {getInitials(msg.userName)}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-baseline gap-2 mb-1">
-                                  <span style={msg.isHost ? { color: '#9333ea' } : {}} className={`text-sm ${msg.isHost ? "font-medium" : "text-gray-900"}`}>
+                                  <span style={msg.isHost ? { color: '#9333ea' } : {}} className={`text-sm ${msg.isHost ? "font-medium" : "text-hh-ink"}`}>
                                     {msg.userName}
                                   </span>
                                   {msg.isHost && (
@@ -570,14 +570,14 @@ ${platformUrl}`;
                                       HOST
                                     </Badge>
                                   )}
-                                  <span className="text-xs text-gray-400">
+                                  <span className="text-xs text-hh-muted">
                                     {new Date(msg.createdAt).toLocaleTimeString("nl-NL", {
                                       hour: "2-digit",
                                       minute: "2-digit",
                                     })}
                                   </span>
                                 </div>
-                                <p className="text-sm text-gray-700">{msg.message}</p>
+                                <p className="text-sm text-hh-ink">{msg.message}</p>
                               </div>
                             </div>
                           ))}
@@ -632,7 +632,7 @@ ${platformUrl}`;
                       ) : (
                         <Card className="p-4 space-y-3" style={{ borderColor: 'rgba(147, 51, 234, 0.3)', backgroundColor: 'rgba(147, 51, 234, 0.05)' }}>
                           <div className="flex items-center justify-between">
-                            <h4 className="font-medium text-gray-900">Nieuwe Poll</h4>
+                            <h4 className="font-medium text-hh-text">Nieuwe Poll</h4>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -705,7 +705,7 @@ ${platformUrl}`;
                     </div>
 
                     {polls.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
+                      <div className="text-center py-8 text-hh-muted">
                         <ThumbsUp className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p>Geen polls</p>
                       </div>
@@ -714,7 +714,7 @@ ${platformUrl}`;
                         {polls.map((poll) => (
                           <Card key={poll.id} className="p-4">
                             <div className="flex items-center justify-between mb-2">
-                              <Badge className={poll.isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-gray-100 text-gray-600"}>
+                              <Badge className={poll.isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-hh-ui-100 text-hh-muted"}>
                                 {poll.isActive ? "Actief" : "Gesloten"}
                               </Badge>
                               {poll.isActive && (
@@ -727,7 +727,7 @@ ${platformUrl}`;
                                 </Button>
                               )}
                             </div>
-                            <p className="font-medium text-gray-900 mb-3">{poll.question}</p>
+                            <p className="font-medium text-hh-text mb-3">{poll.question}</p>
                             <div className="space-y-2">
                               {poll.options.map((option) => {
                                 const percentage = poll.totalVotes > 0
@@ -747,7 +747,7 @@ ${platformUrl}`;
                                 );
                               })}
                             </div>
-                            <p className="text-xs text-gray-500 mt-2">
+                            <p className="text-xs text-hh-muted mt-2">
                               Totaal: {poll.totalVotes} {poll.totalVotes === 1 ? "stem" : "stemmen"}
                             </p>
                           </Card>
@@ -956,8 +956,8 @@ ${platformUrl}`;
                         ${!day ? 'invisible' : 'cursor-pointer'}
                         ${selected && !sessionDay ? 'text-white' : ''}
                         ${sessionDay && !selected ? 'hover:opacity-80' : ''}
-                        ${!sessionDay && !selected ? 'hover:bg-purple-50' : ''}
-                        ${todayDay && !selected && !sessionDay ? 'bg-purple-50 font-bold ring-1 ring-purple-300' : ''}
+                        ${!sessionDay && !selected ? 'hover:bg-hh-ui-50' : ''}
+                        ${todayDay && !selected && !sessionDay ? 'bg-hh-ui-50 font-bold ring-1 ring-purple-300' : ''}
                         ${!selected && !sessionDay && !todayDay ? 'text-hh-text' : ''}
                       `}
                       style={selected ? {
@@ -967,7 +967,7 @@ ${platformUrl}`;
                         minHeight: '44px',
                         borderRadius: '8px',
                       } : sessionDay ? {
-                        backgroundColor: '#f3e8ff',
+                        backgroundColor: 'rgba(147, 51, 234, 0.1)',
                         padding: '4px 2px',
                         minHeight: '44px',
                       } : {
@@ -1204,7 +1204,7 @@ ${platformUrl}`;
           <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-white border-b border-hh-border">
+                <thead className="bg-hh-ui-50 border-b border-hh-border">
                   <tr>
                     <th className="text-left py-4 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       #
@@ -1281,7 +1281,7 @@ ${platformUrl}`;
                       return (
                         <tr
                           key={session.id}
-                          className="border-t border-hh-border hover:bg-gray-50 transition-colors cursor-pointer"
+                          className="border-t border-hh-border hover:bg-hh-ui-50 transition-colors cursor-pointer"
                           onClick={handleRowClick}
                         >
                           <td className="py-3 px-4">

@@ -726,11 +726,11 @@ export function AdminUserManagement({ navigate }: AdminUserManagementProps) {
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" className="flex-1 gap-2 text-red-600 border-red-600 hover:bg-red-50">
+                <Button variant="outline" className="flex-1 gap-2 text-red-600 border-red-600 hover:bg-red-500/10">
                   <Ban className="w-4 h-4" />
                   Suspend Account
                 </Button>
-                <Button variant="outline" className="flex-1 gap-2 text-red-600 border-red-600 hover:bg-red-50">
+                <Button variant="outline" className="flex-1 gap-2 text-red-600 border-red-600 hover:bg-red-500/10">
                   <Trash2 className="w-4 h-4" />
                   Delete Account
                 </Button>

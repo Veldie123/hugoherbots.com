@@ -1569,7 +1569,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                   {batchQueueStatus?.isStalled ? (
                     <Button 
                       variant="outline"
-                      className="border-orange-400 bg-orange-50 text-orange-700 hover:bg-orange-100"
+                      className="border-orange-400 bg-orange-500/10 text-orange-700 hover:bg-orange-500/20"
                       onClick={() => handleStartBatchQueue(true)}
                       disabled={isStartingBatch}
                     >
@@ -1586,13 +1586,13 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                       variant="outline"
                       className={`${
                         batchQueueStatus?.active 
-                          ? 'border-purple-300 text-purple-700 hover:bg-purple-50'
-                          : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                          ? 'border-purple-300 text-purple-700 hover:bg-purple-500/10'
+                          : 'border-hh-border text-hh-muted hover:bg-hh-ui-50'
                       }`}
                       disabled
                     >
                       <span className={`w-2 h-2 rounded-full mr-2 ${
-                        batchQueueStatus?.active ? 'bg-purple-500 animate-pulse' : 'bg-gray-400'
+                        batchQueueStatus?.active ? 'bg-purple-500 animate-pulse' : 'bg-hh-ui-300'
                       }`} />
                       Worker {batchQueueStatus?.active ? 'actief' : 'idle'}
                       {batchQueueStatus?.active && (batchQueueStatus?.counters?.pending ?? 0) > 0 && (
@@ -1602,7 +1602,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                   )}
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className={`max-w-[280px] ${
-                  batchQueueStatus?.active ? 'border-purple-200 bg-purple-50 text-purple-800' : ''
+                  batchQueueStatus?.active ? 'border-purple-200 bg-purple-500/10 text-purple-800' : ''
                 }`}>
                   <p className="text-xs">
                     {batchQueueStatus?.isStalled 
@@ -1619,7 +1619,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
             {isSuperAdmin && errorCount > 0 && (
               <Button 
                 variant="outline"
-                className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                className="border-orange-300 text-orange-700 hover:bg-orange-500/10"
                 onClick={handleResetErrors} 
                 disabled={resettingErrors}
               >
@@ -1681,7 +1681,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                       <li key={i} className="truncate">• {msg.slice(0, 60)}{msg.length > 60 ? '...' : ''}</li>
                     ))}
                     {step.stats.errorMessages.length > 3 && (
-                      <li className="text-gray-400">...en {step.stats.errorMessages.length - 3} meer</li>
+                      <li className="text-hh-muted">...en {step.stats.errorMessages.length - 3} meer</li>
                     )}
                   </ul>
                 </div>
@@ -1710,7 +1710,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                       {hasErrors && (
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button className="p-0.5 rounded hover:bg-gray-100" onClick={(e) => e.stopPropagation()}>
+                            <button className="p-0.5 rounded hover:bg-hh-ui-100" onClick={(e) => e.stopPropagation()}>
                               <Info className="w-3 h-3 text-red-500" />
                             </button>
                           </TooltipTrigger>
@@ -1734,7 +1734,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
-                              className="p-1.5 rounded-full hover:bg-gray-100 text-orange-600"
+                              className="p-1.5 rounded-full hover:bg-hh-ui-100 text-orange-600"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleResetKpiStage(step.name, step.key);
@@ -1750,9 +1750,9 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                       )}
                       {step.stats.pending > 0 && (
                         <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                          step.stats.pending >= 100 ? 'bg-red-100 text-red-700' :
-                          step.stats.pending >= 50 ? 'bg-orange-100 text-orange-700' :
-                          'bg-gray-100 text-gray-600'
+                          step.stats.pending >= 100 ? 'bg-red-500/10 text-red-700' :
+                          step.stats.pending >= 50 ? 'bg-orange-500/10 text-orange-700' :
+                          'bg-hh-ui-100 text-hh-muted'
                         }`}>
                           ⏳ {step.stats.pending}
                         </span>
@@ -1921,7 +1921,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                     size="sm"
                     onClick={handleAiOrder}
                     disabled={isAiOrdering || isSavingOrder}
-                    className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                    className="border-purple-300 text-purple-700 hover:bg-purple-500/10"
                   >
                     {isAiOrdering ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
                     AI Volgorde
@@ -1973,7 +1973,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                     onDragEnd={() => { setDraggedIndex(null); setDragOverIndex(null); }}
                     onDrop={() => handleDrop(index)}
                     className={`flex items-center gap-3 p-3 cursor-grab active:cursor-grabbing transition-all ${
-                      isDragging ? 'opacity-40 bg-purple-50' : ''
+                      isDragging ? 'opacity-40 bg-purple-500/10' : ''
                     } ${isDragOver ? 'border-t-2 border-purple-500' : ''} hover:bg-hh-ui-50`}
                   >
                     <GripVertical className="w-5 h-5 text-hh-muted flex-shrink-0" />
@@ -1996,8 +1996,8 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                         )}
                       </div>
                     ) : (
-                      <div className="w-[80px] h-[45px] flex-shrink-0 bg-gray-100 rounded flex items-center justify-center">
-                        <Play className="w-4 h-4 text-gray-400" />
+                      <div className="w-[80px] h-[45px] flex-shrink-0 bg-hh-ui-100 rounded flex items-center justify-center">
+                        <Play className="w-4 h-4 text-hh-muted" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
@@ -2252,23 +2252,23 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                         const label = getStatusLabel(status);
                         switch (label) {
                           case 'Gepubliceerd': return 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
-                          case 'Concept': return 'bg-orange-50 text-orange-600 border border-orange-200';
-                          case 'Verwerken': case 'Cloud verwerking': return 'bg-blue-50 text-blue-600 border border-blue-200';
+                          case 'Concept': return 'bg-orange-500/10 text-orange-600 border border-orange-500/20';
+                          case 'Verwerken': case 'Cloud verwerking': return 'bg-blue-500/10 text-blue-600 border border-blue-500/20';
                           case 'Transcriberen': return 'border';
-                          case 'Wachtend': return 'bg-gray-50 text-gray-600 border border-gray-200';
-                          case 'Fout': return 'bg-red-50 text-red-600 border border-red-200';
-                          case 'Te groot': return 'bg-orange-50 text-orange-600 border border-orange-200';
-                          default: return 'bg-gray-50 text-gray-600 border border-gray-200';
+                          case 'Wachtend': return 'bg-hh-ui-50 text-hh-muted border border-hh-border';
+                          case 'Fout': return 'bg-red-500/10 text-red-600 border border-red-500/20';
+                          case 'Te groot': return 'bg-orange-500/10 text-orange-600 border border-orange-500/20';
+                          default: return 'bg-hh-ui-50 text-hh-muted border border-hh-border';
                         }
                       };
                       const getFaseBadgeFromNumber = (faseNumber: string) => {
                         switch (faseNumber) {
-                          case '0': return { label: 'Voorbereiding', color: 'bg-sky-100 text-sky-700' };
-                          case '1': return { label: 'Voorbereiding', color: 'bg-sky-100 text-sky-700' };
-                          case '2': return { label: 'Ontdekkingsfase', color: 'bg-teal-100 text-teal-700' };
-                          case '3': return { label: 'Aanbevelingsfase', color: 'bg-orange-100 text-orange-700' };
+                          case '0': return { label: 'Voorbereiding', color: 'bg-sky-500/10 text-sky-700' };
+                          case '1': return { label: 'Voorbereiding', color: 'bg-sky-500/10 text-sky-700' };
+                          case '2': return { label: 'Ontdekkingsfase', color: 'bg-teal-500/10 text-teal-700' };
+                          case '3': return { label: 'Aanbevelingsfase', color: 'bg-orange-500/10 text-orange-700' };
                           case '4': return { label: 'Beslissingsfase', color: 'bg-emerald-500/10 text-emerald-500' };
-                          default: return { label: '-', color: 'bg-gray-100 text-gray-500' };
+                          default: return { label: '-', color: 'bg-hh-ui-100 text-hh-muted' };
                         }
                       };
                       const getLinkedTechnique = (video: LibraryVideo) => {
@@ -2289,7 +2289,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                       const linkedTech = getLinkedTechnique(video);
                       const techNummer = linkedTech?.nummer || '-';
                       const techNaam = linkedTech?.naam || video.title;
-                      const faseBadge = linkedTech ? getFaseBadgeFromNumber(linkedTech.fase) : { label: '-', color: 'bg-gray-100 text-gray-500' };
+                      const faseBadge = linkedTech ? getFaseBadgeFromNumber(linkedTech.fase) : { label: '-', color: 'bg-hh-ui-100 text-hh-muted' };
                       const isPlayable = (video.status === 'ready' || video.status === 'completed') && !!video.mux_playback_id;
                       const views = (video as any).view_count || Math.floor(Math.random() * 900) + 100;
                       const completion = (video as any).avg_completion || Math.floor(Math.random() * 30) + 70;
@@ -2308,7 +2308,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                           <td className="py-3 px-4">
                             <p className="text-[14px] leading-[20px] text-hh-text font-medium">
                               {video.ai_attractive_title || video.title}
-                              {video.is_hidden && <EyeOff className="w-3 h-3 text-gray-400 inline ml-1" />}
+                              {video.is_hidden && <EyeOff className="w-3 h-3 text-hh-muted inline ml-1" />}
                               {linkedTech?.confidence && (
                                 <Badge variant="outline" className="text-[9px] px-1 py-0 ml-2" style={{ backgroundColor: 'rgba(147, 51, 234, 0.05)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
                                   AI {Math.round(linkedTech.confidence * 100)}%
@@ -2339,7 +2339,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                             </span>
                           </td>
                           <td className="py-3 px-4">
-                            <Badge variant="outline" className={`text-[11px] ${video.status === 'ready' || video.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : video.status === 'error' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                            <Badge variant="outline" className={`text-[11px] ${video.status === 'ready' || video.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : video.status === 'error' ? 'bg-red-500/10 text-red-600 border-red-500/20' : 'bg-hh-ui-50 text-hh-muted border-hh-border'}`}>
                               {getStatusLabel(video.status)}
                             </Badge>
                           </td>
@@ -2491,14 +2491,14 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
               const getStatusColor = (status: string) => {
                 switch (status) {
                   case 'ready': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-                  case 'transcript_only': return 'bg-blue-100 text-blue-700 border-blue-200';
-                  case 'processing': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-                  case 'transcribing': return 'bg-blue-100 text-blue-700 border-blue-200';
-                  case 'pending': return 'bg-gray-100 text-gray-700 border-gray-200';
-                  case 'error': return 'bg-red-100 text-red-700 border-red-200';
-                  case 'external_processing': return 'bg-indigo-100 text-indigo-700 border-indigo-200';
-                  case 'disk_quota': return 'bg-orange-100 text-orange-700 border-orange-200';
-                  default: return 'bg-gray-100 text-gray-700 border-gray-200';
+                  case 'transcript_only': return 'bg-blue-500/10 text-blue-700 border-blue-500/20';
+                  case 'processing': return 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20';
+                  case 'transcribing': return 'bg-blue-500/10 text-blue-700 border-blue-500/20';
+                  case 'pending': return 'bg-hh-ui-100 text-hh-muted border-hh-border';
+                  case 'error': return 'bg-red-500/10 text-red-700 border-red-500/20';
+                  case 'external_processing': return 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20';
+                  case 'disk_quota': return 'bg-orange-500/10 text-orange-700 border-orange-500/20';
+                  default: return 'bg-hh-ui-100 text-hh-muted border-hh-border';
                 }
               };
               const isPlayable = video.status === 'ready' && !!video.mux_playback_id;
@@ -2677,7 +2677,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                         {getStatusLabel(video.status)}
                       </Badge>
                       {video.is_hidden && (
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-gray-100 text-gray-500 border-gray-300 gap-1">
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-hh-ui-100 text-hh-muted border-hh-border gap-1">
                           <EyeOff className="w-3 h-3" />Verborgen
                         </Badge>
                       )}
@@ -2738,7 +2738,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                 {selectedTechniqueId}
               </Badge>
             )}
-            <Badge variant="outline" className="text-[11px] bg-gray-50">
+            <Badge variant="outline" className="text-[11px] bg-hh-ui-50">
               {detailsVideo?.status}
             </Badge>
             {detailsVideo?.ai_confidence && (
@@ -2995,7 +2995,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                                 }
                               }}
                               disabled={generatingSummary}
-                              className="text-[12px] font-medium px-3 py-1.5 rounded-md border flex items-center gap-1.5 hover:bg-purple-50 transition-colors"
+                              className="text-[12px] font-medium px-3 py-1.5 rounded-md border flex items-center gap-1.5 hover:bg-purple-500/10 transition-colors"
                               style={{ color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.3)' }}
                             >
                               {generatingSummary ? (
@@ -3054,7 +3054,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                                 }
                               }}
                               disabled={generatingSummary}
-                              className="text-[11px] font-medium px-2 py-1 rounded border flex items-center gap-1 hover:bg-purple-50 transition-colors"
+                              className="text-[11px] font-medium px-2 py-1 rounded border flex items-center gap-1 hover:bg-purple-500/10 transition-colors"
                               style={{ color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.3)' }}
                             >
                               {generatingSummary ? (
@@ -3071,9 +3071,9 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
 
                   {/* Transcript Section */}
                   {detailsVideo.has_transcript && detailsVideo.transcript && (
-                    <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
                       <div className="flex items-start gap-2 mb-2">
-                        <FileText className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                        <FileText className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                         <h3 className="text-[13px] font-semibold text-hh-text">Transcript</h3>
                       </div>
                       {(() => {
@@ -3088,7 +3088,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                             {isLong && (
                               <button 
                                 onClick={() => setTranscriptExpanded(!transcriptExpanded)}
-                                className="text-gray-600 hover:text-gray-800 text-[13px] font-medium mt-2 flex items-center gap-1"
+                                className="text-hh-muted hover:text-hh-text text-[13px] font-medium mt-2 flex items-center gap-1"
                               >
                                 {transcriptExpanded ? (
                                   <>Minder tonen <ChevronUp className="w-4 h-4" /></>
@@ -3139,7 +3139,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                     <div className="space-y-4">
                       {/* Header */}
                       <div className="flex items-center gap-3 flex-wrap">
-                        <Badge className="bg-teal-100 text-teal-700 border-0 rounded-full font-mono">
+                        <Badge className="bg-teal-500/10 text-teal-700 border-0 rounded-full font-mono">
                           {currentTechnique.nummer}
                         </Badge>
                         <span className="font-semibold text-hh-text">{currentTechnique.naam}</span>
@@ -3301,7 +3301,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                         ) : currentTechnique.tags && currentTechnique.tags.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
                             {currentTechnique.tags.map((tag: string) => (
-                              <Badge key={tag} variant="secondary" className="text-[11px] bg-gray-100 text-gray-700 border-0">
+                              <Badge key={tag} variant="secondary" className="text-[11px] bg-hh-ui-100 text-hh-ink border-0">
                                 {tag}
                               </Badge>
                             ))}
@@ -3409,7 +3409,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
           <DialogHeader>
             <DialogTitle>Transcript: {transcriptModal.title}</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="h-[60vh] p-4 border rounded-md bg-gray-50">
+          <ScrollArea className="h-[60vh] p-4 border rounded-md bg-hh-ui-50">
             <p className="whitespace-pre-wrap text-[14px] leading-relaxed">
               {transcriptModal.content || "Geen transcript beschikbaar"}
             </p>

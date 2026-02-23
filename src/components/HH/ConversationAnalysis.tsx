@@ -214,7 +214,7 @@ export function ConversationAnalysis({
     switch (status) {
       case "completed":
         return (
-          <Badge className="bg-emerald-100 text-emerald-700 border-0 font-medium gap-1.5">
+          <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-0 font-medium gap-1.5">
             <CheckCircle2 className="w-3 h-3" />
             Geanalyseerd
           </Badge>
@@ -223,28 +223,28 @@ export function ConversationAnalysis({
       case "transcribing":
       case "analyzing":
         return (
-          <Badge className="bg-blue-100 text-blue-700 border-0 font-medium gap-1.5">
+          <Badge className="bg-blue-500/15 text-blue-600 dark:text-blue-400 border-0 font-medium gap-1.5">
             <Loader2 className="w-3 h-3 animate-spin" />
             Verwerken
           </Badge>
         );
       case "pending":
         return (
-          <Badge className="bg-amber-100 text-amber-700 border-0 font-medium gap-1.5">
+          <Badge className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border-0 font-medium gap-1.5">
             <Clock className="w-3 h-3" />
             Wachtrij
           </Badge>
         );
       case "failed":
         return (
-          <Badge className="bg-red-100 text-red-700 border-0 font-medium gap-1.5">
+          <Badge className="bg-red-500/15 text-red-600 dark:text-red-400 border-0 font-medium gap-1.5">
             <AlertCircle className="w-3 h-3" />
             Mislukt
           </Badge>
         );
       default:
         return (
-          <Badge className="bg-gray-100 text-gray-700 border-0 font-medium">
+          <Badge className="bg-hh-ui-100 text-hh-muted border-0 font-medium">
             {status}
           </Badge>
         );
@@ -308,8 +308,8 @@ export function ConversationAnalysis({
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="p-4 rounded-[16px] border-hh-border shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-slate-600" />
+                <div className="w-10 h-10 rounded-full bg-hh-ui-100 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-hh-muted" />
                 </div>
               </div>
               <div className="text-[28px] leading-[34px] font-semibold text-hh-text">
@@ -320,7 +320,7 @@ export function ConversationAnalysis({
 
             <Card className="p-4 rounded-[16px] border-hh-border shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-emerald-500/15 flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                 </div>
               </div>
@@ -332,7 +332,7 @@ export function ConversationAnalysis({
 
             <Card className="p-4 rounded-[16px] border-hh-border shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-blue-500/15 flex items-center justify-center">
                   <Timer className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
@@ -344,7 +344,7 @@ export function ConversationAnalysis({
 
             <Card className="p-4 rounded-[16px] border-hh-border shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-amber-500/15 flex items-center justify-center">
                   <ListTodo className="w-5 h-5 text-amber-600" />
                 </div>
               </div>
@@ -370,14 +370,14 @@ export function ConversationAnalysis({
           <Card className="rounded-[16px] border-hh-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-hh-border">
+                <thead className="bg-hh-ui-50 border-b border-hh-border">
                   <tr>
                     <th className="text-left px-4 py-3 text-[13px] font-medium text-hh-muted">Bestandsnaam</th>
                     <th className="text-left px-4 py-3 text-[13px] font-medium text-hh-muted">Status</th>
                     <th className="text-left px-4 py-3 text-[13px] font-medium text-hh-muted">Datum</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-hh-border bg-white">
+                <tbody className="divide-y divide-hh-border bg-card">
                   {isLoading ? (
                     <tr>
                       <td colSpan={3} className="px-4 py-8 text-center">
@@ -408,7 +408,7 @@ export function ConversationAnalysis({
                     filteredUploads.map((upload) => (
                       <tr 
                         key={upload.id} 
-                        className="hover:bg-gray-50/50 transition-colors cursor-pointer"
+                        className="hover:bg-hh-ui-50/50 transition-colors cursor-pointer"
                         onClick={() => {
                           if (upload.status === 'completed') {
                             navigate?.(isAdmin ? "admin-analysis-results" : "analysis-results", { id: upload.id });
@@ -763,9 +763,9 @@ export function ConversationAnalysis({
           </Card>
         </div>
 
-        <Card className="p-5 rounded-[16px] border-hh-border bg-white">
+        <Card className="p-5 rounded-[16px] border-hh-border bg-card">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0">
               <AlertCircle className="w-4 h-4 text-amber-600" />
             </div>
             <div>

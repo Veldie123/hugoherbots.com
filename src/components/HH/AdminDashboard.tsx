@@ -228,7 +228,7 @@ export function AdminDashboard({ navigate }: AdminDashboardProps) {
               Vandaag • 15 januari 2025
             </p>
           </div>
-          <Button variant="outline" className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50">
+          <Button variant="outline" className="gap-2 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20">
             <Clock className="w-4 h-4" />
             Laatste 30 dagen
           </Button>
@@ -353,7 +353,7 @@ export function AdminDashboard({ navigate }: AdminDashboardProps) {
                 className="flex items-start gap-3 p-3 rounded-lg border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors cursor-pointer"
                 onClick={() => navigate?.("admin-notifications")}
               >
-                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-500/10 flex items-center justify-center flex-shrink-0">
                   <Calendar className="w-5 h-5 text-orange-600" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -373,7 +373,7 @@ export function AdminDashboard({ navigate }: AdminDashboardProps) {
                 className="flex items-start gap-3 p-3 rounded-lg border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors cursor-pointer"
                 onClick={() => navigate?.("admin-notifications")}
               >
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center flex-shrink-0">
                   <MessageSquare className="w-5 h-5 text-blue-600" />
                 </div>
                 <div className="flex-1 min-w-0">

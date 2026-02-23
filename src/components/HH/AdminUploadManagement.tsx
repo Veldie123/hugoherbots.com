@@ -411,22 +411,22 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
 
         {/* Mobile: compact horizontal stat strip */}
         <div className="flex lg:hidden items-center gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-purple-50 rounded-lg flex-shrink-0">
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-purple-600/10 rounded-lg flex-shrink-0">
             <UploadIcon className="w-3.5 h-3.5 text-purple-600" />
             <span className="text-[12px] text-hh-muted">Totaal</span>
             <span className="text-[14px] font-semibold text-hh-ink">{stats.totalAnalyses}</span>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-green-50 rounded-lg flex-shrink-0">
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-hh-success/10 rounded-lg flex-shrink-0">
             <CheckCircle2 className="w-3.5 h-3.5 text-hh-success" />
             <span className="text-[12px] text-hh-muted">Excellent</span>
             <span className="text-[14px] font-semibold text-hh-ink">{stats.excellentQuality}</span>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 rounded-lg flex-shrink-0">
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-500/10 rounded-lg flex-shrink-0">
             <BarChart3 className="w-3.5 h-3.5 text-blue-600" />
             <span className="text-[12px] text-hh-muted">Score</span>
             <span className="text-[14px] font-semibold text-hh-ink">{stats.avgScore}%</span>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-orange-50 rounded-lg flex-shrink-0">
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-orange-500/10 rounded-lg flex-shrink-0">
             <AlertTriangle className="w-3.5 h-3.5 text-orange-600" />
             <span className="text-[12px] text-hh-muted">Needs Work</span>
             <span className="text-[14px] font-semibold text-hh-ink">{stats.needsWork}</span>
@@ -626,7 +626,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                     onMouseLeave={() => setHoveredRow(null)}
                     onClick={() => openTranscript(upload)}
                     className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50/50 transition-colors cursor-pointer ${
-                      index % 2 === 0 ? "bg-white" : "bg-hh-ui-50/30"
+                      index % 2 === 0 ? "bg-hh-bg" : "bg-hh-ui-50/30"
                     }`}
                   >
                     <td className="px-4 py-3 w-12" onClick={(e) => e.stopPropagation()}>

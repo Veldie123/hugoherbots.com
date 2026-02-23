@@ -384,7 +384,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
           </Card>
         </div>
         {/* Mobile: compact horizontal stat strip */}
-        <div className="flex lg:hidden items-center gap-1 rounded-xl border border-hh-border bg-white p-2.5 overflow-x-auto">
+        <div className="flex lg:hidden items-center gap-1 rounded-xl border border-hh-border bg-card p-2.5 overflow-x-auto">
           <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#4F7396]/5 shrink-0">
             <FileAudio className="w-3.5 h-3.5 text-[#4F7396]" />
             <span className="text-[12px] text-hh-muted">Analyses</span>
@@ -569,7 +569,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                       key={conv.id}
                       onClick={() => openTranscript(conv)}
                       className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50 transition-colors cursor-pointer ${
-                        index % 2 === 0 ? "bg-white" : "bg-hh-ui-50/30"
+                        index % 2 === 0 ? "bg-card" : "bg-hh-ui-50/30"
                       }`}
                     >
                       <td className="py-3 px-4">

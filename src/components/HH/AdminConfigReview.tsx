@@ -212,19 +212,19 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
     switch (status) {
       case "pending":
         return (
-          <Badge variant="outline" className="text-[11px] bg-amber-50 text-amber-700 border-amber-200">
+          <Badge variant="outline" className="text-[11px] bg-amber-500/10 text-amber-600 border-amber-500/20">
             pending
           </Badge>
         );
       case "approved":
         return (
-          <Badge variant="outline" className="text-[11px] bg-green-50 text-green-700 border-green-200">
+          <Badge variant="outline" className="text-[11px] bg-green-500/10 text-green-600 border-green-500/20">
             approved
           </Badge>
         );
       case "rejected":
         return (
-          <Badge variant="outline" className="text-[11px] bg-red-50 text-red-700 border-red-200">
+          <Badge variant="outline" className="text-[11px] bg-red-500/10 text-red-600 border-red-500/20">
             rejected
           </Badge>
         );
@@ -235,7 +235,7 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
 
   const getTypeBadge = (type: string) => {
     return (
-      <Badge variant="outline" className="text-[11px] bg-slate-50 text-slate-600 border-slate-200">
+      <Badge variant="outline" className="text-[11px] bg-hh-ui-50 text-hh-muted border-hh-border">
         {type}
       </Badge>
     );
@@ -255,7 +255,7 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mb-3">
+            <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center mb-3">
               <Clock className="w-5 h-5 text-amber-600" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Pending</p>
@@ -263,7 +263,7 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
           </Card>
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mb-3">
+            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mb-3">
               <CheckCircle2 className="w-5 h-5 text-green-600" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Approved</p>
@@ -271,7 +271,7 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
           </Card>
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mb-3">
+            <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center mb-3">
               <XCircle className="w-5 h-5 text-red-600" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Rejected</p>
@@ -279,7 +279,7 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
           </Card>
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-3">
+            <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center mb-3">
               <LayoutGrid className="w-5 h-5 text-purple-600" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Totaal</p>
@@ -329,7 +329,7 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-hh-border bg-slate-50/50">
+                <tr className="border-b border-hh-border bg-hh-ui-50">
                   <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
                     Techniek
                   </th>
@@ -372,7 +372,7 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
                   return (
                     <tr
                       key={conflict.id}
-                      className="border-b border-hh-border last:border-0 hover:bg-slate-50/50 transition-colors"
+                      className="border-b border-hh-border last:border-0 hover:bg-hh-ui-50 transition-colors"
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -405,7 +405,7 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 hover:bg-green-50 hover:text-green-600"
+                              className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600"
                               onClick={() => handleApprove(conflict.id)}
                             >
                               <Check className="w-4 h-4" />
@@ -413,7 +413,7 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+                              className="h-8 w-8 p-0 hover:bg-red-500/10 hover:text-red-600"
                               onClick={() => handleReject(conflict.id)}
                             >
                               <X className="w-4 h-4" />

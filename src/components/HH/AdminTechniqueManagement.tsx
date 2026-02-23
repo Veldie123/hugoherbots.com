@@ -453,7 +453,7 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
                     <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[12px] font-mono font-semibold" style={{ backgroundColor: 'rgba(147, 51, 234, 0.15)', color: '#3d6080' }}>
                       {techniek.code}
                     </span>
-                    <Badge variant="outline" className="text-[10px]" style={techniek.status === 'Actief' ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' } : { backgroundColor: '#f3f4f6', color: '#6b7280' }}>
+                    <Badge variant="outline" className="text-[10px]" style={techniek.status === 'Actief' ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' } : { backgroundColor: 'rgba(139, 149, 165, 0.1)', color: '#8B95A5' }}>
                       {techniek.status}
                     </Badge>
                   </div>
@@ -493,7 +493,7 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex-1 h-8 text-[11px] text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                    className="flex-1 h-8 text-[11px] text-blue-600 hover:bg-hh-ui-50 hover:text-blue-500"
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       setDetailsTechnique(techniek.code);
@@ -759,7 +759,7 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
         subtitle={
           <span className="flex items-center gap-3 text-[13px]">
             <span>Fase: <strong>{getTechniqueByNumber(editingTechnique || '')?.fase}</strong></span>
-            <span className="text-xs text-gray-500">(Nummer en Fase zijn niet bewerkbaar)</span>
+            <span className="text-xs text-hh-muted">(Nummer en Fase zijn niet bewerkbaar)</span>
           </span>
         }
         footer={
@@ -800,9 +800,9 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
             </div>
 
             {/* Wat Section */}
-            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
               <div className="flex items-start gap-2 mb-2">
-                <HelpCircle className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <HelpCircle className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Wat</h3>
               </div>
               <AutoResizeTextarea
@@ -816,9 +816,9 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
             </div>
 
             {/* Waarom Section */}
-            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
               <div className="flex items-start gap-2 mb-2">
-                <Lightbulb className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <Lightbulb className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Waarom</h3>
               </div>
               <AutoResizeTextarea
@@ -832,9 +832,9 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
             </div>
 
             {/* Wanneer Section */}
-            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
               <div className="flex items-start gap-2 mb-2">
-                <Clock className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <Clock className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Wanneer</h3>
               </div>
               <AutoResizeTextarea
@@ -848,9 +848,9 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
             </div>
 
             {/* Hoe Section */}
-            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
               <div className="flex items-start gap-2 mb-2">
-                <Wrench className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <Wrench className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Hoe</h3>
               </div>
               <AutoResizeTextarea
@@ -864,9 +864,9 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
             </div>
 
             {/* Stappenplan Section */}
-            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
               <div className="flex items-start gap-2 mb-2">
-                <ListOrdered className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <ListOrdered className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Stappenplan</h3>
                 <span className="text-[11px] text-hh-muted">(1 stap per regel)</span>
               </div>
@@ -884,9 +884,9 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
             </div>
 
             {/* Voorbeelden Section */}
-            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
               <div className="flex items-start gap-2 mb-2">
-                <MessageSquare className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <MessageSquare className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Voorbeelden</h3>
                 <span className="text-[11px] text-hh-muted">(1 voorbeeld per regel)</span>
               </div>
@@ -904,9 +904,9 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
             </div>
 
             {/* Tags Section */}
-            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
               <div className="flex items-start gap-2 mb-2">
-                <Tag className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <Tag className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Tags</h3>
                 <span className="text-[11px] text-hh-muted">(1 tag per regel)</span>
               </div>
@@ -924,9 +924,9 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
             </div>
 
             {/* Thema's Section */}
-            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
               <div className="flex items-start gap-2 mb-2">
-                <BarChart3 className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <BarChart3 className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Thema's</h3>
                 <span className="text-[11px] text-hh-muted">(1 thema per regel)</span>
               </div>
@@ -944,9 +944,9 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
             </div>
 
             {/* Context Requirements Section */}
-            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
               <div className="flex items-start gap-2 mb-2">
-                <AlertTriangle className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Context Vereisten</h3>
                 <span className="text-[11px] text-hh-muted">(1 vereiste per regel)</span>
               </div>
@@ -964,9 +964,9 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
             </div>
 
             {/* Verkoper Intentie Section */}
-            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-lg bg-hh-ui-50 border border-hh-border">
               <div className="flex items-start gap-2 mb-2">
-                <Award className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <Award className="w-4 h-4 text-hh-muted mt-0.5 flex-shrink-0" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Verkoper Intentie</h3>
                 <span className="text-[11px] text-hh-muted">(1 intentie per regel)</span>
               </div>

@@ -617,7 +617,7 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
           
           {/* Compact KPI Cards - right aligned */}
           <div className="grid grid-cols-2 sm:flex gap-2 sm:flex-wrap lg:flex-nowrap">
-            <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-hh-border shadow-sm">
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
               <div className="w-6 h-6 rounded-full bg-hh-ink/10 flex items-center justify-center">
                 <Video className="w-3 h-3 text-hh-ink" />
               </div>
@@ -626,7 +626,7 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
                 {isLoading ? <div className="h-4 w-8 bg-hh-ui-100 rounded animate-pulse mt-0.5" /> : <p className="text-[14px] font-semibold text-hh-ink leading-tight">{videos.length}</p>}
               </div>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-hh-border shadow-sm">
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
               <div className="w-6 h-6 rounded-full bg-[#3d9a6e]/10 flex items-center justify-center">
                 <Eye className="w-3 h-3" style={{ color: '#3d9a6e' }} />
               </div>
@@ -635,7 +635,7 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
                 {isLoading ? <div className="h-4 w-8 bg-hh-ui-100 rounded animate-pulse mt-0.5" /> : <p className="text-[14px] font-semibold text-hh-ink leading-tight">{totalViews.toLocaleString()}</p>}
               </div>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-hh-border shadow-sm">
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
               <div className="w-6 h-6 rounded-full bg-hh-primary/10 flex items-center justify-center">
                 <Clock className="w-3 h-3 text-hh-primary" />
               </div>
@@ -644,7 +644,7 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
                 {isLoading ? <div className="h-4 w-12 bg-hh-ui-100 rounded animate-pulse mt-0.5" /> : <p className="text-[14px] font-semibold text-hh-ink leading-tight">{Math.floor(totalDuration / 60)}u {totalDuration % 60}m</p>}
               </div>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-hh-border shadow-sm">
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
               <div className="w-6 h-6 rounded-full bg-[#3d9a6e]/10 flex items-center justify-center">
                 <TrendingUp className="w-3 h-3" style={{ color: '#3d9a6e' }} />
               </div>
@@ -751,19 +751,19 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
 
           {/* Search/Filter toolbar - shown when expanded */}
           {showAllVideos && (
-            <div className="bg-white rounded-xl p-3 border border-hh-border shadow-hh-sm">
+            <div className="bg-card rounded-xl p-3 border border-hh-border shadow-hh-sm">
               <div className="flex items-center gap-2">
                 <div className="relative flex-1 min-w-[140px]">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-hh-muted" />
                   <Input
                     placeholder="Zoek video's..."
-                    className="pl-10 bg-white"
+                    className="pl-10 bg-hh-bg"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
                 <Select value={filterPhase} onValueChange={setFilterPhase}>
-                  <SelectTrigger className="w-[160px] bg-white flex-shrink-0">
+                  <SelectTrigger className="w-[160px] bg-hh-bg flex-shrink-0">
                     <SelectValue placeholder="Alle Fases" />
                   </SelectTrigger>
                   <SelectContent>
@@ -779,7 +779,7 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`h-9 w-9 p-0 ${viewMode === "list" ? "bg-hh-primary text-white hover:bg-hh-primary/90" : "text-hh-muted hover:text-hh-text hover:bg-white"}`}
+                    className={`h-9 w-9 p-0 ${viewMode === "list" ? "bg-hh-primary text-white hover:bg-hh-primary/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
                     onClick={() => setViewMode("list")}
                   >
                     <List className="w-4 h-4" />
@@ -787,7 +787,7 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`h-9 w-9 p-0 ${viewMode === "grid" ? "bg-hh-primary text-white hover:bg-hh-primary/90" : "text-hh-muted hover:text-hh-text hover:bg-white"}`}
+                    className={`h-9 w-9 p-0 ${viewMode === "grid" ? "bg-hh-primary text-white hover:bg-hh-primary/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
                     onClick={() => setViewMode("grid")}
                   >
                     <LayoutGrid className="w-4 h-4" />
@@ -872,7 +872,7 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
                             if (e.key === 'Enter') handleSaveTitle(video.id);
                             if (e.key === 'Escape') handleCancelEditTitle();
                           }}
-                          className="w-full text-[13px] font-medium text-hh-text bg-white border border-hh-border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#1e3a5f]"
+                          className="w-full text-[13px] font-medium text-hh-text bg-hh-bg border border-hh-border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#1e3a5f]"
                           autoFocus
                           disabled={savingTitle}
                         />
@@ -991,7 +991,7 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
                             if (e.key === 'Enter') handleSaveTitle(video.id);
                             if (e.key === 'Escape') handleCancelEditTitle();
                           }}
-                          className="w-full text-[13px] font-medium text-hh-text bg-white border border-hh-border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#1e3a5f]"
+                          className="w-full text-[13px] font-medium text-hh-text bg-hh-bg border border-hh-border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#1e3a5f]"
                           autoFocus
                           disabled={savingTitle}
                         />
@@ -1054,12 +1054,12 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
                       const completed = completedVideoIds.has(video.id);
                       const getFaseBadge = (fase: string) => {
                         const lowerFase = fase.toLowerCase();
-                        if (lowerFase.includes('pre') || lowerFase.includes('voorbereiding')) return { label: fase, color: 'bg-slate-100 text-slate-600' };
-                        if (lowerFase.includes('opening')) return { label: fase, color: 'bg-sky-50 text-sky-700' };
-                        if (lowerFase.includes('ontdekking')) return { label: fase, color: 'bg-blue-50 text-blue-800' };
-                        if (lowerFase.includes('aanbeveling')) return { label: fase, color: 'bg-slate-100 text-slate-700' };
-                        if (lowerFase.includes('beslissing')) return { label: fase, color: 'bg-gray-200 text-gray-800' };
-                        return { label: fase, color: 'bg-gray-100 text-gray-500' };
+                        if (lowerFase.includes('pre') || lowerFase.includes('voorbereiding')) return { label: fase, color: 'bg-hh-ui-100 text-hh-muted' };
+                        if (lowerFase.includes('opening')) return { label: fase, color: 'bg-sky-500/10 text-sky-600 dark:text-sky-400' };
+                        if (lowerFase.includes('ontdekking')) return { label: fase, color: 'bg-blue-500/10 text-blue-700 dark:text-blue-400' };
+                        if (lowerFase.includes('aanbeveling')) return { label: fase, color: 'bg-hh-ui-100 text-hh-ink' };
+                        if (lowerFase.includes('beslissing')) return { label: fase, color: 'bg-hh-ui-200 text-hh-ink' };
+                        return { label: fase, color: 'bg-hh-ui-100 text-hh-muted' };
                       };
                       const faseBadge = getFaseBadge(video.fase);
                       return (

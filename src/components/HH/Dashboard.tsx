@@ -104,7 +104,7 @@ const VideoCard = ({
           <Play className="w-6 h-6 text-hh-ink ml-0.5" />
         </div>
       </div>
-      <Badge className="absolute top-2 left-2 bg-emerald-100 text-emerald-600 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
+      <Badge className="absolute top-2 left-2 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
         {techniqueNumber}
       </Badge>
     </div>
@@ -169,7 +169,7 @@ const WebinarCard = ({
         className="absolute inset-0 w-full h-full object-cover object-top"
       />
       {techniqueNumber && (
-        <Badge className="absolute top-2 left-2 bg-emerald-100 text-emerald-600 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
+        <Badge className="absolute top-2 left-2 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
           {techniqueNumber}
         </Badge>
       )}
@@ -208,8 +208,8 @@ const WebinarCard = ({
         onClick={(e) => { e.stopPropagation(); onRegister(); }}
         className={`mt-2 w-full text-[11px] font-medium py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-colors ${
           isRegistered 
-            ? "bg-emerald-50 text-emerald-600 cursor-default" 
-            : "bg-[#3d9a6e] text-white hover:bg-[#4daa7e]"
+            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default" 
+            : "bg-hh-success text-white hover:bg-hh-success/90"
         }`}
       >
         {isRegistered ? (
@@ -264,7 +264,7 @@ const HugoTrainingCard = ({
           className="absolute inset-0 w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-black/20" />
-        <Badge className="absolute top-2 left-2 bg-emerald-100 text-emerald-600 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
+        <Badge className="absolute top-2 left-2 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
           {techniqueNumber}
         </Badge>
         <Badge className={`absolute top-2 right-2 ${faseColors.bg} ${faseColors.text} text-[10px] px-1.5 py-0.5`}>
@@ -349,9 +349,9 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
             {loginStreak > 0 && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 rounded-full border border-amber-200">
+            <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 rounded-full border border-amber-500/20">
               <span className="text-[16px] sm:text-[18px]">🔥</span>
-              <span className="text-[13px] sm:text-[14px] font-medium text-amber-700 whitespace-nowrap">{loginStreak} {loginStreak === 1 ? 'dag' : 'dagen'} streak</span>
+              <span className="text-[13px] sm:text-[14px] font-medium text-amber-700 dark:text-amber-400 whitespace-nowrap">{loginStreak} {loginStreak === 1 ? 'dag' : 'dagen'} streak</span>
             </div>
             )}
             <div className="flex items-center gap-2.5 px-3 py-2 bg-hh-bg rounded-full border border-hh-border">
@@ -402,10 +402,7 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
                   </p>
                   <div className="flex flex-wrap gap-3 pt-1">
                     <Button 
-                      className="gap-2 text-white border-0"
-                      style={{ backgroundColor: '#3d9a6e' }}
-                      onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#4daa7e'; }}
-                      onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#3d9a6e'; }}
+                      className="gap-2 text-white border-0 bg-hh-success hover:bg-hh-success/90"
                       onClick={() => {
                         if (featuredVideo?.id) {
                           localStorage.setItem('currentVideoId', featuredVideo.id);
@@ -539,11 +536,11 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
             </div>
             <div className="flex gap-1 flex-1 max-w-md">
               {phaseProgress.map((p, index) => (
-                <div key={index} className="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden">
+                <div key={index} className="flex-1 h-2 rounded-full bg-hh-ui-200 overflow-hidden">
                   <div 
                     className={`h-full rounded-full ${
                       p.percentage >= 100 ? "bg-emerald-500" : 
-                      p.percentage > 0 ? "bg-blue-400" : "bg-slate-200"
+                      p.percentage > 0 ? "bg-blue-400" : "bg-hh-ui-200"
                     }`}
                     style={{ width: `${p.percentage}%` }}
                   />

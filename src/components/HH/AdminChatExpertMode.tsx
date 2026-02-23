@@ -1174,20 +1174,20 @@ export function AdminChatExpertMode({
         {/* Unified header row — matching user view */}
         <div className="flex items-stretch border-b border-hh-border flex-shrink-0">
           {desktopSidebarOpen && (
-            <div className="hidden lg:flex items-center justify-between px-4 w-1/3 flex-shrink-0 bg-white" style={{ borderRight: '1px solid #e2e8f0' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', letterSpacing: '0.5px', margin: 0 }}>
+            <div className="hidden lg:flex items-center justify-between px-4 w-1/3 flex-shrink-0 bg-hh-bg" style={{ borderRight: '1px solid var(--hh-border)' }}>
+              <h3 className="text-hh-text" style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '0.5px', margin: 0 }}>
                 E.P.I.C. TECHNIQUE
               </h3>
               <button
                 onClick={() => setDesktopSidebarOpen(false)}
-                className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                className="p-1.5 rounded-md text-hh-muted hover:text-hh-ink hover:bg-hh-ui-100 transition-colors"
                 title="Sluiten"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           )}
-          <div className={`${!desktopSidebarOpen ? 'w-full' : 'flex-1'} flex items-center justify-between px-3 lg:px-6 py-3 lg:py-4 bg-white`}>
+          <div className={`${!desktopSidebarOpen ? 'w-full' : 'flex-1'} flex items-center justify-between px-3 lg:px-6 py-3 lg:py-4 bg-hh-bg`}>
             <div className="flex items-center gap-2 lg:gap-3 min-w-0">
               <span className="text-[13px] text-hh-muted font-medium whitespace-nowrap flex items-center gap-1">
                 {sessionTitle}
@@ -1202,21 +1202,21 @@ export function AdminChatExpertMode({
               <div className="flex items-center bg-hh-ui-50 rounded-full p-0.5">
                 <button
                   onClick={() => setChatMode("chat")}
-                  className={`p-2 rounded-full transition-all ${chatMode === "chat" ? "bg-white shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
+                  className={`p-2 rounded-full transition-all ${chatMode === "chat" ? "bg-hh-bg shadow-sm text-hh-ink" : "text-hh-muted hover:text-hh-primary"}`}
                   title="Chat"
                 >
                   <MessageSquare className="w-4 h-4" strokeWidth={1.5} />
                 </button>
                 <button
                   onClick={() => setChatMode("audio")}
-                  className={`p-2 rounded-full transition-all ${chatMode === "audio" ? "bg-white shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
+                  className={`p-2 rounded-full transition-all ${chatMode === "audio" ? "bg-hh-bg shadow-sm text-hh-ink" : "text-hh-muted hover:text-hh-primary"}`}
                   title="Bellen"
                 >
                   <Phone className="w-4 h-4" strokeWidth={1.5} />
                 </button>
                 <button
                   onClick={() => setChatMode("video")}
-                  className={`p-2 rounded-full transition-all ${chatMode === "video" ? "bg-white shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
+                  className={`p-2 rounded-full transition-all ${chatMode === "video" ? "bg-hh-bg shadow-sm text-hh-ink" : "text-hh-muted hover:text-hh-primary"}`}
                   title="Video"
                 >
                   <Video className="w-4 h-4" strokeWidth={1.5} />
@@ -1225,7 +1225,7 @@ export function AdminChatExpertMode({
               {messages.length > 0 && (
                 <button
                   onClick={confirmStopRoleplay}
-                  className="h-8 px-3 rounded-md border border-hh-border bg-white hover:bg-hh-ui-50 transition-colors flex items-center gap-1.5"
+                  className="h-8 px-3 rounded-md border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors flex items-center gap-1.5"
                   title="Opnieuw starten"
                 >
                   <X className="w-3.5 h-3.5 text-hh-muted" />
@@ -1239,7 +1239,7 @@ export function AdminChatExpertMode({
         {/* Body: EPIC sidebar + Chat */}
         <div className="flex flex-1 overflow-hidden min-h-0">
           {desktopSidebarOpen && (
-            <div className="hidden lg:block w-1/3 flex-shrink-0 h-full overflow-y-auto bg-white" style={{ borderRight: '1px solid #e2e8f0' }}>
+            <div className="hidden lg:block w-1/3 flex-shrink-0 h-full overflow-y-auto bg-hh-bg" style={{ borderRight: '1px solid var(--hh-border)' }}>
               <EPICSidebar
                 fasesAccordionOpen={fasesAccordionOpen}
                 setFasesAccordionOpen={setFasesAccordionOpen}
@@ -1273,7 +1273,7 @@ export function AdminChatExpertMode({
             </div>
           )}
 
-        <div className={`${desktopSidebarOpen ? 'flex-1' : 'w-full'} flex flex-col bg-white overflow-hidden min-h-0`}>
+        <div className={`${desktopSidebarOpen ? 'flex-1' : 'w-full'} flex flex-col bg-hh-bg overflow-hidden min-h-0`}>
 
           {/* Level transition notification banner */}
           {levelTransitionMessage && (
@@ -1296,7 +1296,7 @@ export function AdminChatExpertMode({
               <div className="relative">
                 <div 
                   className="rounded-full flex items-center justify-center shadow-2xl mb-6"
-                  style={{ width: '180px', height: '180px', backgroundColor: '#6B7A92' }}
+                  style={{ width: '180px', height: '180px', backgroundColor: 'var(--hh-primary)' }}
                 >
                   <span className="text-white font-bold" style={{ fontSize: '64px' }}>HH</span>
                 </div>
@@ -1412,7 +1412,7 @@ export function AdminChatExpertMode({
                     <button 
                       onClick={() => setChatMode("chat")}
                       className="flex items-center justify-center shadow-xl"
-                      style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#6B7A92' }}
+                      style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'var(--hh-primary)' }}
                     >
                       <MessageSquare className="w-5 h-5 text-white" />
                     </button>
@@ -1432,7 +1432,7 @@ export function AdminChatExpertMode({
                 <div className={`flex ${message.sender === "hugo" ? "justify-end" : "justify-start"}`}>
                   <div className="flex flex-col gap-1 max-w-[80%]">
                     {message.isTranscriptReplay && message.transcriptRole && (
-                      <span className="text-[11px] font-medium mb-0.5 px-1" style={{ color: message.transcriptRole === 'Klant' ? '#9910FA' : '#4F7396' }}>
+                      <span className="text-[11px] font-medium mb-0.5 px-1" style={{ color: message.transcriptRole === 'Klant' ? '#9910FA' : 'var(--hh-primary)' }}>
                         {message.transcriptRole}
                       </span>
                     )}
@@ -1445,14 +1445,14 @@ export function AdminChatExpertMode({
                             : "rounded-bl-md"
                           : message.sender === "hugo"
                             ? "rounded-br-md"
-                            : "bg-purple-50 text-slate-800 rounded-bl-md border border-purple-100"
+                            : "bg-purple-600/10 text-hh-ink rounded-bl-md border border-purple-600/20"
                       }`}
                       style={
                         message.isTranscriptReplay
                           ? {
                               opacity: 0.85,
-                              backgroundColor: message.sender === 'hugo' ? '#4F7396' : '#E8EDF2',
-                              color: message.sender === 'hugo' ? '#ffffff' : '#1e293b',
+                              backgroundColor: message.sender === 'hugo' ? 'var(--hh-primary)' : 'var(--hh-ui-100)',
+                              color: message.sender === 'hugo' ? '#ffffff' : 'var(--hh-ink)',
                             }
                           : message.sender === "hugo"
                             ? {
@@ -1487,7 +1487,7 @@ export function AdminChatExpertMode({
                               }}
                             >
                               <div className="flex items-center justify-between">
-                                <span className="font-medium text-[13px] text-slate-800">{card.title}</span>
+                                <span className="font-medium text-[13px] text-hh-ink">{card.title}</span>
                                 {card.score !== undefined && (
                                   <span className="text-[12px] font-semibold px-2 py-0.5 rounded-full" style={{
                                     backgroundColor: card.score >= 60 ? 'rgba(60,154,110,0.1)' : 'rgba(239,68,68,0.1)',
@@ -1498,12 +1498,12 @@ export function AdminChatExpertMode({
                                 )}
                               </div>
                               <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[11px] text-slate-400">{card.userName}</span>
-                                <span className="text-[11px] text-slate-300">|</span>
-                                <span className="text-[11px] text-slate-400">
+                                <span className="text-[11px] text-hh-muted">{card.userName}</span>
+                                <span className="text-[11px] text-hh-muted/50">|</span>
+                                <span className="text-[11px] text-hh-muted">
                                   {new Date(card.createdAt).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                                 </span>
-                                <span className="text-[11px] text-slate-300">|</span>
+                                <span className="text-[11px] text-hh-muted/50">|</span>
                                 <span className="text-[11px]" style={{
                                   color: card.status === 'completed' ? '#3C9A6E' : card.status === 'failed' ? '#ef4444' : '#f59e0b',
                                 }}>
@@ -1522,7 +1522,7 @@ export function AdminChatExpertMode({
                         <div className="flex items-center gap-0.5 mt-1.5">
                           <button
                             onClick={() => handleCopyMessage(message.id, message.text)}
-                            className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                            className="p-1.5 rounded-md text-hh-muted hover:text-hh-ink hover:bg-hh-ui-100 transition-colors"
                             title="Kopieer"
                           >
                             {copiedMessageId === message.id ? (
@@ -1537,7 +1537,7 @@ export function AdminChatExpertMode({
                             style={message.feedback === "up" ? { color: '#9910FA', backgroundColor: 'rgba(153,16,250,0.08)' } : undefined}
                             title="Goed antwoord"
                           >
-                            <ThumbsUp className={`w-3.5 h-3.5 ${message.feedback !== "up" ? "text-slate-400 hover:text-slate-600" : ""}`} />
+                            <ThumbsUp className={`w-3.5 h-3.5 ${message.feedback !== "up" ? "text-hh-muted hover:text-hh-muted" : ""}`} />
                           </button>
                           <button
                             onClick={() => handleMessageFeedback(message.id, "down")}
@@ -1545,7 +1545,7 @@ export function AdminChatExpertMode({
                             style={message.feedback === "down" ? { color: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)' } : undefined}
                             title="Correctie toevoegen"
                           >
-                            <ThumbsDown className={`w-3.5 h-3.5 ${message.feedback !== "down" ? "text-slate-400 hover:text-slate-600" : ""}`} />
+                            <ThumbsDown className={`w-3.5 h-3.5 ${message.feedback !== "down" ? "text-hh-muted hover:text-hh-muted" : ""}`} />
                           </button>
                           <button
                             onClick={() => {
@@ -1554,7 +1554,7 @@ export function AdminChatExpertMode({
                                 setInputText(lastUserMsg.text);
                               }
                             }}
-                            className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                            className="p-1.5 rounded-md text-hh-muted hover:text-hh-ink hover:bg-hh-ui-100 transition-colors"
                             title="Opnieuw proberen"
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
@@ -1578,7 +1578,7 @@ export function AdminChatExpertMode({
                               className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-colors ml-1 ${
                                 expandedDebug === message.id
                                   ? "bg-purple-100 text-purple-700"
-                                  : "bg-slate-100 text-slate-500 hover:bg-purple-50 hover:text-purple-600"
+                                  : "bg-hh-ui-100 text-hh-muted hover:bg-purple-600/10 hover:text-purple-600"
                               }`}
                               title="Toggle debug info"
                             >
@@ -1596,20 +1596,20 @@ export function AdminChatExpertMode({
                         {/* Correction panel — shown when admin clicks thumbs down */}
                         {correctionMessageId === message.id && (
                           <div className="mt-2 p-3 rounded-lg border transition-all" style={{ borderColor: 'rgba(153,16,250,0.3)', backgroundColor: 'rgba(153,16,250,0.04)' }}>
-                            <p className="text-[12px] font-medium text-slate-500 mb-2">Correctie toevoegen</p>
+                            <p className="text-[12px] font-medium text-hh-muted mb-2">Correctie toevoegen</p>
                             {correctionTechnique && (
                               <div className="flex items-center gap-1.5 mb-2">
-                                <span className="text-[11px] text-slate-400">Techniek:</span>
+                                <span className="text-[11px] text-hh-muted">Techniek:</span>
                                 <span className="text-[12px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(153,16,250,0.1)', color: '#9910FA' }}>
                                   {correctionTechnique} {correctionTechniqueName}
                                 </span>
-                                <button onClick={() => { setCorrectionTechnique(""); setCorrectionTechniqueName(""); }} className="text-slate-400 hover:text-slate-600">
+                                <button onClick={() => { setCorrectionTechnique(""); setCorrectionTechniqueName(""); }} className="text-hh-muted hover:text-hh-muted">
                                   <X className="w-3 h-3" />
                                 </button>
                               </div>
                             )}
                             {!correctionTechnique && (
-                              <p className="text-[11px] text-slate-400 mb-2 italic">
+                              <p className="text-[11px] text-hh-muted mb-2 italic">
                                 Selecteer optioneel de juiste techniek via het lampje (E.P.I.C. sidebar)
                               </p>
                             )}
@@ -1619,7 +1619,7 @@ export function AdminChatExpertMode({
                                 value={correctionText}
                                 onChange={(e) => setCorrectionText(e.target.value)}
                                 placeholder="Wat klopt er niet? (optioneel)"
-                                className="flex-1 text-[13px] px-3 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:border-purple-300 bg-white"
+                                className="flex-1 text-[13px] px-3 py-1.5 rounded-md border border-hh-border focus:outline-none focus:border-purple-300 bg-hh-bg text-hh-ink"
                                 onKeyDown={(e) => {
                                   if (e.key === 'Enter') handleSubmitCorrection(message.id);
                                   if (e.key === 'Escape') handleCancelCorrection();
@@ -1635,7 +1635,7 @@ export function AdminChatExpertMode({
                               </button>
                               <button
                                 onClick={handleCancelCorrection}
-                                className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                                className="p-1.5 rounded-md text-hh-muted hover:text-hh-ink hover:bg-hh-ui-100 transition-colors"
                                 title="Annuleren"
                               >
                                 <X className="w-4 h-4" />
@@ -1659,18 +1659,18 @@ export function AdminChatExpertMode({
                 {/* Debug Info (collapsible) - Purple admin styling */}
                 {message.debugInfo && expandedDebug === message.id && (
                   <div className={`${message.sender === "hugo" ? "flex justify-end" : ""}`}>
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 max-w-[300px] text-slate-800">
+                    <div className="bg-purple-600/10 border border-purple-600/20 rounded-lg p-3 max-w-[300px] text-hh-ink">
                         <div className="space-y-3 text-[13px] leading-[18px]">
                           {/* For Hugo/Seller messages */}
                           {message.sender === "hugo" && (
                             <div className="space-y-3">
                               {/* Gekozen techniek (MOVED HERE from AI) */}
                               {message.debugInfo.chosenTechniqueForSeller && (
-                                <div className="pb-3 border-b border-slate-200">
+                                <div className="pb-3 border-b border-hh-border">
                                   <p className="text-[12px] text-hh-muted mb-1">Gekozen techniek:</p>
                                   <Badge 
                                     variant="outline" 
-                                    className="text-[11px] cursor-pointer hover:bg-slate-100"
+                                    className="text-[11px] cursor-pointer hover:bg-hh-ui-50"
                                     onClick={() => openTechniqueDetails(message.debugInfo?.chosenTechniqueForSeller || "")}
                                   >
                                     {message.debugInfo.chosenTechniqueForSeller}
@@ -1752,7 +1752,7 @@ export function AdminChatExpertMode({
                                       <Button
                                         size="sm"
                                         variant="outline"
-                                        className="flex-1 border-slate-300 text-slate-700 hover:bg-slate-50"
+                                        className="flex-1 border-hh-border text-hh-ink hover:bg-hh-ui-50"
                                         onClick={async () => {
                                           const success = await flagAsIncorrect(message, feedbackText[message.id], true);
                                           if (success) {
@@ -1773,8 +1773,8 @@ export function AdminChatExpertMode({
                               <div>
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="flex-1">
-                                    <p className="text-[12px] text-slate-600 font-medium mb-1">Gedetecteerde techniek:</p>
-                                    <p className="text-slate-800 text-[12px]">
+                                    <p className="text-[12px] text-hh-muted font-medium mb-1">Gedetecteerde techniek:</p>
+                                    <p className="text-hh-ink text-[12px]">
                                       {message.debugInfo.detectedTechnique || "N/A"}
                                       {message.debugInfo.score && (
                                         <span className="ml-2 text-green-600 font-semibold">
@@ -1848,7 +1848,7 @@ export function AdminChatExpertMode({
                                       <Button
                                         size="sm"
                                         variant="outline"
-                                        className="flex-1 border-slate-300 text-slate-700 hover:bg-slate-50"
+                                        className="flex-1 border-hh-border text-hh-ink hover:bg-hh-ui-50"
                                         onClick={async () => {
                                           const success = await flagAsIncorrect(message, feedbackText[message.id + "_detected"], true);
                                           if (success) {
@@ -1867,10 +1867,10 @@ export function AdminChatExpertMode({
 
                               {/* Collapsible sections for Hugo */}
                               {/* Persona */}
-                              <div className="pt-4 border-t border-slate-200/50">
+                              <div className="pt-4 border-t border-hh-border/50">
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "persona")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-slate-800 hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "persona") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -1881,12 +1881,12 @@ export function AdminChatExpertMode({
                                 </button>
                                 {isDebugSectionExpanded(message.id, "persona") && (
                                   <div className="mt-3 ml-6 grid grid-cols-[120px_1fr] gap-y-2 gap-x-3 text-[12px]">
-                                    <span className="text-slate-600 font-medium">Gedragsstijl:</span>
-                                    <span className="text-slate-800">{message.debugInfo.persona.gedragsstijl}</span>
-                                    <span className="text-slate-600 font-medium">Buying Clock:</span>
-                                    <span className="text-slate-800">{message.debugInfo.persona.koopklok}</span>
-                                    <span className="text-slate-600 font-medium">Difficulty:</span>
-                                    <span className="text-slate-800">{message.debugInfo.persona.moeilijkheid}</span>
+                                    <span className="text-hh-muted font-medium">Gedragsstijl:</span>
+                                    <span className="text-hh-ink">{message.debugInfo.persona.gedragsstijl}</span>
+                                    <span className="text-hh-muted font-medium">Buying Clock:</span>
+                                    <span className="text-hh-ink">{message.debugInfo.persona.koopklok}</span>
+                                    <span className="text-hh-muted font-medium">Difficulty:</span>
+                                    <span className="text-hh-ink">{message.debugInfo.persona.moeilijkheid}</span>
                                   </div>
                                 )}
                               </div>
@@ -1895,7 +1895,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "context")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-slate-800 hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "context") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -1908,32 +1908,32 @@ export function AdminChatExpertMode({
                                   <div className="mt-3 ml-6 grid grid-cols-[120px_1fr] gap-y-2 gap-x-3 text-[12px]">
                                     {message.debugInfo.context.gathered?.sector && (
                                       <>
-                                        <span className="text-slate-600 font-medium">Sector:</span>
-                                        <span className="text-slate-800">{message.debugInfo.context.gathered.sector}</span>
+                                        <span className="text-hh-muted font-medium">Sector:</span>
+                                        <span className="text-hh-ink">{message.debugInfo.context.gathered.sector}</span>
                                       </>
                                     )}
                                     {message.debugInfo.context.gathered?.product && (
                                       <>
-                                        <span className="text-slate-600 font-medium">Product:</span>
-                                        <span className="text-slate-800">{message.debugInfo.context.gathered.product}</span>
+                                        <span className="text-hh-muted font-medium">Product:</span>
+                                        <span className="text-hh-ink">{message.debugInfo.context.gathered.product}</span>
                                       </>
                                     )}
                                     {message.debugInfo.context.gathered?.klantType && (
                                       <>
-                                        <span className="text-slate-600 font-medium">Klant Type:</span>
-                                        <span className="text-slate-800">{message.debugInfo.context.gathered.klantType}</span>
+                                        <span className="text-hh-muted font-medium">Klant Type:</span>
+                                        <span className="text-hh-ink">{message.debugInfo.context.gathered.klantType}</span>
                                       </>
                                     )}
                                     {message.debugInfo.context.gathered?.verkoopkanaal && (
                                       <>
-                                        <span className="text-slate-600 font-medium">Verkoopkanaal:</span>
-                                        <span className="text-slate-800">{message.debugInfo.context.gathered.verkoopkanaal}</span>
+                                        <span className="text-hh-muted font-medium">Verkoopkanaal:</span>
+                                        <span className="text-hh-ink">{message.debugInfo.context.gathered.verkoopkanaal}</span>
                                       </>
                                     )}
                                     {!message.debugInfo.context.gathered?.sector && 
                                      !message.debugInfo.context.gathered?.product && 
                                      !message.debugInfo.context.gathered?.klantType && (
-                                      <span className="col-span-2 text-slate-500 italic">Nog geen context verzameld</span>
+                                      <span className="col-span-2 text-hh-muted italic">Nog geen context verzameld</span>
                                     )}
                                   </div>
                                 )}
@@ -1943,7 +1943,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "dynamics")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-slate-800 hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "dynamics") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -1954,24 +1954,24 @@ export function AdminChatExpertMode({
                                 </button>
                                 {isDebugSectionExpanded(message.id, "dynamics") && (
                                   <div className="mt-3 ml-6 grid grid-cols-[120px_1fr] gap-y-2 gap-x-3 text-[12px]">
-                                    <span className="text-slate-600 font-medium">Rapport:</span>
-                                    <span className="text-slate-800">
+                                    <span className="text-hh-muted font-medium">Rapport:</span>
+                                    <span className="text-hh-ink">
                                       {message.debugInfo.customerDynamics.rapport}%
-                                      <span className="text-slate-500 ml-1">
+                                      <span className="text-hh-muted ml-1">
                                         ({message.debugInfo.customerDynamics.rapport >= 60 ? "hoog" : message.debugInfo.customerDynamics.rapport >= 40 ? "midden" : "laag"})
                                       </span>
                                     </span>
-                                    <span className="text-slate-600 font-medium">Value Tension:</span>
-                                    <span className="text-slate-800">
+                                    <span className="text-hh-muted font-medium">Value Tension:</span>
+                                    <span className="text-hh-ink">
                                       {message.debugInfo.customerDynamics.valueTension}%
-                                      <span className="text-slate-500 ml-1">
+                                      <span className="text-hh-muted ml-1">
                                         ({message.debugInfo.customerDynamics.valueTension >= 60 ? "hoog" : message.debugInfo.customerDynamics.valueTension >= 40 ? "midden" : "laag"})
                                       </span>
                                     </span>
-                                    <span className="text-slate-600 font-medium">Commit Readiness:</span>
-                                    <span className="text-slate-800">
+                                    <span className="text-hh-muted font-medium">Commit Readiness:</span>
+                                    <span className="text-hh-ink">
                                       {message.debugInfo.customerDynamics.commitReadiness}%
-                                      <span className="text-slate-500 ml-1">
+                                      <span className="text-hh-muted ml-1">
                                         ({message.debugInfo.customerDynamics.commitReadiness >= 60 ? "hoog" : message.debugInfo.customerDynamics.commitReadiness >= 40 ? "midden" : "laag"})
                                       </span>
                                     </span>
@@ -1987,31 +1987,31 @@ export function AdminChatExpertMode({
                               {/* Klant Signaal + EPIC Fase + Evaluatie */}
                               <div className="space-y-2 text-[12px]">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-slate-600 font-medium">Klant Signaal:</span>
+                                  <span className="text-hh-muted font-medium">Klant Signaal:</span>
                                   <Badge className={`text-[11px] ${
                                     message.debugInfo.klantSignaal === "positief" 
                                       ? "bg-green-100 text-green-700 border-green-300"
                                       : message.debugInfo.klantSignaal === "negatief"
                                       ? "bg-red-100 text-red-700 border-red-300"
-                                      : "bg-gray-100 text-gray-700 border-gray-300"
+                                      : "bg-hh-ui-100 text-hh-ink border-hh-border"
                                   }`}>
                                     {message.debugInfo.klantSignaal || "neutraal"}
                                   </Badge>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-slate-600 font-medium">EPIC Fase:</span>
-                                  <Badge variant="outline" className="text-[11px] bg-slate-100 text-slate-700 border-slate-300">
+                                  <span className="text-hh-muted font-medium">EPIC Fase:</span>
+                                  <Badge variant="outline" className="text-[11px] bg-hh-ui-100 text-hh-ink border-hh-border">
                                     {message.debugInfo.aiDecision?.epicFase || "onbekend"}
                                   </Badge>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-slate-600 font-medium">Evaluatie:</span>
+                                  <span className="text-hh-muted font-medium">Evaluatie:</span>
                                   <Badge variant="outline" className={`text-[11px] ${
                                     (message.debugInfo.aiDecision?.evaluatie as string) === "positief" || (message.debugInfo.aiDecision?.evaluatie as string) === "perfect"
                                       ? "bg-green-100 text-green-700 border-green-300"
                                       : message.debugInfo.aiDecision?.evaluatie === "gemist"
                                       ? "bg-red-100 text-red-700 border-red-300"
-                                      : "bg-gray-100 text-gray-700 border-gray-300"
+                                      : "bg-hh-ui-100 text-hh-ink border-hh-border"
                                   }`}>
                                     {message.debugInfo.aiDecision?.evaluatie || "neutraal"}
                                   </Badge>
@@ -2023,8 +2023,8 @@ export function AdminChatExpertMode({
                                 <div>
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1 pb-3 border-b border-purple-200">
-                                      <p className="text-[12px] text-slate-600 font-medium mb-1">Verwachte techniek:</p>
-                                      <p className="text-slate-800 text-[12px]">
+                                      <p className="text-[12px] text-hh-muted font-medium mb-1">Verwachte techniek:</p>
+                                      <p className="text-hh-ink text-[12px]">
                                         {message.debugInfo.expectedTechnique}
                                       </p>
                                     </div>
@@ -2093,7 +2093,7 @@ export function AdminChatExpertMode({
                                         <Button
                                           size="sm"
                                           variant="outline"
-                                          className="flex-1 border-slate-300 text-slate-700 hover:bg-slate-50"
+                                          className="flex-1 border-hh-border text-hh-ink hover:bg-hh-ui-50"
                                           onClick={async () => {
                                             const success = await flagAsIncorrect(message, feedbackText[message.id], false);
                                             if (success) {
@@ -2113,9 +2113,9 @@ export function AdminChatExpertMode({
 
                               {/* Gedetecteerde techniek (for AI messages) */}
                               {message.debugInfo.expectedTechnique && (
-                                <div className="grid grid-cols-[120px_1fr] gap-x-3 text-[12px] pb-3 border-b border-slate-200">
-                                  <span className="text-slate-600 font-medium">Gedetecteerde techniek:</span>
-                                  <span className="text-slate-800">
+                                <div className="grid grid-cols-[120px_1fr] gap-x-3 text-[12px] pb-3 border-b border-hh-border">
+                                  <span className="text-hh-muted font-medium">Gedetecteerde techniek:</span>
+                                  <span className="text-hh-ink">
                                     {message.debugInfo.expectedTechnique}
                                     <span className="ml-2 text-green-600 font-semibold">
                                       (+10)
@@ -2129,7 +2129,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "persona")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-slate-800 hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "persona") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -2140,12 +2140,12 @@ export function AdminChatExpertMode({
                                 </button>
                                 {isDebugSectionExpanded(message.id, "persona") && (
                                   <div className="mt-3 ml-6 grid grid-cols-[120px_1fr] gap-y-2 gap-x-3 text-[12px]">
-                                    <span className="text-slate-600 font-medium">Gedragsstijl:</span>
-                                    <span className="text-slate-800">{message.debugInfo.persona.gedragsstijl}</span>
-                                    <span className="text-slate-600 font-medium">Buying Clock:</span>
-                                    <span className="text-slate-800">{message.debugInfo.persona.koopklok}</span>
-                                    <span className="text-slate-600 font-medium">Difficulty:</span>
-                                    <span className="text-slate-800">{message.debugInfo.persona.moeilijkheid}</span>
+                                    <span className="text-hh-muted font-medium">Gedragsstijl:</span>
+                                    <span className="text-hh-ink">{message.debugInfo.persona.gedragsstijl}</span>
+                                    <span className="text-hh-muted font-medium">Buying Clock:</span>
+                                    <span className="text-hh-ink">{message.debugInfo.persona.koopklok}</span>
+                                    <span className="text-hh-muted font-medium">Difficulty:</span>
+                                    <span className="text-hh-ink">{message.debugInfo.persona.moeilijkheid}</span>
                                   </div>
                                 )}
                               </div>
@@ -2154,7 +2154,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "context")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-slate-800 hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "context") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -2167,32 +2167,32 @@ export function AdminChatExpertMode({
                                   <div className="mt-3 ml-6 grid grid-cols-[120px_1fr] gap-y-2 gap-x-3 text-[12px]">
                                     {message.debugInfo.context.gathered?.sector && (
                                       <>
-                                        <span className="text-slate-600 font-medium">Sector:</span>
-                                        <span className="text-slate-800">{message.debugInfo.context.gathered.sector}</span>
+                                        <span className="text-hh-muted font-medium">Sector:</span>
+                                        <span className="text-hh-ink">{message.debugInfo.context.gathered.sector}</span>
                                       </>
                                     )}
                                     {message.debugInfo.context.gathered?.product && (
                                       <>
-                                        <span className="text-slate-600 font-medium">Product:</span>
-                                        <span className="text-slate-800">{message.debugInfo.context.gathered.product}</span>
+                                        <span className="text-hh-muted font-medium">Product:</span>
+                                        <span className="text-hh-ink">{message.debugInfo.context.gathered.product}</span>
                                       </>
                                     )}
                                     {message.debugInfo.context.gathered?.klantType && (
                                       <>
-                                        <span className="text-slate-600 font-medium">Klant Type:</span>
-                                        <span className="text-slate-800">{message.debugInfo.context.gathered.klantType}</span>
+                                        <span className="text-hh-muted font-medium">Klant Type:</span>
+                                        <span className="text-hh-ink">{message.debugInfo.context.gathered.klantType}</span>
                                       </>
                                     )}
                                     {message.debugInfo.context.gathered?.verkoopkanaal && (
                                       <>
-                                        <span className="text-slate-600 font-medium">Verkoopkanaal:</span>
-                                        <span className="text-slate-800">{message.debugInfo.context.gathered.verkoopkanaal}</span>
+                                        <span className="text-hh-muted font-medium">Verkoopkanaal:</span>
+                                        <span className="text-hh-ink">{message.debugInfo.context.gathered.verkoopkanaal}</span>
                                       </>
                                     )}
                                     {!message.debugInfo.context.gathered?.sector && 
                                      !message.debugInfo.context.gathered?.product && 
                                      !message.debugInfo.context.gathered?.klantType && (
-                                      <span className="col-span-2 text-slate-500 italic">Nog geen context verzameld</span>
+                                      <span className="col-span-2 text-hh-muted italic">Nog geen context verzameld</span>
                                     )}
                                   </div>
                                 )}
@@ -2202,7 +2202,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "dynamics")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-slate-800 hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "dynamics") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -2213,24 +2213,24 @@ export function AdminChatExpertMode({
                                 </button>
                                 {isDebugSectionExpanded(message.id, "dynamics") && (
                                   <div className="mt-3 ml-6 grid grid-cols-[120px_1fr] gap-y-2 gap-x-3 text-[12px]">
-                                    <span className="text-slate-600 font-medium">Rapport:</span>
-                                    <span className="text-slate-800">
+                                    <span className="text-hh-muted font-medium">Rapport:</span>
+                                    <span className="text-hh-ink">
                                       {message.debugInfo.customerDynamics.rapport}%
-                                      <span className="text-slate-500 ml-1">
+                                      <span className="text-hh-muted ml-1">
                                         ({message.debugInfo.customerDynamics.rapport >= 60 ? "hoog" : message.debugInfo.customerDynamics.rapport >= 40 ? "midden" : "laag"})
                                       </span>
                                     </span>
-                                    <span className="text-slate-600 font-medium">Value Tension:</span>
-                                    <span className="text-slate-800">
+                                    <span className="text-hh-muted font-medium">Value Tension:</span>
+                                    <span className="text-hh-ink">
                                       {message.debugInfo.customerDynamics.valueTension}%
-                                      <span className="text-slate-500 ml-1">
+                                      <span className="text-hh-muted ml-1">
                                         ({message.debugInfo.customerDynamics.valueTension >= 60 ? "hoog" : message.debugInfo.customerDynamics.valueTension >= 40 ? "midden" : "laag"})
                                       </span>
                                     </span>
-                                    <span className="text-slate-600 font-medium">Commit Readiness:</span>
-                                    <span className="text-slate-800">
+                                    <span className="text-hh-muted font-medium">Commit Readiness:</span>
+                                    <span className="text-hh-ink">
                                       {message.debugInfo.customerDynamics.commitReadiness}%
-                                      <span className="text-slate-500 ml-1">
+                                      <span className="text-hh-muted ml-1">
                                         ({message.debugInfo.customerDynamics.commitReadiness >= 60 ? "hoog" : message.debugInfo.customerDynamics.commitReadiness >= 40 ? "midden" : "laag"})
                                       </span>
                                     </span>
@@ -2242,7 +2242,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "aiPrompt")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-slate-800 hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "aiPrompt") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -2256,26 +2256,26 @@ export function AdminChatExpertMode({
                                     {message.debugInfo.promptsUsed?.systemPrompt ? (
                                       <>
                                         <div>
-                                          <p className="text-slate-600 font-medium mb-1">System Prompt:</p>
-                                          <pre className="bg-slate-100 p-2 rounded text-[11px] max-h-[200px] overflow-auto whitespace-pre-wrap break-words text-slate-700">
+                                          <p className="text-hh-muted font-medium mb-1">System Prompt:</p>
+                                          <pre className="bg-hh-ui-100 p-2 rounded text-[11px] max-h-[200px] overflow-auto whitespace-pre-wrap break-words text-hh-ink">
                                             {message.debugInfo.promptsUsed.systemPrompt.slice(0, 2000)}
                                             {message.debugInfo.promptsUsed.systemPrompt.length > 2000 && "... [truncated]"}
                                           </pre>
                                         </div>
                                         {message.debugInfo.promptsUsed.userPrompt && (
                                           <div>
-                                            <p className="text-slate-600 font-medium mb-1">User Prompt:</p>
-                                            <pre className="bg-slate-100 p-2 rounded text-[11px] max-h-[100px] overflow-auto whitespace-pre-wrap break-words text-slate-700">
+                                            <p className="text-hh-muted font-medium mb-1">User Prompt:</p>
+                                            <pre className="bg-hh-ui-100 p-2 rounded text-[11px] max-h-[100px] overflow-auto whitespace-pre-wrap break-words text-hh-ink">
                                               {message.debugInfo.promptsUsed.userPrompt}
                                             </pre>
                                           </div>
                                         )}
                                         {message.debugInfo.ragDocuments && message.debugInfo.ragDocuments.length > 0 && (
                                           <div>
-                                            <p className="text-slate-600 font-medium mb-1">RAG Documents ({message.debugInfo.ragDocuments.length}):</p>
+                                            <p className="text-hh-muted font-medium mb-1">RAG Documents ({message.debugInfo.ragDocuments.length}):</p>
                                             <div className="space-y-1">
                                               {message.debugInfo.ragDocuments.map((doc, idx) => (
-                                                <div key={idx} className="bg-blue-50 p-2 rounded border border-blue-200">
+                                                <div key={idx} className="bg-blue-600/10 p-2 rounded border border-blue-600/20">
                                                   <p className="font-medium text-blue-800 text-[11px]">{doc.title || `Document ${idx + 1}`}</p>
                                                   <p className="text-blue-600 text-[10px]">{doc.content?.slice(0, 200)}...</p>
                                                 </div>
@@ -2285,7 +2285,7 @@ export function AdminChatExpertMode({
                                         )}
                                       </>
                                     ) : (
-                                      <p className="text-[11px] text-slate-500 italic">Geen prompt data beschikbaar</p>
+                                      <p className="text-[11px] text-hh-muted italic">Geen prompt data beschikbaar</p>
                                     )}
                                   </div>
                                 )}
@@ -2309,15 +2309,15 @@ export function AdminChatExpertMode({
             {attachedFiles.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {attachedFiles.map((file) => (
-                  <div key={file.id} className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-slate-200 bg-slate-50 text-[12px]">
+                  <div key={file.id} className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-hh-border bg-hh-ui-50 text-[12px]">
                     {file.preview ? (
                       <img src={file.preview} alt={file.name} className="w-6 h-6 rounded object-cover" />
                     ) : (
-                      <File className="w-3.5 h-3.5 text-slate-400" />
+                      <File className="w-3.5 h-3.5 text-hh-muted" />
                     )}
-                    <span className="text-slate-600 max-w-[120px] truncate">{file.name}</span>
-                    <span className="text-slate-400">{formatFileSize(file.size)}</span>
-                    <button onClick={() => removeAttachedFile(file.id)} className="text-slate-400 hover:text-red-500 ml-0.5">
+                    <span className="text-hh-muted max-w-[120px] truncate">{file.name}</span>
+                    <span className="text-hh-muted">{formatFileSize(file.size)}</span>
+                    <button onClick={() => removeAttachedFile(file.id)} className="text-hh-muted hover:text-red-500 ml-0.5">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
@@ -2328,7 +2328,7 @@ export function AdminChatExpertMode({
               {/* Paperclip - file upload */}
               <button
                 onClick={() => handleFileSelect("*/*")}
-                className="p-2 rounded-md text-slate-400 hover:text-purple-600 hover:bg-purple-50 transition-colors flex-shrink-0"
+                className="p-2 rounded-md text-hh-muted hover:text-purple-600 hover:bg-purple-600/10 transition-colors flex-shrink-0"
                 title="Bestand bijvoegen"
               >
                 <Paperclip className="w-4 h-4" />
@@ -2345,7 +2345,7 @@ export function AdminChatExpertMode({
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && !isLoading && handleSendMessage()}
                 placeholder={isLoading ? "Hugo denkt na..." : "Typ je bericht..."}
-                className="flex-1 min-w-0 text-slate-800 bg-white"
+                className="flex-1 min-w-0 text-hh-ink bg-hh-bg"
                 disabled={isLoading}
               />
               {/* Microphone - dictation */}

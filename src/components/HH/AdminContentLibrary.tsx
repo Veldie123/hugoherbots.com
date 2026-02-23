@@ -394,7 +394,7 @@ export function AdminContentLibrary({ navigate }: AdminContentLibraryProps) {
                           <Badge variant="outline" className="text-[11px]">
                             {getTypeLabel(content.type)}
                           </Badge>
-                          <Badge variant="outline" className="text-[11px] bg-blue-100 text-blue-700 border-blue-300">
+                          <Badge variant="outline" className="text-[11px] bg-blue-500/10 text-blue-600 border-blue-500/20">
                             {content.fase}
                           </Badge>
                         </div>
@@ -434,7 +434,7 @@ export function AdminContentLibrary({ navigate }: AdminContentLibraryProps) {
         )}
 
         {viewMode === "list" && (
-          <div className="rounded-[16px] border border-hh-border overflow-hidden bg-white">
+          <div className="rounded-[16px] border border-hh-border overflow-hidden bg-card">
             <table className="w-full">
               <thead className="bg-hh-ui-50 border-b border-hh-border">
                 <tr>
@@ -494,7 +494,7 @@ export function AdminContentLibrary({ navigate }: AdminContentLibraryProps) {
                       onMouseEnter={() => setHoveredRow(content.id)}
                       onMouseLeave={() => setHoveredRow(null)}
                       className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50 transition-colors ${
-                        index % 2 === 0 ? "bg-white" : "bg-hh-ui-50/30"
+                        index % 2 === 0 ? "bg-card" : "bg-hh-ui-50/30"
                       }`}
                     >
                       <td className="px-4 py-3 w-12" onClick={(e) => e.stopPropagation()}>
@@ -534,7 +534,7 @@ export function AdminContentLibrary({ navigate }: AdminContentLibraryProps) {
                           >
                             <Icon className="w-4 h-4" style={content.type === "video" ? { color: "#9333ea" } : undefined} />
                           </div>
-                          <Badge variant="outline" className="text-[11px] bg-slate-100 text-slate-600 border-slate-300">
+                          <Badge variant="outline" className="text-[11px] bg-hh-ui-100 text-hh-muted border-hh-border">
                             {getTypeLabel(content.type)}
                           </Badge>
                         </div>

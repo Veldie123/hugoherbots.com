@@ -779,8 +779,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <span 
-                      style={{ backgroundColor: '#D1FAE5', color: '#10B981', borderColor: '#10B981' }}
-                      className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold border-2"
+                      className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold border-2 bg-hh-success/10 text-hh-success border-hh-success"
                     >
                       {session.nummer}
                     </span>

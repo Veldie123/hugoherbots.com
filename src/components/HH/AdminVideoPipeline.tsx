@@ -69,15 +69,15 @@ interface VideoIngestJob {
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
-  pending: { label: "Wachtend", color: "bg-yellow-100 text-yellow-800", icon: Clock },
-  downloading: { label: "Downloaden", color: "bg-blue-100 text-blue-800", icon: HardDrive },
-  processing: { label: "Verwerken", color: "bg-slate-100 text-slate-800", icon: FileVideo },
-  extracting_audio: { label: "Audio extractie", color: "bg-indigo-100 text-indigo-800", icon: Mic },
-  transcribing: { label: "Transcriberen", color: "bg-cyan-100 text-cyan-800", icon: FileText },
-  embedding: { label: "RAG embeddings", color: "bg-teal-100 text-teal-800", icon: FileText },
+  pending: { label: "Wachtend", color: "bg-yellow-500/10 text-yellow-600", icon: Clock },
+  downloading: { label: "Downloaden", color: "bg-blue-500/10 text-blue-600", icon: HardDrive },
+  processing: { label: "Verwerken", color: "bg-hh-ui-100 text-hh-ink", icon: FileVideo },
+  extracting_audio: { label: "Audio extractie", color: "bg-indigo-500/10 text-indigo-600", icon: Mic },
+  transcribing: { label: "Transcriberen", color: "bg-cyan-500/10 text-cyan-600", icon: FileText },
+  embedding: { label: "RAG embeddings", color: "bg-teal-500/10 text-teal-600", icon: FileText },
   completed: { label: "Voltooid", color: "bg-emerald-500/10 text-emerald-500", icon: CheckCircle2 },
-  failed: { label: "Mislukt", color: "bg-red-100 text-red-800", icon: XCircle },
-  deleted: { label: "Verwijderd", color: "bg-gray-100 text-gray-800", icon: Trash2 },
+  failed: { label: "Mislukt", color: "bg-red-500/10 text-red-600", icon: XCircle },
+  deleted: { label: "Verwijderd", color: "bg-hh-ui-100 text-hh-muted", icon: Trash2 },
 };
 
 export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
@@ -624,7 +624,7 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
               {transcriptModal.content.split(/\s+/).length} woorden
             </DialogDescription>
           </DialogHeader>
-          <div className="flex-1 overflow-y-auto py-4 border rounded-lg p-4 bg-gray-50" style={{ minHeight: '200px', maxHeight: '50vh' }}>
+          <div className="flex-1 overflow-y-auto py-4 border border-hh-border rounded-lg p-4 bg-hh-ui-50" style={{ minHeight: '200px', maxHeight: '50vh' }}>
             <p className="text-[14px] text-hh-text whitespace-pre-wrap leading-relaxed">
               {transcriptModal.content}
             </p>

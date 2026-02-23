@@ -421,7 +421,7 @@ export function AdminNotifications({ navigate }: AdminNotificationsProps) {
                     isSelected
                       ? "ring-2 ring-hh-primary bg-hh-primary/5"
                       : "hover:shadow-md"
-                  } ${!notification.read ? "bg-blue-50/50" : "bg-white"}`}
+                  } ${!notification.read ? "bg-blue-500/5" : "bg-card"}`}
                 >
                   <div className="flex items-start gap-4">
                     {/* Checkbox */}
@@ -481,7 +481,7 @@ export function AdminNotifications({ navigate }: AdminNotificationsProps) {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="h-6 text-[11px] px-2 border-purple-300 text-purple-700 hover:bg-purple-50"
+                            className="h-6 text-[11px] px-2 border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
                             onClick={() => {
                               const action = notification.action as string;
                               navigate(action.startsWith('admin-') ? action : `admin-${action}`);

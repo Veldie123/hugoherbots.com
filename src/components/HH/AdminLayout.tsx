@@ -261,7 +261,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
     <div className="flex h-screen bg-hh-bg">
       {/* Mobile Menu Sheet - Full screen */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-full p-0 flex flex-col">
+        <SheetContent side="left" className="w-full p-0 flex flex-col bg-hh-bg">
           <SheetHeader className="px-6 py-4 border-b border-hh-border flex-shrink-0">
             <SheetTitle className="flex items-center gap-2">
               <Logo variant="horizontal" className="text-hh-ink text-[16px]" />
@@ -300,7 +300,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                     </button>
 
                     {isActive && history.length > 0 && (
-                      <div className="ml-3 pl-4 border-l-2 border-purple-200 space-y-0.5 -mt-0.5">
+                      <div className="ml-3 pl-4 border-l-2 border-purple-600/30 space-y-0.5 -mt-0.5">
                         {history.slice(0, 3).map((histItem) => (
                           <button
                             key={histItem.id}
@@ -314,11 +314,11 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                               }
                               setMobileMenuOpen(false);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-left hover:bg-purple-50 transition-colors cursor-pointer"
+                            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-left hover:bg-purple-600/10 transition-colors cursor-pointer"
                           >
                             <div className="flex-1 min-w-0">
-                              <p className="text-[14px] text-slate-700 truncate">{histItem.title}</p>
-                              <p className="text-[12px] text-slate-400">{histItem.date}</p>
+                              <p className="text-[14px] text-hh-text truncate">{histItem.title}</p>
+                              <p className="text-[12px] text-hh-muted">{histItem.date}</p>
                             </div>
                           </button>
                         ))}
@@ -433,7 +433,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                 </button>
 
                 {!collapsed && isActive && history.length > 0 && (
-                  <div className="ml-2 pl-4 border-l-2 border-purple-200 space-y-0.5 -mt-0.5">
+                  <div className="ml-2 pl-4 border-l-2 border-purple-600/30 space-y-0.5 -mt-0.5">
                     {history.slice(0, 3).map((histItem) => (
                       <button
                         key={histItem.id}
@@ -446,11 +446,11 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                             navigate?.('admin-analysis-results', { conversationId: histItem.id });
                           }
                         }}
-                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left hover:bg-purple-50 transition-colors group cursor-pointer"
+                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left hover:bg-purple-600/10 transition-colors group cursor-pointer"
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="text-[13px] text-slate-700 truncate group-hover:text-purple-700">{histItem.title}</p>
-                          <p className="text-[11px] text-slate-400">{histItem.date}</p>
+                          <p className="text-[13px] text-hh-text truncate group-hover:text-purple-400">{histItem.title}</p>
+                          <p className="text-[11px] text-hh-muted">{histItem.date}</p>
                         </div>
                       </button>
                     ))}
@@ -583,7 +583,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                         <div
                           key={notif.id}
                           className={`p-3 border-b border-hh-border last:border-0 hover:bg-hh-ui-50 cursor-pointer ${
-                            !notif.read ? "bg-blue-50/50" : ""
+                            !notif.read ? "bg-hh-primary/5" : ""
                           }`}
                           onClick={() => {
                             markAsRead(notif.id);
@@ -599,7 +599,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                           <div className="flex items-start gap-2">
                             <div
                               className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                                !notif.read ? "bg-blue-600" : "bg-transparent"
+                                !notif.read ? "bg-hh-primary" : "bg-transparent"
                               }`}
                             />
                             <div className="flex-1 min-w-0">

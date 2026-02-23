@@ -423,7 +423,7 @@ export function VideoWatchPage({
                       className={`flex items-center gap-1.5 pr-2 cursor-pointer transition-all text-left ${
                         isActive
                           ? "rounded-lg mx-2 my-0.5 px-3 py-2"
-                          : "px-3 py-1.5 hover:bg-black/[0.02]"
+                          : "px-3 py-1.5 hover:bg-hh-ui-50/30"
                       }`}
                       style={{
                         marginLeft: isActive ? undefined : `${8 + indent * 8}px`,
@@ -492,7 +492,7 @@ export function VideoWatchPage({
                         </div>
                       )}
                       <button
-                        className="text-hh-muted/30 flex-shrink-0 hover:text-hh-muted/70 transition-colors p-1.5 rounded-md hover:bg-black/5 ml-auto"
+                        className="text-hh-muted/30 flex-shrink-0 hover:text-hh-muted/70 transition-colors p-1.5 rounded-md hover:bg-hh-ui-50 ml-auto"
                         onClick={(e) => {
                           e.stopPropagation();
                           setDetailTechnique(tech);
@@ -509,7 +509,7 @@ export function VideoWatchPage({
                   <div key={fase}>
                     <button
                       onClick={() => togglePhase(fase)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-black/[0.02] transition-colors"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-hh-ui-50/30 transition-colors"
                       style={{ borderLeft: `3px solid ${color}` }}
                     >
                       <div
@@ -566,7 +566,7 @@ export function VideoWatchPage({
                                 className={`flex items-center gap-1.5 pr-2 cursor-pointer transition-colors ${
                                   isGroupSelfActive
                                     ? "rounded-lg mx-2 my-0.5 px-3 py-2"
-                                    : "px-3 py-1.5 hover:bg-black/[0.02]"
+                                    : "px-3 py-1.5 hover:bg-hh-ui-50/30"
                                 }`}
                                 style={{
                                   marginLeft: isGroupSelfActive ? undefined : "8px",
@@ -602,7 +602,7 @@ export function VideoWatchPage({
                                   {group.children.length}
                                 </span>
                                 <button
-                                  className="text-hh-muted/30 flex-shrink-0 hover:text-hh-muted/70 transition-colors p-1.5 rounded-md hover:bg-black/5"
+                                  className="text-hh-muted/30 flex-shrink-0 hover:text-hh-muted/70 transition-colors p-1.5 rounded-md hover:bg-hh-ui-50"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setDetailTechnique(group);
@@ -627,7 +627,7 @@ export function VideoWatchPage({
                                           <div
                                             ref={(el) => { techItemRefs.current[child.nummer] = el; }}
                                             className={`flex items-center gap-1.5 pr-2 cursor-pointer transition-colors ${
-                                              childIsActive ? "rounded-lg mx-2 my-0.5 px-3 py-2" : "px-3 py-1.5 hover:bg-black/[0.02]"
+                                              childIsActive ? "rounded-lg mx-2 my-0.5 px-3 py-2" : "px-3 py-1.5 hover:bg-hh-ui-50/30"
                                             }`}
                                             style={{
                                               marginLeft: childIsActive ? undefined : "16px",
@@ -655,7 +655,7 @@ export function VideoWatchPage({
                                               {child.naam}
                                             </p>
                                             <button
-                                              className="text-hh-muted/30 flex-shrink-0 hover:text-hh-muted/70 transition-colors p-1.5 rounded-md hover:bg-black/5"
+                                              className="text-hh-muted/30 flex-shrink-0 hover:text-hh-muted/70 transition-colors p-1.5 rounded-md hover:bg-hh-ui-50"
                                               onClick={(e) => { e.stopPropagation(); setDetailTechnique(child); }}
                                               title="Info over deze techniek"
                                             >
@@ -798,7 +798,7 @@ export function VideoWatchPage({
                       <div key={fase}>
                         <button
                           onClick={() => togglePhase(fase)}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-black/[0.02] transition-colors"
+                          className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-hh-ui-50/30 transition-colors"
                           style={{ borderLeft: `3px solid ${color}` }}
                         >
                           <div
@@ -832,7 +832,7 @@ export function VideoWatchPage({
                                 <div
                                   key={tech.nummer}
                                   className={`flex items-center gap-1.5 px-3 py-1.5 cursor-pointer transition-all text-left ${
-                                    isActive ? "rounded-lg mx-2 my-0.5 px-3 py-2" : "hover:bg-black/[0.02]"
+                                    isActive ? "rounded-lg mx-2 my-0.5 px-3 py-2" : "hover:bg-hh-ui-50/30"
                                   }`}
                                   style={{
                                     marginLeft: isActive ? undefined : "8px",
@@ -898,7 +898,7 @@ export function VideoWatchPage({
                         className="flex items-center gap-2.5 p-2 rounded-lg bg-hh-card border border-hh-border hover:border-hh-text/20 cursor-pointer transition-all group"
                         onClick={() => onVideoChange(v.id)}
                       >
-                        <div className="w-20 h-12 rounded-md overflow-hidden flex-shrink-0 bg-gray-100 relative">
+                        <div className="w-20 h-12 rounded-md overflow-hidden flex-shrink-0 bg-hh-ui-100 relative">
                           <img
                             src={v.thumbnail}
                             alt=""

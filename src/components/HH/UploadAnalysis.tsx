@@ -631,7 +631,7 @@ export function UploadAnalysis({
                       <div
                         key={step}
                         className="h-2 flex-1 rounded-full transition-all duration-500"
-                        style={{ backgroundColor: isActive ? '#3C9A6E' : '#e2e5e9' }}
+                        style={{ backgroundColor: isActive ? '#3C9A6E' : 'var(--hh-ui-200)' }}
                       />
                     );
                   })}
@@ -814,14 +814,14 @@ export function UploadAnalysis({
                         key={idx}
                         className={`p-3 rounded-lg border-l-4 ${
                           tip.type === "wedervraag"
-                            ? "bg-blue-50 border-blue-500"
+                            ? "bg-blue-500/10 border-blue-500"
                             : tip.type === "lock"
-                            ? "bg-purple-50 border-purple-500"
+                            ? "bg-purple-500/10 border-purple-500"
                             : tip.type === "waarschuwing"
-                            ? "bg-red-50 border-red-500"
+                            ? "bg-red-500/10 border-red-500"
                             : tip.type === "open"
-                            ? "bg-teal-50 border-teal-500"
-                            : "bg-green-50 border-green-500"
+                            ? "bg-teal-500/10 border-teal-500"
+                            : "bg-green-500/10 border-green-500"
                         }`}
                       >
                         <div className="flex items-start gap-2">

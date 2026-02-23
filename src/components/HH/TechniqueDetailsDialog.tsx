@@ -160,7 +160,7 @@ export function TechniqueDetailsDialog({
                     <Badge
                       key={index}
                       variant="outline"
-                      className="text-[12px] bg-white text-slate-600 border-slate-200 font-normal px-3 py-1 rounded-full"
+                      className="text-[12px] bg-hh-ui-50 text-hh-muted border-hh-border font-normal px-3 py-1 rounded-full"
                     >
                       {tag}
                       {isEditing && (
@@ -191,7 +191,7 @@ export function TechniqueDetailsDialog({
 
             <div className="px-6 pb-6 space-y-5">
               {displayData.doel && (
-                <div className={`${isAdmin ? 'bg-purple-50 border-purple-100' : 'bg-slate-50 border-slate-100'} border rounded-xl p-4`}>
+                <div className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-4`}>
                   <div className="flex items-center gap-2 mb-2">
                     <Target className={`w-4 h-4 ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`} />
                     <h4 className={`text-[14px] font-semibold ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`}>Doel</h4>

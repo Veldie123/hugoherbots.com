@@ -609,22 +609,22 @@ export function AdminSessions({ navigate }: AdminSessionsProps) {
 
         {/* Mobile: compact horizontal stat strip */}
         <div className="flex lg:hidden items-center gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-purple-50 rounded-lg flex-shrink-0">
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-purple-600/10 rounded-lg flex-shrink-0">
             <MessageSquare className="w-3.5 h-3.5 text-purple-600" />
             <span className="text-[12px] text-hh-muted">Sessies</span>
             <span className="text-[14px] font-semibold text-hh-ink">{stats.totalSessions}</span>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-green-50 rounded-lg flex-shrink-0">
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-hh-success/10 rounded-lg flex-shrink-0">
             <CheckCircle2 className="w-3.5 h-3.5 text-hh-success" />
             <span className="text-[12px] text-hh-muted">Excellent</span>
             <span className="text-[14px] font-semibold text-hh-ink">{stats.excellentCount}</span>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 rounded-lg flex-shrink-0">
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-600/10 rounded-lg flex-shrink-0">
             <BarChart3 className="w-3.5 h-3.5 text-blue-600" />
             <span className="text-[12px] text-hh-muted">Score</span>
             <span className="text-[14px] font-semibold text-hh-ink">{stats.avgScore}%</span>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-orange-50 rounded-lg flex-shrink-0">
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-hh-warn/10 rounded-lg flex-shrink-0">
             <AlertTriangle className="w-3.5 h-3.5 text-hh-warn" />
             <span className="text-[12px] text-hh-muted">Needs Work</span>
             <span className="text-[14px] font-semibold text-hh-ink">{stats.needsWorkCount}</span>
@@ -700,7 +700,7 @@ export function AdminSessions({ navigate }: AdminSessionsProps) {
 
         {/* Bulk Actions */}
         {selectionMode && selectedIds.length > 0 && (
-          <Card className="p-4 rounded-[16px] shadow-hh-sm border-hh-border bg-purple-50 border-purple-200">
+          <Card className="p-4 rounded-[16px] shadow-hh-sm border-hh-border bg-purple-600/10 border-purple-600/20">
             <div className="flex items-center justify-between">
               <p className="text-[14px] text-hh-text">
                 <span className="font-semibold">{selectedIds.length}</span> sessies geselecteerd
@@ -864,7 +864,7 @@ export function AdminSessions({ navigate }: AdminSessionsProps) {
                     onMouseEnter={() => setHoveredRow(session.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                     className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50 transition-colors cursor-pointer ${
-                      index % 2 === 0 ? "bg-white" : "bg-hh-ui-50/30"
+                      index % 2 === 0 ? "bg-hh-bg" : "bg-hh-ui-50/30"
                     }`}
                   >
                     <td className="py-3 px-4 w-[40px]" onClick={(e) => e.stopPropagation()}>

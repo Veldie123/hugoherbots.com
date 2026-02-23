@@ -231,10 +231,10 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
       <div className="space-y-6 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-800">
+            <h1 className="text-2xl font-semibold text-hh-ink">
               RAG Techniek Review
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-hh-muted mt-1">
               Review en keur gesuggereerde technieken goed
             </p>
           </div>
@@ -244,7 +244,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
               size="sm"
               onClick={runVideoTagging}
               disabled={bulkLoading}
-              className="border-purple-300 text-purple-700 hover:bg-purple-50"
+              className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
             >
               <FileText className="w-4 h-4 mr-2" />
               Video Tagging
@@ -258,7 +258,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
               <Zap className="w-4 h-4 mr-2" />
               Run Heuristics
             </Button>
-            <Button variant="outline" size="sm" onClick={loadData} className="border-purple-300 text-purple-700 hover:bg-purple-50">
+            <Button variant="outline" size="sm" onClick={loadData} className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10">
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               Ververs
             </Button>
@@ -266,7 +266,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
               variant="outline" 
               size="sm" 
               onClick={() => window.open('/api/v2/rag/export?format=csv', '_blank')}
-              className="border-purple-300 text-purple-700 hover:bg-purple-50"
+              className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
             >
               <Download className="w-4 h-4 mr-2" />
               Export CSV
@@ -277,26 +277,26 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
         <div className="grid grid-cols-4 gap-4">
           <Card className="p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-500">Totaal Chunks</span>
-              <FileText className="w-4 h-4 text-slate-400" />
+              <span className="text-sm text-hh-muted">Totaal Chunks</span>
+              <FileText className="w-4 h-4 text-hh-muted" />
             </div>
             <p className="text-2xl font-semibold mt-2">{tagStats?.total || 0}</p>
           </Card>
           <Card className="p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-500">Getagd</span>
+              <span className="text-sm text-hh-muted">Getagd</span>
               <CheckCircle2 className="w-4 h-4 text-green-500" />
             </div>
             <p className="text-2xl font-semibold mt-2 text-green-600">
               {tagStats?.tagged || 0}
-              <span className="text-sm font-normal text-slate-400 ml-2">
+              <span className="text-sm font-normal text-hh-muted ml-2">
                 ({tagStats ? Math.round((tagStats.tagged / tagStats.total) * 100) : 0}%)
               </span>
             </p>
           </Card>
           <Card className="p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-500">Te Reviewen</span>
+              <span className="text-sm text-hh-muted">Te Reviewen</span>
               <AlertCircle className="w-4 h-4 text-orange-500" />
             </div>
             <p className="text-2xl font-semibold mt-2 text-orange-600">
@@ -305,7 +305,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
           </Card>
           <Card className="p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-500">Goedgekeurd</span>
+              <span className="text-sm text-hh-muted">Goedgekeurd</span>
               <Check className="w-4 h-4 text-purple-500" />
             </div>
             <p className="text-2xl font-semibold mt-2 text-purple-600">
@@ -325,7 +325,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
                   size="sm"
                   onClick={() => bulkApprove(t.technique)}
                   disabled={bulkLoading}
-                  className="border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400"
+                  className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10 hover:border-purple-500/40"
                   title={getTechniqueName(t.technique)}
                 >
                   <Check className="w-3 h-3 mr-1 text-purple-600" />
@@ -355,9 +355,9 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
           </div>
 
           {loading ? (
-            <div className="text-center py-8 text-slate-400">Laden...</div>
+            <div className="text-center py-8 text-hh-muted">Laden...</div>
           ) : filteredChunks.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
+            <div className="text-center py-8 text-hh-muted">
               Geen chunks te reviewen
             </div>
           ) : (
@@ -367,12 +367,12 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
                 return (
                   <div
                     key={chunk.id}
-                    className="p-3 bg-slate-50 rounded-lg border"
+                    className="p-3 bg-hh-ui-50 rounded-lg border border-hh-border"
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs text-slate-400">{chunk.source_id}</span>
+                          <span className="text-xs text-hh-muted">{chunk.source_id}</span>
                           {chunk.suggested_techniek_id && (
                             <Badge
                               className={`text-xs ${getCodeBadgeColors(
@@ -385,7 +385,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
                           )}
                         </div>
                         <p 
-                          className={`text-sm text-slate-700 ${isExpanded ? '' : 'line-clamp-2'} cursor-pointer`}
+                          className={`text-sm text-hh-ink ${isExpanded ? '' : 'line-clamp-2'} cursor-pointer`}
                           onClick={() => setExpandedChunkId(isExpanded ? null : chunk.id)}
                         >
                           {isExpanded ? chunk.content : chunk.content_preview}
@@ -407,7 +407,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-8 w-8 p-0 text-purple-600 hover:bg-purple-50"
+                          className="h-8 w-8 p-0 text-purple-600 hover:bg-purple-500/10"
                           onClick={() => approveChunk(chunk.id)}
                           title="Goedkeuren"
                         >
@@ -416,7 +416,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-8 w-8 p-0 text-red-600 hover:bg-red-50"
+                          className="h-8 w-8 p-0 text-red-600 hover:bg-red-500/10"
                           onClick={() => openRejectDialog(chunk.id)}
                           title="Afwijzen of corrigeren"
                         >
@@ -440,7 +440,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">
-              <label className="text-sm font-medium text-slate-700 mb-2 block">
+              <label className="text-sm font-medium text-hh-ink mb-2 block">
                 Juiste techniek (optioneel)
               </label>
               <Select value={correctTechniqueId} onValueChange={setCorrectTechniqueId}>
@@ -460,7 +460,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
               <Button
                 variant="outline"
                 onClick={() => rejectChunk(false)}
-                className="border-slate-300"
+                className="border-hh-border"
               >
                 Alleen afwijzen
               </Button>

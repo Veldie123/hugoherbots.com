@@ -424,7 +424,7 @@ export function Resources({ navigate, isAdmin }: ResourcesProps) {
                     <tr
                       key={resource.id}
                       className={`border-t border-hh-border hover:bg-hh-ui-50 transition-colors ${
-                        index % 2 === 0 ? "bg-white" : "bg-hh-ui-50/30"
+                        index % 2 === 0 ? "bg-card" : "bg-hh-ui-50/30"
                       }`}
                     >
                       <td className="py-3 px-4">

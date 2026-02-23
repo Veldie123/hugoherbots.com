@@ -128,10 +128,10 @@ export function EPICSidebar({
 
   if (isUserView) {
     return (
-      <div className="h-full bg-white flex flex-col" style={hideHeader ? {} : { borderRight: '1px solid #e2e8f0' }}>
+      <div className="h-full bg-hh-bg flex flex-col" style={hideHeader ? {} : { borderRight: '1px solid var(--hh-border)' }}>
         {!hideHeader && (
-          <div className="flex items-center px-4 py-3 lg:py-4 border-b border-hh-border bg-white flex-shrink-0">
-            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', letterSpacing: '0.5px', margin: 0 }}>
+          <div className="flex items-center px-4 py-3 lg:py-4 border-b border-hh-border bg-hh-bg flex-shrink-0">
+            <h3 className="text-hh-text" style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '0.5px', margin: 0 }}>
               E.P.I.C. TECHNIQUE
             </h3>
           </div>
@@ -165,7 +165,7 @@ export function EPICSidebar({
                     style={{
                       opacity: isPhaseLocked ? 0.5 : 1,
                       cursor: isPhaseLocked ? 'not-allowed' : 'pointer',
-                      backgroundColor: isExpanded && !isPhaseLocked ? '#f8fafc' : 'transparent',
+                      backgroundColor: isExpanded && !isPhaseLocked ? 'var(--hh-ui-50)' : 'transparent',
                     }}
                   >
                     <div
@@ -174,7 +174,7 @@ export function EPICSidebar({
                         width: '28px',
                         height: '28px',
                         borderRadius: '50%',
-                        backgroundColor: isPhaseLocked ? '#e2e8f0' : circleColor,
+                        backgroundColor: isPhaseLocked ? 'var(--hh-ui-200)' : circleColor,
                         color: 'white',
                         fontSize: '12px',
                         fontWeight: 700,
@@ -191,7 +191,7 @@ export function EPICSidebar({
                       style={{
                         fontSize: '14px',
                         fontWeight: 600,
-                        color: isPhaseLocked ? '#94a3b8' : '#334155',
+                        color: isPhaseLocked ? 'var(--hh-muted)' : 'var(--hh-ink)',
                       }}
                     >
                       {phaseName}
@@ -216,7 +216,7 @@ export function EPICSidebar({
                   </button>
 
                   {isExpanded && !isPhaseLocked && (
-                    <div className="ml-3 mt-1 mb-2" style={{ borderLeft: '2px solid #f1f5f9', paddingLeft: '12px' }}>
+                    <div className="ml-3 mt-1 mb-2" style={{ borderLeft: '2px solid var(--hh-ui-100)', paddingLeft: '12px' }}>
                       {getTopLevelTechniques(phase).map((technique: any) => {
                         const isParent = hasChildren(technique, phase);
                         const isExpandedParent = expandedParents.includes(technique.nummer);
@@ -301,7 +301,7 @@ export function EPICSidebar({
             })}
           </div>
 
-          <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
+          <div style={{ borderTop: '1px solid var(--hh-border)', paddingTop: '12px' }}>
             <button
               type="button"
               onClick={(e) => {
@@ -309,14 +309,14 @@ export function EPICSidebar({
                 setHoudingenAccordionOpen(!houdingenAccordionOpen);
               }}
               className="w-full flex items-center gap-2 py-2 px-2 rounded-lg transition-colors"
-              style={{ backgroundColor: houdingenAccordionOpen ? '#f8fafc' : 'transparent' }}
+              style={{ backgroundColor: houdingenAccordionOpen ? 'var(--hh-ui-50)' : 'transparent' }}
             >
               {houdingenAccordionOpen ? (
                 <ChevronDown className="w-4 h-4" style={{ color: '#94a3b8' }} />
               ) : (
                 <ChevronRight className="w-4 h-4" style={{ color: '#94a3b8' }} />
               )}
-              <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#334155', flex: 1, textAlign: 'left' }}>
+              <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--hh-ink)', flex: 1, textAlign: 'left' }}>
                 Houdingen van de klant
               </h4>
               <span style={{ fontSize: '12px', color: '#94a3b8' }}>
@@ -325,7 +325,7 @@ export function EPICSidebar({
             </button>
 
             {houdingenAccordionOpen && (
-              <div className="ml-3 mt-1" style={{ borderLeft: '2px solid #f1f5f9', paddingLeft: '12px' }}>
+              <div className="ml-3 mt-1" style={{ borderLeft: '2px solid var(--hh-ui-100)', paddingLeft: '12px' }}>
                 {klantHoudingen.map((houding) => {
                   const isExpanded = expandedHoudingen.includes(houding.id);
                   const isActive = activeHouding === houding.id;
@@ -362,7 +362,7 @@ export function EPICSidebar({
                           style={{
                             fontSize: '13px',
                             fontWeight: isActive ? 600 : 400,
-                            color: isActive ? '#9a3412' : '#475569',
+                            color: isActive ? '#9a3412' : 'var(--hh-ink)',
                           }}
                         >
                           {houding.naam}
@@ -509,7 +509,7 @@ export function EPICSidebar({
               e.preventDefault();
               setFasesAccordionOpen(!fasesAccordionOpen);
             }}
-            className="w-full flex items-center justify-between p-3 rounded-lg border border-hh-border bg-white hover:bg-hh-ui-50 transition-all"
+            className="w-full flex items-center justify-between p-3 rounded-lg border border-hh-border bg-card hover:bg-hh-ui-50 transition-all"
           >
             <div className="flex items-center gap-2">
               {fasesAccordionOpen ? (
@@ -547,7 +547,7 @@ export function EPICSidebar({
                         togglePhase(phase);
                         setCurrentPhase(phase);
                       }}
-                      className="w-full flex items-center justify-between p-3 rounded-lg border border-hh-border bg-white hover:bg-hh-ui-50 transition-all"
+                      className="w-full flex items-center justify-between p-3 rounded-lg border border-hh-border bg-card hover:bg-hh-ui-50 transition-all"
                     >
                       <div className="flex items-center gap-2">
                         {isExpanded ? (
@@ -622,10 +622,10 @@ export function EPICSidebar({
                                   "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all",
                                   isParent ? "cursor-pointer" : "cursor-default",
                                   selectedTechnique === technique.naam
-                                    ? "bg-purple-50 text-purple-800 border border-purple-300"
+                                    ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
                                     : isRecommended
-                                    ? "bg-purple-50/30 border border-purple-200"
-                                    : "bg-white text-hh-text hover:bg-hh-ui-50"
+                                    ? "bg-purple-600/5 border border-purple-600/20"
+                                    : "bg-card text-hh-text hover:bg-hh-ui-50"
                                 )}
                               >
                                 <div className="flex items-center justify-between gap-2">
@@ -687,10 +687,10 @@ export function EPICSidebar({
                                             "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all",
                                             childHasGrandchildren ? "cursor-pointer" : "cursor-default",
                                             selectedTechnique === child.naam
-                                              ? "bg-purple-50 text-purple-800 border border-purple-300"
+                                              ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
                                               : isChildRecommended
-                                              ? "bg-purple-50/30 border border-purple-200"
-                                              : "bg-white text-hh-text hover:bg-hh-ui-50"
+                                              ? "bg-purple-600/5 border border-purple-600/20"
+                                              : "bg-card text-hh-text hover:bg-hh-ui-50"
                                           )}
                                         >
                                           <div className="flex items-center justify-between gap-2">
@@ -736,9 +736,9 @@ export function EPICSidebar({
                                                   className={cn(
                                                     "w-full text-left px-3 py-1.5 rounded-lg text-[11px] leading-[15px] transition-all cursor-default",
                                                     selectedTechnique === grandchild.naam
-                                                      ? "bg-purple-50 text-purple-800 border border-purple-300"
+                                                      ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
                                                       : isGrandchildRecommended
-                                                      ? "bg-purple-50/30 border border-purple-200"
+                                                      ? "bg-purple-600/5 border border-purple-600/20"
                                                       : "bg-hh-ui-50/50 text-hh-text hover:bg-hh-ui-100"
                                                   )}
                                                 >
@@ -791,7 +791,7 @@ export function EPICSidebar({
               e.preventDefault();
               setHoudingenAccordionOpen(!houdingenAccordionOpen);
             }}
-            className="w-full flex items-center justify-between p-3 rounded-lg border border-hh-border bg-white hover:bg-hh-ui-50 transition-all"
+            className="w-full flex items-center justify-between p-3 rounded-lg border border-hh-border bg-card hover:bg-hh-ui-50 transition-all"
           >
             <div className="flex items-center gap-2">
               {houdingenAccordionOpen ? (
@@ -825,8 +825,8 @@ export function EPICSidebar({
                       className={cn(
                         "w-full flex items-center justify-between p-3 rounded-lg border transition-all",
                         isActive
-                          ? "border-orange-400 bg-orange-50 shadow-sm"
-                          : "border-hh-border bg-white hover:bg-hh-ui-50"
+                          ? "border-orange-400 bg-orange-600/10 shadow-sm"
+                          : "border-hh-border bg-card hover:bg-hh-ui-50"
                       )}
                     >
                       <div className="flex items-center gap-2">
@@ -876,10 +876,10 @@ export function EPICSidebar({
                                   className={cn(
                                     "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-default",
                                     selectedTechnique === technique.naam
-                                      ? "bg-purple-50 text-purple-800 border border-purple-300"
+                                      ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
                                       : isRecommended
-                                      ? "bg-purple-50/30 border border-purple-200"
-                                      : "bg-white text-hh-text hover:bg-hh-ui-50"
+                                      ? "bg-purple-600/5 border border-purple-600/20"
+                                      : "bg-card text-hh-text hover:bg-hh-ui-50"
                                   )}
                                 >
                                   <div className="flex items-center justify-between gap-2">
@@ -969,7 +969,7 @@ function UserTechniqueRow({
           }
         }
       }}
-      className="flex items-center gap-2 py-1.5 px-2 rounded transition-colors hover:bg-slate-50"
+      className="flex items-center gap-2 py-1.5 px-2 rounded transition-colors hover:bg-hh-ui-50"
       style={{
         cursor: isLocked ? 'not-allowed' : 'pointer',
         opacity: isLocked ? 0.45 : 1,
@@ -1000,7 +1000,7 @@ function UserTechniqueRow({
         style={{
           fontSize: '13px',
           fontWeight: isSelected ? 500 : 400,
-          color: isSelected ? STEEL_BLUE : isLocked ? '#cbd5e1' : '#475569',
+          color: isSelected ? STEEL_BLUE : isLocked ? '#cbd5e1' : 'var(--hh-ink)',
         }}
       >
         {technique.naam}

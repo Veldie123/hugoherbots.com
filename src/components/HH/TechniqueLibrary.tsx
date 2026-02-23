@@ -374,7 +374,7 @@ export function TechniqueLibrary({ navigate, isAdmin }: TechniqueLibraryProps) {
                   }
                 }}
               >
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-teal-100 text-teal-600 text-[12px] font-mono font-semibold flex-shrink-0">
+                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[12px] font-mono font-semibold flex-shrink-0">
                   {techniek.code}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -385,7 +385,7 @@ export function TechniqueLibrary({ navigate, isAdmin }: TechniqueLibraryProps) {
                     <span className="text-[11px] text-hh-success font-medium">{techniek.avgScore}%</span>
                   </div>
                 </div>
-                <Badge className={`text-[9px] px-1.5 py-0 flex-shrink-0 ${techniek.status === 'Actief' ? 'bg-green-100 text-green-700' : techniek.status === 'Concept' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500'} border-0`}>
+                <Badge className={`text-[9px] px-1.5 py-0 flex-shrink-0 ${techniek.status === 'Actief' ? 'bg-green-500/10 text-green-700 dark:text-green-400' : techniek.status === 'Concept' ? 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400' : 'bg-hh-ui-50 text-hh-muted'} border-0`}>
                   {techniek.status}
                 </Badge>
               </div>
@@ -489,7 +489,7 @@ export function TechniqueLibrary({ navigate, isAdmin }: TechniqueLibraryProps) {
                       }}
                     >
                       <td className="py-3 px-4">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-teal-100 text-teal-600 text-[12px] font-mono font-semibold">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[12px] font-mono font-semibold">
                           {techniek.code}
                         </span>
                       </td>

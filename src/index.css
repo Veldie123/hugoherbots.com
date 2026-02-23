@@ -6366,6 +6366,20 @@ body {
 .dark {
   --hh-bg: #0b0f19;
   --hh-text: #f7f9fc;
+  --hh-ink: #e2e8f0;
+  --hh-muted: #8b95a5;
+  --hh-border: #2a3142;
+  --hh-ui-50: #111827;
+  --hh-ui-100: #1a1f2e;
+  --hh-ui-200: #2a3142;
+  --hh-ui-300: #3b4559;
+  --hh-ui-400: #6b7a92;
+  --hh-ui-500: #8b95a5;
+  --hh-platinum: #2a3142;
+  --hh-french-gray: #8b95a5;
+  --hh-slate-50: #111827;
+  --hh-slate-100: #1a1f2e;
+  --hh-slate-200: #2a3142;
   --background: var(--hh-bg);
   --foreground: var(--hh-text);
   --card: #1a1f2e;
@@ -6384,6 +6398,7 @@ body {
   --destructive-foreground: #fff;
   --border: #2a3142;
   --input: #1a1f2e;
+  --input-background: #111827;
   --ring: var(--hh-primary);
   --font-weight-medium: 600;
   --font-weight-semibold: 600;

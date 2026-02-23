@@ -956,7 +956,7 @@ export function AnalysisResults({
                   <span className="text-hh-muted" style={{ fontSize: '12px' }}>
                     Top <span className="font-bold" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }}>{100 - percentileData.percentile > 0 ? 100 - percentileData.percentile : 1}%</span>
                   </span>
-                  <div className="flex items-center rounded-lg overflow-hidden border" style={{ borderColor: '#E2E8F0' }}>
+                  <div className="flex items-center rounded-lg overflow-hidden border" style={{ borderColor: 'var(--hh-border)' }}>
                     {(['week', 'month', 'year', 'all'] as const).map((p, idx) => (
                       <button
                         key={p}
@@ -965,10 +965,10 @@ export function AnalysisResults({
                         style={{
                           fontSize: '11px',
                           padding: '4px 10px',
-                          backgroundColor: percentilePeriod === p ? (adminColors ? '#9910FA' : '#3C9A6E') : 'white',
-                          color: percentilePeriod === p ? '#FFFFFF' : '#64748B',
+                          backgroundColor: percentilePeriod === p ? (adminColors ? '#9910FA' : '#3C9A6E') : 'var(--card)',
+                          color: percentilePeriod === p ? '#FFFFFF' : 'var(--hh-muted)',
                           fontWeight: percentilePeriod === p ? 600 : 500,
-                          borderRight: idx < 3 ? '1px solid #E2E8F0' : 'none',
+                          borderRight: idx < 3 ? '1px solid var(--hh-border)' : 'none',
                         }}
                       >
                         {p === 'week' ? '7d' : p === 'month' ? '30d' : p === 'year' ? '1j' : 'alles'}
@@ -1017,7 +1017,7 @@ export function AnalysisResults({
             return (
               <div className="space-y-4 mb-8 sm:mb-10">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="rounded-2xl p-4 sm:p-5 relative group flex flex-col justify-center" style={{ backgroundColor: '#FAFBFC', border: '1px solid #E2E8F0' }}>
+                  <div className="rounded-2xl p-4 sm:p-5 relative group flex flex-col justify-center" style={{ backgroundColor: 'var(--hh-ui-50)', border: '1px solid var(--hh-border)' }}>
                     {useAdminLayout && editingDebrief ? (
                       <div className="space-y-2">
                         <textarea
@@ -1105,11 +1105,11 @@ export function AnalysisResults({
                           </button>
 
                           {isExpanded && (
-                            <div className="mt-2 rounded-2xl bg-white border border-gray-200 p-4 space-y-3 shadow-sm" style={{ borderTop: `3px solid ${config.color}30` }}>
+                            <div className="mt-2 rounded-2xl bg-card border border-hh-border p-4 space-y-3 shadow-sm" style={{ borderTop: `3px solid ${config.color}30` }}>
                               <p className="text-[13px] leading-[20px] text-hh-text/75" style={{ overflowWrap: 'break-word' }}>{moment.whyItMatters}</p>
 
                               {(moment.sellerText || moment.customerText) && (
-                                <div className="rounded-xl bg-gray-50 p-3 space-y-2">
+                                <div className="rounded-xl bg-hh-ui-50 p-3 space-y-2">
                                   {moment.customerText && (
                                     <div className="flex justify-start">
                                       <div style={{ maxWidth: '80%' }}>
@@ -1169,7 +1169,7 @@ export function AnalysisResults({
                                 </div>
                               )}
 
-                              <div className="pt-2 border-t border-gray-100 flex flex-wrap gap-2">
+                              <div className="pt-2 border-t border-hh-border flex flex-wrap gap-2">
                                 {moment.type !== 'big_win' && (
                                   <button
                                     className="inline-flex items-center gap-1.5 text-[12px] h-8 px-4 text-white rounded-lg font-medium transition-all"
@@ -1184,7 +1184,7 @@ export function AnalysisResults({
                               </div>
 
                               {useAdminLayout && (
-                                <div className="pt-2 border-t border-gray-100">
+                                <div className="pt-2 border-t border-hh-border">
                                   {editingMomentId === moment.id ? (
                                     <div className="space-y-2">
                                       <div>
@@ -1547,7 +1547,7 @@ export function AnalysisResults({
               return (
                 <div key={drilldownKey}>
                   <div
-                    className={`flex items-start gap-2 sm:gap-3 py-2.5 ${isClickable ? 'cursor-pointer hover:bg-gray-50 -mx-3 px-3 sm:-mx-4 sm:px-4 rounded-lg transition-colors' : ''}`}
+                    className={`flex items-start gap-2 sm:gap-3 py-2.5 ${isClickable ? 'cursor-pointer hover:bg-hh-ui-50 -mx-3 px-3 sm:-mx-4 sm:px-4 rounded-lg transition-colors' : ''}`}
                     onClick={isClickable ? () => setExpandedDetailDrilldown(isDrilldownOpen ? null : drilldownKey) : undefined}
                   >
                     <div className="flex-shrink-0 mt-0.5">
@@ -1570,7 +1570,7 @@ export function AnalysisResults({
                       {detail.sub && (
                         <p className="text-[10px] sm:text-[11px] text-hh-muted leading-[14px] sm:leading-[16px]">{detail.sub}</p>
                       )}
-                      <div className="mt-1.5 h-1 rounded-full bg-gray-100 overflow-hidden">
+                      <div className="mt-1.5 h-1 rounded-full bg-hh-ui-100 overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-500" style={{
                           width: `${detail.score}%`,
                           backgroundColor: detail.score >= 70 ? '#22C55E' : detail.score >= 30 ? '#F59E0B' : '#EF4444'
@@ -1586,8 +1586,8 @@ export function AnalysisResults({
 
                   {isDrilldownOpen && hasChecklist && (
                     <div className="ml-2 sm:ml-4 mb-3 mt-2">
-                      <div className="rounded-xl border overflow-hidden" style={{ borderColor: '#E2E8F0' }}>
-                        <div className="divide-y" style={{ borderColor: '#F1F5F9' }}>
+                      <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--hh-border)' }}>
+                        <div className="divide-y" style={{ borderColor: 'var(--hh-ui-100)' }}>
                           {detail.checklistItems.map((item: any, cIdx: number) => (
                             <div key={cIdx} className="flex items-center gap-2.5 px-3 py-2" style={{ backgroundColor: item.found ? '#F0FDF4' : '#FEF2F2' }}>
                               {item.found ? (
@@ -1634,7 +1634,7 @@ export function AnalysisResults({
                                   : (detail.kind === 'recognition' ? 'Gemist' : 'Niet behandeld')
                                 }
                               </span>
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ backgroundColor: '#F1F5F9', color: '#64748B' }}>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ backgroundColor: 'var(--hh-ui-100)', color: 'var(--hh-muted)' }}>
                                 {match.houding || match.type || ''}
                               </span>
                               {matchTurn && (
@@ -1644,7 +1644,7 @@ export function AnalysisResults({
                               )}
                             </div>
 
-                            <div className="px-3 py-2 space-y-2" style={{ backgroundColor: '#FAFBFC' }}>
+                            <div className="px-3 py-2 space-y-2" style={{ backgroundColor: 'var(--hh-ui-50)' }}>
                               {contextTurns.map((ct: any) => {
                                 const isHighlighted = ct.idx === match.turnIdx;
                                 const isSeller = ct.speaker === 'seller';
@@ -1652,10 +1652,10 @@ export function AnalysisResults({
                                   <div key={ct.idx} className={`flex ${isSeller ? 'justify-end' : 'justify-start'}`}>
                                     <div className="max-w-[85%]">
                                       <div className={`flex items-center gap-1.5 mb-0.5 ${isSeller ? 'justify-end' : ''}`}>
-                                        <span className="text-[10px] font-medium" style={{ color: '#94A3B8' }}>
+                                        <span className="text-[10px] font-medium" style={{ color: 'var(--hh-muted)' }}>
                                           {isSeller ? 'Jij' : 'Klant'}
                                         </span>
-                                        <span className="text-[9px]" style={{ color: '#CBD5E1' }}>
+                                        <span className="text-[9px]" style={{ color: 'var(--hh-ui-300)' }}>
                                           {formatTime(ct.startMs)}
                                         </span>
                                       </div>
@@ -1665,11 +1665,11 @@ export function AnalysisResults({
                                           borderRadius: isSeller ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
                                           backgroundColor: isHighlighted
                                             ? (statusOk ? '#DCFCE7' : '#FEE2E2')
-                                            : (isSeller ? (adminColors ? '#F3E8FF' : '#F1F5F9') : '#FFFFFF'),
+                                            : (isSeller ? (adminColors ? '#F3E8FF' : 'var(--hh-ui-100)') : 'var(--card)'),
                                           border: isHighlighted
                                             ? `1.5px solid ${statusOk ? '#86EFAC' : '#FCA5A5'}`
-                                            : '1px solid #E2E8F0',
-                                          color: '#1E293B',
+                                            : '1px solid var(--hh-border)',
+                                          color: 'var(--hh-ink)',
                                         }}
                                       >
                                         {ct.text.length > 250 ? ct.text.substring(0, 250) + '…' : ct.text}
@@ -1681,7 +1681,7 @@ export function AnalysisResults({
                             </div>
 
                             {((!statusOk && match.recommendedTechniques?.length > 0) || (statusOk && match.actualTechniques?.length > 0)) && (
-                              <div className="px-3 py-2 flex flex-wrap gap-1 items-center" style={{ backgroundColor: '#F8FAFC', borderTop: '1px solid #F1F5F9' }}>
+                              <div className="px-3 py-2 flex flex-wrap gap-1 items-center" style={{ backgroundColor: 'var(--hh-ui-50)', borderTop: '1px solid var(--hh-ui-100)' }}>
                                 <span className="text-[10px] text-hh-muted">{statusOk ? 'Toegepast:' : 'Aanbevolen:'}</span>
                                 {(statusOk ? match.actualTechniques : match.recommendedTechniques)?.map((tech: string, tIdx: number) => (
                                   <span key={tIdx} className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{
@@ -1728,8 +1728,8 @@ export function AnalysisResults({
                           onClick={() => setExpandedMetricCategory(isExpanded ? null : `phase-${pd.phase}`)}
                           className="text-left rounded-2xl p-4 sm:p-5 transition-all group cursor-pointer"
                           style={{
-                            backgroundColor: '#FAFBFC',
-                            border: isExpanded ? `2px solid ${pd.color}30` : '2px solid #F1F5F9',
+                            backgroundColor: 'var(--hh-ui-50)',
+                            border: isExpanded ? `2px solid ${pd.color}30` : '2px solid var(--hh-ui-100)',
                           }}
                           onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)'; }}
@@ -1744,7 +1744,7 @@ export function AnalysisResults({
                               <ChevronRight className={`w-4 h-4 text-hh-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                             </div>
                           </div>
-                          <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+                          <div className="h-2 rounded-full bg-hh-ui-100 overflow-hidden">
                             <div className="h-full rounded-full transition-all duration-700" style={{
                               width: `${pd.score}%`,
                               backgroundColor: pd.score >= 60 ? pd.color : pd.score >= 30 ? '#F59E0B' : '#EF4444'
@@ -1753,13 +1753,13 @@ export function AnalysisResults({
                         </button>
 
                         {isExpanded && (
-                          <div className="mt-2 rounded-2xl bg-white border border-gray-200 p-3 sm:p-4 space-y-0 shadow-sm">
+                          <div className="mt-2 rounded-2xl bg-card border border-hh-border p-3 sm:p-4 space-y-0 shadow-sm">
                             {pd.details.map((detail: any, dIdx: number) => (
-                              <div key={dIdx} style={dIdx < pd.details.length - 1 ? { borderBottom: '1px solid #F1F5F9' } : {}}>
+                              <div key={dIdx} style={dIdx < pd.details.length - 1 ? { borderBottom: '1px solid var(--hh-ui-100)' } : {}}>
                                 {renderDetailDrilldown(detail, `phase-${pd.phase}-${dIdx}`, pd.color)}
                               </div>
                             ))}
-                            <div className="pt-3 mt-2 border-t border-gray-100">
+                            <div className="pt-3 mt-2 border-t border-hh-border">
                               <button
                                 className="inline-flex items-center gap-1.5 text-[12px] h-8 px-4 text-white rounded-lg font-medium transition-all"
                                 style={{ backgroundColor: accentColor }}
@@ -1794,8 +1794,8 @@ export function AnalysisResults({
                           onClick={() => setExpandedMetricCategory(isExpanded ? null : cat.key)}
                           className="text-left rounded-2xl p-3 sm:p-5 transition-all group cursor-pointer"
                           style={{
-                            backgroundColor: '#FAFBFC',
-                            border: isExpanded ? `2px solid ${cat.color}30` : '2px solid #F1F5F9',
+                            backgroundColor: 'var(--hh-ui-50)',
+                            border: isExpanded ? `2px solid ${cat.color}30` : '2px solid var(--hh-ui-100)',
                           }}
                           onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)'; }}
@@ -1815,7 +1815,7 @@ export function AnalysisResults({
                               <ChevronRight className={`w-4 h-4 text-hh-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                             </div>
                           </div>
-                          <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                          <div className="h-1.5 rounded-full bg-hh-ui-100 overflow-hidden">
                             <div className="h-full rounded-full transition-all duration-700" style={{
                               width: `${cat.score}%`,
                               backgroundColor: cat.score >= 60 ? cat.color : cat.score >= 30 ? '#F59E0B' : '#EF4444'
@@ -1824,9 +1824,9 @@ export function AnalysisResults({
                         </button>
 
                         {isExpanded && (
-                          <div className="mt-2 rounded-2xl bg-white border border-gray-200 p-3 sm:p-4 space-y-0 shadow-sm">
+                          <div className="mt-2 rounded-2xl bg-card border border-hh-border p-3 sm:p-4 space-y-0 shadow-sm">
                             {cat.details.map((detail: any, dIdx: number) => (
-                              <div key={dIdx} style={dIdx < cat.details.length - 1 ? { borderBottom: '1px solid #F1F5F9' } : {}}>
+                              <div key={dIdx} style={dIdx < cat.details.length - 1 ? { borderBottom: '1px solid var(--hh-ui-100)' } : {}}>
                                 {renderDetailDrilldown(detail, `${cat.key}-${dIdx}`, cat.color)}
                               </div>
                             ))}
@@ -1922,9 +1922,9 @@ export function AnalysisResults({
                                             setFeedbackConfirmed(prev => { const next = new Set(prev); next.add(badgeKey); return next; });
                                           }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
-                                          style={{ color: '#94A3B8' }}
-                                          onMouseEnter={(e) => { e.currentTarget.style.color = '#22C55E'; e.currentTarget.style.backgroundColor = '#F0FDF4'; }}
-                                          onMouseLeave={(e) => { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                                          style={{ color: 'var(--hh-muted)' }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.color = '#22C55E'; e.currentTarget.style.backgroundColor = 'rgba(34,197,94,0.08)'; }}
+                                          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--hh-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
                                           title="Klopt"
                                         >
                                           <ThumbsUp className="w-3 h-3" />
@@ -1932,9 +1932,9 @@ export function AnalysisResults({
                                         <button
                                           onClick={() => { setFeedbackOpen(isFeedbackPanelOpen ? null : badgeKey); setFeedbackText(''); }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
-                                          style={{ color: isFeedbackPanelOpen ? '#EF4444' : '#94A3B8' }}
-                                          onMouseEnter={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.backgroundColor = '#FEF2F2'; } }}
-                                          onMouseLeave={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.backgroundColor = 'transparent'; } }}
+                                          style={{ color: isFeedbackPanelOpen ? '#EF4444' : 'var(--hh-muted)' }}
+                                          onMouseEnter={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)'; } }}
+                                          onMouseLeave={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = 'var(--hh-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; } }}
                                           title="Klopt niet"
                                         >
                                           <ThumbsDown className="w-3 h-3" />
@@ -1965,9 +1965,9 @@ export function AnalysisResults({
                                             setFeedbackConfirmed(prev => { const next = new Set(prev); next.add(badgeKey); return next; });
                                           }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
-                                          style={{ color: '#94A3B8' }}
-                                          onMouseEnter={(e) => { e.currentTarget.style.color = '#22C55E'; e.currentTarget.style.backgroundColor = '#F0FDF4'; }}
-                                          onMouseLeave={(e) => { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                                          style={{ color: 'var(--hh-muted)' }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.color = '#22C55E'; e.currentTarget.style.backgroundColor = 'rgba(34,197,94,0.08)'; }}
+                                          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--hh-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
                                           title="Klopt"
                                         >
                                           <ThumbsUp className="w-3 h-3" />
@@ -1975,9 +1975,9 @@ export function AnalysisResults({
                                         <button
                                           onClick={() => { setFeedbackOpen(isFeedbackPanelOpen ? null : badgeKey); setFeedbackText(''); }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
-                                          style={{ color: isFeedbackPanelOpen ? '#EF4444' : '#94A3B8' }}
-                                          onMouseEnter={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.backgroundColor = '#FEF2F2'; } }}
-                                          onMouseLeave={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.backgroundColor = 'transparent'; } }}
+                                          style={{ color: isFeedbackPanelOpen ? '#EF4444' : 'var(--hh-muted)' }}
+                                          onMouseEnter={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)'; } }}
+                                          onMouseLeave={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = 'var(--hh-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; } }}
                                           title="Klopt niet"
                                         >
                                           <ThumbsDown className="w-3 h-3" />
@@ -2000,8 +2000,8 @@ export function AnalysisResults({
                                     value={feedbackText}
                                     onChange={(e) => setFeedbackText(e.target.value)}
                                     placeholder="Typ correctie of selecteer techniek..."
-                                    className="flex-1 text-[11px] px-2 py-1.5 rounded border bg-white min-w-0"
-                                    style={{ borderColor: '#E5E7EB' }}
+                                    className="flex-1 text-[11px] px-2 py-1.5 rounded border bg-card min-w-0"
+                                    style={{ borderColor: 'var(--hh-border)' }}
                                     onKeyDown={(e) => {
                                       if (e.key === 'Enter' && feedbackText.trim()) {
                                         const isSignal = feedbackOpen.startsWith('signal-');
@@ -2049,7 +2049,7 @@ export function AnalysisResults({
                                   <button
                                     onClick={() => { setFeedbackOpen(null); setFeedbackText(''); }}
                                     className="flex-shrink-0 w-7 h-7 rounded flex items-center justify-center"
-                                    style={{ backgroundColor: '#F1F5F9', color: '#64748B' }}
+                                    style={{ backgroundColor: 'var(--hh-ui-100)', color: 'var(--hh-muted)' }}
                                     title="Annuleren"
                                   >
                                     <X className="w-3.5 h-3.5" />
@@ -2137,8 +2137,8 @@ export function AnalysisResults({
                                     onClick={() => setCorrectionType('technique')}
                                     className="text-[11px] px-3 py-1.5 rounded-lg font-medium transition-colors"
                                     style={{
-                                      backgroundColor: correctionType === 'technique' ? '#9910FA' : '#F1F5F9',
-                                      color: correctionType === 'technique' ? 'white' : '#64748B',
+                                      backgroundColor: correctionType === 'technique' ? '#9910FA' : 'var(--hh-ui-100)',
+                                      color: correctionType === 'technique' ? 'white' : 'var(--hh-muted)',
                                     }}
                                   >
                                     Techniek
@@ -2147,8 +2147,8 @@ export function AnalysisResults({
                                     onClick={() => setCorrectionType('houding')}
                                     className="text-[11px] px-3 py-1.5 rounded-lg font-medium transition-colors"
                                     style={{
-                                      backgroundColor: correctionType === 'houding' ? '#9910FA' : '#F1F5F9',
-                                      color: correctionType === 'houding' ? 'white' : '#64748B',
+                                      backgroundColor: correctionType === 'houding' ? '#9910FA' : 'var(--hh-ui-100)',
+                                      color: correctionType === 'houding' ? 'white' : 'var(--hh-muted)',
                                     }}
                                   >
                                     Houding
@@ -2158,7 +2158,7 @@ export function AnalysisResults({
                                   <select
                                     value={correctionValue}
                                     onChange={(e) => setCorrectionValue(e.target.value)}
-                                    className="w-full text-[12px] px-2.5 py-2 rounded-lg border bg-white"
+                                    className="w-full text-[12px] px-2.5 py-2 rounded-lg border bg-card"
                                     style={{ borderColor: '#E9D5FF' }}
                                   >
                                     <option value="">
@@ -2191,7 +2191,7 @@ export function AnalysisResults({
                                   value={correctionNote}
                                   onChange={(e) => setCorrectionNote(e.target.value)}
                                   placeholder="Optionele toelichting..."
-                                  className="w-full text-[11px] px-2.5 py-1.5 rounded-lg border bg-white mb-2"
+                                  className="w-full text-[11px] px-2.5 py-1.5 rounded-lg border bg-card mb-2"
                                   style={{ borderColor: '#E9D5FF' }}
                                 />
                                 <div className="flex gap-2">
@@ -2206,7 +2206,7 @@ export function AnalysisResults({
                                   <button
                                     onClick={() => { setCorrectionPanelTurn(null); setCorrectionValue(''); setCorrectionNote(''); }}
                                     className="text-[11px] px-3 py-1.5 rounded-lg font-medium transition-colors"
-                                    style={{ backgroundColor: '#F1F5F9', color: '#64748B' }}
+                                    style={{ backgroundColor: 'var(--hh-ui-100)', color: 'var(--hh-muted)' }}
                                   >
                                     Annuleren
                                   </button>

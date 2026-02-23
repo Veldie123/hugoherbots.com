@@ -323,8 +323,8 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
 
         {/* Error State */}
         {error && (
-          <Card className="p-4 rounded-[16px] border-red-200 bg-red-50">
-            <div className="flex items-center gap-3 text-red-700">
+          <Card className="p-4 rounded-[16px] border-red-500/30 bg-red-500/10">
+            <div className="flex items-center gap-3 text-red-500">
               <AlertTriangle className="w-5 h-5" />
               <p className="text-[14px]">{error}</p>
               <Button variant="outline" size="sm" onClick={fetchUploads} className="ml-auto">

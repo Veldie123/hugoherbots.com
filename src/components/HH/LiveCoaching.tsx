@@ -177,7 +177,7 @@ function UserProgressCard({ stats, loading }: { stats: UserProgressStats; loadin
   ];
 
   return (
-    <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden bg-gradient-to-r from-hh-ui-50 to-white">
+    <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden bg-gradient-to-r from-hh-ui-50 to-card">
       <div className="p-5 sm:p-6">
         <h3 className="text-[18px] leading-[24px] sm:text-[20px] sm:leading-[28px] font-semibold text-hh-text mb-4 text-center">
           Jouw Live Coaching Reis
@@ -1276,7 +1276,7 @@ export function LiveCoaching({
                               minHeight: '44px',
                               borderRadius: '8px',
                             } : sessionDay ? {
-                              backgroundColor: '#e8f5ee',
+                              backgroundColor: 'color-mix(in srgb, var(--hh-success) 15%, transparent)',
                               padding: '4px 2px',
                               minHeight: '44px',
                             } : {
@@ -1284,11 +1284,11 @@ export function LiveCoaching({
                               minHeight: '44px',
                             }}
                           >
-                            <span className={sessionDay && !selected ? 'font-semibold text-[#2d7a5e]' : ''} style={todayDay && sessionDay && !selected ? { textDecoration: 'underline', textUnderlineOffset: '2px' } : undefined}>
+                            <span className={sessionDay && !selected ? 'font-semibold text-hh-success' : ''} style={todayDay && sessionDay && !selected ? { textDecoration: 'underline', textUnderlineOffset: '2px' } : undefined}>
                               {day}
                             </span>
                             {sessionDay && (
-                              <span className={`text-[9px] leading-none mt-0.5 font-medium ${selected ? 'text-white/80' : 'text-[#3d9a6e]'}`}>
+                              <span className={`text-[9px] leading-none mt-0.5 font-medium ${selected ? 'text-white/80' : 'text-hh-success'}`}>
                                 {daySessions[0].time}
                               </span>
                             )}
@@ -1342,7 +1342,7 @@ export function LiveCoaching({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 flex-shrink-0 bg-white/90 hover:bg-white shadow-sm"
+                          className="h-8 w-8 flex-shrink-0 bg-card/90 hover:bg-card shadow-sm"
                           onClick={() => toggleReminder(session.id)}
                         >
                           {reminderSessionIds.has(session.id) ? (
@@ -1807,7 +1807,7 @@ export function LiveCoaching({
                             className={`w-5 h-5 ${
                               isFilled
                                 ? "text-yellow-400 fill-yellow-400"
-                                : "text-gray-300"
+                                : "text-hh-muted"
                             }`}
                           />
                         );
@@ -1845,7 +1845,7 @@ export function LiveCoaching({
                               className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
                                 isFilled
                                   ? "text-yellow-400 fill-yellow-400"
-                                  : "text-gray-300"
+                                  : "text-hh-muted"
                               }`}
                             />
                           </button>
@@ -2076,7 +2076,7 @@ export function LiveCoaching({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 bg-white/90 hover:bg-white shadow-sm rounded-full"
+                      className="h-9 w-9 bg-card/90 hover:bg-card shadow-sm rounded-full"
                       onClick={() => toggleReminder(calendarDetailSession.id)}
                     >
                       {hasReminder ? (

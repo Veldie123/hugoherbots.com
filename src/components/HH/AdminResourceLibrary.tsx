@@ -165,7 +165,7 @@ export function AdminResourceLibrary({ navigate }: AdminResourceLibraryProps) {
 
   const getCategoryBadge = (category: string) => {
     return (
-      <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-[11px]">
+      <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[11px]">
         {category}
       </Badge>
     );
@@ -382,7 +382,7 @@ export function AdminResourceLibrary({ navigate }: AdminResourceLibraryProps) {
                   <tr
                     key={resource.id}
                     className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50/50 transition-colors ${
-                      index % 2 === 0 ? "bg-white" : "bg-hh-ui-50/30"
+                      index % 2 === 0 ? "bg-card" : "bg-hh-ui-50/30"
                     }`}
                     onMouseEnter={() => setHoveredRow(resource.id)}
                     onMouseLeave={() => setHoveredRow(null)}
