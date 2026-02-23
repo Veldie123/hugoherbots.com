@@ -7,7 +7,7 @@ async function seedProducts() {
   const products = [
     {
       name: 'Pro',
-      description: 'AI-avatar simulaties, persoonlijk dashboard, video platform met 54 technieken, transcript analyse, exports & rapportages.',
+      description: 'AI coaching, video\'s, transcript analyse.',
       metadata: { tier: 'pro', order: '1' },
       prices: [
         { unit_amount: 9800, currency: 'eur', interval: 'month' as const, metadata: { display: '€98/maand' } },
@@ -16,7 +16,7 @@ async function seedProducts() {
     },
     {
       name: 'Founder',
-      description: 'Alles van Pro + dagelijkse live sessies met Hugo, priority analyse, priority support, Founder community toegang.',
+      description: 'Alles van Pro + live sessies, Founder community.',
       metadata: { tier: 'founder', order: '2' },
       prices: [
         { unit_amount: 49800, currency: 'eur', interval: 'month' as const, metadata: { display: '€498/maand' } },
@@ -25,7 +25,7 @@ async function seedProducts() {
     },
     {
       name: 'Inner Circle',
-      description: 'Alles van Founder + exclusieve 1-op-1 coaching met Hugo, directe lijn, custom scenario\'s, dedicated onboarding.',
+      description: 'Alles van Founder + 1-op-1 coaching, directe lijn, custom scenario\'s.',
       metadata: { tier: 'inner_circle', order: '3' },
       prices: [
         { unit_amount: 249800, currency: 'eur', interval: 'month' as const, metadata: { display: '€2.498/maand' } },
