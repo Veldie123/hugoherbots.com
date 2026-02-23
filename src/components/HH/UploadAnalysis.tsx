@@ -477,7 +477,7 @@ export function UploadAnalysis({
             setAnalysisStatus(null);
             localStorage.removeItem('hh_active_analysis');
           } else if (navigate) {
-            navigate("analysis-results", { conversationId });
+            navigate(isAdmin ? "admin-analysis-results" : "analysis-results", { conversationId });
           }
         } else if (data.status === 'failed') {
           clearInterval(interval);
