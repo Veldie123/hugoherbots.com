@@ -1159,9 +1159,12 @@ export async function generateCoachArtifacts(
   const signalSummaries = signals.map(s => `Turn ${s.turnIdx}: ${s.houding} (${Math.round(s.confidence * 100)}%) [fase ${s.currentPhase}]`).join('\n');
   const missedSummaries = missedOpps.map(m => `Turn ${m.turnIdx}: ${m.type} - ${m.description} | Verkoper: "${m.sellerSaid.substring(0, 100)}" | Klant: "${m.customerSaid.substring(0, 100)}" | Beter: "${m.betterQuestion.substring(0, 100)}"`).join('\n');
 
+  const aiClient = process.env.OPENAI_API_KEY ? openaiDirect : openai;
+  const aiModel = process.env.OPENAI_API_KEY ? 'gpt-4o' : 'gpt-5.1';
+
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-5.1',
+    const response = await aiClient.chat.completions.create({
+      model: aiModel,
       messages: [
         {
           role: 'system',

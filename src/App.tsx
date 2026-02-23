@@ -96,7 +96,16 @@ export default function App() {
   const devPage = getDevPreviewPage();
   const [currentPage, setCurrentPage] = useState<Page | null>(devPage); // Use dev page if set
   const [settingsSection, setSettingsSection] = useState<"profile" | "notifications" | "subscription" | "team" | "danger">("profile");
-  const [navigationData, setNavigationData] = useState<Record<string, any> | undefined>(undefined);
+  const devNavData = (() => {
+    if (devPage === 'analysis-results' || devPage === 'admin-analysis-results') {
+      const params = new URLSearchParams(window.location.search);
+      const cid = params.get('id');
+      if (cid) return { conversationId: cid };
+      return { autoLoadFirst: true };
+    }
+    return undefined;
+  })();
+  const [navigationData, setNavigationData] = useState<Record<string, any> | undefined>(devNavData);
   const [isCheckingAuth, setIsCheckingAuth] = useState(!devPage); // Skip auth check if dev preview
   const [isAdmin, setIsAdmin] = useState(!!devPage); // Track if current user is admin (dev mode = admin)
   const [onboardingMode, setOnboardingMode] = useState(false); // Simplified UI for Hugo's onboarding

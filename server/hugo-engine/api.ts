@@ -111,6 +111,7 @@ import {
   runChatAnalysis,
   getAnalysisStatus,
   getAnalysisResults,
+  generateCoachArtifacts,
   type ConversationAnalysis,
 } from "./v2/analysis-service";
 import multer from "multer";
@@ -3379,6 +3380,66 @@ app.post("/api/v2/analysis/retry/:conversationId", express.json(), async (req: R
   } catch (err: any) {
     console.error("[Analysis] Retry error:", err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/v2/analysis/regenerate-coach/:conversationId", express.json(), async (req: Request, res: Response) => {
+  try {
+    const { conversationId } = req.params;
+    const results = await getAnalysisResults(conversationId);
+    if (!results) {
+      return res.status(404).json({ error: 'Analyse niet gevonden' });
+    }
+
+    const { transcript, evaluations, signals, insights } = results;
+    if (!transcript || transcript.length === 0) {
+      return res.status(400).json({ error: 'Geen transcript beschikbaar' });
+    }
+
+    const { buildSSOTContextForEvaluation } = await import("./v2/ssot-context-builder");
+    const { searchRag } = await import("./v2/rag-service");
+
+    const phaseCoverage = insights.phaseCoverage || { phase1: { score: 0 }, phase2: { overall: { score: 0 }, explore: { score: 0 }, probe: { score: 0 }, impact: { score: 0 }, commit: { score: 0 } }, phase3: { score: 0 }, phase4: { score: 0 }, overall: 0 };
+    const missedOpps = insights.missedOpportunities || [];
+
+    let ssotContext = '';
+    let ragContext = '';
+    try {
+      ssotContext = buildSSOTContextForEvaluation();
+    } catch (e: any) { console.warn('[Regenerate] SSOT context error:', e.message); }
+    try {
+      const ragResults = await searchRag('verkooptechnieken EPIC coaching', 3);
+      if (ragResults.length > 0) {
+        ragContext = '--- RAG CONTEXT ---\n' + ragResults.map((r: any) => r.content?.substring(0, 500)).join('\n\n');
+      }
+    } catch (e: any) { console.warn('[Regenerate] RAG context error:', e.message); }
+
+    console.log(`[Analysis] Regenerating coach artifacts for ${conversationId} (${transcript.length} turns, ${evaluations.length} evals)`);
+
+    const { coachDebrief, moments } = await generateCoachArtifacts(
+      transcript, evaluations, signals, phaseCoverage as any, missedOpps, insights, ssotContext, ragContext
+    );
+
+    insights.coachDebrief = coachDebrief;
+    insights.moments = moments;
+
+    const updatedResult = { ...results, insights };
+
+    await pool.query(
+      'UPDATE conversation_analyses SET result = $1 WHERE id = $2',
+      [JSON.stringify(updatedResult), conversationId]
+    );
+
+    console.log(`[Analysis] Coach artifacts regenerated: ${moments.length} moments for ${conversationId}`);
+
+    res.json({
+      success: true,
+      momentsGenerated: moments.length,
+      oneliner: coachDebrief.oneliner,
+    });
+  } catch (err: any) {
+    console.error("[Analysis] Regenerate coach error:", err);
+    res.status(500).json({ error: err.message || 'Coach artifacts regenereren mislukt' });
   }
 });
 

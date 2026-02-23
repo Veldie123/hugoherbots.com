@@ -43,6 +43,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import MuxPlayer from "@mux/mux-player-react";
 import { getTechniekByNummer, getAllTechnieken, getTechniekenByFase } from "../../data/technieken-service";
+import { useTheme } from "./ThemeProvider";
 
 interface AnalysisResultsProps {
   navigate?: (page: string, data?: any) => void;
@@ -297,6 +298,7 @@ export function AnalysisResults({
   isAdmin = false,
   navigationData,
 }: AnalysisResultsProps) {
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<"coach" | "timeline">(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('tab') === 'timeline' ? 'timeline' : 'coach';
@@ -348,6 +350,8 @@ export function AnalysisResults({
   const [percentileData, setPercentileData] = useState<{ percentile: number; totalAnalyses: number; period: string } | null>(null);
   const [percentilePeriod, setPercentilePeriod] = useState<'all' | 'week' | 'month' | 'year'>('all');
   const [expandedMatchCount, setExpandedMatchCount] = useState<Record<string, number>>({});
+  const [regeneratingCoach, setRegeneratingCoach] = useState(false);
+  const [coachRegenerated, setCoachRegenerated] = useState(false);
 
   const [resolvedConversationId, setResolvedConversationId] = useState<string | null>(
     navigationData?.conversationId || sessionStorage.getItem('analysisId') || null
@@ -619,6 +623,34 @@ export function AnalysisResults({
       .then(data => { if (data) setPercentileData(data); })
       .catch(() => {});
   }, [resolvedConversationId, result, percentilePeriod]);
+
+  useEffect(() => {
+    if (activeTab !== 'coach' || !result || regeneratingCoach || coachRegenerated) return;
+    const moments = result.insights?.moments || [];
+    if (moments.length > 0) return;
+    if (!resolvedConversationId) return;
+    
+    setRegeneratingCoach(true);
+    fetch(`/api/v2/analysis/regenerate-coach/${resolvedConversationId}`, { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          // Refetch the full results to get updated data
+          return fetch(`/api/v2/analysis/results/${resolvedConversationId}`)
+            .then(r => r.json())
+            .then(updatedData => {
+              if (updatedData.insights) {
+                setResult(updatedData);
+              }
+            });
+        }
+      })
+      .catch(err => console.warn('[Coach] Regeneration failed:', err))
+      .finally(() => {
+        setRegeneratingCoach(false);
+        setCoachRegenerated(true);
+      });
+  }, [activeTab, result, resolvedConversationId, regeneratingCoach, coachRegenerated]);
 
   useEffect(() => {
     if (result && (navigationData as any)?.scrollToDetail) {
@@ -1005,19 +1037,45 @@ export function AnalysisResults({
 
         {activeTab === 'coach' && (<div className="max-w-[860px]">
 
+          {regeneratingCoach && (
+            <div className="flex items-center gap-3 p-4 rounded-xl mb-4" style={{ backgroundColor: 'var(--hh-ui-50)', border: '1px solid var(--hh-border)' }}>
+              <Loader2 className="w-5 h-5 animate-spin" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }} />
+              <span className="text-[14px] text-hh-text">AI coaching momenten genereren...</span>
+            </div>
+          )}
+
           {/* SECTION: Coach Summary + Coaching Moments */}
           {(() => {
             const moments = insights.moments || [];
+            const isDark = theme === 'dark';
             const momentConfig: Record<string, { icon: any; color: string; bg: string; iconBg: string; label: string }> = {
-              'big_win': { icon: Trophy, color: '#047857', bg: '#ECFDF5', iconBg: '#D1FAE5', label: 'Big Win' },
-              'quick_fix': { icon: Wrench, color: '#B45309', bg: '#FFFBEB', iconBg: '#FEF3C7', label: 'Quick Fix' },
-              'turning_point': { icon: RotateCcw, color: '#BE123C', bg: '#FFF1F2', iconBg: '#FFE4E6', label: 'Scharnierpunt' },
+              'big_win': { 
+                icon: Trophy, 
+                color: isDark ? '#34D399' : '#047857', 
+                bg: isDark ? '#064E3B' : '#ECFDF5', 
+                iconBg: isDark ? '#065F46' : '#D1FAE5', 
+                label: 'Big Win' 
+              },
+              'quick_fix': { 
+                icon: Wrench, 
+                color: isDark ? '#FBBF24' : '#B45309', 
+                bg: isDark ? '#78350F' : '#FFFBEB', 
+                iconBg: isDark ? '#92400E' : '#FEF3C7', 
+                label: 'Quick Fix' 
+              },
+              'turning_point': { 
+                icon: RotateCcw, 
+                color: isDark ? '#FB7185' : '#BE123C', 
+                bg: isDark ? '#881337' : '#FFF1F2', 
+                iconBg: isDark ? '#9F1239' : '#FFE4E6', 
+                label: 'Scharnierpunt' 
+              },
             };
 
             return (
               <div className="space-y-4 mb-8 sm:mb-10">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="rounded-2xl p-4 sm:p-5 relative group flex flex-col justify-center" style={{ backgroundColor: 'var(--hh-ui-50)', border: '1px solid var(--hh-border)' }}>
+                  <div className="rounded-2xl p-4 sm:p-5 relative group flex flex-col justify-center" style={{ backgroundColor: 'var(--hh-ui-50)', border: '1px solid var(--hh-border)', borderLeft: adminColors ? '3px solid #9910FA' : '3px solid #3C9A6E' }}>
                     {useAdminLayout && editingDebrief ? (
                       <div className="space-y-2">
                         <textarea
