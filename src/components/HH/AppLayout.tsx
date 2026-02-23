@@ -317,19 +317,7 @@ export function AppLayout({
             );
           })}
 
-          {isAdmin && (
-            <div className="mt-1 mb-1">
-              <button
-                onClick={() => navigate?.("admin-uploads")}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-purple-400 dark:border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-700 dark:hover:text-purple-300 transition-colors text-[14px] font-medium"
-              >
-                <Shield className="w-4 h-4 flex-shrink-0" />
-                {!collapsed && <span>Admin View</span>}
-              </button>
-            </div>
-          )}
-
-          <div className="border-t border-hh-border mt-1 pt-1 space-y-0.5">
+          <div className="border-t border-hh-border mt-3 pt-3 space-y-0.5">
             {bottomNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
@@ -354,6 +342,17 @@ export function AppLayout({
               );
             })}
 
+            {isAdmin && (
+              <div className="mt-1">
+                <button
+                  onClick={() => navigate?.("admin-uploads")}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-purple-400 dark:border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-700 dark:hover:text-purple-300 transition-colors text-[14px] font-medium"
+                >
+                  <Shield className="w-4 h-4 flex-shrink-0" />
+                  {!collapsed && <span>Admin View</span>}
+                </button>
+              </div>
+            )}
           </div>
         </nav>
       </div>
@@ -534,7 +533,10 @@ export function AppLayout({
 
             <Button
               onClick={() => navigate?.("talk-to-hugo")}
-              className="gap-2 text-white h-10 px-3 sm:px-4 bg-hh-ui-100 hover:bg-hh-ui-200"
+              className="gap-2 text-white h-10 px-3 sm:px-4 rounded-lg"
+              style={{ backgroundColor: '#1e293b' }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#0f172a')}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#1e293b')}
             >
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline text-[14px]">

@@ -323,9 +323,9 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
             </div>
             <Button 
               className="gap-2 text-white shrink-0 hidden sm:flex"
-              style={{ backgroundColor: isAdmin ? '#7e22ce' : '#059669' }}
-              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#6b21a8' : '#047857')}
-              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#7e22ce' : '#059669')}
+              style={{ backgroundColor: '#059669' }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#047857')}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#059669')}
               onClick={() => navigate?.("upload-analysis")}
             >
               <Upload className="w-4 h-4 text-white" />
@@ -334,9 +334,9 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
           </div>
           <Button 
             className="gap-2 text-white w-full sm:hidden"
-            style={{ backgroundColor: isAdmin ? '#7e22ce' : '#059669' }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#6b21a8' : '#047857')}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#7e22ce' : '#059669')}
+            style={{ backgroundColor: '#059669' }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#047857')}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#059669')}
             onClick={() => navigate?.("upload-analysis")}
           >
             <Upload className="w-4 h-4 text-white" />
@@ -348,16 +348,16 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
         <div className="hidden lg:grid grid-cols-4 gap-4">
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-[#4F7396]/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(79, 115, 150, 0.2)' }}>
                 <FileAudio className="w-5 h-5 text-[#4F7396]" />
               </div>
             </div>
             <p className="text-[13px] leading-[18px] text-hh-muted mb-2">Totaal Analyses</p>
-            <p className="text-[28px] leading-[36px] text-emerald-600">{conversations.length}</p>
+            <p className="text-[28px] leading-[36px] text-[#4F7396]">{conversations.length}</p>
           </Card>
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)' }}>
                 <BarChart2 className="w-5 h-5 text-emerald-500" />
               </div>
             </div>
@@ -366,7 +366,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
           </Card>
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(249, 115, 22, 0.2)' }}>
                 <Clock className="w-5 h-5 text-orange-500" />
               </div>
             </div>
@@ -375,12 +375,12 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
           </Card>
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-sky-500/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(14, 165, 233, 0.2)' }}>
                 <TrendingUp className="w-5 h-5 text-sky-500" />
               </div>
             </div>
             <p className="text-[13px] leading-[18px] text-hh-muted mb-2">Gem. Score</p>
-            <p className="text-[28px] leading-[36px] text-emerald-600">{avgScore}%</p>
+            <p className={`text-[28px] leading-[36px] ${avgScore >= 70 ? 'text-emerald-600' : avgScore >= 40 ? 'text-orange-500' : 'text-red-500'}`}>{avgScore}%</p>
           </Card>
         </div>
         {/* Mobile: compact horizontal stat strip */}
@@ -440,7 +440,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode("list")}
-                  style={viewMode === "list" ? { backgroundColor: isAdmin ? '#7e22ce' : '#059669', color: 'white' } : {}}
+                  style={viewMode === "list" ? { backgroundColor: '#059669', color: 'white' } : {}}
                   className={`hidden md:flex ${viewMode !== "list" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}`}
                 >
                   <List className="w-4 h-4 text-current" />
@@ -449,7 +449,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode("grid")}
-                  style={viewMode === "grid" ? { backgroundColor: isAdmin ? '#7e22ce' : '#059669', color: 'white' } : {}}
+                  style={viewMode === "grid" ? { backgroundColor: '#059669', color: 'white' } : {}}
                   className={`hidden md:flex ${viewMode !== "grid" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}`}
                 >
                   <LayoutGrid className="w-4 h-4 text-current" />
@@ -488,9 +488,9 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
               <p className="text-[14px] text-hh-muted mb-4">Upload een gesprek om je eerste analyse te starten</p>
               <Button 
                 className="gap-2 text-white"
-                style={{ backgroundColor: isAdmin ? '#7e22ce' : '#059669' }}
-                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#6b21a8' : '#047857')}
-                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = isAdmin ? '#7e22ce' : '#059669')}
+                style={{ backgroundColor: '#059669' }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#047857')}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#059669')}
                 onClick={() => navigate?.("upload-analysis")}
               >
                 <Upload className="w-4 h-4 text-white" />
@@ -642,7 +642,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                             </DropdownMenuItem>
                             {conv.status === 'failed' && (
                               <DropdownMenuItem onClick={() => retryAnalysis(conv.id)}>
-                                <RotateCcw className="w-4 h-4 mr-2" style={{ color: isAdmin ? '#7e22ce' : '#059669' }} />
+                                <RotateCcw className="w-4 h-4 mr-2" style={{ color: '#059669' }} />
                                 Opnieuw proberen
                               </DropdownMenuItem>
                             )}
@@ -696,7 +696,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                         </DropdownMenuItem>
                         {conv.status === 'failed' && (
                           <DropdownMenuItem onClick={() => retryAnalysis(conv.id)}>
-                            <RotateCcw className="w-4 h-4 mr-2" style={{ color: isAdmin ? '#7e22ce' : '#059669' }} />
+                            <RotateCcw className="w-4 h-4 mr-2" style={{ color: '#059669' }} />
                             Opnieuw proberen
                           </DropdownMenuItem>
                         )}
@@ -759,7 +759,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                         </DropdownMenuItem>
                         {conv.status === 'failed' && (
                           <DropdownMenuItem onClick={() => retryAnalysis(conv.id)}>
-                            <RotateCcw className="w-4 h-4 mr-2" style={{ color: isAdmin ? '#7e22ce' : '#059669' }} />
+                            <RotateCcw className="w-4 h-4 mr-2" style={{ color: '#059669' }} />
                             Opnieuw proberen
                           </DropdownMenuItem>
                         )}
