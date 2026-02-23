@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  Download,
   ChevronRight,
   ChevronDown,
   ThumbsUp,
@@ -348,6 +347,7 @@ export function AnalysisResults({
   const [correctionSubmitting, setCorrectionSubmitting] = useState(false);
   const [percentileData, setPercentileData] = useState<{ percentile: number; totalAnalyses: number; period: string } | null>(null);
   const [percentilePeriod, setPercentilePeriod] = useState<'all' | 'week' | 'month' | 'year'>('all');
+  const [expandedMatchCount, setExpandedMatchCount] = useState<Record<string, number>>({});
 
   const [resolvedConversationId, setResolvedConversationId] = useState<string | null>(
     navigationData?.conversationId || sessionStorage.getItem('analysisId') || null
@@ -764,143 +764,6 @@ export function AnalysisResults({
     setActionLoading(null);
   };
 
-  const handleExportPDF = async () => {
-    if (!result) return;
-    const { jsPDF } = await import('jspdf');
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageW = doc.internal.pageSize.getWidth();
-    const margin = 15;
-    const maxW = pageW - 2 * margin;
-    let y = 20;
-
-    const checkPage = (needed: number) => {
-      if (y + needed > 275) {
-        doc.addPage();
-        y = 20;
-      }
-    };
-
-    const addWrappedText = (text: string, fontSize: number, isBold = false, color: [number, number, number] = [30, 30, 30]) => {
-      doc.setFontSize(fontSize);
-      doc.setFont('helvetica', isBold ? 'bold' : 'normal');
-      doc.setTextColor(...color);
-      const lines = doc.splitTextToSize(text, maxW);
-      const lineH = fontSize * 0.5;
-      for (const line of lines) {
-        checkPage(lineH);
-        doc.text(line, margin, y);
-        y += lineH;
-      }
-    };
-
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(15, 23, 42);
-    doc.text('HUGO HERBOTS', margin, y);
-    y += 6;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 116, 139);
-    doc.text('E.P.I.C. Sales Analyse Rapport', margin, y);
-    y += 12;
-
-    addWrappedText(result.conversation.title || 'Gespreksanalyse', 16, true);
-    y += 2;
-    addWrappedText(`Datum: ${new Date(result.conversation.createdAt).toLocaleDateString('nl-BE')}`, 10, false, [100, 116, 139]);
-    y += 8;
-
-    doc.setDrawColor(200, 200, 200);
-    doc.line(margin, y, pageW - margin, y);
-    y += 8;
-
-    const coverage = result.insights.phaseCoverage;
-    const overallScore = result.insights.overallScore;
-
-    addWrappedText('Fase Scores', 14, true);
-    y += 2;
-    addWrappedText(`Totaalscore: ${overallScore}/100`, 12, true, overallScore >= 70 ? [34, 197, 94] : overallScore >= 50 ? [245, 158, 11] : [239, 68, 68]);
-    y += 4;
-
-    const phases = [
-      { name: 'Fase 1: Opening', score: coverage?.phase1?.score ?? 0 },
-      { name: 'Fase 2: EPIC (Ontdekking)', score: coverage?.phase2?.overall?.score ?? 0 },
-      { name: 'Fase 3: Aanbeveling', score: coverage?.phase3?.score ?? 0 },
-      { name: 'Fase 4: Beslissing', score: coverage?.phase4?.score ?? 0 },
-    ];
-    for (const phase of phases) {
-      addWrappedText(`${phase.name}: ${phase.score}%`, 10, false);
-      y += 1;
-    }
-
-    if (coverage?.phase2) {
-      y += 2;
-      addWrappedText(`  E: ${coverage.phase2.explore?.score ?? 0}%  P: ${coverage.phase2.probe?.score ?? 0}%  I: ${coverage.phase2.impact?.score ?? 0}%  C: ${coverage.phase2.commit?.score ?? 0}%`, 9, false, [100, 116, 139]);
-    }
-    y += 6;
-
-    addWrappedText('Sterke Punten', 14, true, [34, 197, 94]);
-    y += 2;
-    for (const s of result.insights.strengths) {
-      checkPage(15);
-      addWrappedText(`+ ${s.text}`, 10, false);
-      if (s.quote) {
-        addWrappedText(`  "${s.quote}"`, 9, false, [100, 116, 139]);
-      }
-      y += 2;
-    }
-    y += 4;
-
-    addWrappedText('Verbeterpunten', 14, true, [239, 68, 68]);
-    y += 2;
-    for (const imp of result.insights.improvements) {
-      checkPage(15);
-      addWrappedText(`- ${imp.text}`, 10, false);
-      if (imp.betterApproach) {
-        addWrappedText(`  Tip: ${imp.betterApproach}`, 9, false, [100, 116, 139]);
-      }
-      y += 2;
-    }
-    y += 4;
-
-    if (result.insights.missedOpportunities && result.insights.missedOpportunities.length > 0) {
-      addWrappedText('Gemiste Kansen', 14, true, [245, 158, 11]);
-      y += 2;
-      for (const opp of result.insights.missedOpportunities) {
-        checkPage(20);
-        addWrappedText(`${opp.type} - ${opp.description}`, 10, true);
-        addWrappedText(`Beter alternatief: "${opp.betterQuestion}"`, 9, false, [100, 116, 139]);
-        y += 3;
-      }
-      y += 4;
-    }
-
-    if (result.insights.microExperiments && result.insights.microExperiments.length > 0) {
-      addWrappedText('Micro-experimenten', 14, true, [59, 130, 246]);
-      y += 2;
-      for (const exp of result.insights.microExperiments) {
-        checkPage(15);
-        addWrappedText(`- ${exp}`, 10, false);
-        y += 3;
-      }
-      y += 4;
-    }
-
-    addWrappedText('Transcript Samenvatting', 14, true);
-    y += 2;
-    const sellerTurns = result.transcript.filter(t => t.speaker === 'seller').length;
-    const customerTurns = result.transcript.filter(t => t.speaker === 'customer').length;
-    addWrappedText(`${result.transcript.length} beurten totaal (Verkoper: ${sellerTurns}, Klant: ${customerTurns})`, 10, false, [100, 116, 139]);
-    y += 6;
-
-    checkPage(10);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(150, 150, 150);
-    doc.text('Gegenereerd door Hugo Herbots AI Sales Coach - hugoherbots.ai', margin, 285);
-
-    doc.save(`${result.conversation.title || 'analyse'}-rapport.pdf`);
-  };
-
   const useAdminLayout = !!navigationData?.fromAdmin;
   const adminColors = useAdminLayout;
   const fromHugo = !useAdminLayout && sessionStorage.getItem('analysisFromHugo') === 'true';
@@ -953,25 +816,25 @@ export function AnalysisResults({
     const accentBgLight = adminColors ? 'rgba(153,16,250,0.08)' : 'rgba(60,154,110,0.08)';
     const accentBorder = adminColors ? 'rgba(153,16,250,0.2)' : 'rgba(60,154,110,0.2)';
     return wrapLayout(
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 5rem)', padding: '3rem 1rem' }}>
-        <div className="text-center max-w-lg">
-          <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: accentBg }}>
-            <MessageSquare className="w-10 h-10" style={{ color: accentColor }} />
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+        <div className="text-center space-y-6 max-w-md">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ backgroundColor: accentBg }}>
+            <MessageSquare className="w-8 h-8" style={{ color: accentColor }} />
           </div>
-          <h2 className="text-2xl font-bold text-hh-text mb-3">Oefen verder!</h2>
-          <p className="text-hh-muted text-[15px] leading-relaxed mb-8 max-w-sm mx-auto">
+          <h2 className="text-xl font-bold text-hh-text">Oefen verder!</h2>
+          <p className="text-hh-muted text-sm leading-relaxed">
             {insights.summaryMarkdown}
           </p>
-          <div className="rounded-xl p-5 mb-8 text-left" style={{ backgroundColor: accentBgLight, border: `1px solid ${accentBorder}` }}>
-            <p className="text-sm font-semibold text-hh-text mb-1.5">Tip:</p>
-            <p className="text-sm text-hh-muted leading-relaxed">{insights.microExperiments?.[0] || 'Oefen een volledig verkoopgesprek met Hugo — begin bij de opening en werk door naar een commitment.'}</p>
+          <div className="rounded-xl p-4" style={{ backgroundColor: accentBgLight, border: `1px solid ${accentBorder}` }}>
+            <p className="text-sm font-medium text-hh-text mb-2">Tip:</p>
+            <p className="text-sm text-hh-muted">{insights.microExperiments?.[0] || 'Probeer een volledig gesprek te voeren met Hugo.'}</p>
           </div>
           <Button
             onClick={() => {
               sessionStorage.removeItem('analysisFromHugo');
               navigate?.(fromHugo ? 'talk-to-hugo' : 'upload-analysis');
             }}
-            className="text-white px-8 h-11 text-[15px]"
+            className="text-white"
             style={{ backgroundColor: accentColor }}
           >
             {fromHugo ? 'Verder oefenen met Hugo' : 'Terug naar uploads'}
@@ -1043,29 +906,78 @@ export function AnalysisResults({
               {fromHugo ? '← Terug naar Talk to Hugo' : '← Terug naar analyses'}
             </Button>
           </div>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-[28px] leading-[36px] sm:text-[32px] sm:leading-[40px]">
+          <div className="flex items-center justify-between gap-6 sm:gap-8">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-[26px] leading-[32px] sm:text-[30px] sm:leading-[38px] font-semibold text-hh-text tracking-tight">
                 {conversation.title}
               </h1>
-              <p className="text-[13px] text-hh-muted mt-1 flex items-center gap-1.5 flex-wrap">
-                <span>{new Date(conversation.createdAt).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+              <p className="text-[13px] text-hh-muted mt-2 flex items-center gap-2 flex-wrap">
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {new Date(conversation.createdAt).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
                 <span className="text-hh-border">·</span>
-                <span>{transcript.length} turns</span>
+                <span className="flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  {transcript.length} turns
+                </span>
                 {transcript.length > 0 && (
                   <>
                     <span className="text-hh-border">·</span>
-                    <span>{formatTime(transcript[transcript.length - 1].endMs)}</span>
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5" />
+                      {formatTime(transcript[transcript.length - 1].endMs)}
+                    </span>
                   </>
                 )}
-                <span className="text-hh-border">·</span>
-                <span className={`font-semibold ${getScoreColor(overallScore)}`}>{overallScore}%</span>
               </p>
             </div>
-            <Button variant="outline" size="sm" className="gap-1.5 text-[12px] flex-shrink-0" onClick={handleExportPDF}>
-              <Download className="w-3.5 h-3.5" />
-              PDF
-            </Button>
+            <div className="flex flex-col items-center gap-2 flex-shrink-0">
+              <div className="relative" style={{ width: '80px', height: '80px' }}>
+                <svg width="80" height="80" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="#E5E7EB" strokeWidth="6" />
+                  <circle
+                    cx="50" cy="50" r="42"
+                    fill="none"
+                    stroke={adminColors ? '#9910FA' : '#3C9A6E'}
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                    strokeDasharray={`${2 * Math.PI * 42}`}
+                    strokeDashoffset={`${2 * Math.PI * 42 * (1 - overallScore / 100)}`}
+                    style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%', transition: 'stroke-dashoffset 0.8s ease' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="font-bold text-hh-text leading-none" style={{ fontSize: '22px' }}>{overallScore}%</span>
+                </div>
+              </div>
+              {percentileData && percentileData.totalAnalyses >= 3 && (
+                <div className="flex flex-col items-center gap-1.5">
+                  <span className="text-hh-muted" style={{ fontSize: '12px' }}>
+                    Top <span className="font-bold" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }}>{100 - percentileData.percentile > 0 ? 100 - percentileData.percentile : 1}%</span>
+                  </span>
+                  <div className="flex items-center rounded-lg overflow-hidden border" style={{ borderColor: '#E2E8F0' }}>
+                    {(['week', 'month', 'year', 'all'] as const).map((p, idx) => (
+                      <button
+                        key={p}
+                        onClick={() => setPercentilePeriod(p)}
+                        className="transition-all cursor-pointer"
+                        style={{
+                          fontSize: '11px',
+                          padding: '4px 10px',
+                          backgroundColor: percentilePeriod === p ? (adminColors ? '#9910FA' : '#3C9A6E') : 'white',
+                          color: percentilePeriod === p ? '#FFFFFF' : '#64748B',
+                          fontWeight: percentilePeriod === p ? 600 : 500,
+                          borderRight: idx < 3 ? '1px solid #E2E8F0' : 'none',
+                        }}
+                      >
+                        {p === 'week' ? '7d' : p === 'month' ? '30d' : p === 'year' ? '1j' : 'alles'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1091,87 +1003,9 @@ export function AnalysisResults({
           ))}
         </div>
 
-        {/* Phase scores only shown in timeline tab */}
-
         {activeTab === 'coach' && (<div className="max-w-[860px]">
 
-          {/* SECTION 1: Score ring with percentile + phase scores */}
-          <div className="p-4 sm:p-5 mb-6 sm:mb-8">
-            <div className="flex flex-col items-center sm:flex-row" style={{ gap: '32px' }}>
-              {/* Score circle + percentile label */}
-              <div className="flex flex-col items-center flex-shrink-0">
-                <div className="relative" style={{ width: '140px', height: '140px' }}>
-                  <svg width="140" height="140" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="42" fill="none" stroke="#E5E7EB" strokeWidth="6" />
-                    <circle
-                      cx="50" cy="50" r="42"
-                      fill="none"
-                      stroke={adminColors ? '#9910FA' : '#3C9A6E'}
-                      strokeWidth="6"
-                      strokeLinecap="round"
-                      strokeDasharray={`${2 * Math.PI * 42}`}
-                      strokeDashoffset={`${2 * Math.PI * 42 * (1 - overallScore / 100)}`}
-                      style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%', transition: 'stroke-dashoffset 0.8s ease' }}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="font-bold text-hh-text leading-none" style={{ fontSize: '36px' }}>{overallScore}</span>
-                    <span className="text-hh-muted" style={{ fontSize: '14px', marginTop: '2px' }}>%</span>
-                  </div>
-                </div>
-                {percentileData && percentileData.totalAnalyses >= 3 && (
-                  <div className="flex flex-col items-center" style={{ marginTop: '12px' }}>
-                    <span className="text-hh-muted" style={{ fontSize: '11px', lineHeight: '16px' }}>
-                      Bij de <span className="font-semibold" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }}>top {100 - percentileData.percentile > 0 ? 100 - percentileData.percentile : 1}%</span> gesprekken
-                    </span>
-                    <div className="flex items-center" style={{ gap: '4px', marginTop: '4px' }}>
-                      {(['week', 'month', 'year', 'all'] as const).map((p) => (
-                        <button
-                          key={p}
-                          onClick={() => setPercentilePeriod(p)}
-                          className="rounded-full transition-colors"
-                          style={{
-                            fontSize: '10px',
-                            padding: '2px 8px',
-                            backgroundColor: percentilePeriod === p ? (adminColors ? '#9910FA' : '#3C9A6E') : '#F1F5F9',
-                            color: percentilePeriod === p ? '#FFFFFF' : '#64748B',
-                            fontWeight: percentilePeriod === p ? 600 : 400,
-                          }}
-                        >
-                          {p === 'week' ? '7d' : p === 'month' ? '30d' : p === 'year' ? '1j' : 'alles'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Phase score bars */}
-              <div className="flex-1 w-full min-w-0" style={{ marginTop: '0' }}>
-                <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3">
-                  {phaseScores.map((ps) => (
-                    <div key={ps.phase}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[12px] text-hh-text font-medium">{ps.sublabel}</span>
-                        <span className={`text-[12px] font-semibold ${getScoreColor(ps.score)}`}>{ps.score}%</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-700"
-                          style={{
-                            width: `${ps.score}%`,
-                            backgroundColor: ps.score >= 60 ? (adminColors ? '#9910FA' : '#3C9A6E') : ps.score >= 30 ? '#F59E0B' : '#EF4444'
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* SECTION 2: 2x2 Cards — Algemeen, Big Win, Quick Fix, Scharnierpunt */}
+          {/* SECTION: Coach Summary + Coaching Moments */}
           {(() => {
             const moments = insights.moments || [];
             const momentConfig: Record<string, { icon: any; color: string; bg: string; iconBg: string; label: string }> = {
@@ -1181,11 +1015,9 @@ export function AnalysisResults({
             };
 
             return (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-8 sm:mb-12">
-                {/* Algemeen card */}
-                <div className="rounded-2xl p-4 sm:p-5" style={{ backgroundColor: '#FAFBFC', border: '2px solid #F1F5F9' }}>
-                  <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-hh-muted mb-3">Algemeen</p>
-                  <div className="relative group">
+              <div className="space-y-4 mb-8 sm:mb-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="rounded-2xl p-4 sm:p-5 relative group flex flex-col justify-center" style={{ backgroundColor: '#FAFBFC', border: '1px solid #E2E8F0' }}>
                     {useAdminLayout && editingDebrief ? (
                       <div className="space-y-2">
                         <textarea
@@ -1211,7 +1043,13 @@ export function AnalysisResults({
                       </div>
                     ) : (
                       <>
-                        <p className="text-[13px] sm:text-[14px] leading-[20px] sm:leading-[22px] text-hh-text font-medium" style={{ overflowWrap: 'break-word' }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: adminColors ? '#9910FA15' : '#3C9A6E15' }}>
+                            <Sparkles className="w-3.5 h-3.5" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }} />
+                          </div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }}>Coach Samenvatting</span>
+                        </div>
+                        <p className="text-[14px] sm:text-[15px] leading-[22px] sm:leading-[24px] text-hh-text font-medium" style={{ overflowWrap: 'break-word' }}>
                           {insights.coachDebrief?.oneliner || `Laten we je gesprek samen doornemen.`}
                         </p>
                         {useAdminLayout && (
@@ -1221,7 +1059,7 @@ export function AnalysisResults({
                               setEditedEpicMomentum(insights.coachDebrief?.epicMomentum || '');
                               setEditingDebrief(true);
                             }}
-                            className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg"
+                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg"
                             style={{ backgroundColor: '#9910FA15', color: '#9910FA' }}
                             title="Correctie indienen"
                           >
@@ -1231,357 +1069,327 @@ export function AnalysisResults({
                       </>
                     )}
                   </div>
-                </div>
+                    {moments.slice(0, 4).map((moment) => {
+                      const config = momentConfig[moment.type] || momentConfig['quick_fix'];
+                      const MomentIcon = config.icon;
+                      const isExpanded = expandedMoment === moment.id;
 
-                {/* Moment cards */}
-                {moments.slice(0, 3).map((moment, idx) => {
-                  const config = momentConfig[moment.type] || momentConfig['quick_fix'];
-                  const MomentIcon = config.icon;
-                  const isExpanded = expandedMoment === moment.id;
-
-                  return (
-                    <div key={moment.id} className="flex flex-col">
-                      <button
-                        onClick={() => { setExpandedMoment(isExpanded ? null : moment.id); markMomentViewed(moment.id); }}
-                        className="text-left rounded-2xl p-4 sm:p-5 transition-all group cursor-pointer flex-1"
-                        style={{
-                          backgroundColor: config.bg,
-                          border: isExpanded ? `2px solid ${config.color}40` : '2px solid transparent',
-                          boxShadow: isExpanded ? `0 4px 12px ${config.color}15` : 'none',
-                        }}
-                        onMouseEnter={(e) => { if (!isExpanded) e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                        onMouseLeave={(e) => { if (!isExpanded) e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)'; }}
-                      >
-                        <div className="flex items-center gap-2.5 mb-3">
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: config.iconBg }}>
-                            <MomentIcon className="w-4 h-4" style={{ color: config.color }} strokeWidth={1.75} />
-                          </div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: config.color }}>{config.label}</span>
-                        </div>
-                        <p className="text-[14px] leading-[20px] text-hh-text font-medium mb-3" style={{ overflowWrap: 'break-word' }}>
-                          {moment.label}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] text-hh-muted">{moment.timestamp}</span>
-                          <span className="text-[11px] font-medium flex items-center gap-0.5 transition-colors" style={{ color: config.color }}>
-                            Bekijk <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-90' : 'group-hover:translate-x-0.5'}`} />
-                          </span>
-                        </div>
-                      </button>
-
-                      {isExpanded && (() => {
-                        return (
-                          <div className="mt-3 rounded-2xl bg-white border border-gray-200 p-5 space-y-4 shadow-sm" style={{ borderTop: `3px solid ${config.color}30` }}>
-                            <p className="text-[13px] leading-[20px] text-hh-text/75" style={{ overflowWrap: 'break-word' }}>{moment.whyItMatters}</p>
-
-                            {(moment.sellerText || moment.customerText) && (
-                              <div className="rounded-xl bg-gray-50 p-4 space-y-3">
-                                {moment.customerText && (
-                                  <div className="flex justify-start">
-                                    <div style={{ maxWidth: '75%' }}>
-                                      <p className="text-[11px] font-medium text-hh-muted mb-1 px-1">Klant</p>
-                                      <div className={`px-3 py-2 rounded-2xl rounded-bl-md text-[13px] leading-[18px] ${adminColors ? 'bg-purple-50 text-hh-text' : 'bg-hh-ui-50 text-hh-text'}`}>
-                                        {moment.customerText.length > 200 ? moment.customerText.substring(0, 200) + '...' : moment.customerText}
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
-                                {moment.sellerText && (
-                                  <div className="flex justify-end">
-                                    <div style={{ maxWidth: '75%' }}>
-                                      <p className="text-[11px] font-medium text-hh-text mb-1 px-1 text-right">Jij</p>
-                                      <div className={`px-3 py-2 rounded-2xl rounded-br-md text-[13px] leading-[18px] text-white ${adminColors ? 'bg-purple-600' : ''}`} style={!adminColors ? { backgroundColor: '#4F7396' } : undefined}>
-                                        {moment.sellerText.length > 200 ? moment.sellerText.substring(0, 200) + '...' : moment.sellerText}
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
+                      return (
+                        <div key={moment.id} className="flex flex-col">
+                          <button
+                            onClick={() => { setExpandedMoment(isExpanded ? null : moment.id); markMomentViewed(moment.id); }}
+                            className="text-left rounded-2xl p-4 transition-all group cursor-pointer flex-1"
+                            style={{
+                              backgroundColor: config.bg,
+                              border: isExpanded ? `2px solid ${config.color}40` : '2px solid transparent',
+                              boxShadow: isExpanded ? `0 4px 12px ${config.color}15` : 'none',
+                            }}
+                            onMouseEnter={(e) => { if (!isExpanded) e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={(e) => { if (!isExpanded) e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                          >
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: config.iconBg }}>
+                                <MomentIcon className="w-3.5 h-3.5" style={{ color: config.color }} strokeWidth={1.75} />
                               </div>
-                            )}
+                              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: config.color }}>{config.label}</span>
+                            </div>
+                            <p className="text-[13px] leading-[19px] text-hh-text font-medium mb-2" style={{ overflowWrap: 'break-word' }}>
+                              {moment.label}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] text-hh-muted">{moment.timestamp}</span>
+                              <span className="text-[11px] font-medium flex items-center gap-0.5" style={{ color: config.color }}>
+                                Bekijk <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-90' : 'group-hover:translate-x-0.5'}`} />
+                              </span>
+                            </div>
+                          </button>
 
-                            {moment.betterAlternative && moment.type !== 'big_win' && (
-                              <div className="p-3 rounded-xl border" style={{ backgroundColor: adminColors ? '#9910FA08' : '#3C9A6E08', borderColor: adminColors ? '#9910FA15' : '#3C9A6E15' }}>
-                                <div className="flex gap-2 items-start">
-                                  <Lightbulb className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }} />
-                                  <div>
-                                    <p className="text-[11px] font-medium mb-0.5" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }}>Wat had je kunnen zeggen?</p>
-                                    <p className="text-[13px] leading-[19px] text-hh-text">"{moment.betterAlternative}"</p>
+                          {isExpanded && (
+                            <div className="mt-2 rounded-2xl bg-white border border-gray-200 p-4 space-y-3 shadow-sm" style={{ borderTop: `3px solid ${config.color}30` }}>
+                              <p className="text-[13px] leading-[20px] text-hh-text/75" style={{ overflowWrap: 'break-word' }}>{moment.whyItMatters}</p>
+
+                              {(moment.sellerText || moment.customerText) && (
+                                <div className="rounded-xl bg-gray-50 p-3 space-y-2">
+                                  {moment.customerText && (
+                                    <div className="flex justify-start">
+                                      <div style={{ maxWidth: '80%' }}>
+                                        <p className="text-[10px] font-medium text-hh-muted mb-0.5 px-1">Klant</p>
+                                        <div className={`px-3 py-2 rounded-2xl rounded-bl-md text-[12px] leading-[17px] ${adminColors ? 'bg-purple-50 text-hh-text' : 'bg-hh-ui-50 text-hh-text'}`}>
+                                          {moment.customerText.length > 200 ? moment.customerText.substring(0, 200) + '...' : moment.customerText}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {moment.sellerText && (
+                                    <div className="flex justify-end">
+                                      <div style={{ maxWidth: '80%' }}>
+                                        <p className="text-[10px] font-medium text-hh-text mb-0.5 px-1 text-right">Jij</p>
+                                        <div className={`px-3 py-2 rounded-2xl rounded-br-md text-[12px] leading-[17px] text-white ${adminColors ? 'bg-purple-600' : ''}`} style={!adminColors ? { backgroundColor: '#4F7396' } : undefined}>
+                                          {moment.sellerText.length > 200 ? moment.sellerText.substring(0, 200) + '...' : moment.sellerText}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              {moment.betterAlternative && moment.type !== 'big_win' && (
+                                <div className="p-3 rounded-xl border" style={{ backgroundColor: adminColors ? '#9910FA08' : '#3C9A6E08', borderColor: adminColors ? '#9910FA15' : '#3C9A6E15' }}>
+                                  <div className="flex gap-2 items-start">
+                                    <Lightbulb className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }} />
+                                    <div>
+                                      <p className="text-[11px] font-medium mb-0.5" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }}>Wat had je kunnen zeggen?</p>
+                                      <p className="text-[13px] leading-[19px] text-hh-text">"{moment.betterAlternative}"</p>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
 
-                            {moment.recommendedTechniques.length > 0 && (
-                              <div className="flex gap-1.5 flex-wrap">
-                                {moment.recommendedTechniques.map((t, i) => (
-                                  <span key={i} className="text-[10px] px-2 py-0.5 rounded-full border font-medium"
-                                    style={{ color: adminColors ? '#9910FA' : '#4F7396', borderColor: adminColors ? '#9910FA20' : '#4F739620', backgroundColor: adminColors ? '#9910FA08' : '#4F739608' }}
-                                    title={t}
+                              {moment.recommendedTechniques.length > 0 && (
+                                <div className="flex gap-1.5 flex-wrap">
+                                  {moment.recommendedTechniques.map((t, i) => (
+                                    <span key={i} className="text-[10px] px-2 py-0.5 rounded-full border font-medium"
+                                      style={{ color: adminColors ? '#9910FA' : '#4F7396', borderColor: adminColors ? '#9910FA20' : '#4F739620', backgroundColor: adminColors ? '#9910FA08' : '#4F739608' }}
+                                      title={t}
+                                    >
+                                      {getTechniekByNummer(t)?.naam || t}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+
+                              {(moment as any).videoRecommendations?.length > 0 && (
+                                <div className="space-y-2">
+                                  <p className="text-[11px] font-medium" style={{ color: adminColors ? '#9910FA' : '#4F7396' }}>
+                                    Aanbevolen trainingsmateriaal:
+                                  </p>
+                                  {(moment as any).videoRecommendations.map((video: any, vi: number) => (
+                                    <VideoRecommendationCard key={vi} video={video} adminColors={adminColors} />
+                                  ))}
+                                </div>
+                              )}
+
+                              <div className="pt-2 border-t border-gray-100 flex flex-wrap gap-2">
+                                {moment.type !== 'big_win' && (
+                                  <button
+                                    className="inline-flex items-center gap-1.5 text-[12px] h-8 px-4 text-white rounded-lg font-medium transition-all"
+                                    style={{ backgroundColor: adminColors ? '#9910FA' : '#3C9A6E' }}
+                                    onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? '#7C3AED' : '#2D7F57')}
+                                    onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? '#9910FA' : '#3C9A6E')}
+                                    onClick={() => navigateToHugoForPractice(moment.recommendedTechniques || [], moment.label, moment.turnIndex)}
                                   >
-                                    {getTechniekByNummer(t)?.naam || t}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
-                            {(moment as any).videoRecommendations?.length > 0 && (
-                              <div className="space-y-2">
-                                <p className="text-[11px] font-medium" style={{ color: adminColors ? '#9910FA' : '#4F7396' }}>
-                                  Aanbevolen trainingsmateriaal:
-                                </p>
-                                {(moment as any).videoRecommendations.map((video: any, vi: number) => (
-                                  <VideoRecommendationCard key={vi} video={video} adminColors={adminColors} />
-                                ))}
-                              </div>
-                            )}
-
-                            {moment.type !== 'big_win' && (
-                              <div className="pt-3 border-t border-gray-100">
-                                <button
-                                  className="inline-flex items-center justify-center gap-2 text-[13px] h-10 px-6 text-white rounded-xl font-medium transition-all"
-                                  style={{ backgroundColor: adminColors ? '#9910FA' : '#3C9A6E' }}
-                                  onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? '#7C3AED' : '#2D7F57')}
-                                  onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? '#9910FA' : '#3C9A6E')}
-                                  onClick={() => navigateToHugoForPractice(moment.recommendedTechniques || [], moment.label, moment.turnIndex)}
-                                >
-                                  <ArrowRight className="w-4 h-4" /> Oefen met Hugo
-                                </button>
-                              </div>
-                            )}
-
-                            {useAdminLayout && (
-                              <div className="pt-3 border-t border-gray-100">
-                                {editingMomentId === moment.id ? (
-                                  <div className="space-y-2">
-                                    <div>
-                                      <label className="text-[11px] font-medium mb-1 block" style={{ color: '#9910FA' }}>Moment label</label>
-                                      <input value={editedMomentLabel} onChange={(e) => setEditedMomentLabel(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2" style={{ borderColor: '#9910FA40' }} />
-                                    </div>
-                                    <div>
-                                      <label className="text-[11px] font-medium mb-1 block" style={{ color: '#9910FA' }}>Waarom belangrijk</label>
-                                      <textarea value={editedMomentWhy} onChange={(e) => setEditedMomentWhy(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2 resize-none" style={{ borderColor: '#9910FA40' }} rows={2} />
-                                    </div>
-                                    {moment.betterAlternative && (
-                                      <div>
-                                        <label className="text-[11px] font-medium mb-1 block" style={{ color: '#9910FA' }}>Beter alternatief</label>
-                                        <textarea value={editedMomentAlt} onChange={(e) => setEditedMomentAlt(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2 resize-none" style={{ borderColor: '#9910FA40' }} rows={2} />
-                                      </div>
-                                    )}
-                                    <div className="flex gap-2">
-                                      <Button size="sm" className="gap-1.5 text-[12px] text-white" style={{ backgroundColor: '#9910FA' }} disabled={submittingCorrection}
-                                        onClick={() => {
-                                          if (editedMomentLabel !== moment.label) submitCorrection('moment', 'label', moment.label, editedMomentLabel, `Moment: ${moment.id}`);
-                                          if (editedMomentWhy !== moment.whyItMatters) submitCorrection('moment', 'whyItMatters', moment.whyItMatters, editedMomentWhy, `Moment: ${moment.id}`);
-                                          if (editedMomentAlt !== (moment.betterAlternative || '')) submitCorrection('moment', 'betterAlternative', moment.betterAlternative || '', editedMomentAlt, `Moment: ${moment.id}`);
-                                        }}
-                                      >
-                                        <Save className="w-3.5 h-3.5" /> Indienen voor review
-                                      </Button>
-                                      <Button variant="outline" size="sm" className="text-[12px]" onClick={() => setEditingMomentId(null)}>Annuleren</Button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <button onClick={() => { setEditingMomentId(moment.id); setEditedMomentLabel(moment.label); setEditedMomentWhy(moment.whyItMatters); setEditedMomentAlt(moment.betterAlternative || ''); }}
-                                    className="flex items-center gap-1.5 text-[12px] font-medium"
-                                    style={{ color: '#9910FA' }}
-                                  >
-                                    <Pencil className="w-3 h-3" /> Correctie indienen
+                                    <Sparkles className="w-3.5 h-3.5" /> Oefen met Hugo
                                   </button>
                                 )}
                               </div>
-                            )}
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  );
-                })}
+
+                              {useAdminLayout && (
+                                <div className="pt-2 border-t border-gray-100">
+                                  {editingMomentId === moment.id ? (
+                                    <div className="space-y-2">
+                                      <div>
+                                        <label className="text-[11px] font-medium mb-1 block" style={{ color: '#9910FA' }}>Moment label</label>
+                                        <input value={editedMomentLabel} onChange={(e) => setEditedMomentLabel(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2" style={{ borderColor: '#9910FA40' }} />
+                                      </div>
+                                      <div>
+                                        <label className="text-[11px] font-medium mb-1 block" style={{ color: '#9910FA' }}>Waarom belangrijk</label>
+                                        <textarea value={editedMomentWhy} onChange={(e) => setEditedMomentWhy(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2 resize-none" style={{ borderColor: '#9910FA40' }} rows={2} />
+                                      </div>
+                                      {moment.betterAlternative && (
+                                        <div>
+                                          <label className="text-[11px] font-medium mb-1 block" style={{ color: '#9910FA' }}>Beter alternatief</label>
+                                          <textarea value={editedMomentAlt} onChange={(e) => setEditedMomentAlt(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2 resize-none" style={{ borderColor: '#9910FA40' }} rows={2} />
+                                        </div>
+                                      )}
+                                      <div className="flex gap-2">
+                                        <Button size="sm" className="gap-1.5 text-[12px] text-white" style={{ backgroundColor: '#9910FA' }} disabled={submittingCorrection}
+                                          onClick={() => {
+                                            if (editedMomentLabel !== moment.label) submitCorrection('moment', 'label', moment.label, editedMomentLabel, `Moment: ${moment.id}`);
+                                            if (editedMomentWhy !== moment.whyItMatters) submitCorrection('moment', 'whyItMatters', moment.whyItMatters, editedMomentWhy, `Moment: ${moment.id}`);
+                                            if (editedMomentAlt !== (moment.betterAlternative || '')) submitCorrection('moment', 'betterAlternative', moment.betterAlternative || '', editedMomentAlt, `Moment: ${moment.id}`);
+                                          }}
+                                        >
+                                          <Save className="w-3.5 h-3.5" /> Indienen voor review
+                                        </Button>
+                                        <Button variant="outline" size="sm" className="text-[12px]" onClick={() => setEditingMomentId(null)}>Annuleren</Button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <button onClick={() => { setEditingMomentId(moment.id); setEditedMomentLabel(moment.label); setEditedMomentWhy(moment.whyItMatters); setEditedMomentAlt(moment.betterAlternative || ''); }}
+                                      className="flex items-center gap-1.5 text-[12px] font-medium"
+                                      style={{ color: '#9910FA' }}
+                                    >
+                                      <Pencil className="w-3 h-3" /> Correctie indienen
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
             );
           })()}
 
-          {/* SECTION 3: iPhone Health-style Detailed Metrics */}
+          {/* SECTION 3: Detailed Analysis — Fase-cards + Klanthoudingen + Impact + Balans */}
           {(() => {
             const dm = insights.detailedMetrics;
-            if (!dm) return null;
+            if (!dm?.structure || !dm?.impact || !dm?.houdingen || !dm?.balance) return null;
 
             const accentColor = adminColors ? '#9910FA' : '#3C9A6E';
             const accentColorLight = adminColors ? '#9910FA15' : '#3C9A6E15';
             const accentColorBg = adminColors ? '#9910FA08' : '#3C9A6E08';
 
-            const categories = [
+            const PHASE_COLORS: Record<number, string> = {
+              1: '#3B82F6',
+              2: '#10B981',
+              3: '#8B5CF6',
+              4: '#F59E0B',
+            };
+
+            const phaseDetails: Array<{ phase: number; label: string; sublabel: string; score: number; color: string; details: any[] }> = [
               {
-                key: 'structure',
-                icon: Layers,
-                label: 'Structuur',
-                sublabel: 'Fasestructuur & EPIC-flow',
-                score: dm.structure.overallScore,
-                color: '#3B82F6',
+                phase: 1, label: 'Fase 1: Opening', sublabel: 'Koopklimaat, GA, Instapvraag', score: phaseScores[0].score, color: PHASE_COLORS[1],
                 details: [
                   {
-                    label: 'Faseverloop',
-                    value: dm.structure.phaseFlow.description,
-                    score: dm.structure.phaseFlow.idealFlowScore,
-                    sub: dm.structure.phaseFlow.transitions.length > 0
-                      ? `${dm.structure.phaseFlow.transitions.length} fase-overgangen`
-                      : 'Geen overgangen gedetecteerd',
-                    matches: dm.structure.phaseFlow.transitions.map(t => ({ turnIdx: t.turnIdx, type: `Fase ${t.fromPhase} → ${t.toPhase}`, recognized: true, treated: true })),
-                    kind: 'recognition' as const,
-                  },
-                  {
-                    label: 'Explore-dekking',
-                    value: `${dm.structure.exploreCoverage.themesFound.length}/8 thema's`,
-                    score: dm.structure.exploreCoverage.coveragePercent,
-                    sub: dm.structure.exploreCoverage.themesMissing.length > 0
-                      ? `Missend: ${dm.structure.exploreCoverage.themesMissing.join(', ')}`
-                      : 'Alle thema\'s aangeraakt',
+                    label: 'Opening-stappen',
+                    value: `${dm.structure.openingSequence?.stepsFound?.length ?? 0}/4 stappen`,
+                    score: dm.structure.openingSequence?.completionPercent ?? 0,
+                    sub: dm.structure.openingSequence?.correctOrder ? 'Correcte volgorde' : 'Volgorde kan beter',
                     kind: 'checklist' as const,
                     checklistItems: [
-                      ...dm.structure.exploreCoverage.themesFound.map((t: string) => ({ label: t, found: true })),
-                      ...dm.structure.exploreCoverage.themesMissing.map((t: string) => ({ label: t, found: false })),
+                      ...(dm.structure.openingSequence?.stepsFound || []).map((s: string) => ({ label: s, found: true })),
+                      ...(dm.structure.openingSequence?.stepsMissing || []).map((s: string) => ({ label: s, found: false })),
                     ],
                   },
-                  {
-                    label: 'Opening',
-                    value: `${dm.structure.openingSequence.stepsFound.length}/4 stappen`,
-                    score: dm.structure.openingSequence.completionPercent,
-                    sub: dm.structure.openingSequence.correctOrder
-                      ? 'Correcte volgorde'
-                      : (dm.structure.openingSequence.stepsMissing.length > 0
-                        ? `Missend: ${dm.structure.openingSequence.stepsMissing.join(', ')}`
-                        : 'Volgorde afwijkend'),
+                  ...((phaseCoverage?.phase1 as any)?.techniquesFound?.length > 0 ? [{
+                    label: 'Technieken herkend',
+                    value: `${(phaseCoverage?.phase1 as any)?.techniquesFound?.length || 0} technieken`,
+                    score: (phaseCoverage?.phase1 as any)?.score ?? 0,
+                    sub: ((phaseCoverage?.phase1 as any)?.techniquesFound || []).map((t: any) => t.naam).join(', '),
                     kind: 'checklist' as const,
-                    checklistItems: [
-                      ...dm.structure.openingSequence.stepsFound.map((s: string) => ({ label: s, found: true })),
-                      ...dm.structure.openingSequence.stepsMissing.map((s: string) => ({ label: s, found: false })),
-                    ],
-                  },
-                  {
-                    label: 'E.P.I.C. stappen',
-                    value: `${[dm.structure.epicSteps.explore, dm.structure.epicSteps.probe, dm.structure.epicSteps.impact, dm.structure.epicSteps.commit].filter(Boolean).length}/4`,
-                    score: dm.structure.epicSteps.completionPercent,
-                    sub: [
-                      dm.structure.epicSteps.explore ? null : 'Explore',
-                      dm.structure.epicSteps.probe ? null : 'Probe',
-                      dm.structure.epicSteps.impact ? null : 'Impact',
-                      dm.structure.epicSteps.commit ? null : 'Commit',
-                    ].filter(Boolean).length > 0
-                      ? `Missend: ${[
-                          dm.structure.epicSteps.explore ? null : 'Explore',
-                          dm.structure.epicSteps.probe ? null : 'Probe',
-                          dm.structure.epicSteps.impact ? null : 'Impact',
-                          dm.structure.epicSteps.commit ? null : 'Commit',
-                        ].filter(Boolean).join(', ')}`
-                      : 'Volledig doorlopen',
-                    kind: 'checklist' as const,
-                    checklistItems: [
-                      { label: 'Explore', found: dm.structure.epicSteps.explore },
-                      { label: 'Probe', found: dm.structure.epicSteps.probe },
-                      { label: 'Impact', found: dm.structure.epicSteps.impact },
-                      { label: 'Commit', found: dm.structure.epicSteps.commit },
-                    ],
-                  },
+                    checklistItems: ((phaseCoverage?.phase1 as any)?.techniquesFound || []).map((t: any) => ({ label: `${t.naam} (${t.quality})`, found: t.quality !== 'gemist' })),
+                  }] : []),
                 ],
               },
               {
-                key: 'impact',
-                icon: Zap,
-                label: 'Impact',
-                sublabel: 'Baten, pijnpunten & O.V.B.',
-                score: dm.impact.overallScore,
-                color: '#F59E0B',
+                phase: 2, label: 'Fase 2: EPIC', sublabel: 'Explore, Probe, Impact, Commit', score: phaseScores[1].score, color: PHASE_COLORS[2],
                 details: [
                   {
-                    label: 'Baten gevonden',
-                    value: `${dm.impact.baatenFound.filter(b => b.type === 'explicit_baat').length} expliciete baten`,
-                    score: Math.min(100, dm.impact.baatenFound.filter(b => b.type === 'explicit_baat').length * 30),
-                    sub: dm.impact.baatenFound.length > 0
-                      ? `${dm.impact.baatenFound.filter(b => b.type === 'voordeel_only').length} voordelen zonder baat`
-                      : 'Geen baten of voordelen gedetecteerd',
-                    matches: dm.impact.baatenFound.map(b => ({ turnIdx: b.turnIdx, type: b.type === 'explicit_baat' ? 'Baat' : 'Voordeel', recognized: b.quality === 'goed' || b.quality === 'volledig', treated: true })),
-                    kind: 'recognition' as const,
+                    label: 'EPIC-stappen',
+                    value: `${dm.structure.epicSteps?.completionPercent ?? 0}%`,
+                    score: dm.structure.epicSteps?.completionPercent ?? 0,
+                    sub: [
+                      dm.structure.epicSteps?.explore ? 'Explore ✓' : 'Explore ✗',
+                      dm.structure.epicSteps?.probe ? 'Probe ✓' : 'Probe ✗',
+                      dm.structure.epicSteps?.impact ? 'Impact ✓' : 'Impact ✗',
+                      dm.structure.epicSteps?.commit ? 'Commit ✓' : 'Commit ✗',
+                    ].join(' · '),
+                    kind: 'checklist' as const,
+                    checklistItems: [
+                      { label: 'Explore: breed ontdekken', found: !!dm.structure.epicSteps?.explore },
+                      { label: 'Probe: doorvragen', found: !!dm.structure.epicSteps?.probe },
+                      { label: 'Impact: gevolgen benoemen', found: !!dm.structure.epicSteps?.impact },
+                      { label: 'Commit: commitment vragen', found: !!dm.structure.epicSteps?.commit },
+                    ],
                   },
+                  {
+                    label: 'Explore-dekking',
+                    value: `${dm.structure.exploreCoverage?.themesFound?.length ?? 0}/8 thema's`,
+                    score: dm.structure.exploreCoverage?.coveragePercent ?? 0,
+                    sub: (dm.structure.exploreCoverage?.themesMissing?.length ?? 0) > 0
+                      ? `Missend: ${(dm.structure.exploreCoverage?.themesMissing || []).join(', ')}`
+                      : 'Alle thema\'s aangeraakt',
+                    kind: 'checklist' as const,
+                    checklistItems: [
+                      ...(dm.structure.exploreCoverage?.themesFound || []).map((t: string) => ({ label: t, found: true })),
+                      ...(dm.structure.exploreCoverage?.themesMissing || []).map((t: string) => ({ label: t, found: false })),
+                    ],
+                  },
+                  ...((phaseCoverage?.phase2 as any)?.overall?.techniquesFound?.length > 0 ? [{
+                    label: 'Technieken herkend',
+                    value: `${(phaseCoverage?.phase2 as any)?.overall?.techniquesFound?.length || 0} technieken`,
+                    score: (phaseCoverage?.phase2 as any)?.overall?.score ?? 0,
+                    sub: ((phaseCoverage?.phase2 as any)?.overall?.techniquesFound || []).slice(0, 4).map((t: any) => t.naam).join(', '),
+                    kind: 'checklist' as const,
+                    checklistItems: ((phaseCoverage?.phase2 as any)?.overall?.techniquesFound || []).map((t: any) => ({ label: `${t.naam} (${t.quality})`, found: t.quality !== 'gemist' })),
+                  }] : []),
+                ],
+              },
+              {
+                phase: 3, label: 'Fase 3: Aanbeveling', sublabel: 'O.V.B., USP, Mening vragen', score: phaseScores[2].score, color: PHASE_COLORS[3],
+                details: [
                   {
                     label: 'O.V.B. kwaliteit',
-                    value: dm.impact.ovbChecks.length > 0
-                      ? `${dm.impact.ovbChecks.filter(o => o.quality === 'volledig').length}/${dm.impact.ovbChecks.length} volledig`
-                      : 'Geen O.V.B. gedetecteerd',
+                    value: dm.impact.ovbQualityScore > 0 ? `${dm.impact.ovbQualityScore}%` : 'Geen O.V.B.',
                     score: dm.impact.ovbQualityScore,
-                    sub: dm.impact.ovbChecks.length > 0
-                      ? dm.impact.ovbChecks[0]?.explanation || ''
-                      : 'Oplossing → Voordeel → Baat niet toegepast',
-                    ...(dm.impact.ovbChecks.length > 0
-                      ? {
-                          matches: dm.impact.ovbChecks.map(o => ({ turnIdx: o.turnIdx, type: `O:${o.hasOplossing ? '✓' : '✗'} V:${o.hasVoordeel ? '✓' : '✗'} B:${o.hasBaat ? '✓' : '✗'}`, recognized: o.quality === 'volledig', treated: o.quality !== 'geen' })),
-                          kind: 'treatment' as const,
-                        }
-                      : {
-                          kind: 'checklist' as const,
-                          checklistItems: [
-                            { label: 'Oplossing benoemd', found: false },
-                            { label: 'Voordeel uitgelegd', found: false },
-                            { label: 'Baat voor klant', found: false },
-                          ],
-                        }
-                    ),
+                    sub: dm.impact.ovbChecks.length > 0 ? `${dm.impact.ovbChecks.length} O.V.B. checks` : 'Geen Oplossing-Voordeel-Baat structuur gevonden',
+                    kind: 'checklist' as const,
+                    checklistItems: dm.impact.ovbChecks.length > 0
+                      ? dm.impact.ovbChecks.slice(0, 3).map((c: any) => ({
+                          label: c.explanation || `Beurt ${c.turnIdx + 1}`,
+                          found: c.hasOplossing && c.hasVoordeel && c.hasBaat,
+                        }))
+                      : [
+                          { label: 'Oplossing benoemd', found: false },
+                          { label: 'Voordeel vertaald', found: false },
+                          { label: 'Baat voor klant', found: false },
+                        ],
                   },
                   {
-                    label: 'Pijnpunten',
-                    value: `${dm.impact.pijnpuntenFound} gevonden, ${dm.impact.pijnpuntenUsed} gebruikt`,
-                    score: dm.impact.pijnpuntenFound > 0 ? (dm.impact.pijnpuntenUsed > 0 ? 100 : 40) : 0,
-                    sub: dm.impact.pijnpuntenUsed > 0
-                      ? 'Vertaald naar oplossing'
-                      : (dm.impact.pijnpuntenFound > 0 ? 'Niet vertaald naar oplossing' : 'Geen pijnpunten benoemd'),
-                    ...(dm.impact.pijnpuntenDetails && dm.impact.pijnpuntenDetails.length > 0
-                      ? {
-                          matches: dm.impact.pijnpuntenDetails.map(p => ({ turnIdx: p.turnIdx, type: p.text, recognized: p.usedInSolution, treated: p.usedInSolution })),
-                          kind: 'treatment' as const,
-                        }
-                      : (dm.impact.pijnpuntenFound > 0
-                        ? {
-                            kind: 'checklist' as const,
-                            checklistItems: [
-                              { label: `${dm.impact.pijnpuntenFound} pijnpunt${dm.impact.pijnpuntenFound > 1 ? 'en' : ''} gedetecteerd`, found: true },
-                              { label: 'Vertaald naar oplossing', found: dm.impact.pijnpuntenUsed > 0 },
-                            ],
-                          }
-                        : {
-                            kind: 'checklist' as const,
-                            checklistItems: [
-                              { label: 'Pijnpunten besproken', found: false },
-                              { label: 'Vertaald naar oplossing', found: false },
-                            ],
-                          }
-                      )
-                    ),
-                  },
-                  {
-                    label: 'Commitment vóór fase 3',
+                    label: 'Commitment vóór aanbeveling',
                     value: dm.impact.commitBeforePhase3 ? 'Ja' : 'Nee',
                     score: dm.impact.commitBeforePhase3 ? 100 : 0,
-                    sub: dm.impact.commitBeforePhase3
-                      ? 'Klant bevestigde begrip voordat aanbeveling kwam'
-                      : 'Geen commitment gevraagd vóór aanbeveling',
+                    sub: dm.impact.commitBeforePhase3 ? 'Klant bevestigde begrip' : 'Geen commitment gevraagd vóór aanbeveling',
                     kind: 'checklist' as const,
                     checklistItems: dm.impact.commitmentDetail
                       ? [
                           { label: 'Samenvatting gegeven', found: dm.impact.commitmentDetail.summaryGiven },
                           { label: 'Bevestiging gevraagd', found: dm.impact.commitmentDetail.confirmationAsked },
-                          { label: 'Vóór fase 3 (aanbeveling)', found: dm.impact.commitBeforePhase3 },
                         ]
-                      : (dm.impact.commitBeforePhase3
-                          ? [
-                              { label: 'Commitment gedetecteerd', found: true },
-                              { label: 'Vóór fase 3 (aanbeveling)', found: true },
-                            ]
-                          : [
-                              { label: 'Commitment gedetecteerd', found: false },
-                              { label: 'Vóór fase 3 (aanbeveling)', found: false },
-                            ]
-                        ),
+                      : [
+                          { label: 'Commitment gedetecteerd', found: dm.impact.commitBeforePhase3 },
+                        ],
                   },
+                  ...((phaseCoverage?.phase3 as any)?.techniquesFound?.length > 0 ? [{
+                    label: 'Technieken herkend',
+                    value: `${(phaseCoverage?.phase3 as any)?.techniquesFound?.length || 0} technieken`,
+                    score: (phaseCoverage?.phase3 as any)?.score ?? 0,
+                    sub: ((phaseCoverage?.phase3 as any)?.techniquesFound || []).map((t: any) => t.naam).join(', '),
+                    kind: 'checklist' as const,
+                    checklistItems: ((phaseCoverage?.phase3 as any)?.techniquesFound || []).map((t: any) => ({ label: `${t.naam} (${t.quality})`, found: t.quality !== 'gemist' })),
+                  }] : []),
                 ],
               },
+              {
+                phase: 4, label: 'Fase 4: Beslissing', sublabel: 'Bezwaarbehandeling, Closing', score: phaseScores[3].score, color: PHASE_COLORS[4],
+                details: [
+                  ...((phaseCoverage?.phase4 as any)?.techniquesFound?.length > 0 ? [{
+                    label: 'Technieken herkend',
+                    value: `${(phaseCoverage?.phase4 as any)?.techniquesFound?.length || 0} technieken`,
+                    score: (phaseCoverage?.phase4 as any)?.score ?? 0,
+                    sub: ((phaseCoverage?.phase4 as any)?.techniquesFound || []).map((t: any) => t.naam).join(', '),
+                    kind: 'checklist' as const,
+                    checklistItems: ((phaseCoverage?.phase4 as any)?.techniquesFound || []).map((t: any) => ({ label: `${t.naam} (${t.quality})`, found: t.quality !== 'gemist' })),
+                  }] : [{
+                    label: 'Closing technieken',
+                    value: 'Geen herkend',
+                    score: 0,
+                    sub: 'Geen closing technieken gedetecteerd',
+                    kind: 'checklist' as const,
+                    checklistItems: [
+                      { label: 'Closing vraag gesteld', found: false },
+                      { label: 'Volgende stap afgesproken', found: false },
+                    ],
+                  }]),
+                ],
+              },
+            ];
+
+            const analysisCategories = [
               {
                 key: 'houdingen',
                 icon: Users,
@@ -1599,7 +1407,7 @@ export function AnalysisResults({
                     sub: dm.houdingen.phase2Recognition.total > 0
                       ? `${dm.houdingen.phase2Recognition.percent}% van klantsignalen opgepikt`
                       : 'Geen klantsignalen gedetecteerd in ontdekkingsfase',
-                    matches: dm.houdingen.matches.filter(m => m.phase === 2),
+                    matches: dm.houdingen.matches.filter((m: any) => m.phase === 2),
                     kind: 'recognition' as const,
                   },
                   {
@@ -1611,19 +1419,9 @@ export function AnalysisResults({
                     sub: dm.houdingen.phase3Treatment.style !== 'geen'
                       ? `Stijl: ${dm.houdingen.phase3Treatment.style === 'empathisch' ? 'Empathisch (goed)' : dm.houdingen.phase3Treatment.style === 'technisch' ? 'Technisch (verbeterpunt)' : 'Gemengd'}`
                       : '',
-                    ...(dm.houdingen.matches.filter(m => m.phase === 3).length > 0
-                      ? {
-                          matches: dm.houdingen.matches.filter(m => m.phase === 3),
-                          kind: 'treatment' as const,
-                        }
-                      : {
-                          kind: 'checklist' as const,
-                          checklistItems: [
-                            { label: 'Bezwaren gedetecteerd', found: false },
-                            { label: 'Empathisch behandeld', found: false },
-                            { label: 'Oplossing geboden', found: false },
-                          ],
-                        }
+                    ...(dm.houdingen.matches.filter((m: any) => m.phase === 3).length > 0
+                      ? { matches: dm.houdingen.matches.filter((m: any) => m.phase === 3), kind: 'treatment' as const }
+                      : { kind: 'checklist' as const, checklistItems: [{ label: 'Bezwaren gedetecteerd', found: false }, { label: 'Empathisch behandeld', found: false }] }
                     ),
                   },
                   {
@@ -1633,23 +1431,48 @@ export function AnalysisResults({
                       : 'Geen afritten in fase 4',
                     score: dm.houdingen.phase4Afritten.percent,
                     sub: dm.houdingen.phase4Afritten.total > 0
-                      ? `Vragen, twijfels, bezwaren, uitstel`
+                      ? 'Vragen, twijfels, bezwaren, uitstel'
                       : 'Geen weerstand gedetecteerd in beslissingsfase',
-                    ...(dm.houdingen.matches.filter(m => m.phase === 4).length > 0
-                      ? {
-                          matches: dm.houdingen.matches.filter(m => m.phase === 4),
-                          kind: 'treatment' as const,
-                        }
-                      : {
-                          kind: 'checklist' as const,
-                          checklistItems: [
-                            { label: 'Vragen behandeld', found: false },
-                            { label: 'Twijfels weggenomen', found: false },
-                            { label: 'Bezwaren overwonnen', found: false },
-                            { label: 'Uitstel voorkomen', found: false },
-                          ],
-                        }
+                    ...(dm.houdingen.matches.filter((m: any) => m.phase === 4).length > 0
+                      ? { matches: dm.houdingen.matches.filter((m: any) => m.phase === 4), kind: 'treatment' as const }
+                      : { kind: 'checklist' as const, checklistItems: [{ label: 'Vragen behandeld', found: false }, { label: 'Bezwaren overwonnen', found: false }] }
                     ),
+                  },
+                ],
+              },
+              {
+                key: 'impact',
+                icon: Zap,
+                label: 'Impact & Baten',
+                sublabel: 'Pijnpunten, voordelen & O.V.B.',
+                score: dm.impact.overallScore,
+                color: '#F97316',
+                details: [
+                  {
+                    label: 'Pijnpunten gevonden',
+                    value: dm.impact.pijnpuntenFound > 0 ? `${dm.impact.pijnpuntenUsed}/${dm.impact.pijnpuntenFound} gebruikt` : 'Geen gevonden',
+                    score: dm.impact.pijnpuntenFound > 0 ? Math.round((dm.impact.pijnpuntenUsed / dm.impact.pijnpuntenFound) * 100) : 0,
+                    sub: dm.impact.pijnpuntenFound > 0 ? 'Pijnpunten vertaald naar oplossing' : 'Geen pijnpunten gedetecteerd',
+                    kind: 'checklist' as const,
+                    checklistItems: dm.impact.pijnpuntenDetails?.slice(0, 5).map((p: any) => ({
+                      label: p.text.length > 60 ? p.text.substring(0, 60) + '...' : p.text,
+                      found: p.usedInSolution,
+                    })) || [{ label: 'Pijnpunten besproken', found: false }, { label: 'Vertaald naar oplossing', found: false }],
+                  },
+                  {
+                    label: 'Baten benoemd',
+                    value: dm.impact.baatenFound.length > 0 ? `${dm.impact.baatenFound.length} baten` : 'Geen baten',
+                    score: Math.min(100, dm.impact.baatenFound.length * 25),
+                    sub: dm.impact.baatenFound.length > 0
+                      ? dm.impact.baatenFound.slice(0, 2).map((b: any) => b.text.substring(0, 40)).join('; ')
+                      : 'Geen concrete baten voor klant benoemd',
+                    kind: 'checklist' as const,
+                    checklistItems: dm.impact.baatenFound.length > 0
+                      ? dm.impact.baatenFound.slice(0, 5).map((b: any) => ({
+                          label: b.text.length > 50 ? b.text.substring(0, 50) + '...' : b.text,
+                          found: b.quality === 'goed' || b.quality === 'perfect',
+                        }))
+                      : [{ label: 'Concrete baat benoemd', found: false }],
                   },
                 ],
               },
@@ -1665,49 +1488,38 @@ export function AnalysisResults({
                     label: 'Spreektijd',
                     value: `Verkoper ${dm.balance.talkRatio.sellerPercent}% — Klant ${dm.balance.talkRatio.customerPercent}%`,
                     score: dm.balance.talkRatio.verdict === 'goed' ? 100 : Math.max(0, 100 - Math.abs(dm.balance.talkRatio.sellerPercent - 50) * 2),
-                    sub: dm.balance.talkRatio.verdict === 'te_veel_verkoper'
-                      ? 'Verkoper is te veel aan het woord'
-                      : dm.balance.talkRatio.verdict === 'te_weinig_verkoper'
-                      ? 'Verkoper neemt te weinig initiatief'
+                    sub: dm.balance.talkRatio.verdict === 'te_veel_verkoper' ? 'Verkoper is te veel aan het woord'
+                      : dm.balance.talkRatio.verdict === 'te_weinig_verkoper' ? 'Verkoper neemt te weinig initiatief'
                       : 'Goed evenwicht',
                     kind: 'checklist' as const,
                     checklistItems: [
                       { label: `Verkoper: ${dm.balance.talkRatio.sellerPercent}% spreektijd`, found: dm.balance.talkRatio.sellerPercent <= 60 },
                       { label: `Klant: ${dm.balance.talkRatio.customerPercent}% spreektijd`, found: dm.balance.talkRatio.customerPercent >= 40 },
-                      { label: 'Ideaal: verkoper ≤ 60%, klant ≥ 40%', found: dm.balance.talkRatio.verdict === 'goed' },
                     ],
                   },
                   {
                     label: '"Wij/ik" vs "U/jij"',
                     value: `${dm.balance.perspective.uJijCount}x klant vs ${dm.balance.perspective.wijIkCount}x zelf`,
                     score: dm.balance.perspective.verdict === 'klantgericht' ? 100 : dm.balance.perspective.verdict === 'gemengd' ? 60 : 30,
-                    sub: dm.balance.perspective.verdict === 'klantgericht'
-                      ? 'Spreekt vanuit klantperspectief'
-                      : dm.balance.perspective.verdict === 'zelfgericht'
-                      ? 'Te veel "wij doen dit, wij bieden dat"'
+                    sub: dm.balance.perspective.verdict === 'klantgericht' ? 'Spreekt vanuit klantperspectief'
+                      : dm.balance.perspective.verdict === 'zelfgericht' ? 'Te veel "wij doen dit, wij bieden dat"'
                       : 'Gemengd perspectief',
                     kind: 'checklist' as const,
                     checklistItems: [
                       { label: `"U/jij" perspectief: ${dm.balance.perspective.uJijCount}x`, found: dm.balance.perspective.uJijCount > dm.balance.perspective.wijIkCount },
                       { label: `"Wij/ik" perspectief: ${dm.balance.perspective.wijIkCount}x`, found: dm.balance.perspective.wijIkCount < dm.balance.perspective.uJijCount },
-                      { label: `Ratio: ${dm.balance.perspective.ratio.toFixed(1)}x klantgericht`, found: dm.balance.perspective.verdict === 'klantgericht' },
                     ],
                   },
                   {
                     label: 'Vraag-ratio (Fase 2)',
                     value: `${Math.round(dm.balance.questionRatio.phase2Ratio * 100)}% vragen`,
                     score: Math.min(100, Math.round(dm.balance.questionRatio.phase2Ratio * 150)),
-                    sub: dm.balance.questionRatio.phase2Ratio >= 0.5
-                      ? 'Goede vraaghouding in ontdekking'
-                      : 'Meer vragen stellen in ontdekkingsfase',
-                    matches: (() => {
-                      const phase2Turns = result?.transcript?.filter((t: any) => {
-                        const phase = determinePhaseForTurn(t.idx);
-                        return phase === 2 && t.speaker === 'seller' && t.text.includes('?');
-                      }) || [];
-                      return phase2Turns.slice(0, 5).map((t: any) => ({ turnIdx: t.idx, type: 'Vraag', recognized: true, treated: true }));
-                    })(),
-                    kind: 'recognition' as const,
+                    sub: dm.balance.questionRatio.phase2Ratio >= 0.5 ? 'Goede vraaghouding in ontdekking' : 'Meer vragen stellen in ontdekkingsfase',
+                    kind: 'checklist' as const,
+                    checklistItems: [
+                      { label: `${dm.balance.questionRatio.questions} vragen gesteld`, found: dm.balance.questionRatio.questions > 5 },
+                      { label: `${Math.round(dm.balance.questionRatio.phase2Ratio * 100)}% van uitingen zijn vragen`, found: dm.balance.questionRatio.phase2Ratio >= 0.5 },
+                    ],
                   },
                   {
                     label: 'Klant-taal oppakken',
@@ -1718,25 +1530,266 @@ export function AnalysisResults({
                       : 'Geen klanttermen hergebruikt',
                     kind: 'checklist' as const,
                     checklistItems: dm.balance.clientLanguage.examples.length > 0
-                      ? dm.balance.clientLanguage.examples.slice(0, 6).map(term => ({
-                          label: `"${term}"`, found: true,
-                        }))
+                      ? dm.balance.clientLanguage.examples.slice(0, 4).map(term => ({ label: `"${term}"`, found: true }))
                       : [{ label: 'Klanttermen hergebruikt', found: false }],
                   },
                 ],
               },
             ];
 
+            const renderDetailDrilldown = (detail: any, drilldownKey: string, catColor: string) => {
+              const hasMatches = detail.matches && detail.matches.length > 0;
+              const hasChecklist = detail.kind === 'checklist' && detail.checklistItems && detail.checklistItems.length > 0;
+              const isClickable = hasMatches || hasChecklist;
+              const isDrilldownOpen = expandedDetailDrilldown === drilldownKey;
+              const matchLimit = expandedMatchCount[drilldownKey] || 5;
+
+              return (
+                <div key={drilldownKey}>
+                  <div
+                    className={`flex items-start gap-2 sm:gap-3 py-2.5 ${isClickable ? 'cursor-pointer hover:bg-gray-50 -mx-3 px-3 sm:-mx-4 sm:px-4 rounded-lg transition-colors' : ''}`}
+                    onClick={isClickable ? () => setExpandedDetailDrilldown(isDrilldownOpen ? null : drilldownKey) : undefined}
+                  >
+                    <div className="flex-shrink-0 mt-0.5">
+                      {detail.score >= 70 ? (
+                        <CheckCircle className="w-4 h-4" style={{ color: '#22C55E' }} />
+                      ) : detail.score >= 30 ? (
+                        <Circle className="w-4 h-4" style={{ color: '#F59E0B' }} />
+                      ) : (
+                        <XCircle className="w-4 h-4" style={{ color: '#EF4444' }} />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-0.5">
+                        <span className="text-[12px] sm:text-[13px] font-medium text-hh-text">{detail.label}</span>
+                        <span className="text-[11px] sm:text-[12px] font-semibold text-right min-w-0 truncate" style={{
+                          color: detail.score >= 70 ? '#22C55E' : detail.score >= 30 ? '#F59E0B' : '#EF4444',
+                          maxWidth: '55%',
+                        }}>{detail.value}</span>
+                      </div>
+                      {detail.sub && (
+                        <p className="text-[10px] sm:text-[11px] text-hh-muted leading-[14px] sm:leading-[16px]">{detail.sub}</p>
+                      )}
+                      <div className="mt-1.5 h-1 rounded-full bg-gray-100 overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-500" style={{
+                          width: `${detail.score}%`,
+                          backgroundColor: detail.score >= 70 ? '#22C55E' : detail.score >= 30 ? '#F59E0B' : '#EF4444'
+                        }} />
+                      </div>
+                    </div>
+                    {isClickable && (
+                      <div className="flex-shrink-0 mt-0.5">
+                        <ChevronRight className={`w-3.5 h-3.5 text-hh-muted transition-transform ${isDrilldownOpen ? 'rotate-90' : ''}`} />
+                      </div>
+                    )}
+                  </div>
+
+                  {isDrilldownOpen && hasChecklist && (
+                    <div className="ml-2 sm:ml-4 mb-3 mt-2">
+                      <div className="rounded-xl border overflow-hidden" style={{ borderColor: '#E2E8F0' }}>
+                        <div className="divide-y" style={{ borderColor: '#F1F5F9' }}>
+                          {detail.checklistItems.map((item: any, cIdx: number) => (
+                            <div key={cIdx} className="flex items-center gap-2.5 px-3 py-2" style={{ backgroundColor: item.found ? '#F0FDF4' : '#FEF2F2' }}>
+                              {item.found ? (
+                                <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22C55E' }} />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#EF4444' }} />
+                              )}
+                              <span className="text-[12px] font-medium" style={{ color: item.found ? '#166534' : '#991B1B' }}>
+                                {item.label}
+                              </span>
+                              <span className="ml-auto text-[10px] font-medium" style={{ color: item.found ? '#22C55E' : '#EF4444' }}>
+                                {item.found ? 'Aanwezig' : 'Ontbreekt'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {isDrilldownOpen && hasMatches && (
+                    <div className="ml-2 sm:ml-4 mb-3 mt-2 space-y-4">
+                      {detail.matches.slice(0, matchLimit).map((match: any, mIdx: number) => {
+                        const matchTurn = result?.transcript?.find((t: any) => t.idx === match.turnIdx);
+                        const isRecognized = match.recognized;
+                        const isTreated = match.treated;
+                        const statusOk = detail.kind === 'recognition' ? isRecognized : isTreated;
+
+                        const contextTurns = result?.transcript
+                          ?.filter((t: any) => t.idx >= match.turnIdx - 2 && t.idx <= match.turnIdx + 1)
+                          ?.sort((a: any, b: any) => a.idx - b.idx) || [];
+
+                        return (
+                          <div key={mIdx} className="rounded-xl border overflow-hidden" style={{ borderColor: statusOk ? '#BBF7D0' : '#FECACA' }}>
+                            <div className="flex items-center gap-2 px-3 py-2" style={{ backgroundColor: statusOk ? '#F0FDF4' : '#FEF2F2' }}>
+                              {statusOk ? (
+                                <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22C55E' }} />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#EF4444' }} />
+                              )}
+                              <span className="text-[11px] font-semibold" style={{ color: statusOk ? '#166534' : '#991B1B' }}>
+                                {statusOk
+                                  ? (detail.kind === 'recognition' ? 'Herkend' : 'Behandeld')
+                                  : (detail.kind === 'recognition' ? 'Gemist' : 'Niet behandeld')
+                                }
+                              </span>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ backgroundColor: '#F1F5F9', color: '#64748B' }}>
+                                {match.houding || match.type || ''}
+                              </span>
+                              {matchTurn && (
+                                <span className="text-[10px] text-hh-muted">
+                                  Beurt {match.turnIdx + 1} · {formatTime(matchTurn.startMs)}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="px-3 py-2 space-y-2" style={{ backgroundColor: '#FAFBFC' }}>
+                              {contextTurns.map((ct: any) => {
+                                const isHighlighted = ct.idx === match.turnIdx;
+                                const isSeller = ct.speaker === 'seller';
+                                return (
+                                  <div key={ct.idx} className={`flex ${isSeller ? 'justify-end' : 'justify-start'}`}>
+                                    <div className="max-w-[85%]">
+                                      <div className={`flex items-center gap-1.5 mb-0.5 ${isSeller ? 'justify-end' : ''}`}>
+                                        <span className="text-[10px] font-medium" style={{ color: '#94A3B8' }}>
+                                          {isSeller ? 'Jij' : 'Klant'}
+                                        </span>
+                                        <span className="text-[9px]" style={{ color: '#CBD5E1' }}>
+                                          {formatTime(ct.startMs)}
+                                        </span>
+                                      </div>
+                                      <div
+                                        className="px-3 py-2 text-[11px] sm:text-[12px] leading-[16px] sm:leading-[18px]"
+                                        style={{
+                                          borderRadius: isSeller ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
+                                          backgroundColor: isHighlighted
+                                            ? (statusOk ? '#DCFCE7' : '#FEE2E2')
+                                            : (isSeller ? (adminColors ? '#F3E8FF' : '#F1F5F9') : '#FFFFFF'),
+                                          border: isHighlighted
+                                            ? `1.5px solid ${statusOk ? '#86EFAC' : '#FCA5A5'}`
+                                            : '1px solid #E2E8F0',
+                                          color: '#1E293B',
+                                        }}
+                                      >
+                                        {ct.text.length > 250 ? ct.text.substring(0, 250) + '…' : ct.text}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {((!statusOk && match.recommendedTechniques?.length > 0) || (statusOk && match.actualTechniques?.length > 0)) && (
+                              <div className="px-3 py-2 flex flex-wrap gap-1 items-center" style={{ backgroundColor: '#F8FAFC', borderTop: '1px solid #F1F5F9' }}>
+                                <span className="text-[10px] text-hh-muted">{statusOk ? 'Toegepast:' : 'Aanbevolen:'}</span>
+                                {(statusOk ? match.actualTechniques : match.recommendedTechniques)?.map((tech: string, tIdx: number) => (
+                                  <span key={tIdx} className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{
+                                    backgroundColor: statusOk ? '#DCFCE7' : '#DBEAFE',
+                                    color: statusOk ? '#166534' : '#1E40AF',
+                                  }}>
+                                    {tech}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {detail.matches.length > matchLimit && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedMatchCount(prev => ({ ...prev, [drilldownKey]: matchLimit + 10 }));
+                          }}
+                          className="text-[12px] font-medium px-3 py-1.5 rounded-lg transition-colors"
+                          style={{ color: accentColor, backgroundColor: accentColorBg }}
+                        >
+                          Toon meer ({detail.matches.length - matchLimit} resterend)
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            };
+
             return (
-              <div id="detailed-metrics" className="space-y-4 mb-8 sm:mb-12">
-                <h3 className="text-[16px] font-semibold text-hh-text">Gedetailleerde analyse</h3>
+              <div id="detailed-metrics" className="space-y-6 mb-8 sm:mb-12">
+                <h3 className="text-[16px] font-semibold text-hh-text">Waar is nog werk?</h3>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {categories.map((cat) => {
+                  {phaseDetails.map((pd) => {
+                    const isExpanded = expandedMetricCategory === `phase-${pd.phase}`;
+
+                    return (
+                      <div key={pd.phase} className="flex flex-col">
+                        <button
+                          onClick={() => setExpandedMetricCategory(isExpanded ? null : `phase-${pd.phase}`)}
+                          className="text-left rounded-2xl p-4 sm:p-5 transition-all group cursor-pointer"
+                          style={{
+                            backgroundColor: '#FAFBFC',
+                            border: isExpanded ? `2px solid ${pd.color}30` : '2px solid #F1F5F9',
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <p className="text-[14px] font-semibold text-hh-text">{pd.label}</p>
+                              <p className="text-[11px] text-hh-muted">{pd.sublabel}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[16px] font-bold" style={{ color: pd.score >= 60 ? pd.color : pd.score >= 30 ? '#F59E0B' : '#EF4444' }}>{pd.score}%</span>
+                              <ChevronRight className={`w-4 h-4 text-hh-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                            </div>
+                          </div>
+                          <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+                            <div className="h-full rounded-full transition-all duration-700" style={{
+                              width: `${pd.score}%`,
+                              backgroundColor: pd.score >= 60 ? pd.color : pd.score >= 30 ? '#F59E0B' : '#EF4444'
+                            }} />
+                          </div>
+                        </button>
+
+                        {isExpanded && (
+                          <div className="mt-2 rounded-2xl bg-white border border-gray-200 p-3 sm:p-4 space-y-0 shadow-sm">
+                            {pd.details.map((detail: any, dIdx: number) => (
+                              <div key={dIdx} style={dIdx < pd.details.length - 1 ? { borderBottom: '1px solid #F1F5F9' } : {}}>
+                                {renderDetailDrilldown(detail, `phase-${pd.phase}-${dIdx}`, pd.color)}
+                              </div>
+                            ))}
+                            <div className="pt-3 mt-2 border-t border-gray-100">
+                              <button
+                                className="inline-flex items-center gap-1.5 text-[12px] h-8 px-4 text-white rounded-lg font-medium transition-all"
+                                style={{ backgroundColor: accentColor }}
+                                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.opacity = '0.85')}
+                                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.opacity = '1')}
+                                onClick={() => {
+                                  const phaseKey = `phase${pd.phase}` as string;
+                                  const phaseTechs = (phaseCoverage as any)?.[phaseKey];
+                                  const techsFound = phaseTechs?.techniquesFound || phaseTechs?.overall?.techniquesFound || [];
+                                  const missedTechs = techsFound.filter((t: any) => t.quality === 'gemist').map((t: any) => t.id || t.nummer) || [];
+                                  navigateToHugoForPractice(missedTechs, `${pd.label} verbeteren`);
+                                }}
+                              >
+                                <Sparkles className="w-3.5 h-3.5" /> Oefen {pd.label.split(':')[1]?.trim() || pd.label} met Hugo
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                  {analysisCategories.map((cat) => {
                     const CatIcon = cat.icon;
                     const isExpanded = expandedMetricCategory === cat.key;
 
                     return (
-                      <div key={cat.key} className="flex flex-col">
+                      <div key={cat.key} className={`flex flex-col ${cat.key === 'balance' ? 'md:col-span-2' : ''}`}>
                         <button
                           onClick={() => setExpandedMetricCategory(isExpanded ? null : cat.key)}
                           className="text-left rounded-2xl p-3 sm:p-5 transition-all group cursor-pointer"
@@ -1758,211 +1811,25 @@ export function AnalysisResults({
                               </div>
                             </div>
                             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                              <div className="relative w-10 h-10 sm:w-12 sm:h-12">
-                                <svg className="w-10 h-10 sm:w-12 sm:h-12 -rotate-90" viewBox="0 0 36 36">
-                                  <path
-                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                    fill="none"
-                                    stroke="#F1F5F9"
-                                    strokeWidth="3"
-                                  />
-                                  <path
-                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                    fill="none"
-                                    stroke={cat.score >= 60 ? cat.color : cat.score >= 30 ? '#F59E0B' : '#EF4444'}
-                                    strokeWidth="3"
-                                    strokeDasharray={`${cat.score}, 100`}
-                                    strokeLinecap="round"
-                                  />
-                                </svg>
-                                <span className="absolute inset-0 flex items-center justify-center text-[10px] sm:text-[11px] font-bold text-hh-text">
-                                  {cat.score}%
-                                </span>
-                              </div>
+                              <span className="text-[16px] font-bold" style={{ color: cat.score >= 60 ? cat.color : cat.score >= 30 ? '#F59E0B' : '#EF4444' }}>{cat.score}%</span>
                               <ChevronRight className={`w-4 h-4 text-hh-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                             </div>
                           </div>
-
                           <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-700"
-                              style={{
-                                width: `${cat.score}%`,
-                                backgroundColor: cat.score >= 60 ? cat.color : cat.score >= 30 ? '#F59E0B' : '#EF4444'
-                              }}
-                            />
+                            <div className="h-full rounded-full transition-all duration-700" style={{
+                              width: `${cat.score}%`,
+                              backgroundColor: cat.score >= 60 ? cat.color : cat.score >= 30 ? '#F59E0B' : '#EF4444'
+                            }} />
                           </div>
                         </button>
 
                         {isExpanded && (
                           <div className="mt-2 rounded-2xl bg-white border border-gray-200 p-3 sm:p-4 space-y-0 shadow-sm">
-                            {cat.details.map((detail: any, dIdx: number) => {
-                              const hasMatches = detail.matches && detail.matches.length > 0;
-                              const hasChecklist = detail.kind === 'checklist' && detail.checklistItems && detail.checklistItems.length > 0;
-                              const isClickable = hasMatches || hasChecklist;
-                              const drilldownKey = `${cat.key}-${dIdx}`;
-                              const isDrilldownOpen = expandedDetailDrilldown === drilldownKey;
-
-                              return (
-                                <div key={dIdx} style={dIdx < cat.details.length - 1 ? { borderBottom: '1px solid #F1F5F9' } : {}}>
-                                  <div
-                                    className={`flex items-start gap-2 sm:gap-3 py-2.5 ${isClickable ? 'cursor-pointer hover:bg-gray-50 -mx-3 px-3 sm:-mx-4 sm:px-4 rounded-lg transition-colors' : ''}`}
-                                    onClick={isClickable ? () => setExpandedDetailDrilldown(isDrilldownOpen ? null : drilldownKey) : undefined}
-                                  >
-                                    <div className="flex-shrink-0 mt-0.5">
-                                      {detail.score >= 70 ? (
-                                        <CheckCircle className="w-4 h-4" style={{ color: '#22C55E' }} />
-                                      ) : detail.score >= 30 ? (
-                                        <Circle className="w-4 h-4" style={{ color: '#F59E0B' }} />
-                                      ) : (
-                                        <XCircle className="w-4 h-4" style={{ color: '#EF4444' }} />
-                                      )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center justify-between gap-2 mb-0.5">
-                                        <span className="text-[12px] sm:text-[13px] font-medium text-hh-text">{detail.label}</span>
-                                        <span className="text-[11px] sm:text-[12px] font-semibold text-right min-w-0 truncate" style={{
-                                          color: detail.score >= 70 ? '#22C55E' : detail.score >= 30 ? '#F59E0B' : '#EF4444',
-                                          maxWidth: '55%',
-                                        }}>{detail.value}</span>
-                                      </div>
-                                      {detail.sub && (
-                                        <p className="text-[10px] sm:text-[11px] text-hh-muted leading-[14px] sm:leading-[16px]">{detail.sub}</p>
-                                      )}
-                                      <div className="mt-1.5 h-1 rounded-full bg-gray-100 overflow-hidden">
-                                        <div
-                                          className="h-full rounded-full transition-all duration-500"
-                                          style={{
-                                            width: `${detail.score}%`,
-                                            backgroundColor: detail.score >= 70 ? '#22C55E' : detail.score >= 30 ? '#F59E0B' : '#EF4444'
-                                          }}
-                                        />
-                                      </div>
-                                    </div>
-                                    {isClickable && (
-                                      <div className="flex-shrink-0 mt-0.5">
-                                        <ChevronRight className={`w-3.5 h-3.5 text-hh-muted transition-transform ${isDrilldownOpen ? 'rotate-90' : ''}`} />
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  {isDrilldownOpen && hasChecklist && (
-                                    <div className="ml-2 sm:ml-4 mb-3 mt-2">
-                                      <div className="rounded-xl border overflow-hidden" style={{ borderColor: '#E2E8F0' }}>
-                                        <div className="divide-y" style={{ borderColor: '#F1F5F9' }}>
-                                          {detail.checklistItems.map((item: any, cIdx: number) => (
-                                            <div key={cIdx} className="flex items-center gap-2.5 px-3 py-2" style={{ backgroundColor: item.found ? '#F0FDF4' : '#FEF2F2' }}>
-                                              {item.found ? (
-                                                <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22C55E' }} />
-                                              ) : (
-                                                <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#EF4444' }} />
-                                              )}
-                                              <span className="text-[12px] font-medium" style={{ color: item.found ? '#166534' : '#991B1B' }}>
-                                                {item.label}
-                                              </span>
-                                              <span className="ml-auto text-[10px] font-medium" style={{ color: item.found ? '#22C55E' : '#EF4444' }}>
-                                                {item.found ? 'Aanwezig' : 'Ontbreekt'}
-                                              </span>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {isDrilldownOpen && hasMatches && (
-                                    <div className="ml-2 sm:ml-4 mb-3 mt-2 space-y-4">
-                                      {detail.matches.map((match: any, mIdx: number) => {
-                                        const matchTurn = result?.transcript?.find((t: any) => t.idx === match.turnIdx);
-                                        const isRecognized = match.recognized;
-                                        const isTreated = match.treated;
-                                        const statusOk = detail.kind === 'recognition' ? isRecognized : isTreated;
-
-                                        const contextTurns = result?.transcript
-                                          ?.filter((t: any) => t.idx >= match.turnIdx - 2 && t.idx <= match.turnIdx + 1)
-                                          ?.sort((a: any, b: any) => a.idx - b.idx) || [];
-
-                                        return (
-                                          <div key={mIdx} className="rounded-xl border overflow-hidden" style={{ borderColor: statusOk ? '#BBF7D0' : '#FECACA' }}>
-                                            <div className="flex items-center gap-2 px-3 py-2" style={{ backgroundColor: statusOk ? '#F0FDF4' : '#FEF2F2' }}>
-                                              {statusOk ? (
-                                                <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22C55E' }} />
-                                              ) : (
-                                                <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#EF4444' }} />
-                                              )}
-                                              <span className="text-[11px] font-semibold" style={{ color: statusOk ? '#166534' : '#991B1B' }}>
-                                                {statusOk
-                                                  ? (detail.kind === 'recognition' ? 'Herkend' : 'Behandeld')
-                                                  : (detail.kind === 'recognition' ? 'Gemist' : 'Niet behandeld')
-                                                }
-                                              </span>
-                                              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ backgroundColor: '#F1F5F9', color: '#64748B' }}>
-                                                {match.houding || match.type || ''}
-                                              </span>
-                                              {matchTurn && (
-                                                <span className="text-[10px] text-hh-muted">
-                                                  Beurt {match.turnIdx + 1} · {formatTime(matchTurn.startMs)}
-                                                </span>
-                                              )}
-                                            </div>
-
-                                            <div className="px-3 py-2 space-y-2" style={{ backgroundColor: '#FAFBFC' }}>
-                                              {contextTurns.map((ct: any) => {
-                                                const isHighlighted = ct.idx === match.turnIdx;
-                                                const isSeller = ct.speaker === 'seller';
-                                                return (
-                                                  <div key={ct.idx} className={`flex ${isSeller ? 'justify-end' : 'justify-start'}`}>
-                                                    <div className="max-w-[85%]">
-                                                      <div className={`flex items-center gap-1.5 mb-0.5 ${isSeller ? 'justify-end' : ''}`}>
-                                                        <span className="text-[10px] font-medium" style={{ color: '#94A3B8' }}>
-                                                          {isSeller ? 'Jij' : 'Klant'}
-                                                        </span>
-                                                        <span className="text-[9px]" style={{ color: '#CBD5E1' }}>
-                                                          {formatTime(ct.startMs)}
-                                                        </span>
-                                                      </div>
-                                                      <div
-                                                        className="px-3 py-2 text-[11px] sm:text-[12px] leading-[16px] sm:leading-[18px]"
-                                                        style={{
-                                                          borderRadius: isSeller ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
-                                                          backgroundColor: isHighlighted
-                                                            ? (statusOk ? '#DCFCE7' : '#FEE2E2')
-                                                            : (isSeller ? (adminColors ? '#F3E8FF' : '#F1F5F9') : '#FFFFFF'),
-                                                          border: isHighlighted
-                                                            ? `1.5px solid ${statusOk ? '#86EFAC' : '#FCA5A5'}`
-                                                            : '1px solid #E2E8F0',
-                                                          color: '#1E293B',
-                                                        }}
-                                                      >
-                                                        {ct.text.length > 250 ? ct.text.substring(0, 250) + '…' : ct.text}
-                                                      </div>
-                                                    </div>
-                                                  </div>
-                                                );
-                                              })}
-                                            </div>
-
-                                            {((!statusOk && match.recommendedTechniques?.length > 0) || (statusOk && match.actualTechniques?.length > 0)) && (
-                                              <div className="px-3 py-2 flex flex-wrap gap-1 items-center" style={{ backgroundColor: '#F8FAFC', borderTop: '1px solid #F1F5F9' }}>
-                                                <span className="text-[10px] text-hh-muted">{statusOk ? 'Toegepast:' : 'Aanbevolen:'}</span>
-                                                {(statusOk ? match.actualTechniques : match.recommendedTechniques)?.map((tech: string, tIdx: number) => (
-                                                  <span key={tIdx} className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{
-                                                    backgroundColor: statusOk ? '#DCFCE7' : '#DBEAFE',
-                                                    color: statusOk ? '#166534' : '#1E40AF',
-                                                  }}>
-                                                    {tech}
-                                                  </span>
-                                                ))}
-                                              </div>
-                                            )}
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
+                            {cat.details.map((detail: any, dIdx: number) => (
+                              <div key={dIdx} style={dIdx < cat.details.length - 1 ? { borderBottom: '1px solid #F1F5F9' } : {}}>
+                                {renderDetailDrilldown(detail, `${cat.key}-${dIdx}`, cat.color)}
+                              </div>
+                            ))}
                           </div>
                         )}
                       </div>
