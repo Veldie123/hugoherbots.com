@@ -4286,7 +4286,7 @@ app.get("/api/v2/user/welcome", async (req: Request, res: Response) => {
         lines.push(`\nWaar kan ik je mee helpen?`);
       }
     } else {
-      lines.push(`Hé ${userName}! Ik ben Hugo.\n`);
+      lines.push(`Hé ${userName}!\n`);
       lines.push(`Waar heb je zin in? We kunnen sparren over een techniek, een rollenspel doen, een video bekijken, of een echt gesprek analyseren. Jij zegt het maar.`);
     }
 

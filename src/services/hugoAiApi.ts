@@ -169,7 +169,7 @@ export const hugoAiApi = {
 
   async getWelcomeMessage(userId?: string): Promise<string> {
     if (!userId) {
-      return 'Hallo! Ik ben Hugo, je persoonlijke sales coach. Waar kan ik je vandaag mee helpen?';
+      return 'Hallo! Waar kan ik je vandaag mee helpen?';
     }
 
     try {
