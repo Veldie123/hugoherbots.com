@@ -84,22 +84,15 @@ function getInitials(name: string): string {
 
 function getScoreColor(score: number): string {
   if (score >= 80) return "text-emerald-600";
-  if (score >= 60) return "text-purple-600";
+  if (score >= 60) return "text-amber-500";
   return "text-red-500";
-}
-
-function getNumberBadgeStyle(score: number | null): string {
-  if (score == null) return "bg-gray-400";
-  if (score >= 80) return "bg-emerald-500";
-  if (score >= 60) return "bg-purple-600";
-  return "bg-red-500";
 }
 
 function getQualityBadge(score: number | null) {
   if (score == null) return <span className="text-[12px] text-hh-muted">-</span>;
   if (score >= 80) {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
         <Star className="w-3 h-3" />
         Excellent
       </span>
@@ -107,14 +100,14 @@ function getQualityBadge(score: number | null) {
   }
   if (score >= 60) {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-600 border border-purple-500/20">
+      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-purple-500/10 text-purple-600 border border-purple-500/20">
         <Leaf className="w-3 h-3" />
         Good
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-red-500/10 text-red-500 border border-red-500/20">
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
       <AlertTriangle className="w-3 h-3" />
       Needs Work
     </span>
@@ -432,7 +425,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                     >
                       <td className="py-4 px-4">
                         <span
-                          className={`inline-flex items-center justify-center min-w-[32px] h-8 px-2 rounded-full text-[12px] font-bold text-white ${getNumberBadgeStyle(analysis.overallScore)}`}
+                          className="inline-flex items-center justify-center min-w-[36px] h-9 px-2.5 rounded-full text-[13px] font-semibold text-purple-600 bg-purple-100 border border-purple-200"
                         >
                           {(analysis.techniquesFound || []).length > 0
                             ? analysis.techniquesFound[0]
@@ -541,7 +534,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <span
-                      className={`inline-flex items-center justify-center min-w-[28px] h-7 px-1.5 rounded-full text-[11px] font-bold text-white ${getNumberBadgeStyle(analysis.overallScore)}`}
+                      className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 rounded-full text-[11px] font-semibold text-purple-600 bg-purple-100 border border-purple-200"
                     >
                       {(analysis.techniquesFound || []).length > 0 ? analysis.techniquesFound[0] : "-"}
                     </span>
