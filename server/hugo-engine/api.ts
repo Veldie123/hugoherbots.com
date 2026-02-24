@@ -3350,8 +3350,8 @@ app.post("/api/v2/analysis/retry/:conversationId", express.json(), async (req: R
     }
 
     const analysis = rows[0];
-    if (!['failed', 'transcribing'].includes(analysis.status)) {
-      return res.status(400).json({ error: 'Alleen mislukte analyses kunnen opnieuw worden gestart' });
+    if (!['failed', 'transcribing', 'completed'].includes(analysis.status)) {
+      return res.status(400).json({ error: 'Deze analyse kan niet opnieuw worden gestart' });
     }
 
     const storageKey = analysis.storage_key;

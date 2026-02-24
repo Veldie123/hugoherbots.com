@@ -344,7 +344,7 @@ export function AppLayout({
           })}
 
           {isAdmin && (
-            <div className="mt-1">
+            <div className="mt-1 pt-3 border-t border-hh-border">
               <button
                 onClick={() => navigate?.("admin-dashboard")}
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
@@ -476,7 +476,7 @@ export function AppLayout({
             })}
 
             {isAdmin && (
-              <div className="mt-1">
+              <div className="mt-1 pt-3 border-t border-hh-border">
                 <button
                   onClick={() => {
                     navigate?.("admin-dashboard");
