@@ -1420,14 +1420,16 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     ? "text-white rounded-br-md"
                     : "text-hh-text rounded-bl-md"
                   : message.sender === "hugo"
-                    ? "bg-hh-ink text-white rounded-br-md"
+                    ? "text-white rounded-br-md"
                     : "bg-hh-ui-50 text-hh-text rounded-bl-md"
               }`} style={message.isTranscriptReplay
                 ? {
                     opacity: 0.85,
                     backgroundColor: message.sender === 'hugo' ? '#4F7396' : '#E8EDF2',
                   }
-                : undefined
+                : message.sender === 'hugo'
+                  ? { backgroundColor: '#4F7396' }
+                  : undefined
               }>
                 {message.attachments && message.attachments.length > 0 && (
                   <div className={`flex flex-wrap gap-2 ${message.text ? "mb-2" : ""}`}>
