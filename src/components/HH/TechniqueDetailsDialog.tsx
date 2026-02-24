@@ -8,8 +8,16 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Badge } from "../ui/badge";
-import { Target, X, Info, Clock, Lightbulb, Pencil, Play } from "lucide-react";
+import { Target, X, Info, Clock, Lightbulb, Pencil, Play, ListOrdered, Quote } from "lucide-react";
 import { getCodeBadgeColors } from "../../utils/phaseColors";
+
+const PHASE_LABELS: Record<string, string> = {
+  '0': 'Pre-contactfase',
+  '1': 'Openingsfase',
+  '2': 'Ontdekkingsfase',
+  '3': 'Aanbevelingsfase',
+  '4': 'Beslissingsfase',
+};
 
 interface TechniqueDetailsDialogProps {
   open: boolean;
@@ -136,7 +144,7 @@ export function TechniqueDetailsDialog({
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-[13px] font-bold shrink-0 ${codeBadgeColors}`}>
                   {technique.nummer}
                 </div>
-                <span className="text-[13px] text-hh-muted">Fase {displayData.fase}</span>
+                <span className="text-[13px] text-hh-muted">Fase {displayData.fase} · {PHASE_LABELS[String(displayData.fase)] || ''}</span>
               </div>
               
               {isEditing ? (
@@ -295,6 +303,46 @@ export function TechniqueDetailsDialog({
                       {displayData.hoe}
                     </p>
                   )}
+                </div>
+              )}
+
+              {displayData.stappenplan && displayData.stappenplan.length > 0 && (
+                <div className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-4`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <ListOrdered className={`w-4 h-4 ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`} />
+                    <h4 className={`text-[14px] font-semibold ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`}>Stappenplan</h4>
+                  </div>
+                  <ol className="space-y-2">
+                    {(Array.isArray(displayData.stappenplan) ? displayData.stappenplan : [displayData.stappenplan]).map((stap: string, idx: number) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5 ${isAdmin ? 'bg-purple-600 text-white' : 'bg-hh-ink text-white'}`}>
+                          {idx + 1}
+                        </span>
+                        <span className={`text-[14px] leading-[22px] ${isAdmin ? 'text-purple-700' : 'text-hh-text'}`}>{stap}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              {displayData.voorbeeld && (Array.isArray(displayData.voorbeeld) ? displayData.voorbeeld.length > 0 : true) && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Quote className={`w-4 h-4 ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`} />
+                    <h4 className={`text-[14px] font-semibold ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`}>Voorbeelden</h4>
+                  </div>
+                  <div className="space-y-2">
+                    {(Array.isArray(displayData.voorbeeld) ? displayData.voorbeeld : [displayData.voorbeeld]).map((vb: string, idx: number) => (
+                      <div
+                        key={idx}
+                        className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-4`}
+                      >
+                        <p className={`text-[14px] leading-[22px] italic ${isAdmin ? 'text-purple-700' : 'text-hh-text'}`}>
+                          "{vb}"
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

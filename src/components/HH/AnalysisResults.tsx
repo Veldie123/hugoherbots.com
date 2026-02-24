@@ -2395,6 +2395,12 @@ export function AnalysisResults({
                       <p className="text-[13px] leading-[19px] text-hh-text">{tech.waarom}</p>
                     </div>
                   )}
+                  {tech.wanneer && (
+                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
+                      <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Wanneer</p>
+                      <p className="text-[13px] leading-[19px] text-hh-text">{tech.wanneer}</p>
+                    </div>
+                  )}
                   {tech.hoe && (
                     <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
                       <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Hoe</p>
@@ -2422,6 +2428,16 @@ export function AnalysisResults({
                           <li key={i} className="text-[12px] leading-[17px] text-hh-text pl-3" style={{ borderLeft: '2px solid #E9D5FF' }}>"{v}"</li>
                         ))}
                       </ul>
+                    </div>
+                  )}
+                  {tech.tags && tech.tags.length > 0 && (
+                    <div>
+                      <p className="text-[11px] font-semibold mb-2" style={{ color: '#7C3AED' }}>Tags</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {tech.tags.map((tag, i) => (
+                          <span key={i} className="text-[11px] px-2.5 py-1 rounded-full font-medium" style={{ backgroundColor: '#F3E8FF', color: '#7C3AED' }}>{tag}</span>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
