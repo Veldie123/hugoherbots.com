@@ -190,11 +190,13 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
   const isNavItemActive = (itemId: string): boolean => {
     if (currentPage === itemId) return true;
     
+    const analysisFromHugo = typeof window !== 'undefined' && sessionStorage.getItem('analysisFromHugo') === 'true';
+    
     // Map sub-pages to their parent menu items
     const subPageMapping: Record<string, string> = {
       "admin-chat-expert": "admin-sessions",
       "admin-sessions-detail": "admin-sessions",
-      "admin-analysis-results": "admin-sessions",
+      "admin-analysis-results": analysisFromHugo ? "admin-sessions" : "admin-uploads",
       "admin-upload-detail": "admin-uploads",
       "admin-transcript-detail": "admin-uploads",
     };
@@ -335,8 +337,10 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                               e.stopPropagation();
                               const historyType = (item as any).historyType;
                               if (historyType === "chat") {
+                                sessionStorage.setItem('analysisFromHugo', 'true');
                                 navigate?.('admin-chat-expert', { sessionId: histItem.id });
                               } else {
+                                sessionStorage.setItem('analysisFromHugo', 'false');
                                 navigate?.('admin-analysis-results', { conversationId: histItem.id, fromAdmin: true });
                               }
                               setMobileMenuOpen(false);
@@ -468,8 +472,10 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                           e.stopPropagation();
                           const historyType = (item as any).historyType;
                           if (historyType === "chat") {
+                            sessionStorage.setItem('analysisFromHugo', 'true');
                             navigate?.('admin-chat-expert', { sessionId: histItem.id });
                           } else {
+                            sessionStorage.setItem('analysisFromHugo', 'false');
                             navigate?.('admin-analysis-results', { conversationId: histItem.id, fromAdmin: true });
                           }
                         }}

@@ -340,6 +340,7 @@ export function AnalysisResults({
   const [feedbackOpen, setFeedbackOpen] = useState<string | null>(null);
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackConfirmed, setFeedbackConfirmed] = useState<Set<string>>(new Set());
+  const [badgeFeedbackType, setBadgeFeedbackType] = useState<Record<string, 'positive' | 'negative'>>({});
   const [copiedTurnIdx, setCopiedTurnIdx] = useState<number | null>(null);
   const [goldenSaved, setGoldenSaved] = useState<Set<number>>(new Set());
   const [correctionPanelTurn, setCorrectionPanelTurn] = useState<number | null>(null);
@@ -347,11 +348,16 @@ export function AnalysisResults({
   const [correctionValue, setCorrectionValue] = useState('');
   const [correctionNote, setCorrectionNote] = useState('');
   const [correctionSubmitting, setCorrectionSubmitting] = useState(false);
+  const [feedbackGiven, setFeedbackGiven] = useState<Record<number, 'positive' | 'negative'>>({});
   const [percentileData, setPercentileData] = useState<{ percentile: number; totalAnalyses: number; period: string } | null>(null);
   const [percentilePeriod, setPercentilePeriod] = useState<'all' | 'week' | 'month' | 'year'>('all');
   const [expandedMatchCount, setExpandedMatchCount] = useState<Record<string, number>>({});
   const [regeneratingCoach, setRegeneratingCoach] = useState(false);
   const [coachRegenerated, setCoachRegenerated] = useState(false);
+  const [showTechniqueSidebar, setShowTechniqueSidebar] = useState(false);
+  const [selectedTechniqueId, setSelectedTechniqueId] = useState<string | null>(null);
+  const [techniqueSidebarMode, setTechniqueSidebarMode] = useState<'view' | 'select'>('view');
+  const [techniqueSidebarTurnIdx, setTechniqueSidebarTurnIdx] = useState<number | null>(null);
 
   const [resolvedConversationId, setResolvedConversationId] = useState<string | null>(
     navigationData?.conversationId || sessionStorage.getItem('analysisId') || null
@@ -425,6 +431,7 @@ export function AnalysisResults({
       });
       if (!res.ok) throw new Error('Failed');
       setGoldenSaved(prev => { const next = new Set(prev); next.add(turn.idx); return next; });
+      setFeedbackGiven(prev => ({ ...prev, [turn.idx]: 'positive' }));
       toast?.('Opgeslagen als Golden Standard', { description: 'Dit voorbeeld wordt gebruikt om de AI te verbeteren' });
     } catch {
       toast?.('Opslaan mislukt');
@@ -470,6 +477,7 @@ export function AnalysisResults({
       });
 
       toast?.('Correctie ingediend', { description: 'Verschijnt in Config Review' });
+      setFeedbackGiven(prev => ({ ...prev, [turn.idx]: 'negative' }));
       setCorrectionPanelTurn(null);
       setCorrectionValue('');
       setCorrectionNote('');
@@ -798,11 +806,12 @@ export function AnalysisResults({
 
   const useAdminLayout = !!navigationData?.fromAdmin;
   const adminColors = useAdminLayout;
-  const fromHugo = !useAdminLayout && sessionStorage.getItem('analysisFromHugo') === 'true';
+  const analysisFromHugoFlag = sessionStorage.getItem('analysisFromHugo') === 'true';
+  const fromHugo = !useAdminLayout && analysisFromHugoFlag;
 
   const wrapLayout = (children: React.ReactNode) => {
     if (useAdminLayout) {
-      return <AdminLayout currentPage="admin-uploads" navigate={navigate as (page: string) => void}>{children}</AdminLayout>;
+      return <AdminLayout currentPage="admin-analysis-results" navigate={navigate as (page: string) => void}>{children}</AdminLayout>;
     }
     return <AppLayout currentPage={fromHugo ? "talk-to-hugo" : "analysis"} navigate={navigate} isAdmin={isAdmin}>{children}</AppLayout>;
   };
@@ -831,9 +840,9 @@ export function AnalysisResults({
           <p className="text-hh-text">{error || 'Geen resultaten gevonden'}</p>
           <Button variant="outline" onClick={() => {
             sessionStorage.removeItem('analysisFromHugo');
-            navigate?.(fromHugo ? "hugo-overview" : "upload-analysis");
+            navigate?.(navigationData?.fromAdmin ? (analysisFromHugoFlag ? "admin-chat-expert" : "admin-uploads") : fromHugo ? "hugo-overview" : "upload-analysis");
           }}>
-            {fromHugo ? 'Terug naar Talk to Hugo' : 'Terug naar uploads'}
+            {navigationData?.fromAdmin ? (analysisFromHugoFlag ? 'Terug naar Talk to Hugo' : 'Terug naar uploads') : fromHugo ? 'Terug naar Talk to Hugo' : 'Terug naar uploads'}
           </Button>
         </div>
       </div>
@@ -931,11 +940,11 @@ export function AnalysisResults({
               size="sm"
               onClick={() => {
                 sessionStorage.removeItem('analysisFromHugo');
-                navigate?.(navigationData?.fromAdmin ? "admin-uploads" : fromHugo ? "hugo-overview" : "analysis");
+                navigate?.(navigationData?.fromAdmin ? (analysisFromHugoFlag ? "admin-chat-expert" : "admin-uploads") : fromHugo ? "hugo-overview" : "analysis");
               }}
               className="gap-1 -ml-2"
             >
-              {fromHugo ? '← Terug naar Talk to Hugo' : '← Terug naar analyses'}
+              {navigationData?.fromAdmin ? (analysisFromHugoFlag ? '← Terug naar Talk to Hugo' : '← Terug naar analyses') : fromHugo ? '← Terug naar Talk to Hugo' : '← Terug naar analyses'}
             </Button>
           </div>
           <div className="flex items-center justify-between gap-6 sm:gap-8">
@@ -2004,6 +2013,7 @@ export function AnalysisResults({
                                           onClick={() => {
                                             submitCorrection('signal', 'houding_confirmed', signal.houding, signal.houding, `Turn ${turn.idx}: ${signal.houding} bevestigd`);
                                             setFeedbackConfirmed(prev => { const next = new Set(prev); next.add(badgeKey); return next; });
+                                            setBadgeFeedbackType(prev => ({ ...prev, [badgeKey]: 'positive' }));
                                           }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
                                           style={{ color: 'var(--hh-muted)' }}
@@ -2026,7 +2036,7 @@ export function AnalysisResults({
                                       </span>
                                     )}
                                     {isConfirmed && (
-                                      <CheckCircle className="w-3 h-3 ml-1" style={{ color: '#22C55E' }} />
+                                      <CheckCircle className="w-3 h-3 ml-1" style={{ color: badgeFeedbackType[badgeKey] === 'negative' ? '#EF4444' : '#22C55E' }} />
                                     )}
                                   </span>
                                 );
@@ -2047,6 +2057,7 @@ export function AnalysisResults({
                                           onClick={() => {
                                             submitCorrection('technique', 'quality_confirmed', `${tech.id}:${tech.quality}`, `${tech.id}:${tech.quality}`, `Turn ${turn.idx}: ${tech.naam || tech.id} bevestigd`);
                                             setFeedbackConfirmed(prev => { const next = new Set(prev); next.add(badgeKey); return next; });
+                                            setBadgeFeedbackType(prev => ({ ...prev, [badgeKey]: 'positive' }));
                                           }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
                                           style={{ color: 'var(--hh-muted)' }}
@@ -2069,7 +2080,7 @@ export function AnalysisResults({
                                       </span>
                                     )}
                                     {isConfirmed && (
-                                      <CheckCircle className="w-3 h-3 ml-1" style={{ color: '#22C55E' }} />
+                                      <CheckCircle className="w-3 h-3 ml-1" style={{ color: badgeFeedbackType[badgeKey] === 'negative' ? '#EF4444' : '#22C55E' }} />
                                     )}
                                   </span>
                                 );
@@ -2100,6 +2111,7 @@ export function AnalysisResults({
                                           submitCorrection('technique', 'quality', `${techId}:${tech?.quality || ''}`, feedbackText.trim(), `Turn ${turnIdx}: ${tech?.naam || techId} → ${feedbackText.trim()}`);
                                         }
                                         setFeedbackConfirmed(prev => { const next = new Set(prev); next.add(feedbackOpen); return next; });
+                                        setBadgeFeedbackType(prev => ({ ...prev, [feedbackOpen]: 'negative' }));
                                         setFeedbackOpen(null);
                                         setFeedbackText('');
                                       }
@@ -2121,6 +2133,7 @@ export function AnalysisResults({
                                         submitCorrection('technique', 'quality', `${techId}:${tech?.quality || ''}`, feedbackText.trim(), `Turn ${turnIdx}: ${tech?.naam || techId} → ${feedbackText.trim()}`);
                                       }
                                       setFeedbackConfirmed(prev => { const next = new Set(prev); next.add(feedbackOpen); return next; });
+                                      setBadgeFeedbackType(prev => ({ ...prev, [feedbackOpen]: 'negative' }));
                                       setFeedbackOpen(null);
                                       setFeedbackText('');
                                     }}
@@ -2157,12 +2170,12 @@ export function AnalysisResults({
                                 <button
                                   onClick={() => handleGoldenStandard(turn)}
                                   className={`p-1.5 rounded-md transition-colors ${
-                                    goldenSaved.has(turn.idx)
-                                      ? 'text-green-600 bg-green-50'
+                                    feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx)
+                                      ? 'text-emerald-500 bg-emerald-50'
                                       : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                                   }`}
                                   title="Markeer als correct — Golden Standard"
-                                  disabled={goldenSaved.has(turn.idx)}
+                                  disabled={goldenSaved.has(turn.idx) || feedbackGiven[turn.idx] === 'positive'}
                                 >
                                   <ThumbsUp className="w-3.5 h-3.5" />
                                 </button>
@@ -2174,9 +2187,11 @@ export function AnalysisResults({
                                     setCorrectionType('technique');
                                   }}
                                   className={`p-1.5 rounded-md transition-colors ${
-                                    correctionPanelTurn === turn.idx
+                                    feedbackGiven[turn.idx] === 'negative'
                                       ? 'text-red-500 bg-red-50'
-                                      : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                                      : correctionPanelTurn === turn.idx
+                                        ? 'text-red-500 bg-red-50'
+                                        : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                                   }`}
                                   title="AI tag is fout — Corrigeer"
                                 >
@@ -2199,8 +2214,10 @@ export function AnalysisResults({
                                   onClick={() => {
                                     const techIds = evaluation?.techniques.map(t => t.id) || [];
                                     if (techIds.length > 0) {
-                                      const tech = getTechniekByNummer(techIds[0]);
-                                      if (tech) toast?.(`${tech.naam}`, { description: tech.doel || tech.wat || '' });
+                                      setSelectedTechniqueId(techIds[0]);
+                                      setTechniqueSidebarMode('view');
+                                      setTechniqueSidebarTurnIdx(null);
+                                      setShowTechniqueSidebar(true);
                                     }
                                   }}
                                   className="p-1.5 rounded-md transition-colors hover:bg-purple-50"
@@ -2239,36 +2256,35 @@ export function AnalysisResults({
                                   </button>
                                 </div>
                                 <div className="mb-2">
-                                  <select
-                                    value={correctionValue}
-                                    onChange={(e) => setCorrectionValue(e.target.value)}
-                                    className="w-full text-[12px] px-2.5 py-2 rounded-lg border bg-card"
-                                    style={{ borderColor: '#E9D5FF' }}
-                                  >
-                                    <option value="">
-                                      {correctionType === 'technique' ? 'Selecteer juiste techniek...' : 'Selecteer juiste houding...'}
-                                    </option>
-                                    {correctionType === 'technique' ? (
-                                      <>
-                                        {['Engagement', 'Probing', 'Influencing', 'Closing'].map((faseName, faseIdx) => {
-                                          const faseNum = faseIdx + 1;
-                                          const techs = getAllTechnieken().filter(t => t.fase === `${faseNum}` && !t.is_fase);
-                                          if (techs.length === 0) return null;
-                                          return (
-                                            <optgroup key={faseName} label={`Fase ${faseNum}: ${faseName}`}>
-                                              {techs.map(t => (
-                                                <option key={t.nummer} value={t.nummer}>{t.nummer} — {t.naam}</option>
-                                              ))}
-                                            </optgroup>
-                                          );
-                                        })}
-                                      </>
-                                    ) : (
-                                      KLANT_HOUDINGEN.map(h => (
+                                  {correctionType === 'technique' ? (
+                                    <button
+                                      onClick={() => {
+                                        setTechniqueSidebarMode('select');
+                                        setTechniqueSidebarTurnIdx(turn.idx);
+                                        setSelectedTechniqueId(null);
+                                        setShowTechniqueSidebar(true);
+                                      }}
+                                      className="w-full text-left text-[12px] px-2.5 py-2 rounded-lg border bg-card flex items-center justify-between"
+                                      style={{ borderColor: '#E9D5FF' }}
+                                    >
+                                      <span style={{ color: correctionValue ? 'var(--hh-text)' : 'var(--hh-muted)' }}>
+                                        {correctionValue ? `${correctionValue} — ${getTechniekByNummer(correctionValue)?.naam || correctionValue}` : 'Selecteer juiste techniek...'}
+                                      </span>
+                                      <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#9910FA' }} />
+                                    </button>
+                                  ) : (
+                                    <select
+                                      value={correctionValue}
+                                      onChange={(e) => setCorrectionValue(e.target.value)}
+                                      className="w-full text-[12px] px-2.5 py-2 rounded-lg border bg-card"
+                                      style={{ borderColor: '#E9D5FF' }}
+                                    >
+                                      <option value="">Selecteer juiste houding...</option>
+                                      {KLANT_HOUDINGEN.map(h => (
                                         <option key={h.id} value={h.id}>{h.naam}</option>
-                                      ))
-                                    )}
-                                  </select>
+                                      ))}
+                                    </select>
+                                  )}
                                 </div>
                                 <input
                                   type="text"
@@ -2306,6 +2322,151 @@ export function AnalysisResults({
               </div>
             </Card>
           </div>)}
+
+      {showTechniqueSidebar && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/30 z-40"
+            onClick={() => setShowTechniqueSidebar(false)}
+          />
+          <div className="fixed top-0 right-0 h-full w-[380px] max-w-[90vw] bg-white z-50 shadow-2xl overflow-y-auto"
+            style={{ borderLeft: '2px solid #E9D5FF' }}
+          >
+            <div className="sticky top-0 bg-white z-10 px-5 py-4 border-b" style={{ borderColor: '#E9D5FF' }}>
+              <div className="flex items-center justify-between">
+                <h3 className="text-[15px] font-semibold" style={{ color: '#7C3AED' }}>
+                  {techniqueSidebarMode === 'select' ? 'Selecteer techniek' : 'E.P.I.C. Techniek'}
+                </h3>
+                <button
+                  onClick={() => setShowTechniqueSidebar(false)}
+                  className="p-1.5 rounded-lg hover:bg-purple-50 transition-colors"
+                  style={{ color: '#9910FA' }}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              {techniqueSidebarMode === 'select' && (
+                <p className="text-[12px] mt-1" style={{ color: '#7C3AED' }}>Klik op een techniek om deze te selecteren als correctie</p>
+              )}
+            </div>
+
+            {techniqueSidebarMode === 'view' && selectedTechniqueId && (() => {
+              const tech = getTechniekByNummer(selectedTechniqueId);
+              if (!tech) return <div className="p-5 text-[13px] text-hh-muted">Techniek niet gevonden</div>;
+              const FASE_LABELS: Record<string, { name: string; color: string; bg: string }> = {
+                '0': { name: 'Pre-contact', color: '#6B7280', bg: '#F3F4F6' },
+                '1': { name: 'Opening', color: '#3B82F6', bg: '#EFF6FF' },
+                '2': { name: 'EPIC (Ontdekking)', color: '#10B981', bg: '#ECFDF5' },
+                '3': { name: 'Aanbeveling', color: '#8B5CF6', bg: '#F5F3FF' },
+                '4': { name: 'Beslissing', color: '#F59E0B', bg: '#FFFBEB' },
+              };
+              const faseInfo = FASE_LABELS[tech.fase] || FASE_LABELS['2'];
+              return (
+                <div className="p-5 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#F5F3FF' }}>
+                      <Lightbulb className="w-5 h-5" style={{ color: '#9910FA' }} />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-medium" style={{ color: '#9910FA' }}>Techniek {tech.nummer}</p>
+                      <h4 className="text-[16px] font-semibold text-hh-text">{tech.naam}</h4>
+                    </div>
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium" style={{ backgroundColor: faseInfo.bg, color: faseInfo.color }}>
+                    <Target className="w-3 h-3" /> Fase {tech.fase}: {faseInfo.name}
+                  </div>
+                  {tech.doel && (
+                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
+                      <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Doel</p>
+                      <p className="text-[13px] leading-[19px] text-hh-text">{tech.doel}</p>
+                    </div>
+                  )}
+                  {tech.wat && (
+                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
+                      <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Wat</p>
+                      <p className="text-[13px] leading-[19px] text-hh-text">{tech.wat}</p>
+                    </div>
+                  )}
+                  {tech.waarom && (
+                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
+                      <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Waarom</p>
+                      <p className="text-[13px] leading-[19px] text-hh-text">{tech.waarom}</p>
+                    </div>
+                  )}
+                  {tech.hoe && (
+                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
+                      <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Hoe</p>
+                      <p className="text-[13px] leading-[19px] text-hh-text">{tech.hoe}</p>
+                    </div>
+                  )}
+                  {tech.stappenplan && tech.stappenplan.length > 0 && (
+                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
+                      <p className="text-[11px] font-semibold mb-2" style={{ color: '#7C3AED' }}>Stappenplan</p>
+                      <ol className="space-y-1.5">
+                        {tech.stappenplan.map((stap, i) => (
+                          <li key={i} className="flex gap-2 text-[12px] leading-[17px] text-hh-text">
+                            <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-semibold" style={{ backgroundColor: '#E9D5FF', color: '#7C3AED' }}>{i + 1}</span>
+                            {stap}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+                  {tech.voorbeeld && tech.voorbeeld.length > 0 && (
+                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
+                      <p className="text-[11px] font-semibold mb-2" style={{ color: '#7C3AED' }}>Voorbeelden</p>
+                      <ul className="space-y-1.5">
+                        {tech.voorbeeld.map((v, i) => (
+                          <li key={i} className="text-[12px] leading-[17px] text-hh-text pl-3" style={{ borderLeft: '2px solid #E9D5FF' }}>"{v}"</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {techniqueSidebarMode === 'select' && (
+              <div className="p-4 space-y-3">
+                {[
+                  { fase: '1', label: 'Opening', color: '#3B82F6' },
+                  { fase: '2', label: 'EPIC (Ontdekking)', color: '#10B981' },
+                  { fase: '3', label: 'Aanbeveling', color: '#8B5CF6' },
+                  { fase: '4', label: 'Beslissing', color: '#F59E0B' },
+                ].map(({ fase, label, color }) => {
+                  const techs = getAllTechnieken().filter(t => t.fase === fase && !t.is_fase);
+                  if (techs.length === 0) return null;
+                  return (
+                    <div key={fase}>
+                      <p className="text-[11px] font-semibold mb-1.5 px-1" style={{ color }}>Fase {fase}: {label}</p>
+                      <div className="space-y-1">
+                        {techs.map(t => (
+                          <button
+                            key={t.nummer}
+                            onClick={() => {
+                              setCorrectionValue(t.nummer);
+                              setSelectedTechniqueId(t.nummer);
+                              setTechniqueSidebarMode('view');
+                            }}
+                            className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] transition-colors hover:bg-purple-50"
+                            style={{
+                              backgroundColor: correctionValue === t.nummer ? '#F5F3FF' : 'transparent',
+                              borderLeft: correctionValue === t.nummer ? '3px solid #9910FA' : '3px solid transparent',
+                            }}
+                          >
+                            <span className="font-medium" style={{ color: '#7C3AED', minWidth: 32 }}>{t.nummer}</span>
+                            <span className="text-hh-text">{t.naam}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       </div>
   );
