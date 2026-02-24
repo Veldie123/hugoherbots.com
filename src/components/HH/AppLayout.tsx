@@ -8,7 +8,6 @@ import {
   FileSearch,
   Shield,
   MessageSquare,
-  PanelLeftClose,
   PanelLeft,
   UserCircle,
   CheckCheck,
@@ -215,34 +214,20 @@ export function AppLayout({
       <div
         data-sidebar-collapsed={collapsed ? 'true' : 'false'}
         className={`hidden lg:flex ${
-          collapsed ? "w-[60px]" : "w-[200px]"
+          collapsed ? "w-16" : "w-56"
         } bg-hh-bg border-r border-hh-border flex-col transition-all duration-300 flex-shrink-0`}
       >
-        <div className="h-16 flex items-center justify-between px-3 border-b border-hh-border flex-shrink-0">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="h-16 flex items-center justify-start px-3 border-b border-hh-border flex-shrink-0 hover:bg-hh-ui-50 transition-colors cursor-pointer"
+          aria-label={collapsed ? "Sidebar uitklappen" : "Sidebar inklappen"}
+        >
           {!collapsed ? (
-            <div className="flex flex-col items-start gap-0">
-              <span className="text-[18px] leading-[22px] tracking-widest uppercase font-bold text-hh-ink">HUGO</span>
-              <span className="text-[18px] leading-[22px] tracking-widest uppercase font-bold text-hh-ink">HERBOTS</span>
-            </div>
+            <Logo variant="horizontal" className="text-hh-ink text-[14px]" />
           ) : (
-            <button
-              onClick={() => setCollapsed(false)}
-              className="w-full flex justify-center hover:opacity-70 transition-opacity"
-              aria-label="Expand sidebar"
-            >
-              <Logo variant="icon" className="w-8 h-8" />
-            </button>
+            <Logo variant="icon" className="w-8 h-8 text-hh-ink" />
           )}
-          {!collapsed && (
-            <button
-              onClick={() => setCollapsed(true)}
-              className="w-8 h-8 rounded-lg hover:bg-hh-ui-50 flex items-center justify-center text-hh-muted transition-colors"
-              aria-label="Collapse sidebar"
-            >
-              <PanelLeftClose className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+        </button>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
           {mainNavItems.map((item) => {
@@ -256,10 +241,9 @@ export function AppLayout({
                   onClick={() => handleNavigate(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                     isActive
-                      ? "text-white font-medium"
-                      : "text-hh-text hover:bg-hh-ui-50"
-                  }`}
-                  style={isActive ? { backgroundColor: '#4F7396' } : undefined}
+                      ? "bg-hh-primary/10 border-l-2 border-hh-primary text-hh-primary font-medium"
+                      : "text-hh-text hover:bg-hh-ui-100"
+                  } ${collapsed ? "justify-center" : ""}`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
                   {!collapsed && (
@@ -333,10 +317,9 @@ export function AppLayout({
                 onClick={() => navigate?.(item.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                   isActive
-                    ? "text-white font-medium"
-                    : "text-hh-text hover:bg-hh-ui-50"
-                }`}
-                style={isActive ? { backgroundColor: '#4F7396' } : undefined}
+                    ? "bg-hh-primary/10 border-l-2 border-hh-primary text-hh-primary font-medium"
+                    : "text-hh-text hover:bg-hh-ui-100"
+                } ${collapsed ? "justify-center" : ""}`}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
                 {!collapsed && (
@@ -347,19 +330,29 @@ export function AppLayout({
               </button>
             );
           })}
-
-          {isAdmin && (
-            <div className="p-3 border-t border-hh-border">
-              <button
-                onClick={() => navigate?.("admin-dashboard")}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
-              >
-                <Eye className="w-4 h-4" />
-                {!collapsed && <span>Admin View</span>}
-              </button>
-            </div>
-          )}
         </nav>
+
+        {isAdmin && (
+          <div className="p-3 border-t border-hh-border flex-shrink-0">
+            <button
+              onClick={() => {
+                const pageMap: Record<string, string> = {
+                  'dashboard': 'admin-dashboard', 'techniques': 'admin-techniques', 'videos': 'admin-videos',
+                  'live': 'admin-live', 'analysis': 'admin-uploads', 'talk-to-hugo': 'admin-sessions',
+                  'team': 'admin-users', 'analytics': 'admin-analytics', 'settings': 'admin-settings',
+                  'resources': 'admin-resources', 'analysis-results': 'admin-uploads',
+                  'upload-analysis': 'admin-uploads', 'video-watch': 'admin-videos',
+                  'hugo-overview': 'admin-sessions',
+                };
+                navigate?.(pageMap[currentPage] || 'admin-dashboard');
+              }}
+              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px] ${collapsed ? "justify-center" : ""}`}
+            >
+              <Eye className="w-4 h-4" />
+              {!collapsed && <span>Admin View</span>}
+            </button>
+          </div>
+        )}
       </div>
 
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -388,10 +381,9 @@ export function AppLayout({
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                       isActive
-                        ? "text-white font-medium"
-                        : "text-hh-text hover:bg-hh-ui-50"
+                        ? "bg-hh-primary/10 border-l-2 border-hh-primary text-hh-primary font-medium"
+                        : "text-hh-text hover:bg-hh-ui-100"
                     }`}
-                    style={isActive ? { backgroundColor: '#4F7396' } : undefined}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     <span className="text-[14px] leading-[20px]">
@@ -468,10 +460,9 @@ export function AppLayout({
                   }}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                     isActive
-                      ? "text-white font-medium"
-                      : "text-hh-text hover:bg-hh-ui-50"
+                      ? "bg-hh-primary/10 border-l-2 border-hh-primary text-hh-primary font-medium"
+                      : "text-hh-text hover:bg-hh-ui-100"
                   }`}
-                  style={isActive ? { backgroundColor: '#4F7396' } : undefined}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
                   <span className="text-[14px] leading-[20px] whitespace-nowrap">
@@ -485,10 +476,18 @@ export function AppLayout({
               <div className="mt-1 pt-3 border-t border-hh-border">
                 <button
                   onClick={() => {
-                    navigate?.("admin-dashboard");
+                    const pageMap: Record<string, string> = {
+                      'dashboard': 'admin-dashboard', 'techniques': 'admin-techniques', 'videos': 'admin-videos',
+                      'live': 'admin-live', 'analysis': 'admin-uploads', 'talk-to-hugo': 'admin-sessions',
+                      'team': 'admin-users', 'analytics': 'admin-analytics', 'settings': 'admin-settings',
+                      'resources': 'admin-resources', 'analysis-results': 'admin-uploads',
+                      'upload-analysis': 'admin-uploads', 'video-watch': 'admin-videos',
+                      'hugo-overview': 'admin-sessions',
+                    };
+                    navigate?.(pageMap[currentPage] || 'admin-dashboard');
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
+                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
                 >
                   <Eye className="w-4 h-4" />
                   <span>Admin View</span>

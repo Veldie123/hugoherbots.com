@@ -347,10 +347,10 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Analyses', value: conversations.length, icon: FileAudio, bgColor: 'rgba(37, 99, 235, 0.12)', color: '#2563eb' },
+            { name: 'Totaal Analyses', value: conversations.length, icon: FileAudio, bgColor: 'rgba(79, 115, 150, 0.1)', color: '#4F7396' },
             { name: 'Geanalyseerd', value: analyzedCount, icon: BarChart2, bgColor: 'rgba(5, 150, 105, 0.12)', color: '#059669' },
             { name: 'Totale Duur', value: `${Math.floor(totalDuration / 60)}u ${totalDuration % 60}m`, icon: Clock, bgColor: 'rgba(234, 88, 12, 0.12)', color: '#ea580c' },
-            { name: 'Gem. Score', value: `${avgScore}%`, icon: TrendingUp, bgColor: 'rgba(2, 132, 199, 0.12)', color: '#0284c7' },
+            { name: 'Gem. Score', value: `${avgScore}%`, icon: TrendingUp, bgColor: 'rgba(79, 115, 150, 0.1)', color: '#4F7396' },
           ].map(stat => (
             <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
               <div className="flex items-start justify-between mb-2 sm:mb-3">
@@ -527,7 +527,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                     >
                       <td className="py-3 px-4">
                         <span 
-                          style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}
+                          style={{ backgroundColor: 'rgba(79, 115, 150, 0.1)', color: '#4F7396' }}
                           className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold">
                           {conv.techniquesUsed[0] || "—"}
                         </span>
