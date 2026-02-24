@@ -274,7 +274,7 @@ export function AppLayout({
                 {!collapsed && isActive && item.historyType && (() => {
                   const hiddenIds = getHiddenIds('user', item.historyType === 'chat' ? 'chat' : 'analysis');
                   const visibleHistory = history.filter(h => !hiddenIds.has(h.id));
-                  const totalCount = item.historyType === 'chat' ? chatTotalCount : analysisTotalCount;
+                  const totalCount = visibleHistory.length;
                   return (
                   <div className="ml-2 pl-4 border-l-2 border-hh-border space-y-0.5 -mt-0.5">
                     {visibleHistory.slice(0, 3).map((histItem) => (
@@ -404,7 +404,7 @@ export function AppLayout({
                   {isActive && item.historyType && (() => {
                     const hiddenIds = getHiddenIds('user', item.historyType === 'chat' ? 'chat' : 'analysis');
                     const visibleHistory = history.filter(h => !hiddenIds.has(h.id));
-                    const totalCount = item.historyType === 'chat' ? chatTotalCount : analysisTotalCount;
+                    const totalCount = visibleHistory.length;
                     return (
                     <div className="ml-3 pl-4 border-l-2 border-hh-border space-y-0.5 -mt-0.5">
                       {visibleHistory.slice(0, 3).map((histItem) => (

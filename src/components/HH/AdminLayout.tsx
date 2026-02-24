@@ -364,7 +364,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                           }}
                           className="w-full flex items-center gap-1 px-3 py-2 text-[13px] text-purple-600 hover:text-purple-700 transition-colors"
                         >
-                          <span>Bekijk alle{(() => { const tc = (item as any).historyType === 'chat' ? chatTotalCount : analysisTotalCount; return tc > 0 ? ` (${tc})` : ""; })()}</span>
+                          <span>Bekijk alle{history.length > 0 ? ` (${history.length})` : ""}</span>
                           <ChevronRight className="w-3 h-3" />
                         </button>
                       </div>
@@ -495,7 +495,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                       onClick={() => navigate?.((item as any).overviewPage)}
                       className="w-full flex items-center gap-1 px-2 py-1.5 text-[12px] text-purple-600 hover:text-purple-700 transition-colors"
                     >
-                      <span>Bekijk alle{(() => { const tc = (item as any).historyType === 'chat' ? chatTotalCount : analysisTotalCount; return tc > 0 ? ` (${tc})` : ""; })()}</span>
+                      <span>Bekijk alle{history.length > 0 ? ` (${history.length})` : ""}</span>
                       <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>
