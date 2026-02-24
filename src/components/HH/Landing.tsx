@@ -71,13 +71,18 @@ export function Landing({ navigate }: LandingProps) {
 
         {/* Hero - Large Background Photo with Text Overlay */}
         <section className="relative overflow-hidden" style={{ minHeight: 'calc(100vh - 80px)' }}>
-          {/* Background Image - Hugo Writing */}
+          {/* Background Video - Hugo Writing */}
           <div className="absolute inset-0">
-            <img 
-              src={hugoWriting} 
-              alt="Hugo Herbots"
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster={hugoWriting}
               className="w-full h-full object-cover object-center"
-            />
+            >
+              <source src="/videos/hero-hugo-schrijft.mp4" type="video/mp4" />
+            </video>
             {/* Desktop: dark gradient from left for text contrast */}
             <div className="hidden md:block absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(13,27,42,0.75) 0%, rgba(13,27,42,0.45) 35%, rgba(13,27,42,0.1) 55%, transparent 70%)' }}></div>
             {/* Mobile: dark gradient from bottom for dramatic effect */}
