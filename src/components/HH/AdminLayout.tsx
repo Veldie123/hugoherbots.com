@@ -337,7 +337,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                               if (historyType === "chat") {
                                 navigate?.('admin-chat-expert', { sessionId: histItem.id });
                               } else {
-                                navigate?.('admin-analysis-results', { conversationId: histItem.id });
+                                navigate?.('admin-analysis-results', { conversationId: histItem.id, fromAdmin: true });
                               }
                               setMobileMenuOpen(false);
                             }}
@@ -470,7 +470,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                           if (historyType === "chat") {
                             navigate?.('admin-chat-expert', { sessionId: histItem.id });
                           } else {
-                            navigate?.('admin-analysis-results', { conversationId: histItem.id });
+                            navigate?.('admin-analysis-results', { conversationId: histItem.id, fromAdmin: true });
                           }
                         }}
                         className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left hover:bg-purple-600/10 transition-colors group cursor-pointer"

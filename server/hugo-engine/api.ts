@@ -3758,6 +3758,19 @@ app.post("/api/v2/chat/feedback", express.json(), async (req: Request, res: Resp
 
     if (feedback === 'down') {
       console.log(`[Feedback] Thumbs-down from ${userId} on message ${messageId}: "${(messageText || '').slice(0, 100)}..."`);
+
+      try {
+        await supabase.from('admin_notifications').insert({
+          type: 'chat_feedback',
+          title: 'Negatieve feedback op AI antwoord',
+          message: `Gebruiker gaf een duimpje omlaag: "${(messageText || '').slice(0, 150)}..."`,
+          source: 'talk-to-hugo',
+          metadata: { messageId, sessionId, userId, messageText: (messageText || '').slice(0, 500) },
+          read: false,
+        });
+      } catch (notifErr) {
+        console.error('[Feedback] Failed to create admin notification:', notifErr);
+      }
     }
 
     res.json({ success: true, feedback });

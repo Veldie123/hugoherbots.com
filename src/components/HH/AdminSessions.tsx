@@ -210,7 +210,7 @@ export function AdminSessions({ navigate }: AdminSessionsProps) {
           return next;
         });
         sessionStorage.setItem('analysisId', sessionId);
-        if (navigate) navigate('admin-analysis-results');
+        if (navigate) navigate('admin-analysis-results', { fromAdmin: true });
         return;
       }
 
@@ -227,7 +227,7 @@ export function AdminSessions({ navigate }: AdminSessionsProps) {
               return next;
             });
             sessionStorage.setItem('analysisId', sessionId);
-            if (navigate) navigate('admin-analysis-results');
+            if (navigate) navigate('admin-analysis-results', { fromAdmin: true });
           } else if (statusData.status === 'failed') {
             clearInterval(pollInterval);
             setAnalyzingSessionIds(prev => {
@@ -428,7 +428,7 @@ export function AdminSessions({ navigate }: AdminSessionsProps) {
   const viewSessionAnalysis = (session: Session) => {
     sessionStorage.setItem('analysisId', session.id);
     sessionStorage.setItem('analysisFromHugo', 'true');
-    if (navigate) navigate('admin-analysis-results');
+    if (navigate) navigate('admin-analysis-results', { fromAdmin: true });
   };
 
   const viewTranscript = (session: Session) => {

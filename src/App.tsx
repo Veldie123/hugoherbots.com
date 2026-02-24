@@ -100,8 +100,9 @@ export default function App() {
     if (devPage === 'analysis-results' || devPage === 'admin-analysis-results') {
       const params = new URLSearchParams(window.location.search);
       const cid = params.get('id');
-      if (cid) return { conversationId: cid };
-      return { autoLoadFirst: true };
+      const isAdminRoute = devPage === 'admin-analysis-results';
+      if (cid) return { conversationId: cid, ...(isAdminRoute ? { fromAdmin: true } : {}) };
+      return { autoLoadFirst: true, ...(isAdminRoute ? { fromAdmin: true } : {}) };
     }
     return undefined;
   })();

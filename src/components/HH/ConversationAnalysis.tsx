@@ -202,7 +202,7 @@ export function ConversationAnalysis({
       setShowUploadView(false);
       
       if (navigate && data) {
-        navigate(isAdmin ? "admin-analysis-results" : "analysis-results", { id: data.id, status: "processing" });
+        navigate(isAdmin ? "admin-analysis-results" : "analysis-results", { id: data.id, status: "processing", ...(isAdmin ? { fromAdmin: true } : {}) });
       }
     } catch (err) {
       setUploadError('Er ging iets mis bij het uploaden');
@@ -411,7 +411,7 @@ export function ConversationAnalysis({
                         className="hover:bg-hh-ui-50/50 transition-colors cursor-pointer"
                         onClick={() => {
                           if (upload.status === 'completed') {
-                            navigate?.(isAdmin ? "admin-analysis-results" : "analysis-results", { id: upload.id });
+                            navigate?.(isAdmin ? "admin-analysis-results" : "analysis-results", { id: upload.id, ...(isAdmin ? { fromAdmin: true } : {}) });
                           }
                         }}
                       >
