@@ -65,6 +65,33 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
   const [unreadCount, setUnreadCount] = useState(3);
   const [recentChatSessions, setRecentChatSessions] = useState<HistoryItem[]>([]);
   const [recentAnalyses, setRecentAnalyses] = useState<HistoryItem[]>([]);
+  const [adminUserName, setAdminUserName] = useState('Admin');
+  const [adminUserRole, setAdminUserRole] = useState('Admin');
+  const [adminUserInitials, setAdminUserInitials] = useState('AD');
+
+  useEffect(() => {
+    const loadAdminUser = async () => {
+      try {
+        const { auth } = await import('../../utils/supabase/client');
+        const { session } = await auth.getSession();
+        if (session?.user) {
+          const email = (session.user.email || '').toLowerCase();
+          const meta = session.user.user_metadata || {};
+          const firstName = meta.first_name || meta.firstName || '';
+          const lastName = meta.last_name || meta.lastName || '';
+          const fullName = [firstName, lastName].filter(Boolean).join(' ') || email.split('@')[0];
+          const initials = firstName && lastName
+            ? `${firstName[0]}${lastName[0]}`.toUpperCase()
+            : fullName.substring(0, 2).toUpperCase();
+          const isSuperAdmin = email === 'stephane@hugoherbots.com';
+          setAdminUserName(fullName);
+          setAdminUserRole(isSuperAdmin ? 'Super Admin' : 'Admin');
+          setAdminUserInitials(initials);
+        }
+      } catch {}
+    };
+    loadAdminUser();
+  }, []);
 
   useEffect(() => {
     const fetchChatSessions = async () => {
@@ -662,12 +689,12 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                 <Button variant="ghost" className="gap-2 px-2">
                   <Avatar className="w-8 h-8">
                     <AvatarFallback className="bg-purple-600 text-white text-[12px]">
-                      HH
+                      {adminUserInitials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="text-left hidden sm:block">
-                    <p className="text-[13px] leading-[18px] text-hh-text">Hugo Herbots</p>
-                    <p className="text-[11px] leading-[14px] text-hh-muted">Super Admin</p>
+                    <p className="text-[13px] leading-[18px] text-hh-text">{adminUserName}</p>
+                    <p className="text-[11px] leading-[14px] text-hh-muted">{adminUserRole}</p>
                   </div>
                 </Button>
               </DropdownMenuTrigger>

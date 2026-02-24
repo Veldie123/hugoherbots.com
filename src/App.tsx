@@ -206,14 +206,13 @@ export default function App() {
               onSignupClick={() => navigate("signup")}
               onLoginSuccess={async () => {
                 const { session } = await auth.getSession();
-                const email = session?.user?.email || '';
-                const isHugo = email.toLowerCase() === 'hugo@hugoherbots.com';
+                const email = (session?.user?.email || '').toLowerCase();
+                const isHugobotsUser = email.endsWith('@hugoherbots.com');
                 
-                if (isHugo) {
-                  setOnboardingMode(true);
-                  localStorage.setItem('hugo_onboarding_mode', 'true');
-                  navigate("dashboard");
-                } else if (email.endsWith('@hugoherbots.com')) {
+                if (isHugobotsUser) {
+                  setIsAdmin(true);
+                  setOnboardingMode(false);
+                  localStorage.removeItem('hugo_onboarding_mode');
                   navigate("admin-dashboard");
                 } else {
                   navigate("dashboard");
@@ -229,8 +228,10 @@ export default function App() {
               onLoginClick={() => navigate("login")}
               onSignupSuccess={async () => {
                 const { session } = await auth.getSession();
-                const email = session?.user?.email || '';
+                const email = (session?.user?.email || '').toLowerCase();
                 if (email.endsWith('@hugoherbots.com')) {
+                  setIsAdmin(true);
+                  setOnboardingMode(false);
                   navigate("admin-dashboard");
                 } else {
                   navigate("onboarding");

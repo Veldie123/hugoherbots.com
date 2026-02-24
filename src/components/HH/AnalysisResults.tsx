@@ -1935,15 +1935,52 @@ export function AnalysisResults({
                 {(() => {
                   let lastPhase: number | null = null;
 
-                  return transcript.map((turn) => {
-                    const evaluation = evaluations.find(e => e.turnIdx === turn.idx);
-                    const signal = signals.find(s => s.turnIdx === turn.idx);
-                    const currentPhase = determinePhaseForTurn(turn.idx);
+                  const groupedTranscript = (() => {
+                    const groups: Array<{
+                      speaker: string;
+                      text: string;
+                      startMs: number;
+                      idx: number;
+                      turnIndices: number[];
+                    }> = [];
+
+                    for (const turn of transcript) {
+                      const last = groups[groups.length - 1];
+                      if (last && last.speaker === turn.speaker) {
+                        last.text += ' ' + turn.text;
+                        last.turnIndices.push(turn.idx);
+                      } else {
+                        groups.push({
+                          speaker: turn.speaker,
+                          text: turn.text,
+                          startMs: turn.startMs,
+                          idx: turn.idx,
+                          turnIndices: [turn.idx],
+                        });
+                      }
+                    }
+                    return groups;
+                  })();
+
+                  return groupedTranscript.map((group) => {
+                    const groupEvaluations = evaluations.filter(e => group.turnIndices.includes(e.turnIdx));
+                    const allTechniques = groupEvaluations.flatMap(e => e.techniques);
+                    const groupSignals = signals.filter(s => group.turnIndices.includes(s.turnIdx));
+                    const lastSignal = groupSignals.filter(s => s.houding !== 'neutraal').slice(-1)[0];
+                    const currentPhase = determinePhaseForTurn(group.turnIndices[0]);
                     const showPhaseDivider = currentPhase !== null && currentPhase !== lastPhase;
                     if (currentPhase !== null) lastPhase = currentPhase;
 
+                    const groupTurn: TranscriptTurn = {
+                      idx: group.idx,
+                      startMs: group.startMs,
+                      endMs: group.startMs,
+                      speaker: group.speaker as 'seller' | 'customer',
+                      text: group.text,
+                    };
+
                     return (
-                      <div key={turn.idx}>
+                      <div key={group.idx}>
                         {showPhaseDivider && currentPhase && (
                           <div className="flex items-center gap-3 my-4">
                             <div className="flex-1 h-px bg-hh-border" />
@@ -1955,28 +1992,28 @@ export function AnalysisResults({
                           </div>
                         )}
                         <ChatBubble
-                          speaker={turn.speaker === 'seller' ? 'seller' : 'customer'}
-                          text={turn.text}
-                          timestamp={formatTime(turn.startMs)}
+                          speaker={group.speaker === 'seller' ? 'seller' : 'customer'}
+                          text={group.text}
+                          timestamp={formatTime(group.startMs)}
                           adminColors={adminColors}
                           variant="default"
                         >
                           <div className="space-y-1.5">
                             <div className="flex flex-wrap items-center gap-1.5">
-                              {turn.speaker === 'customer' && signal && signal.houding !== 'neutraal' && (() => {
-                                const badgeKey = `signal-${turn.idx}`;
+                              {group.speaker === 'customer' && lastSignal && (() => {
+                                const badgeKey = `signal-${group.idx}`;
                                 const isConfirmed = feedbackConfirmed.has(badgeKey);
                                 const isFeedbackPanelOpen = feedbackOpen === badgeKey;
                                 return (
                                   <span className="relative inline-flex items-center group/badge">
-                                    <Badge className={`${getSignalLabel(signal.houding).color} text-[10px] px-2 py-0.5`}>
-                                      {getSignalLabel(signal.houding).label}
+                                    <Badge className={`${getSignalLabel(lastSignal.houding).color} text-[10px] px-2 py-0.5`}>
+                                      {getSignalLabel(lastSignal.houding).label}
                                     </Badge>
                                     {useAdminLayout && !isConfirmed && (
                                       <span className="inline-flex items-center gap-0.5 ml-1 opacity-0 group-hover/badge:opacity-100 transition-opacity">
                                         <button
                                           onClick={() => {
-                                            submitCorrection('signal', 'houding_confirmed', signal.houding, signal.houding, `Turn ${turn.idx}: ${signal.houding} bevestigd`);
+                                            submitCorrection('signal', 'houding_confirmed', lastSignal.houding, lastSignal.houding, `Turn ${group.idx}: ${lastSignal.houding} bevestigd`);
                                             setFeedbackConfirmed(prev => { const next = new Set(prev); next.add(badgeKey); return next; });
                                           }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
@@ -2005,9 +2042,9 @@ export function AnalysisResults({
                                   </span>
                                 );
                               })()}
-                              {evaluation && evaluation.techniques.length > 0 && evaluation.techniques.map((tech, i) => {
+                              {allTechniques.length > 0 && allTechniques.map((tech, i) => {
                                 const badge = getQualityBadge(tech.quality);
-                                const badgeKey = `tech-${turn.idx}-${tech.id}`;
+                                const badgeKey = `tech-${group.idx}-${tech.id}`;
                                 const isConfirmed = feedbackConfirmed.has(badgeKey);
                                 const isFeedbackPanelOpen = feedbackOpen === badgeKey;
                                 return (
@@ -2019,7 +2056,7 @@ export function AnalysisResults({
                                       <span className="inline-flex items-center gap-0.5 ml-1 opacity-0 group-hover/badge:opacity-100 transition-opacity">
                                         <button
                                           onClick={() => {
-                                            submitCorrection('technique', 'quality_confirmed', `${tech.id}:${tech.quality}`, `${tech.id}:${tech.quality}`, `Turn ${turn.idx}: ${tech.naam || tech.id} bevestigd`);
+                                            submitCorrection('technique', 'quality_confirmed', `${tech.id}:${tech.quality}`, `${tech.id}:${tech.quality}`, `Turn ${group.idx}: ${tech.naam || tech.id} bevestigd`);
                                             setFeedbackConfirmed(prev => { const next = new Set(prev); next.add(badgeKey); return next; });
                                           }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
@@ -2049,7 +2086,7 @@ export function AnalysisResults({
                                 );
                               })}
                             </div>
-                            {useAdminLayout && feedbackOpen && (feedbackOpen === `signal-${turn.idx}` || feedbackOpen?.startsWith(`tech-${turn.idx}-`)) && (
+                            {useAdminLayout && feedbackOpen && (feedbackOpen === `signal-${group.idx}` || feedbackOpen?.startsWith(`tech-${group.idx}-`)) && (
                               <div className="rounded-lg border p-2.5 mt-1" style={{ backgroundColor: '#FEFCE8', borderColor: '#FDE68A' }}>
                                 <p className="text-[10px] font-medium mb-1.5" style={{ color: '#92400E' }}>Wat zou het moeten zijn?</p>
                                 <div className="flex gap-1.5 items-start">
@@ -2118,37 +2155,37 @@ export function AnalysisResults({
                             {useAdminLayout && (
                               <div className="flex items-center gap-0.5 mt-1">
                                 <button
-                                  onClick={() => handleCopyTurn(turn.idx, turn.text)}
+                                  onClick={() => handleCopyTurn(group.idx, group.text)}
                                   className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
                                   title="Kopieer"
                                 >
-                                  {copiedTurnIdx === turn.idx ? (
+                                  {copiedTurnIdx === group.idx ? (
                                     <Check className="w-3.5 h-3.5" style={{ color: '#22C55E' }} />
                                   ) : (
                                     <Copy className="w-3.5 h-3.5" />
                                   )}
                                 </button>
                                 <button
-                                  onClick={() => handleGoldenStandard(turn)}
+                                  onClick={() => handleGoldenStandard(groupTurn)}
                                   className={`p-1.5 rounded-md transition-colors ${
-                                    goldenSaved.has(turn.idx)
+                                    goldenSaved.has(group.idx)
                                       ? 'text-green-600 bg-green-50'
                                       : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                                   }`}
                                   title="Markeer als correct — Golden Standard"
-                                  disabled={goldenSaved.has(turn.idx)}
+                                  disabled={goldenSaved.has(group.idx)}
                                 >
                                   <ThumbsUp className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => {
-                                    setCorrectionPanelTurn(correctionPanelTurn === turn.idx ? null : turn.idx);
+                                    setCorrectionPanelTurn(correctionPanelTurn === group.idx ? null : group.idx);
                                     setCorrectionValue('');
                                     setCorrectionNote('');
                                     setCorrectionType('technique');
                                   }}
                                   className={`p-1.5 rounded-md transition-colors ${
-                                    correctionPanelTurn === turn.idx
+                                    correctionPanelTurn === group.idx
                                       ? 'text-red-500 bg-red-50'
                                       : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                                   }`}
@@ -2158,9 +2195,9 @@ export function AnalysisResults({
                                 </button>
                                 <button
                                   onClick={() => {
-                                    const lastCustomer = [...(result?.transcript || [])].reverse().find(t => t.speaker === 'customer' && t.idx < turn.idx);
+                                    const lastCustomer = [...(result?.transcript || [])].reverse().find(t => t.speaker === 'customer' && t.idx < group.idx);
                                     if (lastCustomer) {
-                                      navigator.clipboard.writeText(`Klant: ${lastCustomer.text}\nVerkoper: ${turn.text}`);
+                                      navigator.clipboard.writeText(`Klant: ${lastCustomer.text}\nVerkoper: ${group.text}`);
                                       toast?.('Context gekopieerd');
                                     }
                                   }}
@@ -2171,9 +2208,8 @@ export function AnalysisResults({
                                 </button>
                                 <button
                                   onClick={() => {
-                                    const techIds = evaluation?.techniques.map(t => t.id) || [];
-                                    if (techIds.length > 0) {
-                                      const tech = getTechniekByNummer(techIds[0]);
+                                    if (allTechniques.length > 0) {
+                                      const tech = getTechniekByNummer(allTechniques[0].id);
                                       if (tech) toast?.(`${tech.naam}`, { description: tech.doel || tech.wat || '' });
                                     }
                                   }}
@@ -2185,7 +2221,7 @@ export function AnalysisResults({
                                 </button>
                               </div>
                             )}
-                            {useAdminLayout && correctionPanelTurn === turn.idx && (
+                            {useAdminLayout && correctionPanelTurn === group.idx && (
                               <div className="rounded-xl border p-3 mt-2" style={{ backgroundColor: '#FAF5FF', borderColor: '#E9D5FF' }}>
                                 <p className="text-[11px] font-semibold mb-2" style={{ color: '#7C3AED' }}>
                                   Welk type wil je corrigeren?
@@ -2254,7 +2290,7 @@ export function AnalysisResults({
                                 />
                                 <div className="flex gap-2">
                                   <button
-                                    onClick={() => handleCorrectionSubmit(turn)}
+                                    onClick={() => handleCorrectionSubmit(groupTurn)}
                                     disabled={!correctionValue || correctionSubmitting}
                                     className="text-[11px] px-3 py-1.5 rounded-lg font-medium text-white transition-colors disabled:opacity-50"
                                     style={{ backgroundColor: '#9910FA' }}
