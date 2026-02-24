@@ -72,7 +72,7 @@ const mainNavItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "techniques", label: "E.P.I.C. Technieken", icon: Target },
   { id: "videos", label: "Video's", icon: Video },
-  { id: "live", label: "Live Coaching", icon: Radio },
+  { id: "live", label: "Webinars", icon: Radio },
   { id: "analysis", label: "Gespreksanalyse", icon: FileSearch, historyType: "analysis" as const, overviewPage: "analysis" },
   { id: "talk-to-hugo", label: "Talk to Hugo AI", icon: Sparkles, historyType: "chat" as const, overviewPage: "hugo-overview" },
 ];
@@ -266,7 +266,7 @@ export function AppLayout({
                     <span className="text-[14px] leading-[20px] whitespace-nowrap">
                       {item.label === "Talk to Hugo AI" ? (
                         <>Talk to Hugo<sup className="text-[10px] ml-0.5">AI</sup></>
-                      ) : item.label === "Live Coaching" && !isAdmin ? "Webinars" : item.label}
+                      ) : item.label}
                     </span>
                   )}
                 </button>
@@ -397,7 +397,7 @@ export function AppLayout({
                     <span className="text-[14px] leading-[20px]">
                       {item.label === "Talk to Hugo AI" ? (
                         <>Talk to Hugo<sup className="text-[10px] ml-0.5">AI</sup></>
-                      ) : item.label === "Live Coaching" && !isAdmin ? "Webinars" : item.label}
+                      ) : item.label}
                     </span>
                   </button>
 
