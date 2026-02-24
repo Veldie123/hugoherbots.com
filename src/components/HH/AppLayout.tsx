@@ -244,14 +244,14 @@ export function AppLayout({
           )}
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-2 pt-2 min-h-0">
+        <nav className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = isNavItemActive(item.id);
             const history = getHistoryForItem(item.historyType);
 
             return (
-              <div key={item.id} className="mb-0.5">
+              <div key={item.id}>
                 <button
                   onClick={() => handleNavigate(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
@@ -323,7 +323,7 @@ export function AppLayout({
           })}
         </nav>
 
-        <div className="px-2 pb-3 space-y-0.5 flex-shrink-0 border-t border-hh-border pt-3">
+        <nav className="p-3 space-y-2 flex-shrink-0 border-t border-hh-border">
           {bottomNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
@@ -349,17 +349,17 @@ export function AppLayout({
           })}
 
           {isAdmin && (
-            <div className="mt-1 pt-3 border-t border-hh-border">
+            <div className="p-3 border-t border-hh-border">
               <button
                 onClick={() => navigate?.("admin-dashboard")}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
               >
-                <Eye className="w-5 h-5 flex-shrink-0" />
+                <Eye className="w-4 h-4" />
                 {!collapsed && <span>Admin View</span>}
               </button>
             </div>
           )}
-        </div>
+        </nav>
       </div>
 
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
