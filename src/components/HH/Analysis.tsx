@@ -344,69 +344,44 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
           </Button>
         </div>
 
-        {/* KPI Stats - compact inline strip on mobile, cards on desktop */}
-        <div className="hidden lg:grid grid-cols-4 gap-4">
-          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(79, 115, 150, 0.2)' }}>
-                <FileAudio className="w-5 h-5 text-[#4F7396]" />
+        {/* KPI Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(79, 115, 150, 0.15)' }}>
+                <FileAudio className="w-4 h-4 sm:w-5 sm:h-5 text-[#4F7396]" />
               </div>
             </div>
-            <p className="text-[13px] leading-[18px] text-hh-muted mb-2">Totaal Analyses</p>
-            <p className="text-[28px] leading-[36px] text-[#4F7396]">{conversations.length}</p>
+            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">Totaal Analyses</p>
+            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-text">{conversations.length}</p>
           </Card>
-          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)' }}>
-                <BarChart2 className="w-5 h-5 text-emerald-500" />
+          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}>
+                <BarChart2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
               </div>
             </div>
-            <p className="text-[13px] leading-[18px] text-hh-muted mb-2">Geanalyseerd</p>
-            <p className="text-[28px] leading-[36px] text-emerald-600">{analyzedCount}</p>
+            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">Geanalyseerd</p>
+            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-emerald-600">{analyzedCount}</p>
           </Card>
-          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(249, 115, 22, 0.2)' }}>
-                <Clock className="w-5 h-5 text-orange-500" />
+          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(249, 115, 22, 0.15)' }}>
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
               </div>
             </div>
-            <p className="text-[13px] leading-[18px] text-hh-muted mb-2">Totale Duur</p>
-            <p className="text-[28px] leading-[36px] text-orange-600">{Math.floor(totalDuration / 60)}u {totalDuration % 60}m</p>
+            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">Totale Duur</p>
+            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-orange-600">{Math.floor(totalDuration / 60)}u {totalDuration % 60}m</p>
           </Card>
-          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(14, 165, 233, 0.2)' }}>
-                <TrendingUp className="w-5 h-5 text-sky-500" />
+          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(14, 165, 233, 0.15)' }}>
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-sky-500" />
               </div>
             </div>
-            <p className="text-[13px] leading-[18px] text-hh-muted mb-2">Gem. Score</p>
-            <p className={`text-[28px] leading-[36px] ${avgScore >= 70 ? 'text-emerald-600' : avgScore >= 40 ? 'text-orange-500' : 'text-red-500'}`}>{avgScore}%</p>
+            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">Gem. Score</p>
+            <p className={`text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] ${avgScore >= 70 ? 'text-emerald-600' : avgScore >= 40 ? 'text-orange-500' : 'text-red-500'}`}>{avgScore}%</p>
           </Card>
-        </div>
-        {/* Mobile: compact horizontal stat strip */}
-        <div className="flex lg:hidden items-center gap-1 rounded-xl border border-hh-border bg-card p-2.5 overflow-x-auto">
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#4F7396]/5 shrink-0">
-            <FileAudio className="w-3.5 h-3.5 text-[#4F7396]" />
-            <span className="text-[12px] text-hh-muted">Analyses</span>
-            <span className="text-[14px] font-semibold text-hh-text">{conversations.length}</span>
-          </div>
-          <div className="w-px h-5 bg-hh-border shrink-0" />
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/5 shrink-0">
-            <BarChart2 className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="text-[12px] text-hh-muted">Klaar</span>
-            <span className="text-[14px] font-semibold text-hh-text">{analyzedCount}</span>
-          </div>
-          <div className="w-px h-5 bg-hh-border shrink-0" />
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-orange-500/5 shrink-0">
-            <Clock className="w-3.5 h-3.5 text-orange-500" />
-            <span className="text-[14px] font-semibold text-hh-text">{Math.floor(totalDuration / 60)}u {totalDuration % 60}m</span>
-          </div>
-          <div className="w-px h-5 bg-hh-border shrink-0" />
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-sky-500/5 shrink-0">
-            <TrendingUp className="w-3.5 h-3.5 text-sky-500" />
-            <span className="text-[12px] text-hh-muted">Score</span>
-            <span className="text-[14px] font-semibold text-emerald-600">{avgScore}%</span>
-          </div>
         </div>
 
         {/* Filters & Search */}
@@ -564,13 +539,11 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedConversations.map((conv, index) => (
+                  {sortedConversations.map((conv) => (
                     <tr
                       key={conv.id}
                       onClick={() => openTranscript(conv)}
-                      className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50 transition-colors cursor-pointer ${
-                        index % 2 === 0 ? "bg-card" : "bg-hh-ui-50/30"
-                      }`}
+                      className="border-b border-hh-border last:border-0 hover:bg-hh-ui-50/50 transition-colors cursor-pointer"
                     >
                       <td className="py-3 px-4">
                         <span 

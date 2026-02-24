@@ -467,7 +467,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#4F7396]/10 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(79, 115, 150, 0.15)' }}>
                 <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-[#4F7396]" />
               </div>
               <Badge
@@ -488,7 +488,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}>
                 <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
               </div>
               <Badge
@@ -509,7 +509,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-sky-500/10 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(14, 165, 233, 0.15)' }}>
                 <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-sky-500" />
               </div>
               <Badge
@@ -530,7 +530,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(249, 115, 22, 0.15)' }}>
                 <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
               </div>
               <Badge
