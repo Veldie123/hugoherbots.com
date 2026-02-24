@@ -12,6 +12,26 @@
       "recordedBy": "admin",
       "id": "ref-1768863528404-fip7cd98y",
       "recordedAt": "2026-01-19T22:58:48.404Z"
+    },
+    {
+      "techniqueId": "1.2",
+      "customerSignal": "ontwijkend",
+      "customerMessage": "",
+      "sellerResponse": "Maar ik zeg, dat is natuurlijk wel een veronderstelling.",
+      "context": {},
+      "recordedBy": "admin",
+      "id": "ref-1771945207137-380cni8py",
+      "recordedAt": "2026-02-24T15:00:07.137Z"
+    },
+    {
+      "techniqueId": "1.2",
+      "customerSignal": "ontwijkend",
+      "customerMessage": "",
+      "sellerResponse": "Een laatste manier van werken is dat er een onmiddellijke intekening wordt gehanteerd.",
+      "context": {},
+      "recordedBy": "admin",
+      "id": "ref-1771945220864-fhm6sj4jk",
+      "recordedAt": "2026-02-24T15:00:20.864Z"
     }
   ]
 }
