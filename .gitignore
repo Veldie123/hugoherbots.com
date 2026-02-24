@@ -64,3 +64,7 @@ replit_zip_error_log.txt
 __pycache__/
 *.pyc
 .pythonlibs/
+
+# Design audit output (generated files)
+screenshots/
+DESIGN_AUDIT.md

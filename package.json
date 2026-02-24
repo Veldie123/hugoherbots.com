@@ -96,10 +96,11 @@
             "zod-validation-error": "^5.0.0"
       },
       "devDependencies": {
+            "@playwright/test": "^1.58.2",
             "@types/node": "^20.10.0",
             "@vitejs/plugin-react-swc": "^3.10.2",
             "typescript": "^5.9.3",
-            "vite": "6.3.5"
+            "vite": "^6.3.5"
       },
       "scripts": {
             "dev": "vite",
@@ -107,6 +108,9 @@
             "lint": "echo 'No linter configured' && exit 0",
             "typecheck": "npx tsc --noEmit",
             "test": "node scripts/config-lint.js",
-            "config-lint": "node scripts/config-lint.js"
+            "config-lint": "node scripts/config-lint.js",
+            "audit:screenshot": "tsx scripts/audit/screenshot-all.ts",
+            "audit:report": "tsx scripts/audit/generate-report.ts",
+            "audit:full": "npm run audit:screenshot && npm run audit:report"
       }
 }
