@@ -344,10 +344,10 @@ export function AppLayout({
           })}
 
           {isAdmin && (
-            <div className="mt-1">
+            <div className="mt-2 pt-2 border-t border-hh-border">
               <button
-                onClick={() => navigate?.("admin-uploads")}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
+                onClick={() => navigate?.("admin-dashboard")}
+                className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg border border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors text-[14px] font-medium dark:bg-purple-900/20 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/30"
               >
                 <Eye className="w-4 h-4 flex-shrink-0" />
                 {!collapsed && <span>Admin View</span>}
@@ -476,13 +476,13 @@ export function AppLayout({
             })}
 
             {isAdmin && (
-              <div className="mt-1">
+              <div className="mt-2 pt-2 border-t border-hh-border">
                 <button
                   onClick={() => {
-                    navigate?.("admin-uploads");
+                    navigate?.("admin-dashboard");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
+                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg border border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors text-[14px] font-medium dark:bg-purple-900/20 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/30"
                 >
                   <Eye className="w-4 h-4" />
                   <span>Admin View</span>
