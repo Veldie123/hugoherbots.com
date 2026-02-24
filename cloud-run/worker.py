@@ -113,11 +113,10 @@ CHROMAKEY_BLEND = 0.10
 
 ARCHIEF_FOLDER_ID = '1E49dwl2hq_nhoe52bmK0DRn5ZhFdRGyq'
 
-# Background rotation: switch every 10 videos for visual variety
-# NOTE: Avond (evening) skipped because we already have 114 videos with that background
 BACKGROUNDS = [
-    '/app/backgrounds/bg_winter_middag_1080p.jpg',        # Daytime
-    '/app/backgrounds/bg_winter_zonsondergang_1080p.jpg', # Golden hour
+    '/app/backgrounds/bg_kantoor_ochtend_1080p.jpg',
+    '/app/backgrounds/bg_kantoor_golden_hour_1080p.jpg',
+    '/app/backgrounds/bg_kantoor_avond_1080p.jpg',
 ]
 BACKGROUND_BATCH_SIZE = 10  # Switch background every N videos
 

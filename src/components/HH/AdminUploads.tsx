@@ -82,22 +82,24 @@ function getInitials(name: string): string {
   return name[0].toUpperCase();
 }
 
-function getScoreStyle(score: number): React.CSSProperties {
-  if (score >= 60) return { color: '#16A34A' };
-  return { color: '#F97316' };
+function getScoreColor(score: number): string {
+  if (score >= 80) return "text-emerald-600";
+  if (score >= 60) return "text-purple-600";
+  return "text-red-500";
 }
 
-function getNumberBadgeStyle(score: number | null): React.CSSProperties {
-  if (score == null) return { backgroundColor: '#9CA3AF' };
-  if (score >= 60) return { backgroundColor: '#22C55E' };
-  return { backgroundColor: '#F97316' };
+function getNumberBadgeStyle(score: number | null): string {
+  if (score == null) return "bg-gray-400";
+  if (score >= 80) return "bg-emerald-500";
+  if (score >= 60) return "bg-purple-600";
+  return "bg-red-500";
 }
 
 function getQualityBadge(score: number | null) {
-  if (score == null) return <span className="text-[12px]" style={{ color: '#9CA3AF' }}>-</span>;
+  if (score == null) return <span className="text-[12px] text-hh-muted">-</span>;
   if (score >= 80) {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: '#EFF6FF', color: '#2563EB', border: '1px solid #BFDBFE' }}>
+      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
         <Star className="w-3 h-3" />
         Excellent
       </span>
@@ -105,14 +107,14 @@ function getQualityBadge(score: number | null) {
   }
   if (score >= 60) {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: '#F0FDF4', color: '#16A34A', border: '1px solid #BBF7D0' }}>
+      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-600 border border-purple-500/20">
         <Leaf className="w-3 h-3" />
         Good
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: '#FFF7ED', color: '#EA580C', border: '1px solid #FED7AA' }}>
+    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-red-500/10 text-red-500 border border-red-500/20">
       <AlertTriangle className="w-3 h-3" />
       Needs Work
     </span>
@@ -250,12 +252,12 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
 
   const SortHeader = ({ label, field, align = "left" }: { label: string; field: SortField; align?: string }) => (
     <th
-      className={`text-${align} py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:text-gray-800 select-none transition-colors`}
+      className={`text-${align} py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:text-purple-700 select-none transition-colors`}
       onClick={() => handleSort(field)}
     >
       <span className="inline-flex items-center gap-1">
         {label}
-        <ArrowUpDown className={`w-3 h-3 ${sortField === field ? "text-gray-800" : "text-gray-300"}`} />
+        <ArrowUpDown className={`w-3 h-3 ${sortField === field ? "text-purple-600" : "text-hh-muted/50"}`} />
       </span>
     </th>
   );
@@ -296,7 +298,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
             { name: 'Totaal Analyses', value: isLoading ? "-" : stats.total, icon: Upload, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: '#9333ea', badge: '+24%' },
             { name: 'Uitstekend', value: isLoading ? "-" : stats.excellent, icon: CheckCircle2, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: '#10b981', badge: '+43%' },
             { name: 'Gem. Score', value: isLoading ? "-" : `${stats.avgScore}%`, icon: BarChart3, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: '#9333ea', badge: '+5%' },
-            { name: 'Verbetering Nodig', value: isLoading ? "-" : stats.needsImprovement, icon: AlertTriangle, bgColorStyle: 'rgba(249, 115, 22, 0.1)', colorStyle: '#f97316', badge: '15%' },
+            { name: 'Verbetering Nodig', value: isLoading ? "-" : stats.needsImprovement, icon: AlertTriangle, bgColorStyle: 'rgba(239, 68, 68, 0.1)', colorStyle: '#ef4444', badge: '15%' },
           ].map(stat => (
             <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
               <div className="flex items-start justify-between mb-2 sm:mb-3">
@@ -330,10 +332,10 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
           </Card>
         )}
 
-        <Card className="p-4 rounded-[16px] shadow-sm border-gray-200">
+        <Card className="p-4 rounded-[16px] shadow-sm border-hh-border">
           <div className="flex flex-col sm:flex-row gap-3 items-center">
             <div className="flex-1 relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-hh-muted" />
               <Input
                 placeholder="Zoek op gebruiker, titel, email..."
                 className="pl-10"
@@ -353,11 +355,11 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                   <SelectItem value="failed">Mislukt</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="flex border border-gray-200 rounded-lg overflow-hidden">
+              <div className="flex border border-hh-border rounded-lg overflow-hidden">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-9 w-9 rounded-none ${viewMode === "list" ? "bg-purple-100 text-purple-700" : "text-gray-400 hover:text-purple-600"}`}
+                  className={`h-9 w-9 rounded-none ${viewMode === "list" ? "bg-purple-100 text-purple-700" : "text-hh-muted hover:text-purple-600"}`}
                   onClick={() => setViewMode("list")}
                 >
                   <List className="w-4 h-4" />
@@ -365,7 +367,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-9 w-9 rounded-none ${viewMode === "grid" ? "bg-purple-100 text-purple-700" : "text-gray-400 hover:text-purple-600"}`}
+                  className={`h-9 w-9 rounded-none ${viewMode === "grid" ? "bg-purple-100 text-purple-700" : "text-hh-muted hover:text-purple-600"}`}
                   onClick={() => setViewMode("grid")}
                 >
                   <LayoutGrid className="w-4 h-4" />
@@ -375,18 +377,18 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
           </div>
         </Card>
 
-        <Card className="rounded-[16px] shadow-sm border-gray-200 overflow-hidden">
+        <Card className="rounded-[16px] shadow-sm border-hh-border overflow-hidden">
           {isLoading ? (
             <div className="p-12 flex items-center justify-center">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-                <p className="text-gray-500">Analyses laden...</p>
+                <p className="text-hh-muted">Analyses laden...</p>
               </div>
             </div>
           ) : sortedAnalyses.length === 0 ? (
             <div className="p-12 text-center">
-              <FileAudio className="w-12 h-12 text-gray-400 mx-auto mb-4 opacity-40" />
-              <p className="text-gray-500 text-[14px]">
+              <FileAudio className="w-12 h-12 text-hh-muted mx-auto mb-4 opacity-40" />
+              <p className="text-hh-muted text-[14px]">
                 {searchQuery || filterStatus !== "all"
                   ? "Geen analyses gevonden met deze filters"
                   : "Nog geen analyses beschikbaar"}
@@ -420,7 +422,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                   {sortedAnalyses.map((analysis) => (
                     <tr
                       key={analysis.id}
-                      className="border-t border-gray-100 hover:bg-gray-50/60 transition-colors cursor-pointer"
+                      className="border-t border-hh-border/50 hover:bg-purple-50/40 transition-colors cursor-pointer"
                       onClick={() =>
                         navigate?.("admin-analysis-results", {
                           conversationId: analysis.id,
@@ -430,8 +432,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                     >
                       <td className="py-4 px-4">
                         <span
-                          className="inline-flex items-center justify-center min-w-[32px] h-8 px-2 rounded-full text-[12px] font-bold text-white"
-                          style={getNumberBadgeStyle(analysis.overallScore)}
+                          className={`inline-flex items-center justify-center min-w-[32px] h-8 px-2 rounded-full text-[12px] font-bold text-white ${getNumberBadgeStyle(analysis.overallScore)}`}
                         >
                           {(analysis.techniquesFound || []).length > 0
                             ? analysis.techniquesFound[0]
@@ -439,24 +440,24 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                         </span>
                       </td>
                       <td className="py-4 px-4">
-                        <p className="text-[14px] leading-[20px] text-gray-900 font-medium">
+                        <p className="text-[14px] leading-[20px] text-hh-text font-medium">
                           {analysis.title || "Zonder titel"}
                         </p>
-                        <p className="text-[11px] leading-[14px] text-gray-400 mt-0.5">
+                        <p className="text-[11px] leading-[14px] text-hh-muted mt-0.5">
                           {analysis.status === "completed" ? "completed" : analysis.status}
                         </p>
                       </td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-[12px] font-semibold text-orange-700 shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-[12px] font-semibold text-purple-700 shrink-0">
                             {getInitials(analysis.userName || analysis.userId)}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-[13px] leading-[18px] text-gray-900 font-medium truncate">
+                            <p className="text-[13px] leading-[18px] text-hh-text font-medium truncate">
                               {analysis.userName || analysis.userId}
                             </p>
                             {analysis.userEmail && (
-                              <p className="text-[11px] leading-[14px] text-gray-400 truncate">
+                              <p className="text-[11px] leading-[14px] text-hh-muted truncate">
                                 {analysis.userEmail}
                               </p>
                             )}
@@ -464,24 +465,23 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                         </div>
                       </td>
                       <td className="py-4 px-4">
-                        <span className="inline-flex items-center gap-1 text-[12px] text-gray-600 bg-gray-100 px-2 py-1 rounded-md font-medium">
+                        <span className="inline-flex items-center gap-1 text-[12px] text-purple-600 bg-purple-50 px-2 py-1 rounded-md font-medium border border-purple-200">
                           <Mic className="w-3 h-3" />
                           AI Audio
                         </span>
                       </td>
-                      <td className="py-4 px-4 text-[14px] leading-[20px] text-gray-700">
+                      <td className="py-4 px-4 text-[14px] leading-[20px] text-hh-text">
                         {analysis.durationMs ? `${Math.floor(analysis.durationMs / 60000)}:${String(Math.floor((analysis.durationMs % 60000) / 1000)).padStart(2, '0')}` : "-"}
                       </td>
                       <td className="py-4 px-4 text-right">
                         {analysis.overallScore != null ? (
                           <span
-                            className="text-[15px] leading-[20px] font-bold"
-                            style={getScoreStyle(analysis.overallScore)}
+                            className={`text-[15px] leading-[20px] font-bold ${getScoreColor(analysis.overallScore)}`}
                           >
                             {analysis.overallScore}%
                           </span>
                         ) : (
-                          <span className="text-[14px] leading-[20px]" style={{ color: '#9CA3AF' }}>
+                          <span className="text-[14px] leading-[20px] text-hh-muted">
                             -
                           </span>
                         )}
@@ -489,7 +489,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                       <td className="py-4 px-4">
                         {getQualityBadge(analysis.overallScore)}
                       </td>
-                      <td className="py-4 px-4 text-[13px] leading-[18px] text-gray-500">
+                      <td className="py-4 px-4 text-[13px] leading-[18px] text-hh-muted">
                         {formatDate(analysis.createdAt)}
                       </td>
                       <td
@@ -531,7 +531,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
               {sortedAnalyses.map((analysis) => (
                 <Card
                   key={analysis.id}
-                  className="p-4 rounded-xl border-gray-200 hover:border-gray-300 hover:shadow-md transition-all cursor-pointer"
+                  className="p-4 rounded-xl border-hh-border hover:border-purple-300 hover:shadow-md transition-all cursor-pointer"
                   onClick={() =>
                     navigate?.("admin-analysis-results", {
                       conversationId: analysis.id,
@@ -541,8 +541,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <span
-                      className="inline-flex items-center justify-center min-w-[28px] h-7 px-1.5 rounded-full text-[11px] font-bold text-white"
-                      style={getNumberBadgeStyle(analysis.overallScore)}
+                      className={`inline-flex items-center justify-center min-w-[28px] h-7 px-1.5 rounded-full text-[11px] font-bold text-white ${getNumberBadgeStyle(analysis.overallScore)}`}
                     >
                       {(analysis.techniquesFound || []).length > 0 ? analysis.techniquesFound[0] : "-"}
                     </span>
@@ -571,20 +570,20 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                       </DropdownMenu>
                     </div>
                   </div>
-                  <p className="text-[14px] font-medium text-gray-900 mb-1 line-clamp-1">
+                  <p className="text-[14px] font-medium text-hh-text mb-1 line-clamp-1">
                     {analysis.title || "Zonder titel"}
                   </p>
-                  <p className="text-[11px] text-gray-400 mb-3">{analysis.status}</p>
+                  <p className="text-[11px] text-hh-muted mb-3">{analysis.status}</p>
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-[10px] font-semibold text-orange-700">
+                    <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-[10px] font-semibold text-purple-700">
                       {getInitials(analysis.userName || analysis.userId)}
                     </div>
-                    <span className="text-[12px] text-gray-500 truncate">
+                    <span className="text-[12px] text-hh-muted truncate">
                       {analysis.userName || analysis.userId}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1 text-[11px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded font-medium">
+                    <span className="inline-flex items-center gap-1 text-[11px] text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded font-medium border border-purple-200">
                       <Mic className="w-3 h-3" />
                       AI Audio
                     </span>
@@ -597,13 +596,13 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-hh-border/50">
                     <div className="flex flex-wrap gap-1">
                       {(analysis.techniquesFound || []).slice(0, 2).map((tech, i) => (
                         <Badge
                           key={i}
                           variant="outline"
-                          className="text-[9px] px-1 py-0 border-gray-200 text-gray-600 bg-gray-50"
+                          className="text-[9px] px-1 py-0 border-purple-200 text-purple-600 bg-purple-50"
                         >
                           {tech}
                         </Badge>
@@ -611,13 +610,13 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                       {(analysis.techniquesFound || []).length > 2 && (
                         <Badge
                           variant="outline"
-                          className="text-[9px] px-1 py-0 border-gray-200 text-gray-600 bg-gray-50"
+                          className="text-[9px] px-1 py-0 border-purple-200 text-purple-600 bg-purple-50"
                         >
                           +{analysis.techniquesFound.length - 2}
                         </Badge>
                       )}
                     </div>
-                    <span className="text-[11px] text-gray-400">
+                    <span className="text-[11px] text-hh-muted">
                       {formatDate(analysis.createdAt)}
                     </span>
                   </div>
