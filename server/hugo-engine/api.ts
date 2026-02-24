@@ -3782,64 +3782,7 @@ app.get("/api/v2/admin/feedback", async (req: Request, res: Response) => {
 // ADMIN CORRECTIONS API
 // ===========================================
 
-// Ensure corrections table exists
-(async () => {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS admin_corrections (
-        id SERIAL PRIMARY KEY,
-        analysis_id VARCHAR(255),
-        type VARCHAR(100) NOT NULL,
-        field VARCHAR(100) NOT NULL,
-        original_value TEXT,
-        new_value TEXT NOT NULL,
-        context TEXT,
-        submitted_by VARCHAR(100) DEFAULT 'admin',
-        status VARCHAR(20) DEFAULT 'pending',
-        reviewed_by VARCHAR(100),
-        reviewed_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-    console.log('[Admin] Corrections table ready');
-
-    const alterColumns = [
-      { name: 'source', def: "VARCHAR(100) DEFAULT 'analysis'" },
-      { name: 'target_file', def: 'VARCHAR(255)' },
-      { name: 'target_key', def: 'VARCHAR(255)' },
-      { name: 'original_json', def: 'TEXT' },
-      { name: 'new_json', def: 'TEXT' },
-    ];
-    for (const col of alterColumns) {
-      try {
-        await pool.query(`ALTER TABLE admin_corrections ADD COLUMN IF NOT EXISTS ${col.name} ${col.def}`);
-      } catch (alterErr: any) {
-        if (!alterErr.message?.includes('already exists')) {
-          console.error(`[Admin] Failed to add column ${col.name}:`, alterErr.message);
-        }
-      }
-    }
-    console.log('[Admin] Corrections table columns extended');
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS admin_notifications (
-        id SERIAL PRIMARY KEY,
-        type VARCHAR(100) NOT NULL,
-        title VARCHAR(500) NOT NULL,
-        message TEXT,
-        category VARCHAR(100) DEFAULT 'content',
-        severity VARCHAR(20) DEFAULT 'info',
-        related_id INTEGER,
-        related_page VARCHAR(100),
-        read BOOLEAN DEFAULT false,
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-    console.log('[Admin] Notifications table ready');
-  } catch (err) {
-    console.error('[Admin] Failed to create corrections/notifications tables:', err);
-  }
-})();
+// Tables admin_corrections and admin_notifications exist in Supabase (created via SQL Editor)
 
 app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
   try {
@@ -3847,17 +3790,25 @@ app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
     if (!type || !field || !newValue) {
       return res.status(400).json({ error: 'Missing required fields: type, field, newValue' });
     }
-    const { rows } = await pool.query(
-      `INSERT INTO admin_corrections (analysis_id, type, field, original_value, new_value, context, submitted_by, source, target_file, target_key, original_json, new_json)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
-      [
-        analysisId || null, type, field, originalValue || '', newValue, context || '', submittedBy || 'admin',
-        source || 'analysis', targetFile || null, targetKey || null,
-        originalJson ? (typeof originalJson === 'string' ? originalJson : JSON.stringify(originalJson)) : null,
-        newJson ? (typeof newJson === 'string' ? newJson : JSON.stringify(newJson)) : null
-      ]
-    );
-    const correction = rows[0];
+    const { data: correction, error: corrError } = await supabase
+      .from('admin_corrections')
+      .insert({
+        analysis_id: analysisId || null,
+        type,
+        field,
+        original_value: originalValue || '',
+        new_value: newValue,
+        context: context || '',
+        submitted_by: submittedBy || 'admin',
+        source: source || 'analysis',
+        target_file: targetFile || null,
+        target_key: targetKey || null,
+        original_json: originalJson ? (typeof originalJson === 'string' ? originalJson : JSON.stringify(originalJson)) : null,
+        new_json: newJson ? (typeof newJson === 'string' ? newJson : JSON.stringify(newJson)) : null,
+      })
+      .select()
+      .single();
+    if (corrError) throw corrError;
 
     const submitter = submittedBy || 'admin';
     const corrSource = source || 'analysis';
@@ -3873,11 +3824,17 @@ app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
     const notifMessage = `${submitter} heeft ${field} gewijzigd van "${originalValue || '(leeg)'}" naar "${newValue}". Bron: ${corrSource}${targetFile ? `, bestand: ${targetFile}` : ''}${targetKey ? `, key: ${targetKey}` : ''}`;
 
     try {
-      await pool.query(
-        `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        ['correction_submitted', notifTitle, notifMessage, 'content', notifSeverity, correction.id, 'admin-config-review']
-      );
+      await supabase
+        .from('admin_notifications')
+        .insert({
+          type: 'correction_submitted',
+          title: notifTitle,
+          message: notifMessage,
+          category: 'content',
+          severity: notifSeverity,
+          related_id: correction.id,
+          related_page: 'admin-config-review',
+        });
       console.log(`[Admin] Notification created for correction #${correction.id}`);
     } catch (notifErr: any) {
       console.error('[Admin] Failed to create notification:', notifErr.message);
@@ -3893,14 +3850,13 @@ app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
 app.get("/api/v2/admin/corrections", async (req: Request, res: Response) => {
   try {
     const status = req.query.status as string || 'all';
-    let queryText = 'SELECT * FROM admin_corrections ORDER BY created_at DESC LIMIT 100';
-    let params: any[] = [];
+    let query = supabase.from('admin_corrections').select('*').order('created_at', { ascending: false }).limit(100);
     if (status !== 'all') {
-      queryText = 'SELECT * FROM admin_corrections WHERE status = $1 ORDER BY created_at DESC LIMIT 100';
-      params = [status];
+      query = query.eq('status', status);
     }
-    const { rows } = await pool.query(queryText, params);
-    res.json({ corrections: rows });
+    const { data: corrections, error } = await query;
+    if (error) throw error;
+    res.json({ corrections: corrections || [] });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -3915,32 +3871,31 @@ app.patch("/api/v2/admin/corrections/:id", async (req: Request, res: Response) =
     }
     const reviewedAt = status === 'pending' ? null : new Date().toISOString();
     const reviewer = status === 'pending' ? null : (reviewedBy || 'admin');
-    const { rows } = await pool.query(
-      `UPDATE admin_corrections SET status = $1, reviewed_by = $2, reviewed_at = $3 WHERE id = $4 RETURNING *`,
-      [status, reviewer, reviewedAt, id]
-    );
-    if (rows.length === 0) return res.status(404).json({ error: 'Correction not found' });
-
-    const correction = rows[0];
+    const { data: correction, error: updateErr } = await supabase
+      .from('admin_corrections')
+      .update({ status, reviewed_by: reviewer, reviewed_at: reviewedAt })
+      .eq('id', parseInt(id))
+      .select()
+      .single();
+    if (updateErr) throw updateErr;
+    if (!correction) return res.status(404).json({ error: 'Correction not found' });
     let ragGenerated = false;
     let ssotUpdated = false;
     if (status === 'approved') {
       try {
         const ragContent = `[EXPERT CORRECTIE] Bij analyse van een verkoopgesprek werd "${correction.original_value}" gedetecteerd als ${correction.type}/${correction.field}. De expert corrigeerde dit naar "${correction.new_value}". Context: ${correction.context || 'Geen extra context'}. Dit is een belangrijk leermoment voor toekomstige analyses.`;
         const ragTitle = `Expert correctie: ${correction.type} ${correction.field} (${new Date().toISOString().split('T')[0]})`;
-        await pool.query(
-          `INSERT INTO rag_documents (doc_type, title, content, source_id, word_count, needs_review, review_status)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          [
-            'expert_correction',
-            ragTitle,
-            ragContent,
-            `admin_correction_${correction.id}`,
-            ragContent.split(/\s+/).length,
-            false,
-            'approved'
-          ]
-        );
+        await supabase
+          .from('rag_documents')
+          .insert({
+            doc_type: 'expert_correction',
+            title: ragTitle,
+            content: ragContent,
+            source_id: `admin_correction_${correction.id}`,
+            word_count: ragContent.split(/\s+/).length,
+            needs_review: false,
+            review_status: 'approved',
+          });
         ragGenerated = true;
         console.log(`[Admin] RAG fragment generated for approved correction #${correction.id}`);
       } catch (ragErr) {
@@ -4002,15 +3957,15 @@ app.patch("/api/v2/admin/corrections/:id", async (req: Request, res: Response) =
 app.get("/api/v2/admin/notifications", async (req: Request, res: Response) => {
   try {
     const readFilter = req.query.read;
-    let queryText = 'SELECT * FROM admin_notifications ORDER BY created_at DESC LIMIT 200';
-    let params: any[] = [];
+    let query = supabase.from('admin_notifications').select('*').order('created_at', { ascending: false }).limit(200);
     if (readFilter === 'true') {
-      queryText = 'SELECT * FROM admin_notifications WHERE read = true ORDER BY created_at DESC LIMIT 200';
+      query = query.eq('read', true);
     } else if (readFilter === 'false') {
-      queryText = 'SELECT * FROM admin_notifications WHERE read = false ORDER BY created_at DESC LIMIT 200';
+      query = query.eq('read', false);
     }
-    const { rows } = await pool.query(queryText, params);
-    res.json({ notifications: rows });
+    const { data: notifications, error } = await query;
+    if (error) throw error;
+    res.json({ notifications: notifications || [] });
   } catch (err: any) {
     console.error('[Admin] Notifications list error:', err.message);
     res.status(500).json({ error: err.message });
@@ -4019,8 +3974,12 @@ app.get("/api/v2/admin/notifications", async (req: Request, res: Response) => {
 
 app.get("/api/v2/admin/notifications/count", async (req: Request, res: Response) => {
   try {
-    const { rows } = await pool.query('SELECT COUNT(*) as unread FROM admin_notifications WHERE read = false');
-    res.json({ unread: parseInt(rows[0]?.unread || '0') });
+    const { count, error } = await supabase
+      .from('admin_notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('read', false);
+    if (error) throw error;
+    res.json({ unread: count || 0 });
   } catch (err: any) {
     console.error('[Admin] Notifications count error:', err.message);
     res.status(500).json({ error: err.message });
@@ -4029,9 +3988,15 @@ app.get("/api/v2/admin/notifications/count", async (req: Request, res: Response)
 
 app.patch("/api/v2/admin/notifications/read-all", async (req: Request, res: Response) => {
   try {
-    const { rowCount } = await pool.query('UPDATE admin_notifications SET read = true WHERE read = false');
-    console.log(`[Admin] Marked ${rowCount} notifications as read`);
-    res.json({ updated: rowCount, message: 'Alle notificaties als gelezen gemarkeerd' });
+    const { data, error } = await supabase
+      .from('admin_notifications')
+      .update({ read: true })
+      .eq('read', false)
+      .select();
+    if (error) throw error;
+    const updated = data?.length || 0;
+    console.log(`[Admin] Marked ${updated} notifications as read`);
+    res.json({ updated, message: 'Alle notificaties als gelezen gemarkeerd' });
   } catch (err: any) {
     console.error('[Admin] Notifications read-all error:', err.message);
     res.status(500).json({ error: err.message });
@@ -4043,12 +4008,15 @@ app.patch("/api/v2/admin/notifications/:id", async (req: Request, res: Response)
     const { id } = req.params;
     const { read } = req.body;
     const readValue = read !== undefined ? read : true;
-    const { rows } = await pool.query(
-      'UPDATE admin_notifications SET read = $1 WHERE id = $2 RETURNING *',
-      [readValue, id]
-    );
-    if (rows.length === 0) return res.status(404).json({ error: 'Notification not found' });
-    res.json({ notification: rows[0] });
+    const { data: notification, error: updateErr } = await supabase
+      .from('admin_notifications')
+      .update({ read: readValue })
+      .eq('id', parseInt(id))
+      .select()
+      .single();
+    if (updateErr) throw updateErr;
+    if (!notification) return res.status(404).json({ error: 'Notification not found' });
+    res.json({ notification });
   } catch (err: any) {
     console.error('[Admin] Notification update error:', err.message);
     res.status(500).json({ error: err.message });
@@ -4102,10 +4070,11 @@ app.get("/api/v2/admin/stats", async (req: Request, res: Response) => {
       );
       avgAnalysisScore = Math.round(parseFloat(scoreResult.rows[0]?.avg_score || '0'));
 
-      const correctionsResult = await pool.query(
-        "SELECT COUNT(*) as pending FROM admin_corrections WHERE status = 'pending'"
-      );
-      pendingReviews = parseInt(correctionsResult.rows[0]?.pending || '0');
+      const { count: pendingCorrections } = await supabase
+        .from('admin_corrections')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      pendingReviews = pendingCorrections || 0;
     } catch (e) {
       console.log('[Admin Stats] DB query error:', (e as any)?.message);
     }
