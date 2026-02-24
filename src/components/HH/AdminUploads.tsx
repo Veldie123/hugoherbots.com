@@ -424,13 +424,13 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                       }
                     >
                       <td className="py-4 px-4">
-                        <span
-                          className="inline-flex items-center justify-center min-w-[36px] h-9 px-2.5 rounded-full text-[13px] font-semibold text-purple-600 bg-purple-100 border border-purple-200"
-                        >
-                          {(analysis.techniquesFound || []).length > 0
-                            ? analysis.techniquesFound[0]
-                            : "-"}
-                        </span>
+                        {(analysis.techniquesFound || []).length > 0 ? (
+                          <Badge className="bg-purple-600/10 text-purple-600 border-purple-600/20 text-[11px] font-mono">
+                            {analysis.techniquesFound[0]}
+                          </Badge>
+                        ) : (
+                          <span className="text-[13px] text-hh-muted">—</span>
+                        )}
                       </td>
                       <td className="py-4 px-4">
                         <p className="text-[14px] leading-[20px] text-hh-text font-medium">
@@ -533,11 +533,13 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                   }
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <span
-                      className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 rounded-full text-[11px] font-semibold text-purple-600 bg-purple-100 border border-purple-200"
-                    >
-                      {(analysis.techniquesFound || []).length > 0 ? analysis.techniquesFound[0] : "-"}
-                    </span>
+                    {(analysis.techniquesFound || []).length > 0 ? (
+                      <Badge className="bg-purple-600/10 text-purple-600 border-purple-600/20 text-[10px] font-mono px-1.5 py-0">
+                        {analysis.techniquesFound[0]}
+                      </Badge>
+                    ) : (
+                      <span className="text-[12px] text-hh-muted">—</span>
+                    )}
                     <div className="flex items-center gap-2">
                       {getStatusBadge(analysis.status)}
                       <DropdownMenu>
