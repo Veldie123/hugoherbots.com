@@ -44,6 +44,9 @@ import { toast } from "sonner";
 import MuxPlayer from "@mux/mux-player-react";
 import { getTechniekByNummer, getAllTechnieken, getTechniekenByFase } from "../../data/technieken-service";
 import { useTheme } from "./ThemeProvider";
+import { EPICSidebar } from "./AdminChatExpertModeSidebar";
+import technieken_index from "../../data/technieken_index.json";
+import { KLANT_HOUDINGEN as KLANT_HOUDINGEN_DATA } from "../../data/klant_houdingen";
 
 interface AnalysisResultsProps {
   navigate?: (page: string, data?: any) => void;
@@ -358,6 +361,14 @@ export function AnalysisResults({
   const [selectedTechniqueId, setSelectedTechniqueId] = useState<string | null>(null);
   const [techniqueSidebarMode, setTechniqueSidebarMode] = useState<'view' | 'select'>('view');
   const [techniqueSidebarTurnIdx, setTechniqueSidebarTurnIdx] = useState<number | null>(null);
+
+  const [epicSidebarOpen, setEpicSidebarOpenRaw] = useState(false);
+  const [epicFasesAccordionOpen, setEpicFasesAccordionOpen] = useState(true);
+  const [epicHoudingenAccordionOpen, setEpicHoudingenAccordionOpen] = useState(false);
+  const [epicExpandedPhases, setEpicExpandedPhases] = useState<number[]>([]);
+  const [epicExpandedParents, setEpicExpandedParents] = useState<string[]>([]);
+  const [epicExpandedHoudingen, setEpicExpandedHoudingen] = useState<string[]>([]);
+  const [epicCurrentPhase, setEpicCurrentPhase] = useState(1);
 
   const [resolvedConversationId, setResolvedConversationId] = useState<string | null>(
     navigationData?.conversationId || sessionStorage.getItem('analysisId') || null
@@ -713,6 +724,107 @@ export function AnalysisResults({
     return labels[houding] || labels['neutraal'];
   };
 
+  const setEpicSidebarOpen = (open: boolean) => {
+    setEpicSidebarOpenRaw(open);
+    window.dispatchEvent(new CustomEvent('sidebar-collapse-request', { detail: { collapsed: open } }));
+  };
+
+  const epicTechniquesByPhase: Record<number, any[]> = {};
+  Object.values(technieken_index.technieken).forEach((technique: any) => {
+    const phase = parseInt(technique.fase);
+    if (!epicTechniquesByPhase[phase]) {
+      epicTechniquesByPhase[phase] = [];
+    }
+    epicTechniquesByPhase[phase].push(technique);
+  });
+
+  const epicPhaseNames: Record<number, string> = {
+    0: "Pre-contactfase",
+    1: "Openingsfase",
+    2: "Ontdekkingsfase",
+    3: "Aanbevelingsfase",
+    4: "Beslissingsfase"
+  };
+
+  const epicKlantHoudingenArray = Object.entries(KLANT_HOUDINGEN_DATA.houdingen).map(([key, houding]: [string, any]) => ({
+    id: houding.id,
+    key: key,
+    naam: houding.naam,
+    beschrijving: houding.houding_beschrijving,
+    technieken: [...(houding.recommended_technique_ids || [])],
+    recommended_technique_ids: [...(houding.recommended_technique_ids || [])],
+  }));
+
+  const epicTogglePhase = (phase: number) => {
+    setEpicExpandedPhases(prev =>
+      prev.includes(phase) ? prev.filter(p => p !== phase) : [...prev, phase]
+    );
+  };
+
+  const epicToggleParentTechnique = (id: string) => {
+    setEpicExpandedParents(prev =>
+      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+    );
+  };
+
+  const epicToggleHouding = (id: string) => {
+    setEpicExpandedHoudingen(prev =>
+      prev.includes(id) ? prev.filter(h => h !== id) : [...prev, id]
+    );
+  };
+
+  const epicGetFaseBadgeColor = (fase: number) => {
+    const colors: Record<number, string> = {
+      0: "bg-slate-100 text-slate-600 border-slate-200",
+      1: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      2: "bg-blue-100 text-blue-700 border-blue-200",
+      3: "bg-amber-100 text-amber-700 border-amber-200",
+      4: "bg-purple-100 text-purple-700 border-purple-200",
+    };
+    return colors[fase] || "bg-gray-100 text-gray-700 border-gray-200";
+  };
+
+  const epicGetTopLevelTechniques = (phase: number) => {
+    const techniques = epicTechniquesByPhase[phase] || [];
+    return techniques.filter((t: any) => {
+      const parts = t.nummer.split('.');
+      return parts.length === 2;
+    });
+  };
+
+  const epicHasChildren = (technique: any, phase: number) => {
+    const techniques = epicTechniquesByPhase[phase] || [];
+    return techniques.some((t: any) => {
+      const parts = t.nummer.split('.');
+      return parts.length === 3 && t.nummer.startsWith(technique.nummer + '.');
+    });
+  };
+
+  const epicGetChildTechniques = (parentNumber: string, phase: number) => {
+    const techniques = epicTechniquesByPhase[phase] || [];
+    return techniques.filter((t: any) => {
+      const parts = t.nummer.split('.');
+      return parts.length === 3 && t.nummer.startsWith(parentNumber + '.');
+    });
+  };
+
+  const epicOpenTechniqueDetails = (techniqueNumber: string) => {
+    if (techniqueSidebarMode === 'select') {
+      setCorrectionValue(techniqueNumber);
+      setSelectedTechniqueId(techniqueNumber);
+      setEpicSidebarOpen(false);
+    } else {
+      setSelectedTechniqueId(techniqueNumber);
+      setTechniqueSidebarMode('view');
+    }
+  };
+
+  const epicStartTechniqueChat = (techniqueNumber: string, _techniqueName: string) => {
+    setCorrectionValue(techniqueNumber);
+    setSelectedTechniqueId(techniqueNumber);
+    setEpicSidebarOpen(false);
+  };
+
   const getPhaseBadge = (turnIdx: number) => {
     const signal = result?.signals.find(s => s.turnIdx === turnIdx);
     const phase = signal?.currentPhase;
@@ -932,7 +1044,67 @@ export function AnalysisResults({
   ];
 
   return wrapLayout(
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 overflow-y-auto h-[calc(100vh-4rem)]">
+      <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
+        {epicSidebarOpen && (
+          <div className="hidden lg:flex flex-col w-1/3 flex-shrink-0 h-full bg-white" style={{ borderRight: '1px solid #e2e8f0' }}>
+            <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0" style={{ borderColor: '#e2e8f0' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', letterSpacing: '0.5px', margin: 0 }}>
+                {techniqueSidebarMode === 'select' ? 'SELECTEER TECHNIEK' : 'E.P.I.C. TECHNIQUE'}
+              </h3>
+              <button
+                onClick={() => setEpicSidebarOpen(false)}
+                className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                title="Sluiten"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {techniqueSidebarMode === 'select' && (
+              <div className="px-4 py-2 text-[12px] border-b flex-shrink-0" style={{ color: '#7C3AED', borderColor: '#e2e8f0', backgroundColor: '#FAF5FF' }}>
+                Klik op een techniek om deze te selecteren als correctie
+              </div>
+            )}
+            <div className="flex-1 overflow-y-auto">
+              <EPICSidebar
+                fasesAccordionOpen={epicFasesAccordionOpen}
+                setFasesAccordionOpen={setEpicFasesAccordionOpen}
+                houdingenAccordionOpen={epicHoudingenAccordionOpen}
+                setHoudingenAccordionOpen={setEpicHoudingenAccordionOpen}
+                expandedPhases={epicExpandedPhases}
+                togglePhase={epicTogglePhase}
+                setCurrentPhase={setEpicCurrentPhase}
+                expandedParents={epicExpandedParents}
+                toggleParentTechnique={epicToggleParentTechnique}
+                expandedHoudingen={epicExpandedHoudingen}
+                toggleHouding={epicToggleHouding}
+                selectedTechnique={selectedTechniqueId || ''}
+                setSelectedTechnique={(name: string) => {
+                  const tech = Object.values(technieken_index.technieken).find((t: any) => t.naam === name) as any;
+                  if (tech && techniqueSidebarMode === 'select') {
+                    setCorrectionValue(tech.nummer);
+                    setSelectedTechniqueId(tech.nummer);
+                    setEpicSidebarOpen(false);
+                  }
+                }}
+                activeHouding={null}
+                recommendedTechnique={null}
+                openTechniqueDetails={epicOpenTechniqueDetails}
+                startTechniqueChat={epicStartTechniqueChat}
+                techniquesByPhase={epicTechniquesByPhase}
+                phaseNames={epicPhaseNames}
+                getFaseBadgeColor={epicGetFaseBadgeColor}
+                getTopLevelTechniques={epicGetTopLevelTechniques}
+                hasChildren={epicHasChildren}
+                getChildTechniques={epicGetChildTechniques}
+                klantHoudingen={epicKlantHoudingenArray}
+                difficultyLevel="bewuste_kunde"
+                isUserView={true}
+                hideHeader={true}
+              />
+            </div>
+          </div>
+        )}
+        <div className={`${epicSidebarOpen ? 'flex-1' : 'w-full'} p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 overflow-y-auto`}>
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Button
@@ -2231,12 +2403,12 @@ export function AnalysisResults({
                                       setSelectedTechniqueId(techIds[0]);
                                       setTechniqueSidebarMode('view');
                                       setTechniqueSidebarTurnIdx(null);
-                                      setShowTechniqueSidebar(true);
+                                      setEpicSidebarOpen(true);
                                     } else {
                                       setSelectedTechniqueId(null);
                                       setTechniqueSidebarMode('select');
                                       setTechniqueSidebarTurnIdx(null);
-                                      setShowTechniqueSidebar(true);
+                                      setEpicSidebarOpen(true);
                                     }
                                   }}
                                   className="p-1.5 rounded-md transition-colors hover:bg-purple-50"
@@ -2281,7 +2453,7 @@ export function AnalysisResults({
                                         setTechniqueSidebarMode('select');
                                         setTechniqueSidebarTurnIdx(turn.idx);
                                         setSelectedTechniqueId(null);
-                                        setShowTechniqueSidebar(true);
+                                        setEpicSidebarOpen(true);
                                       }}
                                       className="w-full text-left text-[12px] px-2.5 py-2 rounded-lg border bg-card flex items-center justify-between"
                                       style={{ borderColor: '#E9D5FF' }}
@@ -2342,171 +2514,7 @@ export function AnalysisResults({
             </Card>
           </div>)}
 
-      {showTechniqueSidebar && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/30 z-40"
-            onClick={() => setShowTechniqueSidebar(false)}
-          />
-          <div className="fixed top-0 right-0 h-full w-[380px] max-w-[90vw] bg-white z-50 shadow-2xl overflow-y-auto"
-            style={{ borderLeft: '2px solid #E9D5FF' }}
-          >
-            <div className="sticky top-0 bg-white z-10 px-5 py-4 border-b" style={{ borderColor: '#E9D5FF' }}>
-              <div className="flex items-center justify-between">
-                <h3 className="text-[15px] font-semibold" style={{ color: '#7C3AED' }}>
-                  {techniqueSidebarMode === 'select' ? 'Selecteer techniek' : 'E.P.I.C. Techniek'}
-                </h3>
-                <button
-                  onClick={() => setShowTechniqueSidebar(false)}
-                  className="p-1.5 rounded-lg hover:bg-purple-50 transition-colors"
-                  style={{ color: '#9910FA' }}
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              {techniqueSidebarMode === 'select' && (
-                <p className="text-[12px] mt-1" style={{ color: '#7C3AED' }}>Klik op een techniek om deze te selecteren als correctie</p>
-              )}
-            </div>
-
-            {techniqueSidebarMode === 'view' && selectedTechniqueId && (() => {
-              const tech = getTechniekByNummer(selectedTechniqueId);
-              if (!tech) return <div className="p-5 text-[13px] text-hh-muted">Techniek niet gevonden</div>;
-              const FASE_LABELS: Record<string, { name: string; color: string; bg: string }> = {
-                '0': { name: 'Pre-contact', color: '#6B7280', bg: '#F3F4F6' },
-                '1': { name: 'Opening', color: '#3B82F6', bg: '#EFF6FF' },
-                '2': { name: 'EPIC (Ontdekking)', color: '#10B981', bg: '#ECFDF5' },
-                '3': { name: 'Aanbeveling', color: '#8B5CF6', bg: '#F5F3FF' },
-                '4': { name: 'Beslissing', color: '#F59E0B', bg: '#FFFBEB' },
-              };
-              const faseInfo = FASE_LABELS[tech.fase] || FASE_LABELS['2'];
-              return (
-                <div className="p-5 space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#F5F3FF' }}>
-                      <Lightbulb className="w-5 h-5" style={{ color: '#9910FA' }} />
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-medium" style={{ color: '#9910FA' }}>Techniek {tech.nummer}</p>
-                      <h4 className="text-[16px] font-semibold text-hh-text">{tech.naam}</h4>
-                    </div>
-                  </div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium" style={{ backgroundColor: faseInfo.bg, color: faseInfo.color }}>
-                    <Target className="w-3 h-3" /> Fase {tech.fase}: {faseInfo.name}
-                  </div>
-                  {tech.doel && (
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
-                      <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Doel</p>
-                      <p className="text-[13px] leading-[19px] text-hh-text">{tech.doel}</p>
-                    </div>
-                  )}
-                  {tech.wat && (
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
-                      <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Wat</p>
-                      <p className="text-[13px] leading-[19px] text-hh-text">{tech.wat}</p>
-                    </div>
-                  )}
-                  {tech.waarom && (
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
-                      <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Waarom</p>
-                      <p className="text-[13px] leading-[19px] text-hh-text">{tech.waarom}</p>
-                    </div>
-                  )}
-                  {tech.wanneer && (
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
-                      <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Wanneer</p>
-                      <p className="text-[13px] leading-[19px] text-hh-text">{tech.wanneer}</p>
-                    </div>
-                  )}
-                  {tech.hoe && (
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
-                      <p className="text-[11px] font-semibold mb-1" style={{ color: '#7C3AED' }}>Hoe</p>
-                      <p className="text-[13px] leading-[19px] text-hh-text">{tech.hoe}</p>
-                    </div>
-                  )}
-                  {tech.stappenplan && tech.stappenplan.length > 0 && (
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
-                      <p className="text-[11px] font-semibold mb-2" style={{ color: '#7C3AED' }}>Stappenplan</p>
-                      <ol className="space-y-1.5">
-                        {tech.stappenplan.map((stap, i) => (
-                          <li key={i} className="flex gap-2 text-[12px] leading-[17px] text-hh-text">
-                            <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-semibold" style={{ backgroundColor: '#E9D5FF', color: '#7C3AED' }}>{i + 1}</span>
-                            {stap}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
-                  {tech.voorbeeld && tech.voorbeeld.length > 0 && (
-                    <div className="p-3 rounded-xl" style={{ backgroundColor: '#FAF5FF' }}>
-                      <p className="text-[11px] font-semibold mb-2" style={{ color: '#7C3AED' }}>Voorbeelden</p>
-                      <ul className="space-y-1.5">
-                        {tech.voorbeeld.map((v, i) => (
-                          <li key={i} className="text-[12px] leading-[17px] text-hh-text pl-3" style={{ borderLeft: '2px solid #E9D5FF' }}>"{v}"</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {tech.tags && tech.tags.length > 0 && (
-                    <div>
-                      <p className="text-[11px] font-semibold mb-2" style={{ color: '#7C3AED' }}>Tags</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {tech.tags.map((tag, i) => (
-                          <span key={i} className="text-[11px] px-2.5 py-1 rounded-full font-medium" style={{ backgroundColor: '#F3E8FF', color: '#7C3AED' }}>{tag}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-
-            {techniqueSidebarMode === 'select' && (
-              <div className="p-4 space-y-3">
-                {[
-                  { fase: '1', label: 'Opening', color: '#3B82F6' },
-                  { fase: '2', label: 'EPIC (Ontdekking)', color: '#10B981' },
-                  { fase: '3', label: 'Aanbeveling', color: '#8B5CF6' },
-                  { fase: '4', label: 'Beslissing', color: '#F59E0B' },
-                ].map(({ fase, label, color }) => {
-                  const techs = getAllTechnieken().filter(t => t.fase === fase && !t.is_fase);
-                  if (techs.length === 0) return null;
-                  return (
-                    <div key={fase}>
-                      <div className="flex items-center gap-2 mb-2 px-1">
-                        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                        <p className="text-[11px] font-semibold" style={{ color }}>Fase {fase}: {label}</p>
-                      </div>
-                      <div className="space-y-0.5">
-                        {techs.map(t => (
-                          <button
-                            key={t.nummer}
-                            onClick={() => {
-                              setCorrectionValue(t.nummer);
-                              setSelectedTechniqueId(t.nummer);
-                              setShowTechniqueSidebar(false);
-                            }}
-                            className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] transition-colors hover:bg-purple-50"
-                            style={{
-                              backgroundColor: correctionValue === t.nummer ? '#F5F3FF' : 'transparent',
-                              borderLeft: correctionValue === t.nummer ? '3px solid #9910FA' : '3px solid transparent',
-                            }}
-                          >
-                            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color, opacity: 0.6 }} />
-                            <span className="font-medium" style={{ color: '#7C3AED', minWidth: 32 }}>{t.nummer}</span>
-                            <span className="text-hh-text">{t.naam}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </>
-      )}
-
+      </div>
       </div>
   );
 }

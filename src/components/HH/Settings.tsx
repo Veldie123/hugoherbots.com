@@ -9,12 +9,6 @@ import { Switch } from "../ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Textarea } from "../ui/textarea";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion";
-import {
   User,
   Bell,
   CreditCard,
@@ -28,11 +22,29 @@ import {
   ChevronRight,
   X,
   Plus,
+  Loader2,
+  Crown,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { auth } from "../../utils/supabase/client";
 import { uploadAvatar } from "../../utils/supabase/storage";
 import { useUser } from "../../contexts/UserContext";
+
+interface NotificationPreferences {
+  email_notifications: boolean;
+  weekly_summary: boolean;
+  new_scenarios: boolean;
+  team_updates: boolean;
+  marketing_emails: boolean;
+}
+
+const DEFAULT_NOTIFICATIONS: NotificationPreferences = {
+  email_notifications: true,
+  weekly_summary: true,
+  new_scenarios: true,
+  team_updates: false,
+  marketing_emails: false,
+};
 
 interface SettingsProps {
   navigate?: (page: string) => void;
@@ -41,12 +53,55 @@ interface SettingsProps {
 }
 
 export function Settings({ navigate, initialSection = "profile", isAdmin }: SettingsProps) {
-  const { user, workspace } = useUser(); // Get actual user data from context
+  const { user, workspace, session, logout, refreshUser } = useUser();
   const [activeSection, setActiveSection] = useState(initialSection);
   const [changePlanModalOpen, setChangePlanModalOpen] = useState(false);
   const [paymentMethodModalOpen, setPaymentMethodModalOpen] = useState(false);
 
-  // Auto-scroll to section on mount or when initialSection changes
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
+  const [company, setCompany] = useState("");
+  const [bio, setBio] = useState("");
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+
+  const [notifications, setNotifications] = useState<NotificationPreferences>(DEFAULT_NOTIFICATIONS);
+  const [notifSaving, setNotifSaving] = useState(false);
+
+  const isTeamPlan = workspace?.plan_tier === "team" || workspace?.plan_tier === "enterprise";
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.first_name || "");
+      setLastName(user.last_name || "");
+      setEmail(user.email || "");
+    }
+  }, [user]);
+
+  useEffect(() => {
+    async function loadMetadata() {
+      try {
+        const result = await auth.getUser();
+        if (result?.user) {
+          const meta = result.user.user_metadata || {};
+          setRole(meta.role || "");
+          setCompany(meta.company || workspace?.name || "");
+          setBio(meta.bio || "");
+
+          const savedNotifs = meta.notification_preferences;
+          if (savedNotifs) {
+            setNotifications({ ...DEFAULT_NOTIFICATIONS, ...savedNotifs });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load user metadata:", err);
+      }
+    }
+    loadMetadata();
+  }, [workspace]);
+
   useEffect(() => {
     if (initialSection) {
       const element = document.getElementById(`section-${initialSection}`);
@@ -62,7 +117,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
     { id: "profile", label: "Profiel", icon: User },
     { id: "notifications", label: "Notificaties", icon: Bell },
     { id: "subscription", label: "Abonnement", icon: CreditCard },
-    { id: "team", label: "Team", icon: Users },
+    ...(isTeamPlan ? [{ id: "team", label: "Team", icon: Users }] : []),
     { id: "danger", label: "Account", icon: SettingsIcon },
   ];
 
@@ -79,12 +134,11 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
   const handleAvatarChange = async () => {
     const file = avatarRef.current?.files?.[0];
     if (file) {
-      // Get current user - DEFENSIVE CODE
       let userResult;
       try {
         userResult = await auth.getUser();
       } catch (err) {
-        console.error("❌ Error getting user:", err);
+        console.error("Error getting user:", err);
         return;
       }
 
@@ -93,21 +147,81 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
         return;
       }
 
-      const user = userResult.user;
-
-      const { url, error } = await uploadAvatar(user.id, file);
+      const u = userResult.user;
+      const { url, error } = await uploadAvatar(u.id, file);
       if (url) {
-        console.log("Avatar uploaded successfully:", url);
+        await auth.updateUser({ avatar_url: url });
+        await refreshUser();
       } else if (error) {
         console.error("Error uploading avatar:", error);
       }
     }
   };
 
+  const handleSaveProfile = async () => {
+    setProfileSaving(true);
+    setProfileSaved(false);
+    try {
+      const { error } = await auth.updateUser({
+        first_name: firstName,
+        last_name: lastName,
+        role: role,
+        company: company,
+        bio: bio,
+      });
+      if (error) {
+        console.error("Error saving profile:", error);
+      } else {
+        setProfileSaved(true);
+        await refreshUser();
+        setTimeout(() => setProfileSaved(false), 3000);
+      }
+    } catch (err) {
+      console.error("Error saving profile:", err);
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  const handleResetProfile = () => {
+    if (user) {
+      setFirstName(user.first_name || "");
+      setLastName(user.last_name || "");
+      setEmail(user.email || "");
+    }
+    setRole("");
+    setBio("");
+    setCompany(workspace?.name || "");
+  };
+
+  const updateNotification = async (key: keyof NotificationPreferences, value: boolean) => {
+    const updated = { ...notifications, [key]: value };
+    setNotifications(updated);
+    setNotifSaving(true);
+    try {
+      const { error } = await auth.updateUser({
+        notification_preferences: updated,
+      });
+      if (error) {
+        console.error("Error saving notification preferences:", error);
+        setNotifications(notifications);
+      }
+    } catch (err) {
+      console.error("Error saving notification preferences:", err);
+      setNotifications(notifications);
+    } finally {
+      setNotifSaving(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate?.("landing");
+  };
+
   return (
     <AppLayout currentPage="settings" navigate={navigate} isAdmin={isAdmin}>
       <div className="flex h-full">
-        {/* Left Sidebar - Subnavigation */}
         <aside className="hidden lg:block w-64 border-r border-hh-border bg-hh-ui-50 p-4 overflow-y-auto">
           <div className="space-y-1">
             {sections.map((section) => {
@@ -130,10 +244,8 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
           </div>
         </aside>
 
-        {/* Main Content */}
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
-            {/* Header */}
             <div>
               <h1 className="mb-2 text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] lg:text-[48px] lg:leading-[56px]">
                 Instellingen
@@ -161,7 +273,6 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
               </div>
 
               <div className="space-y-6">
-                {/* Avatar */}
                 <div className="flex items-center gap-6">
                   <Avatar className="w-20 h-20">
                     <AvatarFallback className="bg-hh-primary text-white text-[24px]">
@@ -193,13 +304,13 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
 
                 <Separator />
 
-                {/* Name */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">Voornaam</Label>
                     <Input
                       id="firstName"
-                      defaultValue={user?.first_name || ""}
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
                       placeholder="Voornaam"
                       className="bg-hh-ui-50"
                     />
@@ -208,34 +319,35 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
                     <Label htmlFor="lastName">Achternaam</Label>
                     <Input
                       id="lastName"
-                      defaultValue={user?.last_name || ""}
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                       placeholder="Achternaam"
                       className="bg-hh-ui-50"
                     />
                   </div>
                 </div>
 
-                {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
-                    defaultValue={user?.email || ""}
-                    className="bg-hh-ui-50"
+                    value={email}
+                    disabled
+                    className="bg-hh-ui-50 opacity-60"
                   />
                   <p className="text-[12px] leading-[16px] text-hh-muted">
-                    We sturen updates naar dit adres
+                    Email kan niet gewijzigd worden
                   </p>
                 </div>
 
-                {/* Job Info */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="role">Functie</Label>
                     <Input
                       id="role"
-                      defaultValue=""
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
                       placeholder="Bijv. Senior Sales Rep"
                       className="bg-hh-ui-50"
                     />
@@ -244,18 +356,20 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
                     <Label htmlFor="company">Bedrijf</Label>
                     <Input
                       id="company"
-                      defaultValue={workspace?.name || ""}
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
                       placeholder="Bedrijfsnaam"
                       className="bg-hh-ui-50"
                     />
                   </div>
                 </div>
 
-                {/* Bio */}
                 <div className="space-y-2">
                   <Label htmlFor="bio">Bio (optioneel)</Label>
                   <Textarea
                     id="bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
                     placeholder="Vertel iets over jezelf en je sales ervaring..."
                     className="bg-hh-ui-50"
                     rows={3}
@@ -265,15 +379,23 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
                 <div className="flex justify-end gap-3">
                   <Button
                     variant="outline"
-                    onClick={() => {/* Reset form */}}
+                    onClick={handleResetProfile}
                   >
                     Annuleer
                   </Button>
                   <Button
                     className="gap-2"
-                    onClick={() => {/* Save profile settings */}}
+                    onClick={handleSaveProfile}
+                    disabled={profileSaving}
                   >
-                    <Save className="w-4 h-4" /> Opslaan
+                    {profileSaving ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : profileSaved ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
+                    {profileSaved ? "Opgeslagen" : "Opslaan"}
                   </Button>
                 </div>
               </div>
@@ -306,7 +428,10 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
                       Ontvang updates over je voortgang en tips van Hugo
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch
+                    checked={notifications.email_notifications}
+                    onCheckedChange={(v) => updateNotification("email_notifications", v)}
+                  />
                 </div>
 
                 <Separator />
@@ -320,7 +445,10 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
                       Elke maandag een overzicht van je voortgang
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch
+                    checked={notifications.weekly_summary}
+                    onCheckedChange={(v) => updateNotification("weekly_summary", v)}
+                  />
                 </div>
 
                 <Separator />
@@ -334,7 +462,10 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
                       Krijg een melding als er nieuwe scenarios beschikbaar zijn
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch
+                    checked={notifications.new_scenarios}
+                    onCheckedChange={(v) => updateNotification("new_scenarios", v)}
+                  />
                 </div>
 
                 <Separator />
@@ -348,7 +479,10 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
                       Updates over je teamleden en prestaties
                     </p>
                   </div>
-                  <Switch />
+                  <Switch
+                    checked={notifications.team_updates}
+                    onCheckedChange={(v) => updateNotification("team_updates", v)}
+                  />
                 </div>
 
                 <Separator />
@@ -362,8 +496,17 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
                       Productnieuws en speciale aanbiedingen
                     </p>
                   </div>
-                  <Switch />
+                  <Switch
+                    checked={notifications.marketing_emails}
+                    onCheckedChange={(v) => updateNotification("marketing_emails", v)}
+                  />
                 </div>
+
+                {notifSaving && (
+                  <p className="text-[12px] text-hh-muted flex items-center gap-1">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Opslaan...
+                  </p>
+                )}
               </div>
             </Card>
 
@@ -439,69 +582,103 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
               </div>
             </Card>
 
-            {/* Team */}
+            {/* Team - only for Team/Enterprise plans */}
+            {isTeamPlan ? (
+              <Card
+                className="p-6 rounded-[16px] shadow-hh-sm border-hh-border"
+                id="section-team"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-hh-primary" />
+                  </div>
+                  <div>
+                    <h2 className="mb-0">Team</h2>
+                    <p className="text-[14px] leading-[20px] text-hh-muted">
+                      Beheer je teamleden en rollen
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[16px] leading-[24px] text-hh-text">
+                        Teamleden
+                      </p>
+                      <p className="text-[14px] leading-[20px] text-hh-muted">
+                        Voeg teamleden toe of verwijder ze
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      <Plus className="w-4 h-4" /> Voeg toe
+                    </Button>
+                  </div>
+
+                  <Separator />
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[16px] leading-[24px] text-hh-text">
+                        Rollen
+                      </p>
+                      <p className="text-[14px] leading-[20px] text-hh-muted">
+                        Wijs rollen toe aan teamleden
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      <Plus className="w-4 h-4" /> Voeg toe
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ) : (
+              <Card
+                className="p-6 rounded-[16px] shadow-hh-sm border-hh-border"
+                id="section-team"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-hh-primary" />
+                  </div>
+                  <div>
+                    <h2 className="mb-0">Team</h2>
+                    <p className="text-[14px] leading-[20px] text-hh-muted">
+                      Werk samen met je team
+                    </p>
+                  </div>
+                </div>
+
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 rounded-full bg-hh-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <Crown className="w-8 h-8 text-hh-primary" />
+                  </div>
+                  <h3 className="text-[18px] leading-[24px] text-hh-text mb-2">
+                    Upgrade naar Team
+                  </h3>
+                  <p className="text-[14px] leading-[20px] text-hh-muted mb-6 max-w-md mx-auto">
+                    Met een Team abonnement kun je teamleden uitnodigen, voortgang volgen en samen trainen.
+                  </p>
+                  <Button onClick={() => setChangePlanModalOpen(true)} className="gap-2">
+                    <Crown className="w-4 h-4" /> Bekijk Team plan
+                  </Button>
+                </div>
+              </Card>
+            )}
+
+            {/* Account Actions (replaces Danger Zone) */}
             <Card
               className="p-6 rounded-[16px] shadow-hh-sm border-hh-border"
-              id="section-team"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-hh-primary" />
-                </div>
-                <div>
-                  <h2 className="mb-0">Team</h2>
-                  <p className="text-[14px] leading-[20px] text-hh-muted">
-                    Beheer je teamleden en rollen
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[16px] leading-[24px] text-hh-text">
-                      Teamleden
-                    </p>
-                    <p className="text-[14px] leading-[20px] text-hh-muted">
-                      Voeg teamleden toe of verwijder ze
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Plus className="w-4 h-4" /> Voeg toe
-                  </Button>
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[16px] leading-[24px] text-hh-text">
-                      Rollen
-                    </p>
-                    <p className="text-[14px] leading-[20px] text-hh-muted">
-                      Wijs rollen toe aan teamleden
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Plus className="w-4 h-4" /> Voeg toe
-                  </Button>
-                </div>
-              </div>
-            </Card>
-
-            {/* Danger Zone */}
-            <Card
-              className="p-6 rounded-[16px] shadow-hh-sm border-destructive/20 bg-destructive/5"
               id="section-danger"
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-destructive" />
+                <div className="w-10 h-10 rounded-full bg-hh-ui-100 flex items-center justify-center">
+                  <SettingsIcon className="w-5 h-5 text-hh-muted" />
                 </div>
                 <div>
-                  <h2 className="mb-0 text-destructive">Danger Zone</h2>
+                  <h2 className="mb-0">Account</h2>
                   <p className="text-[14px] leading-[20px] text-hh-muted">
-                    Permanente acties — wees voorzichtig
+                    Account instellingen en uitloggen
                   </p>
                 </div>
               </div>
@@ -510,57 +687,18 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
                 <div className="flex items-center justify-between p-4 rounded-lg border border-hh-border bg-hh-bg">
                   <div>
                     <p className="text-[16px] leading-[24px] text-hh-text mb-1">
-                      Verwijder alle sessiedata
+                      Uitloggen
                     </p>
                     <p className="text-[14px] leading-[20px] text-hh-muted">
-                      Wis je complete trainingsgeschiedenis en scores
+                      Log uit van je account op dit apparaat
                     </p>
                   </div>
-                  <Button variant="outline" size="sm">
-                    Wissen
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-lg border border-hh-border bg-hh-bg">
-                  <div>
-                    <p className="text-[16px] leading-[24px] text-hh-text mb-1">
-                      Deactiveer account
-                    </p>
-                    <p className="text-[14px] leading-[20px] text-hh-muted">
-                      Pauzeer je account tijdelijk zonder data te verliezen
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    Deactiveer
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-lg border border-destructive/50 bg-hh-bg">
-                  <div>
-                    <p className="text-[16px] leading-[24px] text-destructive mb-1">
-                      Verwijder account
-                    </p>
-                    <p className="text-[14px] leading-[20px] text-hh-muted">
-                      Permanent verwijderen — dit kan niet ongedaan gemaakt worden
-                    </p>
-                  </div>
-                  <Button variant="destructive" size="sm">
-                    Verwijder
+                  <Button variant="outline" size="sm" className="gap-2" onClick={handleLogout}>
+                    <LogOut className="w-4 h-4" /> Uitloggen
                   </Button>
                 </div>
               </div>
             </Card>
-
-            {/* Logout */}
-            <div className="flex justify-center">
-              <Button
-                variant="ghost"
-                className="gap-2 text-hh-muted"
-                onClick={() => navigate?.("landing")}
-              >
-                <LogOut className="w-4 h-4" /> Log uit
-              </Button>
-            </div>
           </div>
         </div>
       </div>

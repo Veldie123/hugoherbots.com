@@ -84,10 +84,18 @@ export function AdminAnalytics({ navigate }: AdminAnalyticsProps) {
     fetchData();
   }, []);
 
+  const retentionRate = platformData && platformData.activeUsersMonth > 0 && platformData.totalUsers > 0
+    ? Math.round((platformData.activeUsersMonth / platformData.totalUsers) * 100)
+    : 0;
+
+  const completionRate = platformData && platformData.totalLiveSessions > 0
+    ? Math.round((platformData.completedSessions / platformData.totalLiveSessions) * 100)
+    : 0;
+
   const metrics = [
     {
       label: "DAU (Daily Active Users)",
-      value: platformData ? platformData.activeUsersToday.toLocaleString() : loading ? "..." : "—",
+      value: platformData ? platformData.activeUsersToday.toLocaleString() : loading ? "..." : "0",
       change: "",
       trend: "up" as const,
       icon: Users,
@@ -96,7 +104,7 @@ export function AdminAnalytics({ navigate }: AdminAnalyticsProps) {
     },
     {
       label: "MAU (Monthly Active)",
-      value: platformData ? platformData.activeUsersMonth.toLocaleString() : loading ? "..." : "—",
+      value: platformData ? platformData.activeUsersMonth.toLocaleString() : loading ? "..." : "0",
       change: "",
       trend: "up" as const,
       icon: TrendingUp,
@@ -105,17 +113,17 @@ export function AdminAnalytics({ navigate }: AdminAnalyticsProps) {
     },
     {
       label: "Retention Rate",
-      value: "—",
-      change: "n.v.t.",
+      value: platformData ? `${retentionRate}%` : loading ? "..." : "0%",
+      change: "",
       trend: "up" as const,
       icon: Award,
       color: "#f59e0b",
       bgColor: "rgba(245, 158, 11, 0.1)",
     },
     {
-      label: "Revenue (MTD)",
-      value: "—",
-      change: "n.v.t.",
+      label: "Sessie Completion",
+      value: platformData ? `${completionRate}%` : loading ? "..." : "0%",
+      change: "",
       trend: "up" as const,
       icon: DollarSign,
       color: "#10b981",
@@ -227,22 +235,37 @@ export function AdminAnalytics({ navigate }: AdminAnalyticsProps) {
           })}
         </div>
 
-        {/* User Growth Chart Placeholder */}
+        {/* Weekly Engagement Overview */}
         <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
           <h3 className="text-[18px] leading-[24px] text-hh-text mb-4">
-            User Growth (Laatste 6 maanden)
+            Platform Activiteit (Laatste 4 weken)
           </h3>
-          <div className="h-64 bg-hh-ui-50 rounded-lg flex items-center justify-center border border-hh-border">
-            <div className="text-center">
-              <TrendingUp className="w-12 h-12 text-hh-muted mx-auto mb-3" />
-              <p className="text-[14px] leading-[20px] text-hh-muted">
-                Line chart met nieuwe users, churn, net growth
-              </p>
-              <p className="text-[12px] leading-[16px] text-hh-muted mt-1">
-                Recharts integratie vereist
-              </p>
+          {userEngagement.length === 0 ? (
+            <div className="h-48 flex items-center justify-center">
+              <p className="text-[14px] text-hh-muted">Geen activiteit data beschikbaar</p>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-end gap-3 h-48 px-4">
+              {userEngagement.map((week, index) => {
+                const barHeight = maxSessions > 0 ? Math.max(8, (week.sessions / maxSessions) * 100) : 8;
+                return (
+                  <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                    <span className="text-[12px] text-hh-muted font-medium">{week.sessions}</span>
+                    <div className="w-full flex justify-center" style={{ height: '140px', alignItems: 'flex-end', display: 'flex' }}>
+                      <div
+                        className="w-full max-w-[60px] rounded-t-lg transition-all bg-red-600"
+                        style={{ height: `${barHeight}%` }}
+                      />
+                    </div>
+                    <span className="text-[11px] text-hh-muted">{week.week}</span>
+                    {week.avgScore > 0 && (
+                      <span className="text-[10px] text-hh-muted">{week.avgScore}% avg</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
 
         {/* Two Column Layout */}

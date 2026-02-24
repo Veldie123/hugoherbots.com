@@ -52,6 +52,16 @@
       "recordedBy": "admin",
       "id": "ref-1771974877426-gzmbmo97q",
       "recordedAt": "2026-02-24T23:14:37.426Z"
+    },
+    {
+      "techniqueId": "unknown",
+      "customerSignal": "ontwijkend",
+      "customerMessage": "",
+      "sellerResponse": "Ik ga hier even kort over lopen, voordat we vandaag samen zitten.",
+      "context": {},
+      "recordedBy": "admin",
+      "id": "ref-1771975268128-rt4m8gm31",
+      "recordedAt": "2026-02-24T23:21:08.128Z"
     }
   ]
 }

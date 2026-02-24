@@ -108,23 +108,25 @@ export function Analytics({ navigate, isAdmin }: AnalyticsProps) {
       };
     }
     const techniques = apiData.techniquesProgress || [];
-    const scoresWithValues = techniques.filter((t: any) => t.avgScore !== null && t.avgScore !== undefined);
-    const overallScore = scoresWithValues.length > 0
-      ? Math.round(scoresWithValues.reduce((sum: number, t: any) => sum + t.avgScore, 0) / scoresWithValues.length)
-      : 0;
+    const totalViews = techniques.reduce((sum: number, t: any) => sum + (t.views || 0), 0);
 
     const totalActivities = Object.values(apiData.activityCounts || {}).reduce((sum: number, v: any) => sum + (v || 0), 0) as number;
+    const sessionsCompleted = totalActivities + totalViews;
 
     const completionRate = apiData.totalVideoViews > 0
       ? Math.round((apiData.totalVideoCompletes / apiData.totalVideoViews) * 100)
       : 0;
 
+    const avgWatchPerSession = totalViews > 0 && apiData.totalWatchTime > 0
+      ? apiData.totalWatchTime / totalViews
+      : 0;
+
     return {
-      overallScore,
+      overallScore: completionRate,
       scoreDelta: 0,
-      sessionsCompleted: totalActivities,
+      sessionsCompleted,
       sessionsDelta: 0,
-      avgSessionTime: formatWatchTime(apiData.totalWatchTime || 0),
+      avgSessionTime: formatWatchTime(avgWatchPerSession),
       timeDelta: 0,
       completionRate,
       completionDelta: 0,
@@ -134,16 +136,20 @@ export function Analytics({ navigate, isAdmin }: AnalyticsProps) {
   const skillsBreakdown: SkillData[] = useMemo(() => {
     if (!apiData || !apiData.techniquesProgress) return [];
     return apiData.techniquesProgress.map((tp: any, idx: number) => {
-      const techniek = getTechniekByNummer(tp.techniekId);
-      const faseMatch = tp.techniekId.match(/^(\d+)/);
+      const techId = tp.techniekId || tp.techniek_id;
+      const techniek = getTechniekByNummer(techId);
+      const faseMatch = techId?.match(/^(\d+)/);
       const fase = faseMatch ? faseMatch[1] : "1";
+      const views = tp.views || 0;
+      const watchTime = tp.watchTime || 0;
+      const avgWatchPct = watchTime > 0 && views > 0 ? Math.min(100, Math.round((watchTime / views / 300) * 100)) : 0;
       return {
         id: idx + 1,
-        code: tp.techniekId,
-        skill: techniek?.naam || tp.techniekId,
+        code: techId || `${idx + 1}`,
+        skill: techniek?.naam || techId || `Techniek ${idx + 1}`,
         fase,
-        score: Math.round(tp.avgScore || 0),
-        sessions: tp.count || 0,
+        score: avgWatchPct,
+        sessions: views,
         trend: 0,
       };
     });
@@ -155,8 +161,8 @@ export function Analytics({ navigate, isAdmin }: AnalyticsProps) {
     if (!apiData || !apiData.weeklyActivity) return [];
     return apiData.weeklyActivity.map((w: any) => ({
       week: w.week,
-      sessions: w.count || 0,
-      avgScore: 0,
+      sessions: (w.views || 0) + (w.activities || 0),
+      avgScore: w.avgScore || 0,
     }));
   }, [apiData]);
 
@@ -702,7 +708,10 @@ export function Analytics({ navigate, isAdmin }: AnalyticsProps) {
                 Hugo's analyse
               </h3>
               <p className="text-[14px] sm:text-[15px] leading-[22px] sm:leading-[24px] text-hh-muted">
-                Je ontdekkingsfase (91%) is sterk — dit is je grootste wapen. Nu focus op negotiation (71%) en closing (74%). Dáár win je deals. Train deze 15 min per dag, de komende 2 weken. Je ziet resultaat binnen 10 sessies.
+                {skillsBreakdown.length > 0
+                  ? `Je hebt ${totalSessions} sessies afgerond met een gemiddelde score van ${avgScore}%. Blijf oefenen met de technieken waar je score lager is — consistentie is de sleutel tot groei.`
+                  : "Begin met het bekijken van video's en het oefenen van technieken om hier je persoonlijke analyse te zien."
+                }
               </p>
             </div>
           </div>

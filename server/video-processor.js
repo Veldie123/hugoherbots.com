@@ -3209,6 +3209,12 @@ Format: ["id1", "id2", "id3", ...]`;
         const todayViewUsers = new Set(recentViews.filter(v => v.created_at >= todayStart).map(v => v.user_id));
         const monthViewUsers = new Set(recentViews.map(v => v.user_id));
         
+        let analysisScores = [];
+        try {
+          const analysisResult = await supabaseAdmin.from('conversation_analyses').select('score, created_at').gte('created_at', monthStart);
+          analysisScores = analysisResult.data || [];
+        } catch (e) { /* table may not exist */ }
+
         const weeklyEngagement = [];
         for (let i = 3; i >= 0; i--) {
           const weekStart = new Date(now);
@@ -3220,11 +3226,19 @@ Format: ["id1", "id2", "id3", ...]`;
             const viewDate = new Date(v.created_at);
             return viewDate >= weekStart && viewDate < weekEnd;
           });
+
+          const weekScores = analysisScores.filter(a => {
+            const d = new Date(a.created_at);
+            return d >= weekStart && d < weekEnd && a.score != null;
+          });
+          const avgScore = weekScores.length > 0
+            ? Math.round(weekScores.reduce((s, a) => s + (Number(a.score) || 0), 0) / weekScores.length)
+            : 0;
           
           weeklyEngagement.push({
             week: `Week ${4 - i}`,
             sessions: weekViews.length,
-            avgScore: Math.min(100, 70 + (weekViews.length * 2)),
+            avgScore,
           });
         }
         
@@ -3294,6 +3308,12 @@ Format: ["id1", "id2", "id3", ...]`;
         }
         const techniquesProgress = Object.values(techniquesMap);
 
+        let userAnalysisScores = [];
+        try {
+          const analysisRes = await supabaseAdmin.from('conversation_analyses').select('score, created_at').eq('user_id', userId);
+          userAnalysisScores = analysisRes.data || [];
+        } catch (e) { /* table may not exist */ }
+
         const weeklyActivity = [];
         for (let i = 3; i >= 0; i--) {
           const weekStart = new Date(now);
@@ -3312,10 +3332,19 @@ Format: ["id1", "id2", "id3", ...]`;
             return d >= weekStart && d < weekEnd;
           }).length;
 
+          const weekScores = userAnalysisScores.filter(a => {
+            const d = new Date(a.created_at);
+            return d >= weekStart && d < weekEnd && a.score != null;
+          });
+          const avgScore = weekScores.length > 0
+            ? Math.round(weekScores.reduce((s, a) => s + (Number(a.score) || 0), 0) / weekScores.length)
+            : 0;
+
           weeklyActivity.push({
             week: `Week ${4 - i}`,
             views: weekViews,
             activities: weekActivities,
+            avgScore,
           });
         }
 
@@ -5350,6 +5379,84 @@ ANTWOORD FORMAT:
         res.end(JSON.stringify({ error: err.message }));
       }
     });
+    return;
+  }
+
+  if (pathname === '/api/stripe/subscription' && req.method === 'GET') {
+    (async () => {
+      try {
+        const queryParams = new URL(req.url, `http://localhost`).searchParams;
+        const email = queryParams.get('email');
+        if (!email) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'email parameter is verplicht' }));
+          return;
+        }
+
+        const result = await stripeQuery(`
+          SELECT 
+            s.id as subscription_id,
+            s.status,
+            s.current_period_end,
+            s.current_period_start,
+            s.cancel_at_period_end,
+            s.cancel_at,
+            s.items,
+            c.id as customer_id,
+            c.email as customer_email,
+            c.name as customer_name,
+            p.id as product_id,
+            p.name as product_name,
+            pr.unit_amount,
+            pr.currency,
+            pr.recurring
+          FROM stripe.subscriptions s
+          JOIN stripe.customers c ON s.customer = c.id
+          LEFT JOIN stripe.subscription_items si ON si.id = (s.items->'data'->0->>'id')
+          LEFT JOIN stripe.prices pr ON pr.id = (s.items->'data'->0->'price'->>'id')
+          LEFT JOIN stripe.products p ON p.id = (s.items->'data'->0->'price'->>'product')
+          WHERE LOWER(c.email) = LOWER($1)
+            AND s.status IN ('active', 'trialing', 'past_due')
+          ORDER BY s.current_period_end DESC
+          LIMIT 1
+        `, [email]);
+
+        if (result.rows.length === 0) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ subscription: null }));
+          return;
+        }
+
+        const row = result.rows[0];
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          subscription: {
+            id: row.subscription_id,
+            status: row.status,
+            currentPeriodEnd: row.current_period_end,
+            currentPeriodStart: row.current_period_start,
+            cancelAtPeriodEnd: row.cancel_at_period_end,
+            cancelAt: row.cancel_at,
+            customerId: row.customer_id,
+            customerEmail: row.customer_email,
+            customerName: row.customer_name,
+            product: {
+              id: row.product_id,
+              name: row.product_name,
+            },
+            price: {
+              unitAmount: row.unit_amount,
+              currency: row.currency,
+              recurring: row.recurring,
+            },
+          }
+        }));
+      } catch (err) {
+        console.error('[Stripe] Subscription lookup error:', err.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    })();
     return;
   }
 
