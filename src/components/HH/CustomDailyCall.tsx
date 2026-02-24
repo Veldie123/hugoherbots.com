@@ -16,11 +16,37 @@ import {
   ArrowLeft,
   Radio,
   Circle,
+  ImageIcon,
+  Sun,
+  Sunset,
+  Moon,
+  Cloud,
+  X,
+  Check,
+  Hand,
 } from "lucide-react";
 import { cn } from "@/components/ui/utils";
 import { liveCoachingApi } from "@/services/liveCoachingApi";
 import { activityService } from "@/services/activityService";
 import { toast } from "sonner";
+
+type VirtualBgOption = 'none' | 'blur' | 'ochtend' | 'golden-hour' | 'avond' | 'bewolkt' | 'auto';
+
+const VIRTUAL_BACKGROUNDS: Record<string, { label: string; image: string; icon: typeof Sun }> = {
+  ochtend: { label: 'Ochtend', image: '/images/backgrounds/kantoor-ochtend.png', icon: Sun },
+  'golden-hour': { label: 'Golden Hour', image: '/images/backgrounds/kantoor-golden-hour.png', icon: Sunset },
+  avond: { label: 'Avond', image: '/images/backgrounds/kantoor-avond.png', icon: Moon },
+  bewolkt: { label: 'Bewolkt', image: '/images/backgrounds/kantoor-bewolkt.png', icon: Cloud },
+};
+
+function getTimeBasedBackground(): string {
+  const hour = new Date().getHours();
+  if (hour >= 6 && hour < 12) return 'ochtend';
+  if (hour >= 12 && hour < 17) return 'golden-hour';
+  if (hour >= 17 && hour < 21) return 'avond';
+  if (hour >= 21 || hour < 6) return 'avond';
+  return 'ochtend';
+}
 
 interface CustomDailyCallProps {
   roomUrl: string;
@@ -49,6 +75,12 @@ interface ParticipantInfo {
   audioOn: boolean;
 }
 
+interface HandRaise {
+  sessionId: string;
+  userName: string;
+  timestamp: number;
+}
+
 export function CustomDailyCall({
   roomUrl,
   token,
@@ -72,6 +104,13 @@ export function CustomDailyCall({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingLoading, setRecordingLoading] = useState(false);
+  const [virtualBg, setVirtualBg] = useState<VirtualBgOption>('none');
+  const [showBgPicker, setShowBgPicker] = useState(false);
+  const [bgLoading, setBgLoading] = useState(false);
+  const [raisedHands, setRaisedHands] = useState<HandRaise[]>([]);
+  const [isHandRaised, setIsHandRaised] = useState(false);
+  const [showHandsList, setShowHandsList] = useState(false);
+  const [waitingParticipants, setWaitingParticipants] = useState<{ id: string; name: string }[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const isMountedRef = useRef(true);
   const hasLoggedWebinarAttend = useRef(false);
@@ -106,6 +145,94 @@ export function CustomDailyCall({
       callObjectRef.current = null;
     }
   }, []);
+
+  const applyVirtualBackground = useCallback(async (option: VirtualBgOption) => {
+    const call = callObjectRef.current;
+    if (!call) return;
+
+    setBgLoading(true);
+    try {
+      const resolvedOption = option === 'auto' ? getTimeBasedBackground() : option;
+
+      if (resolvedOption === 'none') {
+        await call.updateInputSettings({
+          video: { processor: { type: 'none' } },
+        });
+      } else if (resolvedOption === 'blur') {
+        await call.updateInputSettings({
+          video: { processor: { type: 'background-blur', config: { strength: 0.8 } } },
+        });
+      } else {
+        const bg = VIRTUAL_BACKGROUNDS[resolvedOption];
+        if (bg) {
+          await call.updateInputSettings({
+            video: { processor: { type: 'background-image', config: { source: bg.image } } },
+          });
+        }
+      }
+      setVirtualBg(option);
+    } catch (err) {
+      console.error('[Daily] Virtual background error:', err);
+      toast.error('Virtuele achtergrond kon niet worden ingesteld');
+    } finally {
+      setBgLoading(false);
+    }
+  }, []);
+
+  const handleToggleHandRaise = useCallback(() => {
+    const call = callObjectRef.current;
+    if (!call) return;
+
+    const newState = !isHandRaised;
+    setIsHandRaised(newState);
+
+    const localParticipant = call.participants().local;
+    const userName = localParticipant?.user_name || 'Deelnemer';
+
+    call.sendAppMessage({
+      type: newState ? 'hand-raise' : 'hand-lower',
+      sessionId: localParticipant?.session_id,
+      userName,
+      timestamp: Date.now(),
+    }, '*');
+
+    if (newState) {
+      setRaisedHands(prev => [...prev, {
+        sessionId: localParticipant?.session_id || '',
+        userName,
+        timestamp: Date.now(),
+      }]);
+    } else {
+      setRaisedHands(prev => prev.filter(h => h.sessionId !== localParticipant?.session_id));
+    }
+  }, [isHandRaised]);
+
+  const handleDismissHand = useCallback((targetSessionId: string) => {
+    setRaisedHands(prev => prev.filter(h => h.sessionId !== targetSessionId));
+  }, []);
+
+  const handleAdmitParticipant = useCallback((participantId: string) => {
+    const call = callObjectRef.current;
+    if (!call) return;
+    call.updateWaitingParticipant(participantId, { grantRequestedAccess: true });
+    setWaitingParticipants(prev => prev.filter(p => p.id !== participantId));
+  }, []);
+
+  const handleDenyParticipant = useCallback((participantId: string) => {
+    const call = callObjectRef.current;
+    if (!call) return;
+    call.updateWaitingParticipant(participantId, { grantRequestedAccess: false });
+    setWaitingParticipants(prev => prev.filter(p => p.id !== participantId));
+  }, []);
+
+  const handleAdmitAll = useCallback(() => {
+    const call = callObjectRef.current;
+    if (!call) return;
+    waitingParticipants.forEach(wp => {
+      call.updateWaitingParticipant(wp.id, { grantRequestedAccess: true });
+    });
+    setWaitingParticipants([]);
+  }, [waitingParticipants]);
 
   const initializeCall = useCallback(async () => {
     if (!roomUrl || !token) {
@@ -161,11 +288,47 @@ export function CustomDailyCall({
         if (!isMountedRef.current) return;
         console.log("[Daily] Participant left:", event?.participant?.user_name);
         updateParticipants(call);
+        if (event?.participant?.session_id) {
+          setRaisedHands(prev => prev.filter(h => h.sessionId !== event.participant.session_id));
+        }
       });
 
       call.on("participant-updated", () => {
         if (!isMountedRef.current) return;
         updateParticipants(call);
+      });
+
+      call.on("app-message", (event: any) => {
+        if (!isMountedRef.current || !event?.data) return;
+        const msg = event.data;
+        if (msg.type === 'hand-raise') {
+          setRaisedHands(prev => {
+            if (prev.some(h => h.sessionId === msg.sessionId)) return prev;
+            return [...prev, { sessionId: msg.sessionId, userName: msg.userName, timestamp: msg.timestamp }];
+          });
+        } else if (msg.type === 'hand-lower') {
+          setRaisedHands(prev => prev.filter(h => h.sessionId !== msg.sessionId));
+        }
+      });
+
+      call.on("waiting-participant-added", (event: any) => {
+        if (!isMountedRef.current) return;
+        const wp = event?.participant;
+        if (wp) {
+          setWaitingParticipants(prev => {
+            if (prev.some(p => p.id === wp.id)) return prev;
+            return [...prev, { id: wp.id, name: wp.name || 'Deelnemer' }];
+          });
+          toast.info(`${wp.name || 'Deelnemer'} wacht in de lobby`);
+        }
+      });
+
+      call.on("waiting-participant-removed", (event: any) => {
+        if (!isMountedRef.current) return;
+        const wp = event?.participant;
+        if (wp) {
+          setWaitingParticipants(prev => prev.filter(p => p.id !== wp.id));
+        }
       });
 
       call.on("track-started", () => {
@@ -484,6 +647,61 @@ export function CustomDailyCall({
         </div>
       </div>
 
+      {isHost && waitingParticipants.length > 0 && (
+        <div className="mx-4 mt-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+              <Users className="w-4 h-4 text-amber-700" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-amber-900">
+                {waitingParticipants.length === 1
+                  ? `${waitingParticipants[0].name} wacht in de lobby`
+                  : `${waitingParticipants.length} deelnemers wachten in de lobby`}
+              </p>
+              {waitingParticipants.length > 1 && (
+                <p className="text-xs text-amber-700 mt-0.5">
+                  {waitingParticipants.map(p => p.name).join(', ')}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {waitingParticipants.length === 1 ? (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleDenyParticipant(waitingParticipants[0].id)}
+                  className="h-8 text-xs border-amber-300 text-amber-700 hover:bg-amber-100"
+                >
+                  Weigeren
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleAdmitParticipant(waitingParticipants[0].id)}
+                  className="h-8 text-xs text-white"
+                  style={{ backgroundColor: '#3d9a6e' }}
+                >
+                  Toelaten
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  size="sm"
+                  onClick={handleAdmitAll}
+                  className="h-8 text-xs text-white"
+                  style={{ backgroundColor: '#3d9a6e' }}
+                >
+                  Allemaal toelaten
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 p-4 overflow-hidden min-h-[400px]">
         <div className={cn(
           "grid gap-3 h-full",
@@ -527,6 +745,7 @@ export function CustomDailyCall({
                 key={participant.sessionId}
                 participant={participant}
                 isLarge={participantList.length <= 2}
+                hasHandRaised={raisedHands.some(h => h.sessionId === participant.sessionId)}
               />
             ))
           )}
@@ -553,6 +772,169 @@ export function CustomDailyCall({
         >
           {isCameraOff ? <VideoOff className="w-6 h-6" /> : <Video className="w-6 h-6" />}
         </Button>
+
+        <div className="relative">
+          <Button
+            size="lg"
+            variant={virtualBg !== 'none' ? "default" : "secondary"}
+            onClick={() => setShowBgPicker(!showBgPicker)}
+            disabled={bgLoading}
+            className={cn(
+              "w-14 h-14 rounded-full p-0",
+              virtualBg !== 'none' && "bg-blue-600 hover:bg-blue-700 text-white"
+            )}
+            title="Virtuele achtergrond"
+          >
+            {bgLoading ? (
+              <Loader2 className="w-6 h-6 animate-spin" />
+            ) : (
+              <ImageIcon className="w-6 h-6" />
+            )}
+          </Button>
+
+          {showBgPicker && (
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-white rounded-xl shadow-2xl border border-hh-border p-3 w-[280px] z-50">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[13px] font-semibold text-hh-text">Hugo's Kantoor</p>
+                <button onClick={() => setShowBgPicker(false)} className="p-1 rounded hover:bg-gray-100">
+                  <X className="w-3.5 h-3.5 text-hh-muted" />
+                </button>
+              </div>
+
+              <button
+                onClick={() => { applyVirtualBackground('auto'); setShowBgPicker(false); }}
+                className={cn(
+                  "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors mb-1",
+                  virtualBg === 'auto' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-hh-text"
+                )}
+              >
+                <Sun className="w-4 h-4" />
+                Automatisch (tijdsgebonden)
+                {virtualBg === 'auto' && <Check className="w-3.5 h-3.5 ml-auto text-blue-600" />}
+              </button>
+
+              <div className="grid grid-cols-2 gap-1.5 mb-2">
+                {Object.entries(VIRTUAL_BACKGROUNDS).map(([key, bg]) => {
+                  const Icon = bg.icon;
+                  const isActive = virtualBg === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => { applyVirtualBackground(key as VirtualBgOption); setShowBgPicker(false); }}
+                      className={cn(
+                        "relative rounded-lg overflow-hidden border-2 transition-all aspect-video",
+                        isActive ? "border-blue-600 ring-2 ring-blue-200" : "border-transparent hover:border-blue-300"
+                      )}
+                    >
+                      <img src={bg.image} alt={bg.label} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-1.5 flex items-center gap-1">
+                        <Icon className="w-3 h-3 text-white" />
+                        <span className="text-[10px] text-white font-medium">{bg.label}</span>
+                      </div>
+                      {isActive && (
+                        <div className="absolute top-1 right-1 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="border-t border-hh-border pt-2 space-y-0.5">
+                <button
+                  onClick={() => { applyVirtualBackground('blur'); setShowBgPicker(false); }}
+                  className={cn(
+                    "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
+                    virtualBg === 'blur' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-hh-text"
+                  )}
+                >
+                  <div className="w-4 h-4 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 blur-[1px]" />
+                  Achtergrond vervagen
+                  {virtualBg === 'blur' && <Check className="w-3.5 h-3.5 ml-auto text-blue-600" />}
+                </button>
+                <button
+                  onClick={() => { applyVirtualBackground('none'); setShowBgPicker(false); }}
+                  className={cn(
+                    "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
+                    virtualBg === 'none' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-hh-text"
+                  )}
+                >
+                  <VideoOff className="w-4 h-4" />
+                  Geen achtergrond
+                  {virtualBg === 'none' && <Check className="w-3.5 h-3.5 ml-auto text-blue-600" />}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="relative">
+          <Button
+            size="lg"
+            variant={isHandRaised ? "default" : "secondary"}
+            onClick={handleToggleHandRaise}
+            className={cn(
+              "w-14 h-14 rounded-full p-0",
+              isHandRaised && "bg-amber-500 hover:bg-amber-600 text-white"
+            )}
+            title={isHandRaised ? "Hand laten zakken" : "Hand opsteken"}
+          >
+            <Hand className={cn("w-6 h-6", isHandRaised && "animate-bounce")} />
+          </Button>
+          {isHandRaised && (
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full animate-ping" />
+          )}
+        </div>
+
+        {isHost && raisedHands.length > 0 && (
+          <div className="relative">
+            <Button
+              size="lg"
+              variant="secondary"
+              onClick={() => setShowHandsList(!showHandsList)}
+              className="w-14 h-14 rounded-full p-0 relative"
+              title="Opgestoken handen"
+            >
+              <Hand className="w-6 h-6 text-amber-600" />
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {raisedHands.length}
+              </span>
+            </Button>
+
+            {showHandsList && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-white rounded-xl shadow-2xl border border-hh-border p-3 w-[220px] z-50">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[13px] font-semibold text-hh-text flex items-center gap-1.5">
+                    <Hand className="w-4 h-4 text-amber-500" />
+                    Opgestoken handen
+                  </p>
+                  <button onClick={() => setShowHandsList(false)} className="p-1 rounded hover:bg-gray-100">
+                    <X className="w-3.5 h-3.5 text-hh-muted" />
+                  </button>
+                </div>
+                <div className="space-y-1 max-h-[200px] overflow-y-auto">
+                  {raisedHands.sort((a, b) => a.timestamp - b.timestamp).map((hand, idx) => (
+                    <div key={hand.sessionId} className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-gray-50">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-medium text-amber-600 w-4">{idx + 1}.</span>
+                        <span className="text-[12px] text-hh-text font-medium truncate max-w-[120px]">{hand.userName}</span>
+                      </div>
+                      <button
+                        onClick={() => handleDismissHand(hand.sessionId)}
+                        className="text-gray-400 hover:text-gray-600 p-0.5"
+                        title="Verwijder"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {isHost && (
           <Button
@@ -592,9 +974,10 @@ export function CustomDailyCall({
 interface VideoTileProps {
   participant: ParticipantInfo;
   isLarge?: boolean;
+  hasHandRaised?: boolean;
 }
 
-function VideoTile({ participant, isLarge = false }: VideoTileProps) {
+function VideoTile({ participant, isLarge = false, hasHandRaised = false }: VideoTileProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
 
@@ -647,6 +1030,14 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
             <span className="text-3xl font-bold text-white">
               {participant.userName.charAt(0).toUpperCase()}
             </span>
+          </div>
+        </div>
+      )}
+
+      {hasHandRaised && (
+        <div className="absolute top-3 right-3 z-10">
+          <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center shadow-lg animate-bounce" style={{ animationDuration: '1.5s' }}>
+            <Hand className="w-4 h-4 text-white" />
           </div>
         </div>
       )}

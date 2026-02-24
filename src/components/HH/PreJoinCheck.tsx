@@ -25,8 +25,33 @@ import {
   CheckCircle,
   XCircle,
   ArrowLeft,
+  ImageIcon,
+  Sun,
+  Sunset,
+  Moon,
+  Cloud,
+  Check,
+  X,
 } from "lucide-react";
 import { cn } from "@/components/ui/utils";
+
+type VirtualBgOption = 'none' | 'blur' | 'ochtend' | 'golden-hour' | 'avond' | 'bewolkt' | 'auto';
+
+const VIRTUAL_BACKGROUNDS: Record<string, { label: string; image: string; icon: typeof Sun }> = {
+  ochtend: { label: 'Ochtend', image: '/images/backgrounds/kantoor-ochtend.png', icon: Sun },
+  'golden-hour': { label: 'Golden Hour', image: '/images/backgrounds/kantoor-golden-hour.png', icon: Sunset },
+  avond: { label: 'Avond', image: '/images/backgrounds/kantoor-avond.png', icon: Moon },
+  bewolkt: { label: 'Bewolkt', image: '/images/backgrounds/kantoor-bewolkt.png', icon: Cloud },
+};
+
+function getTimeBasedBackground(): string {
+  const hour = new Date().getHours();
+  if (hour >= 6 && hour < 12) return 'ochtend';
+  if (hour >= 12 && hour < 17) return 'golden-hour';
+  if (hour >= 17 && hour < 21) return 'avond';
+  if (hour >= 21 || hour < 6) return 'avond';
+  return 'ochtend';
+}
 
 interface PreJoinCheckProps {
   sessionTitle: string;
@@ -35,6 +60,7 @@ interface PreJoinCheckProps {
     audioDeviceId?: string;
     isCameraEnabled: boolean;
     isMicEnabled: boolean;
+    virtualBackground?: VirtualBgOption;
   }) => void;
   onCancel: () => void;
 }
@@ -66,6 +92,8 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
   const [audioLevel, setAudioLevel] = useState(0);
   const [helpOpen, setHelpOpen] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [selectedBg, setSelectedBg] = useState<VirtualBgOption>('auto');
+  const [showBgPicker, setShowBgPicker] = useState(false);
 
   const stopAudioMonitoring = useCallback(() => {
     if (animationFrameRef.current) {
@@ -388,6 +416,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
       audioDeviceId: isMicOn ? audioDeviceId : undefined,
       isCameraEnabled: isCameraOn,
       isMicEnabled: isMicOn,
+      virtualBackground: selectedBg,
     });
   };
 
@@ -452,7 +481,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
             </div>
           )}
 
-          {/* Camera/Mic toggles overlay */}
+          {/* Camera/Mic/Background toggles overlay */}
           <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-2">
             <button
               onClick={handleToggleCamera}
@@ -475,6 +504,96 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
             >
               {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
             </button>
+
+            <div className="relative">
+              <button
+                onClick={() => setShowBgPicker(!showBgPicker)}
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                  selectedBg !== 'none' ? "bg-blue-600 text-white" : "bg-white/20 hover:bg-white/30 text-white"
+                )}
+                title="Virtuele achtergrond"
+              >
+                <ImageIcon className="w-5 h-5" />
+              </button>
+
+              {showBgPicker && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-3 w-[260px] z-50">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[12px] font-semibold text-gray-900">Hugo's Kantoor</p>
+                    <button onClick={() => setShowBgPicker(false)} className="p-0.5 rounded hover:bg-gray-100">
+                      <X className="w-3.5 h-3.5 text-gray-400" />
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => { setSelectedBg('auto'); setShowBgPicker(false); }}
+                    className={cn(
+                      "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors mb-1",
+                      selectedBg === 'auto' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"
+                    )}
+                  >
+                    <Sun className="w-3.5 h-3.5" />
+                    Automatisch (tijdsgebonden)
+                    {selectedBg === 'auto' && <Check className="w-3 h-3 ml-auto text-blue-600" />}
+                  </button>
+
+                  <div className="grid grid-cols-2 gap-1.5 mb-1.5">
+                    {Object.entries(VIRTUAL_BACKGROUNDS).map(([key, bg]) => {
+                      const Icon = bg.icon;
+                      const isActive = selectedBg === key;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => { setSelectedBg(key as VirtualBgOption); setShowBgPicker(false); }}
+                          className={cn(
+                            "relative rounded-lg overflow-hidden border-2 transition-all aspect-video",
+                            isActive ? "border-blue-600 ring-2 ring-blue-200" : "border-transparent hover:border-blue-300"
+                          )}
+                        >
+                          <img src={bg.image} alt={bg.label} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-1 flex items-center gap-0.5">
+                            <Icon className="w-2.5 h-2.5 text-white" />
+                            <span className="text-[9px] text-white font-medium">{bg.label}</span>
+                          </div>
+                          {isActive && (
+                            <div className="absolute top-0.5 right-0.5 w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center">
+                              <Check className="w-2.5 h-2.5 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="border-t border-gray-100 pt-1.5 space-y-0.5">
+                    <button
+                      onClick={() => { setSelectedBg('blur'); setShowBgPicker(false); }}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors",
+                        selectedBg === 'blur' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"
+                      )}
+                    >
+                      <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 blur-[1px]" />
+                      Achtergrond vervagen
+                      {selectedBg === 'blur' && <Check className="w-3 h-3 ml-auto text-blue-600" />}
+                    </button>
+                    <button
+                      onClick={() => { setSelectedBg('none'); setShowBgPicker(false); }}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors",
+                        selectedBg === 'none' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"
+                      )}
+                    >
+                      <VideoOff className="w-3.5 h-3.5" />
+                      Geen achtergrond
+                      {selectedBg === 'none' && <Check className="w-3 h-3 ml-auto text-blue-600" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

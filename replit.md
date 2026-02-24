@@ -83,7 +83,7 @@ The application provides public routes for authentication and onboarding. User-s
 Supabase serves as the primary remote database for all application data, encompassing sessions, user context, RAG documents, activity logs, and video progress. A local Replit PostgreSQL instance is specifically used for `conversation_analyses`, `admin_corrections`, and `chat_feedback`.
 
 ### Feature Specifications
-Key features include a unified video system integrating Google Drive with Mux for streaming and AI analysis, Live Coaching with Daily.co, an AI-powered Roleplay System, an AI Chat/RAG System with `pgvector` for semantic search, an Analysis System for sales conversations, Admin Analytics dashboards, and a specialized Hugo Onboarding Mode.
+Key features include a unified video system integrating Google Drive with Mux for streaming and AI analysis, Live Coaching with Daily.co (virtual backgrounds with time-based Hugo's kantoor images, hand-raise/Q&A system, waiting room/lobby with host admit/deny), an AI-powered Roleplay System, an AI Chat/RAG System with `pgvector` for semantic search, an Analysis System for sales conversations, Admin Analytics dashboards, and a specialized Hugo Onboarding Mode.
 
 ### System Design Choices
 The architecture emphasizes modularity, data consistency (Single Source of Truth), scalability, and security. Supabase is exclusively used for all database operations, authentication, and storage. Heavy video processing is offloaded to a Google Cloud Run worker, while the Hugo Engine V2 operates within the deployment environment.

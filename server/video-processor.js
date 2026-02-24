@@ -1692,6 +1692,7 @@ const server = http.createServer((req, res) => {
                 enable_chat: true,
                 enable_screenshare: true,
                 enable_recording: 'cloud',
+                enable_knocking: true,
                 exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
               }
             })
