@@ -548,7 +548,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                     )}
                   </th>
                   <th 
-                    className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("techniqueNumber")}
                   >
                     <div className="flex items-center gap-2">
@@ -557,7 +557,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                     </div>
                   </th>
                   <th 
-                    className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("techniqueName")}
                   >
                     <div className="flex items-center gap-2">
@@ -566,7 +566,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                     </div>
                   </th>
                   <th 
-                    className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("user")}
                   >
                     <div className="flex items-center gap-2">
@@ -575,7 +575,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                     </div>
                   </th>
                   <th 
-                    className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("type")}
                   >
                     <div className="flex items-center gap-2">
@@ -584,7 +584,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                     </div>
                   </th>
                   <th 
-                    className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("duration")}
                   >
                     <div className="flex items-center gap-2">
@@ -593,7 +593,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                     </div>
                   </th>
                   <th 
-                    className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("score")}
                   >
                     <div className="flex items-center gap-2">
@@ -601,11 +601,11 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                       <SortIcon column="score" />
                     </div>
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Kwaliteit
                   </th>
                   <th 
-                    className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("date")}
                   >
                     <div className="flex items-center gap-2">
@@ -613,7 +613,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                       <SortIcon column="date" />
                     </div>
                   </th>
-                  <th className="text-right px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-right px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Acties
                   </th>
                 </tr>

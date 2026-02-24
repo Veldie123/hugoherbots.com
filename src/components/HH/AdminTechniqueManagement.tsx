@@ -533,7 +533,7 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
         <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-hh-ui-50">
+              <thead className="bg-hh-ui-50 border-b border-hh-border">
                 <tr>
                   <th 
                     className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:text-hh-text transition-colors"

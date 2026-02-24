@@ -313,7 +313,7 @@ export function Library({ navigate, isAdmin }: LibraryProps) {
                       </div>
 
                       <div>
-                        <h3 className="text-[16px] font-semibold text-hh-text mb-1">
+                        <h3 className="text-[16px] leading-[22px] text-hh-text font-semibold mb-1">
                           {content.title}
                         </h3>
                         <div className="flex items-center gap-2">
@@ -362,11 +362,11 @@ export function Library({ navigate, isAdmin }: LibraryProps) {
             <table className="w-full">
               <thead className="bg-hh-ui-50 border-b border-hh-border">
                 <tr>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text w-20">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium w-20">
                     #
                   </th>
                   <th
-                    className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("title")}
                   >
                     <div className="flex items-center gap-2">
@@ -374,14 +374,14 @@ export function Library({ navigate, isAdmin }: LibraryProps) {
                       <SortIcon field="title" />
                     </div>
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">
                     Type
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">
                     Fase
                   </th>
                   <th
-                    className="text-right px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-right px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("views")}
                   >
                     <div className="flex items-center justify-end gap-2">
@@ -389,13 +389,13 @@ export function Library({ navigate, isAdmin }: LibraryProps) {
                       <SortIcon field="views" />
                     </div>
                   </th>
-                  <th className="text-right px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-right px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">
                     Engagement
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">
                     Status
                   </th>
-                  <th className="text-right px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-right px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">
                     Acties
                   </th>
                 </tr>

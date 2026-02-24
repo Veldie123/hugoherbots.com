@@ -349,27 +349,27 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
           <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-hh-ui-50">
+                <thead className="bg-hh-ui-50 border-b border-hh-border">
                   <tr>
-                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold cursor-pointer" onClick={() => handleSort("id")}>
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer" onClick={() => handleSort("id")}>
                       Factuur # {getSortIcon("id")}
                     </th>
-                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold cursor-pointer" onClick={() => handleSort("organization")}>
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer" onClick={() => handleSort("organization")}>
                       Organisatie {getSortIcon("organization")}
                     </th>
-                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Plan
                     </th>
-                    <th className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold cursor-pointer" onClick={() => handleSort("amount")}>
+                    <th className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer" onClick={() => handleSort("amount")}>
                       Bedrag {getSortIcon("amount")}
                     </th>
-                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold cursor-pointer" onClick={() => handleSort("date")}>
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer" onClick={() => handleSort("date")}>
                       Datum {getSortIcon("date")}
                     </th>
-                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Status
                     </th>
-                    <th className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold">
+                    <th className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Acties
                     </th>
                   </tr>

@@ -371,26 +371,26 @@ export function AdminHelpCenter({ navigate }: AdminHelpCenterProps) {
             <table className="w-full">
               <thead className="bg-hh-ui-50 border-b border-hh-border">
                 <tr>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text w-[40px]"></th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted w-[40px]"></th>
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Titel & Excerpt
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Categorie
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Status
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Views
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Rating
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Datum
                   </th>
-                  <th className="text-right px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-right px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Acties
                   </th>
                 </tr>

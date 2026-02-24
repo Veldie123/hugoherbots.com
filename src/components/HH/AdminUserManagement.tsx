@@ -388,7 +388,7 @@ export function AdminUserManagement({ navigate }: AdminUserManagementProps) {
                       )}
                     </th>
                     <th
-                      className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left py-3 px-4 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("name")}
                     >
                       <div className="flex items-center gap-2">
@@ -404,17 +404,17 @@ export function AdminUserManagement({ navigate }: AdminUserManagementProps) {
                         )}
                       </div>
                     </th>
-                    <th className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                       Rol
                     </th>
-                    <th className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                       Plan
                     </th>
-                    <th className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                       Status
                     </th>
                     <th
-                      className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left py-3 px-4 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("joined")}
                     >
                       <div className="flex items-center gap-2">
@@ -430,7 +430,7 @@ export function AdminUserManagement({ navigate }: AdminUserManagementProps) {
                         )}
                       </div>
                     </th>
-                    <th className="text-right py-3 px-4 text-[13px] font-semibold text-hh-text">
+                    <th className="text-right py-3 px-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                       Acties
                     </th>
                   </tr>

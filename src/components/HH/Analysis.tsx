@@ -463,7 +463,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                 <thead className="bg-hh-ui-50 border-b border-hh-border">
                   <tr>
                     <th 
-                      className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text w-[80px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium w-[80px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("technieken")}
                     >
                       <div className="flex items-center gap-2">
@@ -472,7 +472,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                       </div>
                     </th>
                     <th 
-                      className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("title")}
                     >
                       <div className="flex items-center gap-2">
@@ -480,14 +480,14 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                         <SortIcon column="title" />
                       </div>
                     </th>
-                    <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                    <th className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Technieken
                     </th>
-                    <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                    <th className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Status
                     </th>
                     <th
-                      className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("score")}
                     >
                       <div className="flex items-center gap-2">
@@ -496,7 +496,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                       </div>
                     </th>
                     <th 
-                      className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("duration")}
                     >
                       <div className="flex items-center gap-2">
@@ -505,7 +505,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                       </div>
                     </th>
                     <th
-                      className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("date")}
                     >
                       <div className="flex items-center gap-2">
@@ -513,7 +513,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                         <SortIcon column="date" />
                       </div>
                     </th>
-                    <th className="text-right px-4 py-3 text-[13px] font-semibold text-hh-text">
+                    <th className="text-right px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Acties
                     </th>
                   </tr>

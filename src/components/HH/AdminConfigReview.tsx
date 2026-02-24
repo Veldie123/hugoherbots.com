@@ -378,30 +378,30 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
         <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead>
-                <tr className="border-b border-hh-border bg-hh-ui-50">
-                  <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
+              <thead className="bg-hh-ui-50 border-b border-hh-border">
+                <tr>
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Techniek
                   </th>
-                  <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Type
                   </th>
-                  <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Severity
                   </th>
-                  <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Beschrijving
                   </th>
-                  <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Status
                   </th>
-                  <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Gedetecteerd
                   </th>
-                  <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Ingediend door
                   </th>
-                  <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Acties
                   </th>
                 </tr>

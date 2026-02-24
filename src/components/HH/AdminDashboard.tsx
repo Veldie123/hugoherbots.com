@@ -507,21 +507,21 @@ export function AdminDashboard({ navigate }: AdminDashboardProps) {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead>
-                <tr className="border-b border-hh-border">
-                  <th className="text-left py-3 px-2 text-[13px] leading-[18px] text-hh-text font-semibold">
+              <thead className="bg-hh-ui-50 border-b border-hh-border">
+                <tr>
+                  <th className="text-left py-3 px-2 text-[13px] leading-[18px] text-hh-muted font-medium">
                     Type
                   </th>
-                  <th className="text-left py-3 px-2 text-[13px] leading-[18px] text-hh-text font-semibold">
+                  <th className="text-left py-3 px-2 text-[13px] leading-[18px] text-hh-muted font-medium">
                     Titel
                   </th>
-                  <th className="text-right py-3 px-2 text-[13px] leading-[18px] text-hh-text font-semibold">
+                  <th className="text-right py-3 px-2 text-[13px] leading-[18px] text-hh-muted font-medium">
                     Views
                   </th>
-                  <th className="text-right py-3 px-2 text-[13px] leading-[18px] text-hh-text font-semibold">
+                  <th className="text-right py-3 px-2 text-[13px] leading-[18px] text-hh-muted font-medium">
                     Completion
                   </th>
-                  <th className="text-right py-3 px-2 text-[13px] leading-[18px] text-hh-text font-semibold">
+                  <th className="text-right py-3 px-2 text-[13px] leading-[18px] text-hh-muted font-medium">
                     Rating
                   </th>
                 </tr>

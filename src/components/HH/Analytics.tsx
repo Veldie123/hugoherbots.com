@@ -416,52 +416,52 @@ export function Analytics({ navigate, isAdmin }: AnalyticsProps) {
           {viewMode === "list" ? (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
-                  <tr className="border-b border-hh-border bg-hh-ui-50">
-                    <th className="text-left py-3 px-4">
+                <thead className="bg-hh-ui-50 border-b border-hh-border">
+                  <tr>
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       <button
-                        className="flex items-center gap-1.5 text-[13px] font-semibold text-hh-text hover:text-hh-ink transition-colors"
+                        className="flex items-center gap-1.5 hover:text-hh-ink transition-colors"
                         onClick={() => handleSort("code")}
                       >
                         #
                         <SortIcon column="code" />
                       </button>
                     </th>
-                    <th className="text-left py-3 px-4">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       <button
-                        className="flex items-center gap-1.5 text-[13px] font-semibold text-hh-text hover:text-hh-ink transition-colors"
+                        className="flex items-center gap-1.5 hover:text-hh-ink transition-colors"
                         onClick={() => handleSort("skill")}
                       >
                         Techniek
                         <SortIcon column="skill" />
                       </button>
                     </th>
-                    <th className="text-left py-3 px-4 hidden md:table-cell">
-                      <span className="text-[13px] font-semibold text-hh-text">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium hidden md:table-cell">
+                      <span>
                         Fase
                       </span>
                     </th>
-                    <th className="text-left py-3 px-4">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       <button
-                        className="flex items-center gap-1.5 text-[13px] font-semibold text-hh-text hover:text-hh-ink transition-colors"
+                        className="flex items-center gap-1.5 hover:text-hh-ink transition-colors"
                         onClick={() => handleSort("sessions")}
                       >
                         Sessies
                         <SortIcon column="sessions" />
                       </button>
                     </th>
-                    <th className="text-left py-3 px-4">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       <button
-                        className="flex items-center gap-1.5 text-[13px] font-semibold text-hh-text hover:text-hh-ink transition-colors"
+                        className="flex items-center gap-1.5 hover:text-hh-ink transition-colors"
                         onClick={() => handleSort("trend")}
                       >
                         Trend
                         <SortIcon column="trend" />
                       </button>
                     </th>
-                    <th className="text-left py-3 px-4 min-w-[180px]">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium min-w-[180px]">
                       <button
-                        className="flex items-center gap-1.5 text-[13px] font-semibold text-hh-text hover:text-hh-ink transition-colors"
+                        className="flex items-center gap-1.5 hover:text-hh-ink transition-colors"
                         onClick={() => handleSort("score")}
                       >
                         Score

@@ -447,11 +447,11 @@ export function AdminContentLibrary({ navigate }: AdminContentLibraryProps) {
                       />
                     )}
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text w-20">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted w-20">
                     #
                   </th>
                   <th
-                    className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("title")}
                   >
                     <div className="flex items-center gap-2">
@@ -459,14 +459,14 @@ export function AdminContentLibrary({ navigate }: AdminContentLibraryProps) {
                       <SortIcon field="title" />
                     </div>
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Type
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Fase
                   </th>
                   <th
-                    className="text-right px-4 py-3 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    className="text-right px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
                     onClick={() => handleSort("views")}
                   >
                     <div className="flex items-center justify-end gap-2">
@@ -474,13 +474,13 @@ export function AdminContentLibrary({ navigate }: AdminContentLibraryProps) {
                       <SortIcon field="views" />
                     </div>
                   </th>
-                  <th className="text-right px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-right px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Engagement
                   </th>
-                  <th className="text-left px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Status
                   </th>
-                  <th className="text-right px-4 py-3 text-[13px] font-semibold text-hh-text">
+                  <th className="text-right px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Acties
                   </th>
                 </tr>

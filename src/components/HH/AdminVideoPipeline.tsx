@@ -439,39 +439,39 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-hh-ui-50 text-left">
+                <thead className="bg-hh-ui-50 border-b border-hh-border">
                   <tr>
                     <th 
-                      className="px-4 py-3 text-[13px] font-medium text-hh-muted cursor-pointer hover:text-hh-text select-none"
+                      className="px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:text-hh-text select-none"
                       onClick={() => handleSort('name')}
                     >
                       <span className="flex items-center">Video <SortIcon column="name" /></span>
                     </th>
                     <th 
-                      className="px-4 py-3 text-[13px] font-medium text-hh-muted cursor-pointer hover:text-hh-text select-none"
+                      className="px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:text-hh-text select-none"
                       onClick={() => handleSort('status')}
                     >
                       <span className="flex items-center">Status <SortIcon column="status" /></span>
                     </th>
                     <th 
-                      className="px-4 py-3 text-[13px] font-medium text-hh-muted cursor-pointer hover:text-hh-text select-none"
+                      className="px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:text-hh-text select-none"
                       onClick={() => handleSort('size')}
                     >
                       <span className="flex items-center">Grootte <SortIcon column="size" /></span>
                     </th>
                     <th 
-                      className="px-4 py-3 text-[13px] font-medium text-hh-muted cursor-pointer hover:text-hh-text select-none"
+                      className="px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:text-hh-text select-none"
                       onClick={() => handleSort('created')}
                     >
                       <span className="flex items-center">Aangemaakt <SortIcon column="created" /></span>
                     </th>
                     <th 
-                      className="px-4 py-3 text-[13px] font-medium text-hh-muted cursor-pointer hover:text-hh-text select-none"
+                      className="px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:text-hh-text select-none"
                       onClick={() => handleSort('completed')}
                     >
                       <span className="flex items-center">Voltooid <SortIcon column="completed" /></span>
                     </th>
-                    <th className="px-4 py-3 text-[13px] font-medium text-hh-muted w-10"></th>
+                    <th className="px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted w-10"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-hh-border">

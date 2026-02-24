@@ -549,10 +549,10 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
           <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
-                  <tr className="border-b border-hh-border bg-hh-ui-50">
+                <thead className="bg-hh-ui-50 border-b border-hh-border">
+                  <tr>
                     <th 
-                      className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text w-[70px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium w-[70px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("nummer")}
                     >
                       <div className="flex items-center">
@@ -561,7 +561,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                       </div>
                     </th>
                     <th 
-                      className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("naam")}
                     >
                       <div className="flex items-center">
@@ -570,7 +570,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                       </div>
                     </th>
                     <th 
-                      className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text w-[120px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium w-[120px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("type")}
                     >
                       <div className="flex items-center">
@@ -579,7 +579,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                       </div>
                     </th>
                     <th 
-                      className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text w-[80px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium w-[80px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("score")}
                     >
                       <div className="flex items-center">
@@ -588,7 +588,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                       </div>
                     </th>
                     <th 
-                      className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text w-[80px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium w-[80px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("duration")}
                     >
                       <div className="flex items-center">
@@ -597,7 +597,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                       </div>
                     </th>
                     <th 
-                      className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text w-[110px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                      className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium w-[110px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
                       onClick={() => handleSort("date")}
                     >
                       <div className="flex items-center">
@@ -605,7 +605,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                         <SortIcon field="date" />
                       </div>
                     </th>
-                    <th className="text-left py-3 px-4 text-[13px] font-semibold text-hh-text w-[60px]">Acties</th>
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium w-[60px]">Acties</th>
                   </tr>
                 </thead>
                 <tbody>

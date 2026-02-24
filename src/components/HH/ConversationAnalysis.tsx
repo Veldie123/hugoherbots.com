@@ -372,9 +372,9 @@ export function ConversationAnalysis({
               <table className="w-full">
                 <thead className="bg-hh-ui-50 border-b border-hh-border">
                   <tr>
-                    <th className="text-left px-4 py-3 text-[13px] font-medium text-hh-muted">Bestandsnaam</th>
-                    <th className="text-left px-4 py-3 text-[13px] font-medium text-hh-muted">Status</th>
-                    <th className="text-left px-4 py-3 text-[13px] font-medium text-hh-muted">Datum</th>
+                    <th className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">Bestandsnaam</th>
+                    <th className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">Status</th>
+                    <th className="text-left px-4 py-3 text-[13px] leading-[18px] text-hh-muted font-medium">Datum</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-hh-border bg-card">

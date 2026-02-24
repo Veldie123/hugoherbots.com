@@ -379,13 +379,13 @@ export function Resources({ navigate, isAdmin }: ResourcesProps) {
           <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-hh-ui-50">
+                <thead className="bg-hh-ui-50 border-b border-hh-border">
                   <tr>
-                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Type
                     </th>
                     <th 
-                      className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold cursor-pointer hover:bg-hh-ui-100 transition-colors select-none"
+                      className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:bg-hh-ui-100 transition-colors select-none"
                       onClick={() => handleSort("title")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -393,11 +393,11 @@ export function Resources({ navigate, isAdmin }: ResourcesProps) {
                         <SortIcon column="title" />
                       </div>
                     </th>
-                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Categorie
                     </th>
                     <th 
-                      className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold cursor-pointer hover:bg-hh-ui-100 transition-colors select-none"
+                      className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:bg-hh-ui-100 transition-colors select-none"
                       onClick={() => handleSort("size")}
                     >
                       <div className="flex items-center justify-end gap-1.5">
@@ -406,7 +406,7 @@ export function Resources({ navigate, isAdmin }: ResourcesProps) {
                       </div>
                     </th>
                     <th 
-                      className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold cursor-pointer hover:bg-hh-ui-100 transition-colors select-none"
+                      className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:bg-hh-ui-100 transition-colors select-none"
                       onClick={() => handleSort("downloads")}
                     >
                       <div className="flex items-center justify-end gap-1.5">
@@ -414,7 +414,7 @@ export function Resources({ navigate, isAdmin }: ResourcesProps) {
                         <SortIcon column="downloads" />
                       </div>
                     </th>
-                    <th className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-text font-semibold">
+                    <th className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Acties
                     </th>
                   </tr>

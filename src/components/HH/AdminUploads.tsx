@@ -250,7 +250,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
 
   const SortHeader = ({ label, field, align = "left" }: { label: string; field: SortField; align?: string }) => (
     <th
-      className={`text-${align} py-3 px-4 text-[13px] leading-[18px] text-gray-500 font-medium cursor-pointer hover:text-gray-800 select-none transition-colors`}
+      className={`text-${align} py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:text-gray-800 select-none transition-colors`}
       onClick={() => handleSort(field)}
     >
       <span className="inline-flex items-center gap-1">
@@ -395,23 +395,23 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
           ) : viewMode === "list" ? (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-hh-ui-50 border-b border-hh-border">
                   <tr>
                     <SortHeader label="#" field="score" />
                     <SortHeader label="Titel" field="title" />
                     <SortHeader label="Gebruiker" field="userName" />
-                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-gray-500 font-medium">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Type
                     </th>
-                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-gray-500 font-medium">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Duur
                     </th>
                     <SortHeader label="Score" field="score" align="right" />
-                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-gray-500 font-medium">
+                    <th className="text-left py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Kwaliteit
                     </th>
                     <SortHeader label="Datum" field="date" />
-                    <th className="text-right py-3 px-4 text-[13px] leading-[18px] text-gray-500 font-medium">
+                    <th className="text-right py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Acties
                     </th>
                   </tr>
