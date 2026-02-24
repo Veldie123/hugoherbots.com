@@ -20,8 +20,7 @@ import {
   ArrowUpDown,
   TrendingUp,
   TrendingDown,
-  Leaf,
-  Star,
+  ThumbsUp,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { AdminLayout } from "./AdminLayout";
@@ -83,35 +82,16 @@ function getInitials(name: string): string {
 }
 
 function getScoreColor(score: number): string {
-  if (score >= 80) return "text-emerald-600";
-  if (score >= 60) return "text-amber-500";
-  return "text-red-500";
+  if (score >= 80) return "text-hh-success";
+  if (score >= 70) return "text-blue-600";
+  return "text-hh-warn";
 }
 
-function getQualityBadge(score: number | null) {
-  if (score == null) return <span className="text-[12px] text-hh-muted">-</span>;
-  if (score >= 80) {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-        <Star className="w-3 h-3" />
-        Excellent
-      </span>
-    );
-  }
-  if (score >= 60) {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-purple-500/10 text-purple-600 border border-purple-500/20">
-        <Leaf className="w-3 h-3" />
-        Good
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
-      <AlertTriangle className="w-3 h-3" />
-      Needs Work
-    </span>
-  );
+function getQualityLabel(score: number | null): string {
+  if (score == null) return "Pending";
+  if (score >= 80) return "Excellent";
+  if (score >= 60) return "Good";
+  return "Needs Work";
 }
 
 export function AdminUploads({ navigate }: AdminUploadsProps) {
@@ -206,6 +186,39 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
         scored.reduce((acc, a) => acc + (a.overallScore || 0), 0) / scored.length
       );
     })(),
+  };
+
+  const getQualityBadge = (quality: string) => {
+    switch (quality) {
+      case "Excellent":
+        return (
+          <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20">
+            <CheckCircle2 className="w-3 h-3 mr-1" />
+            Excellent
+          </Badge>
+        );
+      case "Good":
+        return (
+          <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">
+            <ThumbsUp className="w-3 h-3 mr-1" />
+            Good
+          </Badge>
+        );
+      case "Needs Work":
+        return (
+          <Badge className="bg-hh-warn/10 text-hh-warn border-hh-warn/20">
+            <AlertTriangle className="w-3 h-3 mr-1" />
+            Needs Work
+          </Badge>
+        );
+      default:
+        return (
+          <Badge className="bg-hh-muted/10 text-hh-muted border-hh-muted/20">
+            <Clock className="w-3 h-3 mr-1" />
+            Pending
+          </Badge>
+        );
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -412,10 +425,12 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedAnalyses.map((analysis) => (
+                  {sortedAnalyses.map((analysis, index) => (
                     <tr
                       key={analysis.id}
-                      className="border-t border-hh-border/50 hover:bg-purple-50/40 transition-colors cursor-pointer"
+                      className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50/50 transition-colors cursor-pointer ${
+                        index % 2 === 0 ? "bg-hh-bg" : "bg-hh-ui-50/30"
+                      }`}
                       onClick={() =>
                         navigate?.("admin-analysis-results", {
                           conversationId: analysis.id,
@@ -423,7 +438,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                         })
                       }
                     >
-                      <td className="py-4 px-4">
+                      <td className="px-4 py-3">
                         {(analysis.techniquesFound || []).length > 0 ? (
                           <Badge className="bg-purple-600/10 text-purple-600 border-purple-600/20 text-[11px] font-mono">
                             {analysis.techniquesFound[0]}
@@ -432,57 +447,57 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                           <span className="text-[13px] text-hh-muted">—</span>
                         )}
                       </td>
-                      <td className="py-4 px-4">
-                        <p className="text-[14px] leading-[20px] text-hh-text font-medium">
-                          {analysis.title || "Zonder titel"}
-                        </p>
-                        <p className="text-[11px] leading-[14px] text-hh-muted mt-0.5">
-                          {analysis.status === "completed" ? "completed" : analysis.status}
-                        </p>
+                      <td className="px-4 py-3">
+                        <div>
+                          <p className="text-[14px] font-medium text-hh-text">
+                            {analysis.title || "Zonder titel"}
+                          </p>
+                          <p className="text-[12px] text-hh-muted">
+                            {analysis.status}
+                          </p>
+                        </div>
                       </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-[12px] font-semibold text-purple-700 shrink-0">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-purple-600/10 flex items-center justify-center text-[11px] font-semibold text-purple-600 shrink-0">
                             {getInitials(analysis.userName || analysis.userId)}
                           </div>
-                          <div className="min-w-0">
-                            <p className="text-[13px] leading-[18px] text-hh-text font-medium truncate">
+                          <div>
+                            <p className="text-[14px] font-medium text-hh-text">
                               {analysis.userName || analysis.userId}
                             </p>
                             {analysis.userEmail && (
-                              <p className="text-[11px] leading-[14px] text-hh-muted truncate">
+                              <p className="text-[12px] text-hh-muted">
                                 {analysis.userEmail}
                               </p>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="py-4 px-4">
-                        <span className="inline-flex items-center gap-1 text-[12px] text-purple-600 bg-purple-50 px-2 py-1 rounded-md font-medium border border-purple-200">
-                          <Mic className="w-3 h-3" />
-                          AI Audio
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Mic className="w-4 h-4 text-purple-600" />
+                          <span className="text-[13px] text-hh-text">AI Audio</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-[13px] text-hh-text">
+                          {analysis.durationMs ? `${Math.floor(analysis.durationMs / 60000)}:${String(Math.floor((analysis.durationMs % 60000) / 1000)).padStart(2, '0')}` : "—"}
                         </span>
                       </td>
-                      <td className="py-4 px-4 text-[14px] leading-[20px] text-hh-text">
-                        {analysis.durationMs ? `${Math.floor(analysis.durationMs / 60000)}:${String(Math.floor((analysis.durationMs % 60000) / 1000)).padStart(2, '0')}` : "-"}
-                      </td>
-                      <td className="py-4 px-4 text-right">
+                      <td className="px-4 py-3">
                         {analysis.overallScore != null ? (
-                          <span
-                            className={`text-[15px] leading-[20px] font-bold ${getScoreColor(analysis.overallScore)}`}
-                          >
+                          <span className={`text-[14px] font-semibold ${getScoreColor(analysis.overallScore)}`}>
                             {analysis.overallScore}%
                           </span>
                         ) : (
-                          <span className="text-[14px] leading-[20px] text-hh-muted">
-                            -
-                          </span>
+                          <span className="text-[13px] text-hh-muted">—</span>
                         )}
                       </td>
-                      <td className="py-4 px-4">
-                        {getQualityBadge(analysis.overallScore)}
+                      <td className="px-4 py-3">
+                        {getQualityBadge(getQualityLabel(analysis.overallScore))}
                       </td>
-                      <td className="py-4 px-4 text-[13px] leading-[18px] text-hh-muted">
+                      <td className="px-4 py-3 text-[13px] leading-[18px] text-hh-muted">
                         {formatDate(analysis.createdAt)}
                       </td>
                       <td
@@ -570,7 +585,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                   </p>
                   <p className="text-[11px] text-hh-muted mb-3">{analysis.status}</p>
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-[10px] font-semibold text-purple-700">
+                    <div className="w-6 h-6 rounded-full bg-purple-600/10 flex items-center justify-center text-[10px] font-semibold text-purple-600">
                       {getInitials(analysis.userName || analysis.userId)}
                     </div>
                     <span className="text-[12px] text-hh-muted truncate">
@@ -578,16 +593,17 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1 text-[11px] text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded font-medium border border-purple-200">
-                      <Mic className="w-3 h-3" />
-                      AI Audio
-                    </span>
                     <div className="flex items-center gap-2">
-                      {getQualityBadge(analysis.overallScore)}
-                      {analysis.overallScore != null && (
-                        <span className={`text-[15px] font-bold ${getScoreColor(analysis.overallScore)}`}>
+                      <Mic className="w-3 h-3 text-purple-600" />
+                      <span className="text-[11px] text-hh-text">AI Audio</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {analysis.overallScore != null ? (
+                        <span className={`text-[14px] font-semibold ${getScoreColor(analysis.overallScore)}`}>
                           {analysis.overallScore}%
                         </span>
+                      ) : (
+                        <span className="text-[12px] text-hh-muted">—</span>
                       )}
                     </div>
                   </div>
