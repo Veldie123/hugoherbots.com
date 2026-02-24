@@ -129,26 +129,19 @@ export default function App() {
         if (session?.user) {
           const email = (session.user.email || '').toLowerCase();
           const isSuperAdmin = email === 'stephane@hugoherbots.com';
-          const isHugoOnboarding = email === 'hugo@hugoherbots.com';
-          const isHugobotsAdmin = email.endsWith('@hugoherbots.com') && !isHugoOnboarding;
+          const isHugobotsAdmin = email.endsWith('@hugoherbots.com');
           const userIsAdmin = isSuperAdmin || isHugobotsAdmin;
           
           setIsAdmin(userIsAdmin);
-          setOnboardingMode(isHugoOnboarding);
+          setOnboardingMode(false);
+          localStorage.removeItem('hugo_onboarding_mode');
           
-          if (isHugoOnboarding) {
-            console.log('👋 Hugo onboarding mode activated - simplified UI');
-            localStorage.setItem('hugo_onboarding_mode', 'true');
-            setCurrentPage("dashboard");
+          if (userIsAdmin) {
+            console.log('✅ Admin user logged in, route to admin-dashboard');
+            setCurrentPage("admin-dashboard");
           } else {
-            localStorage.removeItem('hugo_onboarding_mode');
-            if (userIsAdmin) {
-              console.log('✅ Admin user logged in, route to admin-dashboard');
-              setCurrentPage("admin-dashboard");
-            } else {
-              console.log('✅ User is logged in, route to dashboard');
-              setCurrentPage("dashboard");
-            }
+            console.log('✅ User is logged in, route to dashboard');
+            setCurrentPage("dashboard");
           }
         } else {
           setIsAdmin(false);
