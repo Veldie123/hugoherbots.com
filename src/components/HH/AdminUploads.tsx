@@ -291,74 +291,26 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-5 rounded-[16px] shadow-sm border-gray-200 min-h-[120px]">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #FB923C, #F97316)' }}>
-                <Upload className="w-5 h-5 text-white" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[
+            { name: 'Totaal Analyses', value: isLoading ? "-" : stats.total, icon: Upload, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: '#9333ea', badge: '+24%' },
+            { name: 'Uitstekend', value: isLoading ? "-" : stats.excellent, icon: CheckCircle2, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: '#10b981', badge: '+43%' },
+            { name: 'Gem. Score', value: isLoading ? "-" : `${stats.avgScore}%`, icon: BarChart3, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: '#9333ea', badge: '+5%' },
+            { name: 'Verbetering Nodig', value: isLoading ? "-" : stats.needsImprovement, icon: AlertTriangle, bgColorStyle: 'rgba(249, 115, 22, 0.1)', colorStyle: '#f97316', badge: '15%' },
+          ].map(stat => (
+            <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+              <div className="flex items-start justify-between mb-2 sm:mb-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColorStyle }}>
+                  <stat.icon className="w-5 h-5" style={{ color: stat.colorStyle }} />
+                </div>
+                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
+                  {stat.badge}
+                </span>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: '#F0FDF4', color: '#16A34A', border: '1px solid #BBF7D0' }}>
-                +24%
-              </span>
-            </div>
-            <p className="text-[11px] leading-[14px] font-medium uppercase tracking-wider mb-1" style={{ color: '#6B7280' }}>
-              Totaal Analyses
-            </p>
-            <p className="text-[28px] leading-[34px] text-gray-900 font-bold">
-              {isLoading ? "-" : stats.total}
-            </p>
-          </Card>
-
-          <Card className="p-5 rounded-[16px] shadow-sm border-gray-200 min-h-[120px]">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #4ADE80, #10B981)' }}>
-                <CheckCircle2 className="w-5 h-5 text-white" />
-              </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: '#F0FDF4', color: '#16A34A', border: '1px solid #BBF7D0' }}>
-                +43%
-              </span>
-            </div>
-            <p className="text-[11px] leading-[14px] font-medium uppercase tracking-wider mb-1" style={{ color: '#6B7280' }}>
-              Excellent Quality
-            </p>
-            <p className="text-[28px] leading-[34px] text-gray-900 font-bold">
-              {isLoading ? "-" : stats.excellent}
-            </p>
-          </Card>
-
-          <Card className="p-5 rounded-[16px] shadow-sm border-gray-200 min-h-[120px]">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #60A5FA, #A855F7)' }}>
-                <BarChart3 className="w-5 h-5 text-white" />
-              </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: '#F0FDF4', color: '#16A34A', border: '1px solid #BBF7D0' }}>
-                +5%
-              </span>
-            </div>
-            <p className="text-[11px] leading-[14px] font-medium uppercase tracking-wider mb-1" style={{ color: '#6B7280' }}>
-              Gem. Score
-            </p>
-            <p className="text-[28px] leading-[34px] text-gray-900 font-bold">
-              {isLoading ? "-" : `${stats.avgScore}%`}
-            </p>
-          </Card>
-
-          <Card className="p-5 rounded-[16px] shadow-sm border-gray-200 min-h-[120px]">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F87171, #EF4444)' }}>
-                <AlertTriangle className="w-5 h-5 text-white" />
-              </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: '#FEF2F2', color: '#EF4444', border: '1px solid #FECACA' }}>
-                15%
-              </span>
-            </div>
-            <p className="text-[11px] leading-[14px] font-medium uppercase tracking-wider mb-1" style={{ color: '#6B7280' }}>
-              Needs Improvement
-            </p>
-            <p className="text-[28px] leading-[34px] text-gray-900 font-bold">
-              {isLoading ? "-" : stats.needsImprovement}
-            </p>
-          </Card>
+              <p className="text-[13px] leading-[18px] text-hh-muted">{stat.name}</p>
+              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">{stat.value}</p>
+            </Card>
+          ))}
         </div>
 
         {error && (
