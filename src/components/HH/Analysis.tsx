@@ -346,42 +346,22 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(79, 115, 150, 0.15)' }}>
-                <FileAudio className="w-4 h-4 sm:w-5 sm:h-5 text-[#4F7396]" />
+          {[
+            { name: 'Totaal Analyses', value: conversations.length, icon: FileAudio, bgColor: 'rgba(37, 99, 235, 0.12)', color: '#2563eb' },
+            { name: 'Geanalyseerd', value: analyzedCount, icon: BarChart2, bgColor: 'rgba(5, 150, 105, 0.12)', color: '#059669' },
+            { name: 'Totale Duur', value: `${Math.floor(totalDuration / 60)}u ${totalDuration % 60}m`, icon: Clock, bgColor: 'rgba(234, 88, 12, 0.12)', color: '#ea580c' },
+            { name: 'Gem. Score', value: `${avgScore}%`, icon: TrendingUp, bgColor: 'rgba(2, 132, 199, 0.12)', color: '#0284c7' },
+          ].map(stat => (
+            <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+              <div className="flex items-start justify-between mb-2 sm:mb-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColor, color: stat.color }}>
+                  <stat.icon className="w-5 h-5" />
+                </div>
               </div>
-            </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">Totaal Analyses</p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-text">{conversations.length}</p>
-          </Card>
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}>
-                <BarChart2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
-              </div>
-            </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">Geanalyseerd</p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-emerald-600">{analyzedCount}</p>
-          </Card>
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(249, 115, 22, 0.15)' }}>
-                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
-              </div>
-            </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">Totale Duur</p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-orange-600">{Math.floor(totalDuration / 60)}u {totalDuration % 60}m</p>
-          </Card>
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(14, 165, 233, 0.15)' }}>
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-sky-500" />
-              </div>
-            </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">Gem. Score</p>
-            <p className={`text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] ${avgScore >= 70 ? 'text-emerald-600' : avgScore >= 40 ? 'text-orange-500' : 'text-red-500'}`}>{avgScore}%</p>
-          </Card>
+              <p className="text-[13px] leading-[18px] text-hh-muted">{stat.name}</p>
+              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">{stat.value}</p>
+            </Card>
+          ))}
         </div>
 
         {/* Filters & Search */}

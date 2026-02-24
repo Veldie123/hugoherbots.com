@@ -465,88 +465,25 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(79, 115, 150, 0.15)' }}>
-                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-[#4F7396]" />
+          {[
+            { name: 'Totaal Sessies', value: sessions.length, icon: MessageSquare, bgColor: 'rgba(37, 99, 235, 0.12)', color: '#2563eb', badge: '+15%', badgePositive: true },
+            { name: 'Uitstekende Kwaliteit', value: sessions.filter(s => s.quality === "excellent").length, icon: CheckCircle2, bgColor: 'rgba(5, 150, 105, 0.12)', color: '#059669', badge: '+8%', badgePositive: true },
+            { name: 'Gem. Score', value: `${sessions.length > 0 ? Math.round(sessions.reduce((acc, s) => acc + s.score, 0) / sessions.length) : 0}%`, icon: TrendingUp, bgColor: 'rgba(2, 132, 199, 0.12)', color: '#0284c7', badge: '+2.3%', badgePositive: true },
+            { name: 'Verbetering Nodig', value: sessions.filter(s => s.quality === "needs-improvement").length, icon: AlertTriangle, bgColor: 'rgba(234, 88, 12, 0.12)', color: '#ea580c', badge: '-5%', badgePositive: false },
+          ].map(stat => (
+            <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+              <div className="flex items-start justify-between mb-2 sm:mb-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColor, color: stat.color }}>
+                  <stat.icon className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={stat.badgePositive ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' } : { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
+                  {stat.badge}
+                </span>
               </div>
-              <Badge
-                variant="outline"
-                style={{ backgroundColor: 'transparent', color: '#10B981', borderColor: '#10B981' }}
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 border"
-              >
-                +15%
-              </Badge>
-            </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
-              Total Sessies
-            </p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-emerald-600">
-              {sessions.length}
-            </p>
-          </Card>
-
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}>
-                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
-              </div>
-              <Badge
-                variant="outline"
-                style={{ backgroundColor: 'transparent', color: '#10B981', borderColor: '#10B981' }}
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 border"
-              >
-                +8%
-              </Badge>
-            </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
-              Excellent Quality
-            </p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-emerald-600">
-              {sessions.filter(s => s.quality === "excellent").length}
-            </p>
-          </Card>
-
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(14, 165, 233, 0.15)' }}>
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-sky-500" />
-              </div>
-              <Badge
-                variant="outline"
-                style={{ backgroundColor: 'transparent', color: '#10B981', borderColor: '#10B981' }}
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 border"
-              >
-                +2.3%
-              </Badge>
-            </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
-              Gem. Score
-            </p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-emerald-600">
-              {Math.round(sessions.reduce((acc, s) => acc + s.score, 0) / sessions.length)}%
-            </p>
-          </Card>
-
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(249, 115, 22, 0.15)' }}>
-                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
-              </div>
-              <Badge
-                variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-red-500/10 text-red-600 border-red-500/20"
-              >
-                -5%
-              </Badge>
-            </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
-              Needs Improvement
-            </p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-red-600">
-              {sessions.filter(s => s.quality === "needs-improvement").length}
-            </p>
-          </Card>
+              <p className="text-[13px] leading-[18px] text-hh-muted">{stat.name}</p>
+              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">{stat.value}</p>
+            </Card>
+          ))}
         </div>
 
         {/* Filters & Search */}
