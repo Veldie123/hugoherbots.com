@@ -1,0 +1,495 @@
+{
+  "results": [
+    {
+      "pageName": "landing",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "about",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "pricing",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "login",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "signup",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "onboarding",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "privacy-policy",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "dashboard",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "technieken",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "videos",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "live",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "team",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "analytics",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "analysis",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "upload-analysis",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "analysis-results",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "talk-to-hugo",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "hugo-overview",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "coaching",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "roleplay",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "roleplaychat",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "overviewprogress",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "builder",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "library",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "notifications",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "resources",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "help",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "settings",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-dashboard",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-users",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-videos",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-techniques",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-live",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-sessions",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-transcripts",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-uploads",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-content",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-resources",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-help",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-analytics",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-progress",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-analysis-results",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-upload-analysis",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-chat-expert",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-rag-review",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-config-review",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-conflicts",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-notifications",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "admin-settings",
+      "viewport": "desktop",
+      "success": true
+    },
+    {
+      "pageName": "landing",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "about",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "pricing",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "login",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "signup",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "onboarding",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "privacy-policy",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "dashboard",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "technieken",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "videos",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "live",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "team",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "analytics",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "analysis",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "upload-analysis",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "analysis-results",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "talk-to-hugo",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "hugo-overview",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "coaching",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "roleplay",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "roleplaychat",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "overviewprogress",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "builder",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "library",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "notifications",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "resources",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "help",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "settings",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-dashboard",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-users",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-videos",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-techniques",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-live",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-sessions",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-transcripts",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-uploads",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-content",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-resources",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-help",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-analytics",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-progress",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-analysis-results",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-upload-analysis",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-chat-expert",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-rag-review",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-config-review",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-conflicts",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-notifications",
+      "viewport": "mobile",
+      "success": true
+    },
+    {
+      "pageName": "admin-settings",
+      "viewport": "mobile",
+      "success": true
+    }
+  ],
+  "capturedAt": "2026-02-24T22:48:57.432Z"
+}
