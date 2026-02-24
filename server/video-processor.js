@@ -702,11 +702,24 @@ async function initStripe() {
     const stripeSync = await getStripeSync();
 
     const domains = process.env.REPLIT_DOMAINS || '';
-    const webhookBaseUrl = `https://${domains.split(',')[0]}`;
-    const { webhook } = await stripeSync.findOrCreateManagedWebhook(
-      `${webhookBaseUrl}/api/stripe/webhook`
-    );
-    console.log(`[Stripe] Webhook configured: ${webhook.url}`);
+    const firstDomain = domains.split(',')[0];
+    if (firstDomain) {
+      try {
+        const webhookBaseUrl = `https://${firstDomain}`;
+        const result = await stripeSync.findOrCreateManagedWebhook(
+          `${webhookBaseUrl}/api/stripe/webhook`
+        );
+        if (result?.webhook?.url) {
+          console.log(`[Stripe] Webhook configured: ${result.webhook.url}`);
+        } else {
+          console.log('[Stripe] Webhook setup returned no URL, skipping (Stripe Sandbox may not support webhooks)');
+        }
+      } catch (webhookErr) {
+        console.log(`[Stripe] Webhook setup skipped: ${webhookErr.message}`);
+      }
+    } else {
+      console.log('[Stripe] REPLIT_DOMAINS not available, skipping webhook setup (dev mode)');
+    }
 
     stripeSync.syncBackfill()
       .then(() => console.log('[Stripe] Data synced'))
