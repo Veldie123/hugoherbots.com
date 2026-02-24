@@ -116,6 +116,8 @@ export function AppLayout({
   const [notifOpen, setNotifOpen] = useState(false);
   const [fetchedAnalysisHistory, setFetchedAnalysisHistory] = useState<HistoryItem[]>([]);
   const [fetchedChatHistory, setFetchedChatHistory] = useState<HistoryItem[]>([]);
+  const [analysisTotalCount, setAnalysisTotalCount] = useState(0);
+  const [chatTotalCount, setChatTotalCount] = useState(0);
   const notifRef = useRef<HTMLDivElement>(null);
   const { notifications, unreadCount, markAsRead, markAllRead, removeNotification } = useNotifications();
 
@@ -126,7 +128,7 @@ export function AppLayout({
     if (analysisHistoryProp) return;
     const fetchHistory = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list');
+        const res = await fetch('/api/v2/analysis/list?source=upload');
         if (!res.ok) return;
         const data = await res.json();
         const items: HistoryItem[] = (data.analyses || []).slice(0, 5).map((a: any) => ({
@@ -137,6 +139,7 @@ export function AppLayout({
           date: a.createdAt ? new Date(a.createdAt).toISOString().split('T')[0] : '',
         }));
         setFetchedAnalysisHistory(items);
+        setAnalysisTotalCount(data.totalCount || data.analyses?.length || 0);
       } catch { }
     };
     fetchHistory();
@@ -157,6 +160,7 @@ export function AppLayout({
           date: s.date || '',
         }));
         setFetchedChatHistory(items);
+        setChatTotalCount(data.total || data.sessions?.length || 0);
       } catch { }
     };
     fetchChatHistory();
@@ -270,6 +274,7 @@ export function AppLayout({
                 {!collapsed && isActive && item.historyType && (() => {
                   const hiddenIds = getHiddenIds('user', item.historyType === 'chat' ? 'chat' : 'analysis');
                   const visibleHistory = history.filter(h => !hiddenIds.has(h.id));
+                  const totalCount = item.historyType === 'chat' ? chatTotalCount : analysisTotalCount;
                   return (
                   <div className="ml-2 pl-4 border-l-2 border-hh-border space-y-0.5 -mt-0.5">
                     {visibleHistory.slice(0, 3).map((histItem) => (
@@ -307,7 +312,7 @@ export function AppLayout({
                       onClick={() => navigate?.(item.overviewPage)}
                       className="w-full flex items-center gap-1 px-2 py-1.5 text-[12px] text-hh-primary hover:text-hh-primary/80 transition-colors"
                     >
-                      <span>Bekijk alle{visibleHistory.length > 0 ? ` (${visibleHistory.length})` : ""}</span>
+                      <span>Bekijk alle{totalCount > 0 ? ` (${totalCount})` : ""}</span>
                       <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>
@@ -399,6 +404,7 @@ export function AppLayout({
                   {isActive && item.historyType && (() => {
                     const hiddenIds = getHiddenIds('user', item.historyType === 'chat' ? 'chat' : 'analysis');
                     const visibleHistory = history.filter(h => !hiddenIds.has(h.id));
+                    const totalCount = item.historyType === 'chat' ? chatTotalCount : analysisTotalCount;
                     return (
                     <div className="ml-3 pl-4 border-l-2 border-hh-border space-y-0.5 -mt-0.5">
                       {visibleHistory.slice(0, 3).map((histItem) => (
@@ -438,7 +444,7 @@ export function AppLayout({
                         }}
                         className="w-full flex items-center gap-1 px-3 py-2 text-[13px] text-hh-primary hover:text-hh-primary/80 transition-colors"
                       >
-                        <span>Bekijk alle{visibleHistory.length > 0 ? ` (${visibleHistory.length})` : ""}</span>
+                        <span>Bekijk alle{totalCount > 0 ? ` (${totalCount})` : ""}</span>
                         <ChevronRight className="w-3 h-3" />
                       </button>
                     </div>

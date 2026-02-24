@@ -65,6 +65,8 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
   const [unreadCount, setUnreadCount] = useState(3);
   const [recentChatSessions, setRecentChatSessions] = useState<HistoryItem[]>([]);
   const [recentAnalyses, setRecentAnalyses] = useState<HistoryItem[]>([]);
+  const [analysisTotalCount, setAnalysisTotalCount] = useState(0);
+  const [chatTotalCount, setChatTotalCount] = useState(0);
   const [adminUserName, setAdminUserName] = useState('Admin');
   const [adminUserRole, setAdminUserRole] = useState('Admin');
   const [adminUserInitials, setAdminUserInitials] = useState('AD');
@@ -105,6 +107,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
           date: s.date || '',
         }));
         setRecentChatSessions(items);
+        setChatTotalCount(data.total || data.sessions?.length || 0);
       } catch { }
     };
     const fetchAnalyses = async () => {
@@ -118,6 +121,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
           date: a.createdAt ? new Date(a.createdAt).toISOString().split('T')[0] : '',
         }));
         setRecentAnalyses(items);
+        setAnalysisTotalCount(data.totalCount || data.analyses?.length || 0);
       } catch { }
     };
     fetchChatSessions();
@@ -360,7 +364,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                           }}
                           className="w-full flex items-center gap-1 px-3 py-2 text-[13px] text-purple-600 hover:text-purple-700 transition-colors"
                         >
-                          <span>Bekijk alle{history.length > 0 ? ` (${history.length})` : ""}</span>
+                          <span>Bekijk alle{(() => { const tc = (item as any).historyType === 'chat' ? chatTotalCount : analysisTotalCount; return tc > 0 ? ` (${tc})` : ""; })()}</span>
                           <ChevronRight className="w-3 h-3" />
                         </button>
                       </div>
@@ -491,7 +495,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                       onClick={() => navigate?.((item as any).overviewPage)}
                       className="w-full flex items-center gap-1 px-2 py-1.5 text-[12px] text-purple-600 hover:text-purple-700 transition-colors"
                     >
-                      <span>Bekijk alle{history.length > 0 ? ` (${history.length})` : ""}</span>
+                      <span>Bekijk alle{(() => { const tc = (item as any).historyType === 'chat' ? chatTotalCount : analysisTotalCount; return tc > 0 ? ` (${tc})` : ""; })()}</span>
                       <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>

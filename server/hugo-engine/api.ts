@@ -3586,7 +3586,7 @@ app.get("/api/v2/analysis/list", async (req: Request, res: Response) => {
       };
     });
 
-    res.json({ analyses });
+    res.json({ analyses, totalCount: analyses.length });
   } catch (err: any) {
     console.error("[Analysis] List error:", err);
     res.status(500).json({ error: err.message || 'Analyses ophalen mislukt' });
