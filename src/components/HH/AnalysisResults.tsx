@@ -2214,10 +2214,27 @@ export function AnalysisResults({
                                 </button>
                                 <button
                                   onClick={() => {
-                                    const techIds = evaluation?.techniques.map(t => t.id) || [];
+                                    let techIds = evaluation?.techniques.map(t => t.id) || [];
+                                    if (techIds.length === 0) {
+                                      const nearby = [...evaluations]
+                                        .sort((a, b) => Math.abs(a.turnIdx - turn.idx) - Math.abs(b.turnIdx - turn.idx))
+                                        .find(e => e.techniques && e.techniques.length > 0);
+                                      if (nearby) {
+                                        techIds = nearby.techniques.map(t => t.id);
+                                      }
+                                    }
+                                    if (techIds.length === 0) {
+                                      const allTechs = evaluations.flatMap(e => e.techniques?.map(t => t.id) || []);
+                                      techIds = [...new Set(allTechs)];
+                                    }
                                     if (techIds.length > 0) {
                                       setSelectedTechniqueId(techIds[0]);
                                       setTechniqueSidebarMode('view');
+                                      setTechniqueSidebarTurnIdx(null);
+                                      setShowTechniqueSidebar(true);
+                                    } else {
+                                      setSelectedTechniqueId(null);
+                                      setTechniqueSidebarMode('select');
                                       setTechniqueSidebarTurnIdx(null);
                                       setShowTechniqueSidebar(true);
                                     }
