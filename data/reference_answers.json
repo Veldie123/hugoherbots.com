@@ -32,6 +32,16 @@
       "recordedBy": "admin",
       "id": "ref-1771945220864-fhm6sj4jk",
       "recordedAt": "2026-02-24T15:00:20.864Z"
+    },
+    {
+      "techniqueId": "2.1.1.1",
+      "customerSignal": "interesse",
+      "customerMessage": "",
+      "sellerResponse": "En dan is het inderdaad eigenlijk de bedoeling dat we een keer in dialoog treden.",
+      "context": {},
+      "recordedBy": "admin",
+      "id": "ref-1771947620212-4hvjr2yre",
+      "recordedAt": "2026-02-24T15:40:20.212Z"
     }
   ]
 }
