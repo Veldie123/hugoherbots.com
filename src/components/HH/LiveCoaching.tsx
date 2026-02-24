@@ -111,7 +111,7 @@ function generateGoogleCalendarLink(session: LiveSession): string {
   // Generate platform link to the live session
   const platformUrl = `${window.location.origin}/live?session=${session.id}`;
   
-  const description = `${session.description || 'Live Coaching sessie met Hugo Herbots'}
+  const description = `${session.description || 'Webinar sessie met Hugo Herbots'}
 
 📍 Klik hier om deel te nemen:
 ${platformUrl}`;
@@ -180,7 +180,7 @@ function UserProgressCard({ stats, loading }: { stats: UserProgressStats; loadin
     <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden bg-gradient-to-r from-hh-ui-50 to-card">
       <div className="p-5 sm:p-6">
         <h3 className="text-[18px] leading-[24px] sm:text-[20px] sm:leading-[28px] font-semibold text-hh-text mb-4 text-center">
-          Jouw Live Coaching Reis
+          Jouw Webinar Reis
         </h3>
         <div className="grid grid-cols-3 gap-3 sm:gap-6">
           {statItems.map((item, index) => (
@@ -222,7 +222,7 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
       {/* Background Image - Hugo */}
       <img 
         src={hugoLivePhoto}
-        alt="Hugo Herbots Live Coaching"
+        alt="Hugo Herbots Webinar"
         className="absolute inset-0 w-full h-full object-cover"
         style={{ objectPosition: '50% 35%' }}
       />
@@ -241,7 +241,7 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
           </Badge>
           
           <h2 className="text-[24px] sm:text-[32px] font-bold leading-tight">
-            Live Coaching met Hugo
+            Webinar met Hugo
           </h2>
           
           <p className="text-white/70 text-[14px] leading-relaxed line-clamp-2">
@@ -779,7 +779,7 @@ export function LiveCoaching({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="mb-2 text-[24px] leading-[32px] sm:text-[32px] sm:leading-[40px] lg:text-[40px] lg:leading-[48px] font-normal">
-              Live Coaching
+              Webinars
             </h1>
             <p className="text-[14px] leading-[22px] sm:text-[16px] sm:leading-[24px] text-hh-muted">
               Elke week live met Hugo — stel vragen, oefen samen en leer van
@@ -850,7 +850,7 @@ export function LiveCoaching({
                 <div className="w-full h-full bg-hh-ink flex items-center justify-center relative overflow-hidden" style={{ minHeight: '70vh' }}>
                   <img
                     src={hugoLivePhoto}
-                    alt="Hugo Herbots Live Coaching"
+                    alt="Hugo Herbots Webinar"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/30" />
@@ -1953,7 +1953,7 @@ export function LiveCoaching({
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-[20px] leading-[28px] text-hh-text">
-              Inschrijven voor Live Coaching
+              Inschrijven voor Webinar
             </DialogTitle>
           </DialogHeader>
           
