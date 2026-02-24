@@ -294,7 +294,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
         );
       case "Needs Work":
         return (
-          <Badge className="bg-orange-500/10 text-orange-600 border-orange-500/20">
+          <Badge className="bg-hh-warn/10 text-hh-warn border-hh-warn/20 text-[11px]">
             <AlertTriangle className="w-3 h-3 mr-1" />
             Needs Work
           </Badge>
@@ -397,10 +397,10 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
           </Card>
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-orange-600" />
+              <div className="w-10 h-10 rounded-full bg-hh-warn/10 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-hh-warn" />
               </div>
-              <Badge className="bg-orange-500/10 text-orange-600 border-orange-500/20 text-[11px] px-2">
+              <Badge className="bg-hh-error/10 text-hh-error border-hh-error/20 text-[11px] px-2">
                 15%
               </Badge>
             </div>
@@ -426,8 +426,8 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
             <span className="text-[12px] text-hh-muted">Score</span>
             <span className="text-[14px] font-semibold text-hh-ink">{stats.avgScore}%</span>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-orange-500/10 rounded-lg flex-shrink-0">
-            <AlertTriangle className="w-3.5 h-3.5 text-orange-600" />
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-hh-warn/10 rounded-lg flex-shrink-0">
+            <AlertTriangle className="w-3.5 h-3.5 text-hh-warn" />
             <span className="text-[12px] text-hh-muted">Needs Work</span>
             <span className="text-[14px] font-semibold text-hh-ink">{stats.needsWork}</span>
           </div>
