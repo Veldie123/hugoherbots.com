@@ -682,11 +682,11 @@ export function AnalysisResults({
 
   const getQualityBadge = (quality: string) => {
     switch (quality) {
-      case 'perfect': return { label: 'Perfect', color: 'bg-hh-success/10 text-hh-success border-hh-success/20' };
-      case 'goed': return { label: 'Goed', color: 'bg-blue-100 text-blue-700 border-blue-200' };
-      case 'bijna': return { label: 'Bijna', color: 'bg-hh-warn/10 text-hh-warn border-hh-warn/20' };
-      case 'gemist': return { label: 'Gemist', color: 'bg-hh-destructive/10 text-hh-destructive border-hh-destructive/20' };
-      default: return { label: quality, color: 'bg-hh-ui-100 text-hh-muted' };
+      case 'perfect': return { label: 'Perfect', color: '', style: { backgroundColor: '#DCFCE7', color: '#166534', borderColor: '#BBF7D0' } };
+      case 'goed': return { label: 'Goed', color: '', style: { backgroundColor: '#DCFCE7', color: '#166534', borderColor: '#BBF7D0' } };
+      case 'bijna': return { label: 'Bijna', color: '', style: { backgroundColor: '#FFF7ED', color: '#9A3412', borderColor: '#FED7AA' } };
+      case 'gemist': return { label: 'Gemist', color: '', style: { backgroundColor: '#FFF7ED', color: '#9A3412', borderColor: '#FED7AA' } };
+      default: return { label: quality, color: '', style: { backgroundColor: '#EDE9FE', color: '#5B21B6', borderColor: '#DDD6FE' } };
     }
   };
 
@@ -698,17 +698,17 @@ export function AnalysisResults({
   };
 
   const getSignalLabel = (houding: string) => {
-    const labels: Record<string, { label: string; color: string }> = {
-      'interesse': { label: 'Interesse', color: 'bg-hh-success/10 text-hh-success' },
-      'akkoord': { label: 'Akkoord', color: 'bg-hh-success/10 text-hh-success' },
-      'vraag': { label: 'Vraag', color: 'bg-blue-100 text-blue-700' },
-      'twijfel': { label: 'Twijfel', color: 'bg-hh-warn/10 text-hh-warn' },
-      'bezwaar': { label: 'Bezwaar', color: 'bg-hh-destructive/10 text-hh-destructive' },
-      'uitstel': { label: 'Uitstel', color: 'bg-orange-100 text-orange-700' },
-      'negatief': { label: 'Negatief', color: 'bg-hh-destructive/10 text-hh-destructive' },
-      'vaag': { label: 'Vaag', color: 'bg-hh-warn/10 text-hh-warn' },
-      'ontwijkend': { label: 'Ontwijkend', color: 'bg-orange-100 text-orange-700' },
-      'neutraal': { label: 'Neutraal', color: 'bg-hh-ui-100 text-hh-muted' },
+    const labels: Record<string, { label: string; color: string; style: React.CSSProperties }> = {
+      'interesse': { label: 'Interesse', color: '', style: { backgroundColor: '#DCFCE7', color: '#166534' } },
+      'akkoord': { label: 'Akkoord', color: '', style: { backgroundColor: '#DCFCE7', color: '#166534' } },
+      'vraag': { label: 'Vraag', color: '', style: { backgroundColor: '#DBEAFE', color: '#1D4ED8' } },
+      'twijfel': { label: 'Twijfel', color: '', style: { backgroundColor: '#FEF3C7', color: '#92400E' } },
+      'bezwaar': { label: 'Bezwaar', color: '', style: { backgroundColor: '#FEE2E2', color: '#991B1B' } },
+      'uitstel': { label: 'Uitstel', color: '', style: { backgroundColor: '#FFEDD5', color: '#9A3412' } },
+      'negatief': { label: 'Negatief', color: '', style: { backgroundColor: '#FEE2E2', color: '#991B1B' } },
+      'vaag': { label: 'Vaag', color: '', style: { backgroundColor: '#FEF3C7', color: '#92400E' } },
+      'ontwijkend': { label: 'Ontwijkend', color: '', style: { backgroundColor: '#FFEDD5', color: '#9A3412' } },
+      'neutraal': { label: 'Neutraal', color: '', style: { backgroundColor: '#F3F4F6', color: '#6B7280' } },
     };
     return labels[houding] || labels['neutraal'];
   };
@@ -2004,9 +2004,9 @@ export function AnalysisResults({
                                 const isFeedbackPanelOpen = feedbackOpen === badgeKey;
                                 return (
                                   <span className="relative inline-flex items-center group/badge">
-                                    <Badge className={`${getSignalLabel(signal.houding).color} text-[10px] px-2 py-0.5`}>
+                                    <span className="inline-flex items-center text-[10px] px-2 py-0.5 rounded-full font-semibold" style={getSignalLabel(signal.houding).style}>
                                       {getSignalLabel(signal.houding).label}
-                                    </Badge>
+                                    </span>
                                     {useAdminLayout && !isConfirmed && (
                                       <span className="inline-flex items-center gap-0.5 ml-1 opacity-0 group-hover/badge:opacity-100 transition-opacity">
                                         <button
@@ -2048,7 +2048,7 @@ export function AnalysisResults({
                                 const isFeedbackPanelOpen = feedbackOpen === badgeKey;
                                 return (
                                   <span key={i} className="relative inline-flex items-center group/badge">
-                                    <Badge variant="outline" className={`text-[10px] px-2 py-0.5 ${badge.color}`}>
+                                    <Badge variant="outline" className="text-[10px] px-2.5 py-0.5 rounded-full font-medium border" style={badge.style}>
                                       {tech.quality === 'gemist' ? '✗' : '✓'} {tech.naam || tech.id}
                                     </Badge>
                                     {useAdminLayout && !isConfirmed && (
@@ -2169,15 +2169,16 @@ export function AnalysisResults({
                                 </button>
                                 <button
                                   onClick={() => handleGoldenStandard(turn)}
-                                  className={`p-1.5 rounded-md transition-colors ${
+                                  className={`p-1.5 rounded-md transition-all ${
                                     feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx)
-                                      ? 'text-emerald-500 bg-emerald-50'
+                                      ? 'bg-emerald-50 scale-110'
                                       : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                                   }`}
+                                  style={feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx) ? { color: '#22C55E', fill: '#22C55E' } : undefined}
                                   title="Markeer als correct — Golden Standard"
                                   disabled={goldenSaved.has(turn.idx) || feedbackGiven[turn.idx] === 'positive'}
                                 >
-                                  <ThumbsUp className="w-3.5 h-3.5" />
+                                  <ThumbsUp className={feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx) ? 'w-4 h-4' : 'w-3.5 h-3.5'} style={feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx) ? { fill: '#22C55E' } : undefined} />
                                 </button>
                                 <button
                                   onClick={() => {
@@ -2186,16 +2187,17 @@ export function AnalysisResults({
                                     setCorrectionNote('');
                                     setCorrectionType('technique');
                                   }}
-                                  className={`p-1.5 rounded-md transition-colors ${
+                                  className={`p-1.5 rounded-md transition-all ${
                                     feedbackGiven[turn.idx] === 'negative'
-                                      ? 'text-red-500 bg-red-50'
+                                      ? 'bg-red-50 scale-110'
                                       : correctionPanelTurn === turn.idx
-                                        ? 'text-red-500 bg-red-50'
+                                        ? 'bg-red-50'
                                         : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                                   }`}
+                                  style={feedbackGiven[turn.idx] === 'negative' ? { color: '#EF4444', fill: '#EF4444' } : correctionPanelTurn === turn.idx ? { color: '#EF4444' } : undefined}
                                   title="AI tag is fout — Corrigeer"
                                 >
-                                  <ThumbsDown className="w-3.5 h-3.5" />
+                                  <ThumbsDown className={feedbackGiven[turn.idx] === 'negative' ? 'w-4 h-4' : 'w-3.5 h-3.5'} style={feedbackGiven[turn.idx] === 'negative' ? { fill: '#EF4444' } : undefined} />
                                 </button>
                                 <button
                                   onClick={() => {
@@ -2438,22 +2440,26 @@ export function AnalysisResults({
                   if (techs.length === 0) return null;
                   return (
                     <div key={fase}>
-                      <p className="text-[11px] font-semibold mb-1.5 px-1" style={{ color }}>Fase {fase}: {label}</p>
-                      <div className="space-y-1">
+                      <div className="flex items-center gap-2 mb-2 px-1">
+                        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                        <p className="text-[11px] font-semibold" style={{ color }}>Fase {fase}: {label}</p>
+                      </div>
+                      <div className="space-y-0.5">
                         {techs.map(t => (
                           <button
                             key={t.nummer}
                             onClick={() => {
                               setCorrectionValue(t.nummer);
                               setSelectedTechniqueId(t.nummer);
-                              setTechniqueSidebarMode('view');
+                              setShowTechniqueSidebar(false);
                             }}
-                            className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] transition-colors hover:bg-purple-50"
+                            className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[12px] transition-colors hover:bg-purple-50"
                             style={{
                               backgroundColor: correctionValue === t.nummer ? '#F5F3FF' : 'transparent',
                               borderLeft: correctionValue === t.nummer ? '3px solid #9910FA' : '3px solid transparent',
                             }}
                           >
+                            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color, opacity: 0.6 }} />
                             <span className="font-medium" style={{ color: '#7C3AED', minWidth: 32 }}>{t.nummer}</span>
                             <span className="text-hh-text">{t.naam}</span>
                           </button>

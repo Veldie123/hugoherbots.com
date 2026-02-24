@@ -274,7 +274,7 @@ export function TalkToHugoAI({
                 mode: "COACH_CHAT",
                 isExpert: false,
                 modality: "chat",
-                viewMode: isAdmin ? 'admin' : 'user',
+                viewMode: 'user',
               });
               const response = await hugoApi.sendMessage(userMessage, false, systemContext);
               setMessages(prev => [...prev, {
@@ -737,7 +737,7 @@ export function TalkToHugoAI({
         mode: "COACH_CHAT",
         isExpert: difficultyLevel === "onbewuste_kunde",
         modality: chatMode,
-        viewMode: isAdmin ? 'admin' : 'user',
+        viewMode: 'user',
       });
       
       const aiMessage: Message = {
@@ -979,7 +979,7 @@ export function TalkToHugoAI({
           mode: "COACH_CHAT",
           isExpert: difficultyLevel === "onbewuste_kunde",
           modality: chatMode,
-          viewMode: isAdmin ? 'admin' : 'user',
+          viewMode: 'user',
         });
         setHasActiveSession(true);
         console.log("[Hugo] Auto-started coach session");
