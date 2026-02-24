@@ -365,8 +365,8 @@ export function VideoWatchPage({
       </div>
 
       <div className="flex flex-col lg:flex-row gap-4 lg:items-start">
-        <div className="hidden lg:block lg:w-[300px] lg:min-w-[300px] lg:max-w-[300px] flex-shrink-0 order-2 lg:order-1 lg:sticky lg:top-4 lg:self-start">
-          <div className="bg-hh-card border border-hh-border rounded-xl overflow-hidden">
+        <div className="hidden lg:block lg:w-[300px] lg:min-w-[300px] lg:max-w-[300px] flex-shrink-0 order-2 lg:order-1 lg:sticky lg:top-4 lg:self-start overflow-hidden">
+          <div className="bg-hh-card border border-hh-border rounded-xl overflow-hidden w-full">
             <div className="px-3 py-2.5 border-b border-hh-border">
               <h2 className="text-xs font-bold text-hh-text flex items-center gap-1.5 uppercase tracking-wide">
                 <BookOpen className="w-3.5 h-3.5" />
@@ -472,11 +472,12 @@ export function VideoWatchPage({
                               ? "text-hh-text"
                               : "text-hh-muted"
                           }`}
+                          title={tech.naam}
                         >
                           {tech.naam}
                         </p>
                         {isLiveActive && (
-                          <p className="text-[9px] text-[#2563eb]/70 mt-0.5 line-clamp-1">
+                          <p className="text-[9px] text-[#2563eb]/70 mt-0.5 truncate" title={timeline.find(s => s.techniek_id === tech.nummer && Math.floor(currentTime) >= s.start_seconds && Math.floor(currentTime) < s.end_seconds)?.label || 'Nu besproken'}>
                             {timeline.find(s => s.techniek_id === tech.nummer && Math.floor(currentTime) >= s.start_seconds && Math.floor(currentTime) < s.end_seconds)?.label || 'Nu besproken'}
                           </p>
                         )}
@@ -595,7 +596,7 @@ export function VideoWatchPage({
                                 <span className={`text-[10px] font-mono flex-shrink-0 ${groupHasActive || isGroupSelfActive ? "text-[#1e3a5f] font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>
                                   {group.nummer}
                                 </span>
-                                <p className={`text-[11px] leading-tight truncate flex-1 ${groupHasActive || isGroupSelfActive ? "font-semibold text-[#1e3a5f]" : "text-hh-text"}`}>
+                                <p className={`text-[11px] leading-tight truncate flex-1 ${groupHasActive || isGroupSelfActive ? "font-semibold text-[#1e3a5f]" : "text-hh-text"}`} title={group.naam}>
                                   {group.naam}
                                 </p>
                                 <span className="text-[9px] text-hh-muted flex-shrink-0 mr-1">
@@ -651,7 +652,7 @@ export function VideoWatchPage({
                                             <span className={`text-[10px] font-mono flex-shrink-0 ${subHasActive || childIsActive ? "text-[#1e3a5f] font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>
                                               {child.nummer}
                                             </span>
-                                            <p className={`text-[11px] leading-tight truncate flex-1 ${subHasActive || childIsActive ? "font-semibold text-[#1e3a5f]" : "text-hh-text"}`}>
+                                            <p className={`text-[11px] leading-tight truncate flex-1 ${subHasActive || childIsActive ? "font-semibold text-[#1e3a5f]" : "text-hh-text"}`} title={child.naam}>
                                               {child.naam}
                                             </p>
                                             <button
@@ -865,7 +866,7 @@ export function VideoWatchPage({
                                   </span>
                                   <p className={`text-[11px] leading-tight truncate flex-1 ${
                                     isLiveActive ? "font-bold text-[#2563eb]" : isActive ? "font-semibold text-[#1e3a5f]" : hasVideo ? "text-hh-text" : "text-hh-muted"
-                                  }`}>
+                                  }`} title={tech.naam}>
                                     {tech.naam}
                                   </p>
                                 </div>
