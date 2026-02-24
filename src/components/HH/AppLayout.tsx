@@ -263,7 +263,7 @@ export function AppLayout({
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
                   {!collapsed && (
-                    <span className="text-[16px] leading-[24px] font-normal whitespace-nowrap">
+                    <span className="text-[14px] leading-[20px] whitespace-nowrap">
                       {item.label === "Talk to Hugo AI" ? (
                         <>Talk to Hugo<sup className="text-[10px] ml-0.5">AI</sup></>
                       ) : item.label === "Live Coaching" && !isAdmin ? "Webinars" : item.label}
@@ -340,7 +340,7 @@ export function AppLayout({
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
                 {!collapsed && (
-                  <span className="text-[16px] leading-[24px] font-normal whitespace-nowrap">
+                  <span className="text-[14px] leading-[20px] whitespace-nowrap">
                     {item.label}
                   </span>
                 )}
@@ -352,7 +352,7 @@ export function AppLayout({
             <div className="mt-1 pt-3 border-t border-hh-border">
               <button
                 onClick={() => navigate?.("admin-dashboard")}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[16px]"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
               >
                 <Eye className="w-5 h-5 flex-shrink-0" />
                 {!collapsed && <span>Admin View</span>}
@@ -394,7 +394,7 @@ export function AppLayout({
                     style={isActive ? { backgroundColor: '#4F7396' } : undefined}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
-                    <span className="text-[16px] leading-[24px] font-normal">
+                    <span className="text-[14px] leading-[20px]">
                       {item.label === "Talk to Hugo AI" ? (
                         <>Talk to Hugo<sup className="text-[10px] ml-0.5">AI</sup></>
                       ) : item.label === "Live Coaching" && !isAdmin ? "Webinars" : item.label}
@@ -474,7 +474,7 @@ export function AppLayout({
                   style={isActive ? { backgroundColor: '#4F7396' } : undefined}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span className="text-[16px] leading-[24px] font-normal whitespace-nowrap">
+                  <span className="text-[14px] leading-[20px] whitespace-nowrap">
                     {item.label}
                   </span>
                 </button>
@@ -488,7 +488,7 @@ export function AppLayout({
                     navigate?.("admin-dashboard");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[16px]"
+                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
                 >
                   <Eye className="w-4 h-4" />
                   <span>Admin View</span>
