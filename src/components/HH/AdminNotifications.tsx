@@ -16,7 +16,7 @@ import {
   MoreVertical,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -48,118 +48,50 @@ export function AdminNotifications({ navigate }: AdminNotificationsProps) {
   const [filter, setFilter] = useState<NotificationFilter>("all");
   const [category, setCategory] = useState<NotificationCategory>("all");
   const [selectedNotifications, setSelectedNotifications] = useState<number[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const notifications = [
-    {
-      id: 9,
-      type: "warning",
-      category: "content",
-      title: "RAG techniek review vraagt jouw aandacht",
-      message: "Er zijn nieuwe technieksuggesties die je moet reviewen",
-      timestamp: "nu",
-      read: false,
-      icon: Zap,
-      iconColor: "text-purple-500",
-      iconBg: "bg-purple-500/10",
-      action: "admin-rag-review",
-    },
-    {
-      id: 1,
-      type: "success",
-      category: "users",
-      title: "Nieuwe gebruiker geregistreerd",
-      message: "Jan de Vries heeft zich aangemeld voor het Pro abonnement",
-      timestamp: "2 min geleden",
-      read: false,
-      icon: Users,
-      iconColor: "text-green-500",
-      iconBg: "bg-green-500/10",
-    },
-    {
-      id: 2,
-      type: "warning",
-      category: "sessions",
-      title: "Live sessie start binnenkort",
-      message: "Discovery Technieken Q&A begint over 15 minuten",
-      timestamp: "15 min geleden",
-      read: false,
-      icon: Calendar,
-      iconColor: "text-orange-500",
-      iconBg: "bg-orange-500/10",
-    },
-    {
-      id: 3,
-      type: "info",
-      category: "content",
-      title: "Nieuwe feedback ontvangen",
-      message: "5 nieuwe reviews voor SPIN Questioning Workshop",
-      timestamp: "1 uur geleden",
-      read: false,
-      icon: MessageSquare,
-      iconColor: "text-blue-500",
-      iconBg: "bg-blue-500/10",
-    },
-    {
-      id: 4,
-      type: "success",
-      category: "system",
-      title: "Database backup voltooid",
-      message: "Automatische backup succesvol afgerond",
-      timestamp: "2 uur geleden",
-      read: true,
-      icon: CheckCircle2,
-      iconColor: "text-green-500",
-      iconBg: "bg-green-500/10",
-    },
-    {
-      id: 5,
-      type: "info",
-      category: "users",
-      title: "Gebruikersactiviteit stijgt",
-      message: "42% meer actieve gebruikers deze week",
-      timestamp: "3 uur geleden",
-      read: true,
-      icon: TrendingUp,
-      iconColor: "text-blue-500",
-      iconBg: "bg-blue-500/10",
-    },
-    {
-      id: 6,
-      type: "warning",
-      category: "system",
-      title: "Server gebruik hoog",
-      message: "CPU gebruik heeft 85% bereikt",
-      timestamp: "5 uur geleden",
-      read: true,
-      icon: AlertCircle,
-      iconColor: "text-orange-500",
-      iconBg: "bg-orange-500/10",
-    },
-    {
-      id: 7,
-      type: "info",
-      category: "sessions",
-      title: "Sessie opname beschikbaar",
-      message: "Cold Calling Best Practices opname is beschikbaar",
-      timestamp: "1 dag geleden",
-      read: true,
-      icon: Calendar,
-      iconColor: "text-blue-500",
-      iconBg: "bg-blue-500/10",
-    },
-    {
-      id: 8,
-      type: "success",
-      category: "users",
-      title: "Nieuwe team toegevoegd",
-      message: "TechCorp heeft 12 nieuwe gebruikers toegevoegd",
-      timestamp: "2 dagen geleden",
-      read: true,
-      icon: Users,
-      iconColor: "text-green-500",
-      iconBg: "bg-green-500/10",
-    },
-  ];
+  const getTimeAgo = (date: Date) => {
+    const diff = Date.now() - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'nu';
+    if (mins < 60) return `${mins}m geleden`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}u geleden`;
+    const days = Math.floor(hours / 24);
+    return `${days}d geleden`;
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/v2/admin/notifications');
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications((data.notifications || []).map((n: any) => ({
+          id: n.id,
+          type: n.severity === 'warning' ? 'warning' : n.severity === 'critical' ? 'warning' : n.type === 'correction_submitted' ? 'warning' : 'info',
+          category: n.category || 'content',
+          title: n.title,
+          message: n.message,
+          timestamp: getTimeAgo(new Date(n.created_at)),
+          read: n.read,
+          icon: n.type === 'correction_submitted' ? Settings : n.category === 'users' ? Users : n.category === 'system' ? CheckCircle2 : Zap,
+          iconColor: n.severity === 'warning' ? 'text-orange-500' : n.severity === 'critical' ? 'text-red-500' : 'text-purple-500',
+          iconBg: n.severity === 'warning' ? 'bg-orange-500/10' : n.severity === 'critical' ? 'bg-red-500/10' : 'bg-purple-500/10',
+          action: n.related_page || undefined,
+        })));
+      }
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   const filteredNotifications = notifications.filter((notification) => {
     const matchesSearch =
@@ -192,8 +124,17 @@ export function AdminNotifications({ navigate }: AdminNotificationsProps) {
     setSelectedNotifications([]);
   };
 
-  const markAsRead = () => {
-    console.log("Mark as read:", selectedNotifications);
+  const markAsRead = async () => {
+    for (const id of selectedNotifications) {
+      await fetch(`/api/v2/admin/notifications/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read: true }),
+      });
+    }
+    setNotifications(prev => prev.map(n => 
+      selectedNotifications.includes(n.id) ? { ...n, read: true } : n
+    ));
     setSelectedNotifications([]);
   };
 
@@ -406,7 +347,7 @@ export function AdminNotifications({ navigate }: AdminNotificationsProps) {
             <Card className="p-8 rounded-[16px] border-hh-border text-center">
               <Bell className="w-12 h-12 text-hh-muted mx-auto mb-3" />
               <p className="text-[16px] text-hh-muted">
-                Geen notificaties gevonden
+                {loading ? "Notificaties laden..." : "Nog geen notificaties. Notificaties verschijnen hier wanneer een admin wijzigingen indient."}
               </p>
             </Card>
           ) : (

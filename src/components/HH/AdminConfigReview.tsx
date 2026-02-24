@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -30,6 +30,8 @@ import {
   ThumbsDown,
   Loader2,
   Database,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { getCodeBadgeColors } from "../../utils/phaseColors";
 import { toast } from "sonner";
@@ -43,6 +45,7 @@ interface ConfigConflict {
   techniqueNumber: string;
   techniqueName: string;
   type: string;
+  source: string;
   severity: "HIGH" | "MEDIUM" | "LOW";
   description: string;
   status: "pending" | "approved" | "rejected";
@@ -50,14 +53,21 @@ interface ConfigConflict {
   context?: string;
   originalValue?: string;
   newValue?: string;
+  originalJson?: any;
+  newJson?: any;
+  submittedBy?: string;
+  targetFile?: string;
+  targetKey?: string;
 }
 
 export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [severityFilter, setSeverityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sourceFilter, setSourceFilter] = useState("all");
   const [conflicts, setConflicts] = useState<ConfigConflict[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCorrections();
@@ -73,17 +83,37 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
           const typeMap: Record<string, string> = {
             'signal': 'Signaal Correctie',
             'technique': 'Techniek Correctie',
+            'technique_edit': 'SSOT Techniek Bewerking',
+            'video_edit': 'Video Bewerking',
+            'chat_correction': 'Chat Correctie',
+            'ssot_edit': 'SSOT Bewerking',
             'coach_debrief': 'Debrief Correctie',
             'moment': 'Moment Correctie',
           };
-          const severity = c.type === 'signal' ? 'HIGH' : c.type === 'technique' ? 'MEDIUM' : 'LOW';
+          const sourceOrType = c.source || c.type;
+          const severity = ['technique_edit', 'ssot_edit'].includes(sourceOrType)
+            ? 'HIGH'
+            : sourceOrType === 'video_edit'
+              ? 'MEDIUM'
+              : 'LOW';
           const techNum = c.field?.match(/\d+\.\d+/)?.[0] || c.type?.charAt(0)?.toUpperCase() || '—';
           const timeAgo = getTimeAgo(new Date(c.created_at));
+
+          let originalJson = null;
+          let newJson = null;
+          try {
+            if (c.original_json) originalJson = typeof c.original_json === 'string' ? JSON.parse(c.original_json) : c.original_json;
+          } catch {}
+          try {
+            if (c.new_json) newJson = typeof c.new_json === 'string' ? JSON.parse(c.new_json) : c.new_json;
+          } catch {}
+
           return {
             id: String(c.id),
             techniqueNumber: techNum,
             techniqueName: c.field || c.type,
-            type: typeMap[c.type] || c.type,
+            type: typeMap[sourceOrType] || typeMap[c.type] || sourceOrType,
+            source: c.source || c.type || '',
             severity,
             description: c.context || `${c.original_value} → ${c.new_value}`,
             status: c.status,
@@ -91,6 +121,11 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
             context: c.context,
             originalValue: c.original_value,
             newValue: c.new_value,
+            originalJson,
+            newJson,
+            submittedBy: c.submitted_by || c.reviewed_by || undefined,
+            targetFile: c.target_file || undefined,
+            targetKey: c.target_key || undefined,
           };
         });
         setConflicts(mapped);
@@ -119,7 +154,8 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
       conflict.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSeverity = severityFilter === "all" || conflict.severity === severityFilter;
     const matchesStatus = statusFilter === "all" || conflict.status === statusFilter;
-    return matchesSearch && matchesSeverity && matchesStatus;
+    const matchesSource = sourceFilter === "all" || conflict.source === sourceFilter;
+    return matchesSearch && matchesSeverity && matchesStatus && matchesSource;
   });
 
   const pendingCount = conflicts.filter((c) => c.status === "pending").length;
@@ -322,6 +358,20 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
                 <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
+
+            <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              <SelectTrigger className="w-full sm:w-[160px]">
+                <SelectValue placeholder="Alle Bronnen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Bronnen</SelectItem>
+                <SelectItem value="technique_edit">Techniek Bewerking</SelectItem>
+                <SelectItem value="video_edit">Video Bewerking</SelectItem>
+                <SelectItem value="chat_correction">Chat Correctie</SelectItem>
+                <SelectItem value="analysis_correction">Analyse Correctie</SelectItem>
+                <SelectItem value="ssot_edit">SSOT Bewerking</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </Card>
 
@@ -349,19 +399,22 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
                     Gedetecteerd
                   </th>
                   <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
+                    Ingediend door
+                  </th>
+                  <th className="text-left p-4 text-[13px] font-medium text-hh-muted">
                     Acties
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {loading && (
-                  <tr><td colSpan={7} className="p-8 text-center">
+                  <tr><td colSpan={8} className="p-8 text-center">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-purple-600 mb-2" />
                     <p className="text-[13px] text-hh-muted">Correcties laden...</p>
                   </td></tr>
                 )}
                 {!loading && filteredConflicts.length === 0 && (
-                  <tr><td colSpan={7} className="p-8 text-center">
+                  <tr><td colSpan={8} className="p-8 text-center">
                     <Database className="w-8 h-8 mx-auto text-hh-muted/50 mb-2" />
                     <p className="text-[14px] font-medium text-hh-text mb-1">Geen correcties gevonden</p>
                     <p className="text-[13px] text-hh-muted">Correcties verschijnen hier wanneer een admin feedback geeft op AI-aanduidingen in het transcript.</p>
@@ -369,73 +422,134 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
                 )}
                 {filteredConflicts.map((conflict) => {
                   const badgeColors = getCodeBadgeColors(conflict.techniqueNumber);
+                  const isExpanded = expandedId === conflict.id;
+                  const hasDiff = conflict.originalJson && conflict.newJson;
                   return (
-                    <tr
-                      key={conflict.id}
-                      className="border-b border-hh-border last:border-0 hover:bg-hh-ui-50 transition-colors"
-                    >
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`w-10 h-10 rounded-lg flex items-center justify-center text-[12px] font-semibold ${badgeColors}`}
-                          >
-                            {conflict.techniqueNumber}
+                    <React.Fragment key={conflict.id}>
+                      <tr
+                        className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50 transition-colors ${hasDiff ? 'cursor-pointer' : ''}`}
+                        onClick={() => hasDiff && setExpandedId(isExpanded ? null : conflict.id)}
+                      >
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-10 h-10 rounded-lg flex items-center justify-center text-[12px] font-semibold ${badgeColors}`}
+                            >
+                              {conflict.techniqueNumber}
+                            </div>
+                            <span className="text-[14px] font-medium text-hh-ink">
+                              {conflict.techniqueName}
+                            </span>
+                            {hasDiff && (
+                              isExpanded
+                                ? <ChevronUp className="w-4 h-4 text-hh-muted ml-1" />
+                                : <ChevronDown className="w-4 h-4 text-hh-muted ml-1" />
+                            )}
                           </div>
-                          <span className="text-[14px] font-medium text-hh-ink">
-                            {conflict.techniqueName}
+                        </td>
+                        <td className="p-4">{getTypeBadge(conflict.type)}</td>
+                        <td className="p-4">{getSeverityBadge(conflict.severity)}</td>
+                        <td className="p-4">
+                          <p className="text-[13px] text-hh-text max-w-[300px]">
+                            {conflict.description}
+                          </p>
+                        </td>
+                        <td className="p-4">{getStatusBadge(conflict.status)}</td>
+                        <td className="p-4">
+                          <span className="text-[13px] text-hh-muted">
+                            {conflict.detectedAt}
                           </span>
-                        </div>
-                      </td>
-                      <td className="p-4">{getTypeBadge(conflict.type)}</td>
-                      <td className="p-4">{getSeverityBadge(conflict.severity)}</td>
-                      <td className="p-4">
-                        <p className="text-[13px] text-hh-text max-w-[300px]">
-                          {conflict.description}
-                        </p>
-                      </td>
-                      <td className="p-4">{getStatusBadge(conflict.status)}</td>
-                      <td className="p-4">
-                        <span className="text-[13px] text-hh-muted">
-                          {conflict.detectedAt}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        {conflict.status === "pending" ? (
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600"
-                              onClick={() => handleApprove(conflict.id)}
-                            >
-                              <Check className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-red-500/10 hover:text-red-600"
-                              onClick={() => handleReject(conflict.id)}
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MoreVertical className="w-4 h-4" />
+                        </td>
+                        <td className="p-4">
+                          <span className="text-[13px] text-hh-muted">
+                            {conflict.submittedBy || '—'}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          {conflict.status === "pending" ? (
+                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600"
+                                onClick={() => handleApprove(conflict.id)}
+                              >
+                                <Check className="w-4 h-4" />
                               </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>Bekijk details</DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleResetStatus(conflict.id)}>
-                                Reset status
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        )}
-                      </td>
-                    </tr>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-red-500/10 hover:text-red-600"
+                                onClick={() => handleReject(conflict.id)}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreVertical className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem>Bekijk details</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleResetStatus(conflict.id)}>
+                                    Reset status
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                      {isExpanded && conflict.originalJson && conflict.newJson && (
+                        <tr>
+                          <td colSpan={8} className="p-4 bg-hh-ui-50">
+                            <div className="grid grid-cols-2 gap-4 max-w-4xl">
+                              <div>
+                                <p className="text-[12px] font-medium text-red-600 mb-2">Origineel</p>
+                                <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 space-y-1 text-[13px]">
+                                  {Object.keys(conflict.newJson).filter(key =>
+                                    JSON.stringify(conflict.originalJson[key]) !== JSON.stringify(conflict.newJson[key])
+                                  ).map(key => (
+                                    <div key={key}>
+                                      <span className="font-medium text-hh-muted">{key}:</span>
+                                      <span className="ml-2 text-red-700 dark:text-red-400">
+                                        {typeof conflict.originalJson[key] === 'object'
+                                          ? JSON.stringify(conflict.originalJson[key], null, 2)
+                                          : String(conflict.originalJson[key] || '—')}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <p className="text-[12px] font-medium text-green-600 mb-2">Voorgesteld</p>
+                                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 space-y-1 text-[13px]">
+                                  {Object.keys(conflict.newJson).filter(key =>
+                                    JSON.stringify(conflict.originalJson[key]) !== JSON.stringify(conflict.newJson[key])
+                                  ).map(key => (
+                                    <div key={key}>
+                                      <span className="font-medium text-hh-muted">{key}:</span>
+                                      <span className="ml-2 text-green-700 dark:text-green-400">
+                                        {typeof conflict.newJson[key] === 'object'
+                                          ? JSON.stringify(conflict.newJson[key], null, 2)
+                                          : String(conflict.newJson[key] || '—')}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-hh-muted mt-2">
+                              Ingediend door: {conflict.submittedBy || 'admin'} | Target: {conflict.targetFile || '—'} → {conflict.targetKey || '—'}
+                            </p>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>

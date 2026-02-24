@@ -123,41 +123,61 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
   ];
 
   // Handle save technique for Config Review
-  const handleSaveTechnique = () => {
-    console.log('handleSaveTechnique called');
-    console.log('editingTechnique:', editingTechnique);
-    console.log('editedTechniqueData:', editedTechniqueData);
-    
-    if (!editingTechnique || !editedTechniqueData) {
-      console.log('Early return - missing data');
-      return;
-    }
+  const handleSaveTechnique = async () => {
+    if (!editingTechnique || !editedTechniqueData) return;
     
     const originalTech = getTechniqueByNumber(editingTechnique);
-    console.log('originalTech:', originalTech);
-    
-    // Create a fully merged object preserving all original fields plus edits
     const mergedTechnique = {
       ...originalTech,
       ...editedTechniqueData,
-      // Ensure nummer and fase are preserved from original
       nummer: originalTech?.nummer,
       fase: originalTech?.fase,
     };
-    console.log('mergedTechnique:', mergedTechnique);
     
-    const pendingChanges = JSON.parse(localStorage.getItem('pendingConfigReview') || '[]');
-    pendingChanges.push({
-      type: 'technique',
-      id: editingTechnique,
-      original: originalTech,
-      edited: mergedTechnique,
-      timestamp: new Date().toISOString()
-    });
-    console.log('Saving to localStorage:', pendingChanges);
-    localStorage.setItem('pendingConfigReview', JSON.stringify(pendingChanges));
-    console.log('Saved successfully');
-    toast.success('Wijziging opgeslagen voor review');
+    // Find which fields changed
+    const changedFields: string[] = [];
+    for (const key of Object.keys(editedTechniqueData)) {
+      const origVal = JSON.stringify((originalTech as any)?.[key]);
+      const newVal = JSON.stringify((editedTechniqueData as any)?.[key]);
+      if (origVal !== newVal) changedFields.push(key);
+    }
+    
+    if (changedFields.length === 0) {
+      toast.info('Geen wijzigingen gedetecteerd');
+      setEditingTechnique(null);
+      setEditedTechniqueData(null);
+      return;
+    }
+    
+    try {
+      const response = await fetch('/api/v2/admin/corrections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'technique',
+          field: `${editingTechnique} - ${originalTech?.naam || ''}`,
+          originalValue: changedFields.map(f => `${f}: ${JSON.stringify((originalTech as any)?.[f])}`).join('\n'),
+          newValue: changedFields.map(f => `${f}: ${JSON.stringify((editedTechniqueData as any)?.[f])}`).join('\n'),
+          context: `Techniek ${editingTechnique} bewerkt. Gewijzigde velden: ${changedFields.join(', ')}`,
+          submittedBy: 'Hugo',
+          source: 'technique_edit',
+          targetFile: 'technieken_index.json',
+          targetKey: editingTechnique,
+          originalJson: JSON.stringify(originalTech),
+          newJson: JSON.stringify(mergedTechnique),
+        }),
+      });
+      
+      if (response.ok) {
+        toast.success('Wijziging ingediend voor review door superadmin');
+      } else {
+        const err = await response.json();
+        toast.error(`Fout: ${err.error || 'Opslaan mislukt'}`);
+      }
+    } catch (err) {
+      toast.error('Netwerk fout bij opslaan');
+    }
+    
     setEditingTechnique(null);
     setEditedTechniqueData(null);
   };

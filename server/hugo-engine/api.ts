@@ -3802,23 +3802,88 @@ app.get("/api/v2/admin/feedback", async (req: Request, res: Response) => {
       )
     `);
     console.log('[Admin] Corrections table ready');
+
+    const alterColumns = [
+      { name: 'source', def: "VARCHAR(100) DEFAULT 'analysis'" },
+      { name: 'target_file', def: 'VARCHAR(255)' },
+      { name: 'target_key', def: 'VARCHAR(255)' },
+      { name: 'original_json', def: 'TEXT' },
+      { name: 'new_json', def: 'TEXT' },
+    ];
+    for (const col of alterColumns) {
+      try {
+        await pool.query(`ALTER TABLE admin_corrections ADD COLUMN IF NOT EXISTS ${col.name} ${col.def}`);
+      } catch (alterErr: any) {
+        if (!alterErr.message?.includes('already exists')) {
+          console.error(`[Admin] Failed to add column ${col.name}:`, alterErr.message);
+        }
+      }
+    }
+    console.log('[Admin] Corrections table columns extended');
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS admin_notifications (
+        id SERIAL PRIMARY KEY,
+        type VARCHAR(100) NOT NULL,
+        title VARCHAR(500) NOT NULL,
+        message TEXT,
+        category VARCHAR(100) DEFAULT 'content',
+        severity VARCHAR(20) DEFAULT 'info',
+        related_id INTEGER,
+        related_page VARCHAR(100),
+        read BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    console.log('[Admin] Notifications table ready');
   } catch (err) {
-    console.error('[Admin] Failed to create corrections table:', err);
+    console.error('[Admin] Failed to create corrections/notifications tables:', err);
   }
 })();
 
 app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
   try {
-    const { analysisId, type, field, originalValue, newValue, context, submittedBy } = req.body;
+    const { analysisId, type, field, originalValue, newValue, context, submittedBy, source, targetFile, targetKey, originalJson, newJson } = req.body;
     if (!type || !field || !newValue) {
       return res.status(400).json({ error: 'Missing required fields: type, field, newValue' });
     }
     const { rows } = await pool.query(
-      `INSERT INTO admin_corrections (analysis_id, type, field, original_value, new_value, context, submitted_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [analysisId || null, type, field, originalValue || '', newValue, context || '', submittedBy || 'admin']
+      `INSERT INTO admin_corrections (analysis_id, type, field, original_value, new_value, context, submitted_by, source, target_file, target_key, original_json, new_json)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+      [
+        analysisId || null, type, field, originalValue || '', newValue, context || '', submittedBy || 'admin',
+        source || 'analysis', targetFile || null, targetKey || null,
+        originalJson ? (typeof originalJson === 'string' ? originalJson : JSON.stringify(originalJson)) : null,
+        newJson ? (typeof newJson === 'string' ? newJson : JSON.stringify(newJson)) : null
+      ]
     );
-    res.json({ correction: rows[0], message: 'Correctie ingediend voor review' });
+    const correction = rows[0];
+
+    const submitter = submittedBy || 'admin';
+    const corrSource = source || 'analysis';
+    const titleMap: Record<string, string> = {
+      'technique_edit': `Techniek ${field} bewerkt door ${submitter}`,
+      'video_edit': `Video ${field} bewerkt door ${submitter}`,
+      'chat_correction': `Chat correctie: ${field} door ${submitter}`,
+      'analysis_correction': `Analyse correctie: ${field} door ${submitter}`,
+      'ssot_edit': `SSOT ${field} bewerkt door ${submitter}`,
+    };
+    const notifTitle = titleMap[corrSource] || `Correctie: ${field} door ${submitter}`;
+    const notifSeverity = ['technique_edit', 'ssot_edit'].includes(corrSource) ? 'warning' : 'info';
+    const notifMessage = `${submitter} heeft ${field} gewijzigd van "${originalValue || '(leeg)'}" naar "${newValue}". Bron: ${corrSource}${targetFile ? `, bestand: ${targetFile}` : ''}${targetKey ? `, key: ${targetKey}` : ''}`;
+
+    try {
+      await pool.query(
+        `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        ['correction_submitted', notifTitle, notifMessage, 'content', notifSeverity, correction.id, 'admin-config-review']
+      );
+      console.log(`[Admin] Notification created for correction #${correction.id}`);
+    } catch (notifErr: any) {
+      console.error('[Admin] Failed to create notification:', notifErr.message);
+    }
+
+    res.json({ correction, message: 'Correctie ingediend voor review' });
   } catch (err: any) {
     console.error('[Admin] Correction submit error:', err);
     res.status(500).json({ error: err.message || 'Correctie opslaan mislukt' });
@@ -3858,6 +3923,7 @@ app.patch("/api/v2/admin/corrections/:id", async (req: Request, res: Response) =
 
     const correction = rows[0];
     let ragGenerated = false;
+    let ssotUpdated = false;
     if (status === 'approved') {
       try {
         const ragContent = `[EXPERT CORRECTIE] Bij analyse van een verkoopgesprek werd "${correction.original_value}" gedetecteerd als ${correction.type}/${correction.field}. De expert corrigeerde dit naar "${correction.new_value}". Context: ${correction.context || 'Geen extra context'}. Dit is een belangrijk leermoment voor toekomstige analyses.`;
@@ -3881,10 +3947,110 @@ app.patch("/api/v2/admin/corrections/:id", async (req: Request, res: Response) =
         console.error('[Admin] Failed to generate RAG fragment:', ragErr);
         ragGenerated = false;
       }
+
+      if (correction.source === 'technique_edit' && correction.target_key && correction.new_json) {
+        try {
+          const ssotPath = path.join(process.cwd(), 'config/ssot/technieken_index.json');
+          const srcPath = path.join(process.cwd(), 'src/data/technieken_index.json');
+          const ssotData = JSON.parse(fs.readFileSync(ssotPath, 'utf-8'));
+          const technieken = ssotData.technieken || {};
+          const targetNummer = correction.target_key;
+          const newData = typeof correction.new_json === 'string' ? JSON.parse(correction.new_json) : correction.new_json;
+
+          let found = false;
+          for (const [key, tech] of Object.entries(technieken)) {
+            if ((tech as any).nummer === targetNummer || key === targetNummer) {
+              technieken[key] = { ...(tech as any), ...newData };
+              found = true;
+              console.log(`[Admin] Updated technique ${targetNummer} in SSOT`);
+              break;
+            }
+          }
+
+          if (found) {
+            ssotData.technieken = technieken;
+            fs.writeFileSync(ssotPath, JSON.stringify(ssotData, null, 2), 'utf-8');
+            console.log(`[Admin] Saved SSOT file: ${ssotPath}`);
+
+            try {
+              fs.writeFileSync(srcPath, JSON.stringify(ssotData, null, 2), 'utf-8');
+              console.log(`[Admin] Copied to src/data: ${srcPath}`);
+            } catch (copyErr: any) {
+              console.error('[Admin] Failed to copy to src/data:', copyErr.message);
+            }
+
+            ssotUpdated = true;
+          } else {
+            console.warn(`[Admin] Technique ${targetNummer} not found in SSOT`);
+          }
+        } catch (ssotErr: any) {
+          console.error('[Admin] Failed to update SSOT for technique_edit:', ssotErr.message);
+        }
+      }
     }
 
-    res.json({ correction, ragGenerated });
+    res.json({ correction, ragGenerated, ssotUpdated });
   } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ===========================================
+// ADMIN NOTIFICATIONS API
+// ===========================================
+
+app.get("/api/v2/admin/notifications", async (req: Request, res: Response) => {
+  try {
+    const readFilter = req.query.read;
+    let queryText = 'SELECT * FROM admin_notifications ORDER BY created_at DESC LIMIT 200';
+    let params: any[] = [];
+    if (readFilter === 'true') {
+      queryText = 'SELECT * FROM admin_notifications WHERE read = true ORDER BY created_at DESC LIMIT 200';
+    } else if (readFilter === 'false') {
+      queryText = 'SELECT * FROM admin_notifications WHERE read = false ORDER BY created_at DESC LIMIT 200';
+    }
+    const { rows } = await pool.query(queryText, params);
+    res.json({ notifications: rows });
+  } catch (err: any) {
+    console.error('[Admin] Notifications list error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/v2/admin/notifications/count", async (req: Request, res: Response) => {
+  try {
+    const { rows } = await pool.query('SELECT COUNT(*) as unread FROM admin_notifications WHERE read = false');
+    res.json({ unread: parseInt(rows[0]?.unread || '0') });
+  } catch (err: any) {
+    console.error('[Admin] Notifications count error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch("/api/v2/admin/notifications/read-all", async (req: Request, res: Response) => {
+  try {
+    const { rowCount } = await pool.query('UPDATE admin_notifications SET read = true WHERE read = false');
+    console.log(`[Admin] Marked ${rowCount} notifications as read`);
+    res.json({ updated: rowCount, message: 'Alle notificaties als gelezen gemarkeerd' });
+  } catch (err: any) {
+    console.error('[Admin] Notifications read-all error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch("/api/v2/admin/notifications/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { read } = req.body;
+    const readValue = read !== undefined ? read : true;
+    const { rows } = await pool.query(
+      'UPDATE admin_notifications SET read = $1 WHERE id = $2 RETURNING *',
+      [readValue, id]
+    );
+    if (rows.length === 0) return res.status(404).json({ error: 'Notification not found' });
+    res.json({ notification: rows[0] });
+  } catch (err: any) {
+    console.error('[Admin] Notification update error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
