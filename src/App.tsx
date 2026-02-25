@@ -7,6 +7,7 @@ import { Login } from "./components/HH/Login";
 import { Signup } from "./components/HH/Signup";
 import { AuthCallback } from "./components/HH/AuthCallback";
 import { Landing } from "./components/HH/Landing";
+import { ProductShowcase } from "./components/HH/ProductShowcase";
 import { About } from "./components/HH/About";
 import { Pricing } from "./components/HH/Pricing";
 import { Onboarding } from "./components/HH/Onboarding";
@@ -53,7 +54,7 @@ import { AdminChatExpertMode } from "./components/HH/AdminChatExpertMode";
 import { AdminRAGReview } from "./components/HH/AdminRAGReview";
 import { AdminConflicts } from "./components/HH/AdminConflicts";
 import { SSOValidate } from "./components/HH/SSOValidate";
-type Page = "landing" | "pricing" | "about" | "login" | "signup" | "authcallback" | "preview" | "onboarding" | "dashboard" | "technieken" | "techniques" | "coaching" | "roleplay" | "roleplays" | "roleplaychat" | "roleplays-chat" | "overviewprogress" | "builder" | "videos" | "live" | "team" | "analytics" | "settings" | "analysis" | "analysis-results" | "upload-analysis" | "privacy-policy" | "help" | "resources" | "hugo-overview" | "talk-to-hugo" | "library" | "notifications" | "admin-dashboard" | "admin-videos" | "admin-live" | "admin-progress" | "admin-users" | "admin-techniques" | "admin-transcripts" | "admin-uploads" | "admin-content" | "admin-analytics" | "admin-settings" | "admin-help" | "admin-resources" | "admin-sessions" | "admin-config-review" | "admin-notifications" | "admin-chat-expert" | "admin-rag-review" | "admin-conflicts" | "admin-analysis-results" | "admin-upload-analysis" | "sso-validate";
+type Page = "landing" | "pricing" | "about" | "login" | "signup" | "authcallback" | "preview" | "onboarding" | "dashboard" | "technieken" | "techniques" | "coaching" | "roleplay" | "roleplays" | "roleplaychat" | "roleplays-chat" | "overviewprogress" | "builder" | "videos" | "live" | "team" | "analytics" | "settings" | "analysis" | "analysis-results" | "upload-analysis" | "privacy-policy" | "help" | "resources" | "hugo-overview" | "talk-to-hugo" | "library" | "notifications" | "admin-dashboard" | "admin-videos" | "admin-live" | "admin-progress" | "admin-users" | "admin-techniques" | "admin-transcripts" | "admin-uploads" | "admin-content" | "admin-analytics" | "admin-settings" | "admin-help" | "admin-resources" | "admin-sessions" | "admin-config-review" | "admin-notifications" | "admin-chat-expert" | "admin-rag-review" | "admin-conflicts" | "admin-analysis-results" | "admin-upload-analysis" | "sso-validate" | "showcase" | "showcase-video" | "showcase-roleplay" | "showcase-analysis";
 
 export default function App() {
   // Development screenshot bypass: check URL path immediately (synchronously)
@@ -249,6 +250,28 @@ export default function App() {
 
           {/* Landing page - met navigate prop */}
           {currentPage === "landing" && <Landing navigate={navigate} />}
+
+          {/* Dev showcase preview */}
+          {currentPage === "showcase" && (
+            <div className="bg-white py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+              <ProductShowcase />
+            </div>
+          )}
+          {currentPage === "showcase-video" && (
+            <div className="bg-white py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+              <ProductShowcase initialTab={1} />
+            </div>
+          )}
+          {currentPage === "showcase-roleplay" && (
+            <div className="bg-white py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+              <ProductShowcase initialTab={2} />
+            </div>
+          )}
+          {currentPage === "showcase-analysis" && (
+            <div className="bg-white py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+              <ProductShowcase initialTab={3} />
+            </div>
+          )}
 
           {/* About page */}
           {currentPage === "about" && <About navigate={navigate} />}
