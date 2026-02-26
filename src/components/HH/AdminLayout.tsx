@@ -180,8 +180,8 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
 
   const allAdminManagementItems = [
     { id: "admin-users", label: "Gebruikers", icon: Users, superAdminOnly: true },
-    { id: "admin-analytics", label: "Analytics", icon: BarChart3, superAdminOnly: true },
-    { id: "admin-help", label: "Help Center", icon: HelpCircle },
+    { id: "admin-analytics", label: "Analytics", icon: BarChart3 },
+    { id: "admin-help", label: "Help Center", icon: HelpCircle, superAdminOnly: true },
     { id: "admin-resources", label: "Resources", icon: Library, superAdminOnly: true },
     { id: "admin-settings", label: "Instellingen", icon: Settings, superAdminOnly: true },
   ];
