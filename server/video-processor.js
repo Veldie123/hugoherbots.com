@@ -985,7 +985,7 @@ async function listDriveSubfolders(folderId, accessToken) {
   
   do {
     const query = `'${folderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
-    let url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=nextPageToken,files(id,name)&pageSize=100`;
+    let url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=nextPageToken,files(id,name)&pageSize=1000&orderBy=name`;
     if (pageToken) url += `&pageToken=${pageToken}`;
     
     const response = await fetch(url, {
@@ -1005,6 +1005,8 @@ async function listDriveSubfolders(folderId, accessToken) {
     pageToken = data.nextPageToken || null;
   } while (pageToken);
   
+  // Client-side natural sort as backup guarantee
+  folders.sort((a, b) => a.name.localeCompare(b.name, 'nl', { numeric: true, sensitivity: 'base' }));
   return folders;
 }
 
@@ -1014,7 +1016,7 @@ async function listDriveVideosInFolder(folderId, accessToken) {
   
   do {
     const query = `'${folderId}' in parents and mimeType contains 'video/' and trashed = false`;
-    let url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=nextPageToken,files(id,name,mimeType,size,modifiedTime,parents)&pageSize=100`;
+    let url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=nextPageToken,files(id,name,mimeType,size,modifiedTime,parents)&pageSize=1000&orderBy=name`;
     if (pageToken) url += `&pageToken=${pageToken}`;
     
     const response = await fetch(url, {
@@ -1042,6 +1044,8 @@ async function listDriveVideosInFolder(folderId, accessToken) {
     pageToken = data.nextPageToken || null;
   } while (pageToken);
   
+  // Client-side natural sort as backup guarantee
+  videos.sort((a, b) => a.name.localeCompare(b.name, 'nl', { numeric: true, sensitivity: 'base' }));
   return videos;
 }
 
@@ -2233,54 +2237,10 @@ const server = http.createServer((req, res) => {
         console.log('[AutoOrder] Scanning Drive folder tree...');
         const driveTree = await scanFolderTree(HUGO_FOLDER_ID, '', 0);
         console.log(`[AutoOrder] Found ${driveTree.length} videos in Drive tree`);
-
-        const FASE_ORDER = {
-          'algemeen intro': 0,
-          'fase 0': 1,
-          'fase 1': 2,
-          'fase 2': 3,
-          'fase 3': 4,
-          'fase 4': 5,
-        };
-
-        function extractSortKey(path) {
-          const parts = path.split('/').filter(Boolean);
-          let faseKey = 99;
-          let subKey = 999;
-          let subSubKey = 999;
-
-          for (const part of parts) {
-            const lower = part.toLowerCase();
-
-            for (const [prefix, order] of Object.entries(FASE_ORDER)) {
-              if (lower.startsWith(prefix) || lower.includes(prefix)) {
-                faseKey = order;
-                break;
-              }
-            }
-
-            const numMatch = part.match(/\b(\d+)\.(\d+)(?:\.(\d+))?\b/);
-            if (numMatch) {
-              subKey = parseInt(numMatch[1]) * 100 + parseInt(numMatch[2]);
-              if (numMatch[3]) {
-                subSubKey = parseInt(numMatch[3]);
-              }
-            }
-          }
-
-          return { faseKey, subKey, subSubKey };
-        }
-
-        driveTree.forEach(v => {
-          v.sortKey = extractSortKey(v.path);
-        });
-
-        driveTree.sort((a, b) => {
-          if (a.sortKey.faseKey !== b.sortKey.faseKey) return a.sortKey.faseKey - b.sortKey.faseKey;
-          if (a.sortKey.subKey !== b.sortKey.subKey) return a.sortKey.subKey - b.sortKey.subKey;
-          if (a.sortKey.subSubKey !== b.sortKey.subSubKey) return a.sortKey.subSubKey - b.sortKey.subSubKey;
-          return a.name.localeCompare(b.name, 'nl', { numeric: true });
-        });
+        // The traversal order from scanFolderTree IS the correct playback order:
+        // listDriveSubfolders and listDriveVideosInFolder both use orderBy=name
+        // (Drive API) + client-side natural sort, so the depth-first traversal
+        // already reflects the exact alphabetical/numerical folder structure.
 
         const { data: pipelineVideos } = await supabaseAdmin
           .from('video_ingest_jobs')
