@@ -131,19 +131,26 @@ export default function App() {
         if (session?.user) {
           const email = (session.user.email || '').toLowerCase();
           const isSuperAdmin = email === 'stephane@hugoherbots.com';
-          const isHugobotsAdmin = email.endsWith('@hugoherbots.com');
+          const isHugoOnboarding = email === 'hugo@hugoherbots.com';
+          const isHugobotsAdmin = email.endsWith('@hugoherbots.com') && !isHugoOnboarding;
           const userIsAdmin = isSuperAdmin || isHugobotsAdmin;
           
           setIsAdmin(userIsAdmin);
-          setOnboardingMode(false);
-          localStorage.removeItem('hugo_onboarding_mode');
+          setOnboardingMode(isHugoOnboarding);
           
-          if (userIsAdmin) {
-            console.log('✅ Admin user logged in, route to admin-dashboard');
-            setCurrentPage("admin-dashboard");
-          } else {
-            console.log('✅ User is logged in, route to dashboard');
+          if (isHugoOnboarding) {
+            console.log('👋 Hugo onboarding mode activated - simplified UI');
+            localStorage.setItem('hugo_onboarding_mode', 'true');
             setCurrentPage("dashboard");
+          } else {
+            localStorage.removeItem('hugo_onboarding_mode');
+            if (userIsAdmin) {
+              console.log('✅ Admin user logged in, route to admin-dashboard');
+              setCurrentPage("admin-dashboard");
+            } else {
+              console.log('✅ User is logged in, route to dashboard');
+              setCurrentPage("dashboard");
+            }
           }
         } else {
           setIsAdmin(false);
@@ -209,9 +216,15 @@ export default function App() {
               onLoginSuccess={async () => {
                 const { session } = await auth.getSession();
                 const email = (session?.user?.email || '').toLowerCase();
-                const isHugobotsUser = email.endsWith('@hugoherbots.com');
+                const isHugo = email === 'hugo@hugoherbots.com';
+                const isHugobotsAdmin = email.endsWith('@hugoherbots.com') && !isHugo;
                 
-                if (isHugobotsUser) {
+                if (isHugo) {
+                  setIsAdmin(false);
+                  setOnboardingMode(true);
+                  localStorage.setItem('hugo_onboarding_mode', 'true');
+                  navigate("dashboard");
+                } else if (isHugobotsAdmin) {
                   setIsAdmin(true);
                   setOnboardingMode(false);
                   localStorage.removeItem('hugo_onboarding_mode');
@@ -231,7 +244,9 @@ export default function App() {
               onSignupSuccess={async () => {
                 const { session } = await auth.getSession();
                 const email = (session?.user?.email || '').toLowerCase();
-                if (email.endsWith('@hugoherbots.com')) {
+                const isHugo = email === 'hugo@hugoherbots.com';
+                const isHugobotsAdmin = email.endsWith('@hugoherbots.com') && !isHugo;
+                if (isHugobotsAdmin) {
                   setIsAdmin(true);
                   setOnboardingMode(false);
                   navigate("admin-dashboard");
