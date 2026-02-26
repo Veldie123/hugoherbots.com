@@ -1884,6 +1884,24 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                 <ArrowUpDown className="w-4 h-4" />
               </Button>
             </div>
+            <Button
+              size="sm"
+              onClick={handleSync}
+              disabled={syncing}
+              className="text-white hover:opacity-90 flex-shrink-0"
+              style={{ backgroundColor: '#9333ea' }}
+              title="Synchroniseer Google Drive — voegt nieuwe video's toe en detecteert verwijderde"
+            >
+              {syncing
+                ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                : <FolderSync className="w-4 h-4 mr-1.5" />}
+              {syncing ? 'Bezig...' : 'Sync Drive'}
+              {syncResult && (
+                <span className={`ml-1.5 text-xs font-bold ${syncResult.success ? 'text-green-200' : 'text-red-200'}`}>
+                  {syncResult.message}
+                </span>
+              )}
+            </Button>
           </div>
         </Card>
 
