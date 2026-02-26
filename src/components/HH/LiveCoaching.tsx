@@ -262,7 +262,10 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
           <div className="flex flex-wrap gap-3 pt-1">
             {nextSession && (
               <Button 
-                className={`gap-2 border-0 transition-colors ${isRegistered ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-hh-primary hover:bg-hh-primary/90 text-white'}`}
+                className={`gap-2 border-0 transition-colors ${isRegistered ? 'bg-white/20 text-white hover:bg-white/30' : 'text-white'}`}
+                style={isRegistered ? {} : { backgroundColor: '#3d9a6e' }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { if (!isRegistered) e.currentTarget.style.backgroundColor = '#4daa7e'; }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { if (!isRegistered) e.currentTarget.style.backgroundColor = '#3d9a6e'; }}
                 onClick={onRegister}
               >
                 {isRegistered ? <CheckCircle className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}

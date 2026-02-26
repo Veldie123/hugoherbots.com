@@ -44,6 +44,7 @@ import {
   Pencil,
   Check,
   X,
+  BookOpen,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -686,13 +687,9 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
                 </>
               ) : (
                 <>
-                  <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: '#3d9a6e' }}>
-                    <Play className="w-3 h-3 mr-1" />
-                    {continueWatching?.reason === 'next' 
-                      ? 'Volgende in de reeks' 
-                      : continueWatching?.reason === 'continue' 
-                        ? 'Ga verder waar je gebleven was'
-                        : 'Aanbevolen voor jou'}
+                  <Badge className="text-white border-0 text-[12px] bg-hh-primary">
+                    <BookOpen className="w-3 h-3 mr-1" />
+                    {featuredVideo?.fase || (continueWatching?.reason === 'continue' ? 'Ga verder' : 'EPIC Training')}
                   </Badge>
                   
                   <h2 className="text-[20px] sm:text-[24px] font-bold leading-tight">
