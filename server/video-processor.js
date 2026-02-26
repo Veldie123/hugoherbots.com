@@ -1695,6 +1695,85 @@ const server = http.createServer((req, res) => {
     return;
   }
   
+  // PATCH /api/admin/sessions/:id — update webinar title, date, description
+  if (pathname.match(/^\/api\/admin\/sessions\/[^/]+$/) && req.method === 'PATCH') {
+    const sessionId = pathname.replace('/api/admin/sessions/', '');
+    if (!supabaseAdmin) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
+      return;
+    }
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const patch = JSON.parse(body || '{}');
+        const allowed = {};
+        if (patch.title !== undefined) allowed.title = patch.title;
+        if (patch.scheduledDate !== undefined) allowed.scheduled_date = patch.scheduledDate;
+        if (patch.scheduled_date !== undefined) allowed.scheduled_date = patch.scheduled_date;
+        if (patch.description !== undefined) allowed.description = patch.description;
+        if (patch.topic !== undefined) allowed.topic = patch.topic;
+        const { data, error } = await supabaseAdmin
+          .from('live_sessions')
+          .update(allowed)
+          .eq('id', sessionId)
+          .select()
+          .single();
+        if (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: error.message }));
+        } else {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, session: data }));
+        }
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Server error' }));
+      }
+    });
+    return;
+  }
+
+  // POST /api/admin/sessions — create new webinar
+  if (pathname === '/api/admin/sessions' && req.method === 'POST') {
+    if (!supabaseAdmin) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
+      return;
+    }
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const { title, scheduledDate, scheduled_date, description, topic, level } = JSON.parse(body || '{}');
+        const { data, error } = await supabaseAdmin
+          .from('live_sessions')
+          .insert({
+            title: title || 'Nieuw Webinar',
+            scheduled_date: scheduledDate || scheduled_date || new Date().toISOString(),
+            description: description || '',
+            topic: topic || '',
+            level: level || 'intermediate',
+            status: 'scheduled'
+          })
+          .select()
+          .single();
+        if (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: error.message }));
+        } else {
+          res.writeHead(201, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, session: data }));
+        }
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Server error' }));
+      }
+    });
+    return;
+  }
+
   if (pathname.startsWith('/api/admin/sessions/') && req.method === 'DELETE') {
     const sessionId = pathname.replace('/api/admin/sessions/', '');
     

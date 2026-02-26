@@ -104,4 +104,4 @@ Key features include a unified video system integrating Google Drive with Mux, L
 -   **Google Cloud Run**: External worker for video processing.
 -   **Google Drive**: Source for Hugo's training videos.
 -   **Stripe**: Payments and subscriptions.
--   **Replit PostgreSQL**: Local database for specific analytical data.
+-   **Replit PostgreSQL**: Local database for specific analytical data (`conversation_analyses`, `admin_corrections`, `chat_feedback`, `config_proposals`).

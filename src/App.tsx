@@ -51,10 +51,11 @@ import { UserNotifications } from "./components/HH/UserNotifications";
 import { Library } from "./components/HH/Library";
 import { PrivacyPolicy } from "./components/HH/PrivacyPolicy";
 import { AdminChatExpertMode } from "./components/HH/AdminChatExpertMode";
+import { AdminHugoAgent } from "./components/HH/AdminHugoAgent";
 import { AdminRAGReview } from "./components/HH/AdminRAGReview";
 import { AdminConflicts } from "./components/HH/AdminConflicts";
 import { SSOValidate } from "./components/HH/SSOValidate";
-type Page = "landing" | "pricing" | "about" | "login" | "signup" | "authcallback" | "preview" | "onboarding" | "dashboard" | "technieken" | "techniques" | "coaching" | "roleplay" | "roleplays" | "roleplaychat" | "roleplays-chat" | "overviewprogress" | "builder" | "videos" | "live" | "team" | "analytics" | "settings" | "analysis" | "analysis-results" | "upload-analysis" | "privacy-policy" | "help" | "resources" | "hugo-overview" | "talk-to-hugo" | "library" | "notifications" | "admin-dashboard" | "admin-videos" | "admin-live" | "admin-progress" | "admin-users" | "admin-techniques" | "admin-transcripts" | "admin-uploads" | "admin-content" | "admin-analytics" | "admin-settings" | "admin-help" | "admin-resources" | "admin-sessions" | "admin-config-review" | "admin-notifications" | "admin-chat-expert" | "admin-rag-review" | "admin-conflicts" | "admin-analysis-results" | "admin-upload-analysis" | "sso-validate" | "showcase" | "showcase-video" | "showcase-roleplay" | "showcase-analysis";
+type Page = "landing" | "pricing" | "about" | "login" | "signup" | "authcallback" | "preview" | "onboarding" | "dashboard" | "technieken" | "techniques" | "coaching" | "roleplay" | "roleplays" | "roleplaychat" | "roleplays-chat" | "overviewprogress" | "builder" | "videos" | "live" | "team" | "analytics" | "settings" | "analysis" | "analysis-results" | "upload-analysis" | "privacy-policy" | "help" | "resources" | "hugo-overview" | "talk-to-hugo" | "library" | "notifications" | "admin-dashboard" | "admin-videos" | "admin-live" | "admin-progress" | "admin-users" | "admin-techniques" | "admin-transcripts" | "admin-uploads" | "admin-content" | "admin-analytics" | "admin-settings" | "admin-help" | "admin-resources" | "admin-sessions" | "admin-config-review" | "admin-notifications" | "admin-chat-expert" | "admin-rag-review" | "admin-conflicts" | "admin-analysis-results" | "admin-upload-analysis" | "admin-hugo-agent" | "sso-validate" | "showcase" | "showcase-video" | "showcase-roleplay" | "showcase-analysis";
 
 export default function App() {
   // Development screenshot bypass: check URL path immediately (synchronously)
@@ -342,6 +343,7 @@ export default function App() {
           {currentPage === "admin-config-review" && <AdminConfigReview navigate={navigate} />}
           {currentPage === "admin-notifications" && <AdminNotifications navigate={navigate} />}
           {currentPage === "admin-chat-expert" && <AdminChatExpertMode sessionId="default" sessionTitle="Talk to myself AI" navigate={navigate} />}
+          {currentPage === "admin-hugo-agent" && <AdminHugoAgent navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-rag-review" && <AdminRAGReview navigate={navigate} currentPage={currentPage} />}
           {currentPage === "admin-conflicts" && <AdminConflicts navigate={navigate} />}
           {currentPage === "admin-analysis-results" && <AnalysisResults navigate={navigate} isAdmin={true} navigationData={navigationData} />}

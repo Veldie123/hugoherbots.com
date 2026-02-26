@@ -35,3 +35,20 @@ if (!process.env.DATABASE_URL) {
 
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle({ client: pool, schema });
+
+// Ensure config_proposals table exists for Hugo Agent
+pool.query(`
+  CREATE TABLE IF NOT EXISTS config_proposals (
+    id SERIAL PRIMARY KEY,
+    proposed_by TEXT DEFAULT 'hugo',
+    type TEXT NOT NULL,
+    field TEXT,
+    current_value TEXT,
+    proposed_value TEXT NOT NULL,
+    reason TEXT,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMPTZ DEFAULT now(),
+    reviewed_at TIMESTAMPTZ,
+    reviewed_by TEXT
+  )
+`).catch((err: Error) => console.warn('[DB] config_proposals table check failed:', err.message));

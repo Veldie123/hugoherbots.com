@@ -115,6 +115,7 @@ import {
   type ConversationAnalysis,
 } from "./v2/analysis-service";
 import multer from "multer";
+import { hugoAgentRouter } from "./hugo-agent";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -4425,6 +4426,9 @@ app.get("/api/health", (req, res) => {
     ]
   });
 });
+
+// Hugo Agent router — platform management chat for Hugo Herbots
+app.use("/api/hugo-agent", hugoAgentRouter);
 
 // Error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
