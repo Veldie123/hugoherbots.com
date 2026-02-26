@@ -121,6 +121,7 @@ export const videoApi = {
   async getLibrary(status?: string, fase?: string, includeHidden: boolean = false): Promise<Array<{
     id: string;
     title: string;
+    original_title: string | null;
     description: string | null;
     thumbnail_url: string | null;
     mux_asset_id: string | null;

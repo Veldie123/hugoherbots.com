@@ -67,6 +67,7 @@ import { supabase } from "../../utils/supabase/client";
 interface LibraryVideo {
   id: string;
   title: string;
+  original_title: string | null;
   description: string | null;
   thumbnail_url: string | null;
   mux_asset_id: string | null;
@@ -2005,7 +2006,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
                         {video.ai_attractive_title || video.title || 'Naamloze video'}
                       </div>
                       <div className="text-[12px] text-hh-muted truncate">
-                        {video.title}{technique ? ` · #${techId} ${technique.naam} · Fase ${technique.fase}` : ''} · {video.duration ? `${Math.floor(video.duration / 60)}:${String(Math.floor(video.duration % 60)).padStart(2, '0')}` : '--:--'}
+                        {video.title}{technique ? ` · #${techId} ${technique.naam} · Fase ${technique.fase}` : ''} · {video.duration ? `${Math.floor(video.duration / 60)}:${String(Math.floor(video.duration % 60)).padStart(2, '0')}` : '--:--'}{video.original_title ? ` · ${video.original_title}` : ''}
                       </div>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
