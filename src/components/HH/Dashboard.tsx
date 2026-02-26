@@ -26,6 +26,7 @@ interface DashboardProps {
   hasData?: boolean;
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
   isPreview?: boolean;
 }
 
@@ -295,7 +296,7 @@ const HugoTrainingCard = ({
   );
 };
 
-export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview = false }: DashboardProps) {
+export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview = false, onboardingMode }: DashboardProps) {
   const { videos: realVideos, featuredVideo, loading: videosLoading } = useDashboardVideos();
   const { firstName, loginStreak, phaseProgress, totalCompleted, totalVideos } = useDashboardUserData();
   const displayName = isPreview ? "" : firstName;
@@ -342,7 +343,7 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
 
   if (!hasData) {
     return (
-      <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin}>
+      <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
         <div className="p-8">
           <EmptyState
             icon={Play}
@@ -363,7 +364,7 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
   }
 
   return (
-    <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin}>
+    <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
       <div className="p-4 sm:p-5 lg:p-6 space-y-6">
         {/* Header with streak + E.P.I.C. progress */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">

@@ -51,6 +51,7 @@ interface AppLayoutProps {
   navigate?: (page: string, data?: Record<string, any>) => void;
   onOpenFlowDrawer?: () => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
   chatHistory?: HistoryItem[];
   analysisHistory?: HistoryItem[];
   onSelectHistoryItem?: (id: string, type: "chat" | "analysis") => void;
@@ -92,6 +93,7 @@ export function AppLayout({
   navigate,
   onOpenFlowDrawer,
   isAdmin,
+  onboardingMode,
   contentClassName,
   chatHistory: chatHistoryProp = defaultChatHistory,
   analysisHistory: analysisHistoryProp,
@@ -101,6 +103,16 @@ export function AppLayout({
   const shouldAutoCollapse = currentPage === 'video-watch';
   const [collapsed, setCollapsed] = useState(shouldAutoCollapse);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Items verborgen voor Hugo (onboardingMode): te vroeg, nog bugs
+  const HUGO_HIDDEN_MAIN = new Set(['techniques', 'analysis', 'talk-to-hugo']);
+  const HUGO_HIDDEN_BOTTOM = new Set(['team', 'resources', 'settings']);
+  const visibleMainNavItems = onboardingMode
+    ? mainNavItems.filter(item => !HUGO_HIDDEN_MAIN.has(item.id))
+    : mainNavItems;
+  const visibleBottomNavItems = onboardingMode
+    ? bottomNavItems.filter(item => !HUGO_HIDDEN_BOTTOM.has(item.id))
+    : bottomNavItems;
 
   useEffect(() => {
     setCollapsed(shouldAutoCollapse);
@@ -245,7 +257,7 @@ export function AppLayout({
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
-          {mainNavItems.map((item) => {
+          {visibleMainNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = isNavItemActive(item.id);
             const history = getHistoryForItem(item.historyType);
@@ -324,7 +336,7 @@ export function AppLayout({
         </nav>
 
         <nav className="p-3 space-y-2 flex-shrink-0 border-t border-hh-border">
-          {bottomNavItems.map((item) => {
+          {visibleBottomNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
             return (
@@ -351,7 +363,7 @@ export function AppLayout({
           {isAdmin && (
             <div className="p-3 border-t border-hh-border">
               <button
-                onClick={() => navigate?.("admin-dashboard")}
+                onClick={() => navigate?.(onboardingMode ? "admin-videos" : "admin-dashboard")}
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
               >
                 <Eye className="w-4 h-4" />
@@ -374,7 +386,7 @@ export function AppLayout({
           </SheetHeader>
 
           <nav className="flex-1 px-3 pb-3 pt-3 overflow-y-auto">
-            {mainNavItems.map((item) => {
+            {visibleMainNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = isNavItemActive(item.id);
               const history = getHistoryForItem(item.historyType);
@@ -456,7 +468,7 @@ export function AppLayout({
           </nav>
 
           <div className="px-3 pb-3 space-y-1 flex-shrink-0 border-t border-hh-border pt-3">
-            {bottomNavItems.map((item) => {
+            {visibleBottomNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
               return (
@@ -485,7 +497,7 @@ export function AppLayout({
               <div className="mt-1 pt-3 border-t border-hh-border">
                 <button
                   onClick={() => {
-                    navigate?.("admin-dashboard");
+                    navigate?.(onboardingMode ? "admin-videos" : "admin-dashboard");
                     setMobileMenuOpen(false);
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"

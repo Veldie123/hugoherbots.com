@@ -65,9 +65,10 @@ import { toast } from "sonner";
 
 interface AdminLiveSessionsProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
-export function AdminLiveSessions({ navigate }: AdminLiveSessionsProps) {
+export function AdminLiveSessions({ navigate, isSuperAdmin }: AdminLiveSessionsProps) {
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [editingSession, setEditingSession] = useState<LiveSession | null>(null);
   const [view, setView] = useState<"list" | "upcoming">("list");
@@ -539,7 +540,7 @@ ${platformUrl}`;
 
   if (loading) {
     return (
-      <AdminLayout currentPage="admin-live" navigate={navigate}>
+      <AdminLayout currentPage="admin-live" navigate={navigate} isSuperAdmin={isSuperAdmin}>
         <div className="p-6 flex items-center justify-center min-h-[400px]">
           <Loader2 className="w-8 h-8 animate-spin text-hh-muted" />
         </div>
@@ -549,7 +550,7 @@ ${platformUrl}`;
 
   if (activeCall) {
     return (
-      <AdminLayout currentPage="admin-live" navigate={navigate}>
+      <AdminLayout currentPage="admin-live" navigate={navigate} isSuperAdmin={isSuperAdmin}>
         <div className="p-6 space-y-4">
           <Button
             variant="outline"
@@ -824,7 +825,7 @@ ${platformUrl}`;
   }
 
   return (
-    <AdminLayout currentPage="admin-live" navigate={navigate}>
+    <AdminLayout currentPage="admin-live" navigate={navigate} isSuperAdmin={isSuperAdmin}>
       <div className="p-6 space-y-6">
         <div className="flex items-start justify-between">
           <div>

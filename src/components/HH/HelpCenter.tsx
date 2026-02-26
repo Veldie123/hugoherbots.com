@@ -6,6 +6,7 @@ import { Search, BookOpen, MessageCircle, Video, FileText, ExternalLink, HelpCir
 interface HelpCenterProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 export function HelpCenter({ navigate, isAdmin }: HelpCenterProps) {

@@ -67,6 +67,7 @@ interface Phase {
 interface RolePlayChatProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 // Scenario flow data gebaseerd op Hugo's 4-fasen methodologie

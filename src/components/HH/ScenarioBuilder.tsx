@@ -43,6 +43,7 @@ interface Node {
 interface ScenarioBuilderProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 export function ScenarioBuilder({ navigate, isAdmin = false }: ScenarioBuilderProps) {

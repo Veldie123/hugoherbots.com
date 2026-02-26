@@ -55,9 +55,10 @@ interface AdminLayoutProps {
   children: React.ReactNode;
   currentPage: string;
   navigate?: (page: string, data?: Record<string, any>) => void;
+  isSuperAdmin?: boolean;
 }
 
-export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProps) {
+export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isSuperAdminProp }: AdminLayoutProps) {
   const { theme, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -85,9 +86,9 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
           const initials = firstName && lastName
             ? `${firstName[0]}${lastName[0]}`.toUpperCase()
             : fullName.substring(0, 2).toUpperCase();
-          const isSuperAdmin = email === 'stephane@hugoherbots.com';
+          const detectedSuperAdmin = email === 'stephane@hugoherbots.com';
           setAdminUserName(fullName);
-          setAdminUserRole(isSuperAdmin ? 'Super Admin' : 'Admin');
+          setAdminUserRole(detectedSuperAdmin ? 'Super Admin' : 'Admin');
           setAdminUserInitials(initials);
         }
       } catch {}
@@ -161,14 +162,15 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
     return () => window.removeEventListener('sidebar-collapse-request', handleCollapseRequest as EventListener);
   }, []);
 
-  const mainNavItems = [
+  const allMainNavItems = [
     { id: "admin-dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "admin-techniques", label: "E.P.I.C technieken", icon: Target },
+    { id: "admin-techniques", label: "E.P.I.C technieken", icon: Target, superAdminOnly: true },
     { id: "admin-videos", label: "Video's", icon: Video },
     { id: "admin-live", label: "Webinars", icon: Radio },
-    { id: "admin-uploads", label: "Gespreksanalyse", icon: Upload, historyType: "analysis" as const, overviewPage: "admin-uploads" },
-    { id: "admin-sessions", label: "Talk to Hugo", icon: Sparkles, hasSuperscript: true, historyType: "chat" as const, overviewPage: "admin-sessions" },
+    { id: "admin-uploads", label: "Gespreksanalyse", icon: Upload, historyType: "analysis" as const, overviewPage: "admin-uploads", superAdminOnly: true },
+    { id: "admin-sessions", label: "Talk to Hugo", icon: Sparkles, hasSuperscript: true, historyType: "chat" as const, overviewPage: "admin-sessions", superAdminOnly: true },
   ];
+  const mainNavItems = allMainNavItems.filter(item => isSuperAdminProp || !item.superAdminOnly);
 
   const getHistoryForItem = (historyType?: "chat" | "analysis"): HistoryItem[] => {
     if (historyType === "chat") return recentChatSessions;
@@ -176,13 +178,14 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
     return [];
   };
 
-  const adminManagementItems = [
-    { id: "admin-users", label: "Gebruikers", icon: Users },
-    { id: "admin-analytics", label: "Analytics", icon: BarChart3 },
+  const allAdminManagementItems = [
+    { id: "admin-users", label: "Gebruikers", icon: Users, superAdminOnly: true },
+    { id: "admin-analytics", label: "Analytics", icon: BarChart3, superAdminOnly: true },
     { id: "admin-help", label: "Help Center", icon: HelpCircle },
-    { id: "admin-resources", label: "Resources", icon: Library },
-    { id: "admin-settings", label: "Instellingen", icon: Settings },
+    { id: "admin-resources", label: "Resources", icon: Library, superAdminOnly: true },
+    { id: "admin-settings", label: "Instellingen", icon: Settings, superAdminOnly: true },
   ];
+  const adminManagementItems = allAdminManagementItems.filter(item => isSuperAdminProp || !item.superAdminOnly);
 
   const handleNavigate = (page: string) => {
     setMobileMenuOpen(false);
@@ -406,7 +409,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
                 <Button
                   variant="outline"
                   className="w-full gap-2 justify-start h-12"
-                  onClick={() => handleNavigate("analysis")}
+                  onClick={() => handleNavigate(isSuperAdminProp ? "analysis" : "dashboard")}
                 >
                   <Eye className="w-5 h-5" />
                   <span className="text-[16px] font-normal">User View</span>
@@ -536,7 +539,7 @@ export function AdminLayout({ children, currentPage, navigate }: AdminLayoutProp
 
         <div className="p-3 border-t border-hh-border flex-shrink-0">
           <button
-            onClick={() => navigate?.("analysis")}
+            onClick={() => navigate?.(isSuperAdminProp ? "analysis" : "dashboard")}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
           >
             <Eye className="w-4 h-4" />

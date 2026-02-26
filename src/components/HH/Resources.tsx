@@ -39,6 +39,7 @@ import {
 interface ResourcesProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 interface Resource {

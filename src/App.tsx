@@ -109,8 +109,10 @@ export default function App() {
   })();
   const [navigationData, setNavigationData] = useState<Record<string, any> | undefined>(devNavData);
   const [isCheckingAuth, setIsCheckingAuth] = useState(!devPage); // Skip auth check if dev preview
+  const isHugoDevPath = typeof window !== 'undefined' && window.location.pathname.startsWith('/_hugo/');
   const [isAdmin, setIsAdmin] = useState(!!devPage); // Track if current user is admin (dev mode = admin)
-  const [onboardingMode, setOnboardingMode] = useState(false); // Simplified UI for Hugo's onboarding
+  const [isSuperAdmin, setIsSuperAdmin] = useState(!!devPage && !isHugoDevPath); // Stéphane only — full access
+  const [onboardingMode, setOnboardingMode] = useState(isHugoDevPath); // Simplified UI for Hugo's onboarding
 
   console.log('📍 App.tsx rendered, currentPage:', currentPage);
 
@@ -130,16 +132,17 @@ export default function App() {
         
         if (session?.user) {
           const email = (session.user.email || '').toLowerCase();
-          const isSuperAdmin = email === 'stephane@hugoherbots.com';
+          const superAdmin = email === 'stephane@hugoherbots.com';
           const isHugoOnboarding = email === 'hugo@hugoherbots.com';
           const isHugobotsAdmin = email.endsWith('@hugoherbots.com') && !isHugoOnboarding;
-          const userIsAdmin = isSuperAdmin || isHugobotsAdmin;
+          const userIsAdmin = superAdmin || isHugobotsAdmin || isHugoOnboarding;
           
           setIsAdmin(userIsAdmin);
+          setIsSuperAdmin(superAdmin);
           setOnboardingMode(isHugoOnboarding);
           
           if (isHugoOnboarding) {
-            console.log('👋 Hugo onboarding mode activated - simplified UI');
+            console.log('👋 Hugo onboarding mode activated - content admin, user view');
             localStorage.setItem('hugo_onboarding_mode', 'true');
             setCurrentPage("dashboard");
           } else {
@@ -174,6 +177,7 @@ export default function App() {
     console.log('🧭 Navigate called with:', page, data);
     if (page === "landing" || page === "logout") {
       setIsAdmin(false);
+      setIsSuperAdmin(false);
       setOnboardingMode(false);
       setNavigationData(undefined);
       setCurrentPage("landing");
@@ -217,19 +221,24 @@ export default function App() {
                 const { session } = await auth.getSession();
                 const email = (session?.user?.email || '').toLowerCase();
                 const isHugo = email === 'hugo@hugoherbots.com';
+                const superAdmin = email === 'stephane@hugoherbots.com';
                 const isHugobotsAdmin = email.endsWith('@hugoherbots.com') && !isHugo;
                 
                 if (isHugo) {
-                  setIsAdmin(false);
+                  setIsAdmin(true);
+                  setIsSuperAdmin(false);
                   setOnboardingMode(true);
                   localStorage.setItem('hugo_onboarding_mode', 'true');
                   navigate("dashboard");
                 } else if (isHugobotsAdmin) {
                   setIsAdmin(true);
+                  setIsSuperAdmin(superAdmin);
                   setOnboardingMode(false);
                   localStorage.removeItem('hugo_onboarding_mode');
                   navigate("admin-dashboard");
                 } else {
+                  setIsAdmin(false);
+                  setIsSuperAdmin(false);
                   navigate("dashboard");
                 }
               }}
@@ -301,24 +310,24 @@ export default function App() {
           {currentPage === "preview" && <AppPreview navigate={navigate} />}
 
           {/* App pages - gebruik AppLayout's interne navigatie */}
-          {currentPage === "dashboard" && <Dashboard hasData={true} navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "technieken" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "roleplay" && <RolePlay navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "roleplays" && <RolePlay navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "roleplaychat" && <RolePlayChat navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "roleplays-chat" && <RolePlayChat navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "overviewprogress" && <OverviewProgress navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "builder" && <ScenarioBuilder navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "videos" && <VideoLibrary navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "live" && <LiveCoaching navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "team" && <TeamSessions navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "analytics" && <Analytics navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "settings" && <Settings navigate={navigate} initialSection={settingsSection} isAdmin={isAdmin} />}
-          {currentPage === "help" && <HelpCenter navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "resources" && <Resources navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "admin-dashboard" && <AdminDashboard navigate={navigate} />}
-          {currentPage === "admin-videos" && <AdminVideoManagement navigate={navigate} />}
-          {currentPage === "admin-live" && <AdminLiveSessions navigate={navigate} />}
+          {currentPage === "dashboard" && <Dashboard hasData={true} navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "technieken" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "roleplay" && <RolePlay navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "roleplays" && <RolePlay navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "roleplaychat" && <RolePlayChat navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "roleplays-chat" && <RolePlayChat navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "overviewprogress" && <OverviewProgress navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "builder" && <ScenarioBuilder navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "videos" && <VideoLibrary navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "live" && <LiveCoaching navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "team" && <TeamSessions navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "analytics" && <Analytics navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "settings" && <Settings navigate={navigate} initialSection={settingsSection} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "help" && <HelpCenter navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "resources" && <Resources navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "admin-dashboard" && <AdminDashboard navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-videos" && <AdminVideoManagement navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-live" && <AdminLiveSessions navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-progress" && <AdminProgress navigate={navigate} />}
           {currentPage === "admin-users" && <AdminUserManagement navigate={navigate} />}
           {currentPage === "admin-techniques" && <AdminTechniqueManagement navigate={navigate} />}

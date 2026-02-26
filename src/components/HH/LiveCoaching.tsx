@@ -79,6 +79,7 @@ interface LiveCoachingProps {
   navigate?: (page: string) => void;
   isPreview?: boolean;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 interface LiveCoachingHeroProps {
@@ -293,6 +294,7 @@ export function LiveCoaching({
   navigate,
   isPreview = false,
   isAdmin,
+  onboardingMode,
 }: LiveCoachingProps) {
   const [chatMessage, setChatMessage] = useState("");
   const [activeTab, setActiveTab] = useState<"chat" | "polls">("chat");
@@ -786,7 +788,7 @@ export function LiveCoaching({
 
   if (loading) {
     return (
-      <AppLayout currentPage="live" navigate={navigate} isAdmin={isAdmin}>
+      <AppLayout currentPage="live" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
         <div className="p-6 flex items-center justify-center min-h-[400px]">
           <Loader2 className="w-8 h-8 animate-spin text-hh-muted" />
         </div>

@@ -19,6 +19,7 @@ import { useUser } from "@/contexts/UserContext";
 interface TeamSessionsProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 export function TeamSessions({ navigate, isAdmin }: TeamSessionsProps) {

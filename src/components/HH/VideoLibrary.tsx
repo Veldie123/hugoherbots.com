@@ -84,6 +84,7 @@ interface LibraryVideo {
 interface VideoLibraryProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 interface ActiveVideo {
@@ -110,7 +111,7 @@ const markVideoCompleted = (videoId: string) => {
   localStorage.setItem(COMPLETED_VIDEOS_KEY, JSON.stringify([...completed]));
 };
 
-export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
+export function VideoLibrary({ navigate, isAdmin, onboardingMode }: VideoLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterPhase, setFilterPhase] = useState<string>("all");
   const [filterTechniek, setFilterTechniek] = useState<string | null>(null);
@@ -529,7 +530,7 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
     const activeVideoData = videos.find(v => v.id === activeVideo.id);
     if (activeVideoData) {
       return (
-        <AppLayout currentPage="video-watch" navigate={navigate} isAdmin={isAdmin}>
+        <AppLayout currentPage="video-watch" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
           <VideoWatchPage
             video={{
               id: activeVideoData.id,
@@ -598,7 +599,7 @@ export function VideoLibrary({ navigate, isAdmin }: VideoLibraryProps) {
   }
 
   return (
-    <AppLayout currentPage="videos" navigate={navigate} isAdmin={isAdmin}>
+    <AppLayout currentPage="videos" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
       <div className="p-3 sm:p-4 lg:p-6 space-y-6">
         {/* Header with compact KPI cards on the right */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">

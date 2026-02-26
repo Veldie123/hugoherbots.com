@@ -45,6 +45,7 @@ import { videoApi } from "../../services/videoApi";
 interface TechniqueLibraryProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 export function TechniqueLibrary({ navigate, isAdmin }: TechniqueLibraryProps) {

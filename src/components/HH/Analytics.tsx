@@ -36,6 +36,7 @@ import { supabase } from "@/utils/supabase/client";
 interface AnalyticsProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 interface SkillData {

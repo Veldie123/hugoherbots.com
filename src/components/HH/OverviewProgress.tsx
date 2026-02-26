@@ -62,6 +62,7 @@ interface TechniqueDetail {
 interface OverviewProgressProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgressProps) {

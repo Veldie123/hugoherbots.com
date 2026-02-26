@@ -50,6 +50,7 @@ interface SettingsProps {
   navigate?: (page: string) => void;
   initialSection?: "profile" | "notifications" | "subscription" | "team" | "danger";
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 export function Settings({ navigate, initialSection = "profile", isAdmin }: SettingsProps) {

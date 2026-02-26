@@ -139,6 +139,7 @@ import {
 
 interface AdminVideoManagementProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
 const matchesSearch = (video: LibraryVideo, query: string): boolean => {
@@ -154,19 +155,11 @@ const matchesSearch = (video: LibraryVideo, query: string): boolean => {
   return false;
 };
 
-export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
+export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVideoManagementProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterFase, setFilterFase] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [activeKpiFilter, setActiveKpiFilter] = useState<string | null>(null);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      const email = data?.session?.user?.email?.toLowerCase();
-      setIsSuperAdmin(email === 'stephane@hugoherbots.com');
-    });
-  }, []);
   
   // Helper function to get fase from technique number (e.g., "4.2.4" -> "4", "2.1" -> "2")
   const getFaseFromTechniqueId = (techId: string | null): string => {
@@ -1563,7 +1556,7 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
   };
 
   return (
-    <AdminLayout currentPage="admin-videos" navigate={navigate}>
+    <AdminLayout currentPage="admin-videos" navigate={navigate} isSuperAdmin={isSuperAdmin}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">

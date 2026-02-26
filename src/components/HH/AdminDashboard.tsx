@@ -30,9 +30,10 @@ import { getTechniekByNummer } from "../../data/technieken-service";
 
 interface AdminDashboardProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
-export function AdminDashboard({ navigate }: AdminDashboardProps) {
+export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) {
   const kpiData = [
     {
       label: "Actieve Users",
@@ -216,7 +217,7 @@ export function AdminDashboard({ navigate }: AdminDashboardProps) {
   ];
 
   return (
-    <AdminLayout currentPage="admin-dashboard" navigate={navigate}>
+    <AdminLayout currentPage="admin-dashboard" navigate={navigate} isSuperAdmin={isSuperAdmin}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">
@@ -234,38 +235,63 @@ export function AdminDashboard({ navigate }: AdminDashboardProps) {
           </Button>
         </div>
 
-        {/* KPI Tiles - 2x2 grid on mobile, 4 columns on desktop */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {kpiData.map((kpi) => {
-            const Icon = kpi.icon;
-            return (
-              <Card key={kpi.label} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-                <div className="flex items-start justify-between mb-2 sm:mb-3">
-                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center`} style={{ backgroundColor: kpi.bgColor }}>
-                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5`} style={{ color: kpi.color }} />
+        {/* KPI Tiles */}
+        {isSuperAdmin ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {kpiData.map((kpi) => {
+              const Icon = kpi.icon;
+              return (
+                <Card key={kpi.label} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+                  <div className="flex items-start justify-between mb-2 sm:mb-3">
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center`} style={{ backgroundColor: kpi.bgColor }}>
+                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5`} style={{ color: kpi.color }} />
+                    </div>
+                    <Badge
+                      variant="outline"
+                      style={kpi.trend === "up" ? { backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' } : undefined}
+                      className={`text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 ${
+                        kpi.trend !== "up"
+                          ? "bg-hh-error/10 text-hh-error border-hh-error/20"
+                          : ""
+                      }`}
+                    >
+                      {kpi.change}
+                    </Badge>
                   </div>
-                  <Badge
-                    variant="outline"
-                    style={kpi.trend === "up" ? { backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' } : undefined}
-                    className={`text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 ${
-                      kpi.trend !== "up"
-                        ? "bg-hh-error/10 text-hh-error border-hh-error/20"
-                        : ""
-                    }`}
-                  >
-                    {kpi.change}
-                  </Badge>
-                </div>
-                <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
-                  {kpi.label}
-                </p>
-                <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-ink">
-                  {kpi.value}
-                </p>
-              </Card>
-            );
-          })}
-        </div>
+                  <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
+                    {kpi.label}
+                  </p>
+                  <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-ink">
+                    {kpi.value}
+                  </p>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {[
+              { label: "Actieve Video's", icon: Video, color: "#9333ea", bgColor: "rgba(147, 51, 234, 0.1)", note: "Beheer via Video's" },
+              { label: "Live Webinars", icon: Radio, color: "#2563eb", bgColor: "rgba(37, 99, 235, 0.1)", note: "Beheer via Webinars" },
+              { label: "Platform Users", icon: Users, color: "#059669", bgColor: "rgba(5, 150, 105, 0.1)", note: "Ingeschreven gebruikers" },
+            ].map((kpi) => {
+              const Icon = kpi.icon;
+              return (
+                <Card key={kpi.label} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+                  <div className="flex items-start justify-between mb-2 sm:mb-3">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: kpi.bgColor }}>
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: kpi.color }} />
+                    </div>
+                  </div>
+                  <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
+                    {kpi.label}
+                  </p>
+                  <p className="text-[13px] text-hh-muted italic">{kpi.note}</p>
+                </Card>
+              );
+            })}
+          </div>
+        )}
 
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
