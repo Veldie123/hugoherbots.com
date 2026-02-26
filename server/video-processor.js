@@ -1948,7 +1948,7 @@ const server = http.createServer((req, res) => {
             
             // Queue webinar recording for transcription pipeline
             try {
-              const { error: queueError } = await supabase
+              const { error: queueError } = await supabaseAdmin
                 .from('video_ingest_jobs')
                 .insert({
                   source_type: 'webinar_recording',
@@ -1956,7 +1956,7 @@ const server = http.createServer((req, res) => {
                   title: session.title || `Webinar Recording ${sessionId}`,
                   status: 'queued',
                   skip_greenscreen: true,
-                  skip_mux_upload: true, // Already has playback URL from recording service
+                  skip_mux_upload: false, // Trigger Mux upload for streaming
                   metadata: {
                     session_id: sessionId,
                     session_title: session.title,
@@ -3940,6 +3940,373 @@ Format: ["id1", "id2", "id3", ...]`;
     });
     return;
   }
+
+  // Webinar Recording Processor Endpoint
+  if (pathname === '/api/webinar-recordings/process' && req.method === 'POST') {
+    (async () => {
+      try {
+        if (!supabaseAdmin) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: 'Database not configured' }));
+          return;
+        }
+
+        // Fetch pending webinar ingest jobs
+        const { data: jobs, error: fetchError } = await supabaseAdmin
+          .from('video_ingest_jobs')
+          .select('*')
+          .eq('source_type', 'webinar_recording')
+          .eq('status', 'queued');
+
+        if (fetchError) throw fetchError;
+
+        console.log(`[WebinarProcessor] Found ${jobs?.length || 0} pending webinar jobs`);
+        const results = [];
+
+        for (const job of jobs || []) {
+          try {
+            console.log(`[WebinarProcessor] Processing job ${job.id}: ${job.title}`);
+            
+            // 1. Update status to processing
+            await supabaseAdmin.from('video_ingest_jobs').update({ status: 'processing' }).eq('id', job.id);
+
+            // 2. Mux upload via URL
+            const MUX_TOKEN_ID = process.env.MUX_TOKEN_ID;
+            const MUX_TOKEN_SECRET = process.env.MUX_TOKEN_SECRET;
+            let muxAssetId = null;
+            let muxPlaybackId = null;
+
+            if (MUX_TOKEN_ID && MUX_TOKEN_SECRET) {
+              const auth = Buffer.from(`${MUX_TOKEN_ID}:${MUX_TOKEN_SECRET}`).toString('base64');
+              const muxResponse = await fetch('https://api.mux.com/video/v1/assets', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Basic ${auth}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  input: [{ url: job.source_url }],
+                  playback_policy: ['public']
+                })
+              });
+
+              if (muxResponse.ok) {
+                const muxData = await muxResponse.json();
+                muxAssetId = muxData.data.id;
+                muxPlaybackId = muxData.data.playback_ids?.[0]?.id;
+                console.log(`[WebinarProcessor] Mux asset created: ${muxAssetId}`);
+              } else {
+                console.error(`[WebinarProcessor] Mux upload failed for job ${job.id}:`, await muxResponse.text());
+              }
+            }
+
+            // 3. Transcription via Whisper (OpenAI)
+            // As noted, Whisper requires a file. Since we have a URL, we'll use a temporary file.
+            const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+            let transcript = null;
+            if (OPENAI_API_KEY) {
+              console.log(`[WebinarProcessor] Requesting transcription for ${job.source_url}`);
+              try {
+                // Download the file to a temporary location
+                const tempFile = path.join('/tmp', `webinar_${job.id}.mp4`);
+                const response = await fetch(job.source_url);
+                const buffer = await response.arrayBuffer();
+                fs.writeFileSync(tempFile, Buffer.from(buffer));
+
+                // Send to Whisper
+                const formData = new FormData();
+                formData.append('file', new Blob([fs.readFileSync(tempFile)]), `webinar_${job.id}.mp4`);
+                formData.append('model', 'whisper-1');
+
+                const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${OPENAI_API_KEY}`
+                  },
+                  body: formData
+                });
+
+                if (whisperResponse.ok) {
+                  const whisperData = await whisperResponse.json();
+                  transcript = whisperData.text;
+                  console.log(`[WebinarProcessor] Transcription complete (${transcript.length} chars)`);
+                } else {
+                  console.error(`[WebinarProcessor] Whisper failed:`, await whisperResponse.text());
+                }
+
+                // Cleanup
+                fs.unlinkSync(tempFile);
+              } catch (transErr) {
+                console.error(`[WebinarProcessor] Transcription error:`, transErr);
+              }
+            }
+
+            // 4. Samenvatting
+            let summary = null;
+            if (transcript) {
+              summary = await generateAiSummary(job.id, job.title, transcript);
+            }
+
+            // 5. Technique detection
+            let detectedTechniques = [];
+            if (transcript) {
+              detectedTechniques = await detectMultipleTechniques(job.id, transcript);
+              await saveVideoTechnieken(job.id, detectedTechniques);
+            }
+
+            // 6. RAG embedding
+            let ragDocumentId = null;
+            if (transcript && OPENAI_API_KEY) {
+              console.log(`[WebinarProcessor] Generating RAG embedding...`);
+              
+              // Correct chunking for long transcripts (max 1000 tokens ≈ 4000 chars)
+              const chunkSize = 4000;
+              const chunks = [];
+              for (let i = 0; i < transcript.length; i += chunkSize) {
+                chunks.push(transcript.slice(i, i + chunkSize));
+              }
+
+              for (let i = 0; i < chunks.length; i++) {
+                const chunk = chunks[i];
+                const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    model: 'text-embedding-3-small',
+                    input: chunk
+                  })
+                });
+
+                if (embeddingResponse.ok) {
+                  const embeddingData = await embeddingResponse.json();
+                  const embedding = embeddingData.data[0].embedding;
+
+                  const { data: ragDoc, error: ragError } = await supabaseAdmin
+                    .from('rag_documents')
+                    .insert({
+                      content: chunk,
+                      embedding: embedding,
+                      title: chunks.length > 1 ? `${job.title} (Deel ${i + 1})` : job.title,
+                      source_id: `webinar_${job.id}_${i}`,
+                      doc_type: 'webinar',
+                      metadata: {
+                        session_id: job.metadata?.session_id,
+                        session_title: job.metadata?.session_title,
+                        session_date: job.metadata?.recorded_at || new Date().toISOString(),
+                        source_type: 'webinar',
+                        techniek_ids: detectedTechniques.map(t => t.techniek_id),
+                        chunk_index: i,
+                        total_chunks: chunks.length
+                      }
+                    })
+                    .select()
+                    .single();
+
+                  if (!ragError && i === 0) {
+                    ragDocumentId = ragDoc.id;
+                    console.log(`[WebinarProcessor] RAG document created: ${ragDocumentId}`);
+                  } else if (ragError) {
+                    console.error(`[WebinarProcessor] RAG insertion failed for chunk ${i}:`, ragError);
+                  }
+                }
+              }
+            }
+
+            // 7. Update live_sessions
+            if (job.metadata?.session_id) {
+              await supabaseAdmin
+                .from('live_sessions')
+                .update({
+                  mux_playback_id: muxPlaybackId,
+                  transcript: transcript,
+                  ai_summary: summary,
+                  processed_at: new Date().toISOString()
+                })
+                .eq('id', job.metadata.session_id);
+            }
+
+            // 8. Update video_ingest_jobs
+            await supabaseAdmin.from('video_ingest_jobs').update({ 
+              status: 'completed',
+              mux_asset_id: muxAssetId,
+              mux_playback_id: muxPlaybackId,
+              transcript: transcript,
+              ai_summary: summary,
+              rag_document_id: ragDocumentId,
+              processed_at: new Date().toISOString()
+            }).eq('id', job.id);
+
+            results.push({ id: job.id, success: true });
+          } catch (jobErr) {
+            console.error(`[WebinarProcessor] Job ${job.id} failed:`, jobErr);
+            await supabaseAdmin.from('video_ingest_jobs').update({ 
+              status: 'failed', 
+              error_message: jobErr.message 
+            }).eq('id', job.id);
+            results.push({ id: job.id, success: false, error: jobErr.message });
+          }
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, processed: results.length, results }));
+      } catch (err) {
+        console.error('[WebinarProcessor] General error:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: err.message }));
+      }
+    })();
+    return;
+  }
+
+  // Manual Trigger Endpoint for Admin
+  if (pathname === '/api/webinar-recordings/trigger-process' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const { sessionId, recordingUrl, title } = data;
+
+        if (!sessionId || !recordingUrl) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: 'sessionId and recordingUrl are required' }));
+          return;
+        }
+
+        if (!supabaseAdmin) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: 'Database not configured' }));
+          return;
+        }
+
+        // Queue the job
+        const { error: queueError } = await supabaseAdmin
+          .from('video_ingest_jobs')
+          .insert({
+            source_type: 'webinar_recording',
+            source_url: recordingUrl,
+            title: title || `Webinar Recording ${sessionId}`,
+            status: 'queued',
+            skip_greenscreen: true,
+            skip_mux_upload: false,
+            metadata: {
+              session_id: sessionId,
+              session_title: title,
+              recorded_at: new Date().toISOString()
+            }
+          });
+
+        if (queueError) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: queueError.message }));
+          return;
+        }
+
+        console.log(`[WebinarProcessor] Manually queued webinar for session ${sessionId}`);
+        
+        // Optionally trigger the processor immediately
+        // (could be done via a separate call or here)
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Webinar processing job queued' }));
+      } catch (err) {
+        console.error('[WebinarProcessor] Trigger error:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Polling mechanism: Check for finished recordings
+  if (pathname === '/api/webinar-recordings/check-pending' && req.method === 'GET') {
+    (async () => {
+      try {
+        if (!supabaseAdmin) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: 'Database not configured' }));
+          return;
+        }
+
+        // Find sessions that ended but don't have a video_url yet
+        const { data: sessions, error } = await supabaseAdmin
+          .from('live_sessions')
+          .select('id, daily_room_name, title')
+          .eq('status', 'ended')
+          .is('video_url', null)
+          .not('daily_room_name', 'is', null);
+
+        if (error) throw error;
+
+        console.log(`[WebinarPolling] Checking ${sessions?.length || 0} sessions for recordings`);
+        const dailyApiKey = process.env.DAILY_API_KEY;
+        const results = [];
+
+        if (dailyApiKey) {
+          for (const session of sessions || []) {
+            try {
+              const recordingsResponse = await fetch(
+                `https://api.daily.co/v1/recordings?room_name=${session.daily_room_name}`,
+                { headers: { 'Authorization': `Bearer ${dailyApiKey}` } }
+              );
+
+              if (recordingsResponse.ok) {
+                const recordingsData = await recordingsResponse.json();
+                const latest = (recordingsData.data || []).sort((a, b) => 
+                  new Date(b.start_ts).getTime() - new Date(a.start_ts).getTime()
+                )[0];
+
+                if (latest && (latest.status === 'finished' || latest.status === 'saved')) {
+                  const accessResp = await fetch(
+                    `https://api.daily.co/v1/recordings/${latest.id}/access-link`,
+                    { headers: { 'Authorization': `Bearer ${dailyApiKey}` } }
+                  );
+
+                  if (accessResp.ok) {
+                    const { download_link } = await accessResp.json();
+                    
+                    // Update session
+                    await supabaseAdmin.from('live_sessions').update({ video_url: download_link }).eq('id', session.id);
+
+                    // Queue ingest job
+                    await supabaseAdmin.from('video_ingest_jobs').insert({
+                      source_type: 'webinar_recording',
+                      source_url: download_link,
+                      title: session.title || `Webinar Recording ${session.id}`,
+                      status: 'queued',
+                      skip_greenscreen: true,
+                      skip_mux_upload: false,
+                      metadata: {
+                        session_id: session.id,
+                        session_title: session.title,
+                        recorded_at: new Date().toISOString()
+                      }
+                    });
+                    
+                    results.push({ id: session.id, found: true });
+                    console.log(`[WebinarPolling] Found recording for session ${session.id}`);
+                  }
+                }
+              }
+            } catch (sessErr) {
+              console.error(`[WebinarPolling] Error checking session ${session.id}:`, sessErr);
+            }
+          }
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, results }));
+      } catch (err) {
+        console.error('[WebinarPolling] Global error:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: err.message }));
+      }
+    })();
+    return;
+  }
   
   if (pathname === '/api/video-processor/batch/stop' && req.method === 'POST') {
     (async () => {
@@ -5617,4 +5984,75 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('[AutoHeal] Running periodic auto-heal check...');
     autoHealMissingAiFields();
   }, 30 * 60 * 1000);
+
+  // Periodic webinar recording polling (every 2 minutes)
+  const pollWebinarRecordings = async () => {
+    if (!supabaseAdmin) return;
+    try {
+      // 1. Find ended sessions without a processed recording, check Daily.co for available recordings
+      const { data: pendingSessions } = await supabaseAdmin
+        .from('live_sessions')
+        .select('id, daily_room_name, title')
+        .eq('status', 'ended')
+        .is('video_url', null)
+        .not('daily_room_name', 'is', null);
+
+      const dailyApiKey = process.env.DAILY_API_KEY;
+      if (dailyApiKey && pendingSessions?.length > 0) {
+        for (const session of pendingSessions) {
+          try {
+            const recordingsResp = await fetch(
+              `https://api.daily.co/v1/recordings?room_name=${session.daily_room_name}`,
+              { headers: { 'Authorization': `Bearer ${dailyApiKey}` } }
+            );
+            if (!recordingsResp.ok) continue;
+            const recordingsData = await recordingsResp.json();
+            const latest = (recordingsData.data || []).sort((a, b) =>
+              new Date(b.start_ts).getTime() - new Date(a.start_ts).getTime()
+            )[0];
+
+            if (latest && (latest.status === 'finished' || latest.status === 'saved')) {
+              const accessResp = await fetch(
+                `https://api.daily.co/v1/recordings/${latest.id}/access-link`,
+                { headers: { 'Authorization': `Bearer ${dailyApiKey}` } }
+              );
+              if (!accessResp.ok) continue;
+              const { download_link } = await accessResp.json();
+
+              await supabaseAdmin.from('live_sessions').update({ video_url: download_link }).eq('id', session.id);
+              const { error: qErr } = await supabaseAdmin.from('video_ingest_jobs').insert({
+                source_type: 'webinar_recording',
+                source_url: download_link,
+                title: session.title || `Webinar Recording ${session.id}`,
+                status: 'queued',
+                skip_greenscreen: true,
+                skip_mux_upload: false,
+                metadata: { session_id: session.id, session_title: session.title, recorded_at: new Date().toISOString() }
+              });
+              if (!qErr) console.log(`[WebinarPoll] Queued recording for session ${session.id}`);
+            }
+          } catch (e) { /* ignore per-session errors */ }
+        }
+      }
+
+      // 2. Process any queued webinar jobs
+      const { data: queuedJobs } = await supabaseAdmin
+        .from('video_ingest_jobs')
+        .select('id')
+        .eq('source_type', 'webinar_recording')
+        .eq('status', 'queued')
+        .limit(1);
+
+      if (queuedJobs?.length > 0) {
+        console.log(`[WebinarPoll] Found ${queuedJobs.length} queued jobs, triggering processor...`);
+        fetch(`http://localhost:3001/api/webinar-recordings/process`, { method: 'POST' }).catch(() => {});
+      }
+    } catch (e) {
+      console.error('[WebinarPoll] Error:', e.message);
+    }
+  };
+
+  setInterval(pollWebinarRecordings, 2 * 60 * 1000);
+  // Run once after 60s on startup
+  setTimeout(pollWebinarRecordings, 60 * 1000);
 });

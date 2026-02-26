@@ -137,11 +137,20 @@ export async function searchRag(
 
     // Filter by docType and technikId if provided
     let filteredData = data || [];
-    if (docType) {
+    
+    // Support webinar source_type filter
+    if (docType === 'webinar') {
+      filteredData = filteredData.filter((row: any) => 
+        row.doc_type === 'webinar' || (row.metadata && row.metadata.source_type === 'webinar')
+      );
+    } else if (docType) {
       filteredData = filteredData.filter((row: any) => row.doc_type === docType);
     }
+
     if (technikId) {
-      filteredData = filteredData.filter((row: any) => row.techniek_id === technikId);
+      filteredData = filteredData.filter((row: any) => 
+        row.techniek_id === technikId || (row.metadata && row.metadata.techniek_ids && row.metadata.techniek_ids.includes(technikId))
+      );
     }
 
     const documents: RagDocument[] = filteredData.map((row: any) => ({

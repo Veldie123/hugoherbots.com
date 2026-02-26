@@ -24,6 +24,14 @@ function mapRowToSession(row: any): LiveSession {
     thumbnailUrl: row.thumbnail_url,
     viewerCount: row.viewer_count,
     hostId: row.host_id,
+    recordingId: row.recording_id,
+    dailyRecordingId: row.daily_recording_id,
+    dailyRecordingUrl: row.daily_recording_url,
+    recordingReady: row.recording_ready,
+    muxPlaybackId: row.mux_playback_id,
+    muxAssetId: row.mux_asset_id,
+    transcript: row.transcript,
+    aiSummary: row.ai_summary,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -31,6 +39,19 @@ function mapRowToSession(row: any): LiveSession {
 
 export const liveCoachingApi = {
   sessions: {
+    triggerProcess: async (sessionId: string): Promise<{ success: boolean }> => {
+      const response = await fetch('/api/admin/sessions/process-recording', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId })
+      });
+      
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Proces triggeren mislukt');
+      }
+      return { success: true };
+    },
     list: async (status?: string): Promise<{ sessions: LiveSession[] }> => {
       let query = supabase
         .from('live_sessions')

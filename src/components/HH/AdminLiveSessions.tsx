@@ -80,6 +80,7 @@ export function AdminLiveSessions({ navigate }: AdminLiveSessionsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterFase, setFilterFase] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [processingId, setProcessingId] = useState<string | null>(null);
   
   const [activeCall, setActiveCall] = useState<{
     roomUrl: string;
@@ -444,6 +445,70 @@ ${platformUrl}`;
     const url = `${window.location.origin}/live/${session.id}`;
     navigator.clipboard.writeText(url);
     toast.success("Link gekopieerd");
+  };
+
+  const handleTriggerProcess = async (e: React.MouseEvent, sessionId: string) => {
+    e.stopPropagation();
+    try {
+      setProcessingId(sessionId);
+      await liveCoachingApi.sessions.triggerProcess(sessionId);
+      toast.success("Verwerking gestart");
+      loadSessions();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const getRecordingStatus = (session: LiveSession) => {
+    if (session.muxPlaybackId) {
+      return (
+        <Badge className="bg-green-500/10 text-green-600 border-green-500/20 gap-1">
+          <CheckCircle2 className="w-3 h-3" />
+          Verwerkt
+        </Badge>
+      );
+    }
+    
+    if (processingId === session.id || session.recordingReady === 0 && session.dailyRecordingId) {
+      return (
+        <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 gap-1 animate-pulse">
+          <Loader2 className="w-3 h-3 animate-spin" />
+          In verwerking...
+        </Badge>
+      );
+    }
+
+    if (session.dailyRecordingUrl || session.recordingReady === 1) {
+      return (
+        <div className="flex items-center gap-2">
+          <Badge className="bg-gray-500/10 text-gray-600 border-gray-500/20">
+            Niet verwerkt
+          </Badge>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="h-7 px-2 text-[11px] gap-1"
+            onClick={(e) => handleTriggerProcess(e, session.id)}
+            disabled={!!processingId}
+          >
+            <Play className="w-3 h-3" />
+            Verwerk
+          </Button>
+        </div>
+      );
+    }
+
+    if (session.status?.toLowerCase() === 'ended' || session.status?.toLowerCase() === 'completed') {
+      return (
+        <Badge variant="outline" className="text-hh-muted opacity-50">
+          Geen opname
+        </Badge>
+      );
+    }
+
+    return null;
   };
 
   const getStatusBadge = (status: string) => {
@@ -1199,6 +1264,9 @@ ${platformUrl}`;
                     <th className="text-left py-4 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Status ↕
                     </th>
+                    <th className="text-left py-4 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
+                      Opname status
+                    </th>
                     <th className="text-right py-4 px-4 text-[13px] leading-[18px] text-hh-muted font-medium">
                       Acties
                     </th>
@@ -1305,6 +1373,9 @@ ${platformUrl}`;
                             >
                               {isCompleted ? 'Afgelopen' : 'Gepland'}
                             </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            {getRecordingStatus(session)}
                           </td>
                           <td className="py-3 px-4 text-right">
                             <DropdownMenu>

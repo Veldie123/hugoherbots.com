@@ -37,6 +37,39 @@ import { setupScribeWebSocket } from "./elevenlabs-stt";
 import { setupStreamingResponseWebSocket } from "./streaming-response";
 import { canAccessTechnique, getUserProgress, getMissingContextSlots } from "./v2/technique-sequence";
 
+// Supabase REST API helper for reading live_sessions data
+// (admin frontend stores sessions directly in Supabase, not local PostgreSQL)
+async function getSupabaseSessions(filter?: string): Promise<any[]> {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return [];
+  const url = `${SUPABASE_URL}/rest/v1/live_sessions?${filter || ''}select=*&order=scheduled_date.desc`;
+  const r = await fetch(url, {
+    headers: {
+      'apikey': SUPABASE_SERVICE_ROLE_KEY,
+      'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+    }
+  });
+  if (!r.ok) return [];
+  return await r.json();
+}
+
+async function getSupabaseSession(sessionId: string): Promise<any | null> {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
+  const url = `${SUPABASE_URL}/rest/v1/live_sessions?id=eq.${sessionId}&select=*&limit=1`;
+  const r = await fetch(url, {
+    headers: {
+      'apikey': SUPABASE_SERVICE_ROLE_KEY,
+      'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+    }
+  });
+  if (!r.ok) return null;
+  const rows = await r.json();
+  return rows[0] || null;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/fases - get phase configuration data
   app.get("/api/fases", async (req, res) => {
@@ -2519,6 +2552,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // LIVE COACHING ROUTES
   // =====================
   
+  // POST /api/admin/sessions/process-recording - Trigger recording processing
+  app.post("/api/admin/sessions/process-recording", async (req, res) => {
+    try {
+      const { sessionId } = req.body;
+      // Try local PostgreSQL first, then fallback to Supabase
+      let session: any = await storage.getLiveSession(sessionId);
+      if (!session) {
+        // Session might be in Supabase (created by admin frontend directly)
+        const sbSession = await getSupabaseSession(sessionId);
+        if (!sbSession) return res.status(404).json({ error: "Session not found" });
+        // Normalize to camelCase
+        session = {
+          id: sbSession.id,
+          title: sbSession.title,
+          status: sbSession.status,
+          dailyRoomName: sbSession.daily_room_name,
+          dailyRecordingId: sbSession.daily_recording_id,
+          dailyRecordingUrl: sbSession.daily_recording_url,
+          recordingReady: sbSession.recording_ready,
+          muxPlaybackId: sbSession.mux_playback_id,
+          videoUrl: sbSession.video_url,
+        };
+      }
+      
+      if (!session.dailyRecordingUrl && session.status === 'ended' && session.dailyRoomName) {
+        // Try refreshing recording once if missing
+        const { dailyService } = await import("./daily-service");
+        const recording = await dailyService.getMostRecentRecording(session.dailyRoomName);
+        if (recording && recording.download_link) {
+          session.dailyRecordingUrl = recording.download_link;
+        }
+      }
+
+      if (!session.dailyRecordingUrl) {
+        return res.status(400).json({ error: "Geen opname URL gevonden voor deze sessie" });
+      }
+
+      const VIDEO_PROCESSOR_URL = process.env.VIDEO_PROCESSOR_URL || 'http://localhost:3001';
+      const VIDEO_PROCESSOR_SECRET = process.env.VIDEO_PROCESSOR_SECRET;
+      const fetch = (await import('node-fetch')).default as any;
+
+      const response = await fetch(`${VIDEO_PROCESSOR_URL}/api/webinar-recordings/trigger-process`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${VIDEO_PROCESSOR_SECRET}`
+        },
+        body: JSON.stringify({
+          sessionId: session.id,
+          recordingUrl: session.dailyRecordingUrl,
+          title: session.title
+        })
+      });
+
+      const result = await response.json();
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // GET /api/live-sessions - get all live sessions
   app.get("/api/live-sessions", async (req, res) => {
     try {
@@ -2540,6 +2634,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // GET /api/live-sessions/recordings - get all sessions with processed recordings
+  // IMPORTANT: must be before /:id to avoid "recordings" being matched as an id
+  app.get("/api/live-sessions/recordings", async (req, res) => {
+    try {
+      // Query Supabase directly since admin frontend stores sessions there
+      const rows = await getSupabaseSessions('mux_playback_id=not.is.null&');
+      // Map snake_case Supabase fields to camelCase for frontend
+      const recordings = rows.map((s: any) => ({
+        id: s.id,
+        title: s.title,
+        description: s.description,
+        status: s.status,
+        scheduledDate: s.scheduled_date,
+        durationMinutes: s.duration_minutes,
+        topic: s.topic,
+        phaseId: s.phase_id,
+        muxPlaybackId: s.mux_playback_id,
+        transcript: s.transcript,
+        aiSummary: s.ai_summary,
+        dailyRecordingId: s.daily_recording_id,
+        dailyRecordingUrl: s.daily_recording_url,
+        recordingReady: s.recording_ready,
+        processedAt: s.processed_at,
+        thumbnailUrl: s.thumbnail_url,
+        hostName: s.host_name,
+        createdAt: s.created_at,
+      }));
+      res.json(recordings);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // GET /api/live-sessions/:id - get a specific live session
   app.get("/api/live-sessions/:id", async (req, res) => {
     try {
@@ -2734,6 +2861,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Session not found" });
       }
       
+      let recordingUrl = null;
+      
       // Stop Daily.co recording and get recording info
       if (session.dailyRoomName) {
         try {
@@ -2745,9 +2874,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           const recording = await dailyService.getMostRecentRecording(session.dailyRoomName);
           if (recording) {
+            recordingUrl = recording.download_link || null;
             await storage.updateLiveSession(session.id, {
               dailyRecordingId: recording.id,
-              dailyRecordingUrl: recording.download_link || null,
+              dailyRecordingUrl: recordingUrl,
               recordingReady: recording.download_link ? 1 : 0, // 0 = still processing
             });
             console.log(`Recording saved: ${recording.id}, ready: ${recording.download_link ? 'yes' : 'processing'}`);
@@ -2763,6 +2893,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update status to ended
       const updated = await storage.updateLiveSession(session.id, { status: "ended" });
+      
+      // Queue processing if recording is ready
+      if (recordingUrl) {
+        try {
+          // Send request to video-processor to queue the job
+          // Note: we're using a direct DB call in video-processor for this usually,
+          // but here we can just use the supabase client if available or a fetch to video-processor
+          const fetch = (await import('node-fetch')).default;
+          const VIDEO_PROCESSOR_URL = process.env.VIDEO_PROCESSOR_URL || 'http://localhost:3001';
+          const VIDEO_PROCESSOR_SECRET = process.env.VIDEO_PROCESSOR_SECRET;
+
+          await fetch(`${VIDEO_PROCESSOR_URL}/api/webinar-recordings/trigger-process`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${VIDEO_PROCESSOR_SECRET}`
+            },
+            body: JSON.stringify({
+              sessionId: session.id,
+              recordingUrl: recordingUrl,
+              title: session.title
+            })
+          });
+          console.log(`Triggered webinar processing for session ${session.id}`);
+        } catch (queueError) {
+          console.error("Failed to trigger webinar processing:", queueError);
+        }
+      }
       
       res.json(updated);
     } catch (error: any) {

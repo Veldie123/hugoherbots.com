@@ -37,7 +37,13 @@ export function findRelevantVideos(techniqueIds: string[], limit: number = 3): V
     if (!video.techniek || !video.has_mux) continue;
 
     for (const techId of techniqueIds) {
-      if (video.techniek === techId || video.techniek?.startsWith(techId + '.')) {
+      if (!techId) continue;
+
+      if (
+        video.techniek === techId || 
+        video.techniek?.startsWith(techId + '.') ||
+        techId.startsWith(video.techniek + '.')
+      ) {
         results.push({
           videoId: video.id,
           title: video.title,
@@ -55,6 +61,35 @@ export function findRelevantVideos(techniqueIds: string[], limit: number = 3): V
   }
 
   results.sort((a, b) => (b.durationSeconds || 0) - (a.durationSeconds || 0));
+
+  // FALLBACK: If no videos found for techniques, try matching by phase
+  if (results.length === 0 && techniqueIds.length > 0) {
+    const phases = techniqueIds
+      .map(id => parseInt(id.split('.')[0]))
+      .filter(p => !isNaN(p));
+    
+    if (phases.length > 0) {
+      const targetPhase = phases[0];
+      for (const [, video] of Object.entries(videoMapping.videos) as any) {
+        if (video.status === 'deleted' || video.is_hidden) continue;
+        if (video.fase === targetPhase && video.has_mux) {
+          results.push({
+            videoId: video.id,
+            title: video.title,
+            fileName: video.file_name,
+            techniqueId: video.techniek || '',
+            techniqueName: video.technique_naam || '',
+            phase: video.fase || 0,
+            phaseName: video.fase_naam || '',
+            durationSeconds: video.duration_seconds,
+            muxPlaybackId: video.mux_playback_id,
+          });
+          if (results.length >= limit) break;
+        }
+      }
+    }
+  }
+
   return results.slice(0, limit);
 }
 

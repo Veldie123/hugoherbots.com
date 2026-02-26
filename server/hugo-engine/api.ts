@@ -1279,6 +1279,93 @@ app.get("/api/user/sessions", async (req, res) => {
   }
 });
 
+// POST /api/admin/sessions/process-recording - Trigger webinar recording processing pipeline
+// Used by AdminLiveSessions.tsx "Verwerk opname" button
+app.post("/api/admin/sessions/process-recording", async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+    if (!sessionId) return res.status(400).json({ error: "sessionId required" });
+
+    // Fetch session from Supabase
+    const { data: sessionRow, error: fetchErr } = await supabase
+      .from('live_sessions').select('*').eq('id', sessionId).single();
+
+    if (fetchErr || !sessionRow) {
+      return res.status(404).json({ error: "Session not found" });
+    }
+
+    const recordingUrl = sessionRow.daily_recording_url || sessionRow.video_url;
+    if (!recordingUrl) {
+      return res.status(400).json({ error: "Geen opname URL gevonden voor deze sessie" });
+    }
+
+    const VIDEO_PROCESSOR_URL = process.env.VIDEO_PROCESSOR_URL || 'http://localhost:3001';
+    const VIDEO_PROCESSOR_SECRET = process.env.VIDEO_PROCESSOR_SECRET;
+    const nodeFetch = (await import('node-fetch')).default as any;
+
+    const response = await nodeFetch(`${VIDEO_PROCESSOR_URL}/api/webinar-recordings/trigger-process`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${VIDEO_PROCESSOR_SECRET}`
+      },
+      body: JSON.stringify({
+        sessionId,
+        recordingUrl,
+        title: sessionRow.title
+      })
+    });
+
+    const result = await response.json();
+    res.json(result);
+  } catch (error: any) {
+    console.error("[API] process-recording error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/live-sessions/recordings - get all webinar sessions with processed Mux recordings
+// Used by LiveCoaching.tsx "Opgenomen Webinars" section
+app.get("/api/live-sessions/recordings", async (req, res) => {
+  try {
+    const { data: rows, error } = await supabase
+      .from('live_sessions')
+      .select('*')
+      .eq('status', 'ended')
+      .order('scheduled_date', { ascending: false });
+    
+    if (error) throw error;
+    
+    // Filter to only sessions with a processed mux_playback_id (column may not exist yet → undefined check)
+    const processed = (rows || []).filter((s: any) => s.mux_playback_id);
+    
+    const recordings = processed.map((s: any) => ({
+      id: s.id,
+      title: s.title,
+      description: s.description,
+      status: s.status,
+      scheduledDate: s.scheduled_date,
+      durationMinutes: s.duration_minutes,
+      topic: s.topic,
+      phaseId: s.phase_id,
+      muxPlaybackId: s.mux_playback_id,
+      transcript: s.transcript,
+      aiSummary: s.ai_summary,
+      dailyRecordingId: s.daily_recording_id,
+      dailyRecordingUrl: s.daily_recording_url,
+      recordingReady: s.recording_ready,
+      processedAt: s.processed_at,
+      thumbnailUrl: s.thumbnail_url,
+      hostName: s.host_name,
+      createdAt: s.created_at,
+    }));
+    res.json(recordings);
+  } catch (error: any) {
+    console.error("[API] Error fetching live session recordings:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ===========================================
 // USER CONTEXT ENDPOINTS - DATABASE BACKED
 // ===========================================

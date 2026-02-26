@@ -108,6 +108,13 @@ export const liveSessions = pgTable("live_sessions", {
   viewersCount: integer("viewer_count").default(0),
   hostId: uuid("host_id"),
   recordingId: varchar("recording_id"),
+  dailyRecordingId: varchar("daily_recording_id"),
+  dailyRecordingUrl: text("daily_recording_url"),
+  recordingReady: integer("recording_ready").default(0), // 0=none, 1=ready, 2=failed/no_rec
+  muxPlaybackId: varchar("mux_playback_id"),
+  muxAssetId: varchar("mux_asset_id"),
+  transcript: text("transcript"),
+  aiSummary: text("ai_summary"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

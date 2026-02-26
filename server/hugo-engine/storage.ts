@@ -79,6 +79,7 @@ export interface IStorage {
   getLiveSessions(): Promise<LiveSession[]>;
   getLiveSessionsByStatus(status: string): Promise<LiveSession[]>;
   updateLiveSession(id: string, updates: Partial<LiveSession>): Promise<LiveSession>;
+  getSessionsWithRecordings(): Promise<LiveSession[]>;
   
   // Live chat
   createChatMessage(message: InsertLiveChatMessage): Promise<LiveChatMessage>;
@@ -454,6 +455,12 @@ export class DatabaseStorage implements IStorage {
       .where(eq(liveSessions.id, id))
       .returning();
     return session;
+  }
+  
+  async getSessionsWithRecordings(): Promise<LiveSession[]> {
+    return await db.select().from(liveSessions)
+      .where(sql`${liveSessions.muxPlaybackId} IS NOT NULL`)
+      .orderBy(desc(liveSessions.scheduledDate));
   }
   
   // Live chat

@@ -1322,6 +1322,10 @@ Gebruik de methodiek-context om je coaching te gronden in het Hugo Herbots frame
         const prevTurn = turns.find(t => t.idx === turnIdx - 1) || turns.find(t => t.idx === turnIdx + 1);
         const signal = signals.find(s => s.turnIdx === turnIdx);
 
+        console.log(`[Analysis] Moment ${idx} techniques:`, m.recommendedTechniques);
+        const videos = findRelevantVideos(m.recommendedTechniques || [], 2);
+        console.log(`[Analysis] Moment ${idx} found ${videos.length} videos`);
+
         return {
           id: `m-${turn ? formatTimestamp(turn.startMs).replace(':', '') : idx}`,
           timestamp: turn ? formatTimestamp(turn.startMs) : '00:00',
@@ -1335,7 +1339,7 @@ Gebruik de methodiek-context om je coaching te gronden in het Hugo Herbots frame
           whyItMatters: m.whyItMatters || '',
           betterAlternative: m.betterAlternative || '',
           recommendedTechniques: m.recommendedTechniques || [],
-          videoRecommendations: findRelevantVideos(m.recommendedTechniques || [], 2),
+          videoRecommendations: videos,
           replay: {
             startTurnIndex: Math.max(0, turnIdx - 2),
             contextTurns: 4,

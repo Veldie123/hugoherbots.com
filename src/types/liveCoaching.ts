@@ -19,6 +19,13 @@ export interface LiveSession {
   recordingUrl?: string | null;
   isRecording?: boolean;
   recordingId?: string | null;
+  dailyRecordingId?: string | null;
+  dailyRecordingUrl?: string | null;
+  recordingReady?: number;
+  muxPlaybackId?: string | null;
+  muxAssetId?: string | null;
+  transcript?: string | null;
+  aiSummary?: string | null;
 }
 
 export interface LiveChatMessage {

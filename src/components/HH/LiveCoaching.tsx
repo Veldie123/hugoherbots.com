@@ -276,7 +276,7 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
                 onClick={onScrollToRecordings}
               >
                 <Play className="w-4 h-4" />
-                Bekijk Opnames
+                Opgenomen Webinars
               </Button>
             )}
           </div>
@@ -300,7 +300,9 @@ export function LiveCoaching({
   const [selectedRecording, setSelectedRecording] = useState<LiveSession | null>(null);
 
   const [sessions, setSessions] = useState<LiveSession[]>([]);
+  const [recordings, setRecordings] = useState<LiveSession[]>([]);
   const [loading, setLoading] = useState(true);
+  const [recordingsLoading, setRecordingsLoading] = useState(false);
   const [chatMessages, setChatMessages] = useState<LiveChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -423,16 +425,17 @@ export function LiveCoaching({
 
   useEffect(() => {
     loadSessions();
+    loadRecordings();
   }, []);
 
   useEffect(() => {
     setUserStats({
       sessionsAttended: reminderSessionIds.size,
-      recordingsWatched: 0,
+      recordingsWatched: recordings.length,
       questionsAsked: 0,
     });
     setUserStatsLoading(false);
-  }, [reminderSessionIds]);
+  }, [reminderSessionIds, recordings.length]);
 
   async function loadSessions() {
     try {
@@ -443,6 +446,29 @@ export function LiveCoaching({
       toast.error("Kon sessies niet laden");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadRecordings() {
+    try {
+      setRecordingsLoading(true);
+      const { supabase } = await import('@/utils/supabase/client');
+      const { data: { session: authSession } } = await supabase.auth.getSession();
+      
+      const response = await fetch('/api/live-sessions/recordings', {
+        headers: authSession?.access_token ? {
+          'Authorization': `Bearer ${authSession.access_token}`
+        } : {}
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setRecordings(data);
+      }
+    } catch (error) {
+      console.error("Failed to load recordings:", error);
+    } finally {
+      setRecordingsLoading(false);
     }
   }
 
@@ -534,7 +560,7 @@ export function LiveCoaching({
         const ids = new Set<string>();
         await Promise.all(upcomingSessions.map(async (session) => {
           try {
-            const response = await fetch(`/make-server-b9a572ea/api/live/sessions/${session.id}/reminder`, {
+            const response = await fetch(`/api/live-sessions/${session.id}/reminder`, {
               method: 'GET',
               headers,
             });
@@ -1560,7 +1586,7 @@ export function LiveCoaching({
           </div>
         )}
 
-        {pastSessions.length > 0 && (
+        {((pastSessions.length > 0) || (recordings.length > 0)) && (
           <div id="recordings-section" className="mt-12 pt-8 border-t border-hh-border">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -1569,17 +1595,86 @@ export function LiveCoaching({
                 </div>
                 <div>
                   <h2 className="text-[24px] leading-[32px] text-hh-text font-semibold">
-                    Opnames
+                    Opgenomen Webinars
                   </h2>
                   <p className="text-[13px] leading-[18px] text-hh-muted">
-                    {pastSessions.length} {pastSessions.length === 1 ? 'sessie' : 'sessies'} beschikbaar
+                    {recordings.length} {recordings.length === 1 ? 'opname' : 'opnames'} beschikbaar
                   </p>
                 </div>
               </div>
             </div>
             
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {pastSessions.map((session, index) => {
+              {/* Processed recordings from the pipeline */}
+              {recordings.map((session, index) => {
+                const sessionDate = new Date(session.scheduledDate || session.createdAt || '');
+                const muxPlaybackId = session.muxPlaybackId;
+                const thumbnail = muxPlaybackId 
+                  ? `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=640&height=360&fit_mode=preserve`
+                  : SESSION_IMAGES[index % SESSION_IMAGES.length];
+                
+                return (
+                  <div
+                    key={session.id}
+                    className="group cursor-pointer"
+                    onClick={() => {
+                      if (navigate) {
+                        navigate(`video/${session.id}?source=webinar`);
+                      }
+                    }}
+                  >
+                    <div className="relative rounded-xl overflow-hidden mb-3 shadow-sm group-hover:shadow-lg transition-shadow" style={{ aspectRatio: "16/9" }}>
+                      <img
+                        src={thumbnail}
+                        alt={session.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                        <div 
+                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100 bg-hh-ink"
+                        >
+                          <Play className="w-5 h-5 text-white ml-0.5" />
+                        </div>
+                      </div>
+                      
+                      <div className="absolute top-2 left-2 flex gap-2">
+                        <Badge className="text-[10px] px-2 py-0.5 bg-[#1e293b] text-white border-none">
+                          Webinar Opname
+                        </Badge>
+                      </div>
+                      
+                      {session.durationMinutes && (
+                        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[11px] px-2 py-1 rounded">
+                          {session.durationMinutes} min
+                        </div>
+                      )}
+                    </div>
+                    
+                    <h4 className="text-[14px] leading-[20px] text-hh-text font-medium mb-1 line-clamp-2 group-hover:text-hh-primary transition-colors">
+                      {session.title}
+                    </h4>
+                    
+                    <div className="flex items-center gap-2 text-[12px] text-hh-muted">
+                      <span>
+                        {sessionDate.toLocaleDateString("nl-NL", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    {session.aiSummary && (
+                      <p className="text-[12px] text-hh-muted mt-2 line-clamp-2 italic">
+                        {session.aiSummary}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Fallback legacy past sessions that don't have muxPlaybackId yet */}
+              {pastSessions.filter(s => !recordings.find(r => r.id === s.id)).map((session, index) => {
                 const sessionDate = new Date(session.scheduledDate);
                 const isNew = (Date.now() - sessionDate.getTime()) < 7 * 24 * 60 * 60 * 1000;
                 const hugoPhotos = [

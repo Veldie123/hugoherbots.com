@@ -155,6 +155,14 @@ export default defineConfig({
         target: 'http://localhost:3002',
         changeOrigin: true,
       },
+      '/api/live-sessions': {
+        target: 'http://localhost:3002',
+        changeOrigin: true,
+      },
+      '/api/webinar-recordings': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
       '/ws': {
         target: 'http://localhost:3002',
         changeOrigin: true,
