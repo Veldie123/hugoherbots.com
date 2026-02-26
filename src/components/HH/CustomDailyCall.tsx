@@ -111,6 +111,7 @@ export function CustomDailyCall({
   const [isHandRaised, setIsHandRaised] = useState(false);
   const [showHandsList, setShowHandsList] = useState(false);
   const [waitingParticipants, setWaitingParticipants] = useState<{ id: string; name: string }[]>([]);
+  const [activeSpeakerId, setActiveSpeakerId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isMountedRef = useRef(true);
   const hasLoggedWebinarAttend = useRef(false);
@@ -331,6 +332,11 @@ export function CustomDailyCall({
         }
       });
 
+      call.on("active-speaker-change" as any, (event: any) => {
+        if (!isMountedRef.current) return;
+        setActiveSpeakerId(event?.activeSpeaker?.peerId || null);
+      });
+
       call.on("track-started", () => {
         if (!isMountedRef.current) return;
         updateParticipants(call);
@@ -547,10 +553,10 @@ export function CustomDailyCall({
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-hh-text mb-2">
             Verbindingsfout
           </h3>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <p className="text-hh-muted mb-6">{error}</p>
           <div className="flex gap-3 justify-center">
             <Button onClick={handleRetry} className="gap-2 bg-purple-600 hover:bg-purple-700">
               <RefreshCw className="w-4 h-4" />
@@ -573,17 +579,17 @@ export function CustomDailyCall({
           <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-hh-text mb-2">
             Verbinden met sessie
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-hh-muted mb-4">
             Even geduld, we stellen de verbinding in...
           </p>
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center justify-center gap-2 text-sm text-hh-muted">
             <Radio className="w-4 h-4 animate-pulse text-purple-500" />
             <span>{sessionTitle}</span>
           </div>
-          <Button variant="ghost" onClick={onLeave} className="mt-6 text-gray-500">
+          <Button variant="ghost" onClick={onLeave} className="mt-6 text-hh-muted">
             Annuleren
           </Button>
         </div>
@@ -595,7 +601,7 @@ export function CustomDailyCall({
     <div 
       ref={containerRef}
       className={cn(
-        "flex flex-col bg-gray-50 rounded-lg overflow-hidden border border-hh-border",
+        "flex flex-col bg-hh-bg rounded-lg overflow-hidden border border-hh-border",
         isFullscreen ? "fixed inset-0 z-50 rounded-none" : "h-[600px]"
       )}
     >
@@ -605,7 +611,7 @@ export function CustomDailyCall({
             size="sm"
             variant="ghost"
             onClick={handleLeave}
-            className="text-gray-600 hover:text-gray-900"
+            className="text-hh-muted hover:text-hh-text"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Terug
@@ -615,7 +621,7 @@ export function CustomDailyCall({
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-            <span className="text-gray-900 font-medium text-sm">LIVE</span>
+            <span className="text-hh-text font-medium text-sm">LIVE</span>
           </div>
           {isRecording && (
             <div className="flex items-center gap-1.5 bg-red-600 text-white text-xs font-medium px-2 py-1 rounded animate-pulse">
@@ -623,7 +629,7 @@ export function CustomDailyCall({
               REC
             </div>
           )}
-          <span className="text-gray-600 text-sm">{sessionTitle}</span>
+          <span className="text-hh-muted text-sm">{sessionTitle}</span>
           {isHost && (
             <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-0.5 rounded">
               HOST
@@ -632,7 +638,7 @@ export function CustomDailyCall({
         </div>
         
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-sm text-gray-500 mr-2">
+          <div className="flex items-center gap-1.5 text-sm text-hh-muted mr-2">
             <Users className="w-4 h-4" />
             <span>{participants.size}</span>
           </div>
@@ -640,7 +646,7 @@ export function CustomDailyCall({
             size="sm"
             variant="ghost"
             onClick={toggleFullscreen}
-            className="text-gray-600 hover:text-gray-900"
+            className="text-hh-muted hover:text-hh-text"
           >
             <Maximize2 className="w-4 h-4" />
           </Button>
@@ -648,19 +654,19 @@ export function CustomDailyCall({
       </div>
 
       {isHost && waitingParticipants.length > 0 && (
-        <div className="mx-4 mt-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5 flex items-center justify-between">
+        <div className="mx-4 mt-2 bg-hh-primary/10 border border-hh-primary/30 rounded-lg px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-              <Users className="w-4 h-4 text-amber-700" />
+            <div className="w-8 h-8 bg-hh-primary/20 rounded-full flex items-center justify-center">
+              <Users className="w-4 h-4 text-hh-primary" />
             </div>
             <div>
-              <p className="text-sm font-medium text-amber-900">
+              <p className="text-sm font-medium text-hh-text">
                 {waitingParticipants.length === 1
                   ? `${waitingParticipants[0].name} wacht in de lobby`
                   : `${waitingParticipants.length} deelnemers wachten in de lobby`}
               </p>
               {waitingParticipants.length > 1 && (
-                <p className="text-xs text-amber-700 mt-0.5">
+                <p className="text-xs text-hh-muted mt-0.5">
                   {waitingParticipants.map(p => p.name).join(', ')}
                 </p>
               )}
@@ -673,15 +679,14 @@ export function CustomDailyCall({
                   size="sm"
                   variant="outline"
                   onClick={() => handleDenyParticipant(waitingParticipants[0].id)}
-                  className="h-8 text-xs border-amber-300 text-amber-700 hover:bg-amber-100"
+                  className="h-8 text-xs border-hh-border text-hh-muted hover:bg-hh-ui-50"
                 >
                   Weigeren
                 </Button>
                 <Button
                   size="sm"
                   onClick={() => handleAdmitParticipant(waitingParticipants[0].id)}
-                  className="h-8 text-xs text-white"
-                  style={{ backgroundColor: '#3d9a6e' }}
+                  className="h-8 text-xs text-white bg-hh-primary hover:bg-hh-primary/90"
                 >
                   Toelaten
                 </Button>
@@ -691,8 +696,7 @@ export function CustomDailyCall({
                 <Button
                   size="sm"
                   onClick={handleAdmitAll}
-                  className="h-8 text-xs text-white"
-                  style={{ backgroundColor: '#3d9a6e' }}
+                  className="h-8 text-xs text-white bg-hh-primary hover:bg-hh-primary/90"
                 >
                   Allemaal toelaten
                 </Button>
@@ -734,7 +738,7 @@ export function CustomDailyCall({
                 
                 {/* Session info */}
                 <div className="inline-flex items-center gap-2 bg-hh-bg rounded-full px-4 py-2 shadow-sm border border-hh-border">
-                  <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#3d9a6e' }} />
+                  <div className="w-2 h-2 rounded-full animate-pulse bg-hh-primary" />
                   <span className="text-sm text-hh-text font-medium">{sessionTitle}</span>
                 </div>
               </div>
@@ -746,6 +750,7 @@ export function CustomDailyCall({
                 participant={participant}
                 isLarge={participantList.length <= 2}
                 hasHandRaised={raisedHands.some(h => h.sessionId === participant.sessionId)}
+                isSpeaking={activeSpeakerId === participant.sessionId}
               />
             ))
           )}
@@ -781,7 +786,7 @@ export function CustomDailyCall({
             disabled={bgLoading}
             className={cn(
               "w-14 h-14 rounded-full p-0",
-              virtualBg !== 'none' && "bg-blue-600 hover:bg-blue-700 text-white"
+              virtualBg !== 'none' && "bg-hh-primary hover:bg-hh-primary/90 text-white"
             )}
             title="Virtuele achtergrond"
           >
@@ -793,10 +798,10 @@ export function CustomDailyCall({
           </Button>
 
           {showBgPicker && (
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-white rounded-xl shadow-2xl border border-hh-border p-3 w-[280px] z-50">
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[280px] z-50">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-[13px] font-semibold text-hh-text">Hugo's Kantoor</p>
-                <button onClick={() => setShowBgPicker(false)} className="p-1 rounded hover:bg-gray-100">
+                <button onClick={() => setShowBgPicker(false)} className="p-1 rounded hover:bg-hh-ui-50">
                   <X className="w-3.5 h-3.5 text-hh-muted" />
                 </button>
               </div>
@@ -805,12 +810,12 @@ export function CustomDailyCall({
                 onClick={() => { applyVirtualBackground('auto'); setShowBgPicker(false); }}
                 className={cn(
                   "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors mb-1",
-                  virtualBg === 'auto' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-hh-text"
+                  virtualBg === 'auto' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
                 )}
               >
                 <Sun className="w-4 h-4" />
                 Automatisch (tijdsgebonden)
-                {virtualBg === 'auto' && <Check className="w-3.5 h-3.5 ml-auto text-blue-600" />}
+                {virtualBg === 'auto' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
               </button>
 
               <div className="grid grid-cols-2 gap-1.5 mb-2">
@@ -823,7 +828,7 @@ export function CustomDailyCall({
                       onClick={() => { applyVirtualBackground(key as VirtualBgOption); setShowBgPicker(false); }}
                       className={cn(
                         "relative rounded-lg overflow-hidden border-2 transition-all aspect-video",
-                        isActive ? "border-blue-600 ring-2 ring-blue-200" : "border-transparent hover:border-blue-300"
+                        isActive ? "border-hh-primary ring-2 ring-hh-primary/30" : "border-transparent hover:border-hh-primary/50"
                       )}
                     >
                       <img src={bg.image} alt={bg.label} className="w-full h-full object-cover" />
@@ -833,7 +838,7 @@ export function CustomDailyCall({
                         <span className="text-[10px] text-white font-medium">{bg.label}</span>
                       </div>
                       {isActive && (
-                        <div className="absolute top-1 right-1 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                        <div className="absolute top-1 right-1 w-5 h-5 bg-hh-primary rounded-full flex items-center justify-center">
                           <Check className="w-3 h-3 text-white" />
                         </div>
                       )}
@@ -847,23 +852,23 @@ export function CustomDailyCall({
                   onClick={() => { applyVirtualBackground('blur'); setShowBgPicker(false); }}
                   className={cn(
                     "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
-                    virtualBg === 'blur' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-hh-text"
+                    virtualBg === 'blur' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
                   )}
                 >
                   <div className="w-4 h-4 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 blur-[1px]" />
                   Achtergrond vervagen
-                  {virtualBg === 'blur' && <Check className="w-3.5 h-3.5 ml-auto text-blue-600" />}
+                  {virtualBg === 'blur' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
                 </button>
                 <button
                   onClick={() => { applyVirtualBackground('none'); setShowBgPicker(false); }}
                   className={cn(
                     "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
-                    virtualBg === 'none' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-hh-text"
+                    virtualBg === 'none' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
                   )}
                 >
                   <VideoOff className="w-4 h-4" />
                   Geen achtergrond
-                  {virtualBg === 'none' && <Check className="w-3.5 h-3.5 ml-auto text-blue-600" />}
+                  {virtualBg === 'none' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
                 </button>
               </div>
             </div>
@@ -904,26 +909,26 @@ export function CustomDailyCall({
             </Button>
 
             {showHandsList && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-white rounded-xl shadow-2xl border border-hh-border p-3 w-[220px] z-50">
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[220px] z-50">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-[13px] font-semibold text-hh-text flex items-center gap-1.5">
                     <Hand className="w-4 h-4 text-amber-500" />
                     Opgestoken handen
                   </p>
-                  <button onClick={() => setShowHandsList(false)} className="p-1 rounded hover:bg-gray-100">
+                  <button onClick={() => setShowHandsList(false)} className="p-1 rounded hover:bg-hh-ui-50">
                     <X className="w-3.5 h-3.5 text-hh-muted" />
                   </button>
                 </div>
                 <div className="space-y-1 max-h-[200px] overflow-y-auto">
                   {raisedHands.sort((a, b) => a.timestamp - b.timestamp).map((hand, idx) => (
-                    <div key={hand.sessionId} className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-gray-50">
+                    <div key={hand.sessionId} className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-hh-ui-50">
                       <div className="flex items-center gap-2">
                         <span className="text-[11px] font-medium text-amber-600 w-4">{idx + 1}.</span>
                         <span className="text-[12px] text-hh-text font-medium truncate max-w-[120px]">{hand.userName}</span>
                       </div>
                       <button
                         onClick={() => handleDismissHand(hand.sessionId)}
-                        className="text-gray-400 hover:text-gray-600 p-0.5"
+                        className="text-hh-muted hover:text-hh-text p-0.5"
                         title="Verwijder"
                       >
                         <X className="w-3 h-3" />
@@ -975,9 +980,10 @@ interface VideoTileProps {
   participant: ParticipantInfo;
   isLarge?: boolean;
   hasHandRaised?: boolean;
+  isSpeaking?: boolean;
 }
 
-function VideoTile({ participant, isLarge = false, hasHandRaised = false }: VideoTileProps) {
+function VideoTile({ participant, isLarge = false, hasHandRaised = false, isSpeaking = false }: VideoTileProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
 
@@ -1008,8 +1014,9 @@ function VideoTile({ participant, isLarge = false, hasHandRaised = false }: Vide
   return (
     <div 
       className={cn(
-        "relative bg-gray-800 rounded-lg overflow-hidden w-full",
-        isLarge ? "h-full min-h-[300px]" : "h-full min-h-[150px]"
+        "relative bg-hh-ink rounded-lg overflow-hidden w-full transition-shadow duration-300",
+        isLarge ? "h-full min-h-[300px]" : "h-full min-h-[150px]",
+        isSpeaking && "ring-2 ring-hh-primary shadow-[0_0_12px_rgba(var(--hh-primary-rgb,79,139,179),0.4)]"
       )}
       style={{ aspectRatio: isLarge ? "16/9" : "4/3" }}
     >
@@ -1025,7 +1032,7 @@ function VideoTile({ participant, isLarge = false, hasHandRaised = false }: Vide
       />
       
       {(!showVideo || !videoReady) && (
-        <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)' }}>
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-hh-ink/80 to-hh-ink">
           <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
             <span className="text-3xl font-bold text-white">
               {participant.userName.charAt(0).toUpperCase()}

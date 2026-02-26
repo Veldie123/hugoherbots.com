@@ -233,7 +233,7 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
       <div className="relative h-full flex items-center p-6 sm:p-8">
         <div className="text-white space-y-3 max-w-lg">
           {/* Green accent badge - dynamic date */}
-          <Badge className="text-white border-0" style={{ backgroundColor: '#3d9a6e' }}>
+          <Badge className="text-white border-0 bg-hh-primary">
             <CalendarIcon className="w-3 h-3 mr-1" />
             {nextSession?.scheduledDate 
               ? formatNextSessionDate(new Date(nextSession.scheduledDate))
@@ -262,10 +262,7 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
           <div className="flex flex-wrap gap-3 pt-1">
             {nextSession && (
               <Button 
-                className={`gap-2 border-0 transition-colors ${isRegistered ? 'bg-white/20 text-white hover:bg-white/30' : ''}`}
-                style={isRegistered ? {} : { backgroundColor: '#3d9a6e' }}
-                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { if (!isRegistered) e.currentTarget.style.backgroundColor = '#4daa7e'; }}
-                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { if (!isRegistered) e.currentTarget.style.backgroundColor = '#3d9a6e'; }}
+                className={`gap-2 border-0 transition-colors ${isRegistered ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-hh-primary hover:bg-hh-primary/90 text-white'}`}
                 onClick={onRegister}
               >
                 {isRegistered ? <CheckCircle className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
@@ -790,8 +787,7 @@ export function LiveCoaching({
             {liveSession && (
               <Button
                 variant="default"
-                className="gap-2 text-white animate-pulse cursor-default"
-                style={{ backgroundColor: '#3d9a6e' }}
+                className="gap-2 text-white animate-pulse cursor-default bg-hh-primary"
               >
                 <Radio className="w-4 h-4" />
                 <span>LIVE NU</span>
@@ -802,10 +798,7 @@ export function LiveCoaching({
                 setShowCalendar(!showCalendar);
                 if (showCalendar) setSelectedCalendarDate(null);
               }}
-              className="gap-2 transition-colors"
-              style={{ backgroundColor: '#3d9a6e', color: 'white' }}
-              onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#2d7f57'}
-              onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#3d9a6e'}
+              className="gap-2 transition-colors bg-hh-primary hover:bg-hh-primary/90 text-white"
             >
               <CalendarIcon className="w-4 h-4" />
               <span className="hidden sm:inline">Kalender</span>
@@ -859,8 +852,7 @@ export function LiveCoaching({
                   <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-20">
                     <div className="flex items-center gap-3">
                       <Badge 
-                        className="text-white border-none flex items-center gap-2 px-3 py-1.5"
-                        style={{ backgroundColor: '#3d9a6e' }}
+                        className="text-white border-none flex items-center gap-2 px-3 py-1.5 bg-hh-primary"
                       >
                         <Radio className="w-4 h-4 animate-pulse" />
                         <span>LIVE</span>
@@ -882,10 +874,7 @@ export function LiveCoaching({
                   <div className="absolute inset-0 flex items-center justify-center z-20">
                     <Button
                       size="lg"
-                      className="text-white gap-3 px-10 py-7 text-xl shadow-2xl"
-                      style={{ backgroundColor: '#3d9a6e' }}
-                      onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#2d7a5e'}
-                      onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#3d9a6e'}
+                      className="text-white gap-3 px-10 py-7 text-xl shadow-2xl bg-hh-primary hover:bg-hh-primary/90"
                       onClick={() => handleJoinLiveSession(liveSession)}
                       disabled={joiningCall}
                     >
@@ -1263,18 +1252,16 @@ export function LiveCoaching({
                             className={`
                               relative flex flex-col items-center justify-center rounded-lg text-[13px] transition-colors
                               ${!day ? 'invisible' : 'cursor-pointer'}
-                              ${selected && !sessionDay ? 'text-white' : ''}
+                              ${selected && !sessionDay ? 'bg-hh-primary text-white rounded-lg' : ''}
+                              ${selected && sessionDay ? 'bg-hh-primary text-white rounded-lg' : ''}
                               ${sessionDay && !selected ? 'hover:opacity-80' : ''}
                               ${!sessionDay && !selected ? 'hover:bg-hh-ui-50' : ''}
                               ${todayDay && !selected && !sessionDay ? 'bg-hh-ui-50 font-bold ring-1 ring-hh-primary/30' : ''}
                               ${!selected && !sessionDay && !todayDay ? 'text-hh-text' : ''}
                             `}
                             style={selected ? {
-                              backgroundColor: '#3d9a6e',
-                              color: 'white',
                               padding: '4px 2px',
                               minHeight: '44px',
-                              borderRadius: '8px',
                             } : sessionDay ? {
                               backgroundColor: 'color-mix(in srgb, var(--hh-success) 15%, transparent)',
                               padding: '4px 2px',
@@ -1294,8 +1281,7 @@ export function LiveCoaching({
                             )}
                             {sessionDay && !selected && (
                               <span
-                                className="absolute top-1 right-1 w-2 h-2 rounded-full"
-                                style={{ backgroundColor: '#3d9a6e', boxShadow: '0 0 0 2px rgba(61, 154, 110, 0.25)' }}
+                                className="absolute top-1 right-1 w-2 h-2 rounded-full bg-hh-primary shadow-[0_0_0_2px_hsl(var(--hh-primary)/0.25)]"
                               />
                             )}
                           </button>
@@ -1356,7 +1342,7 @@ export function LiveCoaching({
                     
                     <div className="p-4 flex flex-col flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge className="text-[11px]" style={{ backgroundColor: '#3d9a6e', color: 'white', border: 'none' }}>
+                        <Badge className="text-[11px] bg-hh-primary text-white border-none">
                           Gepland
                         </Badge>
                         {session.topic && (
@@ -1408,10 +1394,7 @@ export function LiveCoaching({
                       <div className="mt-4 pt-3 border-t border-hh-border space-y-2">
                         <Button
                           size="sm"
-                          className={`w-full gap-2 ${registeredSessionIds.has(session.id) ? 'bg-hh-ui-100 text-hh-text hover:bg-hh-ui-200' : 'text-white'}`}
-                          style={registeredSessionIds.has(session.id) ? {} : { backgroundColor: '#3d9a6e' }}
-                          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { if (!registeredSessionIds.has(session.id)) e.currentTarget.style.backgroundColor = '#4daa7e'; }}
-                          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { if (!registeredSessionIds.has(session.id)) e.currentTarget.style.backgroundColor = '#3d9a6e'; }}
+                          className={`w-full gap-2 ${registeredSessionIds.has(session.id) ? 'bg-hh-ui-100 text-hh-text hover:bg-hh-ui-200' : 'bg-hh-primary hover:bg-hh-primary/90 text-white'}`}
                           onClick={() => handleRegisterSession(session)}
                         >
                           {registeredSessionIds.has(session.id) ? (
@@ -1505,7 +1488,7 @@ export function LiveCoaching({
                             </div>
                           </td>
                           <td className="py-3 px-4">
-                            <Badge className="text-[11px]" style={{ backgroundColor: '#3d9a6e', color: 'white', border: 'none' }}>
+                            <Badge className="text-[11px] bg-hh-primary text-white border-none">
                               Gepland
                             </Badge>
                           </td>
@@ -1581,7 +1564,7 @@ export function LiveCoaching({
           <div id="recordings-section" className="mt-12 pt-8 border-t border-hh-border">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#3d9a6e' }}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-primary">
                   <Video className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -1629,8 +1612,7 @@ export function LiveCoaching({
                       
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
                         <div 
-                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100"
-                          style={{ backgroundColor: '#1e3a5f' }}
+                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100 bg-hh-ink"
                         >
                           <Play className="w-5 h-5 text-white ml-0.5" />
                         </div>
@@ -1638,7 +1620,7 @@ export function LiveCoaching({
                       
                       {isNew && (
                         <div className="absolute top-2 left-2">
-                          <Badge className="text-[10px] px-2 py-0.5" style={{ backgroundColor: '#3d9a6e', color: 'white', border: 'none' }}>
+                          <Badge className="text-[10px] px-2 py-0.5 bg-hh-primary text-white border-none">
                             Nieuw
                           </Badge>
                         </div>
@@ -1999,10 +1981,7 @@ export function LiveCoaching({
                       Annuleren
                     </Button>
                     <Button
-                      className="flex-1 text-white"
-                      style={{ backgroundColor: '#3d9a6e' }}
-                      onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#4daa7e'}
-                      onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#3d9a6e'}
+                      className="flex-1 text-white bg-hh-primary hover:bg-hh-primary/90"
                       onClick={confirmRegistration}
                     >
                       <UserPlus className="w-4 h-4 mr-2" />
@@ -2013,7 +1992,7 @@ export function LiveCoaching({
               ) : (
                 <>
                   <div className="text-center py-4">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#3d9a6e' }}>
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-hh-primary">
                       <CheckCircle className="w-8 h-8 text-white" />
                     </div>
                     <h3 className="text-[18px] font-semibold text-hh-text mb-2">
@@ -2029,10 +2008,7 @@ export function LiveCoaching({
                       Voeg deze sessie toe aan je agenda zodat je de sessie niet mist.
                     </p>
                     <Button
-                      className="w-full text-white"
-                      style={{ backgroundColor: '#4F7396' }}
-                      onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#5d8aab'}
-                      onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#4F7396'}
+                      className="w-full text-white bg-hh-primary hover:bg-hh-primary/90"
                       onClick={() => {
                         window.open(generateGoogleCalendarLink(selectedSessionForRegistration), '_blank');
                       }}
@@ -2089,7 +2065,7 @@ export function LiveCoaching({
                 </div>
                 <div className="p-5 space-y-4">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge className="text-[11px] px-2.5 py-0.5" style={{ backgroundColor: '#3d9a6e', color: 'white', border: 'none' }}>
+                    <Badge className="text-[11px] px-2.5 py-0.5 bg-hh-primary text-white border-none">
                       Gepland
                     </Badge>
                     {calendarDetailSession.topic && (
@@ -2130,7 +2106,7 @@ export function LiveCoaching({
                       </span>
                     </div>
                     {calendarDetailSession.viewerCount && calendarDetailSession.viewerCount > 0 && (
-                      <div className="flex items-center gap-2.5 text-[14px]" style={{ color: '#3d9a6e' }}>
+                      <div className="flex items-center gap-2.5 text-[14px] text-hh-primary">
                         <Users className="w-4 h-4 flex-shrink-0" />
                         <span>{calendarDetailSession.viewerCount} verkopers nemen deel</span>
                       </div>
@@ -2138,10 +2114,7 @@ export function LiveCoaching({
                   </div>
                   <div className="pt-2 border-t border-hh-border space-y-2.5">
                     <Button
-                      className={`w-full gap-2 h-11 text-[15px] ${isRegistered ? 'bg-hh-ui-100 text-hh-text hover:bg-hh-ui-200' : 'text-white'}`}
-                      style={isRegistered ? {} : { backgroundColor: '#3d9a6e' }}
-                      onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { if (!isRegistered) e.currentTarget.style.backgroundColor = '#4daa7e'; }}
-                      onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { if (!isRegistered) e.currentTarget.style.backgroundColor = '#3d9a6e'; }}
+                      className={`w-full gap-2 h-11 text-[15px] ${isRegistered ? 'bg-hh-ui-100 text-hh-text hover:bg-hh-ui-200' : 'bg-hh-primary hover:bg-hh-primary/90 text-white'}`}
                       onClick={() => {
                         setCalendarDetailSession(null);
                         handleRegisterSession(calendarDetailSession);

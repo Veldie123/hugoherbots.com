@@ -463,7 +463,7 @@ ${platformUrl}`;
         );
       case "ended":
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px]">
+          <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20 text-[11px]">
             Afgelopen
           </Badge>
         );
@@ -520,16 +520,14 @@ ${platformUrl}`;
                     <TabsList className="w-full bg-hh-ui-100">
                       <TabsTrigger
                         value="chat"
-                        className="flex-1"
-                        style={{ color: activeTab === "chat" ? "white" : undefined, backgroundColor: activeTab === "chat" ? "#9333ea" : "transparent" }}
+                        className="flex-1 data-[state=active]:bg-purple-600 data-[state=active]:text-white"
                       >
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Chat
                       </TabsTrigger>
                       <TabsTrigger
                         value="polls"
-                        className="flex-1"
-                        style={{ color: activeTab === "polls" ? "white" : undefined, backgroundColor: activeTab === "polls" ? "#9333ea" : "transparent" }}
+                        className="flex-1 data-[state=active]:bg-purple-600 data-[state=active]:text-white"
                       >
                         <ThumbsUp className="w-4 h-4 mr-2" />
                         Polls ({polls.length})
@@ -554,19 +552,18 @@ ${platformUrl}`;
                             <div key={msg.id} className="flex gap-3">
                               <Avatar className="flex-shrink-0 w-8 h-8">
                                 <AvatarFallback
-                                  style={msg.isHost ? { backgroundColor: '#9333ea', color: 'white' } : {}}
-                                  className={msg.isHost ? "text-[12px]" : "bg-hh-ui-200 text-hh-ink text-[12px]"}
+                                  className={msg.isHost ? "bg-purple-600 text-white text-[12px]" : "bg-hh-ui-200 text-hh-ink text-[12px]"}
                                 >
                                   {getInitials(msg.userName)}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-baseline gap-2 mb-1">
-                                  <span style={msg.isHost ? { color: '#9333ea' } : {}} className={`text-sm ${msg.isHost ? "font-medium" : "text-hh-ink"}`}>
+                                  <span className={`text-sm ${msg.isHost ? "font-medium text-purple-600" : "text-hh-ink"}`}>
                                     {msg.userName}
                                   </span>
                                   {msg.isHost && (
-                                    <Badge style={{ backgroundColor: 'rgba(147, 51, 234, 0.15)', color: '#3d6080', borderColor: 'rgba(147, 51, 234, 0.3)' }} className="text-[10px] px-1.5 py-0">
+                                    <Badge className="bg-purple-500/15 text-purple-600 border-purple-500/30 text-[10px] px-1.5 py-0">
                                       HOST
                                     </Badge>
                                   )}
@@ -605,8 +602,7 @@ ${platformUrl}`;
                           onClick={handleSendMessage}
                           disabled={!chatMessage.trim() || sendingMessage}
                           size="icon"
-                          style={{ backgroundColor: '#9333ea' }}
-                          className="hover:opacity-90"
+                          className="bg-purple-600 hover:bg-purple-700 text-white"
                         >
                           {sendingMessage ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -623,14 +619,13 @@ ${platformUrl}`;
                       {!showCreatePoll ? (
                         <Button
                           onClick={() => setShowCreatePoll(true)}
-                          className="w-full gap-2"
-                          style={{ backgroundColor: '#9333ea' }}
+                          className="w-full gap-2 bg-purple-600 hover:bg-purple-700 text-white"
                         >
                           <Plus className="w-4 h-4" />
                           Nieuwe Poll
                         </Button>
                       ) : (
-                        <Card className="p-4 space-y-3" style={{ borderColor: 'rgba(147, 51, 234, 0.3)', backgroundColor: 'rgba(147, 51, 234, 0.05)' }}>
+                        <Card className="p-4 space-y-3 border-purple-500/30 bg-purple-500/5">
                           <div className="flex items-center justify-between">
                             <h4 className="font-medium text-hh-text">Nieuwe Poll</h4>
                             <Button
@@ -692,8 +687,7 @@ ${platformUrl}`;
                           <Button
                             onClick={handleCreatePoll}
                             disabled={creatingPoll || !pollQuestion.trim()}
-                            className="w-full text-white hover:opacity-90"
-                            style={{ backgroundColor: '#9333ea' }}
+                            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                           >
                             {creatingPoll ? (
                               <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -714,7 +708,7 @@ ${platformUrl}`;
                         {polls.map((poll) => (
                           <Card key={poll.id} className="p-4">
                             <div className="flex items-center justify-between mb-2">
-                              <Badge className={poll.isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-hh-ui-100 text-hh-muted"}>
+                              <Badge className={poll.isActive ? "bg-purple-500/10 text-purple-500" : "bg-hh-ui-100 text-hh-muted"}>
                                 {poll.isActive ? "Actief" : "Gesloten"}
                               </Badge>
                               {poll.isActive && (
@@ -736,8 +730,8 @@ ${platformUrl}`;
                                 return (
                                   <div key={option.id} className="relative">
                                     <div
-                                      className="absolute inset-0 rounded"
-                                      style={{ backgroundColor: 'rgba(147, 51, 234, 0.15)', width: `${percentage}%` }}
+                                      className="absolute inset-0 rounded bg-purple-500/15"
+                                      style={{ width: `${percentage}%` }}
                                     />
                                     <div className="relative p-2 flex justify-between text-sm">
                                       <span>{option.optionText}</span>
@@ -779,18 +773,17 @@ ${platformUrl}`;
           <div className="flex gap-2">
             <Button
               variant="outline"
-              className="gap-2"
+              className={`gap-2 ${showAdminCalendar ? 'bg-purple-600 text-white hover:bg-purple-700 border-purple-600' : ''}`}
               onClick={() => {
                 setShowAdminCalendar(!showAdminCalendar);
                 if (showAdminCalendar) setAdminSelectedDate(null);
               }}
-              style={showAdminCalendar ? { backgroundColor: '#9333ea', color: 'white' } : {}}
             >
               <CalendarIcon className="w-4 h-4" />
               Kalender
             </Button>
             <Button
-              className="gap-2 bg-red-600 hover:bg-red-700"
+              className="gap-2 bg-purple-600 hover:bg-purple-700 text-white"
               onClick={openCreateModal}
             >
               <Plus className="w-4 h-4" />
@@ -802,17 +795,17 @@ ${platformUrl}`;
         {/* KPI Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColorStyle: 'rgba(220, 38, 38, 0.1)', colorStyle: '#dc2626', badge: `+${Math.round(sessions.length * 0.12)}%` },
-            { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: '#9333ea', badge: `+${upcomingSessionsAll.length}` },
-            { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: '#9333ea', badge: '+8%' },
-            { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: '#10b981', badge: '100%' },
+            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgClass: 'bg-red-600/10', iconClass: 'text-red-600', badge: `+${Math.round(sessions.length * 0.12)}%` },
+            { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgClass: 'bg-purple-500/10', iconClass: 'text-purple-500', badge: `+${upcomingSessionsAll.length}` },
+            { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgClass: 'bg-purple-500/10', iconClass: 'text-purple-500', badge: '+8%' },
+            { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgClass: 'bg-purple-500/10', iconClass: 'text-purple-500', badge: '100%' },
           ].map(stat => (
             <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
               <div className="flex items-start justify-between mb-2 sm:mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColorStyle }}>
-                  <stat.icon className="w-5 h-5" style={{ color: stat.colorStyle }} />
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${stat.bgClass}`}>
+                  <stat.icon className={`w-5 h-5 ${stat.iconClass}`} />
                 </div>
-                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+                <span className="text-[11px] px-2 py-0.5 rounded-full border bg-purple-500/10 text-purple-500 border-purple-500/20">
                   {stat.badge}
                 </span>
               </div>
@@ -862,8 +855,7 @@ ${platformUrl}`;
               <Button
                 variant={view === "list" ? "default" : "ghost"}
                 size="sm"
-                className="rounded-r-none"
-                style={view === "list" ? { backgroundColor: '#9333ea', color: 'white' } : {}}
+                className={`rounded-r-none ${view === "list" ? "bg-purple-600 text-white hover:bg-purple-700" : ""}`}
                 onClick={() => setView("list")}
               >
                 <List className="w-4 h-4" />
@@ -871,8 +863,7 @@ ${platformUrl}`;
               <Button
                 variant={view === "upcoming" ? "default" : "ghost"}
                 size="sm"
-                className="rounded-l-none"
-                style={view === "upcoming" ? { backgroundColor: '#9333ea', color: 'white' } : {}}
+                className={`rounded-l-none ${view === "upcoming" ? "bg-purple-600 text-white hover:bg-purple-700" : ""}`}
                 onClick={() => setView("upcoming")}
               >
                 <Grid3X3 className="w-4 h-4" />
@@ -928,7 +919,7 @@ ${platformUrl}`;
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
-              <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+              <div className="grid gap-1 grid-cols-7">
                 {DAY_HEADERS.map(d => (
                   <div key={d} className="text-center text-[11px] font-medium text-hh-muted py-1">{d}</div>
                 ))}
@@ -952,41 +943,26 @@ ${platformUrl}`;
                         }
                       }}
                       className={`
-                        relative flex flex-col items-center justify-center rounded-lg text-[13px] transition-colors
+                        relative flex flex-col items-center justify-center rounded-lg text-[13px] transition-colors min-h-[44px]
                         ${!day ? 'invisible' : 'cursor-pointer'}
-                        ${selected && !sessionDay ? 'text-white' : ''}
-                        ${sessionDay && !selected ? 'hover:opacity-80' : ''}
-                        ${!sessionDay && !selected ? 'hover:bg-hh-ui-50' : ''}
+                        ${selected ? 'bg-purple-600 text-white rounded-lg py-1 px-0.5' : ''}
+                        ${sessionDay && !selected ? 'bg-purple-500/10 py-1 px-0.5 hover:opacity-80' : ''}
+                        ${!sessionDay && !selected ? 'py-1.5 px-0.5 hover:bg-hh-ui-50' : ''}
                         ${todayDay && !selected && !sessionDay ? 'bg-hh-ui-50 font-bold ring-1 ring-purple-300' : ''}
                         ${!selected && !sessionDay && !todayDay ? 'text-hh-text' : ''}
                       `}
-                      style={selected ? {
-                        backgroundColor: '#9333ea',
-                        color: 'white',
-                        padding: '4px 2px',
-                        minHeight: '44px',
-                        borderRadius: '8px',
-                      } : sessionDay ? {
-                        backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                        padding: '4px 2px',
-                        minHeight: '44px',
-                      } : {
-                        padding: '6px 2px',
-                        minHeight: '44px',
-                      }}
                     >
-                      <span className={sessionDay && !selected ? 'font-semibold' : ''} style={sessionDay && !selected ? { color: '#7e22ce', ...(todayDay ? { textDecoration: 'underline', textUnderlineOffset: '2px' } : {}) } : undefined}>
+                      <span className={`${sessionDay && !selected ? 'font-semibold text-purple-700' : ''} ${sessionDay && !selected && todayDay ? 'underline underline-offset-2' : ''}`}>
                         {day}
                       </span>
                       {sessionDay && (
-                        <span className={`text-[9px] leading-none mt-0.5 font-medium ${selected ? 'text-white/80' : ''}`} style={!selected ? { color: '#9333ea' } : undefined}>
+                        <span className={`text-[9px] leading-none mt-0.5 font-medium ${selected ? 'text-white/80' : 'text-purple-600'}`}>
                           {daySessions[0].time}
                         </span>
                       )}
                       {sessionDay && !selected && (
                         <span
-                          className="absolute top-1 right-1 w-2 h-2 rounded-full"
-                          style={{ backgroundColor: '#9333ea', boxShadow: '0 0 0 2px rgba(147, 51, 234, 0.25)' }}
+                          className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-600 ring-2 ring-purple-500/25"
                         />
                       )}
                     </button>
@@ -1018,7 +994,7 @@ ${platformUrl}`;
                 <Video className="w-12 h-12 text-hh-muted mx-auto mb-4" />
                 <h3 className="text-[18px] text-hh-text mb-2">Geen sessies gepland</h3>
                 <p className="text-hh-muted mb-4">Plan je eerste live coaching sessie</p>
-                <Button onClick={openCreateModal} className="bg-red-600 hover:bg-red-700">
+                <Button onClick={openCreateModal} className="bg-purple-600 hover:bg-purple-700 text-white">
                   <Plus className="w-4 h-4 mr-2" />
                   Plan Sessie
                 </Button>
@@ -1116,7 +1092,7 @@ ${platformUrl}`;
                         {session.status?.toLowerCase() === "upcoming" && (
                           <Button 
                             size="sm" 
-                            className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
                             onClick={() => handleStartSession(session)}
                           >
                             <Play className="w-4 h-4 mr-2" />
@@ -1127,8 +1103,7 @@ ${platformUrl}`;
                           <Button 
                             size="sm" 
                             onClick={() => handleJoinLiveSession(session)}
-                            style={{ backgroundColor: '#16a34a', color: 'white' }}
-                            className="flex-1 hover:opacity-90"
+                            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
                           >
                             <Radio className="w-4 h-4 mr-2 animate-pulse" />
                             Join Live Sessie
@@ -1286,8 +1261,7 @@ ${platformUrl}`;
                         >
                           <td className="py-3 px-4">
                             <span 
-                              className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[11px] font-mono font-medium"
-                              style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', border: '1px solid rgba(147, 51, 234, 0.2)' }}
+                              className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[11px] font-mono font-medium bg-purple-500/10 text-purple-600 border border-purple-500/20"
                             >
                               {techniqueNumber}
                             </span>
@@ -1310,7 +1284,7 @@ ${platformUrl}`;
                             </p>
                           </td>
                           <td className="py-3 px-4">
-                            <span className="text-[14px] leading-[20px]" style={{ color: '#9333ea' }}>
+                            <span className="text-[14px] leading-[20px] text-purple-600">
                               {phaseName}
                             </span>
                           </td>
@@ -1321,14 +1295,13 @@ ${platformUrl}`;
                                 <span className="text-hh-muted"> / 50</span>
                               </div>
                               {!isCompleted && (
-                                <span className="text-[11px]" style={{ color: '#10b981' }}>ingeschreven</span>
+                                <span className="text-[11px] text-purple-500">ingeschreven</span>
                               )}
                             </div>
                           </td>
                           <td className="py-3 px-4">
                             <span 
-                              className="text-[14px] leading-[20px]"
-                              style={{ color: isCompleted ? '#d97706' : '#10b981' }}
+                              className={`text-[14px] leading-[20px] ${isCompleted ? 'text-purple-500' : 'text-purple-600'}`}
                             >
                               {isCompleted ? 'Afgelopen' : 'Gepland'}
                             </span>
@@ -1501,7 +1474,7 @@ ${platformUrl}`;
               Annuleren
             </Button>
             <Button
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-purple-600 hover:bg-purple-700 text-white"
               onClick={handleSubmit}
               disabled={submitting}
             >

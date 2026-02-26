@@ -426,7 +426,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
   };
 
   return (
-    <Card className="rounded-[16px] shadow-hh-md border-hh-border overflow-hidden bg-white max-w-2xl mx-auto">
+    <Card className="rounded-[16px] shadow-hh-md border-hh-border overflow-hidden bg-hh-bg max-w-2xl mx-auto">
       {/* Compact Header */}
       <div className="px-4 py-3 border-b border-hh-border flex items-center justify-between">
         <button
@@ -445,7 +445,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
 
       <div className="p-4 space-y-4">
         {/* Camera Preview - Compact */}
-        <div className="relative bg-gray-900 rounded-xl overflow-hidden" style={{ aspectRatio: "16/9", maxHeight: "280px" }}>
+        <div className="relative bg-hh-ink rounded-xl overflow-hidden" style={{ aspectRatio: "16/9", maxHeight: "280px" }}>
           <video
             ref={videoRef}
             autoPlay
@@ -510,7 +510,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
                 onClick={() => setShowBgPicker(!showBgPicker)}
                 className={cn(
                   "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-                  selectedBg !== 'none' ? "bg-blue-600 text-white" : "bg-white/20 hover:bg-white/30 text-white"
+                  selectedBg !== 'none' ? "bg-hh-primary text-white" : "bg-white/20 hover:bg-white/30 text-white"
                 )}
                 title="Virtuele achtergrond"
               >
@@ -518,11 +518,11 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
               </button>
 
               {showBgPicker && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-3 w-[260px] z-50">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[260px] z-50">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-[12px] font-semibold text-gray-900">Hugo's Kantoor</p>
-                    <button onClick={() => setShowBgPicker(false)} className="p-0.5 rounded hover:bg-gray-100">
-                      <X className="w-3.5 h-3.5 text-gray-400" />
+                    <p className="text-[12px] font-semibold text-hh-text">Hugo's Kantoor</p>
+                    <button onClick={() => setShowBgPicker(false)} className="p-0.5 rounded hover:bg-hh-ui-50">
+                      <X className="w-3.5 h-3.5 text-hh-muted" />
                     </button>
                   </div>
 
@@ -530,12 +530,12 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
                     onClick={() => { setSelectedBg('auto'); setShowBgPicker(false); }}
                     className={cn(
                       "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors mb-1",
-                      selectedBg === 'auto' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"
+                      selectedBg === 'auto' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
                     )}
                   >
                     <Sun className="w-3.5 h-3.5" />
                     Automatisch (tijdsgebonden)
-                    {selectedBg === 'auto' && <Check className="w-3 h-3 ml-auto text-blue-600" />}
+                    {selectedBg === 'auto' && <Check className="w-3 h-3 ml-auto text-hh-primary" />}
                   </button>
 
                   <div className="grid grid-cols-2 gap-1.5 mb-1.5">
@@ -548,7 +548,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
                           onClick={() => { setSelectedBg(key as VirtualBgOption); setShowBgPicker(false); }}
                           className={cn(
                             "relative rounded-lg overflow-hidden border-2 transition-all aspect-video",
-                            isActive ? "border-blue-600 ring-2 ring-blue-200" : "border-transparent hover:border-blue-300"
+                            isActive ? "border-hh-primary ring-2 ring-hh-primary/30" : "border-transparent hover:border-hh-primary/50"
                           )}
                         >
                           <img src={bg.image} alt={bg.label} className="w-full h-full object-cover" />
@@ -558,7 +558,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
                             <span className="text-[9px] text-white font-medium">{bg.label}</span>
                           </div>
                           {isActive && (
-                            <div className="absolute top-0.5 right-0.5 w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center">
+                            <div className="absolute top-0.5 right-0.5 w-4 h-4 bg-hh-primary rounded-full flex items-center justify-center">
                               <Check className="w-2.5 h-2.5 text-white" />
                             </div>
                           )}
@@ -567,28 +567,28 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
                     })}
                   </div>
 
-                  <div className="border-t border-gray-100 pt-1.5 space-y-0.5">
+                  <div className="border-t border-hh-border pt-1.5 space-y-0.5">
                     <button
                       onClick={() => { setSelectedBg('blur'); setShowBgPicker(false); }}
                       className={cn(
                         "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors",
-                        selectedBg === 'blur' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"
+                        selectedBg === 'blur' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
                       )}
                     >
                       <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 blur-[1px]" />
                       Achtergrond vervagen
-                      {selectedBg === 'blur' && <Check className="w-3 h-3 ml-auto text-blue-600" />}
+                      {selectedBg === 'blur' && <Check className="w-3 h-3 ml-auto text-hh-primary" />}
                     </button>
                     <button
                       onClick={() => { setSelectedBg('none'); setShowBgPicker(false); }}
                       className={cn(
                         "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors",
-                        selectedBg === 'none' ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"
+                        selectedBg === 'none' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
                       )}
                     >
                       <VideoOff className="w-3.5 h-3.5" />
                       Geen achtergrond
-                      {selectedBg === 'none' && <Check className="w-3 h-3 ml-auto text-blue-600" />}
+                      {selectedBg === 'none' && <Check className="w-3 h-3 ml-auto text-hh-primary" />}
                     </button>
                   </div>
                 </div>
@@ -618,21 +618,18 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
         ) : (
           <>
             {/* Mic Level - Compact */}
-            <div className="flex items-center gap-3 bg-gray-50 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-3 bg-hh-ui-50 rounded-lg px-3 py-2">
               <Mic className="w-4 h-4 text-hh-muted flex-shrink-0" />
               <div className="flex-1">
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-2 bg-hh-ui-200 rounded-full overflow-hidden">
                   <div
-                    className={cn(
-                      "h-full transition-all duration-100 rounded-full",
-                      audioLevel > 60 ? "bg-green-500" : audioLevel > 30 ? "bg-yellow-500" : "bg-green-400"
-                    )}
-                    style={{ width: `${isMicOn ? audioLevel : 0}%`, backgroundColor: '#3d9a6e' }}
+                    className="h-full transition-all duration-100 rounded-full bg-hh-primary"
+                    style={{ width: `${isMicOn ? audioLevel : 0}%` }}
                   />
                 </div>
               </div>
               {isMicOn && audioLevel > 5 && (
-                <div className="flex items-center gap-1 text-xs" style={{ color: '#3d9a6e' }}>
+                <div className="flex items-center gap-1 text-xs text-hh-primary">
                   <CheckCircle className="w-3 h-3" />
                   <span>Geluid gedetecteerd</span>
                 </div>
@@ -686,10 +683,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
             <div className="flex gap-3 pt-2">
               <Button
                 onClick={handleJoin}
-                className="flex-1 h-10 gap-2 text-white"
-                style={{ backgroundColor: '#3d9a6e' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#2d7a5e'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#3d9a6e'}
+                className="flex-1 h-10 gap-2 bg-hh-primary hover:bg-hh-primary/90 text-white"
                 disabled={permissionState === "requesting"}
               >
                 {permissionState === "requesting" ? (
