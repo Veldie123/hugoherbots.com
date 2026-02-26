@@ -1059,9 +1059,22 @@ export function AdminVideoManagement({ navigate }: AdminVideoManagementProps) {
 
       const result = await response.json();
       
-      if (!response.ok) {
+      if (!response.ok && response.status !== 202) {
         console.warn('Sync mislukt:', result.message);
         throw new Error(result.message);
+      }
+      
+      // 202 = background sync started, reload after ~35s when sync is done
+      if (response.status === 202) {
+        toast.success("Sync gestart! Volgorde wordt bijgewerkt, herlaad over 35 seconden...", { id: 'sync', duration: 35000 });
+        setSyncResult({ success: true, message: 'Bezig...' });
+        setTimeout(async () => {
+          await fetchVideos();
+          toast.success("Drive sync voltooid! Volgorde bijgewerkt.", { id: 'sync-done' });
+          setSyncResult({ success: true, message: 'Klaar' });
+          setTimeout(() => setSyncResult(null), 5000);
+        }, 35000);
+        return;
       }
       
       totalAdded = result.added?.length || 0;

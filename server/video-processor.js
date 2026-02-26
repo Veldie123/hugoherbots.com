@@ -16,6 +16,22 @@ const { createClient } = require('@supabase/supabase-js');
 const PORT = 3001;
 const AUTH_SECRET = process.env.VIDEO_PROCESSOR_SECRET || (() => { console.warn('VIDEO_PROCESSOR_SECRET not set, using generated fallback'); return require('crypto').randomBytes(32).toString('hex'); })();
 
+const PYTHON_BIN = (() => {
+  const candidates = [
+    process.env.PYTHON_BIN,
+    '/home/runner/workspace/.pythonlibs/bin/python3',
+    '/usr/bin/python3',
+    '/usr/local/bin/python3',
+    'python3',
+  ].filter(Boolean);
+  const fs = require('fs');
+  for (const p of candidates) {
+    if (p === 'python3') return p;
+    try { if (fs.existsSync(p)) return p; } catch {}
+  }
+  return 'python3';
+})();
+
 // Mux API for fetching video durations with persistent cache
 const MUX_TOKEN_ID = process.env.MUX_TOKEN_ID;
 const MUX_TOKEN_SECRET = process.env.MUX_TOKEN_SECRET;
@@ -1093,39 +1109,41 @@ async function listDriveVideosWithArchief(folderId, accessToken, depth = 0, isIn
   const indent = '  '.repeat(depth);
   const result = { activeVideos: [], archiefVideos: [] };
   
-  // Check if this folder IS the archief folder
+  // Check if this folder IS the archief folder — if so, SKIP entirely (rule: archief nooit verwerken)
   const currentIsArchief = isInArchief || folderId === ARCHIEF_FOLDER_ID;
+  if (currentIsArchief) {
+    console.log(`${indent}[Drive] SKIPPING archief folder: ${folderId}`);
+    return result;
+  }
   
-  console.log(`${indent}[Drive] Scanning folder: ${folderId}${currentIsArchief ? ' (ARCHIEF)' : ''}`);
+  console.log(`${indent}[Drive] Scanning folder: ${folderId}`);
   
   const videos = await listDriveVideosInFolder(folderId, accessToken);
   console.log(`${indent}[Drive] Found ${videos.length} videos in this folder`);
   
-  // Add videos to appropriate list
   for (const video of videos) {
-    video.isArchief = currentIsArchief;
-    if (currentIsArchief) {
-      result.archiefVideos.push(video);
-    } else {
-      result.activeVideos.push(video);
-    }
+    video.isArchief = false;
+    result.activeVideos.push(video);
   }
   
   const subfolders = await listDriveSubfolders(folderId, accessToken);
   console.log(`${indent}[Drive] Found ${subfolders.length} subfolders`);
   
   for (const subfolder of subfolders) {
-    // Check if subfolder is archief
-    const subfolderIsArchief = currentIsArchief || subfolder.id === ARCHIEF_FOLDER_ID || subfolder.name.toLowerCase() === 'archief';
-    console.log(`${indent}[Drive] Recursing into: ${subfolder.name}${subfolderIsArchief ? ' (ARCHIEF)' : ''}`);
+    // Skip if this subfolder is archief (by ID or name)
+    const subfolderIsArchief = subfolder.id === ARCHIEF_FOLDER_ID || subfolder.name.toLowerCase() === 'archief';
+    if (subfolderIsArchief) {
+      console.log(`${indent}[Drive] SKIPPING archief subfolder: ${subfolder.name}`);
+      continue;
+    }
+    console.log(`${indent}[Drive] Recursing into: ${subfolder.name}`);
     
-    const subResult = await listDriveVideosWithArchief(subfolder.id, accessToken, depth + 1, subfolderIsArchief);
+    const subResult = await listDriveVideosWithArchief(subfolder.id, accessToken, depth + 1, false);
     result.activeVideos.push(...subResult.activeVideos);
-    result.archiefVideos.push(...subResult.archiefVideos);
   }
   
   if (depth === 0) {
-    console.log(`[Drive] Total: ${result.activeVideos.length} active + ${result.archiefVideos.length} archief = ${result.activeVideos.length + result.archiefVideos.length} videos`);
+    console.log(`[Drive] Total active videos found: ${result.activeVideos.length}`);
   }
   
   return result;
@@ -1192,18 +1210,25 @@ async function syncVideosFromDrive(folderIdOrIds) {
   const archiefFileIds = new Set(allArchiefVideos.map(v => v.id));
   const allDriveFileIds = new Set(allDriveVideos.map(v => v.id));
   
-  // Get ALL existing jobs including deleted ones
+  // Get only active (non-deleted) jobs — deduplicate by drive_file_id keeping the one with mux_playback_id
   const { data: existingJobs, error: fetchError } = await supabaseAdmin
     .from('video_ingest_jobs')
-    .select('id, drive_file_id, drive_folder_id, drive_modified_time, status, mux_playback_id, video_title, is_hidden');
+    .select('id, drive_file_id, drive_folder_id, drive_modified_time, status, mux_playback_id, video_title, is_hidden')
+    .neq('status', 'deleted');
   
   if (fetchError) {
     throw new Error(`Fout bij ophalen bestaande jobs: ${fetchError.message}`);
   }
   
-  const existingMap = new Map(
-    (existingJobs || []).map(job => [job.drive_file_id, job])
-  );
+  // Deduplicate: per drive_file_id keep the row with mux_playback_id (or the latest)
+  const existingMap = new Map();
+  for (const job of (existingJobs || [])) {
+    const existing = existingMap.get(job.drive_file_id);
+    if (!existing || (job.mux_playback_id && !existing.mux_playback_id)) {
+      existingMap.set(job.drive_file_id, job);
+    }
+  }
+  console.log(`[Sync] Loaded ${existingJobs?.length || 0} jobs, deduplicated to ${existingMap.size} unique videos`);
   
   let skippedCopies = 0;
   
@@ -1316,11 +1341,37 @@ async function syncVideosFromDrive(folderIdOrIds) {
     console.log(`[Sync] Skipped ${skippedCopies} backup copies (Kopie van...)`);
   }
   
+  // AUTO-ASSIGN playback_order based on Drive traversal order (Drive folder structure = correct order)
+  // allActiveVideos is already in Drive folder order (orderBy=name, depth-first traversal)
+  console.log(`[Sync] Assigning playback_order for ${allActiveVideos.length} active videos...`);
+  const orderUpdates = [];
+  for (let i = 0; i < allActiveVideos.length; i++) {
+    const video = allActiveVideos[i];
+    if (video.name.startsWith('Kopie van ')) continue;
+    const job = existingMap.get(video.id);
+    if (job) {
+      orderUpdates.push({ id: job.id, playback_order: i + 1, drive_file_name: video.name });
+    }
+  }
+  
+  // Batch update playback_order in groups of 10
+  const batchSize = 10;
+  for (let i = 0; i < orderUpdates.length; i += batchSize) {
+    const batch = orderUpdates.slice(i, i + batchSize);
+    await Promise.all(batch.map(u =>
+      supabaseAdmin.from('video_ingest_jobs')
+        .update({ playback_order: u.playback_order, updated_at: new Date().toISOString() })
+        .eq('id', u.id)
+    ));
+  }
+  console.log(`[Sync] playback_order assigned for ${orderUpdates.length} videos`);
+  result.ordersUpdated = orderUpdates.length;
+  
   // DELETION LOGIC: Mark videos as deleted if they're NOT in Drive AT ALL (not active, not archief)
   // This means: if Hugo deletes a video from Drive completely, it gets deleted here + from RAG
   for (const [driveFileId, job] of existingMap) {
-    // Only delete if video is NOT anywhere in Drive and not already deleted
-    if (!allDriveFileIds.has(driveFileId) && job.status !== 'deleted') {
+    // Only delete if video is NOT in active Drive AND not is_hidden (archief videos stay in DB even if not re-scanned)
+    if (!allDriveFileIds.has(driveFileId) && job.status !== 'deleted' && !job.is_hidden) {
       try {
         // Mark job as deleted
         await supabaseAdmin
@@ -1369,11 +1420,17 @@ function runProcessing(jobId = null) {
   
   console.log(`[VideoProcessor] Starting: python3 ${args.join(' ')}`);
   
-  const proc = spawn('python3', args, {
+  const proc = spawn(PYTHON_BIN, args, {
     cwd: process.cwd(),
     env: process.env
   });
   
+  proc.on('error', (err) => {
+    console.error(`[VideoProcessor] Failed to start python process: ${err.message}`);
+    processingActive = false;
+    lastOutput.push(`ERROR: Python niet gevonden (${err.message})`);
+  });
+
   proc.stdout.on('data', (data) => {
     const line = data.toString();
     console.log(`[Python] ${line}`);
@@ -1604,7 +1661,6 @@ const server = http.createServer((req, res) => {
     req.on('end', async () => {
       try {
         const data = JSON.parse(body || '{}');
-        // Accept either folderId (single) or folderIds (array)
         const folderIds = data.folderIds || (data.folderId ? [data.folderId] : []);
         
         if (!folderIds.length) {
@@ -1613,14 +1669,25 @@ const server = http.createServer((req, res) => {
           return;
         }
         
-        console.log('[VideoProcessor] Starting sync for folders:', folderIds);
+        // Return 202 immediately — sync runs as a separate spawned process to avoid memory issues
+        console.log('[VideoProcessor] Spawning standalone sync for folders:', folderIds);
+        res.writeHead(202, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Sync gestart op de achtergrond. Video\'s worden bijgewerkt, herlaad de pagina over ~35 seconden.' }));
         
-        const result = await syncVideosFromDrive(folderIds);
+        // Spawn as completely separate process (inherits env vars including REPLIT_CONNECTORS_HOSTNAME)
+        const { spawn } = require('child_process');
+        const child = spawn('node', ['scripts/sync_drive_order_standalone.js', ...folderIds], {
+          detached: true,
+          stdio: ['ignore', 'pipe', 'pipe'],
+          env: process.env
+        });
+        child.stdout.on('data', d => process.stdout.write('[SyncChild] ' + d));
+        child.stderr.on('data', d => process.stderr.write('[SyncChild] ' + d));
+        child.on('close', code => console.log(`[VideoProcessor] Standalone sync exited with code ${code}`));
+        child.unref();
         
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result));
       } catch (err) {
-        console.error('[VideoProcessor] Sync error:', err);
+        console.error('[VideoProcessor] Sync parse error:', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, message: err.message }));
       }
@@ -3804,7 +3871,7 @@ Format: ["id1", "id2", "id3", ...]`;
     
     console.log('[Deploy] Starting Cloud Run worker deployment...');
     
-    const deployScript = spawn('python3', ['scripts/deploy_cloud_run.py'], {
+    const deployScript = spawn(PYTHON_BIN, ['scripts/deploy_cloud_run.py'], {
       cwd: process.cwd(),
       env: process.env
     });
@@ -3812,6 +3879,12 @@ Format: ["id1", "id2", "id3", ...]`;
     let output = '';
     let errorOutput = '';
     
+    deployScript.on('error', (err) => {
+      console.error(`[Deploy] Failed to start deploy script: ${err.message}`);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Python niet beschikbaar', error: err.message }));
+    });
+
     deployScript.stdout.on('data', (data) => {
       const line = data.toString();
       output += line;
@@ -3855,13 +3928,22 @@ Format: ["id1", "id2", "id3", ...]`;
       return;
     }
     
-    const checkScript = spawn('python3', ['scripts/deploy_cloud_run.py', '--check'], {
+    const checkScript = spawn(PYTHON_BIN, ['scripts/deploy_cloud_run.py', '--check'], {
       cwd: process.cwd(),
       env: process.env
     });
     
     let output = '';
-    
+    let checkRespondedAlready = false;
+
+    checkScript.on('error', (err) => {
+      if (checkRespondedAlready) return;
+      checkRespondedAlready = true;
+      console.warn(`[CloudRun] python3 niet beschikbaar: ${err.message}`);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ valid: false, message: 'Python niet beschikbaar', details: err.message }));
+    });
+
     checkScript.stdout.on('data', (data) => {
       output += data.toString();
     });
@@ -3871,6 +3953,8 @@ Format: ["id1", "id2", "id3", ...]`;
     });
     
     checkScript.on('close', (code) => {
+      if (checkRespondedAlready) return;
+      checkRespondedAlready = true;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ 
         valid: code === 0,
@@ -4592,10 +4676,13 @@ Format: ["id1", "id2", "id3", ...]`;
         console.log(`[ConfigReview] Techniek ${techniqueNumber} bijgewerkt in SSOT`);
         
         // Optionally trigger RAG sync (async, don't wait)
-        const syncProcess = spawn('python', ['scripts/sync_ssot_to_rag.py'], {
+        const syncProcess = spawn(PYTHON_BIN, ['scripts/sync_ssot_to_rag.py'], {
           cwd: path.join(__dirname, '..'),
           detached: true,
           stdio: 'ignore'
+        });
+        syncProcess.on('error', (err) => {
+          console.warn(`[ConfigReview] RAG sync kon niet starten: ${err.message}`);
         });
         syncProcess.unref();
         console.log(`[ConfigReview] RAG sync gestart voor techniek ${techniqueNumber}`);
