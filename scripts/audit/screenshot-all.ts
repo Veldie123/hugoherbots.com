@@ -2,7 +2,7 @@ import { chromium } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = `http://localhost:${process.env.PORT || 5000}`;
 
 const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 },

@@ -68,3 +68,6 @@ __pycache__/
 # Design audit output (generated files)
 screenshots/
 DESIGN_AUDIT.md
+
+# Claude Code local settings
+.claude/
