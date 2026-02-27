@@ -48,7 +48,7 @@ interface ConfigConflict {
   techniqueName: string;
   type: string;
   source: string;
-  severity: "HIGH" | "MEDIUM" | "LOW";
+  severity: "HIGH" | "MEDIUM" | "LOW" | "ACTION";
   description: string;
   status: "pending" | "approved" | "rejected";
   detectedAt: string;
@@ -88,16 +88,20 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             'technique_edit': 'SSOT Techniek Bewerking',
             'video_edit': 'Video Bewerking',
             'chat_correction': 'Chat Correctie',
+            'chat_feedback': 'Chat Feedback',
             'ssot_edit': 'SSOT Bewerking',
             'coach_debrief': 'Debrief Correctie',
             'moment': 'Moment Correctie',
           };
           const sourceOrType = c.source || c.type;
+          const isGeneralFeedback = c.field === 'general_feedback';
           const severity = ['technique_edit', 'ssot_edit'].includes(sourceOrType)
             ? 'HIGH'
             : sourceOrType === 'video_edit'
               ? 'MEDIUM'
-              : 'LOW';
+              : isGeneralFeedback
+                ? 'ACTION'
+                : 'LOW';
           const techNum = c.field?.match(/\d+\.\d+/)?.[0] || c.type?.charAt(0)?.toUpperCase() || '—';
           const timeAgo = getTimeAgo(new Date(c.created_at));
 
@@ -235,6 +239,12 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             MEDIUM
           </Badge>
         );
+      case "ACTION":
+        return (
+          <Badge className="bg-purple-600 text-white border-0 text-[10px] px-2 py-0.5">
+            ACTIE
+          </Badge>
+        );
       case "LOW":
         return (
           <Badge className="bg-blue-500 text-white border-0 text-[10px] px-2 py-0.5">
@@ -345,6 +355,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                 <SelectItem value="all">Alle Severity</SelectItem>
                 <SelectItem value="HIGH">High</SelectItem>
                 <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="ACTION">Actie vereist</SelectItem>
                 <SelectItem value="LOW">Low</SelectItem>
               </SelectContent>
             </Select>
@@ -369,6 +380,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                 <SelectItem value="all">Alle Bronnen</SelectItem>
                 <SelectItem value="technique_edit">Techniek Bewerking</SelectItem>
                 <SelectItem value="video_edit">Video Bewerking</SelectItem>
+                <SelectItem value="chat_feedback">Chat Feedback</SelectItem>
                 <SelectItem value="chat_correction">Chat Correctie</SelectItem>
                 <SelectItem value="analysis_correction">Analyse Correctie</SelectItem>
                 <SelectItem value="ssot_edit">SSOT Bewerking</SelectItem>
@@ -452,20 +464,28 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                         <td className="p-4">{getTypeBadge(conflict.type)}</td>
                         <td className="p-4">{getSeverityBadge(conflict.severity)}</td>
                         <td className="p-4">
-                          {conflict.originalValue || conflict.newValue ? (
-                            <div className="max-w-[300px]">
+                          <div className="max-w-[300px]">
+                            {conflict.severity === 'ACTION' && conflict.status === 'pending' && (
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+                                <span className="text-[11px] font-medium text-purple-600">
+                                  Actie vereist — vrije feedback, geen automatische verwerking
+                                </span>
+                              </div>
+                            )}
+                            {conflict.originalValue || conflict.newValue ? (
                               <TrackChange
                                 original={conflict.originalValue}
                                 proposed={conflict.newValue}
                                 label={conflict.techniqueName}
                                 compact
                               />
-                            </div>
-                          ) : (
-                            <p className="text-[13px] text-hh-text max-w-[300px]">
-                              {conflict.description}
-                            </p>
-                          )}
+                            ) : (
+                              <p className="text-[13px] text-hh-text">
+                                {conflict.description}
+                              </p>
+                            )}
+                          </div>
                         </td>
                         <td className="p-4">{getStatusBadge(conflict.status)}</td>
                         <td className="p-4">

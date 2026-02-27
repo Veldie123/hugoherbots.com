@@ -2,19 +2,17 @@ import {
   Bell,
   CheckCircle2,
   AlertCircle,
-  Info,
-  TrendingUp,
-  Users,
-  Calendar,
-  MessageSquare,
+  Clock,
   Settings,
-  Archive,
-  Trash2,
-  Check,
-  Search,
-  Filter,
-  MoreVertical,
+  Users,
   Zap,
+  Check,
+  X,
+  Search,
+  Loader2,
+  Database,
+  MoreVertical,
+  ExternalLink,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AdminLayout } from "./AdminLayout";
@@ -35,13 +33,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { toast } from "sonner";
 
 interface AdminNotificationsProps {
   navigate?: (page: string) => void;
   isSuperAdmin?: boolean;
 }
 
-type NotificationFilter = "all" | "unread" | "read" | "archived";
+type NotificationFilter = "all" | "unread" | "read";
 type NotificationCategory = "all" | "system" | "users" | "sessions" | "content";
 
 export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotificationsProps) {
@@ -71,16 +70,15 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
         const data = await response.json();
         setNotifications((data.notifications || []).map((n: any) => ({
           id: n.id,
-          type: n.severity === 'warning' ? 'warning' : n.severity === 'critical' ? 'warning' : n.type === 'correction_submitted' ? 'warning' : 'info',
+          type: n.type,
           category: n.category || 'content',
           title: n.title,
           message: n.message,
           timestamp: getTimeAgo(new Date(n.created_at)),
           read: n.read,
-          icon: n.type === 'correction_submitted' ? Settings : n.category === 'users' ? Users : n.category === 'system' ? CheckCircle2 : Zap,
-          iconColor: n.severity === 'warning' ? 'text-orange-500' : n.severity === 'critical' ? 'text-red-500' : 'text-purple-500',
-          iconBg: n.severity === 'warning' ? 'bg-orange-500/10' : n.severity === 'critical' ? 'bg-red-500/10' : 'bg-purple-500/10',
-          action: n.related_page || undefined,
+          severity: n.severity || 'info',
+          relatedPage: n.related_page || undefined,
+          submittedBy: n.submitted_by || undefined,
         })));
       }
     } catch (err) {
@@ -117,15 +115,34 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
     );
   };
 
-  const selectAll = () => {
-    setSelectedNotifications(filteredNotifications.map((n) => n.id));
+  const handleMarkRead = async (id: number) => {
+    try {
+      await fetch(`/api/v2/admin/notifications/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read: true }),
+      });
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+      toast.success('Gemarkeerd als gelezen');
+    } catch {
+      toast.error('Fout bij markeren');
+    }
   };
 
-  const deselectAll = () => {
-    setSelectedNotifications([]);
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await fetch(`/api/v2/admin/notifications/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+        setSelectedNotifications(prev => prev.filter(nId => nId !== id));
+        toast.success('Notificatie verwijderd');
+      }
+    } catch {
+      toast.error('Fout bij verwijderen');
+    }
   };
 
-  const markAsRead = async () => {
+  const handleBulkMarkRead = async () => {
     for (const id of selectedNotifications) {
       await fetch(`/api/v2/admin/notifications/${id}`, {
         method: 'PATCH',
@@ -133,340 +150,306 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
         body: JSON.stringify({ read: true }),
       });
     }
-    setNotifications(prev => prev.map(n => 
+    setNotifications(prev => prev.map(n =>
       selectedNotifications.includes(n.id) ? { ...n, read: true } : n
     ));
+    toast.success(`${selectedNotifications.length} notificatie(s) als gelezen gemarkeerd`);
     setSelectedNotifications([]);
   };
 
-  const archiveSelected = () => {
-    console.log("Archive:", selectedNotifications);
+  const handleBulkDelete = async () => {
+    for (const id of selectedNotifications) {
+      await fetch(`/api/v2/admin/notifications/${id}`, { method: 'DELETE' });
+    }
+    setNotifications(prev => prev.filter(n => !selectedNotifications.includes(n.id)));
+    toast.success(`${selectedNotifications.length} notificatie(s) verwijderd`);
     setSelectedNotifications([]);
   };
 
-  const deleteSelected = () => {
-    console.log("Delete:", selectedNotifications);
-    setSelectedNotifications([]);
+  const getTypeLabel = (type: string) => {
+    const map: Record<string, string> = {
+      'correction_submitted': 'Correctie',
+      'feedback_received': 'Feedback',
+      'system': 'Systeem',
+    };
+    return map[type] || type;
+  };
+
+  const getSeverityBadge = (severity: string) => {
+    switch (severity) {
+      case "critical":
+        return <Badge className="bg-red-600 text-white border-0 text-[10px] px-2 py-0.5">Kritiek</Badge>;
+      case "warning":
+        return <Badge className="bg-orange-500 text-white border-0 text-[10px] px-2 py-0.5">Waarschuwing</Badge>;
+      default:
+        return <Badge className="bg-blue-500 text-white border-0 text-[10px] px-2 py-0.5">Info</Badge>;
+    }
   };
 
   return (
     <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-notifications" navigate={navigate}>
       <div className="p-6 space-y-6">
-        {/* Header */}
         <div className="flex items-start justify-between">
-          <div className="max-w-[50%]">
-            <h1 className="text-[32px] leading-[40px] text-hh-text mb-2">
+          <div>
+            <h1 className="text-[32px] leading-[40px] font-bold text-hh-ink mb-2">
               Notificaties
             </h1>
             <p className="text-[16px] leading-[24px] text-hh-muted">
               Beheer systeem notificaties en meldingen
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            {selectedNotifications.length > 0 && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                  onClick={markAsRead}
-                >
-                  <Check className="w-4 h-4" />
-                  <span className="hidden lg:inline">Markeer gelezen</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                  onClick={archiveSelected}
-                >
-                  <Archive className="w-4 h-4" />
-                  <span className="hidden lg:inline">Archiveer</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 text-red-600 hover:text-red-700"
-                  onClick={deleteSelected}
-                >
-                  <Trash2 className="w-4 h-4" />
-                  <span className="hidden lg:inline">Verwijder</span>
-                </Button>
-              </>
-            )}
-          </div>
+          {selectedNotifications.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-[12px]">
+                {selectedNotifications.length} geselecteerd
+              </Badge>
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={handleBulkMarkRead}>
+                <Check className="w-3.5 h-3.5" />
+                Gelezen
+              </Button>
+              <Button variant="outline" size="sm" className="gap-1.5 text-red-600 hover:text-red-700" onClick={handleBulkDelete}>
+                <X className="w-3.5 h-3.5" />
+                Verwijder
+              </Button>
+            </div>
+          )}
         </div>
 
-        {/* KPI Tiles - 4 columns */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
-              </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center mb-3">
+              <Bell className="w-5 h-5 text-purple-600" />
             </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
-              Totaal Notificaties
-            </p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-ink">
-              {notifications.length}
-            </p>
+            <p className="text-[13px] text-hh-muted mb-1">Totaal</p>
+            <p className="text-[28px] font-semibold text-hh-ink">{notifications.length}</p>
           </Card>
 
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
-                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
-              </div>
-              <Badge
-                variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-orange-500/10 text-orange-500 border-orange-500/20"
-              >
-                Nieuw
-              </Badge>
+          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center mb-3">
+              <Clock className="w-5 h-5 text-amber-600" />
             </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
-              Ongelezen
-            </p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-ink">
-              {unreadCount}
-            </p>
+            <p className="text-[13px] text-hh-muted mb-1">Ongelezen</p>
+            <p className="text-[28px] font-semibold text-hh-ink">{unreadCount}</p>
           </Card>
 
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-              </div>
+          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mb-3">
+              <CheckCircle2 className="w-5 h-5 text-green-600" />
             </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
-              Gelezen
-            </p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-ink">
-              {readCount}
-            </p>
+            <p className="text-[13px] text-hh-muted mb-1">Gelezen</p>
+            <p className="text-[28px] font-semibold text-hh-ink">{readCount}</p>
           </Card>
 
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
-              </div>
-              <Badge
-                variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
-              >
-                +12%
-              </Badge>
+          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-3">
+              <AlertCircle className="w-5 h-5 text-blue-600" />
             </div>
-            <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
-              Deze week
-            </p>
-            <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-ink">
-              24
+            <p className="text-[13px] text-hh-muted mb-1">Correcties</p>
+            <p className="text-[28px] font-semibold text-hh-ink">
+              {notifications.filter(n => n.type === 'correction_submitted').length}
             </p>
           </Card>
         </div>
 
-        {/* Filter Card */}
-        <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-          <div className="space-y-3">
-            {/* Row 1: Search + Bulk Actions */}
-            <div className="flex items-center gap-3">
-              {/* Search - Left Side */}
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-hh-muted" />
-                <Input
-                  placeholder="Zoek notificaties..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              {/* Bulk Actions - Right Side */}
-              {selectedNotifications.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-[12px]">
-                    {selectedNotifications.length} geselecteerd
-                  </Badge>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={deselectAll}
-                    className="text-[12px]"
-                  >
-                    Deselecteer
-                  </Button>
-                </div>
-              )}
-              {selectedNotifications.length === 0 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={selectAll}
-                  className="gap-2"
-                >
-                  <Check className="w-4 h-4" />
-                  <span className="hidden sm:inline">Alles</span>
-                </Button>
-              )}
+        <Card className="p-4 rounded-[16px] shadow-hh-sm border-hh-border">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-hh-muted" />
+              <Input
+                placeholder="Zoek notificaties..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
             </div>
 
-            {/* Row 2: Filters */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Select value={filter} onValueChange={(v) => setFilter(v as NotificationFilter)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Status filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle notificaties</SelectItem>
-                  <SelectItem value="unread">Ongelezen</SelectItem>
-                  <SelectItem value="read">Gelezen</SelectItem>
-                  <SelectItem value="archived">Gearchiveerd</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select value={filter} onValueChange={(v) => setFilter(v as NotificationFilter)}>
+              <SelectTrigger className="w-full sm:w-[160px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle notificaties</SelectItem>
+                <SelectItem value="unread">Ongelezen</SelectItem>
+                <SelectItem value="read">Gelezen</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select value={category} onValueChange={(v) => setCategory(v as NotificationCategory)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Categorie filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle categorieën</SelectItem>
-                  <SelectItem value="system">Systeem</SelectItem>
-                  <SelectItem value="users">Gebruikers</SelectItem>
-                  <SelectItem value="sessions">Sessies</SelectItem>
-                  <SelectItem value="content">Content</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={category} onValueChange={(v) => setCategory(v as NotificationCategory)}>
+              <SelectTrigger className="w-full sm:w-[160px]">
+                <SelectValue placeholder="Categorie" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle categorieën</SelectItem>
+                <SelectItem value="system">Systeem</SelectItem>
+                <SelectItem value="users">Gebruikers</SelectItem>
+                <SelectItem value="sessions">Sessies</SelectItem>
+                <SelectItem value="content">Content</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </Card>
 
-        {/* Notifications List */}
-        <div className="space-y-2">
-          {filteredNotifications.length === 0 ? (
-            <Card className="p-8 rounded-[16px] border-hh-border text-center">
-              <Bell className="w-12 h-12 text-hh-muted mx-auto mb-3" />
-              <p className="text-[16px] text-hh-muted">
-                {loading ? "Notificaties laden..." : "Nog geen notificaties. Notificaties verschijnen hier wanneer een admin wijzigingen indient."}
-              </p>
-            </Card>
-          ) : (
-            filteredNotifications.map((notification) => {
-              const Icon = notification.icon;
-              const isSelected = selectedNotifications.includes(notification.id);
-
-              return (
-                <Card
-                  key={notification.id}
-                  className={`p-4 rounded-[16px] border-hh-border transition-all ${
-                    isSelected
-                      ? "ring-2 ring-hh-primary bg-hh-primary/5"
-                      : "hover:shadow-md"
-                  } ${!notification.read ? "bg-blue-500/5" : "bg-card"}`}
-                >
-                  <div className="flex items-start gap-4">
-                    {/* Checkbox */}
+        <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-hh-ui-50 border-b border-hh-border">
+                <tr>
+                  <th className="w-12 p-4">
                     <button
-                      onClick={() => toggleSelection(notification.id)}
-                      className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                        isSelected
-                          ? "bg-hh-primary border-hh-primary"
-                          : "border-hh-border hover:border-hh-primary"
+                      onClick={() => {
+                        if (selectedNotifications.length === filteredNotifications.length) {
+                          setSelectedNotifications([]);
+                        } else {
+                          setSelectedNotifications(filteredNotifications.map(n => n.id));
+                        }
+                      }}
+                      className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                        selectedNotifications.length === filteredNotifications.length && filteredNotifications.length > 0
+                          ? "bg-purple-600 border-purple-600"
+                          : "border-hh-border hover:border-purple-400"
                       }`}
                     >
-                      {isSelected && <Check className="w-3 h-3 text-white" />}
+                      {selectedNotifications.length === filteredNotifications.length && filteredNotifications.length > 0 && (
+                        <Check className="w-3 h-3 text-white" />
+                      )}
                     </button>
-
-                    {/* Icon */}
-                    <div
-                      className={`w-10 h-10 rounded-full ${notification.iconBg} flex items-center justify-center flex-shrink-0`}
+                  </th>
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
+                    Bericht
+                  </th>
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
+                    Type
+                  </th>
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
+                    Severity
+                  </th>
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
+                    Status
+                  </th>
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
+                    Tijd
+                  </th>
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
+                    Acties
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading && (
+                  <tr><td colSpan={7} className="p-8 text-center">
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-purple-600 mb-2" />
+                    <p className="text-[13px] text-hh-muted">Notificaties laden...</p>
+                  </td></tr>
+                )}
+                {!loading && filteredNotifications.length === 0 && (
+                  <tr><td colSpan={7} className="p-8 text-center">
+                    <Database className="w-8 h-8 mx-auto text-hh-muted/50 mb-2" />
+                    <p className="text-[14px] font-medium text-hh-text mb-1">Geen notificaties</p>
+                    <p className="text-[13px] text-hh-muted">Notificaties verschijnen hier wanneer een admin wijzigingen indient.</p>
+                  </td></tr>
+                )}
+                {filteredNotifications.map((notification) => {
+                  const isSelected = selectedNotifications.includes(notification.id);
+                  return (
+                    <tr
+                      key={notification.id}
+                      className={`border-b border-hh-border last:border-0 transition-colors ${
+                        notification.relatedPage ? 'cursor-pointer hover:bg-hh-ui-50' : 'hover:bg-hh-ui-50'
+                      } ${!notification.read ? 'bg-purple-500/5' : ''}`}
+                      onClick={() => {
+                        if (notification.relatedPage && navigate) {
+                          handleMarkRead(notification.id);
+                          const page = notification.relatedPage;
+                          navigate(page.startsWith('admin-') ? page : `admin-${page}`);
+                        }
+                      }}
                     >
-                      <Icon className={`w-5 h-5 ${notification.iconColor}`} />
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4 mb-1">
-                        <h3
-                          className={`text-[15px] leading-[22px] ${
-                            notification.read
-                              ? "text-hh-text"
-                              : "text-hh-ink font-semibold"
+                      <td className="p-4" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => toggleSelection(notification.id)}
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                            isSelected
+                              ? "bg-purple-600 border-purple-600"
+                              : "border-hh-border hover:border-purple-400"
                           }`}
                         >
-                          {notification.title}
-                        </h3>
-                        <span className="text-[12px] text-hh-muted whitespace-nowrap">
-                          {notification.timestamp}
-                        </span>
-                      </div>
-                      <p className="text-[14px] leading-[20px] text-hh-muted mb-2">
-                        {notification.message}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          className="text-[10px] capitalize"
-                        >
-                          {notification.category}
+                          {isSelected && <Check className="w-3 h-3 text-white" />}
+                        </button>
+                      </td>
+                      <td className="p-4">
+                        <div className="max-w-[400px]">
+                          <div className="flex items-center gap-2">
+                            {!notification.read && (
+                              <span className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0" />
+                            )}
+                            <p className={`text-[14px] leading-[20px] ${!notification.read ? 'font-semibold text-hh-ink' : 'text-hh-text'}`}>
+                              {notification.title}
+                            </p>
+                          </div>
+                          <p className="text-[13px] leading-[18px] text-hh-muted mt-0.5 line-clamp-2">
+                            {notification.message}
+                          </p>
+                          {notification.relatedPage && (
+                            <div className="flex items-center gap-1 mt-1">
+                              <ExternalLink className="w-3 h-3 text-purple-500" />
+                              <span className="text-[11px] text-purple-600">Bekijk in Config Review</span>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <Badge variant="outline" className="text-[11px] bg-hh-ui-50 text-hh-muted border-hh-border">
+                          {getTypeLabel(notification.type)}
                         </Badge>
-                        {!notification.read && (
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] bg-blue-500/10 text-blue-600 border-blue-500/20"
-                          >
+                      </td>
+                      <td className="p-4">{getSeverityBadge(notification.severity)}</td>
+                      <td className="p-4">
+                        {notification.read ? (
+                          <Badge variant="outline" className="text-[11px] bg-green-500/10 text-green-600 border-green-500/20">
+                            Gelezen
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[11px] bg-amber-500/10 text-amber-600 border-amber-500/20">
                             Nieuw
                           </Badge>
                         )}
-                        {"action" in notification && notification.action && navigate && (
+                      </td>
+                      <td className="p-4">
+                        <span className="text-[13px] text-hh-muted whitespace-nowrap">
+                          {notification.timestamp}
+                        </span>
+                      </td>
+                      <td className="p-4" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1">
+                          {!notification.read && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600"
+                              onClick={() => handleMarkRead(notification.id)}
+                              title="Markeer als gelezen"
+                            >
+                              <Check className="w-4 h-4" />
+                            </Button>
+                          )}
                           <Button
+                            variant="ghost"
                             size="sm"
-                            variant="outline"
-                            className="h-6 text-[11px] px-2 border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
-                            onClick={() => {
-                              const action = notification.action as string;
-                              navigate(action.startsWith('admin-') ? action : `admin-${action}`);
-                            }}
+                            className="h-8 w-8 p-0 hover:bg-red-500/10 hover:text-red-600"
+                            onClick={() => handleDelete(notification.id)}
+                            title="Verwijder"
                           >
-                            Bekijk
+                            <X className="w-4 h-4" />
                           </Button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 flex-shrink-0"
-                        >
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Check className="w-4 h-4 mr-2" />
-                          Markeer als gelezen
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Archive className="w-4 h-4 mr-2" />
-                          Archiveer
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Verwijder
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </Card>
-              );
-            })
-          )}
-        </div>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       </div>
     </AdminLayout>
   );

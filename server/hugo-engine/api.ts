@@ -4136,6 +4136,21 @@ app.patch("/api/v2/admin/notifications/:id", async (req: Request, res: Response)
   }
 });
 
+app.delete("/api/v2/admin/notifications/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `DELETE FROM admin_notifications WHERE id = $1 RETURNING id`,
+      [parseInt(id)]
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Notification not found' });
+    res.json({ deleted: true, id: parseInt(id) });
+  } catch (err: any) {
+    console.error('[Admin] Notification delete error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ===========================================
 // ADMIN DASHBOARD STATS
 // ===========================================
