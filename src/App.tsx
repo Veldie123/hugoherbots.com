@@ -51,7 +51,6 @@ import { UserNotifications } from "./components/HH/UserNotifications";
 import { Library } from "./components/HH/Library";
 import { PrivacyPolicy } from "./components/HH/PrivacyPolicy";
 import { AdminChatExpertMode } from "./components/HH/AdminChatExpertMode";
-import { AdminHugoAgent } from "./components/HH/AdminHugoAgent";
 import { AdminRAGReview } from "./components/HH/AdminRAGReview";
 import { AdminConflicts } from "./components/HH/AdminConflicts";
 import { SSOValidate } from "./components/HH/SSOValidate";
@@ -342,8 +341,8 @@ export default function App() {
           {currentPage === "admin-sessions" && <AdminSessions navigate={navigate} />}
           {currentPage === "admin-config-review" && <AdminConfigReview navigate={navigate} />}
           {currentPage === "admin-notifications" && <AdminNotifications navigate={navigate} />}
-          {currentPage === "admin-chat-expert" && <AdminChatExpertMode sessionId="default" sessionTitle="Talk to myself AI" navigate={navigate} />}
-          {currentPage === "admin-hugo-agent" && <AdminHugoAgent navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-chat-expert" && <AdminChatExpertMode sessionId="default" sessionTitle="Talk to myself AI" navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-hugo-agent" && <AdminChatExpertMode sessionId="hugo-agent" sessionTitle="Talk to Myself AI" navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-rag-review" && <AdminRAGReview navigate={navigate} currentPage={currentPage} />}
           {currentPage === "admin-conflicts" && <AdminConflicts navigate={navigate} />}
           {currentPage === "admin-analysis-results" && <AnalysisResults navigate={navigate} isAdmin={true} navigationData={navigationData} />}

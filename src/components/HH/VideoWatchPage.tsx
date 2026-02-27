@@ -365,7 +365,7 @@ export function VideoWatchPage({
       </div>
 
       <div className="flex flex-col lg:flex-row gap-4 lg:items-start">
-        <div className="hidden lg:block lg:w-[300px] lg:min-w-[300px] lg:max-w-[300px] flex-shrink-0 order-2 lg:order-1 lg:sticky lg:top-4 lg:self-start overflow-hidden">
+        <div className="hidden lg:block lg:w-[300px] lg:min-w-[300px] lg:max-w-[300px] flex-shrink-0 order-2 lg:order-1 lg:sticky lg:top-4 lg:self-start overflow-hidden" style={{ contain: 'layout', width: '300px', minWidth: '300px', maxWidth: '300px' }}>
           <div className="bg-hh-card border border-hh-border rounded-xl overflow-hidden w-full">
             <div className="px-3 py-2.5 border-b border-hh-border">
               <h2 className="text-xs font-bold text-hh-text flex items-center gap-1.5 uppercase tracking-wide">
@@ -378,16 +378,14 @@ export function VideoWatchPage({
                 </p>
                 {timeline.length > 0 && activeTimelineTechnique && (
                   <span className="flex items-center gap-1 text-[9px] text-[#2563eb] font-semibold">
-                    <span className="w-3.5 h-3.5 rounded-full bg-[#2563eb] flex items-center justify-center animate-pulse">
-                      <Play className="w-1.5 h-1.5 text-white ml-[0.5px]" fill="white" />
-                    </span>
+                    <span className="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse" />
                     Actief
                   </span>
                 )}
               </div>
             </div>
 
-            <div ref={navigatorRef} className="max-h-[calc(100vh-180px)] overflow-y-auto">
+            <div ref={navigatorRef} className="max-h-[calc(100vh-180px)] overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {phaseData.map(({ fase, name, techniques, topLevel, color }) => {
                 const isExpanded = expandedPhase === fase || autoExpandedPhases.has(fase);
                 const techCount = techniques.length;
@@ -445,13 +443,9 @@ export function VideoWatchPage({
                     >
                       <div className="flex-shrink-0 w-4">
                         {isLiveActive ? (
-                          <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center animate-pulse" style={{ backgroundColor: "#2563eb" }}>
-                            <Play className="w-2 h-2 text-white ml-[0.5px]" fill="white" />
-                          </div>
+                          <div className="w-3.5 h-3.5 rounded-full animate-pulse" style={{ backgroundColor: "#2563eb" }} />
                         ) : isPrimary ? (
-                          <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ backgroundColor: "#1e3a5f" }}>
-                            <Play className="w-2 h-2 text-white ml-[1px]" fill="white" />
-                          </div>
+                          <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: "#1e3a5f" }} />
                         ) : isHighlighted ? (
                           <Tag className="w-3 h-3" style={{ color: "#1e3a5f" }} />
                         ) : isCompleted ? (
@@ -486,11 +480,6 @@ export function VideoWatchPage({
                         <span className="text-[8px] text-[#1e3a5f]/60 font-mono flex-shrink-0">
                           {Math.round(techConfidence.confidence * 100)}%
                         </span>
-                      )}
-                      {isLiveActive && (
-                        <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 animate-pulse" style={{ backgroundColor: "#2563eb" }}>
-                          <Play className="w-2 h-2 text-white ml-[0.5px]" fill="white" />
-                        </div>
                       )}
                       <button
                         className="text-hh-muted/30 flex-shrink-0 hover:text-hh-muted/70 transition-colors p-1.5 rounded-md hover:bg-hh-ui-50 ml-auto"
@@ -582,9 +571,7 @@ export function VideoWatchPage({
                               >
                                 <div className="flex-shrink-0 w-4">
                                   {isGroupSelfActive ? (
-                                    <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ backgroundColor: "#1e3a5f" }}>
-                                      <Play className="w-2 h-2 text-white ml-[1px]" fill="white" />
-                                    </div>
+                                    <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: "#1e3a5f" }} />
                                   ) : isGroupCompleted ? (
                                     <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "#3d9a6e" }} />
                                   ) : isGroupExpanded ? (
@@ -638,9 +625,7 @@ export function VideoWatchPage({
                                           >
                                             <div className="flex-shrink-0 w-4">
                                               {childIsActive ? (
-                                                <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ backgroundColor: "#1e3a5f" }}>
-                                                  <Play className="w-2 h-2 text-white ml-[1px]" fill="white" />
-                                                </div>
+                                                <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: "#1e3a5f" }} />
                                               ) : childCompleted ? (
                                                 <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "#3d9a6e" }} />
                                               ) : isSubExpanded ? (
@@ -777,15 +762,13 @@ export function VideoWatchPage({
                     </p>
                     {timeline.length > 0 && activeTimelineTechnique && (
                       <span className="flex items-center gap-1 text-[9px] text-[#2563eb] font-semibold">
-                        <span className="w-3.5 h-3.5 rounded-full bg-[#2563eb] flex items-center justify-center animate-pulse">
-                          <Play className="w-1.5 h-1.5 text-white ml-[0.5px]" fill="white" />
-                        </span>
+                        <span className="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse" />
                         Actief
                       </span>
                     )}
                   </div>
                 </div>
-                <div className="max-h-[50vh] overflow-y-auto">
+                <div className="max-h-[50vh] overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                   {phaseData.map(({ fase, name, techniques, topLevel, color }) => {
                     const isExpanded = expandedPhase === fase || autoExpandedPhases.has(fase);
                     const techCount = techniques.length;
@@ -852,13 +835,9 @@ export function VideoWatchPage({
                                 >
                                   <div className="flex-shrink-0 w-4">
                                     {isLiveActive ? (
-                                      <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center animate-pulse" style={{ backgroundColor: "#2563eb" }}>
-                                        <Play className="w-2 h-2 text-white ml-[0.5px]" fill="white" />
-                                      </div>
+                                      <div className="w-3.5 h-3.5 rounded-full animate-pulse" style={{ backgroundColor: "#2563eb" }} />
                                     ) : isPrimary ? (
-                                      <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ backgroundColor: "#1e3a5f" }}>
-                                        <Play className="w-2 h-2 text-white ml-[1px]" fill="white" />
-                                      </div>
+                                      <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: "#1e3a5f" }} />
                                     ) : null}
                                   </div>
                                   <span className={`text-[10px] font-mono flex-shrink-0 ${isLiveActive ? "text-[#2563eb] font-bold" : isActive ? "text-[#1e3a5f] font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>

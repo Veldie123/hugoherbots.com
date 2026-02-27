@@ -2757,6 +2757,7 @@ Format: ["id1", "id2", "id3", ...]`;
             playback_order: job.playback_order != null ? job.playback_order : null,
             source: 'pipeline',
             is_hidden: job.is_hidden || false,
+            user_ready: !!(job.mux_playback_id && job.techniek_id && job.ai_attractive_title), // Fully processed for user view
             created_at: job.created_at,
             updated_at: job.updated_at
           };

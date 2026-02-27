@@ -4253,7 +4253,7 @@ app.get("/api/v2/admin/stats", async (req: Request, res: Response) => {
 // ===========================================
 app.get("/api/v2/admin/welcome", async (req: Request, res: Response) => {
   try {
-    const statsRes = await fetch(`http://localhost:5000/api/v2/admin/stats`);
+    const statsRes = await fetch(`http://localhost:3002/api/v2/admin/stats`);
     const stats = await statsRes.json();
     
     const lines: string[] = [];

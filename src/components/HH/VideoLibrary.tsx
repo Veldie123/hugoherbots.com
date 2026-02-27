@@ -266,7 +266,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode }: VideoLibrary
 
   const getVideosByPlaybackOrder = () => {
     return [...libraryVideos]
-      .filter(v => v.mux_playback_id)
+      .filter(v => v.mux_playback_id && (v.technique_id || v.ai_suggested_techniek_id))
       .sort((a, b) => {
         if (a.playback_order != null && b.playback_order != null) return a.playback_order - b.playback_order;
         if (a.playback_order != null) return -1;
@@ -316,7 +316,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode }: VideoLibrary
     aiMatchScore: null as number | null,
     playbackOrder: null as number | null,
     aiSummary: null as string | null,
-  })) : libraryVideos.map(v => {
+  })) : libraryVideos.filter(v => v.mux_playback_id && (v.technique_id || v.ai_suggested_techniek_id)).map(v => {
     const techId = v.ai_suggested_techniek_id || v.technique_id || "";
     return {
       id: v.id,
@@ -663,7 +663,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode }: VideoLibrary
           {featuredVideo?.thumbnail ? (
             <img 
               src={featuredVideo.thumbnail.replace('width=320&height=180', 'width=800&height=450')} 
-              alt="Featured video"
+              alt="Hugo Herbots training video"
               className="absolute inset-0 w-full h-full object-cover"
               style={{ objectPosition: '50% 35%' }}
               loading="eager"
@@ -690,7 +690,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode }: VideoLibrary
                 <>
                   <Badge className="text-white border-0 text-[12px] bg-hh-primary">
                     <BookOpen className="w-3 h-3 mr-1" />
-                    {featuredVideo?.fase || (continueWatching?.reason === 'continue' ? 'Ga verder' : 'EPIC Training')}
+                    {(featuredVideo?.fase && featuredVideo.fase !== 'Onbekend') ? featuredVideo.fase : (continueWatching?.reason === 'continue' ? 'Ga verder' : 'EPIC Training')}
                   </Badge>
                   
                   <h2 className="text-[20px] sm:text-[24px] font-bold leading-tight">

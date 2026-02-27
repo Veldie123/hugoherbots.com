@@ -164,7 +164,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
 
   const allMainNavItems = [
     { id: "admin-dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "admin-hugo-agent", label: "Talk to Myself", icon: Sparkles, hasSuperscript: true },
+    { id: "admin-hugo-agent", label: "Talk to Myself", icon: Sparkles, hasSuperscript: true, superAdminOnly: true },
     { id: "admin-techniques", label: "E.P.I.C technieken", icon: Target, superAdminOnly: true },
     { id: "admin-videos", label: "Video's", icon: Video },
     { id: "admin-live", label: "Webinars", icon: Radio },

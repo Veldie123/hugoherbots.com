@@ -172,12 +172,14 @@ interface AdminChatExpertModeProps {
   sessionId: string;
   sessionTitle: string;
   navigate: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
 export function AdminChatExpertMode({
   sessionId,
   sessionTitle,
   navigate,
+  isSuperAdmin,
 }: AdminChatExpertModeProps) {
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -1169,7 +1171,7 @@ export function AdminChatExpertMode({
   };
 
   return (
-    <AdminLayout currentPage="admin-chat-expert" navigate={navigate}>
+    <AdminLayout currentPage={sessionId === "hugo-agent" ? "admin-hugo-agent" : "admin-chat-expert"} navigate={navigate} isSuperAdmin={isSuperAdmin}>
       <div className="flex flex-col h-full">
         {/* Unified header row — matching user view */}
         <div className="flex items-stretch border-b border-hh-border flex-shrink-0">
