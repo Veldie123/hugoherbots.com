@@ -63,9 +63,10 @@ interface Session {
 
 interface AdminSessionTranscriptsProps {
   navigate?: (page: string, data?: any) => void;
+  isSuperAdmin?: boolean;
 }
 
-export function AdminSessionTranscripts({ navigate }: AdminSessionTranscriptsProps) {
+export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSessionTranscriptsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTechnique, setFilterTechnique] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -278,7 +279,7 @@ export function AdminSessionTranscripts({ navigate }: AdminSessionTranscriptsPro
   });
 
   return (
-    <AdminLayout currentPage="admin-transcripts" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-transcripts" navigate={navigate}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">

@@ -57,9 +57,10 @@ import { getTechniekByNummer } from "../../data/technieken-service";
 
 interface AdminUserManagementProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
-export function AdminUserManagement({ navigate }: AdminUserManagementProps) {
+export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagementProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPlan, setFilterPlan] = useState("all");
@@ -196,7 +197,7 @@ export function AdminUserManagement({ navigate }: AdminUserManagementProps) {
   });
 
   return (
-    <AdminLayout currentPage="admin-users" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-users" navigate={navigate}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">

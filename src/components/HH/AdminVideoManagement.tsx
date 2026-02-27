@@ -3025,7 +3025,20 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
 
                       if (corrections.length > 0) {
                         await Promise.all(corrections);
-                        toast.success("Wijzigingen ingediend ter goedkeuring");
+                        const changeLines: string[] = [];
+                        if (titleChanged) {
+                          changeLines.push(`Titel: "${detailsVideo.ai_attractive_title || '(leeg)'}" → "${editedVideoData.attractiveTitle}"`);
+                        }
+                        if (origTitleChanged) {
+                          changeLines.push(`Originele titel: "${detailsVideo.title || '(leeg)'}" → "${editedVideoData.title}"`);
+                        }
+                        if (corrections.length > changeLines.length) {
+                          changeLines.push('Techniek velden gewijzigd');
+                        }
+                        toast.success("Wijzigingen ingediend ter goedkeuring", {
+                          description: changeLines.join(' | '),
+                          duration: 6000,
+                        });
                       } else {
                         toast.info("Geen wijzigingen gevonden");
                       }

@@ -50,9 +50,10 @@ import {
 
 interface AdminHelpCenterProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
-export function AdminHelpCenter({ navigate }: AdminHelpCenterProps) {
+export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -223,7 +224,7 @@ export function AdminHelpCenter({ navigate }: AdminHelpCenterProps) {
   };
 
   return (
-    <AdminLayout currentPage="admin-help" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-help" navigate={navigate}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">

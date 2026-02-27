@@ -24,9 +24,10 @@ interface UserProgress {
 
 interface AdminProgressProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
-export function AdminProgress({ navigate }: AdminProgressProps) {
+export function AdminProgress({ navigate, isSuperAdmin }: AdminProgressProps) {
   const [progressData, setProgressData] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +75,7 @@ export function AdminProgress({ navigate }: AdminProgressProps) {
   const totalWatchTime = progressData.reduce((sum, p) => sum + p.totalWatchTimeMinutes, 0);
 
   return (
-    <AdminLayout currentPage="admin-progress" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-progress" navigate={navigate}>
       <div className="p-6 space-y-6">
         <div>
           <h1 className="text-2xl font-semibold text-hh-ink">Voortgang Deelnemers</h1>

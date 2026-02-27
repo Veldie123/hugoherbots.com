@@ -169,7 +169,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
     { id: "admin-videos", label: "Video's", icon: Video },
     { id: "admin-live", label: "Webinars", icon: Radio },
     { id: "admin-uploads", label: "Gespreksanalyse", icon: Upload, historyType: "analysis" as const, overviewPage: "admin-uploads", superAdminOnly: true },
-    { id: "admin-sessions", label: "Talk to Hugo", icon: Sparkles, hasSuperscript: true, historyType: "chat" as const, overviewPage: "admin-sessions", superAdminOnly: true },
+    { id: "admin-sessions", label: "Talk to Hugo", icon: MessageSquare, hasSuperscript: true, historyType: "chat" as const, overviewPage: "admin-sessions", superAdminOnly: true },
   ];
   const mainNavItems = allMainNavItems.filter(item => isSuperAdminProp || !item.superAdminOnly);
 

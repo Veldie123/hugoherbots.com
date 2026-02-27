@@ -21,11 +21,12 @@ import {
 
 interface AdminSettingsProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
-export function AdminSettings({ navigate }: AdminSettingsProps) {
+export function AdminSettings({ navigate, isSuperAdmin }: AdminSettingsProps) {
   return (
-    <AdminLayout currentPage="admin-settings" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-settings" navigate={navigate}>
       <div className="p-6 space-y-6">
         <div>
           <h1 className="text-[32px] leading-[40px] text-hh-text mb-2">

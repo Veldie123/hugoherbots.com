@@ -21,11 +21,12 @@ import { AlertTriangle } from "lucide-react";
 
 interface AdminConflictsProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
-export function AdminConflicts({ navigate }: AdminConflictsProps) {
+export function AdminConflicts({ navigate, isSuperAdmin }: AdminConflictsProps) {
   return (
-    <AdminLayout currentPage="admin-conflicts" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-conflicts" navigate={navigate}>
       <div className="p-6 space-y-6">
         <div>
           <h1 className="text-[32px] leading-[40px] text-hh-text mb-2">

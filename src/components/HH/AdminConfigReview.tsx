@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AdminLayout } from "./AdminLayout";
+import { TrackChange } from "./TrackChange";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -38,6 +39,7 @@ import { toast } from "sonner";
 
 interface AdminConfigReviewProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
 interface ConfigConflict {
@@ -60,7 +62,7 @@ interface ConfigConflict {
   targetKey?: string;
 }
 
-export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
+export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [severityFilter, setSeverityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -278,7 +280,7 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
   };
 
   return (
-    <AdminLayout currentPage="admin-config-review" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-config-review" navigate={navigate}>
       <div className="p-6 space-y-6">
         <div>
           <h1 className="text-[32px] leading-[40px] font-bold text-hh-ink mb-2">
@@ -450,9 +452,20 @@ export function AdminConfigReview({ navigate }: AdminConfigReviewProps) {
                         <td className="p-4">{getTypeBadge(conflict.type)}</td>
                         <td className="p-4">{getSeverityBadge(conflict.severity)}</td>
                         <td className="p-4">
-                          <p className="text-[13px] text-hh-text max-w-[300px]">
-                            {conflict.description}
-                          </p>
+                          {conflict.originalValue || conflict.newValue ? (
+                            <div className="max-w-[300px]">
+                              <TrackChange
+                                original={conflict.originalValue}
+                                proposed={conflict.newValue}
+                                label={conflict.techniqueName}
+                                compact
+                              />
+                            </div>
+                          ) : (
+                            <p className="text-[13px] text-hh-text max-w-[300px]">
+                              {conflict.description}
+                            </p>
+                          )}
                         </td>
                         <td className="p-4">{getStatusBadge(conflict.status)}</td>
                         <td className="p-4">

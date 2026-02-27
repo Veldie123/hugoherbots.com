@@ -36,6 +36,7 @@ import { toast } from "sonner";
 interface AdminRAGReviewProps {
   navigate?: (page: string) => void;
   currentPage?: string;
+  isSuperAdmin?: boolean;
 }
 
 interface ChunkForReview {
@@ -63,7 +64,7 @@ interface TagStats {
   untagged: number;
 }
 
-export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: AdminRAGReviewProps) {
+export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-rag-review" }: AdminRAGReviewProps) {
   const [chunks, setChunks] = useState<ChunkForReview[]>([]);
   const [reviewStats, setReviewStats] = useState<ReviewStats | null>(null);
   const [tagStats, setTagStats] = useState<TagStats | null>(null);
@@ -227,7 +228,7 @@ export function AdminRAGReview({ navigate, currentPage = "admin-rag-review" }: A
   ] as string[];
 
   return (
-    <AdminLayout navigate={navigate} currentPage={currentPage}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} navigate={navigate} currentPage={currentPage}>
       <div className="space-y-6 p-6">
         <div className="flex items-center justify-between">
           <div>

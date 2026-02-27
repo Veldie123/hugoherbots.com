@@ -38,12 +38,13 @@ import {
 
 interface AdminNotificationsProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
 type NotificationFilter = "all" | "unread" | "read" | "archived";
 type NotificationCategory = "all" | "system" | "users" | "sessions" | "content";
 
-export function AdminNotifications({ navigate }: AdminNotificationsProps) {
+export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotificationsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<NotificationFilter>("all");
   const [category, setCategory] = useState<NotificationCategory>("all");
@@ -149,7 +150,7 @@ export function AdminNotifications({ navigate }: AdminNotificationsProps) {
   };
 
   return (
-    <AdminLayout currentPage="admin-notifications" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-notifications" navigate={navigate}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">

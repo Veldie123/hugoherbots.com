@@ -30,6 +30,7 @@ import { getTechniekByNummer } from "../../data/technieken-service";
 
 interface AdminAnalyticsProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
 interface PlatformData {
@@ -51,7 +52,7 @@ interface ContentItem {
   fase: string;
 }
 
-export function AdminAnalytics({ navigate }: AdminAnalyticsProps) {
+export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) {
   const [platformData, setPlatformData] = useState<PlatformData | null>(null);
   const [contentData, setContentData] = useState<ContentItem[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -158,7 +159,7 @@ export function AdminAnalytics({ navigate }: AdminAnalyticsProps) {
 
   if (loading) {
     return (
-      <AdminLayout currentPage="admin-analytics" navigate={navigate}>
+      <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-analytics" navigate={navigate}>
         <div className="p-6 flex items-center justify-center min-h-[400px]">
           <p className="text-hh-muted text-[16px]">Laden...</p>
         </div>
@@ -167,7 +168,7 @@ export function AdminAnalytics({ navigate }: AdminAnalyticsProps) {
   }
 
   return (
-    <AdminLayout currentPage="admin-analytics" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-analytics" navigate={navigate}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">

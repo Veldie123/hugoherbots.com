@@ -49,9 +49,10 @@ import {
 
 interface AdminResourceLibraryProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
-export function AdminResourceLibrary({ navigate }: AdminResourceLibraryProps) {
+export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterType, setFilterType] = useState("all");
@@ -206,7 +207,7 @@ export function AdminResourceLibrary({ navigate }: AdminResourceLibraryProps) {
   };
 
   return (
-    <AdminLayout currentPage="admin-resources" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-resources" navigate={navigate}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">

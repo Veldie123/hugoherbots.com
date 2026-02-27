@@ -46,12 +46,13 @@ import {
 
 interface AdminContentLibraryProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
 type SortField = "title" | "views" | "date" | null;
 type SortDirection = "asc" | "desc";
 
-export function AdminContentLibrary({ navigate }: AdminContentLibraryProps) {
+export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterFase, setFilterFase] = useState("all");
@@ -175,7 +176,7 @@ export function AdminContentLibrary({ navigate }: AdminContentLibraryProps) {
   };
 
   return (
-    <AdminLayout currentPage="admin-content" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-content" navigate={navigate}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">

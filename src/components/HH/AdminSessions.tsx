@@ -59,6 +59,7 @@ import { hideItem, getHiddenIds } from "../../utils/hiddenItems";
 
 interface AdminSessionsProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
 type SessionType = "ai-audio" | "ai-video" | "ai-chat" | "upload-audio" | "upload-video" | "live-analysis";
@@ -103,7 +104,7 @@ interface Session {
   };
 }
 
-export function AdminSessions({ navigate }: AdminSessionsProps) {
+export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterQuality, setFilterQuality] = useState<string>("all");
@@ -502,7 +503,7 @@ export function AdminSessions({ navigate }: AdminSessionsProps) {
 
   if (loading) {
     return (
-      <AdminLayout currentPage="admin-sessions" navigate={navigate}>
+      <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-sessions" navigate={navigate}>
         <div className="p-6 flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
@@ -515,7 +516,7 @@ export function AdminSessions({ navigate }: AdminSessionsProps) {
 
   if (error) {
     return (
-      <AdminLayout currentPage="admin-sessions" navigate={navigate}>
+      <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-sessions" navigate={navigate}>
         <div className="p-6">
           <Card className="p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-hh-warn mx-auto mb-4" />
@@ -528,7 +529,7 @@ export function AdminSessions({ navigate }: AdminSessionsProps) {
   }
 
   return (
-    <AdminLayout currentPage="admin-sessions" navigate={navigate}>
+    <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-sessions" navigate={navigate}>
       <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
         {/* Header */}
         <div>

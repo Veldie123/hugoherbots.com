@@ -3848,14 +3848,11 @@ app.post("/api/v2/chat/feedback", express.json(), async (req: Request, res: Resp
       console.log(`[Feedback] Thumbs-down from ${userId} on message ${messageId}: "${(messageText || '').slice(0, 100)}..."`);
 
       try {
-        await supabase.from('admin_notifications').insert({
-          type: 'chat_feedback',
-          title: 'Negatieve feedback op AI antwoord',
-          message: `Gebruiker gaf een duimpje omlaag: "${(messageText || '').slice(0, 150)}..."`,
-          source: 'talk-to-hugo',
-          metadata: { messageId, sessionId, userId, messageText: (messageText || '').slice(0, 500) },
-          read: false,
-        });
+        await pool.query(
+          `INSERT INTO admin_notifications (type, title, message, category, severity)
+           VALUES ($1, $2, $3, $4, $5)`,
+          ['chat_feedback', 'Negatieve feedback op AI antwoord', `Gebruiker gaf een duimpje omlaag: "${(messageText || '').slice(0, 150)}..."`, 'feedback', 'info']
+        );
       } catch (notifErr) {
         console.error('[Feedback] Failed to create admin notification:', notifErr);
       }
@@ -3883,7 +3880,7 @@ app.get("/api/v2/admin/feedback", async (req: Request, res: Response) => {
 // ADMIN CORRECTIONS API
 // ===========================================
 
-// Tables admin_corrections and admin_notifications exist in Supabase (created via SQL Editor)
+// Tables admin_corrections and admin_notifications exist in LOCAL PostgreSQL (DATABASE_URL)
 
 app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
   try {
@@ -3891,25 +3888,26 @@ app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
     if (!type || !field || !newValue) {
       return res.status(400).json({ error: 'Missing required fields: type, field, newValue' });
     }
-    const { data: correction, error: corrError } = await supabase
-      .from('admin_corrections')
-      .insert({
-        analysis_id: analysisId || null,
+    const insertResult = await pool.query(
+      `INSERT INTO admin_corrections (analysis_id, type, field, original_value, new_value, context, submitted_by, source, target_file, target_key, original_json, new_json)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+       RETURNING *`,
+      [
+        analysisId || null,
         type,
         field,
-        original_value: originalValue || '',
-        new_value: newValue,
-        context: context || '',
-        submitted_by: submittedBy || 'admin',
-        source: source || 'analysis',
-        target_file: targetFile || null,
-        target_key: targetKey || null,
-        original_json: originalJson ? (typeof originalJson === 'string' ? originalJson : JSON.stringify(originalJson)) : null,
-        new_json: newJson ? (typeof newJson === 'string' ? newJson : JSON.stringify(newJson)) : null,
-      })
-      .select()
-      .single();
-    if (corrError) throw corrError;
+        originalValue || '',
+        newValue,
+        context || '',
+        submittedBy || 'admin',
+        source || 'analysis',
+        targetFile || null,
+        targetKey || null,
+        originalJson ? (typeof originalJson === 'string' ? originalJson : JSON.stringify(originalJson)) : null,
+        newJson ? (typeof newJson === 'string' ? newJson : JSON.stringify(newJson)) : null,
+      ]
+    );
+    const correction = insertResult.rows[0];
 
     const submitter = submittedBy || 'admin';
     const corrSource = source || 'analysis';
@@ -3925,17 +3923,11 @@ app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
     const notifMessage = `${submitter} heeft ${field} gewijzigd van "${originalValue || '(leeg)'}" naar "${newValue}". Bron: ${corrSource}${targetFile ? `, bestand: ${targetFile}` : ''}${targetKey ? `, key: ${targetKey}` : ''}`;
 
     try {
-      await supabase
-        .from('admin_notifications')
-        .insert({
-          type: 'correction_submitted',
-          title: notifTitle,
-          message: notifMessage,
-          category: 'content',
-          severity: notifSeverity,
-          related_id: correction.id,
-          related_page: 'admin-config-review',
-        });
+      await pool.query(
+        `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        ['correction_submitted', notifTitle, notifMessage, 'content', notifSeverity, correction.id, 'admin-config-review']
+      );
       console.log(`[Admin] Notification created for correction #${correction.id}`);
     } catch (notifErr: any) {
       console.error('[Admin] Failed to create notification:', notifErr.message);
@@ -3951,13 +3943,15 @@ app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
 app.get("/api/v2/admin/corrections", async (req: Request, res: Response) => {
   try {
     const status = req.query.status as string || 'all';
-    let query = supabase.from('admin_corrections').select('*').order('created_at', { ascending: false }).limit(100);
+    let queryText = 'SELECT * FROM admin_corrections';
+    const params: any[] = [];
     if (status !== 'all') {
-      query = query.eq('status', status);
+      queryText += ' WHERE status = $1';
+      params.push(status);
     }
-    const { data: corrections, error } = await query;
-    if (error) throw error;
-    res.json({ corrections: corrections || [] });
+    queryText += ' ORDER BY created_at DESC LIMIT 100';
+    const { rows } = await pool.query(queryText, params);
+    res.json({ corrections: rows || [] });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -3972,13 +3966,11 @@ app.patch("/api/v2/admin/corrections/:id", async (req: Request, res: Response) =
     }
     const reviewedAt = status === 'pending' ? null : new Date().toISOString();
     const reviewer = status === 'pending' ? null : (reviewedBy || 'admin');
-    const { data: correction, error: updateErr } = await supabase
-      .from('admin_corrections')
-      .update({ status, reviewed_by: reviewer, reviewed_at: reviewedAt })
-      .eq('id', parseInt(id))
-      .select()
-      .single();
-    if (updateErr) throw updateErr;
+    const updateResult = await pool.query(
+      `UPDATE admin_corrections SET status = $1, reviewed_by = $2, reviewed_at = $3 WHERE id = $4 RETURNING *`,
+      [status, reviewer, reviewedAt, parseInt(id)]
+    );
+    const correction = updateResult.rows[0];
     if (!correction) return res.status(404).json({ error: 'Correction not found' });
     let ragGenerated = false;
     let ssotUpdated = false;
@@ -4086,15 +4078,16 @@ app.patch("/api/v2/admin/corrections/:id", async (req: Request, res: Response) =
 app.get("/api/v2/admin/notifications", async (req: Request, res: Response) => {
   try {
     const readFilter = req.query.read;
-    let query = supabase.from('admin_notifications').select('*').order('created_at', { ascending: false }).limit(200);
+    let queryText = 'SELECT * FROM admin_notifications';
+    const params: any[] = [];
     if (readFilter === 'true') {
-      query = query.eq('read', true);
+      queryText += ' WHERE read = true';
     } else if (readFilter === 'false') {
-      query = query.eq('read', false);
+      queryText += ' WHERE read = false';
     }
-    const { data: notifications, error } = await query;
-    if (error) throw error;
-    res.json({ notifications: notifications || [] });
+    queryText += ' ORDER BY created_at DESC LIMIT 200';
+    const { rows } = await pool.query(queryText, params);
+    res.json({ notifications: rows || [] });
   } catch (err: any) {
     console.error('[Admin] Notifications list error:', err.message);
     res.status(500).json({ error: err.message });
@@ -4103,12 +4096,8 @@ app.get("/api/v2/admin/notifications", async (req: Request, res: Response) => {
 
 app.get("/api/v2/admin/notifications/count", async (req: Request, res: Response) => {
   try {
-    const { count, error } = await supabase
-      .from('admin_notifications')
-      .select('*', { count: 'exact', head: true })
-      .eq('read', false);
-    if (error) throw error;
-    res.json({ unread: count || 0 });
+    const { rows } = await pool.query('SELECT COUNT(*) as count FROM admin_notifications WHERE read = false');
+    res.json({ unread: parseInt(rows[0]?.count || '0') });
   } catch (err: any) {
     console.error('[Admin] Notifications count error:', err.message);
     res.status(500).json({ error: err.message });
@@ -4117,13 +4106,10 @@ app.get("/api/v2/admin/notifications/count", async (req: Request, res: Response)
 
 app.patch("/api/v2/admin/notifications/read-all", async (req: Request, res: Response) => {
   try {
-    const { data, error } = await supabase
-      .from('admin_notifications')
-      .update({ read: true })
-      .eq('read', false)
-      .select();
-    if (error) throw error;
-    const updated = data?.length || 0;
+    const result = await pool.query(
+      `UPDATE admin_notifications SET read = true WHERE read = false RETURNING *`
+    );
+    const updated = result.rows?.length || 0;
     console.log(`[Admin] Marked ${updated} notifications as read`);
     res.json({ updated, message: 'Alle notificaties als gelezen gemarkeerd' });
   } catch (err: any) {
@@ -4137,13 +4123,11 @@ app.patch("/api/v2/admin/notifications/:id", async (req: Request, res: Response)
     const { id } = req.params;
     const { read } = req.body;
     const readValue = read !== undefined ? read : true;
-    const { data: notification, error: updateErr } = await supabase
-      .from('admin_notifications')
-      .update({ read: readValue })
-      .eq('id', parseInt(id))
-      .select()
-      .single();
-    if (updateErr) throw updateErr;
+    const result = await pool.query(
+      `UPDATE admin_notifications SET read = $1 WHERE id = $2 RETURNING *`,
+      [readValue, parseInt(id)]
+    );
+    const notification = result.rows[0];
     if (!notification) return res.status(404).json({ error: 'Notification not found' });
     res.json({ notification });
   } catch (err: any) {
@@ -4199,11 +4183,8 @@ app.get("/api/v2/admin/stats", async (req: Request, res: Response) => {
       );
       avgAnalysisScore = Math.round(parseFloat(scoreResult.rows[0]?.avg_score || '0'));
 
-      const { count: pendingCorrections } = await supabase
-        .from('admin_corrections')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
-      pendingReviews = pendingCorrections || 0;
+      const pendingResult = await pool.query("SELECT COUNT(*) as count FROM admin_corrections WHERE status = 'pending'");
+      pendingReviews = parseInt(pendingResult.rows[0]?.count || '0');
     } catch (e) {
       console.log('[Admin Stats] DB query error:', (e as any)?.message);
     }

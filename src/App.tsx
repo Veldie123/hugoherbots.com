@@ -328,23 +328,23 @@ export default function App() {
           {currentPage === "admin-dashboard" && <AdminDashboard navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-videos" && <AdminVideoManagement navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-live" && <AdminLiveSessions navigate={navigate} isSuperAdmin={isSuperAdmin} />}
-          {currentPage === "admin-progress" && <AdminProgress navigate={navigate} />}
-          {currentPage === "admin-users" && <AdminUserManagement navigate={navigate} />}
+          {currentPage === "admin-progress" && <AdminProgress navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-users" && <AdminUserManagement navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-techniques" && <AdminTechniqueManagement navigate={navigate} isSuperAdmin={isSuperAdmin} />}
-          {currentPage === "admin-transcripts" && <AdminSessionTranscripts navigate={navigate} />}
+          {currentPage === "admin-transcripts" && <AdminSessionTranscripts navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-uploads" && <AdminUploads navigate={navigate} isSuperAdmin={isSuperAdmin} />}
-          {currentPage === "admin-content" && <AdminContentLibrary navigate={navigate} />}
-          {currentPage === "admin-analytics" && <AdminAnalytics navigate={navigate} />}
-          {currentPage === "admin-settings" && <AdminSettings navigate={navigate} />}
-          {currentPage === "admin-help" && <AdminHelpCenter navigate={navigate} />}
-          {currentPage === "admin-resources" && <AdminResourceLibrary navigate={navigate} />}
-          {currentPage === "admin-sessions" && <AdminSessions navigate={navigate} />}
-          {currentPage === "admin-config-review" && <AdminConfigReview navigate={navigate} />}
-          {currentPage === "admin-notifications" && <AdminNotifications navigate={navigate} />}
+          {currentPage === "admin-content" && <AdminContentLibrary navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-analytics" && <AdminAnalytics navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-settings" && <AdminSettings navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-help" && <AdminHelpCenter navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-resources" && <AdminResourceLibrary navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-sessions" && <AdminSessions navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-config-review" && <AdminConfigReview navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-notifications" && <AdminNotifications navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-chat-expert" && <AdminChatExpertMode sessionId="default" sessionTitle="Talk to myself AI" navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-hugo-agent" && <AdminChatExpertMode sessionId="hugo-agent" sessionTitle="Talk to Myself AI" navigate={navigate} isSuperAdmin={isSuperAdmin} />}
-          {currentPage === "admin-rag-review" && <AdminRAGReview navigate={navigate} currentPage={currentPage} />}
-          {currentPage === "admin-conflicts" && <AdminConflicts navigate={navigate} />}
+          {currentPage === "admin-rag-review" && <AdminRAGReview navigate={navigate} currentPage={currentPage} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-conflicts" && <AdminConflicts navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-analysis-results" && <AnalysisResults navigate={navigate} isAdmin={true} isSuperAdmin={isSuperAdmin} navigationData={navigationData} />}
           {currentPage === "admin-upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={true} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "sso-validate" && <SSOValidate navigate={navigate} />}
