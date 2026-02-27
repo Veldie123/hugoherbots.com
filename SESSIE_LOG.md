@@ -4,6 +4,19 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-27 — Admin chat buildValidatorDebugInfo crash fix + E.P.I.C. sidebar verificatie
+
+**Vraag:** Fix E.P.I.C. sidebar: klik op techniek = selecteer voor correctie. Klik op info (i) = bekijk details. Consistent met user view bij video's.
+
+> **Conclusie:**
+> - E.P.I.C. sidebar techniek-selectie was **al correct geïmplementeerd** — `onSelectTechnique` prop bestond al, werd doorgegeven, en leaf-technieken waren klikbaar met `cursor-pointer` en paarse highlight bij selectie
+> - **Werkelijke bug gefixt**: `buildValidatorDebugInfo` crashte met `Cannot read properties of undefined (reading 'label')` omdat het admin validation bypass object de verkeerde structuur had — miste `initialValidation`, `originalResponse`, en `valid` velden
+> - Fix in `server/hugo-engine/v2/coach-engine.ts`: admin bypass object matcht nu exact de `RepairResult` interface met alle verplichte velden (`initialValidation`, `validationResult`, `originalResponse`, `repairedResponse`, `wasRepaired`, `repairAttempts`)
+> - Admin chat responstijd gedaald van 17+ seconden naar ~5-6 seconden
+> - Bestanden: `server/hugo-engine/v2/coach-engine.ts` (2 plekken: `generateCoachResponse` + `generateCoachOpening`)
+
+---
+
 ## 2026-02-27 — Hero button styling consistent maken
 
 **Vraag:** "opgenomen webinars" button is niet zichtbaar in de hero als ik hover. Video's is anders vormgegeven. "Chat met Hugo" button moet op dezelfde manier vormgegeven worden als de "Opgenomen Webinars" button en als de button bij Dashboard hero. Moet 3 keer dezelfde vormgeving zijn. Tag bovenaan is een keer groen en twee keer blauw — moet allemaal steel blauw. Primaire button groen. Secundaire button wit met donkere tekst + hover effect.

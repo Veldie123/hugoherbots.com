@@ -258,13 +258,20 @@ export function getTechniqueOverlay(techniqueId: string): any {
  */
 export function getVideosForTechnique(techniqueId: string): { title: string; beschrijving: string }[] {
   const mapping = loadVideoMapping();
-  if (!mapping) return [];
+  if (!mapping?.videos) return [];
   
-  const videoFiles = mapping.techniek_videos[techniqueId] || [];
-  return videoFiles.map(file => {
-    const info = mapping.videos[file];
-    return info ? { title: info.title, beschrijving: info.beschrijving } : null;
-  }).filter(v => v !== null) as { title: string; beschrijving: string }[];
+  if (mapping.techniek_videos?.[techniqueId]) {
+    const videoFiles = mapping.techniek_videos[techniqueId] || [];
+    return videoFiles.map((file: string) => {
+      const info = mapping.videos[file];
+      return info ? { title: info.title, beschrijving: info.beschrijving || '' } : null;
+    }).filter((v: any) => v !== null) as { title: string; beschrijving: string }[];
+  }
+  
+  return Object.values(mapping.videos)
+    .filter((v: any) => v.techniek === techniqueId && v.user_ready)
+    .slice(0, 5)
+    .map((v: any) => ({ title: v.title || v.file_name, beschrijving: v.beschrijving || '' }));
 }
 
 // ============================================================================

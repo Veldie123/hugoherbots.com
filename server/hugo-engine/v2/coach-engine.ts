@@ -733,14 +733,30 @@ export async function generateCoachResponse(
       ? `VALIDATOR HINTS:\n${validatorHints.join('\n')}`
       : undefined;
     
-    const repairResult = await validateAndRepair(rawMessage, "COACH_CHAT", {
-      originalSystemPrompt: enhancedSystemPrompt,
-      conversationHistory: conversationHistory.map(m => ({ role: m.role, content: m.content })),
-      conversationContext: validatorContext,
-    });
+    const skipValidation = context.viewMode === 'admin';
+    const adminBypass = {
+      originalResponse: rawMessage,
+      repairedResponse: rawMessage,
+      wasRepaired: false,
+      validationResult: { valid: true, label: 'VALID' as const, reason: 'Admin mode - validation skipped' },
+      initialValidation: { valid: true, label: 'VALID' as const, reason: 'Admin mode - validation skipped' },
+      repairAttempts: 0,
+    };
     
-    if (repairResult.wasRepaired) {
-      console.log(`[COACH] Response repaired: ${repairResult.validationResult.label}`);
+    let repairResult;
+    if (skipValidation) {
+      repairResult = adminBypass;
+      console.log("[COACH] Admin mode — skipping validation");
+    } else {
+      repairResult = await validateAndRepair(rawMessage, "COACH_CHAT", {
+        originalSystemPrompt: enhancedSystemPrompt,
+        conversationHistory: conversationHistory.map(m => ({ role: m.role, content: m.content })),
+        conversationContext: validatorContext,
+      });
+      
+      if (repairResult.wasRepaired) {
+        console.log(`[COACH] Response repaired: ${repairResult.validationResult.label}`);
+      }
     }
     
     const validatorInfo = buildValidatorDebugInfo("COACH_CHAT", repairResult);
@@ -963,12 +979,25 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
 
     const rawMessage = content || TECHNICAL_FALLBACKS.error_generic;
     
-    const repairResult = await validateAndRepair(rawMessage, "COACH_CHAT", {
-      originalSystemPrompt: systemPrompt,
-    });
-    
-    if (repairResult.wasRepaired) {
-      console.log(`[COACH] Opening repaired: ${repairResult.validationResult.label}`);
+    let repairResult;
+    if (context.viewMode === 'admin') {
+      repairResult = {
+        originalResponse: rawMessage,
+        repairedResponse: rawMessage,
+        wasRepaired: false,
+        validationResult: { valid: true, label: 'VALID' as const, reason: 'Admin mode - validation skipped' },
+        initialValidation: { valid: true, label: 'VALID' as const, reason: 'Admin mode - validation skipped' },
+        repairAttempts: 0,
+      };
+      console.log("[COACH] Admin mode — skipping opening validation");
+    } else {
+      repairResult = await validateAndRepair(rawMessage, "COACH_CHAT", {
+        originalSystemPrompt: systemPrompt,
+      });
+      
+      if (repairResult.wasRepaired) {
+        console.log(`[COACH] Opening repaired: ${repairResult.validationResult.label}`);
+      }
     }
     
     const validatorInfo = buildValidatorDebugInfo("COACH_CHAT", repairResult);
