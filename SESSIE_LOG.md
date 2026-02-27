@@ -222,3 +222,20 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - Build command: `npm run build` (Vite bouwt naar `build/` directory)
 > - Proxy routing matched exact met Vite dev proxy config
 > - Bestanden: `server/production-server.js`, `.replit`
+
+---
+
+## 2026-02-27 — E.P.I.C. sidebar techniek selectie in admin chat — VERIFICATIE
+
+**Vraag:** Fix: in de E.P.I.C. sidebar (admin chat) kun je geen techniek selecteren voor een correctie.
+
+> **Conclusie:**
+> - Geen wijzigingen nodig — was al geïmplementeerd
+> - `onSelectTechnique` prop bestaat al op `EPICSidebarProps` en wordt correct doorgegeven
+> - Admin view: leaf-technieken roepen `onSelectTechnique` aan (top, child, grandchild)
+> - Admin view: parent-technieken doen expand/collapse
+> - Admin view: info-icoon heeft `e.stopPropagation()` en opent detail-sheet
+> - `AdminChatExpertMode.tsx`: `onSelectTechnique` callback zet `correctionTechnique`, `correctionTechniqueName`, `selectedTechnique`
+> - Paarse highlight op `selectedTechnique === technique.naam`
+> - Alle technieken hebben `cursor-pointer`
+> - Correctie-panel toont geselecteerde techniek na klik
