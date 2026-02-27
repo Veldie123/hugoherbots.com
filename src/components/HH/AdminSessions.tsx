@@ -574,7 +574,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">+15%</Badge>
             </div>
             <p className="text-[13px] text-hh-muted mb-2">Total Sessies</p>
-            <p className="text-[28px] leading-[36px] text-hh-ink">{stats.totalSessions}</p>
+            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.totalSessions}</p>
           </Card>
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-3">
@@ -584,17 +584,17 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">+8%</Badge>
             </div>
             <p className="text-[13px] text-hh-muted mb-2">Excellent Quality</p>
-            <p className="text-[28px] leading-[36px] text-hh-ink">{stats.excellentCount}</p>
+            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.excellentCount}</p>
           </Card>
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-blue-600/10 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 rounded-full bg-purple-600/10 flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-purple-600" />
               </div>
               <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">+2.3%</Badge>
             </div>
             <p className="text-[13px] text-hh-muted mb-2">Gem. Score</p>
-            <p className="text-[28px] leading-[36px] text-hh-ink">{stats.avgScore}%</p>
+            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.avgScore}%</p>
           </Card>
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-3">
@@ -604,7 +604,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-error/10 text-hh-error border-hh-error/20">-5%</Badge>
             </div>
             <p className="text-[13px] text-hh-muted mb-2">Needs Improvement</p>
-            <p className="text-[28px] leading-[36px] text-hh-ink">{stats.needsWorkCount}</p>
+            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.needsWorkCount}</p>
           </Card>
         </div>
 

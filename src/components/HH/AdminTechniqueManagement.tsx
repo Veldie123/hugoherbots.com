@@ -335,7 +335,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
             <p className="text-[13px] leading-[18px] text-hh-muted">
               Totaal Technieken
             </p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>
               {totalTechnieken}
             </p>
           </Card>
@@ -352,7 +352,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
             <p className="text-[13px] leading-[18px] text-hh-muted">
               Actieve Technieken
             </p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>
               {activeTechnieken}
             </p>
           </Card>
@@ -369,7 +369,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
             <p className="text-[13px] leading-[18px] text-hh-muted">
               Gem. Score
             </p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>
               {avgScore}%
             </p>
           </Card>
@@ -386,7 +386,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
             <p className="text-[13px] leading-[18px] text-hh-muted">
               Trend Score
             </p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>
               {needsImprovement}
             </p>
           </Card>

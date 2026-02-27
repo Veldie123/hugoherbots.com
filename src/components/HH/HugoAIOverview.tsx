@@ -481,7 +481,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                 </span>
               </div>
               <p className="text-[13px] leading-[18px] text-hh-muted">{stat.name}</p>
-              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">{stat.value}</p>
+              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stat.value}</p>
             </Card>
           ))}
         </div>

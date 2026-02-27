@@ -861,24 +861,30 @@ ${platformUrl}`;
         {/* KPI Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColor: 'rgba(147, 51, 234, 0.12)', color: '#9333ea', badge: `+${Math.round(sessions.length * 0.12)}%` },
-            { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgColor: 'rgba(79, 70, 229, 0.12)', color: '#4f46e5', badge: `+${upcomingSessionsAll.length}` },
-            { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgColor: 'rgba(219, 39, 119, 0.12)', color: '#db2777', badge: '+8%' },
-            { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgColor: 'rgba(16, 185, 129, 0.12)', color: '#10b981', badge: '100%' },
-          ].map(stat => (
+            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColor: 'rgba(147, 51, 234, 0.12)', color: '#9333ea', badge: `+${Math.round(sessions.length * 0.12)}%`, badgeTrend: 'up' as const },
+            { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgColor: 'rgba(79, 70, 229, 0.12)', color: '#4f46e5', badge: `+${upcomingSessionsAll.length}`, badgeTrend: 'up' as const },
+            { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgColor: 'rgba(219, 39, 119, 0.12)', color: '#db2777', badge: '+8%', badgeTrend: 'up' as const },
+            { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgColor: 'rgba(16, 185, 129, 0.12)', color: '#10b981', badge: '100%', badgeTrend: 'up' as const },
+          ].map(stat => {
+            const badgeStyles = stat.badgeTrend === 'up'
+              ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }
+              : stat.badgeTrend === 'neutral'
+              ? { backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.2)' }
+              : { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' };
+            return (
             <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
               <div className="flex items-start justify-between mb-2 sm:mb-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColor }}>
                   <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
                 </div>
-                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
+                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={badgeStyles}>
                   {stat.badge}
                 </span>
               </div>
               <p className="text-[13px] leading-[18px] text-hh-muted">{stat.name}</p>
-              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">{stat.value}</p>
+              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stat.value}</p>
             </Card>
-          ))}
+          );})}
         </div>
 
         {/* Search & Filter Bar */}

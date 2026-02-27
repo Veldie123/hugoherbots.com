@@ -261,7 +261,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                   <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
                     {kpi.label}
                   </p>
-                  <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-ink">
+                  <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px]" style={{ color: '#7c3aed' }}>
                     {kpi.value}
                   </p>
                 </Card>

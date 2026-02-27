@@ -65,3 +65,24 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - Tabel `#` badges en fase-links waren al correct paars
 > - Bestand: `AdminLiveSessions.tsx`
 > - Agent Usage: ~$0.80
+
+---
+
+## 2026-02-27 — Uniforme KPI kleuren op alle admin pagina's
+
+**Vraag:** Cijfers zijn niet paars in de KPI cards. Vergelijk webinars met dashboard of techniques. Zorg voor uniforme KPI kleurcode: groen positief, oranje semi-positief, rood negatief.
+
+> **Conclusie:**
+> - **KPI cijfers**: nu overal **paars** (`#7c3aed`) op alle admin pagina's
+> - **KPI badges**: semantische kleuren:
+>   - Groen (`#10b981`) voor positieve trends (+5%, +12%, +8%)
+>   - Rood (`#ef4444`) voor negatieve trends (-5%)
+>   - Oranje (`#f59e0b`) beschikbaar voor neutrale trends
+> - **6 bestanden aangepast**:
+>   - `AdminDashboard.tsx` — cijfers paars
+>   - `AdminLiveSessions.tsx` — cijfers paars + badges semantisch
+>   - `AdminTechniqueManagement.tsx` — cijfers paars
+>   - `AdminSessions.tsx` — cijfers paars + icon blauw→paars
+>   - `HugoAIOverview.tsx` — cijfers paars
+>   - `AdminAnalytics.tsx` — cijfers paars
+> - Agent Usage: ~$1.20
