@@ -484,13 +484,13 @@ ${platformUrl}`;
     if (session.dailyRecordingUrl || session.recordingReady === 1) {
       return (
         <div className="flex items-center gap-2">
-          <Badge className="bg-gray-500/10 text-gray-600 border-gray-500/20">
+          <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20">
             Niet verwerkt
           </Badge>
           <Button 
             size="sm" 
             variant="outline" 
-            className="h-7 px-2 text-[11px] gap-1"
+            className="h-7 px-2 text-[11px] gap-1 border-purple-300 text-purple-700 hover:bg-purple-500/10"
             onClick={(e) => handleTriggerProcess(e, session.id)}
             disabled={!!processingId}
           >
@@ -503,7 +503,7 @@ ${platformUrl}`;
 
     if (session.status?.toLowerCase() === 'ended' || session.status?.toLowerCase() === 'completed') {
       return (
-        <Badge variant="outline" className="text-hh-muted opacity-50">
+        <Badge variant="outline" className="text-purple-400 border-purple-200 opacity-70">
           Geen opname
         </Badge>
       );
@@ -861,17 +861,17 @@ ${platformUrl}`;
         {/* KPI Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgClass: 'bg-red-600/10', iconClass: 'text-red-600', badge: `+${Math.round(sessions.length * 0.12)}%` },
-            { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgClass: 'bg-purple-500/10', iconClass: 'text-purple-500', badge: `+${upcomingSessionsAll.length}` },
-            { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgClass: 'bg-purple-500/10', iconClass: 'text-purple-500', badge: '+8%' },
-            { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgClass: 'bg-purple-500/10', iconClass: 'text-purple-500', badge: '100%' },
+            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColor: 'rgba(147, 51, 234, 0.12)', color: '#9333ea', badge: `+${Math.round(sessions.length * 0.12)}%` },
+            { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgColor: 'rgba(79, 70, 229, 0.12)', color: '#4f46e5', badge: `+${upcomingSessionsAll.length}` },
+            { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgColor: 'rgba(219, 39, 119, 0.12)', color: '#db2777', badge: '+8%' },
+            { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgColor: 'rgba(16, 185, 129, 0.12)', color: '#10b981', badge: '100%' },
           ].map(stat => (
             <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
               <div className="flex items-start justify-between mb-2 sm:mb-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${stat.bgClass}`}>
-                  <stat.icon className={`w-5 h-5 ${stat.iconClass}`} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColor }}>
+                  <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
                 </div>
-                <span className="text-[11px] px-2 py-0.5 rounded-full border bg-purple-500/10 text-purple-500 border-purple-500/20">
+                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
                   {stat.badge}
                 </span>
               </div>

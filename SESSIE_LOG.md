@@ -46,3 +46,22 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 >   - **TXT record**: `www` → `replit-verify=46000ef4-0131-44be-8266-a219bbaadf18`
 > - Geen code wijzigingen — dit is een externe DNS configuratie
 > - Agent Usage: ~$0.30
+
+---
+
+## 2026-02-27 — Admin Webinars KPI cards + tabel kleuren fix
+
+**Vraag:** Wat is er mis met het design van webinars in admin view? Tabel + KPI cards allemaal kleurloos vergeleken met andere admin pagina's. Pas aan!
+
+> **Conclusie:**
+> - **KPI cards**: iconen waren kleurloos/grijs → nu elk een eigen levendige kleur:
+>   - Totaal Sessies: paars (`#9333ea`)
+>   - Aankomend: indigo (`#4f46e5`)
+>   - Gem. Deelnemers: roze (`#db2777`)
+>   - Voltooide Sessies: groen (`#10b981`)
+> - **KPI badges**: uniform paars (`#9333ea`) met paarse border
+> - **"Niet verwerkt" badge + Verwerk knop**: grijs → paars
+> - **"Geen opname" badge**: grijs → subtiel paars (`text-purple-400 border-purple-200`)
+> - Tabel `#` badges en fase-links waren al correct paars
+> - Bestand: `AdminLiveSessions.tsx`
+> - Agent Usage: ~$0.80
