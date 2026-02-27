@@ -138,7 +138,12 @@ export function AppLayout({
   const [analysisTotalCount, setAnalysisTotalCount] = useState(0);
   const [chatTotalCount, setChatTotalCount] = useState(0);
   const notifRef = useRef<HTMLDivElement>(null);
-  const { notifications, unreadCount, markAsRead, markAllRead, removeNotification } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllRead, removeNotification, setIsAdmin } = useNotifications();
+
+  useEffect(() => {
+    const isAdminPage = isAdmin || currentPage.startsWith('admin-');
+    setIsAdmin(isAdminPage);
+  }, [isAdmin, currentPage, setIsAdmin]);
 
   const analysisHistory = analysisHistoryProp || fetchedAnalysisHistory;
   const chatHistory = chatHistoryProp.length > 0 ? chatHistoryProp : fetchedChatHistory;
@@ -618,6 +623,9 @@ export function AppLayout({
                               markAsRead(notif.id);
                               if (notif.type === "analysis_complete" && notif.conversationId && navigate) {
                                 navigate("analysis-results", { conversationId: notif.conversationId });
+                                setNotifOpen(false);
+                              } else if (notif.relatedPage && navigate) {
+                                navigate(notif.relatedPage);
                                 setNotifOpen(false);
                               }
                             }}
