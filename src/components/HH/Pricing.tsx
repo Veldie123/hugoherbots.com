@@ -223,7 +223,7 @@ export function Pricing({ navigate }: PricingProps) {
   ];
 
   return (
-    <div className="bg-hh-bg min-h-screen">
+    <div className="bg-hh-bg min-h-screen" data-theme="light">
       <StickyHeader currentPage="pricing" navigate={handleNavigate} />
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-32 pb-12 sm:pb-16 text-center">

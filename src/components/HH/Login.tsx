@@ -80,7 +80,7 @@ export function Login({ onSignupClick, onLoginSuccess, navigate }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-hh-bg">
+    <div className="min-h-screen bg-hh-bg" data-theme="light">
       {/* Navigation Header */}
       {navigate && <StickyHeader currentPage="login" navigate={navigate} />}
       

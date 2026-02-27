@@ -30,7 +30,7 @@ export function About({ navigate }: AboutProps) {
   };
 
   return (
-    <div className="bg-hh-bg min-h-screen">
+    <div className="bg-hh-bg min-h-screen" data-theme="light">
       {/* Sticky Header */}
       <StickyHeader currentPage="about" navigate={handleNavigate} />
 

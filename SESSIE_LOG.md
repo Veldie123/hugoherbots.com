@@ -4,6 +4,30 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-27 — Landing/publieke pagina's altijd light mode
+
+**Vraag:** Geen dark mode voor de landing page — de publieke pagina's moeten altijd licht blijven.
+
+> **Conclusie:**
+> - CSS override `[data-theme="light"]` toegevoegd in `src/index.css` die alle `--hh-*` variabelen terugzet naar light mode waarden
+> - `data-theme="light"` attribuut toegevoegd aan: `Landing.tsx`, `Login.tsx`, `About.tsx`, `Pricing.tsx`
+> - Publieke pagina's blijven nu altijd in light mode, ongeacht de dark mode instelling van de gebruiker
+> - Bestanden: `src/index.css`, `Landing.tsx`, `Login.tsx`, `About.tsx`, `Pricing.tsx`
+
+---
+
+## 2026-02-27 — Dark mode hero banners fix
+
+**Vraag:** Hero banners op Dashboard, Video's en Techniques zien er niet goed uit in dark mode.
+
+> **Conclusie:**
+> - Subtiele `dark:ring-1 dark:ring-white/10` ring toegevoegd aan hero containers (Dashboard, VideoLibrary, TechniqueLibrary)
+> - Extra donkere overlay laag (`bg-black/20 dark:bg-black/40`) voor betere diepte
+> - "Chat met Hugo" knop gewijzigd van solid wit naar translucent wit (`bg-white/10 text-white border-white/30`) — consistent met Techniques hero stijl
+> - Bestanden: `Dashboard.tsx`, `VideoLibrary.tsx`, `TechniqueLibrary.tsx`
+
+---
+
 ## 2026-02-27 — Mobile UX Sprint (5 fixes)
 
 **Vraag:** Vijf mobiele UX-problemen fixen: notificatie dropdown overflow, hamburger te klein, view toggles verbergen op mobiel, dark mode AnalysisResults, AdminConfigReview card view.

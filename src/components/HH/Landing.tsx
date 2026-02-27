@@ -63,7 +63,7 @@ export function Landing({ navigate }: LandingProps) {
   };
 
   return (
-    <div className="bg-hh-bg" data-theme="light">
+    <div className="bg-hh-bg light" data-theme="light" style={{ colorScheme: 'light' }}>
       {/* Hero Section - Light Gray Background */}
       <div className="bg-hh-ui-50">
         {/* Sticky Header */}

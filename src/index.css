@@ -6419,6 +6419,31 @@ body {
   --sidebar-ring: var(--hh-primary);
 }
 
+[data-theme="light"] {
+  --hh-bg: #fff;
+  --hh-text: #1c2535;
+  --hh-ink: #2b3748;
+  --hh-muted: #b1b2b5;
+  --hh-border: #e4e4e4;
+  --hh-ui-50: #f7f7f8;
+  --hh-ui-100: #f3f4f6;
+  --hh-ui-200: #e4e4e4;
+  --hh-ui-300: #d1d5db;
+  --hh-primary: #6b7a92;
+  --hh-success: #3d9a6e;
+  --hh-warn: #ffb020;
+  --background: #fff;
+  --foreground: #1c2535;
+  --card: #fff;
+  --card-foreground: #1c2535;
+  --popover: #fff;
+  --popover-foreground: #1c2535;
+  --border: #e4e4e4;
+  --input: #e4e4e4;
+  --destructive: #ef4444;
+  color-scheme: light;
+}
+
 html {
   font-size: var(--font-size);
   font-family: Outfit, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
