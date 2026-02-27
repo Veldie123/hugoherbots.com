@@ -4,6 +4,23 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-27 — Dark mode fix Talk to Hugo AI chatvenster
+
+**Vraag:** Dark mode Talk to Hugo AI in user view is kapot — chatvenster is knal wit. Analyseer en fix.
+
+> **Conclusie:**
+> - **Root cause**: `TalkToHugoAI.tsx` gebruikte 13x hardcoded `bg-white` en `#e2e8f0` kleuren die niet reageren op dark mode
+> - **Fix**: Alle hardcoded kleuren vervangen door theme-aware CSS variabelen:
+>   - `bg-white` → `bg-hh-bg` (chat area, header, input bar, sidebar, drag overlay, buttons)
+>   - `#e2e8f0` borders → `border-hh-border` (sidebar borders, PiP preview)
+>   - `#E8EDF2` transcript replay → `var(--hh-ui-100)` 
+>   - Mode toggle active state `bg-white` → `bg-card`
+> - **Resultaat**: Chat area, header, input bar, sidebar, en alle knoppen volgen nu automatisch het gekozen thema
+> - **E2e test geslaagd**: Volledige dark mode pagina geverifieerd — body background `rgb(11, 15, 25)`, chat area `rgb(11, 15, 25)`, geen witte vlakken
+> - Bestand: `src/components/HH/TalkToHugoAI.tsx` (13 wijzigingen)
+
+---
+
 ## 2026-02-27 — E.P.I.C. sidebar techniek selectie verificatie (admin chat)
 
 **Vraag:** Fix: in de E.P.I.C. sidebar (admin chat) kun je geen techniek selecteren voor een correctie. Klik op techniek = selecteer. Klik op info (i) = bekijk details.

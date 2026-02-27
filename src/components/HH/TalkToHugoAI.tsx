@@ -1391,14 +1391,14 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
   const renderChatInterface = () => (
     <div
-      className={`flex-1 min-h-0 flex flex-col bg-white relative ${isDraggingOver ? "ring-2 ring-[#4F7396] ring-inset" : ""}`}
+      className={`flex-1 min-h-0 flex flex-col bg-hh-bg relative ${isDraggingOver ? "ring-2 ring-[#4F7396] ring-inset" : ""}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {isDraggingOver && (
         <div className="absolute inset-0 bg-[#4F7396]/5 z-10 flex items-center justify-center pointer-events-none">
-          <div className="bg-white border-2 border-dashed border-[#4F7396] rounded-2xl px-8 py-6 shadow-lg">
+          <div className="bg-hh-bg border-2 border-dashed border-[#4F7396] rounded-2xl px-8 py-6 shadow-lg">
             <div className="flex flex-col items-center gap-2">
               <Paperclip className="w-8 h-8 text-[#4F7396]" />
               <p className="text-[15px] font-medium text-hh-text">Sleep bestanden hier</p>
@@ -1427,7 +1427,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               }`} style={message.isTranscriptReplay
                 ? {
                     opacity: 0.85,
-                    backgroundColor: message.sender === 'hugo' ? '#4F7396' : '#E8EDF2',
+                    backgroundColor: message.sender === 'hugo' ? '#4F7396' : 'var(--hh-ui-100)',
                   }
                 : message.sender === 'hugo'
                   ? { backgroundColor: '#4F7396' }
@@ -1441,7 +1441,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                         className={`flex items-center gap-2 rounded-lg px-2.5 py-1.5 ${
                           message.sender === "hugo"
                             ? "bg-white/15"
-                            : "bg-white border border-hh-border"
+                            : "bg-hh-bg border border-hh-border"
                         }`}
                       >
                         {att.preview ? (
@@ -1597,7 +1597,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
       
 
-      <div className="border-t border-hh-border bg-white">
+      <div className="border-t border-hh-border bg-hh-bg">
         <input
           ref={fileInputRef}
           type="file"
@@ -1658,7 +1658,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             <button
               onClick={handleRequestFeedback}
               disabled={isLoading || isStreaming}
-              className="flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-full border border-hh-border bg-white hover:bg-hh-ui-50 transition-colors disabled:opacity-40"
+              className="flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-full border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors disabled:opacity-40"
               title="Vraag Hugo om feedback"
             >
               <Award className="w-3.5 h-3.5 text-[#4F7396]" />
@@ -1867,7 +1867,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
       >
         <div 
           className="flex items-center justify-center"
-          style={{ width: '50px', height: '50px', borderRadius: '50%', backgroundColor: '#e2e8f0' }}
+          style={{ width: '50px', height: '50px', borderRadius: '50%', backgroundColor: 'var(--hh-ui-100)' }}
         >
           <span className="text-slate-700 text-[12px] font-medium">JIJ</span>
         </div>
@@ -1944,20 +1944,20 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         {/* Unified header row — one continuous border-bottom */}
         <div className="flex items-stretch border-b border-hh-border flex-shrink-0">
           {!assistanceConfig.blindPlay && desktopSidebarOpen && (
-            <div className="hidden lg:flex items-center justify-between px-4 w-1/3 flex-shrink-0 bg-white" style={{ borderRight: '1px solid #e2e8f0' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', letterSpacing: '0.5px', margin: 0 }}>
+            <div className="hidden lg:flex items-center justify-between px-4 w-1/3 flex-shrink-0 bg-hh-bg border-r border-hh-border">
+              <h3 style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '0.5px', margin: 0 }} className="text-hh-ink">
                 E.P.I.C. TECHNIQUE
               </h3>
               <button
                 onClick={() => setDesktopSidebarOpen(false)}
-                className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                className="p-1.5 rounded-md text-hh-muted hover:text-hh-ink hover:bg-hh-ui-50 transition-colors"
                 title="Sluiten"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           )}
-          <div className={`${assistanceConfig.blindPlay || !desktopSidebarOpen ? 'w-full' : 'flex-1'} flex items-center justify-between px-3 lg:px-6 py-3 lg:py-4 bg-white`}>
+          <div className={`${assistanceConfig.blindPlay || !desktopSidebarOpen ? 'w-full' : 'flex-1'} flex items-center justify-between px-3 lg:px-6 py-3 lg:py-4 bg-hh-bg`}>
             {/* Left: Help sidebar toggle + Title */}
             <div className="flex items-center gap-2 lg:gap-3 min-w-0">
               {/* E.P.I.C. sidebar toggle removed from header — accessible via lightbulb action button under messages */}
@@ -1973,21 +1973,21 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               <div className="flex items-center bg-hh-ui-50 rounded-full p-0.5">
                 <button
                   onClick={() => setChatMode("chat")}
-                  className={`p-2 rounded-full transition-all ${chatMode === "chat" ? "bg-white shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
+                  className={`p-2 rounded-full transition-all ${chatMode === "chat" ? "bg-card shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
                   title="Chat"
                 >
                   <MessageSquare className="w-4 h-4" strokeWidth={1.5} />
                 </button>
                 <button
                   onClick={() => setChatMode("audio")}
-                  className={`p-2 rounded-full transition-all ${chatMode === "audio" ? "bg-white shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
+                  className={`p-2 rounded-full transition-all ${chatMode === "audio" ? "bg-card shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
                   title="Bellen"
                 >
                   <Phone className="w-4 h-4" strokeWidth={1.5} />
                 </button>
                 <button
                   onClick={() => setChatMode("video")}
-                  className={`p-2 rounded-full transition-all ${chatMode === "video" ? "bg-white shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
+                  className={`p-2 rounded-full transition-all ${chatMode === "video" ? "bg-card shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
                   title="Video"
                 >
                   <Video className="w-4 h-4" strokeWidth={1.5} />
@@ -1998,7 +1998,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               {selectedTechnique && chatMode === "chat" && (
                 <button
                   onClick={handleStopRoleplay}
-                  className="h-8 px-3 rounded-md border border-hh-border bg-white hover:bg-hh-ui-50 transition-colors flex items-center gap-1.5"
+                  className="h-8 px-3 rounded-md border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors flex items-center gap-1.5"
                   title="Stop rollenspel"
                 >
                   <X className="w-3.5 h-3.5 text-hh-muted" />
@@ -2012,7 +2012,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         {/* Body: EPIC sidebar content + Chat content side by side */}
         <div className="flex flex-1 overflow-hidden min-h-0">
           {!assistanceConfig.blindPlay && desktopSidebarOpen && (
-            <div className="hidden lg:block w-1/3 flex-shrink-0 h-full overflow-y-auto bg-white" style={{ borderRight: '1px solid #e2e8f0' }}>
+            <div className="hidden lg:block w-1/3 flex-shrink-0 h-full overflow-y-auto bg-hh-bg border-r border-hh-border">
               <EPICSidebar
                 fasesAccordionOpen={fasesAccordionOpen}
                 setFasesAccordionOpen={setFasesAccordionOpen}
@@ -2045,7 +2045,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             </div>
           )}
 
-          <div className={`${assistanceConfig.blindPlay || !desktopSidebarOpen ? 'w-full' : 'flex-1'} flex flex-col bg-white overflow-hidden min-h-0`}>
+          <div className={`${assistanceConfig.blindPlay || !desktopSidebarOpen ? 'w-full' : 'flex-1'} flex flex-col bg-hh-bg overflow-hidden min-h-0`}>
             {/* Level transition notification banner */}
             {levelTransitionMessage && (
               <div className="px-6 py-3 bg-gradient-to-r from-[#4F7396]/10 to-[#4F7396]/5 border-b border-[#4F7396]/20">
