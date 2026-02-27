@@ -102,3 +102,13 @@ Key features include a unified video system (Google Drive to Mux), Live Coaching
 -   **Google Drive**: Source for Hugo's training videos.
 -   **Stripe**: Payments and subscriptions.
 -   **Replit PostgreSQL**: Local database for specific analytics and feedback tables.
+
+## Sessie Logboek Protocol
+**VERPLICHT** bij het afsluiten van elke sessie/taak:
+1. Schrijf een entry naar `SESSIE_LOG.md` in de root van het project
+2. Formaat per entry:
+   - `## DATUM — Korte titel`
+   - `**Vraag:**` de originele vraag van de gebruiker (ingekort indien nodig)
+   - `> **Conclusie:**` ingesprongen bullets met wat er gedaan is, welke bestanden, en de kosten
+3. Dit document is het permanente overzicht voor de gebruiker om snel terug te vinden wat er gedaan is
+4. Doe dit ALTIJD, ook als er geen code wijzigingen waren (bijv. "geen wijzigingen nodig — was al geïmplementeerd")
