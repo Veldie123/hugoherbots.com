@@ -164,7 +164,6 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
 
   const allMainNavItems = [
     { id: "admin-dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "admin-hugo-agent", label: "Talk to Myself", icon: Sparkles, hasSuperscript: true, superAdminOnly: true },
     { id: "admin-techniques", label: "E.P.I.C. techniques", icon: Target, superAdminOnly: true },
     { id: "admin-videos", label: "Video's", icon: Video },
     { id: "admin-live", label: "Webinars", icon: Radio },
@@ -202,7 +201,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
     
     // Map sub-pages to their parent menu items
     const subPageMapping: Record<string, string> = {
-      "admin-hugo-agent": "admin-hugo-agent",
+      "admin-hugo-agent": "admin-sessions",
       "admin-chat-expert": "admin-sessions",
       "admin-sessions-detail": "admin-sessions",
       "admin-analysis-results": analysisFromHugo ? "admin-sessions" : "admin-uploads",
