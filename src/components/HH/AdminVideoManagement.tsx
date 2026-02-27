@@ -61,6 +61,7 @@ import { Badge } from "../ui/badge";
 import { Textarea } from "../ui/textarea";
 import { AutoResizeTextarea } from "../ui/auto-resize-textarea";
 import { ScrollArea } from "../ui/scroll-area";
+import { TrackChange } from "./TrackChange";
 import { videoApi } from "@/services/videoApi";
 import { supabase } from "../../utils/supabase/client";
 
@@ -1255,6 +1256,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
 
   // State for edit mode in Video Details modal
   const [isEditingVideo, setIsEditingVideo] = useState(false);
+  const [pendingVideoCorrections, setPendingVideoCorrections] = useState<Array<{field: string; original: string; proposed: string}>>([]);
   const [editedVideoData, setEditedVideoData] = useState<{
     title: string;
     attractiveTitle: string;
@@ -1275,9 +1277,10 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     setDetailsVideo(video);
     setSelectedTechniqueId(video.technique_id || video.ai_suggested_techniek_id || "");
     setIsEditingVideo(false);
+    setPendingVideoCorrections([]);
     setEditedVideoData({title: '', attractiveTitle: '', description: '', techniqueDoel: '', techniqueWat: '', techniqueWaarom: '', techniqueWanneer: '', techniqueHoe: '', techniqueStappenplan: '', techniqueVoorbeeld: '', techniqueTags: '', techniqueThemas: '', techniqueContextRequirements: ''});
-    setSummaryExpanded(false); // Reset summary expand state
-    setTranscriptExpanded(false); // Reset transcript expand state
+    setSummaryExpanded(false);
+    setTranscriptExpanded(false);
     
     if (video.has_transcript && !video.transcript) {
       try {
@@ -3025,18 +3028,31 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
 
                       if (corrections.length > 0) {
                         await Promise.all(corrections);
-                        const changeLines: string[] = [];
+                        const pendingItems: Array<{field: string; original: string; proposed: string}> = [];
                         if (titleChanged) {
-                          changeLines.push(`Titel: "${detailsVideo.ai_attractive_title || '(leeg)'}" → "${editedVideoData.attractiveTitle}"`);
+                          pendingItems.push({
+                            field: 'Commerciële titel',
+                            original: detailsVideo.ai_attractive_title || '(leeg)',
+                            proposed: editedVideoData.attractiveTitle || '',
+                          });
                         }
                         if (origTitleChanged) {
-                          changeLines.push(`Originele titel: "${detailsVideo.title || '(leeg)'}" → "${editedVideoData.title}"`);
+                          pendingItems.push({
+                            field: 'Originele titel',
+                            original: detailsVideo.title || '(leeg)',
+                            proposed: editedVideoData.title || '',
+                          });
                         }
-                        if (corrections.length > changeLines.length) {
-                          changeLines.push('Techniek velden gewijzigd');
+                        if (corrections.length > pendingItems.length) {
+                          pendingItems.push({
+                            field: 'Techniek velden',
+                            original: 'Huidige waarden',
+                            proposed: 'Bijgewerkte waarden',
+                          });
                         }
+                        setPendingVideoCorrections(pendingItems);
                         toast.success("Wijzigingen ingediend ter goedkeuring", {
-                          description: changeLines.join(' | '),
+                          description: "Wacht op review door Stéphane in Config Review",
                           duration: 6000,
                         });
                       } else {
@@ -3050,7 +3066,9 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                   }
 
                   setIsEditingVideo(false);
-                  setDetailsVideo(null);
+                  if (isSuperAdmin) {
+                    setDetailsVideo(null);
+                  }
                 }}
                 className="text-white gap-2 hover:opacity-90"
                 style={{ backgroundColor: '#9333ea' }}
@@ -3071,6 +3089,33 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               
               return (
                 <>
+                  {pendingVideoCorrections.length > 0 && !isEditingVideo && (
+                    <div className="p-4 rounded-lg border space-y-3" style={{ backgroundColor: 'rgba(234, 88, 12, 0.05)', borderColor: 'rgba(234, 88, 12, 0.2)' }}>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" style={{ color: '#ea580c' }} />
+                        <span className="text-[13px] font-semibold" style={{ color: '#ea580c' }}>Wijzigingen ingediend ter review</span>
+                        <Badge variant="outline" className="text-[10px] ml-auto" style={{ color: '#ea580c', borderColor: 'rgba(234, 88, 12, 0.3)' }}>
+                          Wacht op goedkeuring
+                        </Badge>
+                      </div>
+                      <div className="space-y-2">
+                        {pendingVideoCorrections.map((pc, idx) => (
+                          <div key={idx}>
+                            <TrackChange
+                              original={pc.original}
+                              proposed={pc.proposed}
+                              label={pc.field}
+                              compact
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-[11px] text-hh-muted">
+                        Stéphane kan deze wijzigingen goedkeuren of afwijzen in Config Review.
+                      </p>
+                    </div>
+                  )}
+
                   {/* Video Info Section */}
                   <div>
                     <h3 className="text-[14px] font-bold text-hh-text mb-2">Video Informatie</h3>

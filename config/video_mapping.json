@@ -412,23 +412,6 @@
       "is_hidden": false,
       "user_ready": true
     },
-    "MVI_1029.MP4": {
-      "id": "dc6d6935-09b4-44ad-a5bd-ab4a0c3ff45a",
-      "title": "MVI_1029",
-      "file_name": "MVI_1029.MP4",
-      "fase": 0,
-      "techniek": null,
-      "techniek_naam": "",
-      "techniek_source": "ai",
-      "ai_confidence": null,
-      "duration_seconds": null,
-      "status": "pending",
-      "has_transcript": false,
-      "has_mux": false,
-      "mux_playback_id": null,
-      "is_hidden": false,
-      "user_ready": false
-    },
     "MVI_0519.MP4": {
       "id": "04bce5e7-11a1-49e4-85a8-609cb86ddff1",
       "title": "Wie is jouw klant echt?",
@@ -445,6 +428,23 @@
       "mux_playback_id": "8ctvktY02WgSaAFF00stOWEylrJQTCsv7rrsJ99AdOylA",
       "is_hidden": false,
       "user_ready": true
+    },
+    "MVI_1029.MP4": {
+      "id": "dc6d6935-09b4-44ad-a5bd-ab4a0c3ff45a",
+      "title": "MVI_1029",
+      "file_name": "MVI_1029.MP4",
+      "fase": 0,
+      "techniek": null,
+      "techniek_naam": "",
+      "techniek_source": "ai",
+      "ai_confidence": null,
+      "duration_seconds": null,
+      "status": "pending",
+      "has_transcript": false,
+      "has_mux": false,
+      "mux_playback_id": null,
+      "is_hidden": false,
+      "user_ready": false
     },
     "MVI_0538.MP4": {
       "id": "37d8f233-3bdf-4f92-8f28-d9212101df1b",
