@@ -185,3 +185,21 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - Info-icoontje (i) op alle niveaus opent detail-sheet met `e.stopPropagation()` om parent-klik te voorkomen
 > - Alle leaf-technieken hebben `cursor-pointer` en paarse highlight bij selectie
 > - Agent Usage: ~$0.10
+
+---
+
+## 2026-02-27 — Admin Dashboard KPIs, Activity, Notificaties, Top Content: echte data
+
+**Vraag:** Stripe is gekoppeld — maak KPI cards echt ipv dummy data. Idem voor Recent Activity, Notificaties, en Top Performing Content.
+
+> **Conclusie:**
+> - Nieuw backend endpoint: `GET /api/admin/dashboard-stats` in `server/video-processor.js`
+> - **KPIs** uit echte bronnen: Actieve Users (Supabase profiles), Sessies Vandaag (video_views), Nieuwe Signups (profiles created_at), Revenue (Stripe charges)
+> - **Recent Activity** uit Supabase: user_activity + video_views + profiles (nieuwe signups), met echte namen en tijden
+> - **Notificaties** uit lokale PostgreSQL `admin_notifications` tabel (5 records)
+> - **Top Performing Content** uit Supabase: video_views + video_ingest_jobs
+> - Alle % change berekeningen: vergelijken huidige vs vorige maand/dag
+> - `AdminDashboard.tsx` volledig herschreven: dummy data vervangen door useEffect fetch, loading spinner, error state
+> - Datum nu dynamisch (toLocaleDateString nl-NL)
+> - Stripe tabellen zijn leeg (nog geen klanten/betalingen) — revenue toont €0
+> - Bestanden: `server/video-processor.js`, `src/components/HH/AdminDashboard.tsx`

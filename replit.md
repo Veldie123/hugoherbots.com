@@ -62,7 +62,7 @@ The frontend is built with React 18, TypeScript, Vite 6, and Tailwind CSS v4. Sa
 ### Backend Architecture
 The Replit project features three main services:
 -   **Vite Dev Server** (port 5000): Frontend hosting.
--   **Video Processor** (port 3001): Manages the video pipeline, Mux integration, RAG search, platform sync, SSO, Stripe, and admin Daily.co endpoints.
+-   **Video Processor** (port 3001): Manages the video pipeline, Mux integration, RAG search, platform sync, SSO, Stripe, admin dashboard stats (`/api/admin/dashboard-stats`), and admin Daily.co endpoints.
 -   **Hugo Engine V2** (port 3002): An AI coaching engine (TypeScript/Express) handling nested prompts, RAG-grounding, validation, LiveKit audio, HeyGen video, analysis, roleplay, and user Daily.co Live Coaching endpoints.
 
 ### Core V2 Engine Components

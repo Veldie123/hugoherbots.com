@@ -3289,6 +3289,327 @@ Format: ["id1", "id2", "id3", ...]`;
     return;
   }
   
+  // Admin Dashboard Stats - KPIs, recent activity, notifications, top content
+  if (pathname === '/api/admin/dashboard-stats' && req.method === 'GET') {
+    (async () => {
+      try {
+        if (!supabaseAdmin) {
+          throw new Error('Supabase niet geconfigureerd');
+        }
+
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+        const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59).toISOString();
+        const sevenDaysAgo = new Date(now);
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const fourteenDaysAgo = new Date(now);
+        fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+
+        // --- KPI DATA ---
+        let totalUsers = 0;
+        let newSignupsThisMonth = 0;
+        let newSignupsPrevMonth = 0;
+        try {
+          const profilesResult = await supabaseAdmin.from('profiles').select('id, created_at');
+          const profiles = profilesResult.data || [];
+          if (profiles.length > 0) {
+            totalUsers = profiles.length;
+            newSignupsThisMonth = profiles.filter(p => p.created_at >= monthStart).length;
+            newSignupsPrevMonth = profiles.filter(p => p.created_at >= prevMonthStart && p.created_at <= prevMonthEnd).length;
+          } else {
+            try {
+              const authResult = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+              const authUsers = authResult.data?.users || [];
+              totalUsers = authUsers.length;
+              newSignupsThisMonth = authUsers.filter(u => u.created_at >= monthStart).length;
+              newSignupsPrevMonth = authUsers.filter(u => u.created_at >= prevMonthStart && u.created_at <= prevMonthEnd).length;
+            } catch (e) { /* ignore */ }
+          }
+        } catch (e) { /* ignore */ }
+
+        const [viewsThisWeek, viewsPrevWeek, viewsToday, viewsYesterday] = await Promise.all([
+          supabaseAdmin.from('video_views').select('user_id, created_at').gte('created_at', sevenDaysAgo.toISOString()),
+          supabaseAdmin.from('video_views').select('user_id, created_at').gte('created_at', fourteenDaysAgo.toISOString()).lt('created_at', sevenDaysAgo.toISOString()),
+          supabaseAdmin.from('video_views').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),
+          supabaseAdmin.from('video_views').select('id', { count: 'exact', head: true }).gte('created_at', new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toISOString()).lt('created_at', todayStart),
+        ]);
+
+        const activeUsersThisWeek = new Set((viewsThisWeek.data || []).map(v => v.user_id).filter(Boolean)).size;
+        const activeUsersPrevWeek = new Set((viewsPrevWeek.data || []).map(v => v.user_id).filter(Boolean)).size;
+
+        const sessionsToday = viewsToday.count || 0;
+        const sessionsYesterday = viewsYesterday.count || 0;
+
+        // Revenue from Stripe
+        let revenueThisMonth = 0;
+        let revenuePrevMonth = 0;
+        try {
+          const chargesThis = await stripePool.query(
+            `SELECT COALESCE(SUM(amount), 0) as total FROM stripe.charges WHERE status = 'succeeded' AND created >= $1`,
+            [Math.floor(new Date(monthStart).getTime() / 1000)]
+          );
+          revenueThisMonth = parseInt(chargesThis.rows[0]?.total || '0') / 100;
+
+          const chargesPrev = await stripePool.query(
+            `SELECT COALESCE(SUM(amount), 0) as total FROM stripe.charges WHERE status = 'succeeded' AND created >= $1 AND created < $2`,
+            [Math.floor(new Date(prevMonthStart).getTime() / 1000), Math.floor(new Date(monthStart).getTime() / 1000)]
+          );
+          revenuePrevMonth = parseInt(chargesPrev.rows[0]?.total || '0') / 100;
+        } catch (e) {
+          console.log('[Dashboard] Stripe revenue query failed (tables may be empty):', e.message);
+        }
+
+        // Active subscriptions count
+        let activeSubscriptions = 0;
+        try {
+          const subsResult = await stripePool.query(
+            `SELECT COUNT(*) as cnt FROM stripe.subscriptions WHERE status IN ('active', 'trialing')`
+          );
+          activeSubscriptions = parseInt(subsResult.rows[0]?.cnt || '0');
+        } catch (e) { /* ignore */ }
+
+        const calcChange = (current, previous) => {
+          if (previous === 0 && current === 0) return '+0%';
+          if (previous === 0) return current > 0 ? '+100%' : '+0%';
+          const pct = Math.round(((current - previous) / previous) * 100);
+          return pct >= 0 ? `+${pct}%` : `${pct}%`;
+        };
+
+        const displayActiveUsers = activeUsersThisWeek > 0 ? activeUsersThisWeek : totalUsers;
+        const kpis = {
+          activeUsers: { value: displayActiveUsers, change: calcChange(activeUsersThisWeek, activeUsersPrevWeek) },
+          sessionsToday: { value: sessionsToday, change: calcChange(sessionsToday, sessionsYesterday) },
+          newSignups: { value: newSignupsThisMonth, change: calcChange(newSignupsThisMonth, newSignupsPrevMonth) },
+          revenue: { value: revenueThisMonth, change: calcChange(revenueThisMonth, revenuePrevMonth), subscriptions: activeSubscriptions },
+        };
+
+        // --- RECENT ACTIVITY ---
+        let recentActivity = [];
+        try {
+          const [activityResult, recentViewsResult, recentSignups] = await Promise.all([
+            supabaseAdmin.from('user_activity').select('id, user_id, activity_type, metadata, created_at').order('created_at', { ascending: false }).limit(20),
+            supabaseAdmin.from('video_views').select('id, user_id, video_id, created_at').order('created_at', { ascending: false }).limit(20),
+            supabaseAdmin.from('profiles').select('id, full_name, email, created_at, plan').order('created_at', { ascending: false }).limit(5),
+          ]);
+
+          const activities = activityResult.data || [];
+          const recentViews = recentViewsResult.data || [];
+          const signups = recentSignups.data || [];
+
+          const userIds = new Set([
+            ...activities.map(a => a.user_id),
+            ...recentViews.map(v => v.user_id),
+          ].filter(Boolean));
+
+          let userNames = {};
+          if (userIds.size > 0) {
+            try {
+              const profilesRes = await supabaseAdmin.from('profiles').select('id, full_name, email').in('id', [...userIds]);
+              for (const p of (profilesRes.data || [])) {
+                userNames[p.id] = p.full_name || p.email || 'Onbekend';
+              }
+            } catch (e) { /* ignore */ }
+          }
+
+          const videoIds = [...new Set(recentViews.map(v => v.video_id).filter(Boolean))];
+          let videoTitles = {};
+          if (videoIds.length > 0) {
+            try {
+              const videosRes = await supabaseAdmin.from('video_ingest_jobs').select('id, title').in('id', videoIds);
+              for (const v of (videosRes.data || [])) {
+                videoTitles[v.id] = v.title || 'Video';
+              }
+            } catch (e) { /* ignore */ }
+          }
+
+          const allEvents = [];
+
+          for (const a of activities) {
+            const userName = userNames[a.user_id] || 'Gebruiker';
+            let action = 'was actief';
+            let detail = '';
+            let type = 'session';
+
+            if (a.activity_type === 'chat_session' || a.activity_type === 'session_complete') {
+              action = 'voltooide sessie';
+              detail = a.metadata?.technique_name || a.metadata?.topic || '';
+              type = 'session';
+            } else if (a.activity_type === 'video_view') {
+              action = 'bekeek video';
+              detail = a.metadata?.video_title || '';
+              type = 'video';
+            } else if (a.activity_type === 'live_session') {
+              action = 'startte live sessie';
+              detail = a.metadata?.session_name || '';
+              type = 'live';
+            } else if (a.activity_type === 'roleplay') {
+              action = 'deed rollenspel';
+              detail = a.metadata?.scenario_name || '';
+              type = 'session';
+            }
+
+            allEvents.push({
+              id: `act-${a.id}`,
+              type,
+              user: userName,
+              action,
+              detail,
+              time: a.created_at,
+            });
+          }
+
+          for (const v of recentViews) {
+            const userName = userNames[v.user_id] || 'Gebruiker';
+            allEvents.push({
+              id: `view-${v.id}`,
+              type: 'video',
+              user: userName,
+              action: 'bekeek video',
+              detail: videoTitles[v.video_id] || 'Video',
+              time: v.created_at,
+            });
+          }
+
+          for (const s of signups) {
+            allEvents.push({
+              id: `signup-${s.id}`,
+              type: 'signup',
+              user: s.full_name || s.email || 'Nieuwe gebruiker',
+              action: 'nieuwe gebruiker',
+              detail: s.plan || 'Free plan',
+              time: s.created_at,
+            });
+          }
+
+          allEvents.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+          const seen = new Set();
+          recentActivity = allEvents.filter(e => {
+            const key = `${e.type}-${e.user}-${e.action}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          }).slice(0, 8);
+
+          const formatTimeAgo = (dateStr) => {
+            const diff = now - new Date(dateStr);
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'Zojuist';
+            if (mins < 60) return `${mins} min geleden`;
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return `${hours} uur geleden`;
+            const days = Math.floor(hours / 24);
+            return `${days} dag${days > 1 ? 'en' : ''} geleden`;
+          };
+          recentActivity = recentActivity.map(a => ({ ...a, time: formatTimeAgo(a.time) }));
+        } catch (e) {
+          console.log('[Dashboard] Recent activity error:', e.message);
+        }
+
+        // --- NOTIFICATIONS (from local DB) ---
+        let notifications = [];
+        try {
+          const notifResult = await pool.query(
+            `SELECT id, type, title, message, category, severity, related_page, read, created_at
+             FROM admin_notifications
+             ORDER BY created_at DESC
+             LIMIT 10`
+          );
+          const formatTimeAgo = (dateStr) => {
+            const diff = now - new Date(dateStr);
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'Zojuist';
+            if (mins < 60) return `${mins} min geleden`;
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return `${hours} uur geleden`;
+            const days = Math.floor(hours / 24);
+            return `${days} dag${days > 1 ? 'en' : ''} geleden`;
+          };
+          notifications = notifResult.rows.map(n => ({
+            id: n.id,
+            type: n.type || n.severity || 'info',
+            category: n.category || 'system',
+            title: n.title,
+            message: n.message,
+            timestamp: formatTimeAgo(n.created_at),
+            read: n.read || false,
+            relatedPage: n.related_page || null,
+          }));
+        } catch (e) {
+          console.log('[Dashboard] Notifications error:', e.message);
+        }
+        const unreadCount = notifications.filter(n => !n.read).length;
+
+        // --- TOP PERFORMING CONTENT ---
+        let topContent = [];
+        try {
+          const [viewsResult, jobsResult] = await Promise.all([
+            supabaseAdmin.from('video_views').select('video_id').limit(5000),
+            supabaseAdmin.from('video_ingest_jobs').select('id, title, techniek_id, fase, detected_technieken').eq('status', 'completed').limit(1000),
+          ]);
+
+          const views = viewsResult.data || [];
+          const jobs = jobsResult.data || [];
+
+          const viewCounts = {};
+          for (const v of views) {
+            if (v.video_id) {
+              viewCounts[v.video_id] = (viewCounts[v.video_id] || 0) + 1;
+            }
+          }
+
+          const jobMap = {};
+          for (const j of jobs) {
+            jobMap[j.id] = j;
+          }
+
+          topContent = Object.entries(viewCounts)
+            .map(([videoId, viewCount]) => {
+              const job = jobMap[videoId];
+              return {
+                id: videoId,
+                type: 'Video',
+                title: job?.title || 'Onbekende video',
+                views: viewCount,
+                fase: job?.fase || job?.detected_technieken?.[0]?.techniek_id?.split('.')[0] || null,
+              };
+            })
+            .sort((a, b) => b.views - a.views)
+            .slice(0, 10);
+
+          if (topContent.length === 0 && jobs.length > 0) {
+            topContent = jobs.slice(0, 10).map(j => ({
+              id: j.id,
+              type: 'Video',
+              title: j.title || 'Video',
+              views: viewCounts[j.id] || 0,
+              fase: j.fase || j.detected_technieken?.[0]?.techniek_id?.split('.')[0] || null,
+            }));
+          }
+        } catch (e) {
+          console.log('[Dashboard] Top content error:', e.message);
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          kpis,
+          recentActivity,
+          notifications,
+          unreadNotifications: unreadCount,
+          topContent,
+          generatedAt: now.toISOString(),
+        }));
+      } catch (err) {
+        console.error('[Dashboard] Stats error:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    })();
+    return;
+  }
+
   // Platform Analytics - Aggregated metrics (bypasses RLS with service role)
   if (pathname === '/api/analytics/platform' && req.method === 'GET') {
     (async () => {
