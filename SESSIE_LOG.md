@@ -110,3 +110,16 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - **AdminUploadManagement.tsx**: cijfers van zwart (`text-hh-ink`) → paars (`#7c3aed`), icon "Gem. Score" van blauw → paars
 > - Alle admin pagina's nu uniform: paarse cijfers, semantische badges, kleurrijke iconen
 > - Agent Usage: ~$0.60
+
+---
+
+## 2026-02-27 — E.P.I.C. sidebar techniek selectie admin chat
+
+**Vraag:** Fix: in de E.P.I.C. sidebar (admin chat) kun je geen techniek selecteren voor een correctie. Klik op techniek = selecteer. Klik op info-icoontje (i) = bekijk details.
+
+> **Conclusie:**
+> - **Geen wijzigingen nodig** — was al volledig geïmplementeerd
+> - `AdminChatExpertModeSidebar.tsx`: `onSelectTechnique` prop (regel 44), leaf-click → `onSelectTechnique(nummer, naam)`, parent-click → expand/collapse, info-icon → details-sheet met `stopPropagation`, cursor-pointer op alles, paarse highlight op selectie
+> - `AdminChatExpertMode.tsx`: callback correct doorgestuurd (regel 1274-1278) → `setCorrectionTechnique(nummer)` + `setCorrectionTechniqueName(naam)`, correctie-panel toont geselecteerde techniek (regel 1607-1616)
+> - Sidebar opent via E.P.I.C. knop of `?epic=1` URL param
+> - Agent Usage: ~$0.15

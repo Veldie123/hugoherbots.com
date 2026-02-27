@@ -1342,6 +1342,14 @@ async function syncVideosFromDrive(folderIdOrIds) {
     console.log(`[Sync] Skipped ${skippedCopies} backup copies (Kopie van...)`);
   }
   
+  // STRUCTURAL FIX: Unhide videos that are is_hidden=true but NOT in the archief folder
+  // This corrects historical data where videos were incorrectly marked as hidden
+  const unhideCount = await autoFixHiddenVideos();
+  if (unhideCount > 0) {
+    result.unarchived = result.unarchived || [];
+    console.log(`[Sync] Auto-fixed ${unhideCount} incorrectly hidden videos`);
+  }
+  
   // AUTO-ASSIGN playback_order based on Drive traversal order (Drive folder structure = correct order)
   // allActiveVideos is already in Drive folder order (orderBy=name, depth-first traversal)
   console.log(`[Sync] Assigning playback_order for ${allActiveVideos.length} active videos...`);
@@ -6095,6 +6103,43 @@ async function autoBatchPendingJobs() {
   }
 }
 
+async function autoFixHiddenVideos() {
+  if (!supabaseAdmin) return 0;
+  try {
+    const { data: wronglyHidden, error } = await supabaseAdmin
+      .from('video_ingest_jobs')
+      .select('id, drive_file_name, drive_folder_id, status')
+      .eq('is_hidden', true)
+      .neq('drive_folder_id', ARCHIEF_FOLDER_ID)
+      .neq('status', 'deleted');
+
+    if (error) throw error;
+    if (!wronglyHidden || wronglyHidden.length === 0) {
+      console.log('[AutoFix] No incorrectly hidden videos found');
+      return 0;
+    }
+
+    console.log(`[AutoFix] Found ${wronglyHidden.length} videos marked is_hidden=true but NOT in archief folder — fixing...`);
+
+    const batchSize = 50;
+    for (let i = 0; i < wronglyHidden.length; i += batchSize) {
+      const batch = wronglyHidden.slice(i, i + batchSize);
+      const ids = batch.map(v => v.id);
+      const { error: updateError } = await supabaseAdmin
+        .from('video_ingest_jobs')
+        .update({ is_hidden: false, updated_at: new Date().toISOString() })
+        .in('id', ids);
+      if (updateError) console.warn(`[AutoFix] Batch update error:`, updateError.message);
+    }
+
+    console.log(`[AutoFix] Successfully unhid ${wronglyHidden.length} videos`);
+    return wronglyHidden.length;
+  } catch (err) {
+    console.warn('[AutoFix] Failed:', err.message);
+    return 0;
+  }
+}
+
 async function autoHealMissingAiFields() {
   if (!supabaseAdmin) {
     console.log('[AutoHeal] Supabase niet geconfigureerd, overgeslagen');
@@ -6226,14 +6271,22 @@ server.listen(PORT, '0.0.0.0', () => {
 
   initStripe().catch(err => console.error('[Stripe] Init failed:', err.message));
 
+  setTimeout(async () => {
+    console.log('[AutoFix] Running initial hidden-video fix (15s after startup)...');
+    const fixed = await autoFixHiddenVideos();
+    if (fixed > 0) await regenerateVideoMapping();
+  }, 15000);
+
   setTimeout(() => {
     console.log('[AutoHeal] Running initial auto-heal check (30s after startup)...');
     autoHealMissingAiFields();
   }, 30000);
 
-  setInterval(() => {
+  setInterval(async () => {
     console.log('[AutoHeal] Running periodic auto-heal check...');
     autoHealMissingAiFields();
+    const fixed = await autoFixHiddenVideos();
+    if (fixed > 0) await regenerateVideoMapping();
   }, 30 * 60 * 1000);
 
   // Auto-batch: check every 15 minutes for pending jobs and auto-start Cloud Run
