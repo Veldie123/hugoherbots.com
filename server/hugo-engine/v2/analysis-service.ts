@@ -215,53 +215,18 @@ export async function transcribeAudio(storageKey: string): Promise<WhisperSegmen
 export async function buildTurns(segments: WhisperSegment[]): Promise<TranscriptTurn[]> {
   if (segments.length === 0) return [];
 
-  const GAP_THRESHOLD_S = 1.2;
-  const preGroups: Array<{ indices: number[]; texts: string[]; start: number; end: number }> = [];
-  let currentGroup: { indices: number[]; texts: string[]; start: number; end: number } | null = null;
+  const CHUNK_SIZE = 80;
+  const allLabels: Array<{ idx: number; speaker: 'seller' | 'customer' }> = [];
 
-  for (let i = 0; i < segments.length; i++) {
-    const seg = segments[i];
-    if (!currentGroup) {
-      currentGroup = { indices: [i], texts: [seg.text], start: seg.start, end: seg.end };
-    } else {
-      const gap = seg.start - currentGroup.end;
-      if (gap > GAP_THRESHOLD_S) {
-        preGroups.push(currentGroup);
-        currentGroup = { indices: [i], texts: [seg.text], start: seg.start, end: seg.end };
-      } else {
-        currentGroup.indices.push(i);
-        currentGroup.texts.push(seg.text);
-        currentGroup.end = seg.end;
-      }
-    }
-  }
-  if (currentGroup) preGroups.push(currentGroup);
+  for (let chunkStart = 0; chunkStart < segments.length; chunkStart += CHUNK_SIZE) {
+    const chunkEnd = Math.min(chunkStart + CHUNK_SIZE, segments.length);
+    const chunkSegments = segments.slice(chunkStart, chunkEnd);
+    const chunkLines = chunkSegments.map((seg, i) => `[${chunkStart + i}] ${seg.text}`).join('\n');
 
-  console.log(`[Diarization] Pre-grouped ${segments.length} segments into ${preGroups.length} groups by timing gaps (>${GAP_THRESHOLD_S}s)`);
-
-  const groupLines = preGroups.map((g, i) => {
-    const timeLabel = `[${Math.floor(g.start / 60)}:${String(Math.floor(g.start % 60)).padStart(2, '0')}]`;
-    return `[G${i}] ${timeLabel} ${g.texts.join(' ')}`;
-  }).join('\n');
-
-  const CHUNK_SIZE = 120;
-  const allGroupLabels: Array<{ gIdx: number; speaker: 'seller' | 'customer' }> = [];
-
-  for (let chunkStart = 0; chunkStart < preGroups.length; chunkStart += CHUNK_SIZE) {
-    const chunkEnd = Math.min(chunkStart + CHUNK_SIZE, preGroups.length);
-    const chunkLines = preGroups.slice(chunkStart, chunkEnd).map((g, i) => {
-      const gIdx = chunkStart + i;
-      const timeLabel = `[${Math.floor(g.start / 60)}:${String(Math.floor(g.start % 60)).padStart(2, '0')}]`;
-      return `[G${gIdx}] ${timeLabel} ${g.texts.join(' ')}`;
-    }).join('\n');
-
-    let prevTranscript = '';
-    if (chunkStart > 0) {
-      const prevLabeled = allGroupLabels.slice(-15);
-      prevTranscript = '\nVoorgaande context (laatste 15 groepen):\n' + prevLabeled.map(l => {
-        const g = preGroups[l.gIdx];
-        return `[G${l.gIdx}] ${l.speaker === 'seller' ? 'VERKOPER' : 'KLANT'}: ${g.texts.join(' ').substring(0, 80)}`;
-      }).join('\n');
+    let prevContext = '';
+    if (chunkStart > 0 && allLabels.length > 0) {
+      const lastLabels = allLabels.slice(-3);
+      prevContext = `\nDe laatste sprekers voor dit fragment waren: ${lastLabels.map(l => `[${l.idx}] = ${l.speaker === 'seller' ? 'V' : 'K'}`).join(', ')}. Houd hier rekening mee voor continuïteit.`;
     }
 
     try {
@@ -270,32 +235,31 @@ export async function buildTurns(segments: WhisperSegment[]): Promise<Transcript
         messages: [
           {
             role: 'system',
-            content: `Je bent een expert in speaker diarization van verkoopgesprekken. Je ontvangt een transcript opgedeeld in groepen (G0, G1, ...) op basis van stiltes. Elke groep is waarschijnlijk van DEZELFDE spreker.
+            content: `Je bent een expert in het analyseren van verkoopgesprekken. Je taak is om per zin te bepalen wie er spreekt: de Verkoper (V) of de Klant (K).
 
-TAAK: Bepaal per groep of het de Verkoper (V) of Klant (K) is.
+BELANGRIJK - Analyseer op INHOUD, niet op aannames:
+- De verkoper stelt ontdekkingsvragen, presenteert oplossingen, stuurt het gesprek, probeert te overtuigen
+- De klant beschrijft zijn situatie, beantwoordt vragen, stelt vragen over het aanbod, geeft bezwaren
+- Let op dialoogpatronen: als iemand een vraag stelt en het antwoord volgt, is dat vaak een sprekerwisseling
+- "Ja", "Nee", korte bevestigingen na een vraag = vaak de ANDERE spreker
+- Als iemand zegt "ik heb dat al twee keer meegemaakt" na een vraag "is dat iets dat je al hebt meegemaakt?" = dat is de klant die antwoordt
+- Whisper maakt GEEN onderscheid tussen sprekers. Lange blokken tekst bevatten vaak BEIDE sprekers.
+- Zoek naar natuurlijke dialoogwisselingen: vraag → antwoord, pitch → reactie
+- Let op voornaamwoorden en context: "wij verkopen" vs "ik zoek", "ons aanbod" vs "mijn situatie"
+- Verkopers mogen LANG spreken: een presentatie, pitch of uitleg kan vele zinnen zijn — dit is normaal.
+- Wees EXTRA CONSERVATIEF bij korte uitroepen ("Ah, toch?", "Oké", "Ja, precies", "Prima", "Zeker") midden in een verkoopverhaal — dit zijn BIJNA ALTIJD de verkoper die een retorische wending maakt, NIET een klantreactie.
 
-REGELS:
-1. Een verkoopgesprek wisselt typisch af: V-K-V-K. Eén spreker praat zelden 5+ groepen achter elkaar.
-2. De VERKOPER opent het gesprek, stelt vragen, presenteert oplossingen, stuurt het gesprek.
-3. De KLANT beschrijft zijn situatie, beantwoordt vragen, geeft bezwaren, stelt vragen over het aanbod.
-4. Na een vraag komt typisch een antwoord van de ANDERE spreker.
-5. Korte bevestigingen ("ja", "nee", "oké") na een vraag = de ANDERE spreker.
-6. Let op voornaamwoorden: "wij bieden aan", "ons product" = verkoper. "Ik zoek", "wij hebben het probleem" = klant.
-7. De eerste groep is BIJNA ALTIJD de verkoper (die opent het gesprek).
-8. Wees CONSERVATIEF met speaker-wissels. Kies alleen een wissel als de inhoud duidelijk wijst op een andere spreker.
-
-Antwoord als JSON: {"labels": [{"g": 0, "s": "V"}, {"g": 1, "s": "K"}, ...]}
-Geef ELKE groep index terug.`
+Antwoord als JSON object met een "labels" array: {"labels": [{"idx": 0, "s": "V"}, {"idx": 1, "s": "K"}, ...]}
+Gebruik alleen "V" voor Verkoper en "K" voor Klant. Geef ELKE idx terug.`
           },
           {
             role: 'user',
-            content: `Label elke groep als V (Verkoper) of K (Klant):${prevTranscript}
+            content: `Bepaal per zin wie er spreekt (V=Verkoper, K=Klant):${prevContext}
 
-TE LABELEN GROEPEN:
 ${chunkLines}`
           }
         ],
-        temperature: 0.05,
+        temperature: 0.1,
         response_format: { type: 'json_object' },
       });
 
@@ -306,65 +270,45 @@ ${chunkLines}`
       } catch {
         console.error('[Diarization] Failed to parse AI response for chunk', chunkStart);
         for (let i = chunkStart; i < chunkEnd; i++) {
-          const prevSpeaker = allGroupLabels.length > 0 ? allGroupLabels[allGroupLabels.length - 1].speaker : 'seller';
-          allGroupLabels.push({ gIdx: i, speaker: prevSpeaker });
+          const prevSpeaker = allLabels.length > 0 ? allLabels[allLabels.length - 1].speaker : 'seller';
+          allLabels.push({ idx: i, speaker: prevSpeaker });
         }
         continue;
       }
 
-      const labels = Array.isArray(parsed) ? parsed : (parsed.labels || parsed.result || Object.values(parsed).find(Array.isArray) || []);
+      const labels = Array.isArray(parsed) ? parsed : (parsed.labels || parsed.result || parsed.segments || Object.values(parsed).find(Array.isArray) || []);
 
       const labelMap = new Map<number, 'seller' | 'customer'>();
       for (const item of labels) {
-        const gIdx = typeof item.g === 'number' ? item.g : (typeof item.idx === 'number' ? item.idx : parseInt(item.g || item.idx));
-        const speaker = (item.s === 'V' || item.speaker === 'V') ? 'seller' : 'customer';
-        labelMap.set(gIdx, speaker);
+        const idx = typeof item.idx === 'number' ? item.idx : parseInt(item.idx);
+        const speaker = (item.s === 'V' || item.speaker === 'V' || item.s === 'seller') ? 'seller' : 'customer';
+        labelMap.set(idx, speaker);
       }
 
       for (let i = chunkStart; i < chunkEnd; i++) {
-        const speaker = labelMap.get(i) || (allGroupLabels.length > 0 ? allGroupLabels[allGroupLabels.length - 1].speaker : 'seller');
-        allGroupLabels.push({ gIdx: i, speaker });
+        const speaker = labelMap.get(i) || (i > 0 && allLabels.length > 0 ? allLabels[allLabels.length - 1].speaker : 'seller');
+        allLabels.push({ idx: i, speaker });
       }
 
     } catch (err) {
       console.error('[Diarization] AI call failed for chunk', chunkStart, err);
       for (let i = chunkStart; i < chunkEnd; i++) {
-        const prevSpeaker = allGroupLabels.length > 0 ? allGroupLabels[allGroupLabels.length - 1].speaker : 'seller';
-        allGroupLabels.push({ gIdx: i, speaker: prevSpeaker });
+        const prevSpeaker = allLabels.length > 0 ? allLabels[allLabels.length - 1].speaker : 'seller';
+        allLabels.push({ idx: i, speaker: prevSpeaker });
       }
     }
   }
 
-  const smoothedLabels = [...allGroupLabels];
-  for (let i = 1; i < smoothedLabels.length - 1; i++) {
-    const prev = smoothedLabels[i - 1].speaker;
-    const curr = smoothedLabels[i].speaker;
-    const next = smoothedLabels[i + 1].speaker;
-    const groupTextLen = preGroups[i].texts.join(' ').length;
-
-    if (curr !== prev && curr !== next && groupTextLen < 60) {
-      console.log(`[Diarization] Smoothing: G${i} "${preGroups[i].texts.join(' ').substring(0, 40)}..." flipped ${curr} → ${prev} (isolated short group)`);
-      smoothedLabels[i] = { ...smoothedLabels[i], speaker: prev };
-    }
-  }
-
-  const sellerCount = smoothedLabels.filter(l => l.speaker === 'seller').length;
-  const customerCount = smoothedLabels.filter(l => l.speaker === 'customer').length;
-  console.log(`[Diarization] Final: ${smoothedLabels.length} groups labeled. Seller: ${sellerCount}, Customer: ${customerCount}`);
-
-  if (customerCount === 0 && smoothedLabels.length > 3) {
-    console.log('[Diarization] WARNING: No customer detected — falling back to alternating pattern');
-    for (let i = 0; i < smoothedLabels.length; i++) {
-      smoothedLabels[i] = { ...smoothedLabels[i], speaker: i % 2 === 0 ? 'seller' : 'customer' };
-    }
-  }
+  const sellerCount = allLabels.filter(l => l.speaker === 'seller').length;
+  const customerCount = allLabels.filter(l => l.speaker === 'customer').length;
+  console.log(`[Diarization] AI labeled ${allLabels.length} segments. Seller: ${sellerCount}, Customer: ${customerCount}`);
 
   const turns: TranscriptTurn[] = [];
   let currentTurn: { speaker: 'seller' | 'customer'; texts: string[]; startMs: number; endMs: number } | null = null;
 
-  for (let i = 0; i < smoothedLabels.length; i++) {
-    const label = smoothedLabels[i];
-    const group = preGroups[label.gIdx];
+  for (let i = 0; i < allLabels.length; i++) {
+    const label = allLabels[i];
+    const segment = segments[label.idx];
 
     if (!currentTurn || currentTurn.speaker !== label.speaker) {
       if (currentTurn) {
@@ -378,13 +322,13 @@ ${chunkLines}`
       }
       currentTurn = {
         speaker: label.speaker,
-        texts: [...group.texts],
-        startMs: group.start,
-        endMs: group.end,
+        texts: [segment.text],
+        startMs: segment.start,
+        endMs: segment.end,
       };
     } else {
-      currentTurn.texts.push(...group.texts);
-      currentTurn.endMs = group.end;
+      currentTurn.texts.push(segment.text);
+      currentTurn.endMs = segment.end;
     }
   }
 

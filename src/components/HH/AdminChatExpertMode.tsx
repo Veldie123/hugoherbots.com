@@ -1434,7 +1434,7 @@ export function AdminChatExpertMode({
                 <div className={`flex ${message.sender === "hugo" ? "justify-end" : "justify-start"}`}>
                   <div className="flex flex-col gap-1 max-w-[80%]">
                     {message.isTranscriptReplay && message.transcriptRole && (
-                      <span className="text-[11px] font-medium mb-0.5 px-1" style={{ color: message.transcriptRole === 'Klant' ? '#9910FA' : 'var(--hh-primary)' }}>
+                      <span className="text-[11px] font-medium mb-0.5 px-1" style={{ color: message.transcriptRole === 'Klant' ? '#9910FA' : '#7e22ce' }}>
                         {message.transcriptRole}
                       </span>
                     )}
@@ -1453,7 +1453,7 @@ export function AdminChatExpertMode({
                         message.isTranscriptReplay
                           ? {
                               opacity: 0.85,
-                              backgroundColor: message.sender === 'hugo' ? 'var(--hh-primary)' : 'var(--hh-ui-100)',
+                              backgroundColor: message.sender === 'hugo' ? '#7e22ce' : 'var(--hh-ui-100)',
                               color: message.sender === 'hugo' ? '#ffffff' : 'var(--hh-ink)',
                             }
                           : message.sender === "hugo"
