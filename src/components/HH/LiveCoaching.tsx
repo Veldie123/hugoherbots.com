@@ -234,7 +234,7 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
       <div className="relative h-full flex items-center p-6 sm:p-8">
         <div className="text-white space-y-3 max-w-lg">
           {/* Green accent badge - dynamic date */}
-          <Badge className="text-white border-0 bg-hh-primary">
+          <Badge className="text-white border-0" style={{ backgroundColor: '#4F7396' }}>
             <CalendarIcon className="w-3 h-3 mr-1" />
             {nextSession?.scheduledDate 
               ? formatNextSessionDate(new Date(nextSession.scheduledDate))

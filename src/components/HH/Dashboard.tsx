@@ -419,7 +419,7 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
               <div className="absolute inset-0 bg-gradient-to-r from-hh-ink via-hh-ink/80 to-transparent" />
               <div className="relative h-full flex items-center p-6 sm:p-8">
                 <div className="text-white space-y-3 max-w-lg">
-                  <Badge className="bg-hh-success text-white border-0">
+                  <Badge className="text-white border-0" style={{ backgroundColor: '#4F7396' }}>
                     Aanbevolen voor jou
                   </Badge>
                   <h2 className="text-[24px] sm:text-[32px] font-bold leading-tight">
@@ -431,7 +431,10 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
                   </p>
                   <div className="flex flex-wrap gap-3 pt-1">
                     <Button 
-                      className="gap-2 text-white border-0 bg-hh-success hover:bg-hh-success/90"
+                      className="gap-2 text-white border-0"
+                      style={{ backgroundColor: '#3d9a6e' }}
+                      onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#4daa7e'; }}
+                      onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#3d9a6e'; }}
                       onClick={() => {
                         if (featuredVideo?.id) {
                           localStorage.setItem('currentVideoId', featuredVideo.id);
@@ -443,7 +446,10 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
                       Verder kijken
                     </Button>
                     <Button 
-                      className="bg-hh-ink/80 text-white hover:bg-hh-ink gap-2 border border-white/30"
+                      className="gap-2 border-0 font-medium"
+                      style={{ backgroundColor: 'white', color: '#1e293b' }}
+                      onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#e2e8f0'; }}
+                      onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = 'white'; }}
                       onClick={() => navigate?.("talk-to-hugo")}
                     >
                       <MessageSquare className="w-4 h-4" />

@@ -689,7 +689,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                 </>
               ) : (
                 <>
-                  <Badge className="text-white border-0 text-[12px] bg-hh-primary">
+                  <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: '#4F7396' }}>
                     <BookOpen className="w-3 h-3 mr-1" />
                     {(featuredVideo?.fase && featuredVideo.fase !== 'Onbekend') ? featuredVideo.fase : (continueWatching?.reason === 'continue' ? 'Ga verder' : 'EPIC Training')}
                   </Badge>
@@ -719,8 +719,10 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                   Verder kijken
                 </Button>
                 <Button 
-                  className="gap-2 border border-white/30 text-white hover:bg-white/10"
-                  style={{ backgroundColor: 'rgba(15, 24, 38, 0.8)' }}
+                  className="gap-2 border-0 font-medium"
+                  style={{ backgroundColor: 'white', color: '#1e293b' }}
+                  onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#e2e8f0'; }}
+                  onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = 'white'; }}
                   onClick={() => navigate?.("talk-to-hugo")}
                 >
                   <MessageSquare className="w-4 h-4" />
