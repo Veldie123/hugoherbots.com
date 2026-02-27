@@ -913,14 +913,20 @@ export function EPICSidebar({
                               const isRecommended = recommendedTechnique === techniqueId;
 
                               return (
-                                <div
+                                <button
                                   key={techniqueId}
+                                  type="button"
+                                  onClick={() => {
+                                    if (onSelectTechnique) {
+                                      onSelectTechnique(technique.nummer, technique.naam);
+                                    }
+                                  }}
                                   className={cn(
-                                    "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-default",
+                                    "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-pointer",
                                     selectedTechnique === technique.naam
                                       ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
                                       : isRecommended
-                                      ? "bg-purple-600/5 border border-purple-600/20"
+                                      ? "bg-purple-600/5 border border-purple-600/20 hover:bg-purple-600/10"
                                       : "bg-card text-hh-text hover:bg-hh-ui-50"
                                   )}
                                 >
@@ -948,7 +954,7 @@ export function EPICSidebar({
                                       )}
                                     </div>
                                   </div>
-                                </div>
+                                </button>
                               );
                             })} 
                           </div>
