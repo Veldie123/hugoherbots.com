@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useMobileViewMode } from "@/hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -50,7 +51,7 @@ export function Library({ navigate, isAdmin }: LibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<ContentType>("all");
   const [filterFase, setFilterFase] = useState("all");
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useMobileViewMode("grid", "grid");
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 

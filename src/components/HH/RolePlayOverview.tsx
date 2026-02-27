@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useMobileViewMode } from "@/hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -56,7 +57,7 @@ interface Scenario {
 }
 
 export function RolePlayOverview({ navigate, isAdmin }: RolePlayOverviewProps) {
-  const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
+  const [viewMode, setViewMode] = useMobileViewMode("grid", "grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [difficultyFilter, setDifficultyFilter] = useState("all");

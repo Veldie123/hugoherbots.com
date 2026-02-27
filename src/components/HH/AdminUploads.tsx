@@ -28,6 +28,7 @@ import {
   Play,
 } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useMobileViewMode } from "@/hooks/useMobileViewMode";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -125,7 +126,7 @@ const MAX_FILE_SIZE = 100 * 1024 * 1024;
 export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [viewMode, setViewMode] = useMobileViewMode("grid", "grid");
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 

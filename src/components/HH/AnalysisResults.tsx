@@ -304,6 +304,7 @@ export function AnalysisResults({
   navigationData,
 }: AnalysisResultsProps) {
   const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<"coach" | "timeline">(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('tab') === 'timeline' ? 'timeline' : 'coach';
@@ -695,11 +696,11 @@ export function AnalysisResults({
 
   const getQualityBadge = (quality: string) => {
     switch (quality) {
-      case 'perfect': return { label: 'Perfect', color: '', style: { backgroundColor: '#DCFCE7', color: '#166534', borderColor: '#BBF7D0' } };
-      case 'goed': return { label: 'Goed', color: '', style: { backgroundColor: '#DCFCE7', color: '#166534', borderColor: '#BBF7D0' } };
-      case 'bijna': return { label: 'Bijna', color: '', style: { backgroundColor: '#FFF7ED', color: '#9A3412', borderColor: '#FED7AA' } };
-      case 'gemist': return { label: 'Gemist', color: '', style: { backgroundColor: '#FFF7ED', color: '#9A3412', borderColor: '#FED7AA' } };
-      default: return { label: quality, color: '', style: { backgroundColor: '#EDE9FE', color: '#5B21B6', borderColor: '#DDD6FE' } };
+      case 'perfect': return { label: 'Perfect', color: '', style: { backgroundColor: isDark ? '#064E3B' : '#DCFCE7', color: isDark ? '#86EFAC' : '#166534', borderColor: isDark ? '#065F46' : '#BBF7D0' } };
+      case 'goed': return { label: 'Goed', color: '', style: { backgroundColor: isDark ? '#064E3B' : '#DCFCE7', color: isDark ? '#86EFAC' : '#166534', borderColor: isDark ? '#065F46' : '#BBF7D0' } };
+      case 'bijna': return { label: 'Bijna', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FFF7ED', color: isDark ? '#FBBF24' : '#9A3412', borderColor: isDark ? '#92400E' : '#FED7AA' } };
+      case 'gemist': return { label: 'Gemist', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FFF7ED', color: isDark ? '#FBBF24' : '#9A3412', borderColor: isDark ? '#92400E' : '#FED7AA' } };
+      default: return { label: quality, color: '', style: { backgroundColor: isDark ? '#3B0764' : '#EDE9FE', color: isDark ? '#C4B5FD' : '#5B21B6', borderColor: isDark ? '#581C87' : '#DDD6FE' } };
     }
   };
 
@@ -712,16 +713,16 @@ export function AnalysisResults({
 
   const getSignalLabel = (houding: string) => {
     const labels: Record<string, { label: string; color: string; style: React.CSSProperties }> = {
-      'interesse': { label: 'Interesse', color: '', style: { backgroundColor: '#DCFCE7', color: '#166534' } },
-      'akkoord': { label: 'Akkoord', color: '', style: { backgroundColor: '#DCFCE7', color: '#166534' } },
-      'vraag': { label: 'Vraag', color: '', style: { backgroundColor: '#DBEAFE', color: '#1D4ED8' } },
-      'twijfel': { label: 'Twijfel', color: '', style: { backgroundColor: '#FEF3C7', color: '#92400E' } },
-      'bezwaar': { label: 'Bezwaar', color: '', style: { backgroundColor: '#FEE2E2', color: '#991B1B' } },
-      'uitstel': { label: 'Uitstel', color: '', style: { backgroundColor: '#FFEDD5', color: '#9A3412' } },
-      'negatief': { label: 'Negatief', color: '', style: { backgroundColor: '#FEE2E2', color: '#991B1B' } },
-      'vaag': { label: 'Vaag', color: '', style: { backgroundColor: '#FEF3C7', color: '#92400E' } },
-      'ontwijkend': { label: 'Ontwijkend', color: '', style: { backgroundColor: '#FFEDD5', color: '#9A3412' } },
-      'neutraal': { label: 'Neutraal', color: '', style: { backgroundColor: '#F3F4F6', color: '#6B7280' } },
+      'interesse': { label: 'Interesse', color: '', style: { backgroundColor: isDark ? '#064E3B' : '#DCFCE7', color: isDark ? '#86EFAC' : '#166534' } },
+      'akkoord': { label: 'Akkoord', color: '', style: { backgroundColor: isDark ? '#064E3B' : '#DCFCE7', color: isDark ? '#86EFAC' : '#166534' } },
+      'vraag': { label: 'Vraag', color: '', style: { backgroundColor: isDark ? '#1E3A5F' : '#DBEAFE', color: isDark ? '#93C5FD' : '#1D4ED8' } },
+      'twijfel': { label: 'Twijfel', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FEF3C7', color: isDark ? '#FBBF24' : '#92400E' } },
+      'bezwaar': { label: 'Bezwaar', color: '', style: { backgroundColor: isDark ? '#450A0A' : '#FEE2E2', color: isDark ? '#FCA5A5' : '#991B1B' } },
+      'uitstel': { label: 'Uitstel', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FFEDD5', color: isDark ? '#FBBF24' : '#9A3412' } },
+      'negatief': { label: 'Negatief', color: '', style: { backgroundColor: isDark ? '#450A0A' : '#FEE2E2', color: isDark ? '#FCA5A5' : '#991B1B' } },
+      'vaag': { label: 'Vaag', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FEF3C7', color: isDark ? '#FBBF24' : '#92400E' } },
+      'ontwijkend': { label: 'Ontwijkend', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FFEDD5', color: isDark ? '#FBBF24' : '#9A3412' } },
+      'neutraal': { label: 'Neutraal', color: '', style: { backgroundColor: isDark ? '#374151' : '#F3F4F6', color: isDark ? '#9CA3AF' : '#6B7280' } },
     };
     return labels[houding] || labels['neutraal'];
   };
@@ -777,13 +778,13 @@ export function AnalysisResults({
 
   const epicGetFaseBadgeColor = (fase: number) => {
     const colors: Record<number, string> = {
-      0: "bg-slate-100 text-slate-600 border-slate-200",
-      1: "bg-emerald-100 text-emerald-700 border-emerald-200",
-      2: "bg-blue-100 text-blue-700 border-blue-200",
-      3: "bg-amber-100 text-amber-700 border-amber-200",
-      4: "bg-purple-100 text-purple-700 border-purple-200",
+      0: isDark ? "bg-slate-800 text-slate-300 border-slate-700" : "bg-slate-100 text-slate-600 border-slate-200",
+      1: isDark ? "bg-emerald-900 text-emerald-300 border-emerald-800" : "bg-emerald-100 text-emerald-700 border-emerald-200",
+      2: isDark ? "bg-blue-900 text-blue-300 border-blue-800" : "bg-blue-100 text-blue-700 border-blue-200",
+      3: isDark ? "bg-amber-900 text-amber-300 border-amber-800" : "bg-amber-100 text-amber-700 border-amber-200",
+      4: isDark ? "bg-purple-900 text-purple-300 border-purple-800" : "bg-purple-100 text-purple-700 border-purple-200",
     };
-    return colors[fase] || "bg-gray-100 text-gray-700 border-gray-200";
+    return colors[fase] || (isDark ? "bg-gray-800 text-gray-300 border-gray-700" : "bg-gray-100 text-gray-700 border-gray-200");
   };
 
   const epicGetTopLevelTechniques = (phase: number) => {
@@ -920,7 +921,6 @@ export function AnalysisResults({
 
   const useAdminLayout = !!navigationData?.fromAdmin;
   const adminColors = useAdminLayout;
-  const isDark = theme === 'dark';
   const analysisFromHugoFlag = sessionStorage.getItem('analysisFromHugo') === 'true';
   const fromHugo = !useAdminLayout && analysisFromHugoFlag;
 
@@ -1145,7 +1145,7 @@ export function AnalysisResults({
                       }
                     }}
                     className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-lg font-medium transition-colors border"
-                    style={{ borderColor: adminColors ? '#E9D5FF' : 'var(--hh-border)', color: adminColors ? '#9910FA' : '#4F7396', backgroundColor: adminColors ? '#FAF5FF' : 'var(--hh-ui-50)' }}
+                    style={{ borderColor: adminColors ? (isDark ? '#581C87' : '#E9D5FF') : 'var(--hh-border)', color: adminColors ? (isDark ? '#C4B5FD' : '#9910FA') : (isDark ? '#93C5FD' : '#4F7396'), backgroundColor: adminColors ? (isDark ? '#3B0764' : '#FAF5FF') : 'var(--hh-ui-50)' }}
                     title="Opnieuw analyseren"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -1177,7 +1177,7 @@ export function AnalysisResults({
             <div className="flex flex-col items-center gap-2 flex-shrink-0">
               <div className="relative" style={{ width: '80px', height: '80px' }}>
                 <svg width="80" height="80" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="#E5E7EB" strokeWidth="6" />
+                  <circle cx="50" cy="50" r="42" fill="none" stroke={isDark ? '#374151' : '#E5E7EB'} strokeWidth="6" />
                   <circle
                     cx="50" cy="50" r="42"
                     fill="none"
@@ -1952,8 +1952,8 @@ export function AnalysisResults({
                                 <span className="text-[10px] text-hh-muted">{statusOk ? 'Toegepast:' : 'Aanbevolen:'}</span>
                                 {(statusOk ? match.actualTechniques : match.recommendedTechniques)?.map((tech: string, tIdx: number) => (
                                   <span key={tIdx} className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{
-                                    backgroundColor: statusOk ? '#DCFCE7' : '#DBEAFE',
-                                    color: statusOk ? '#166534' : '#1E40AF',
+                                    backgroundColor: statusOk ? (isDark ? '#064E3B' : '#DCFCE7') : (isDark ? '#1E3A5F' : '#DBEAFE'),
+                                    color: statusOk ? (isDark ? '#86EFAC' : '#166534') : (isDark ? '#93C5FD' : '#1E40AF'),
                                   }}>
                                     {tech}
                                   </span>
@@ -2458,19 +2458,19 @@ export function AnalysisResults({
                                         setEpicSidebarOpen(true);
                                       }}
                                       className="w-full text-left text-[12px] px-2.5 py-2 rounded-lg border bg-card flex items-center justify-between"
-                                      style={{ borderColor: '#E9D5FF' }}
+                                      style={{ borderColor: isDark ? '#6D28D9' : '#E9D5FF' }}
                                     >
                                       <span style={{ color: correctionValue ? 'var(--hh-text)' : 'var(--hh-muted)' }}>
                                         {correctionValue ? `${correctionValue} — ${getTechniekByNummer(correctionValue)?.naam || correctionValue}` : 'Selecteer juiste techniek...'}
                                       </span>
-                                      <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#9910FA' }} />
+                                      <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" style={{ color: isDark ? '#C4B5FD' : '#9910FA' }} />
                                     </button>
                                   ) : (
                                     <select
                                       value={correctionValue}
                                       onChange={(e) => setCorrectionValue(e.target.value)}
                                       className="w-full text-[12px] px-2.5 py-2 rounded-lg border bg-card"
-                                      style={{ borderColor: '#E9D5FF' }}
+                                      style={{ borderColor: isDark ? '#6D28D9' : '#E9D5FF' }}
                                     >
                                       <option value="">Selecteer juiste houding...</option>
                                       {KLANT_HOUDINGEN.map(h => (
@@ -2485,7 +2485,7 @@ export function AnalysisResults({
                                   onChange={(e) => setCorrectionNote(e.target.value)}
                                   placeholder="Optionele toelichting..."
                                   className="w-full text-[11px] px-2.5 py-1.5 rounded-lg border bg-card mb-2"
-                                  style={{ borderColor: '#E9D5FF' }}
+                                  style={{ borderColor: isDark ? '#6D28D9' : '#E9D5FF' }}
                                 />
                                 <div className="flex gap-2">
                                   <button

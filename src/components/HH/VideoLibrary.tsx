@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { VideoTechniek } from "@/types/video";
+import { useMobileViewMode } from "@/hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -116,7 +117,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
   const [searchQuery, setSearchQuery] = useState("");
   const [filterPhase, setFilterPhase] = useState<string>("all");
   const [filterTechniek, setFilterTechniek] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
+  const [viewMode, setViewMode] = useMobileViewMode("grid", "grid");
   const [showAllVideos, setShowAllVideos] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('expanded') === 'true') return true;

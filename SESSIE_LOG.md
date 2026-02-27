@@ -4,6 +4,20 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-27 — Mobiele UX Sprint: view toggles, dark mode, hamburger
+
+**Vraag:** 5 mobiele UX-problemen fixen: notificatie dropdown overflow, hamburger te klein, view toggles verbergen op mobiel, dark mode Analysis Results, Admin Config Review card view.
+
+> **Conclusie:**
+> - T001 (notificatie dropdown) en T002 (hamburger menu) waren **al gefixt** in vorige sessie — geen wijzigingen nodig
+> - T003: `useMobileViewMode` hook toegevoegd aan 4 componenten die nog `useState` gebruikten: `VideoLibrary.tsx`, `RolePlayOverview.tsx`, `Library.tsx`, `AdminUploads.tsx` — nu forceren ze grid view op mobiel (<768px). Desktop default behouden als "grid". Alle 22+ componenten hebben nu `hidden sm:flex` op toggle wrappers.
+> - T004: Dark mode kleuren gefixt in `AnalysisResults.tsx` — `getQualityBadge()`, `getSignalLabel()`, `epicGetFaseBadgeColor()` gebruiken nu `isDark` ternaries voor donkere achtergrondkleuren. Correction panel borders (`#E9D5FF`) en progress circle stroke ook dark-mode-aware gemaakt. `isDark` verplaatst naar eerder in de component (line 310) om beschikbaar te zijn voor alle helper functies.
+> - T005: Admin Config Review had **al een mobiele card view** (`md:hidden` op line 392) — geen wijzigingen nodig
+> - Code review: PASS — reviewer ving correcte parameterrolvolgorde op bij `useMobileViewMode`, direct gefixt
+> - E2e tests: alle checks geslaagd
+
+---
+
 ## 2026-02-27 — Border alignment sidebar ↔ chat input
 
 **Vraag:** De horizontale lijn boven "Admin View" en boven "Typ je bericht..." liep niet mooi door — border-t op verschillende hoogtes.
