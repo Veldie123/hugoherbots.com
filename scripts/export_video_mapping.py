@@ -83,7 +83,7 @@ def main():
     print("\nFetching videos from video_ingest_jobs...")
     result = supabase.table("video_ingest_jobs").select(
         "id, video_title, drive_file_name, fase, techniek_id, ai_suggested_techniek_id, "
-        "duration_seconds, status, transcript, mux_asset_id, mux_playback_id, ai_confidence, is_hidden"
+        "duration_seconds, status, transcript, mux_asset_id, mux_playback_id, ai_confidence, is_hidden, ai_attractive_title"
     ).is_("deleted_at", "null").order("drive_file_name").execute()
     
     videos = result.data
@@ -126,7 +126,7 @@ def main():
         
         video_entry = {
             "id": v["id"],
-            "title": v.get("video_title") or file_name.replace(".mp4", "").replace(".m4a", "").replace("_", " "),
+            "title": v.get("ai_attractive_title") or v.get("video_title") or file_name.replace(".mp4", "").replace(".m4a", "").replace("_", " "),
             "file_name": file_name,
             "fase": fase_num,
             "fase_naam": get_fase_naam(fase_num),
@@ -161,10 +161,15 @@ def main():
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(video_mapping, f, ensure_ascii=False, indent=2)
     
+    config_path = Path("config/video_mapping.json")
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump(video_mapping, f, ensure_ascii=False, indent=2)
+    
     print("\n" + "=" * 70)
     print("EXPORT COMPLETE")
     print("=" * 70)
     print(f"Output file: {OUTPUT_FILE}")
+    print(f"Config file: {config_path}")
     print(f"\nSummary:")
     print(f"  Total videos:        {video_mapping['status_summary']['total']}")
     print(f"  With manual techniek: {video_mapping['status_summary']['with_techniek']}")
