@@ -4,6 +4,17 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-27 — Border alignment sidebar ↔ chat input
+
+**Vraag:** De horizontale lijn boven "Admin View" en boven "Typ je bericht..." liep niet mooi door — border-t op verschillende hoogtes.
+
+> **Conclusie:**
+> - Admin View wrapper padding van `p-3` naar `p-4` gewijzigd in `AppLayout.tsx` zodat de hoogte matcht met de chat input bar (`p-4`)
+> - Beide border-t lijnen zitten nu op exact dezelfde Y-positie en vormen één doorlopende lijn
+> - Bestanden: `src/components/HH/AppLayout.tsx`
+
+---
+
 ## 2026-02-27 — Landing/publieke pagina's altijd light mode
 
 **Vraag:** Geen dark mode voor de landing page — de publieke pagina's moeten altijd licht blijven.
