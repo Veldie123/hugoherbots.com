@@ -118,12 +118,14 @@ interface TalkToHugoAIProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
   navigationData?: Record<string, any>;
+  onboardingMode?: boolean;
 }
 
 export function TalkToHugoAI({
   navigate,
   isAdmin,
   navigationData,
+  onboardingMode,
 }: TalkToHugoAIProps) {
   const { user } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -1937,7 +1939,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
   };
 
   return (
-    <AppLayout currentPage="talk-to-hugo" navigate={navigate} isAdmin={isAdmin} contentClassName="flex-1 overflow-hidden min-h-0 flex flex-col">
+    <AppLayout currentPage="talk-to-hugo" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} contentClassName="flex-1 overflow-hidden min-h-0 flex flex-col">
       <div className="flex flex-col flex-1 min-h-0">
         {/* Unified header row — one continuous border-bottom */}
         <div className="flex items-stretch border-b border-hh-border flex-shrink-0">

@@ -22,13 +22,13 @@ interface TeamSessionsProps {
   onboardingMode?: boolean;
 }
 
-export function TeamSessions({ navigate, isAdmin }: TeamSessionsProps) {
+export function TeamSessions({ navigate, isAdmin, onboardingMode }: TeamSessionsProps) {
   const { workspace, isLoading: userLoading } = useUser();
   const isTeamPlan = workspace?.plan_tier === "team";
 
   if (userLoading) {
     return (
-      <AppLayout currentPage="team" navigate={navigate} isAdmin={isAdmin}>
+      <AppLayout currentPage="team" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
         <div className="flex items-center justify-center min-h-[60vh]">
           <Loader2 className="w-8 h-8 animate-spin text-hh-primary" />
         </div>
@@ -38,14 +38,14 @@ export function TeamSessions({ navigate, isAdmin }: TeamSessionsProps) {
 
   if (!isTeamPlan) {
     return (
-      <AppLayout currentPage="team" navigate={navigate} isAdmin={isAdmin}>
+      <AppLayout currentPage="team" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
         <UpgradeCTA navigate={navigate} currentPlan={workspace?.plan_tier || "starter"} />
       </AppLayout>
     );
   }
 
   return (
-    <AppLayout currentPage="team" navigate={navigate} isAdmin={isAdmin}>
+    <AppLayout currentPage="team" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
       <TeamEmptyState />
     </AppLayout>
   );

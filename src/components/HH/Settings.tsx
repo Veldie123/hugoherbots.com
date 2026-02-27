@@ -53,7 +53,7 @@ interface SettingsProps {
   onboardingMode?: boolean;
 }
 
-export function Settings({ navigate, initialSection = "profile", isAdmin }: SettingsProps) {
+export function Settings({ navigate, initialSection = "profile", isAdmin, onboardingMode }: SettingsProps) {
   const { user, workspace, session, logout, refreshUser } = useUser();
   const [activeSection, setActiveSection] = useState(initialSection);
   const [changePlanModalOpen, setChangePlanModalOpen] = useState(false);
@@ -221,7 +221,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin }: Sett
   };
 
   return (
-    <AppLayout currentPage="settings" navigate={navigate} isAdmin={isAdmin}>
+    <AppLayout currentPage="settings" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
       <div className="flex h-full">
         <aside className="hidden lg:block w-64 border-r border-hh-border bg-hh-ui-50 p-4 overflow-y-auto">
           <div className="space-y-1">

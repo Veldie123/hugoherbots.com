@@ -9,7 +9,7 @@ interface HelpCenterProps {
   onboardingMode?: boolean;
 }
 
-export function HelpCenter({ navigate, isAdmin }: HelpCenterProps) {
+export function HelpCenter({ navigate, isAdmin, onboardingMode }: HelpCenterProps) {
   const categories = [
     {
       icon: BookOpen,
@@ -79,6 +79,7 @@ export function HelpCenter({ navigate, isAdmin }: HelpCenterProps) {
       currentPage="help"
       navigate={navigate}
       isAdmin={isAdmin}
+      onboardingMode={onboardingMode}
     >
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* Search */}

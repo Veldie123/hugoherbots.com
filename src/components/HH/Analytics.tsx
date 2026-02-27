@@ -49,7 +49,7 @@ interface SkillData {
   trend: number;
 }
 
-export function Analytics({ navigate, isAdmin }: AnalyticsProps) {
+export function Analytics({ navigate, isAdmin, onboardingMode }: AnalyticsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [timePeriod, setTimePeriod] = useState("month");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -227,7 +227,7 @@ export function Analytics({ navigate, isAdmin }: AnalyticsProps) {
 
   if (loading) {
     return (
-      <AppLayout currentPage="analytics" navigate={navigate} isAdmin={isAdmin}>
+      <AppLayout currentPage="analytics" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
         <div className="p-6 flex flex-col items-center justify-center min-h-[400px] gap-3">
           <Loader2 className="w-8 h-8 text-hh-primary animate-spin" />
           <p className="text-[16px] text-hh-muted">Laden...</p>
@@ -237,7 +237,7 @@ export function Analytics({ navigate, isAdmin }: AnalyticsProps) {
   }
 
   return (
-    <AppLayout currentPage="analytics" navigate={navigate} isAdmin={isAdmin}>
+    <AppLayout currentPage="analytics" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between">

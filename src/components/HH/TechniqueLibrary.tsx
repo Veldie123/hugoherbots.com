@@ -48,7 +48,7 @@ interface TechniqueLibraryProps {
   onboardingMode?: boolean;
 }
 
-export function TechniqueLibrary({ navigate, isAdmin }: TechniqueLibraryProps) {
+export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: TechniqueLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFase, setActiveFase] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -178,7 +178,7 @@ export function TechniqueLibrary({ navigate, isAdmin }: TechniqueLibraryProps) {
   );
 
   return (
-    <AppLayout currentPage="techniques" navigate={navigate} isAdmin={isAdmin}>
+    <AppLayout currentPage="techniques" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
       <div className="p-3 sm:p-4 lg:p-6 space-y-4">
         {/* Header with compact KPI cards on the right */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-2">

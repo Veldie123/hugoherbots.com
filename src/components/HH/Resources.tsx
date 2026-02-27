@@ -53,7 +53,7 @@ interface Resource {
   category: string;
 }
 
-export function Resources({ navigate, isAdmin }: ResourcesProps) {
+export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterType, setFilterType] = useState("all");
@@ -224,6 +224,7 @@ export function Resources({ navigate, isAdmin }: ResourcesProps) {
       currentPage="resources"
       navigate={navigate}
       isAdmin={isAdmin}
+      onboardingMode={onboardingMode}
     >
       <div className="p-6 space-y-6">
         <div className="flex items-start justify-between">

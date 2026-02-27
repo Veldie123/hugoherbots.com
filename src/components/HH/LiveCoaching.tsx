@@ -801,6 +801,7 @@ export function LiveCoaching({
       currentPage="live"
       navigate={navigate}
       isAdmin={isAdmin}
+      onboardingMode={onboardingMode}
       onOpenFlowDrawer={() => setFlowDrawerOpen(true)}
     >
       <div className="p-3 sm:p-4 lg:p-6 space-y-6 sm:space-y-8">

@@ -354,8 +354,8 @@ export default function App() {
           {currentPage === "upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "privacy-policy" && <PrivacyPolicy navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "hugo-overview" && <HugoAIOverview navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "talk-to-hugo" && <TalkToHugoAI navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "techniques" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "talk-to-hugo" && <TalkToHugoAI navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "techniques" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "library" && <Library navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "notifications" && <UserNotifications navigate={navigate} isAdmin={isAdmin} />}
         </>
