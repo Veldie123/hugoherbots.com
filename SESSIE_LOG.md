@@ -31,3 +31,18 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - E2E test: GESLAAGD
 > - Bestanden: `AdminChatExpertModeSidebar.tsx`, `AdminChatExpertMode.tsx` (geen wijzigingen nodig)
 > - Agent Usage: ~$1.00
+
+---
+
+## 2026-02-27 — SESSIE_LOG.md aangemaakt + DNS setup hugoherbots.com
+
+**Vraag:** Ik wil een document waar je altijd jouw conclusie naartoe plakt, zodat ik niet in de chat hoef te scrollen. + DNS records voor www.hugoherbots.com instellen.
+
+> **Conclusie:**
+> - `SESSIE_LOG.md` aangemaakt — voortaan wordt elke sessie hier gelogd
+> - Instructie toegevoegd aan `replit.md` (Sessie Logboek Protocol)
+> - DNS voor `www.hugoherbots.com`: gebruiker moet bij DNS-provider twee records toevoegen:
+>   - **A record**: `www` → `34.111.179.208`
+>   - **TXT record**: `www` → `replit-verify=46000ef4-0131-44be-8266-a219bbaadf18`
+> - Geen code wijzigingen — dit is een externe DNS configuratie
+> - Agent Usage: ~$0.30
