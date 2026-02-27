@@ -224,7 +224,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
         </div>
 
         {/* Hero Banner - exact zoals Webinars */}
-        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px]">
+        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px] dark:ring-1 dark:ring-white/10">
           {/* Background Image - Hugo */}
           <img 
             src="/images/Hugo-Herbots-WEB-0281.JPG"
@@ -234,6 +234,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
           />
           {/* Gradient overlay - dark to light from left */}
           <div className="absolute inset-0 bg-gradient-to-r from-hh-ink via-hh-ink/80 to-transparent" />
+          <div className="absolute inset-0 bg-black/20 dark:bg-black/40 pointer-events-none" />
           
           {/* Content */}
           <div className="relative h-full flex items-center p-6 sm:p-8">

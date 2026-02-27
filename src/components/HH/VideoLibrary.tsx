@@ -660,7 +660,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
         </div>
 
         {/* Hero Banner - matching Dashboard style */}
-        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px]">
+        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px] dark:ring-1 dark:ring-white/10">
           {featuredVideo?.thumbnail ? (
             <img 
               src={featuredVideo.thumbnail.replace('width=320&height=180', 'width=800&height=450')} 
@@ -678,6 +678,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-r from-hh-ink via-hh-ink/80 to-transparent" />
+          <div className="absolute inset-0 bg-black/20 dark:bg-black/40 pointer-events-none" />
           
           <div className="relative h-full flex items-center p-6 sm:p-8">
             <div className="text-white space-y-3 max-w-lg">
@@ -719,10 +720,8 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                   Verder kijken
                 </Button>
                 <Button 
-                  className="gap-2 border-0 font-medium"
-                  style={{ backgroundColor: 'white', color: '#1e293b' }}
-                  onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#e2e8f0'; }}
-                  onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = 'white'; }}
+                  variant="outline"
+                  className="gap-2 bg-white/10 text-white border-white/30 hover:bg-white/20 hover:border-white/50"
                   onClick={() => navigate?.("talk-to-hugo")}
                 >
                   <MessageSquare className="w-4 h-4" />
