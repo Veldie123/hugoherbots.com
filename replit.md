@@ -1,7 +1,7 @@
 # HugoHerbots.ai Sales Coach App
 
 ## Overview
-This project is an AI-powered sales coaching platform that unifies hugoherbots.com and hugoherbots.ai functionalities. Its core purpose is to deliver comprehensive, scalable, and personalized sales coaching through AI Chat (text, audio, video), a Video Platform, Live Coaching, Roleplay, and Transcript Uploads. The platform leverages HugoHerbots' training videos and EPIC sales techniques to enhance sales performance. The business vision is to become the leading AI sales coaching solution, engaging a large user base with advanced AI capabilities.
+The HugoHerbots.ai Sales Coach App is an AI-powered platform designed to provide comprehensive, scalable, and personalized sales coaching. It integrates functionalities from hugoherbots.com and hugoherbots.ai, offering AI Chat (text, audio, video), a Video Platform, Live Coaching, Roleplay, and Transcript Uploads. The platform utilizes HugoHerbots' training videos and EPIC sales techniques to improve sales performance. The project aims to become the leading AI sales coaching solution with a large user base and advanced AI capabilities.
 
 ## User Preferences
 1. **SUPABASE IS DE ENIGE DATABASE** - Er is GEEN lokale PostgreSQL voor productiedata. Alle database operaties gaan via Supabase. Schema wijzigingen moeten in de Supabase SQL Editor. **BELANGRIJK: NOOIT de execute_sql_tool gebruiken** - deze gaat naar een automatische Replit dev database, NIET naar Supabase. Query Supabase altijd via de backend API endpoints of Python scripts met de Supabase client.
@@ -54,52 +54,45 @@ This project is an AI-powered sales coaching platform that unifies hugoherbots.c
 ## System Architecture
 
 ### UI/UX Decisions
-The frontend uses a "final" design with HugoHerbots branding, a light theme (with dark mode), and Dutch language content. Radix UI / Shadcn components are used. User views are blue, and Admin views are purple, with green for success states. Dark mode is persistent. The EPIC Technique Sidebar opens as an integrated left flex panel. Mobile views always default to card/grid layout.
+The frontend features a "final" design aligned with HugoHerbots branding, utilizing a light theme (with dark mode support) and Dutch language content. Radix UI / Shadcn components are employed. A clear visual distinction is made between user views (blue) and admin views (purple), with green for success states. Dark mode persistence is implemented. The EPIC Technique Sidebar operates as an integrated left flex panel, and mobile views consistently default to a card/grid layout.
 
 ### Technical Implementations
-The frontend is built with React 18, TypeScript, Vite 6, and Tailwind CSS v4. Sales techniques are centrally managed in `config/ssot/technieken_index.json` (Single Source of Truth).
+The frontend is developed using React 18, TypeScript, Vite 6, and Tailwind CSS v4. Sales techniques are centrally managed through `config/ssot/technieken_index.json`, serving as the Single Source of Truth.
 
 ### Backend Architecture
-The system employs three services in a single Replit project:
--   **Vite Dev Server** (port 5000): Hosts the frontend application.
--   **Video Processor** (port 3001): Manages video pipeline, Mux integration, RAG search, platform sync, SSO, Stripe, and admin-facing Daily.co endpoints.
--   **Hugo Engine V2** (port 3002): An AI coaching engine (TypeScript/Express) offering nested prompts, RAG-grounding, validation loops, LiveKit audio, HeyGen video, analysis, roleplay, and user-facing Daily.co Live Coaching endpoints.
+The Replit project hosts three primary services:
+-   **Vite Dev Server** (port 5000): For frontend application hosting.
+-   **Video Processor** (port 3001): Handles video pipeline, Mux integration, RAG search, platform sync, SSO, Stripe, and admin-facing Daily.co endpoints.
+-   **Hugo Engine V2** (port 3002): An AI coaching engine (TypeScript/Express) providing nested prompts, RAG-grounding, validation loops, LiveKit audio, HeyGen video, analysis, roleplay, and user-facing Daily.co Live Coaching endpoints.
 
-### Daily.co Live Coaching Endpoint Mapping
-Two sets of Daily.co endpoints are used:
--   **Admin flow** (video-processor.js, port 3001): For room creation, host tokens, recording control, and listing recordings.
--   **User flow** (hugo-engine, port 3002): For joining rooms, participant tokens, host start/end with room creation and recording retrieval.
-Both use the `DAILY_API_KEY` and interact with the Daily.co REST API v1.
+Daily.co integration uses separate endpoints for admin (video-processor.js) and user (hugo-engine) flows, both interacting with the Daily.co REST API v1.
 
 ### Core V2 Engine Components
-The Hugo Engine V2 incorporates modules for Coach Engine, Context Engine, Analysis Service, Evaluator, RAG Service, Rich Response Builder, Intent Detector, Content Assets, Response Repair/Validator, SSOT Context Builder, Roleplay Engine, Customer Engine, Detailed Metrics, Performance Tracker, Historical Context Service, Artifact Service, Brief Generator Service, and Context Layers Service.
+The Hugo Engine V2 is modular, comprising components such as Coach Engine, Context Engine, Analysis Service, Evaluator, RAG Service, Rich Response Builder, Intent Detector, Content Assets, Response Repair/Validator, SSOT Context Builder, Roleplay Engine, Customer Engine, Detailed Metrics, Performance Tracker, Historical Context Service, Artifact Service, Brief Generator Service, and Context Layers Service.
 
 ### SSOT Configuration
-AI engine and content configuration are centralized in JSON files under `config/ssot/` and `config/prompts/`. This Single Source of Truth architecture dictates that `.ts` engine files contain only logic, loading all instructional content and behavioral rules from these JSON configurations. This includes Hugo's persona, coaching rules, evaluation criteria, sales techniques, intent detection triggers, customer attitudes, personas, dynamics, RAG heuristics, video mappings, EPIC slides, and global settings.
+AI engine and content configurations are exclusively managed in JSON files located under `config/ssot/` and `config/prompts/`. This Single Source of Truth architecture ensures that `.ts` engine files contain only logic, loading all instructional content, behavioral rules, Hugo's persona, coaching rules, evaluation criteria, sales techniques, intent detection triggers, customer attitudes, personas, dynamics, RAG heuristics, video mappings, EPIC slides, and global settings from these JSON files.
 
 ### Frontend Routes
-Public routes exist for authentication and onboarding. User-specific pages include dashboard, techniques, videos, live coaching, conversation analysis, AI chat, analysis uploads, resources, and settings. Administrative pages cover video management, user management, session tracking, uploads, expert chat mode, config review, notifications, RAG review, analytics, billing, and content libraries. Development access is available via `/_dev/{page-name}`.
+Public routes facilitate authentication and onboarding. User-specific pages include a dashboard, techniques, videos, live coaching, conversation analysis, AI chat, analysis uploads, resources, and settings. Administrative pages cover video management, user management, session tracking, uploads, expert chat mode, config review, notifications, RAG review, analytics, billing, and content libraries. Development access is provided via `/_dev/{page-name}`.
 
 ### Multi-Modal Capabilities
 The platform supports:
 -   **Chat Mode**: Text-based coaching with rich content streaming and audio analysis.
--   **Audio Mode**: Utilizes WebRTC, Deepgram Nova 3 for STT, and ElevenLabs for TTS.
+-   **Audio Mode**: Leverages WebRTC, Deepgram Nova 3 for STT, and ElevenLabs for TTS.
 -   **Video Mode**: Integrates HeyGen Streaming Avatar SDK for interactive video.
 
 ### Database Usage
-Supabase serves as the primary remote database for all application data. A local Replit PostgreSQL instance is used exclusively for `conversation_analyses`, `admin_corrections`, and `chat_feedback`.
+Supabase is the primary remote database for all application data. A local Replit PostgreSQL instance is specifically used for `conversation_analyses`, `admin_corrections`, and `chat_feedback`.
 
 ### Automated Video Pipeline
-Two background automation systems in `server/video-processor.js`:
--   **AutoHeal**: Detects videos missing AI summary/title and generates them.
--   **AutoBatch**: Checks Supabase for pending/failed jobs (excluding archief folder) and auto-starts the Cloud Run batch queue if needed and no batch is already active.
--   **regenerateVideoMapping()**: Queries Supabase for all non-archief, non-hidden, non-deleted jobs. Uses `ai_suggested_techniek_id` (from AI transcript analysis) as primary technique source. Writes to `config/video_mapping.json`.
-
-### isSuperAdmin Propagation
-`isSuperAdmin` prop flows from App.tsx → AdminUploads, AnalysisResults, UploadAnalysis → AdminLayout. This controls sidebar visibility for super admins and content admins.
+The `server/video-processor.js` manages two background automation systems:
+-   **AutoHeal**: Identifies and generates missing AI summaries/titles for videos.
+-   **AutoBatch**: Checks Supabase for pending/failed jobs (excluding archived videos) and initiates the Cloud Run batch queue if no batch is active.
+-   **regenerateVideoMapping()**: Populates `config/video_mapping.json` by querying Supabase for relevant video jobs and using `ai_suggested_techniek_id` for primary technique source.
 
 ### Feature Specifications
-Key features include a unified video system integrating Google Drive with Mux, Live Coaching with Daily.co (virtual backgrounds, Q&A, waiting room), an AI-powered Roleplay System, an AI Chat/RAG System with `pgvector`, an Analysis System for sales conversations (with two-stage speaker diarization), Admin Analytics dashboards, and a specialized Hugo Onboarding Mode. Subscription data is fetched from Stripe, and profile/notification preferences are saved via Supabase Auth `user_metadata`.
+Key features include a unified video system integrating Google Drive with Mux, Live Coaching via Daily.co (with virtual backgrounds, Q&A, waiting room), an AI-powered Roleplay System, an AI Chat/RAG System utilizing `pgvector`, an Analysis System for sales conversations (with two-stage speaker diarization), Admin Analytics dashboards, and a specialized Hugo Onboarding Mode. Stripe handles subscription data, while profile and notification preferences are managed through Supabase Auth `user_metadata`.
 
 ## External Dependencies
 -   **OpenAI (gpt-5.1)**: AI engine for coaching, evaluation, and analysis.
@@ -113,4 +106,4 @@ Key features include a unified video system integrating Google Drive with Mux, L
 -   **Google Cloud Run**: External worker for video processing.
 -   **Google Drive**: Source for Hugo's training videos.
 -   **Stripe**: Payments and subscriptions.
--   **Replit PostgreSQL**: Local database for specific analytical data (`conversation_analyses`, `admin_corrections`, `chat_feedback`, `config_proposals`).
+-   **Replit PostgreSQL**: Local database for `conversation_analyses`, `admin_corrections`, `chat_feedback`, `config_proposals`.
