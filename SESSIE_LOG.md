@@ -123,3 +123,25 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - `AdminChatExpertMode.tsx`: callback correct doorgestuurd (regel 1274-1278) → `setCorrectionTechnique(nummer)` + `setCorrectionTechniqueName(naam)`, correctie-panel toont geselecteerde techniek (regel 1607-1616)
 > - Sidebar opent via E.P.I.C. knop of `?epic=1` URL param
 > - Agent Usage: ~$0.15
+
+---
+
+## 2026-02-27 — Bulk Upload voor Gespreksanalyse
+
+**Vraag:** Kan je bij gespreksanalyse (admin) een bulk upload maken zodat Hugo 30 gesprekken tegelijk kan analyseren?
+
+> **Conclusie:**
+> - **Nieuw: Bulk Upload dialog** in `AdminUploads.tsx` — multi-file selectie voor batch gespreksanalyse
+> - Bestanden: `src/components/HH/AdminUploads.tsx`
+> - Features:
+>   - "Bulk Upload" knop naast "Analyseer gesprek" (paarse outline styling)
+>   - Dialog met drag & drop zone voor meerdere bestanden (MP3, WAV, M4A, MP4, MOV, max 100MB/bestand)
+>   - Bestandslijst met per-bestand status (pending → uploading → completed / failed)
+>   - Totale voortgangsbalk met teller
+>   - Pauzeer/Hervat functie + "Stop na huidig" knop
+>   - Overgeslagen bestanden worden getoond (ongeldige types, te groot)
+>   - Sequentiële verwerking: bestanden worden één voor één geüpload en analyse gestart
+>   - Hergebruikt bestaand `/api/v2/analysis/upload` endpoint + chunked upload voor grote bestanden
+>   - Titel automatisch afgeleid uit bestandsnaam
+> - Architect review + e2e test geslaagd
+> - Agent Usage: ~$1.50

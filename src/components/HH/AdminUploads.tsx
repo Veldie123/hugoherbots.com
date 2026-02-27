@@ -21,13 +21,24 @@ import {
   TrendingUp,
   TrendingDown,
   ThumbsUp,
+  Files,
+  X,
+  FileVideo,
+  Pause,
+  Play,
 } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import {
   Select,
   SelectContent,
@@ -95,6 +106,22 @@ function getQualityLabel(score: number | null): string {
   return "Needs Work";
 }
 
+interface BulkFile {
+  file: File;
+  id: string;
+  status: "pending" | "uploading" | "processing" | "completed" | "failed";
+  conversationId?: string;
+  error?: string;
+  title: string;
+}
+
+const VALID_EXTENSIONS = /\.(mp3|wav|m4a|mp4|mov)$/i;
+const VALID_MIME_TYPES = [
+  "audio/mpeg", "audio/mp3", "audio/wav", "audio/m4a",
+  "audio/mp4", "audio/x-m4a", "video/mp4", "video/quicktime",
+];
+const MAX_FILE_SIZE = 100 * 1024 * 1024;
+
 export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -105,6 +132,20 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
   const [analyses, setAnalyses] = useState<AnalysisRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search).get('bulk') === '1';
+    }
+    return false;
+  });
+  const [bulkFiles, setBulkFiles] = useState<BulkFile[]>([]);
+  const [bulkRunning, setBulkRunning] = useState(false);
+  const [bulkPaused, setBulkPaused] = useState(false);
+  const [bulkSkippedErrors, setBulkSkippedErrors] = useState<string[]>([]);
+  const bulkPausedRef = useRef(false);
+  const bulkFileInputRef = useRef<HTMLInputElement>(null);
+  const bulkAbortRef = useRef(false);
 
   const fetchAnalyses = useCallback(async () => {
     setIsLoading(true);
@@ -257,6 +298,164 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
     }
   };
 
+  const handleBulkFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles: BulkFile[] = [];
+    const errors: string[] = [];
+
+    for (const file of files) {
+      const hasValidMime = VALID_MIME_TYPES.includes(file.type);
+      const hasValidExt = VALID_EXTENSIONS.test(file.name);
+      if (!hasValidMime && !hasValidExt) {
+        errors.push(`${file.name}: ongeldig bestandstype`);
+        continue;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        errors.push(`${file.name}: te groot (max 100MB)`);
+        continue;
+      }
+      const title = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+      validFiles.push({
+        file,
+        id: crypto.randomUUID(),
+        status: "pending",
+        title,
+      });
+    }
+
+    if (errors.length > 0) {
+      setBulkSkippedErrors(prev => [...prev, ...errors]);
+    }
+
+    setBulkFiles(prev => [...prev, ...validFiles]);
+    if (e.target) e.target.value = '';
+  };
+
+  const removeBulkFile = (id: string) => {
+    setBulkFiles(prev => prev.filter(f => f.id !== id));
+  };
+
+  const startBulkUpload = async () => {
+    if (bulkFiles.length === 0) return;
+    setBulkRunning(true);
+    setBulkPaused(false);
+    bulkPausedRef.current = false;
+    bulkAbortRef.current = false;
+
+    const CHUNK_SIZE = 20 * 1024 * 1024;
+
+    for (let i = 0; i < bulkFiles.length; i++) {
+      const bf = bulkFiles[i];
+      if (bf.status === "completed" || bf.status === "failed") continue;
+      if (bulkAbortRef.current) break;
+
+      while (bulkPausedRef.current) {
+        await new Promise(r => setTimeout(r, 500));
+        if (bulkAbortRef.current) break;
+      }
+      if (bulkAbortRef.current) break;
+
+      setBulkFiles(prev => prev.map(f => f.id === bf.id ? { ...f, status: "uploading" } : f));
+
+      try {
+        let result: any;
+
+        if (bf.file.size > CHUNK_SIZE) {
+          const totalChunks = Math.ceil(bf.file.size / CHUNK_SIZE);
+          const initRes = await fetch('/api/v2/analysis/upload/init', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileName: bf.file.name,
+              fileSize: bf.file.size,
+              totalChunks,
+              mimetype: bf.file.type,
+            }),
+          });
+          if (!initRes.ok) throw new Error('Upload init mislukt');
+          const { uploadId } = await initRes.json();
+
+          for (let c = 0; c < totalChunks; c++) {
+            const start = c * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, bf.file.size);
+            const chunk = bf.file.slice(start, end);
+            const fd = new FormData();
+            fd.append('chunk', chunk, `chunk_${c}`);
+            fd.append('uploadId', uploadId);
+            fd.append('chunkIndex', String(c));
+            const chunkRes = await fetch('/api/v2/analysis/upload/chunk', { method: 'POST', body: fd });
+            if (!chunkRes.ok) throw new Error(`Chunk ${c + 1} mislukt`);
+          }
+
+          const completeRes = await fetch('/api/v2/analysis/upload/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              uploadId,
+              title: bf.title,
+              context: '',
+              userId: 'admin-bulk',
+              consentConfirmed: 'true',
+            }),
+          });
+          result = await completeRes.json();
+          if (!completeRes.ok) throw new Error(result.error || 'Upload afronden mislukt');
+        } else {
+          const formData = new FormData();
+          formData.append('file', bf.file);
+          formData.append('title', bf.title);
+          formData.append('context', '');
+          formData.append('userId', 'admin-bulk');
+          formData.append('consentConfirmed', 'true');
+
+          const response = await fetch('/api/v2/analysis/upload', {
+            method: 'POST',
+            body: formData,
+          });
+          result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Upload mislukt');
+        }
+
+        setBulkFiles(prev => prev.map(f => f.id === bf.id ? {
+          ...f,
+          status: "completed",
+          conversationId: result.conversationId,
+        } : f));
+
+      } catch (err: any) {
+        setBulkFiles(prev => prev.map(f => f.id === bf.id ? {
+          ...f,
+          status: "failed",
+          error: err.message || 'Upload mislukt',
+        } : f));
+      }
+    }
+
+    setBulkRunning(false);
+    fetchAnalyses();
+  };
+
+  const toggleBulkPause = () => {
+    const newPaused = !bulkPaused;
+    setBulkPaused(newPaused);
+    bulkPausedRef.current = newPaused;
+  };
+
+  const cancelBulkUpload = () => {
+    bulkAbortRef.current = true;
+    bulkPausedRef.current = false;
+    setBulkPaused(false);
+    setBulkRunning(false);
+  };
+
+  const bulkStats = {
+    total: bulkFiles.length,
+    completed: bulkFiles.filter(f => f.status === "completed").length,
+    failed: bulkFiles.filter(f => f.status === "failed").length,
+    pending: bulkFiles.filter(f => f.status === "pending").length,
+    uploading: bulkFiles.filter(f => f.status === "uploading").length,
+  };
+
   const SortHeader = ({ label, field, align = "left" }: { label: string; field: SortField; align?: string }) => (
     <th
       className={`text-${align} py-3 px-4 text-[13px] leading-[18px] text-hh-muted font-medium cursor-pointer hover:text-purple-700 select-none transition-colors`}
@@ -283,6 +482,14 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
           </div>
           <div className="flex gap-2">
             <Button
+              variant="outline"
+              className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
+              onClick={() => { setBulkDialogOpen(true); setBulkFiles([]); setBulkRunning(false); setBulkPaused(false); setBulkSkippedErrors([]); bulkAbortRef.current = false; }}
+            >
+              <Files className="w-4 h-4" />
+              Bulk Upload
+            </Button>
+            <Button
               className="gap-2 text-white"
               style={{ backgroundColor: "#7e22ce" }}
               onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) =>
@@ -295,7 +502,6 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
             >
               <Upload className="w-4 h-4" />
               Analyseer gesprek
-            
             </Button>
           </div>
         </div>
@@ -644,6 +850,160 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
           )}
         </Card>
       </div>
+
+      <Dialog open={bulkDialogOpen} onOpenChange={(open) => { if (!bulkRunning) setBulkDialogOpen(open); }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-[20px] text-hh-text flex items-center gap-2">
+              <Files className="w-5 h-5 text-purple-600" />
+              Bulk Gespreksanalyse
+            </DialogTitle>
+            <p className="text-[13px] text-hh-muted mt-1">
+              Selecteer meerdere audio/video bestanden om tegelijk te analyseren. De bestanden worden sequentieel verwerkt.
+            </p>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-hidden flex flex-col gap-4 mt-2">
+            {!bulkRunning && (
+              <div
+                className="border-2 border-dashed border-purple-300 rounded-xl p-6 text-center cursor-pointer hover:border-purple-500 hover:bg-purple-50/50 transition-all"
+                onClick={() => bulkFileInputRef.current?.click()}
+              >
+                <Upload className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                <p className="text-[14px] font-medium text-hh-text">Klik om bestanden te selecteren</p>
+                <p className="text-[12px] text-hh-muted mt-1">MP3, WAV, M4A, MP4, MOV — max 100MB per bestand</p>
+                <input
+                  ref={bulkFileInputRef}
+                  type="file"
+                  multiple
+                  accept=".mp3,.wav,.m4a,.mp4,.mov,audio/*,video/*"
+                  className="hidden"
+                  onChange={handleBulkFileSelect}
+                />
+              </div>
+            )}
+
+            {bulkSkippedErrors.length > 0 && (
+              <div className="rounded-lg border border-orange-300 bg-orange-50/50 px-3 py-2">
+                <p className="text-[12px] font-medium text-orange-700 mb-1">Overgeslagen bestanden:</p>
+                {bulkSkippedErrors.map((err, i) => (
+                  <p key={i} className="text-[11px] text-orange-600">{err}</p>
+                ))}
+              </div>
+            )}
+
+            {bulkFiles.length > 0 && (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[13px] font-medium text-hh-text">{bulkFiles.length} bestanden</span>
+                    {bulkRunning && (
+                      <div className="flex items-center gap-2">
+                        <div className="w-32 h-2 bg-hh-ui-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${bulkStats.total > 0 ? ((bulkStats.completed + bulkStats.failed) / bulkStats.total * 100) : 0}%`,
+                              backgroundColor: '#7e22ce',
+                            }}
+                          />
+                        </div>
+                        <span className="text-[12px] text-hh-muted">
+                          {bulkStats.completed + bulkStats.failed}/{bulkStats.total}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  {bulkRunning && (
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" onClick={toggleBulkPause} className="h-7 text-[12px] border-purple-300 text-purple-700">
+                        {bulkPaused ? <><Play className="w-3 h-3 mr-1" /> Hervat</> : <><Pause className="w-3 h-3 mr-1" /> Pauzeer</>}
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={cancelBulkUpload} className="h-7 text-[12px] border-red-300 text-red-600 hover:bg-red-50" title="Stopt na het huidige bestand">
+                        <X className="w-3 h-3 mr-1" /> Stop na huidig
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="overflow-y-auto flex-1 max-h-[350px] space-y-1.5 pr-1">
+                  {bulkFiles.map((bf, idx) => (
+                    <div
+                      key={bf.id}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg border transition-all text-[13px] ${
+                        bf.status === "completed" ? "bg-emerald-50/50 border-emerald-200" :
+                        bf.status === "failed" ? "bg-red-50/50 border-red-200" :
+                        bf.status === "uploading" ? "bg-purple-50/50 border-purple-300" :
+                        "bg-hh-bg border-hh-border"
+                      }`}
+                    >
+                      <span className="text-[11px] text-hh-muted font-mono w-6 text-right">{idx + 1}</span>
+                      {bf.file.type.startsWith('video/') ? (
+                        <FileVideo className="w-4 h-4 text-purple-500 shrink-0" />
+                      ) : (
+                        <FileAudio className="w-4 h-4 text-purple-500 shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="truncate text-hh-text font-medium">{bf.title}</p>
+                        <p className="text-[11px] text-hh-muted">
+                          {(bf.file.size / 1024 / 1024).toFixed(1)}MB
+                          {bf.error && <span className="text-red-500 ml-2">{bf.error}</span>}
+                        </p>
+                      </div>
+                      <div className="shrink-0">
+                        {bf.status === "pending" && (
+                          !bulkRunning ? (
+                            <button onClick={() => removeBulkFile(bf.id)} className="p-1 hover:bg-hh-ui-100 rounded">
+                              <X className="w-3.5 h-3.5 text-hh-muted" />
+                            </button>
+                          ) : (
+                            <Clock className="w-4 h-4 text-hh-muted" />
+                          )
+                        )}
+                        {bf.status === "uploading" && <Loader2 className="w-4 h-4 text-purple-600 animate-spin" />}
+                        {bf.status === "completed" && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                        {bf.status === "failed" && <XCircle className="w-4 h-4 text-red-500" />}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="flex justify-between items-center pt-4 border-t border-hh-border mt-2">
+            <div className="text-[12px] text-hh-muted">
+              {bulkRunning && bulkStats.completed > 0 && (
+                <span>{bulkStats.completed} geüpload, {bulkStats.failed > 0 ? `${bulkStats.failed} mislukt, ` : ''}{bulkStats.pending} wachtend</span>
+              )}
+              {!bulkRunning && bulkStats.completed > 0 && (
+                <span className="text-emerald-600">{bulkStats.completed} analyses gestart{bulkStats.failed > 0 ? `, ${bulkStats.failed} mislukt` : ''}</span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              {!bulkRunning && (
+                <>
+                  <Button variant="outline" onClick={() => setBulkDialogOpen(false)} className="text-[13px]">
+                    {bulkStats.completed > 0 ? 'Sluiten' : 'Annuleren'}
+                  </Button>
+                  {bulkFiles.some(f => f.status === "pending") && (
+                    <Button
+                      onClick={startBulkUpload}
+                      className="text-[13px] text-white gap-2"
+                      style={{ backgroundColor: "#7e22ce" }}
+                      onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = "#6b21a8")}
+                      onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = "#7e22ce")}
+                    >
+                      <Upload className="w-4 h-4" />
+                      Start {bulkFiles.filter(f => f.status === "pending").length} Analyses
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }
