@@ -158,3 +158,16 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - Navigeert naar `admin-chat-expert` (de admin AI chat pagina)
 > - Consistent zichtbaar op alle admin pagina's
 > - Agent Usage: ~$0.20
+
+---
+
+## 2026-02-27 — Sidebar inklap-icoontje verwijderd + breedte gelijkgetrokken
+
+**Vraag:** Het inklap-icoontje op de sidebar is niet nodig (mag weg). Staat er alleen in user view waardoor de sidebar in user en admin view een andere breedte hebben.
+
+> **Conclusie:**
+> - `AppLayout.tsx`: PanelLeftClose inklap-knop verwijderd uit de header
+> - Sidebar breedte user view gewijzigd van `w-[200px]` naar `w-56` (224px) — nu gelijk aan admin view
+> - Collapse-logica blijft intern bestaan (wordt nog gebruikt door VideoWatchPage, TalkToHugoAI, AnalysisResults om sidebar automatisch in te klappen)
+> - PanelLeftClose en PanelLeft imports verwijderd
+> - Agent Usage: ~$0.15

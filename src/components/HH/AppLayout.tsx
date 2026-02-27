@@ -8,8 +8,6 @@ import {
   FileSearch,
   Shield,
   MessageSquare,
-  PanelLeftClose,
-  PanelLeft,
   UserCircle,
   CheckCheck,
   ExternalLink,
@@ -239,10 +237,10 @@ export function AppLayout({
       <div
         data-sidebar-collapsed={collapsed ? 'true' : 'false'}
         className={`hidden lg:flex ${
-          collapsed ? "w-[60px]" : "w-[200px]"
+          collapsed ? "w-[60px]" : "w-56"
         } bg-hh-bg border-r border-hh-border flex-col transition-all duration-300 flex-shrink-0`}
       >
-        <div className="h-16 flex items-center justify-between px-3 border-b border-hh-border flex-shrink-0">
+        <div className="h-16 flex items-center px-3 border-b border-hh-border flex-shrink-0">
           {!collapsed ? (
             <div className="flex flex-col items-start gap-0">
               <span className="text-[18px] leading-[22px] tracking-widest uppercase font-bold text-hh-ink">HUGO</span>
@@ -255,15 +253,6 @@ export function AppLayout({
               aria-label="Expand sidebar"
             >
               <Logo variant="icon" className="w-8 h-8" />
-            </button>
-          )}
-          {!collapsed && (
-            <button
-              onClick={() => setCollapsed(true)}
-              className="w-8 h-8 rounded-lg hover:bg-hh-ui-50 flex items-center justify-center text-hh-muted transition-colors"
-              aria-label="Collapse sidebar"
-            >
-              <PanelLeftClose className="w-4 h-4" />
             </button>
           )}
         </div>
