@@ -1271,6 +1271,11 @@ export function AdminChatExpertMode({
                 isUserView={true}
                 isAdminView={true}
                 hideHeader={true}
+                onSelectTechnique={(nummer, naam) => {
+                  setCorrectionTechnique(nummer);
+                  setCorrectionTechniqueName(naam);
+                  setSelectedTechnique(naam);
+                }}
               />
             </div>
           )}

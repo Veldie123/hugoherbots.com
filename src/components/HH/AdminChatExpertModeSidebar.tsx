@@ -41,6 +41,7 @@ interface EPICSidebarProps {
   completedTechniques?: string[];
   currentUnlockedPhase?: number;
   hideHeader?: boolean;
+  onSelectTechnique?: (nummer: string, naam: string) => void;
 }
 
 const PHASE_CIRCLE_COLORS: Record<number, string> = {
@@ -86,6 +87,7 @@ export function EPICSidebar({
   completedTechniques = ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2"],
   currentUnlockedPhase = 2,
   hideHeader = false,
+  onSelectTechnique,
 }: EPICSidebarProps) {
   const ACCENT = isAdminView ? '#9910FA' : '#10B981';
   const ACCENT_BG = isAdminView ? 'rgba(153, 16, 250, 0.1)' : undefined;
@@ -235,6 +237,10 @@ export function EPICSidebar({
                                 if (isLocked) return;
                                 if (isParent) {
                                   toggleParentTechnique(technique.nummer);
+                                } else if (onSelectTechnique) {
+                                  onSelectTechnique(technique.nummer, technique.naam);
+                                } else {
+                                  openTechniqueDetails(technique.nummer);
                                 }
                               }}
                               onInfo={() => openTechniqueDetails(technique.nummer)}
@@ -260,6 +266,10 @@ export function EPICSidebar({
                                           if (isChildLocked) return;
                                           if (childHasGrandchildren) {
                                             toggleParentTechnique(child.nummer);
+                                          } else if (onSelectTechnique) {
+                                            onSelectTechnique(child.nummer, child.naam);
+                                          } else {
+                                            openTechniqueDetails(child.nummer);
                                           }
                                         }}
                                         onInfo={() => openTechniqueDetails(child.nummer)}
@@ -279,7 +289,14 @@ export function EPICSidebar({
                                                 isLocked={isGrandchildLocked}
                                                 isParent={false}
                                                 isExpandedParent={false}
-                                                onSelect={() => {}}
+                                                onSelect={() => {
+                                                  if (isGrandchildLocked) return;
+                                                  if (onSelectTechnique) {
+                                                    onSelectTechnique(grandchild.nummer, grandchild.naam);
+                                                  } else {
+                                                    openTechniqueDetails(grandchild.nummer);
+                                                  }
+                                                }}
                                                 onInfo={() => openTechniqueDetails(grandchild.nummer)}
                                               />
                                             );
@@ -396,7 +413,14 @@ export function EPICSidebar({
                                   isLocked={isLocked}
                                   isParent={false}
                                   isExpandedParent={false}
-                                  onSelect={() => {}}
+                                  onSelect={() => {
+                                    if (isLocked) return;
+                                    if (onSelectTechnique) {
+                                      onSelectTechnique(technique.nummer, technique.naam);
+                                    } else {
+                                      openTechniqueDetails(technique.nummer);
+                                    }
+                                  }}
                                   onInfo={() => openTechniqueDetails(technique.nummer)}
                                 />
                               );
@@ -604,23 +628,28 @@ export function EPICSidebar({
                           return (
                             <div key={technique.nummer} id={`technique-${technique.id}`}>
                               <div
-                                role={isParent ? "button" : undefined}
-                                tabIndex={isParent ? 0 : undefined}
+                                role="button"
+                                tabIndex={0}
                                 onClick={(e) => {
                                   e.preventDefault();
                                   if (isParent) {
                                     toggleParentTechnique(technique.nummer);
+                                  } else if (onSelectTechnique) {
+                                    onSelectTechnique(technique.nummer, technique.naam);
                                   }
                                 }}
                                 onKeyDown={(e) => {
-                                  if (isParent && (e.key === 'Enter' || e.key === ' ')) {
+                                  if ((e.key === 'Enter' || e.key === ' ')) {
                                     e.preventDefault();
-                                    toggleParentTechnique(technique.nummer);
+                                    if (isParent) {
+                                      toggleParentTechnique(technique.nummer);
+                                    } else if (onSelectTechnique) {
+                                      onSelectTechnique(technique.nummer, technique.naam);
+                                    }
                                   }
                                 }}
                                 className={cn(
-                                  "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all",
-                                  isParent ? "cursor-pointer" : "cursor-default",
+                                  "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-pointer",
                                   selectedTechnique === technique.naam
                                     ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
                                     : isRecommended
@@ -669,23 +698,28 @@ export function EPICSidebar({
                                     return (
                                       <div key={child.nummer} id={`technique-${child.id}`}>
                                         <div
-                                          role={childHasGrandchildren ? "button" : undefined}
-                                          tabIndex={childHasGrandchildren ? 0 : undefined}
+                                          role="button"
+                                          tabIndex={0}
                                           onClick={(e) => {
                                             e.preventDefault();
                                             if (childHasGrandchildren) {
                                               toggleParentTechnique(child.nummer);
+                                            } else if (onSelectTechnique) {
+                                              onSelectTechnique(child.nummer, child.naam);
                                             }
                                           }}
                                           onKeyDown={(e) => {
-                                            if (childHasGrandchildren && (e.key === 'Enter' || e.key === ' ')) {
+                                            if ((e.key === 'Enter' || e.key === ' ')) {
                                               e.preventDefault();
-                                              toggleParentTechnique(child.nummer);
+                                              if (childHasGrandchildren) {
+                                                toggleParentTechnique(child.nummer);
+                                              } else if (onSelectTechnique) {
+                                                onSelectTechnique(child.nummer, child.naam);
+                                              }
                                             }
                                           }}
                                           className={cn(
-                                            "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all",
-                                            childHasGrandchildren ? "cursor-pointer" : "cursor-default",
+                                            "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-pointer",
                                             selectedTechnique === child.naam
                                               ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
                                               : isChildRecommended
@@ -733,8 +767,16 @@ export function EPICSidebar({
                                                 <div
                                                   key={grandchild.nummer}
                                                   id={`technique-${grandchild.id}`}
+                                                  role="button"
+                                                  tabIndex={0}
+                                                  onClick={(e) => {
+                                                    e.preventDefault();
+                                                    if (onSelectTechnique) {
+                                                      onSelectTechnique(grandchild.nummer, grandchild.naam);
+                                                    }
+                                                  }}
                                                   className={cn(
-                                                    "w-full text-left px-3 py-1.5 rounded-lg text-[11px] leading-[15px] transition-all cursor-default",
+                                                    "w-full text-left px-3 py-1.5 rounded-lg text-[11px] leading-[15px] transition-all cursor-pointer",
                                                     selectedTechnique === grandchild.naam
                                                       ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
                                                       : isGrandchildRecommended
@@ -952,21 +994,13 @@ function UserTechniqueRow({
       onClick={(e) => {
         e.preventDefault();
         if (isLocked) return;
-        if (isParent) {
-          onSelect();
-        } else {
-          onInfo();
-        }
+        onSelect();
       }}
       onKeyDown={(e) => {
         if ((e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
           if (isLocked) return;
-          if (isParent) {
-            onSelect();
-          } else {
-            onInfo();
-          }
+          onSelect();
         }
       }}
       className="flex items-center gap-2 py-1.5 px-2 rounded transition-colors hover:bg-hh-ui-50"
