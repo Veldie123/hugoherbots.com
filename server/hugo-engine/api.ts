@@ -4004,6 +4004,34 @@ app.patch("/api/v2/admin/corrections/:id", async (req: Request, res: Response) =
         ragGenerated = false;
       }
 
+      if (correction.source === 'video_edit' && correction.context) {
+        try {
+          const ctx = typeof correction.context === 'string' ? JSON.parse(correction.context) : correction.context;
+          const videoId = ctx.videoId;
+          if (videoId && correction.field && correction.new_value) {
+            const updateFields: Record<string, any> = {};
+            if (correction.field === 'ai_attractive_title') {
+              updateFields.ai_attractive_title = correction.new_value;
+            } else if (correction.field === 'title') {
+              updateFields.title = correction.new_value;
+            }
+            if (Object.keys(updateFields).length > 0) {
+              const { error: videoErr } = await supabase
+                .from('video_ingest_jobs')
+                .update(updateFields)
+                .eq('id', videoId);
+              if (videoErr) {
+                console.error(`[Admin] Failed to apply video_edit correction #${correction.id}:`, videoErr.message);
+              } else {
+                console.log(`[Admin] Applied video_edit correction #${correction.id}: ${correction.field} updated for video ${videoId}`);
+              }
+            }
+          }
+        } catch (videoEditErr: any) {
+          console.error('[Admin] Failed to process video_edit approval:', videoEditErr.message);
+        }
+      }
+
       if (correction.source === 'technique_edit' && correction.target_key && correction.new_json) {
         try {
           const ssotPath = path.join(process.cwd(), 'config/ssot/technieken_index.json');

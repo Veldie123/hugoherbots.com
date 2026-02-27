@@ -45,8 +45,8 @@ interface FAQItem {
 const faqData: FAQItem[] = [
   {
     id: 1,
-    question: "Wat zijn E.P.I.C technieken en hoe gebruik ik ze?",
-    answer: "E.P.I.C staat voor Engageren, Probleemanalyse, Impactverkenning en Commitment. Dit zijn de vier kernfases van het verkoopproces. Elke fase bevat specifieke technieken die je helpen om effectievere gesprekken te voeren. Je kunt de technieken leren via onze videobibliotheek en oefenen met AI-roleplays.",
+    question: "Wat zijn E.P.I.C. techniques en hoe gebruik ik ze?",
+    answer: "E.P.I.C. staat voor Engageren, Probleemanalyse, Impactverkenning en Commitment. Dit zijn de vier kernfases van het verkoopproces. Elke fase bevat specifieke technieken die je helpen om effectievere gesprekken te voeren. Je kunt de technieken leren via onze videobibliotheek en oefenen met AI-roleplays.",
     category: "techniques",
   },
   {
@@ -64,7 +64,7 @@ const faqData: FAQItem[] = [
   {
     id: 4,
     question: "Waar vind ik de instructievideo's?",
-    answer: "Alle instructievideo's zijn te vinden in de Video's sectie in het hoofdmenu. De video's zijn georganiseerd per E.P.I.C fase en techniek. Je kunt video's markeren als favoriet en je voortgang wordt automatisch bijgehouden.",
+    answer: "Alle instructievideo's zijn te vinden in de Video's sectie in het hoofdmenu. De video's zijn georganiseerd per E.P.I.C. fase en techniek. Je kunt video's markeren als favoriet en je voortgang wordt automatisch bijgehouden.",
     category: "techniques",
   },
   {
@@ -76,7 +76,7 @@ const faqData: FAQItem[] = [
   {
     id: 6,
     question: "Wat is gespreksanalyse en hoe werkt het?",
-    answer: "Met gespreksanalyse kun je opnames van je verkoopgesprekken uploaden. Onze AI analyseert het gesprek en geeft je inzicht in welke E.P.I.C technieken je hebt gebruikt, wat goed ging en waar je kunt verbeteren. Upload je gesprek als MP3, WAV of M4A bestand.",
+    answer: "Met gespreksanalyse kun je opnames van je verkoopgesprekken uploaden. Onze AI analyseert het gesprek en geeft je inzicht in welke E.P.I.C. techniques je hebt gebruikt, wat goed ging en waar je kunt verbeteren. Upload je gesprek als MP3, WAV of M4A bestand.",
     category: "techniques",
   },
   {
@@ -100,7 +100,7 @@ const faqData: FAQItem[] = [
   {
     id: 10,
     question: "Hoe werkt het scoresysteem?",
-    answer: "Je score wordt berekend op basis van hoe goed je de E.P.I.C technieken toepast tijdens roleplays en gesprekken. De AI beoordeelt aspecten zoals timing, woordkeuze, en gesprekstechniek. Je ziet een totaalscore en scores per techniek.",
+    answer: "Je score wordt berekend op basis van hoe goed je de E.P.I.C. techniques toepast tijdens roleplays en gesprekken. De AI beoordeelt aspecten zoals timing, woordkeuze, en gesprekstechniek. Je ziet een totaalscore en scores per techniek.",
     category: "techniques",
   },
   {
@@ -122,7 +122,7 @@ const quickLinks = [
   { label: "Video tutorials", icon: PlayCircle, page: "videos" },
   { label: "Start een roleplay", icon: MessageSquare, page: "coaching" },
   { label: "Webinar agenda", icon: Calendar, page: "live" },
-  { label: "E.P.I.C technieken", icon: Target, page: "library" },
+  { label: "E.P.I.C. techniques", icon: Target, page: "library" },
   { label: "Account instellingen", icon: Settings, page: "settings" },
 ];
 

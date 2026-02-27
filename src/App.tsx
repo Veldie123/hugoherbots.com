@@ -330,7 +330,7 @@ export default function App() {
           {currentPage === "admin-live" && <AdminLiveSessions navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-progress" && <AdminProgress navigate={navigate} />}
           {currentPage === "admin-users" && <AdminUserManagement navigate={navigate} />}
-          {currentPage === "admin-techniques" && <AdminTechniqueManagement navigate={navigate} />}
+          {currentPage === "admin-techniques" && <AdminTechniqueManagement navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-transcripts" && <AdminSessionTranscripts navigate={navigate} />}
           {currentPage === "admin-uploads" && <AdminUploads navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-content" && <AdminContentLibrary navigate={navigate} />}

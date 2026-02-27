@@ -694,7 +694,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode }: VideoLibrary
                   </Badge>
                   
                   <h2 className="text-[20px] sm:text-[24px] font-bold leading-tight">
-                    {featuredVideo?.displayTitle || 'Leer de E.P.I.C. Technieken'}
+                    {featuredVideo?.displayTitle || 'Leer de E.P.I.C. Techniques'}
                   </h2>
                   
                   <p className="text-white/70 text-[13px] sm:text-[14px] leading-relaxed line-clamp-2">

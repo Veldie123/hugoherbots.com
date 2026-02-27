@@ -158,7 +158,7 @@ export function ScenarioFlowTracker({
           </div>
           <div className="flex-1">
             <h3 className="text-[16px] leading-[24px] text-hh-text">
-              E.P.I.C sales flow
+              E.P.I.C. Sales Flow
             </h3>
             <p className="text-[12px] leading-[18px] text-hh-muted">
               {completedSteps} / {totalSteps} voltooid

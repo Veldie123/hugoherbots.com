@@ -55,12 +55,13 @@ import { DetailsSheet, TechniqueContent } from './DetailsSheet';
 
 interface AdminTechniqueManagementProps {
   navigate?: (page: string) => void;
+  isSuperAdmin?: boolean;
 }
 
 type SortField = 'code' | 'name' | 'videos' | 'roleplays' | 'avgScore' | 'completion' | 'status';
 type SortDirection = 'asc' | 'desc';
 
-export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementProps) {
+export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: AdminTechniqueManagementProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFase, setActiveFase] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -308,15 +309,15 @@ export function AdminTechniqueManagement({ navigate }: AdminTechniqueManagementP
   const needsImprovement = allTechnieken.filter(t => t.avgScore < 75).length;
 
   return (
-    <AdminLayout currentPage="admin-techniques" navigate={navigate}>
+    <AdminLayout currentPage="admin-techniques" navigate={navigate} isSuperAdmin={isSuperAdmin}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-[32px] leading-[40px] text-hh-text mb-2">
-            E.P.I.C. Technieken
+            E.P.I.C. Techniques
           </h1>
           <p className="text-[16px] leading-[24px] text-hh-muted">
-            {totalTechnieken} E.P.I.C. technieken verdeeld over 5 fases
+            {totalTechnieken} E.P.I.C. techniques verdeeld over 5 fases
           </p>
         </div>
 

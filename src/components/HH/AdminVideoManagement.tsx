@@ -2841,104 +2841,201 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               </Button>
               <Button
                 onClick={async () => {
-                  if (detailsVideo?.id) {
+                  if (!detailsVideo?.id) return;
+
+                  const titleChanged = editedVideoData.attractiveTitle !== (detailsVideo?.ai_attractive_title || '');
+                  const origTitleChanged = editedVideoData.title !== (detailsVideo?.title || '');
+                  const currentTechnique = selectedTechniqueId ? getTechniqueByNumber(selectedTechniqueId) : null;
+
+                  if (isSuperAdmin) {
                     try {
-                      const updateData: Record<string, any> = {};
-                      if (editedVideoData.attractiveTitle !== (detailsVideo?.ai_attractive_title || '')) {
-                        updateData.ai_attractive_title = editedVideoData.attractiveTitle || null;
-                      }
-                      if (editedVideoData.title !== (detailsVideo?.title || '')) {
-                        updateData.title = editedVideoData.title;
-                      }
-                      if (Object.keys(updateData).length > 0) {
-                        const { error } = await supabase
-                          .from('videos')
-                          .update(updateData)
-                          .eq('id', detailsVideo.id);
-                        if (error) {
-                          console.warn('Direct save failed, changes sent to Config Review:', error.message);
-                        } else {
+                      if (titleChanged || origTitleChanged) {
+                        const res = await fetch('/api/videos/update-title', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            videoId: detailsVideo.id,
+                            attractiveTitle: titleChanged ? (editedVideoData.attractiveTitle || null) : undefined,
+                            title: origTitleChanged ? editedVideoData.title : undefined,
+                          }),
+                        });
+                        if (res.ok) {
+                          const updateData: Record<string, any> = {};
+                          if (titleChanged) updateData.ai_attractive_title = editedVideoData.attractiveTitle || null;
+                          if (origTitleChanged) updateData.title = editedVideoData.title;
                           setDetailsVideo(prev => prev ? { ...prev, ...updateData } : null);
                           setVideos(prev => prev.map(v => v.id === detailsVideo.id ? { ...v, ...updateData } : v));
+                        } else {
+                          toast.error("Opslaan mislukt");
+                          return;
                         }
                       }
+
+                      if (currentTechnique && selectedTechniqueId) {
+                        const arraysEqual = (a: string[], b: string[]) =>
+                          a.length === b.length && a.every((v, i) => v === b[i]);
+                        const parseLines = (s: string) => s.split('\n').map(l => l.trim()).filter(l => l);
+                        const techniqueChanged =
+                          editedVideoData.techniqueDoel !== (currentTechnique.doel || '') ||
+                          editedVideoData.techniqueWat !== (currentTechnique.wat || '') ||
+                          editedVideoData.techniqueWaarom !== (currentTechnique.waarom || '') ||
+                          editedVideoData.techniqueWanneer !== (currentTechnique.wanneer || '') ||
+                          editedVideoData.techniqueHoe !== (currentTechnique.hoe || '') ||
+                          !arraysEqual(parseLines(editedVideoData.techniqueStappenplan), currentTechnique.stappenplan || []) ||
+                          !arraysEqual(parseLines(editedVideoData.techniqueVoorbeeld), currentTechnique.voorbeeld || []) ||
+                          !arraysEqual(parseLines(editedVideoData.techniqueTags), currentTechnique.tags || []) ||
+                          !arraysEqual(parseLines(editedVideoData.techniqueThemas), currentTechnique.themas || []) ||
+                          !arraysEqual(parseLines(editedVideoData.techniqueContextRequirements), currentTechnique.context_requirements || []);
+                        if (techniqueChanged) {
+                          await fetch('/api/v2/admin/corrections', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              type: 'technique',
+                              field: currentTechnique.nummer,
+                              originalValue: currentTechnique.name || '',
+                              newValue: editedVideoData.techniqueDoel || currentTechnique.name || '',
+                              source: 'technique_edit',
+                              submittedBy: 'superadmin',
+                              targetKey: currentTechnique.nummer,
+                              originalJson: {
+                                doel: currentTechnique.doel || '',
+                                wat: currentTechnique.wat || '',
+                                waarom: currentTechnique.waarom || '',
+                                wanneer: currentTechnique.wanneer || '',
+                                hoe: currentTechnique.hoe || '',
+                                stappenplan: currentTechnique.stappenplan || [],
+                                voorbeeld: currentTechnique.voorbeeld || [],
+                                tags: currentTechnique.tags || [],
+                                themas: currentTechnique.themas || [],
+                                context_requirements: currentTechnique.context_requirements || [],
+                              },
+                              newJson: {
+                                doel: editedVideoData.techniqueDoel,
+                                wat: editedVideoData.techniqueWat,
+                                waarom: editedVideoData.techniqueWaarom,
+                                wanneer: editedVideoData.techniqueWanneer,
+                                hoe: editedVideoData.techniqueHoe,
+                                stappenplan: parseLines(editedVideoData.techniqueStappenplan),
+                                voorbeeld: parseLines(editedVideoData.techniqueVoorbeeld),
+                                tags: parseLines(editedVideoData.techniqueTags),
+                                themas: parseLines(editedVideoData.techniqueThemas),
+                                context_requirements: parseLines(editedVideoData.techniqueContextRequirements),
+                              },
+                            }),
+                          });
+                        }
+                      }
+                      toast.success("Wijzigingen opgeslagen");
                     } catch (err) {
-                      console.warn('Direct save failed, changes sent to Config Review:', err);
+                      console.error('Save failed:', err);
+                      toast.error("Opslaan mislukt");
+                      return;
+                    }
+                  } else {
+                    try {
+                      const corrections: Promise<Response>[] = [];
+
+                      if (titleChanged) {
+                        corrections.push(fetch('/api/v2/admin/corrections', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            type: 'video',
+                            field: 'ai_attractive_title',
+                            originalValue: detailsVideo.ai_attractive_title || '',
+                            newValue: editedVideoData.attractiveTitle || '',
+                            source: 'video_edit',
+                            submittedBy: 'hugo',
+                            context: JSON.stringify({ videoId: detailsVideo.id, videoTitle: detailsVideo.title }),
+                          }),
+                        }));
+                      }
+                      if (origTitleChanged) {
+                        corrections.push(fetch('/api/v2/admin/corrections', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            type: 'video',
+                            field: 'title',
+                            originalValue: detailsVideo.title || '',
+                            newValue: editedVideoData.title || '',
+                            source: 'video_edit',
+                            submittedBy: 'hugo',
+                            context: JSON.stringify({ videoId: detailsVideo.id, videoTitle: detailsVideo.title }),
+                          }),
+                        }));
+                      }
+
+                      if (currentTechnique && selectedTechniqueId) {
+                        const arraysEqual = (a: string[], b: string[]) =>
+                          a.length === b.length && a.every((v, i) => v === b[i]);
+                        const parseLines = (s: string) => s.split('\n').map(l => l.trim()).filter(l => l);
+                        const techniqueChanged =
+                          editedVideoData.techniqueDoel !== (currentTechnique.doel || '') ||
+                          editedVideoData.techniqueWat !== (currentTechnique.wat || '') ||
+                          editedVideoData.techniqueWaarom !== (currentTechnique.waarom || '') ||
+                          editedVideoData.techniqueWanneer !== (currentTechnique.wanneer || '') ||
+                          editedVideoData.techniqueHoe !== (currentTechnique.hoe || '') ||
+                          !arraysEqual(parseLines(editedVideoData.techniqueStappenplan), currentTechnique.stappenplan || []) ||
+                          !arraysEqual(parseLines(editedVideoData.techniqueVoorbeeld), currentTechnique.voorbeeld || []) ||
+                          !arraysEqual(parseLines(editedVideoData.techniqueTags), currentTechnique.tags || []) ||
+                          !arraysEqual(parseLines(editedVideoData.techniqueThemas), currentTechnique.themas || []) ||
+                          !arraysEqual(parseLines(editedVideoData.techniqueContextRequirements), currentTechnique.context_requirements || []);
+                        if (techniqueChanged) {
+                          corrections.push(fetch('/api/v2/admin/corrections', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              type: 'technique',
+                              field: currentTechnique.nummer,
+                              originalValue: currentTechnique.name || '',
+                              newValue: editedVideoData.techniqueDoel || currentTechnique.name || '',
+                              source: 'technique_edit',
+                              submittedBy: 'hugo',
+                              targetKey: currentTechnique.nummer,
+                              originalJson: {
+                                doel: currentTechnique.doel || '',
+                                wat: currentTechnique.wat || '',
+                                waarom: currentTechnique.waarom || '',
+                                wanneer: currentTechnique.wanneer || '',
+                                hoe: currentTechnique.hoe || '',
+                                stappenplan: currentTechnique.stappenplan || [],
+                                voorbeeld: currentTechnique.voorbeeld || [],
+                                tags: currentTechnique.tags || [],
+                                themas: currentTechnique.themas || [],
+                                context_requirements: currentTechnique.context_requirements || [],
+                              },
+                              newJson: {
+                                doel: editedVideoData.techniqueDoel,
+                                wat: editedVideoData.techniqueWat,
+                                waarom: editedVideoData.techniqueWaarom,
+                                wanneer: editedVideoData.techniqueWanneer,
+                                hoe: editedVideoData.techniqueHoe,
+                                stappenplan: parseLines(editedVideoData.techniqueStappenplan),
+                                voorbeeld: parseLines(editedVideoData.techniqueVoorbeeld),
+                                tags: parseLines(editedVideoData.techniqueTags),
+                                themas: parseLines(editedVideoData.techniqueThemas),
+                                context_requirements: parseLines(editedVideoData.techniqueContextRequirements),
+                              },
+                            }),
+                          }));
+                        }
+                      }
+
+                      if (corrections.length > 0) {
+                        await Promise.all(corrections);
+                        toast.success("Wijzigingen ingediend ter goedkeuring");
+                      } else {
+                        toast.info("Geen wijzigingen gevonden");
+                      }
+                    } catch (err) {
+                      console.error('Corrections submission failed:', err);
+                      toast.error("Indienen mislukt");
+                      return;
                     }
                   }
 
-                  const pendingChanges = JSON.parse(localStorage.getItem('pendingConfigReview') || '[]');
-                  const currentTechnique = selectedTechniqueId ? getTechniqueByNumber(selectedTechniqueId) : null;
-                  
-                  pendingChanges.push({
-                    type: 'video',
-                    id: detailsVideo?.id,
-                    original: {
-                      title: detailsVideo?.title,
-                      description: detailsVideo?.description,
-                      techniqueId: detailsVideo?.technique_id,
-                    },
-                    edited: {
-                      title: editedVideoData.title,
-                      description: editedVideoData.description,
-                      techniqueId: selectedTechniqueId,
-                    },
-                    timestamp: new Date().toISOString(),
-                  });
-                  
-                  if (currentTechnique && selectedTechniqueId) {
-                    const arraysEqual = (a: string[], b: string[]) => 
-                      a.length === b.length && a.every((v, i) => v === b[i]);
-                    
-                    const parseLines = (s: string) => s.split('\n').map(l => l.trim()).filter(l => l);
-                    
-                    const techniqueChanged = 
-                      editedVideoData.techniqueDoel !== (currentTechnique.doel || '') ||
-                      editedVideoData.techniqueWat !== (currentTechnique.wat || '') ||
-                      editedVideoData.techniqueWaarom !== (currentTechnique.waarom || '') ||
-                      editedVideoData.techniqueWanneer !== (currentTechnique.wanneer || '') ||
-                      editedVideoData.techniqueHoe !== (currentTechnique.hoe || '') ||
-                      !arraysEqual(parseLines(editedVideoData.techniqueStappenplan), currentTechnique.stappenplan || []) ||
-                      !arraysEqual(parseLines(editedVideoData.techniqueVoorbeeld), currentTechnique.voorbeeld || []) ||
-                      !arraysEqual(parseLines(editedVideoData.techniqueTags), currentTechnique.tags || []) ||
-                      !arraysEqual(parseLines(editedVideoData.techniqueThemas), currentTechnique.themas || []) ||
-                      !arraysEqual(parseLines(editedVideoData.techniqueContextRequirements), currentTechnique.context_requirements || []);
-                      
-                    if (techniqueChanged) {
-                      pendingChanges.push({
-                        type: 'technique',
-                        id: currentTechnique.nummer,
-                        original: {
-                          doel: currentTechnique.doel || '',
-                          wat: currentTechnique.wat || '',
-                          waarom: currentTechnique.waarom || '',
-                          wanneer: currentTechnique.wanneer || '',
-                          hoe: currentTechnique.hoe || '',
-                          stappenplan: currentTechnique.stappenplan || [],
-                          voorbeeld: currentTechnique.voorbeeld || [],
-                          tags: currentTechnique.tags || [],
-                          themas: currentTechnique.themas || [],
-                          context_requirements: currentTechnique.context_requirements || [],
-                        },
-                        edited: {
-                          doel: editedVideoData.techniqueDoel,
-                          wat: editedVideoData.techniqueWat,
-                          waarom: editedVideoData.techniqueWaarom,
-                          wanneer: editedVideoData.techniqueWanneer,
-                          hoe: editedVideoData.techniqueHoe,
-                          stappenplan: parseLines(editedVideoData.techniqueStappenplan),
-                          voorbeeld: parseLines(editedVideoData.techniqueVoorbeeld),
-                          tags: parseLines(editedVideoData.techniqueTags),
-                          themas: parseLines(editedVideoData.techniqueThemas),
-                          context_requirements: parseLines(editedVideoData.techniqueContextRequirements),
-                        },
-                        timestamp: new Date().toISOString(),
-                      });
-                    }
-                  }
-                  
-                  localStorage.setItem('pendingConfigReview', JSON.stringify(pendingChanges));
-                  toast.success("Wijzigingen naar Config Review gestuurd");
                   setIsEditingVideo(false);
                   setDetailsVideo(null);
                 }}
@@ -2946,7 +3043,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 style={{ backgroundColor: '#9333ea' }}
               >
                 <Save className="w-4 h-4" />
-                Opslaan naar Review
+                {isSuperAdmin ? 'Opslaan' : 'Indienen ter review'}
               </Button>
             </>
           )

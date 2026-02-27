@@ -3037,7 +3037,7 @@ Format: ["id1", "id2", "id3", ...]`;
         }
         
         const data = JSON.parse(body || '{}');
-        const { videoId, title } = data;
+        const { videoId, title, attractiveTitle } = data;
         
         if (!videoId) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -3045,25 +3045,33 @@ Format: ["id1", "id2", "id3", ...]`;
           return;
         }
         
-        if (!title || typeof title !== 'string' || title.trim().length === 0) {
+        const updateFields = {};
+        if (attractiveTitle !== undefined) {
+          updateFields.ai_attractive_title = attractiveTitle ? String(attractiveTitle).trim() : null;
+        } else if (title && typeof title === 'string' && title.trim().length > 0) {
+          updateFields.ai_attractive_title = title.trim();
+        }
+        if (data.title !== undefined && attractiveTitle !== undefined) {
+          updateFields.title = data.title ? String(data.title).trim() : null;
+        }
+        
+        if (Object.keys(updateFields).length === 0) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: false, message: 'Titel mag niet leeg zijn' }));
+          res.end(JSON.stringify({ success: false, message: 'Geen velden om te updaten' }));
           return;
         }
         
-        const cleanTitle = title.trim();
-        
         const { error } = await supabaseAdmin
           .from('video_ingest_jobs')
-          .update({ ai_attractive_title: cleanTitle })
+          .update(updateFields)
           .eq('id', videoId);
         
         if (error) throw error;
         
-        console.log(`[VideoProcessor] Video ${videoId} title updated to: "${cleanTitle}"`);
+        console.log(`[VideoProcessor] Video ${videoId} updated:`, JSON.stringify(updateFields));
         regenerateVideoMapping().catch(e => console.warn('[VideoMapping] bg update failed:', e.message));
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, videoId, title: cleanTitle }));
+        res.end(JSON.stringify({ success: true, videoId, updated: updateFields }));
       } catch (err) {
         console.error('[VideoProcessor] Update title error:', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });

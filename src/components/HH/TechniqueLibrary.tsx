@@ -184,10 +184,10 @@ export function TechniqueLibrary({ navigate, isAdmin }: TechniqueLibraryProps) {
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-2">
           <div>
             <h1 className="text-[28px] leading-[36px] text-hh-text mb-1">
-              E.P.I.C. Technieken
+              E.P.I.C. Techniques
             </h1>
             <p className="text-[16px] leading-[24px] text-hh-muted">
-              {Object.values(technieken).reduce((sum, arr) => sum + arr.length, 0)} technieken verdeeld over 5 fases
+              {Object.values(technieken).reduce((sum, arr) => sum + arr.length, 0)} techniques verdeeld over 5 fases
             </p>
           </div>
           
@@ -228,7 +228,7 @@ export function TechniqueLibrary({ navigate, isAdmin }: TechniqueLibraryProps) {
           {/* Background Image - Hugo */}
           <img 
             src="/images/Hugo-Herbots-WEB-0281.JPG"
-            alt="Hugo Herbots E.P.I.C. Technieken"
+            alt="Hugo Herbots E.P.I.C. Techniques"
             className="absolute inset-0 w-full h-full object-cover"
             style={{ objectPosition: '50% 30%' }}
           />
@@ -241,7 +241,7 @@ export function TechniqueLibrary({ navigate, isAdmin }: TechniqueLibraryProps) {
               {/* Green accent badge */}
               <Badge className="text-white border-0" style={{ backgroundColor: '#3d9a6e' }}>
                 <Award className="w-3 h-3 mr-1" />
-                54 E.P.I.C. Technieken
+                54 E.P.I.C. Techniques
               </Badge>
               
               <h2 className="text-[24px] sm:text-[32px] font-bold leading-tight">
