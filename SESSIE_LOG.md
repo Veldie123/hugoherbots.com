@@ -171,3 +171,17 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - Collapse-logica blijft intern bestaan (wordt nog gebruikt door VideoWatchPage, TalkToHugoAI, AnalysisResults om sidebar automatisch in te klappen)
 > - PanelLeftClose en PanelLeft imports verwijderd
 > - Agent Usage: ~$0.15
+
+---
+
+## 2026-02-27 — E.P.I.C. sidebar techniek selectie check (admin chat)
+
+**Vraag:** In de E.P.I.C. sidebar (admin chat) kun je geen techniek selecteren voor een correctie. Klik op techniek = selecteer. Klik op info-icoontje (i) = bekijk details.
+
+> **Conclusie:**
+> - Geen wijzigingen nodig — was al volledig geïmplementeerd
+> - `AdminChatExpertModeSidebar.tsx`: `onSelectTechnique` prop bestaat (regel 44), leaf-technieken op alle 3 niveaus (top, child, grandchild) roepen `onSelectTechnique` aan bij klik
+> - `AdminChatExpertMode.tsx`: `onSelectTechnique` is gekoppeld aan `setCorrectionTechnique` + `setCorrectionTechniqueName` (regel 1274-1278)
+> - Info-icoontje (i) op alle niveaus opent detail-sheet met `e.stopPropagation()` om parent-klik te voorkomen
+> - Alle leaf-technieken hebben `cursor-pointer` en paarse highlight bij selectie
+> - Agent Usage: ~$0.10
