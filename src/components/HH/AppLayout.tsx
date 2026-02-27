@@ -52,6 +52,7 @@ interface AppLayoutProps {
   onOpenFlowDrawer?: () => void;
   isAdmin?: boolean;
   onboardingMode?: boolean;
+  isPreview?: boolean;
   chatHistory?: HistoryItem[];
   analysisHistory?: HistoryItem[];
   onSelectHistoryItem?: (id: string, type: "chat" | "analysis") => void;
@@ -94,6 +95,7 @@ export function AppLayout({
   onOpenFlowDrawer,
   isAdmin,
   onboardingMode,
+  isPreview,
   contentClassName,
   chatHistory: chatHistoryProp = defaultChatHistory,
   analysisHistory: analysisHistoryProp,
@@ -104,12 +106,17 @@ export function AppLayout({
   const [collapsed, setCollapsed] = useState(shouldAutoCollapse);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Items verborgen voor Hugo (onboardingMode): te vroeg, nog bugs
+  const autoDetectPreview = typeof document !== 'undefined' && !!document.querySelector('[data-preview-mode="true"]');
+  const effectivePreview = isPreview || autoDetectPreview;
+
   const HUGO_HIDDEN_MAIN = new Set(['techniques', 'analysis', 'talk-to-hugo']);
   const HUGO_HIDDEN_BOTTOM = new Set(['team', 'resources', 'settings']);
+  const PREVIEW_HIDDEN_MAIN = new Set(['techniques']);
   const visibleMainNavItems = onboardingMode
     ? mainNavItems.filter(item => !HUGO_HIDDEN_MAIN.has(item.id))
-    : mainNavItems;
+    : effectivePreview
+      ? mainNavItems.filter(item => !PREVIEW_HIDDEN_MAIN.has(item.id))
+      : mainNavItems;
   const visibleBottomNavItems = onboardingMode
     ? bottomNavItems.filter(item => !HUGO_HIDDEN_BOTTOM.has(item.id))
     : bottomNavItems;

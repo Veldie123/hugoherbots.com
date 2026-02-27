@@ -96,7 +96,7 @@ export function AppPreview({ navigate }: AppPreviewProps) {
   };
 
   return (
-    <div className="relative h-screen flex flex-col overflow-hidden">
+    <div className="relative h-screen flex flex-col overflow-hidden" data-preview-mode="true">
       {/* Preview Banner - Sticky */}
       <div className="sticky top-0 z-50 bg-gradient-to-r from-hh-primary/10 to-hh-success/10 border-b border-hh-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">

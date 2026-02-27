@@ -343,7 +343,7 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
 
   if (!hasData) {
     return (
-      <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
+      <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} isPreview={isPreview}>
         <div className="p-8">
           <EmptyState
             icon={Play}
@@ -364,7 +364,7 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
   }
 
   return (
-    <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
+    <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} isPreview={isPreview}>
       <div className="p-4 sm:p-5 lg:p-6 space-y-6">
         {/* Header with streak + E.P.I.C. progress */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
