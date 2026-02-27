@@ -345,7 +345,7 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
                 <SelectItem value="Gearchiveerd">Gearchiveerd</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex gap-2">
+            <div className="hidden sm:flex gap-2">
               <Button
                 variant={viewMode === "list" ? "default" : "ghost"}
                 size="icon"

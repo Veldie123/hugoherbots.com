@@ -776,7 +776,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                     <SelectItem value="beslissing">Fase 4 - Beslissingsfase</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="flex gap-1 flex-shrink-0">
+                <div className="hidden sm:flex gap-1 flex-shrink-0">
                   <Button
                     variant="ghost"
                     size="sm"

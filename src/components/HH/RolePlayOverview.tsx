@@ -297,7 +297,7 @@ export function RolePlayOverview({ navigate, isAdmin }: RolePlayOverviewProps) {
               </SelectContent>
             </Select>
             
-            <div className="flex gap-1">
+            <div className="hidden sm:flex gap-1">
               <Button
                 variant="ghost"
                 size="sm"

@@ -560,10 +560,10 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="lg:hidden h-10 w-10"
               onClick={() => setMobileMenuOpen(true)}
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-6 h-6" />
             </Button>
 
             {/* Search */}
@@ -616,7 +616,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
               {notificationsOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setNotificationsOpen(false)} />
-                  <div className="absolute right-0 top-11 w-80 max-h-[400px] bg-hh-bg rounded-xl shadow-xl border border-hh-border z-50 overflow-hidden flex flex-col">
+                  <div className="absolute right-0 top-11 w-[calc(100vw-32px)] sm:w-80 max-h-[400px] bg-hh-bg rounded-xl shadow-xl border border-hh-border z-50 overflow-hidden flex flex-col">
                     <div className="p-3 border-b border-hh-border flex-shrink-0">
                       <div className="flex items-center justify-between">
                         <h3 className="text-[14px] font-semibold text-hh-text">
@@ -657,17 +657,17 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                               }`}
                             />
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-0.5">
+                              <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                                 <p className="text-[13px] text-hh-text font-medium">
                                   {notif.title}
                                 </p>
                                 {notif.severity === "high" && (
-                                  <Badge className="bg-red-600 text-white border-0 text-[9px] px-1.5 py-0">
+                                  <Badge className="bg-red-600 text-white border-0 text-[9px] px-1.5 py-0 flex-shrink-0">
                                     HIGH
                                   </Badge>
                                 )}
                                 {notif.severity === "medium" && (
-                                  <Badge className="bg-orange-600 text-white border-0 text-[9px] px-1.5 py-0">
+                                  <Badge className="bg-orange-600 text-white border-0 text-[9px] px-1.5 py-0 flex-shrink-0">
                                     MED
                                   </Badge>
                                 )}

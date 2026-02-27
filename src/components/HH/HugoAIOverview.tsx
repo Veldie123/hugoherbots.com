@@ -521,7 +521,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                 <SelectItem value="needs-improvement">Needs Improvement</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex gap-1">
+            <div className="hidden sm:flex gap-1">
               <Button
                 variant="ghost"
                 size="sm"

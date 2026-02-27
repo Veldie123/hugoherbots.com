@@ -380,7 +380,7 @@ export function Analytics({ navigate, isAdmin, onboardingMode }: AnalyticsProps)
               </SelectContent>
             </Select>
 
-            <div className="flex gap-1">
+            <div className="hidden sm:flex gap-1">
               <Button
                 variant="ghost"
                 size="sm"

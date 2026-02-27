@@ -574,7 +574,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                   <SelectItem value="failed">Mislukt</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="flex border border-hh-border rounded-lg overflow-hidden">
+              <div className="hidden sm:flex border border-hh-border rounded-lg overflow-hidden">
                 <Button
                   variant="ghost"
                   size="icon"

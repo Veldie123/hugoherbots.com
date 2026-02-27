@@ -295,7 +295,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <div className="flex rounded-lg border border-hh-border overflow-hidden">
+              <div className="hidden sm:flex rounded-lg border border-hh-border overflow-hidden">
                 <Button
                   variant={viewMode === "list" ? "secondary" : "ghost"}
                   size="sm"

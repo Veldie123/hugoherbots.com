@@ -4,6 +4,20 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-27 — Mobile UX Sprint (5 fixes)
+
+**Vraag:** Vijf mobiele UX-problemen fixen: notificatie dropdown overflow, hamburger te klein, view toggles verbergen op mobiel, dark mode AnalysisResults, AdminConfigReview card view.
+
+> **Conclusie:**
+> - **T001**: Notificatie dropdown responsive — `w-[calc(100vw-32px)] sm:w-80` in `AppLayout.tsx` + `AdminLayout.tsx`, badges wrappen met `flex-wrap`
+> - **T002**: Hamburger menu vergroot — icoon `w-6 h-6`, touch target ~40-44px in `AppLayout.tsx` + `AdminLayout.tsx`
+> - **T003**: View toggles verborgen op mobiel — `hidden sm:flex` toegevoegd aan 20 componenten: VideoLibrary, TechniqueLibrary, LiveCoaching, RolePlayOverview, Analytics, Library, Resources, HugoAIOverview, AdminVideoManagement, AdminUserManagement, AdminUploads, AdminTechniqueManagement, AdminContentLibrary, AdminResourceLibrary, AdminHelpCenter, AdminSessionTranscripts, AdminBilling, AdminOrganizationManagement (Analysis + AdminSessions + AdminUploadManagement hadden het al)
+> - **T004**: Dark mode AnalysisResults — 14+ fixes: `bg-white`→`bg-hh-bg`, borders→`var(--hh-border)`, semantic kleuren met `dark:` variants, sidebar/checklist/feedback/correction panels
+> - **T005**: AdminConfigReview — card view op mobiel (`md:hidden`) met badges, actie-knoppen, expandable diffs; tabel bewaard als `hidden md:block`
+> - E2e test passed: toggles verborgen, hamburger zichtbaar, dark mode correct, cards op mobiel
+
+---
+
 ## 2026-02-27 — Dark mode fix Talk to Hugo AI chatvenster
 
 **Vraag:** Dark mode Talk to Hugo AI in user view is kapot — chatvenster is knal wit. Analyseer en fix.

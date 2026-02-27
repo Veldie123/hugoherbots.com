@@ -429,7 +429,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
             </Select>
             
             {/* View Toggle */}
-            <div className="flex gap-1">
+            <div className="hidden sm:flex gap-1">
               <Button
                 variant="ghost"
                 size="sm"

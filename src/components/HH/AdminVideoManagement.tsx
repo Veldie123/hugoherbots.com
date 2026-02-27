@@ -1863,7 +1863,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 <SelectItem value="error">Fout</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex border rounded-md">
+            <div className="hidden sm:flex border rounded-md">
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"

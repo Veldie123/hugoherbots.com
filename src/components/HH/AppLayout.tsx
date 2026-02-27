@@ -518,10 +518,10 @@ export function AppLayout({
           <div className="flex items-center gap-2 lg:hidden">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="text-hh-text hover:text-hh-ink p-1.5 rounded-lg hover:bg-hh-ui-50 transition-colors"
+              className="text-hh-text hover:text-hh-ink p-2 rounded-lg hover:bg-hh-ui-50 transition-colors"
               aria-label="Open menu"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-6 h-6" />
             </button>
             {(currentPage === "coaching" || currentPage === "live" || currentPage === "analysis-results") && onOpenFlowDrawer && (
               <button
@@ -584,7 +584,7 @@ export function AppLayout({
               {notifOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
-                  <div className="absolute right-0 top-11 w-80 max-h-[400px] bg-hh-bg rounded-xl shadow-xl border border-hh-border z-50 overflow-hidden flex flex-col">
+                  <div className="absolute right-0 top-11 w-[calc(100vw-32px)] sm:w-80 max-h-[400px] bg-hh-bg rounded-xl shadow-xl border border-hh-border z-50 overflow-hidden flex flex-col">
                     <div className="flex items-center justify-between px-4 py-2.5 border-b border-hh-border flex-shrink-0">
                       <span className="text-[14px] font-semibold text-hh-ink">Notificaties</span>
                       {unreadCount > 0 && (

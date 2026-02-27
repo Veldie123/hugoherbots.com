@@ -389,7 +389,172 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
           </div>
         </Card>
 
-        <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
+        <div className="space-y-3 md:hidden">
+          {loading && (
+            <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border text-center">
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-purple-600 mb-2" />
+              <p className="text-[13px] text-hh-muted">Correcties laden...</p>
+            </Card>
+          )}
+          {!loading && filteredConflicts.length === 0 && (
+            <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border text-center">
+              <Database className="w-8 h-8 mx-auto text-hh-muted/50 mb-2" />
+              <p className="text-[14px] font-medium text-hh-text mb-1">Geen correcties gevonden</p>
+              <p className="text-[13px] text-hh-muted">Correcties verschijnen hier wanneer een admin feedback geeft op AI-aanduidingen in het transcript.</p>
+            </Card>
+          )}
+          {!loading && filteredConflicts.map((conflict) => {
+            const badgeColors = getCodeBadgeColors(conflict.techniqueNumber);
+            const isExpanded = expandedId === conflict.id;
+            const hasDiff = conflict.originalJson && conflict.newJson;
+            return (
+              <Card
+                key={conflict.id}
+                className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden"
+              >
+                <div
+                  className={`p-4 space-y-3 ${hasDiff ? 'cursor-pointer' : ''}`}
+                  onClick={() => hasDiff && setExpandedId(isExpanded ? null : conflict.id)}
+                >
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center text-[12px] font-semibold shrink-0 ${badgeColors}`}
+                    >
+                      {conflict.techniqueNumber}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[14px] font-medium text-hh-ink truncate">
+                          {conflict.techniqueName}
+                        </span>
+                        {hasDiff && (
+                          isExpanded
+                            ? <ChevronUp className="w-4 h-4 text-hh-muted shrink-0" />
+                            : <ChevronDown className="w-4 h-4 text-hh-muted shrink-0" />
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                        {getTypeBadge(conflict.type)}
+                        {getSeverityBadge(conflict.severity)}
+                        {getStatusBadge(conflict.status)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    {conflict.severity === 'ACTION' && conflict.status === 'pending' && (
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+                        <span className="text-[11px] font-medium text-purple-600">
+                          Actie vereist — vrije feedback
+                        </span>
+                      </div>
+                    )}
+                    {conflict.originalValue || conflict.newValue ? (
+                      <TrackChange
+                        original={conflict.originalValue}
+                        proposed={conflict.newValue}
+                        label={conflict.techniqueName}
+                        compact
+                      />
+                    ) : (
+                      <p className="text-[13px] text-hh-text line-clamp-3">
+                        {conflict.description}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1 border-t border-hh-border">
+                    <div className="flex items-center gap-3 text-[12px] text-hh-muted">
+                      <span>{conflict.detectedAt}</span>
+                      {conflict.submittedBy && <span>door {conflict.submittedBy}</span>}
+                    </div>
+                    <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      {conflict.status === "pending" ? (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600"
+                            onClick={() => handleApprove(conflict.id)}
+                          >
+                            <Check className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-red-500/10 hover:text-red-600"
+                            onClick={() => handleReject(conflict.id)}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>Bekijk details</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleResetStatus(conflict.id)}>
+                              Reset status
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {isExpanded && conflict.originalJson && conflict.newJson && (
+                  <div className="p-4 bg-hh-ui-50 border-t border-hh-border space-y-3">
+                    <div>
+                      <p className="text-[12px] font-medium text-red-600 mb-2">Origineel</p>
+                      <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 space-y-1 text-[13px]">
+                        {Object.keys(conflict.newJson).filter(key =>
+                          JSON.stringify(conflict.originalJson![key]) !== JSON.stringify(conflict.newJson![key])
+                        ).map(key => (
+                          <div key={key}>
+                            <span className="font-medium text-hh-muted">{key}:</span>
+                            <span className="ml-2 text-red-700 dark:text-red-400 break-all">
+                              {typeof conflict.originalJson![key] === 'object'
+                                ? JSON.stringify(conflict.originalJson![key], null, 2)
+                                : String(conflict.originalJson![key] || '—')}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[12px] font-medium text-green-600 mb-2">Voorgesteld</p>
+                      <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 space-y-1 text-[13px]">
+                        {Object.keys(conflict.newJson).filter(key =>
+                          JSON.stringify(conflict.originalJson![key]) !== JSON.stringify(conflict.newJson![key])
+                        ).map(key => (
+                          <div key={key}>
+                            <span className="font-medium text-hh-muted">{key}:</span>
+                            <span className="ml-2 text-green-700 dark:text-green-400 break-all">
+                              {typeof conflict.newJson![key] === 'object'
+                                ? JSON.stringify(conflict.newJson![key], null, 2)
+                                : String(conflict.newJson![key] || '—')}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-hh-muted">
+                      Ingediend door: {conflict.submittedBy || 'admin'} | Target: {conflict.targetFile || '—'} → {conflict.targetKey || '—'}
+                    </p>
+                  </div>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+
+        <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden hidden md:block">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-hh-ui-50 border-b border-hh-border">

@@ -420,7 +420,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
             </Select>
             
             {/* View Toggle - Right Side */}
-            <div className="flex gap-1 sm:ml-auto shrink-0">
+            <div className="hidden sm:flex gap-1 sm:ml-auto shrink-0">
               <Button
                 variant="ghost"
                 size="sm"

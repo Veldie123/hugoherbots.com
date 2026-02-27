@@ -295,7 +295,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
             </Select>
             
             {/* View Toggle - Right Side */}
-            <div className="flex gap-1">
+            <div className="hidden sm:flex gap-1">
               <Button
                 variant="ghost"
                 size="sm"
