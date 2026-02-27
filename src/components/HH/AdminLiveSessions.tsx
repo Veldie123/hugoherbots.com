@@ -1335,11 +1335,9 @@ ${platformUrl}`;
                           onClick={handleRowClick}
                         >
                           <td className="py-3 px-4">
-                            <span 
-                              className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[11px] font-mono font-medium bg-purple-500/10 text-purple-600 border border-purple-500/20"
-                            >
+                            <Badge variant="outline" className="text-[11px] font-mono" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
                               {techniqueNumber}
-                            </span>
+                            </Badge>
                           </td>
                           <td className="py-3 px-4">
                             <p className="text-[14px] leading-[20px] text-hh-ink font-medium">

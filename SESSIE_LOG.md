@@ -86,3 +86,15 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 >   - `HugoAIOverview.tsx` — cijfers paars
 >   - `AdminAnalytics.tsx` — cijfers paars
 > - Agent Usage: ~$1.20
+
+---
+
+## 2026-02-27 — E.P.I.C. sidebar techniek selectie + Webinars tabel badge fix
+
+**Vraag:** Fix: in de E.P.I.C. sidebar (admin chat) kun je geen techniek selecteren voor een correctie. + Webinars tabel eerste kolom styling inconsistent (ronde badges ipv pill-shaped).
+
+> **Conclusie:**
+> - **E.P.I.C. sidebar selectie**: was al correct geïmplementeerd — leaf-klik selecteert techniek, parent-klik expand/collapse, info-icoon opent details, paarse highlight bij selectie
+> - **Webinars tabel #-badges**: gefixt van `rounded-full` span naar `Badge variant="outline"` component, nu consistent met Video Management tabel (pill-shaped, paars)
+> - Bestand: `AdminLiveSessions.tsx`
+> - Agent Usage: ~$0.40
