@@ -584,6 +584,19 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
               {theme === 'dark' ? <Sun className="w-5 h-5 text-hh-text" /> : <Moon className="w-5 h-5 text-hh-text" />}
             </button>
 
+            <button
+              onClick={() => navigate?.("admin-chat-expert")}
+              className="flex items-center gap-2 text-white h-10 px-3 sm:px-4 rounded-lg transition-colors"
+              style={{ backgroundColor: '#7e22ce' }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6b21a8')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7e22ce')}
+            >
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline text-[14px]">
+                Talk to Hugo<sup className="text-[10px] ml-0.5">AI</sup>
+              </span>
+            </button>
+
             {/* Notifications Bell - Purple for Admin */}
             <div className="relative">
               <button

@@ -145,3 +145,16 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 >   - Titel automatisch afgeleid uit bestandsnaam
 > - Architect review + e2e test geslaagd
 > - Agent Usage: ~$1.50
+
+---
+
+## 2026-02-27 — Talk to Hugo AI knop in admin header
+
+**Vraag:** Dezelfde "Talk to Hugo AI" knop als in user view, maar dan in paars in de admin header.
+
+> **Conclusie:**
+> - Paarse "Talk to Hugo AI" knop toegevoegd in `AdminLayout.tsx` header (rechts, tussen theme toggle en notificatie-bel)
+> - Stijl: `#7e22ce` achtergrond, hover `#6b21a8`, Sparkles icoon, "Talk to Hugo^AI" tekst
+> - Navigeert naar `admin-chat-expert` (de admin AI chat pagina)
+> - Consistent zichtbaar op alle admin pagina's
+> - Agent Usage: ~$0.20
