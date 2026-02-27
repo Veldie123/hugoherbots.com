@@ -98,3 +98,15 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - **Webinars tabel #-badges**: gefixt van `rounded-full` span naar `Badge variant="outline"` component, nu consistent met Video Management tabel (pill-shaped, paars)
 > - Bestand: `AdminLiveSessions.tsx`
 > - Agent Usage: ~$0.40
+
+---
+
+## 2026-02-27 — KPI badges semantisch kleuren op AdminUploads (Gespreksanalyse)
+
+**Vraag:** KPI badges zijn allemaal paars, moeten semantisch zijn: groen=positief, oranje=neutraal, rood=negatief
+
+> **Conclusie:**
+> - **AdminUploads.tsx**: badges van paars → semantisch (groen +24%, +43%, +5% / rood 15% voor "Verbetering Nodig"), cijfers van zwart → paars (`#7c3aed`)
+> - **AdminUploadManagement.tsx**: cijfers van zwart (`text-hh-ink`) → paars (`#7c3aed`), icon "Gem. Score" van blauw → paars
+> - Alle admin pagina's nu uniform: paarse cijfers, semantische badges, kleurrijke iconen
+> - Agent Usage: ~$0.60

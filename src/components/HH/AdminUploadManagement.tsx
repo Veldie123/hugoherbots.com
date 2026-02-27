@@ -369,7 +369,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
               </Badge>
             </div>
             <p className="text-[13px] text-hh-muted mb-2">Totaal Analyses</p>
-            <p className="text-[28px] leading-[36px] text-hh-ink">{stats.totalAnalyses}</p>
+            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.totalAnalyses}</p>
           </Card>
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
@@ -381,19 +381,19 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
               </Badge>
             </div>
             <p className="text-[13px] text-hh-muted mb-2">Excellent Quality</p>
-            <p className="text-[28px] leading-[36px] text-hh-ink">{stats.excellentQuality}</p>
+            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.excellentQuality}</p>
           </Card>
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)' }}>
+                <BarChart3 className="w-5 h-5" style={{ color: '#9333ea' }} />
               </div>
               <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px] px-2">
                 +5%
               </Badge>
             </div>
             <p className="text-[13px] text-hh-muted mb-2">Gem. Score</p>
-            <p className="text-[28px] leading-[36px] text-hh-ink">{stats.avgScore}%</p>
+            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.avgScore}%</p>
           </Card>
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
@@ -405,7 +405,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
               </Badge>
             </div>
             <p className="text-[13px] text-hh-muted mb-2">Needs Improvement</p>
-            <p className="text-[28px] leading-[36px] text-hh-ink">{stats.needsWork}</p>
+            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.needsWork}</p>
           </Card>
         </div>
 

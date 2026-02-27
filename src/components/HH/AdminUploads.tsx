@@ -302,24 +302,30 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Analyses', value: isLoading ? "-" : stats.total, icon: Upload, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: '#9333ea', badge: '+24%' },
-            { name: 'Uitstekend', value: isLoading ? "-" : stats.excellent, icon: CheckCircle2, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: '#10b981', badge: '+43%' },
-            { name: 'Gem. Score', value: isLoading ? "-" : `${stats.avgScore}%`, icon: BarChart3, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: '#9333ea', badge: '+5%' },
-            { name: 'Verbetering Nodig', value: isLoading ? "-" : stats.needsImprovement, icon: AlertTriangle, bgColorStyle: 'rgba(239, 68, 68, 0.1)', colorStyle: '#ef4444', badge: '15%' },
-          ].map(stat => (
+            { name: 'Totaal Analyses', value: isLoading ? "-" : stats.total, icon: Upload, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: '#9333ea', badge: '+24%', badgeTrend: 'up' as const },
+            { name: 'Uitstekend', value: isLoading ? "-" : stats.excellent, icon: CheckCircle2, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: '#10b981', badge: '+43%', badgeTrend: 'up' as const },
+            { name: 'Gem. Score', value: isLoading ? "-" : `${stats.avgScore}%`, icon: BarChart3, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: '#9333ea', badge: '+5%', badgeTrend: 'up' as const },
+            { name: 'Verbetering Nodig', value: isLoading ? "-" : stats.needsImprovement, icon: AlertTriangle, bgColorStyle: 'rgba(239, 68, 68, 0.1)', colorStyle: '#ef4444', badge: '15%', badgeTrend: 'down' as const },
+          ].map(stat => {
+            const badgeStyles = stat.badgeTrend === 'up'
+              ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }
+              : stat.badgeTrend === 'neutral'
+              ? { backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.2)' }
+              : { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' };
+            return (
             <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
               <div className="flex items-start justify-between mb-2 sm:mb-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColorStyle }}>
                   <stat.icon className="w-5 h-5" style={{ color: stat.colorStyle }} />
                 </div>
-                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
+                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={badgeStyles}>
                   {stat.badge}
                 </span>
               </div>
               <p className="text-[13px] leading-[18px] text-hh-muted">{stat.name}</p>
-              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">{stat.value}</p>
+              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stat.value}</p>
             </Card>
-          ))}
+          );})}
         </div>
 
         {error && (
