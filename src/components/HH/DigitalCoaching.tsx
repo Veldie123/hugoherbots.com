@@ -791,7 +791,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
 
               {/* Horizontal Phase Bar */}
               <div className="flex items-center gap-1">
-                {/* Fase -1: Voorbereiding - Completed */}
+                {/* Fase 0: Pre-contactfase */}
                 <button
                   onClick={() => scrollToPhase("-1")}
                   className="flex-1 flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
@@ -799,7 +799,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
                   <div className="w-full h-1.5 bg-hh-success rounded-full" />
                   <div className="flex flex-col items-center">
                     <div className="text-[11px] leading-[14px] text-hh-success font-semibold">
-                      -1
+                      0
                     </div>
                     <div className="text-[10px] leading-[12px] text-hh-muted text-center hidden sm:block">
                       Voorber.
@@ -945,7 +945,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
                     {showPhaseHeader && (
                       <div className="pt-12 pb-8 first:pt-4">
                         <h2 className="text-[24px] leading-[32px] text-hh-text">
-                          Fase {technique.fase} — {technique.faseNaam}
+                          {technique.faseNaam}
                         </h2>
                       </div>
                     )}
@@ -1377,7 +1377,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
             {/* Phase Progress Bar */}
             <Card className="p-4 rounded-[16px] border-hh-border mb-4">
               <div className="flex items-center gap-1">
-                {/* Fase -1 */}
+                {/* Fase 0: Pre-contactfase */}
                 <button
                   onClick={() => {
                     scrollToPhase("-1");
@@ -1386,7 +1386,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
                   className="flex-1 flex flex-col items-center gap-1.5"
                 >
                   <div className="w-full h-1.5 bg-hh-success rounded-full" />
-                  <div className="text-[11px] text-hh-success font-semibold">-1</div>
+                  <div className="text-[11px] text-hh-success font-semibold">0</div>
                   <div className="text-[10px] text-hh-muted text-center">Voorber.</div>
                 </button>
 

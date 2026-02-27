@@ -157,8 +157,15 @@ export default function App() {
           }
         } else {
           setIsAdmin(false);
-          console.log('❌ No session, route to landing');
-          setCurrentPage("landing");
+          const publicPages: Page[] = ["pricing", "about", "login", "signup", "privacy-policy"];
+          const pathPage = window.location.pathname.replace('/', '') as Page;
+          if (publicPages.includes(pathPage)) {
+            console.log('🌐 No session, route to public page:', pathPage);
+            setCurrentPage(pathPage);
+          } else {
+            console.log('❌ No session, route to landing');
+            setCurrentPage("landing");
+          }
         }
       } catch (error) {
         console.error('❌ Error checking auth:', error);

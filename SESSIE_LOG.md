@@ -4,6 +4,39 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-27 — E.P.I.C. sidebar techniek selectie verificatie (admin chat)
+
+**Vraag:** Fix: in de E.P.I.C. sidebar (admin chat) kun je geen techniek selecteren voor een correctie. Klik op techniek = selecteer. Klik op info (i) = bekijk details.
+
+> **Conclusie:**
+> - **Geen code wijzigingen nodig** — alle functionaliteit was al correct geïmplementeerd:
+>   - `onSelectTechnique` prop bestaat al in `EPICSidebarProps` interface
+>   - Alle leaf-technieken (top-level, kinderen, kleinkinderen) roepen `onSelectTechnique` aan bij klik
+>   - Parent-technieken expand/collapse bij klik
+>   - Info-icoon (i) opent detail-sheet via `stopPropagation` + `openTechniqueDetails`
+>   - `cursor-pointer` staat op alle leaf-technieken
+>   - Paarse highlight bij `selectedTechnique === technique.naam`
+>   - `AdminChatExpertMode.tsx` geeft `onSelectTechnique` callback door die `setCorrectionTechnique` en `setCorrectionTechniqueName` zet
+> - **Correcte workflow**: eerst thumbs down op bericht → correctie panel opent → dan techniek selecteren in sidebar → paarse badge verschijnt in correctie panel
+> - **E2e test geslaagd**: volledige flow geverifieerd met geautomatiseerde browser test
+> - Bestanden: `src/components/HH/AdminChatExpertModeSidebar.tsx`, `src/components/HH/AdminChatExpertMode.tsx` (geen wijzigingen)
+
+---
+
+## 2026-02-27 — Design Audit Sprint: Public routing, Coaching fixes, About images
+
+**Vraag:** Voer de design audit sprint uit op basis van het audit rapport (public pages, user platform, admin platform).
+
+> **Conclusie:**
+> - **Public page routing gefixt**: `/pricing`, `/login`, `/signup`, `/about`, `/privacy-policy` werken nu als directe URLs zonder ingelogd te zijn. Voorheen redirectten alle public routes naar de landing page.
+> - **Coaching "Fase 0 — Fase 0" dubbele tekst gefixt**: `getPhaseLabel()` bevatte al "Fase X - ..." maar het template voegde nog een keer "Fase X —" toe. Nu toont het alleen `{technique.faseNaam}`.
+> - **Progress bar "-1" naar "0" gefixt**: De E.P.I.C. Sales Flow progress bar in DigitalCoaching.tsx toonde "-1" voor Pre-contactfase. Nu toont het "0" (desktop + mobile).
+> - **About page afbeeldingen gefixt**: Figma asset imports (`figma:asset/[hash].png`) vervangen door echte afbeeldingen uit `/images/`. Hugo's portret, walking en working foto's laden nu correct.
+> - **Visueel geverifieerd**: Alle public pages (landing, pricing, login, signup, about, privacy-policy), user pages (dashboard, techniques, videos, webinars, coaching, analysis, talk-to-hugo, settings, roleplay, overviewprogress, onboarding), en admin pages (dashboard, videos, sessions, live, users, analytics, chat-expert).
+> - Bestanden: `src/App.tsx`, `src/components/HH/DigitalCoaching.tsx`, `src/components/HH/About.tsx`
+
+---
+
 ## 2026-02-27 — Admin chat buildValidatorDebugInfo crash fix + E.P.I.C. sidebar verificatie
 
 **Vraag:** Fix E.P.I.C. sidebar: klik op techniek = selecteer voor correctie. Klik op info (i) = bekijk details. Consistent met user view bij video's.

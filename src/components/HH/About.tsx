@@ -14,9 +14,9 @@ import {
   Play,
 } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
-import hugoPortrait from "figma:asset/9fadffbf5efd08d95548ac3acedf2a4c54db789e.png";
-import hugoWalking from "figma:asset/3303da6db66b7132ebc5f2f6276712c9a0fd485e.png";
-import hugoWorking from "figma:asset/ffe328d4703b02e265880fd122f17bde74ebfa9d.png";
+const hugoPortrait = "/images/hugo_over_hugo.png";
+const hugoWalking = "/images/hugo_40jaar_lopen.png";
+const hugoWorking = "/images/hugo_zo_train_ik.png";
 
 type Page = "landing" | "pricing" | "about" | "login" | "signup" | "preview" | "onboarding" | "dashboard" | "roleplay" | "library" | "builder" | "sessions" | "analytics" | "settings";
 
