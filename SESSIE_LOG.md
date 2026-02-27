@@ -203,3 +203,22 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - Datum nu dynamisch (toLocaleDateString nl-NL)
 > - Stripe tabellen zijn leeg (nog geen klanten/betalingen) — revenue toont €0
 > - Bestanden: `server/video-processor.js`, `src/components/HH/AdminDashboard.tsx`
+
+---
+
+## 2026-02-27 — Deployment fix: Autoscale → Reserved VM + production server
+
+**Vraag:** Deploy/publish faalt steeds — 3 builds failed. Cloud Run Autoscale ondersteunt maar 1 poort maar app draait 3 services.
+
+> **Conclusie:**
+> - Deployment type gewijzigd van Autoscale → **Reserved VM** (ondersteunt meerdere processen/poorten)
+> - Nieuw bestand: `server/production-server.js` — lightweight Node.js server die:
+>   - Statische bestanden serveert vanuit `build/` directory
+>   - API calls proxied naar port 3001 (video-processor) en 3002 (hugo-engine)
+>   - WebSocket connections proxied voor `/ws/*` naar port 3002
+>   - SPA fallback: alle niet-bestaande paden → index.html
+>   - Health check op `/` retourneert 200 onmiddellijk
+> - Run command: `node server/production-server.js & node server/video-processor.js & npx tsx ... server/hugo-engine/standalone.ts`
+> - Build command: `npm run build` (Vite bouwt naar `build/` directory)
+> - Proxy routing matched exact met Vite dev proxy config
+> - Bestanden: `server/production-server.js`, `.replit`
