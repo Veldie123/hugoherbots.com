@@ -4,6 +4,20 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-27 — Hero banner outline button hover fix
+
+**Vraag:** De rechtse outline button ("Chat met Hugo", "Bekijk Video's", "Opgenomen Webinars") op hero banners is slecht leesbaar bij hover — transparante achtergrond met donkere tekst op donkere foto. Aanpassen naar volledig wit met donkerblauwe tekst bij hover.
+
+> **Conclusie:**
+> - 5 locaties gefixt: `Dashboard.tsx`, `VideoLibrary.tsx`, `LiveCoaching.tsx`, `TechniqueLibrary.tsx`, `ImmersiveVideoPlayer.tsx`
+> - Originele Shadcn `<Button variant="outline">` vervangen door plain `<button>` — de Shadcn outline variant overschreef hover classes via `cva` + dark mode combinator (`dark:hover:bg-input/50`)
+> - Hover gedrag via inline `onMouseEnter`/`onMouseLeave` + `onFocus`/`onBlur` voor keyboard accessibility
+> - Normal state: `rgba(255,255,255,0.1)` achtergrond, witte tekst, `rgba(255,255,255,0.3)` border
+> - Hover/focus state: `#ffffff` achtergrond, `#1C2535` donkerblauwe tekst, `#ffffff` border
+> - E2e tests geslaagd op Dashboard, Video's, en Technieken pagina's
+
+---
+
 ## 2026-02-27 — Mobiele UX Sprint: view toggles, dark mode, hamburger
 
 **Vraag:** 5 mobiele UX-problemen fixen: notificatie dropdown overflow, hamburger te klein, view toggles verbergen op mobiel, dark mode Analysis Results, Admin Config Review card view.

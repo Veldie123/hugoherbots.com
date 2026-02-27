@@ -264,7 +264,10 @@ export function ImmersiveVideoPlayer({
             </div>
             <div className="flex items-center justify-center gap-3">
               <button
-                className="px-5 py-2.5 rounded-lg border border-white/40 text-white bg-white/10 hover:bg-white/20 text-[14px] font-medium transition-colors cursor-pointer"
+                className="px-5 py-2.5 rounded-lg border border-white/40 text-white text-[14px] font-medium transition-colors cursor-pointer"
+                style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

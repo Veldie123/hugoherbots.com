@@ -274,14 +274,18 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
               </Button>
             )}
             {hasPastSessions && (
-              <Button 
-                variant="outline"
-                className="gap-2 bg-white/10 text-white border-white/30 hover:bg-white/20 hover:border-white/50"
+              <button 
+                className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border border-white/30 transition-colors cursor-pointer"
+                style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+                onFocus={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
+                onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
                 onClick={onScrollToRecordings}
               >
                 <Play className="w-4 h-4" />
                 Opgenomen Webinars
-              </Button>
+              </button>
             )}
           </div>
         </div>
