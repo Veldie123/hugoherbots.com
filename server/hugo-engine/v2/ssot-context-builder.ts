@@ -34,7 +34,7 @@ export function findRelevantVideos(techniqueIds: string[], limit: number = 3): V
 
   for (const [, video] of Object.entries(videoMapping.videos) as any) {
     if (video.status === 'deleted' || video.is_hidden) continue;
-    if (!video.techniek || !video.has_mux) continue;
+    if (!video.techniek || !video.has_mux || video.user_ready === false) continue;
 
     for (const techId of techniqueIds) {
       if (!techId) continue;

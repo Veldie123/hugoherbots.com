@@ -89,6 +89,15 @@ The platform supports:
 ### Database Usage
 Supabase serves as the primary remote database for all application data. A local Replit PostgreSQL instance is used exclusively for `conversation_analyses`, `admin_corrections`, and `chat_feedback`.
 
+### Automated Video Pipeline
+Two background automation systems in `server/video-processor.js`:
+-   **AutoHeal**: Detects videos missing AI summary/title and generates them.
+-   **AutoBatch**: Checks Supabase for pending/failed jobs (excluding archief folder) and auto-starts the Cloud Run batch queue if needed and no batch is already active.
+-   **regenerateVideoMapping()**: Queries Supabase for all non-archief, non-hidden, non-deleted jobs. Uses `ai_suggested_techniek_id` (from AI transcript analysis) as primary technique source. Writes to `config/video_mapping.json`.
+
+### isSuperAdmin Propagation
+`isSuperAdmin` prop flows from App.tsx → AdminUploads, AnalysisResults, UploadAnalysis → AdminLayout. This controls sidebar visibility for super admins and content admins.
+
 ### Feature Specifications
 Key features include a unified video system integrating Google Drive with Mux, Live Coaching with Daily.co (virtual backgrounds, Q&A, waiting room), an AI-powered Roleplay System, an AI Chat/RAG System with `pgvector`, an Analysis System for sales conversations (with two-stage speaker diarization), Admin Analytics dashboards, and a specialized Hugo Onboarding Mode. Subscription data is fetched from Stripe, and profile/notification preferences are saved via Supabase Auth `user_metadata`.
 

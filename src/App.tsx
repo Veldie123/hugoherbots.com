@@ -332,7 +332,7 @@ export default function App() {
           {currentPage === "admin-users" && <AdminUserManagement navigate={navigate} />}
           {currentPage === "admin-techniques" && <AdminTechniqueManagement navigate={navigate} />}
           {currentPage === "admin-transcripts" && <AdminSessionTranscripts navigate={navigate} />}
-          {currentPage === "admin-uploads" && <AdminUploads navigate={navigate} />}
+          {currentPage === "admin-uploads" && <AdminUploads navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-content" && <AdminContentLibrary navigate={navigate} />}
           {currentPage === "admin-analytics" && <AdminAnalytics navigate={navigate} />}
           {currentPage === "admin-settings" && <AdminSettings navigate={navigate} />}
@@ -345,8 +345,8 @@ export default function App() {
           {currentPage === "admin-hugo-agent" && <AdminChatExpertMode sessionId="hugo-agent" sessionTitle="Talk to Myself AI" navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-rag-review" && <AdminRAGReview navigate={navigate} currentPage={currentPage} />}
           {currentPage === "admin-conflicts" && <AdminConflicts navigate={navigate} />}
-          {currentPage === "admin-analysis-results" && <AnalysisResults navigate={navigate} isAdmin={true} navigationData={navigationData} />}
-          {currentPage === "admin-upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={true} />}
+          {currentPage === "admin-analysis-results" && <AnalysisResults navigate={navigate} isAdmin={true} isSuperAdmin={isSuperAdmin} navigationData={navigationData} />}
+          {currentPage === "admin-upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={true} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "sso-validate" && <SSOValidate navigate={navigate} />}
           {currentPage === "coaching" && <DigitalCoaching navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "analysis" && <Analysis navigate={navigate} isAdmin={isAdmin} />}

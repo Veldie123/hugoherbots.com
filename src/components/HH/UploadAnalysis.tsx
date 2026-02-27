@@ -53,6 +53,7 @@ interface UploadAnalysisProps {
   navigate?: (page: string, data?: any) => void;
   isPreview?: boolean;
   isAdmin?: boolean;
+  isSuperAdmin?: boolean;
 }
 
 export function UploadAnalysis({

@@ -53,6 +53,7 @@ interface AnalysisResultsProps {
   analysisId?: string;
   isPreview?: boolean;
   isAdmin?: boolean;
+  isSuperAdmin?: boolean;
   navigationData?: { conversationId?: string; fromAdmin?: boolean; autoLoadFirst?: boolean };
 }
 
@@ -299,6 +300,7 @@ export function AnalysisResults({
   navigate,
   isPreview = false,
   isAdmin = false,
+  isSuperAdmin = false,
   navigationData,
 }: AnalysisResultsProps) {
   const { theme } = useTheme();
@@ -923,7 +925,7 @@ export function AnalysisResults({
 
   const wrapLayout = (children: React.ReactNode) => {
     if (useAdminLayout) {
-      return <AdminLayout currentPage="admin-analysis-results" navigate={navigate as (page: string) => void}>{children}</AdminLayout>;
+      return <AdminLayout currentPage="admin-analysis-results" navigate={navigate as (page: string) => void} isSuperAdmin={isSuperAdmin}>{children}</AdminLayout>;
     }
     return <AppLayout currentPage={fromHugo ? "talk-to-hugo" : "analysis"} navigate={navigate} isAdmin={isAdmin}>{children}</AppLayout>;
   };

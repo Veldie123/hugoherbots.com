@@ -44,6 +44,7 @@ import {
 
 interface AdminUploadsProps {
   navigate?: (page: string, data?: Record<string, any>) => void;
+  isSuperAdmin?: boolean;
 }
 
 interface AnalysisRecord {
@@ -94,7 +95,7 @@ function getQualityLabel(score: number | null): string {
   return "Needs Work";
 }
 
-export function AdminUploads({ navigate }: AdminUploadsProps) {
+export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
@@ -269,7 +270,7 @@ export function AdminUploads({ navigate }: AdminUploadsProps) {
   );
 
   return (
-    <AdminLayout currentPage="admin-uploads" navigate={navigate}>
+    <AdminLayout currentPage="admin-uploads" navigate={navigate} isSuperAdmin={isSuperAdmin}>
       <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
         <div className="flex items-start justify-between">
           <div>

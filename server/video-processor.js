@@ -647,6 +647,7 @@ ${transcriptSnippet ? `Transcript fragment: ${transcriptSnippet}` : ''}`
     }
 
     console.log(`[AITitle] Generated for ${videoId}: "${originalTitle}" → "${aiTitle}"`);
+    regenerateVideoMapping().catch(e => console.warn('[VideoMapping] bg update failed:', e.message));
     return aiTitle;
   } catch (err) {
     console.error(`[AITitle] Error generating title for ${videoId}:`, err.message);
@@ -3060,6 +3061,7 @@ Format: ["id1", "id2", "id3", ...]`;
         if (error) throw error;
         
         console.log(`[VideoProcessor] Video ${videoId} title updated to: "${cleanTitle}"`);
+        regenerateVideoMapping().catch(e => console.warn('[VideoMapping] bg update failed:', e.message));
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, videoId, title: cleanTitle }));
       } catch (err) {
@@ -5973,6 +5975,118 @@ ANTWOORD FORMAT:
   res.end(JSON.stringify({ error: 'Not found' }));
 });
 
+async function regenerateVideoMapping() {
+  if (!supabaseAdmin) return;
+  try {
+    // Fetch all jobs (same minimal SQL as AutoHeal), all filtering done in JS
+    const { data: rawJobs, error: jobsError } = await supabaseAdmin
+      .from('video_ingest_jobs')
+      .select('id, video_title, drive_file_name, drive_folder_id, fase, techniek_id, ai_suggested_techniek_id, ai_confidence, duration_seconds, mux_playback_id, ai_attractive_title, is_hidden, status, rag_document_id, ai_summary');
+
+    if (jobsError) throw jobsError;
+
+    // Also get video_technieken join table (may be empty — that's OK)
+    const { data: techMappings } = await supabaseAdmin
+      .from('video_technieken')
+      .select('video_id, techniek_id, is_primary');
+
+    const techByVideoId = {};
+    for (const m of (techMappings || [])) {
+      if (!techByVideoId[m.video_id] || m.is_primary) {
+        techByVideoId[m.video_id] = m.techniek_id;
+      }
+    }
+
+    // Load techniek names from SSOT
+    let techniekNamen = {};
+    try {
+      const techData = JSON.parse(fs.readFileSync(path.join(__dirname, '../config/ssot/technieken_index.json'), 'utf-8'));
+      for (const t of (techData.technieken || [])) techniekNamen[t.nummer] = t.naam || '';
+    } catch (_) {}
+
+    // Exclude archief folder and hidden; include all other videos
+    const jobs = (rawJobs || []).filter(v =>
+      v.drive_folder_id !== ARCHIEF_FOLDER_ID &&
+      !v.is_hidden &&
+      v.status !== 'deleted'
+    );
+
+    const videoEntries = {};
+    let userReadyCount = 0;
+    for (const v of jobs) {
+      const fileName = v.drive_file_name || v.video_title || `video_${v.id}`;
+      const title = v.ai_attractive_title || v.video_title || fileName;
+      // Techniek: prefer explicit id, then join table, then AI suggestion
+      const techniek = v.techniek_id || techByVideoId[v.id] || v.ai_suggested_techniek_id || null;
+      const hasMux = !!v.mux_playback_id;
+      const userReady = hasMux && !!techniek;
+      if (userReady) userReadyCount++;
+
+      videoEntries[fileName] = {
+        id: v.id,
+        title,
+        file_name: fileName,
+        fase: v.fase || (techniek ? parseInt(techniek.split('.')[0]) || 0 : 0),
+        techniek,
+        techniek_naam: techniekNamen[techniek] || '',
+        techniek_source: v.techniek_id ? 'manual' : (techByVideoId[v.id] ? 'join' : 'ai'),
+        ai_confidence: v.ai_confidence || null,
+        duration_seconds: v.duration_seconds || null,
+        status: v.status || null,
+        has_transcript: !!(v.rag_document_id || v.ai_summary),
+        has_mux: hasMux,
+        mux_playback_id: v.mux_playback_id || null,
+        is_hidden: !!v.is_hidden,
+        user_ready: userReady,
+      };
+    }
+
+    console.log(`[VideoMapping] Total jobs: ${(rawJobs || []).length}, mapped: ${jobs.length}, user_ready: ${userReadyCount}`);
+
+    const mapping = {
+      _meta: { updated: new Date().toISOString().split('T')[0], total_videos: Object.keys(videoEntries).length },
+      videos: videoEntries,
+    };
+
+    const configPath = path.join(__dirname, '../config/video_mapping.json');
+    fs.writeFileSync(configPath, JSON.stringify(mapping, null, 2), 'utf-8');
+    console.log(`[VideoMapping] Regenerated: ${Object.keys(videoEntries).length} user-ready videos`);
+  } catch (err) {
+    console.error('[VideoMapping] Regenerate failed:', err.message);
+  }
+}
+
+async function autoBatchPendingJobs() {
+  const CLOUD_RUN_URL = process.env.CLOUD_RUN_WORKER_URL;
+  const WORKER_SECRET = process.env.CLOUD_RUN_WORKER_SECRET;
+  if (!CLOUD_RUN_URL || !WORKER_SECRET || !supabaseAdmin) return;
+
+  try {
+    const { data: batchRows } = await supabaseAdmin
+      .from('video_batch_state')
+      .select('batch_active')
+      .limit(1);
+    const batchActive = batchRows && batchRows[0] && batchRows[0].batch_active;
+    if (batchActive) {
+      console.log('[AutoBatch] Batch already active, skipping auto-trigger');
+      return;
+    }
+
+    const { count } = await supabaseAdmin
+      .from('video_ingest_jobs')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['pending', 'failed'])
+      .neq('drive_folder_id', ARCHIEF_FOLDER_ID);
+
+    if (!count || count === 0) return;
+
+    console.log(`[AutoBatch] Found ${count} pending/failed jobs — auto-starting batch queue`);
+    await startBatchQueue();
+  } catch (err) {
+    console.warn('[AutoBatch] Auto-batch check failed:', err.message);
+  }
+}
+
 async function autoHealMissingAiFields() {
   if (!supabaseAdmin) {
     console.log('[AutoHeal] Supabase niet geconfigureerd, overgeslagen');
@@ -6022,6 +6136,7 @@ async function autoHealMissingAiFields() {
 
     if (needsSummary.length === 0 && needsTitle.length === 0) {
       console.log('[AutoHeal] Alle ready videos hebben AI summary + title. Niets te doen.');
+      await regenerateVideoMapping();
       return;
     }
 
@@ -6069,6 +6184,7 @@ async function autoHealMissingAiFields() {
     }
 
     console.log(`[AutoHeal] Klaar! ${summariesGenerated} summaries + ${titlesGenerated} titles gegenereerd.`);
+    await regenerateVideoMapping();
   } catch (err) {
     console.error('[AutoHeal] Unexpected error:', err.message);
   }
@@ -6111,6 +6227,13 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log('[AutoHeal] Running periodic auto-heal check...');
     autoHealMissingAiFields();
   }, 30 * 60 * 1000);
+
+  // Auto-batch: check every 15 minutes for pending jobs and auto-start Cloud Run
+  setTimeout(() => autoBatchPendingJobs(), 2 * 60 * 1000);
+  setInterval(() => {
+    console.log('[AutoBatch] Checking for pending jobs...');
+    autoBatchPendingJobs();
+  }, 15 * 60 * 1000);
 
   // Periodic webinar recording polling (every 2 minutes)
   const pollWebinarRecordings = async () => {
