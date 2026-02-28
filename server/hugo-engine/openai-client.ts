@@ -2,9 +2,14 @@
 // SIMPLIFIED for V2 engine - V1 functions archived to server/_archive/openai-v1.ts
 import OpenAI from "openai";
 
+const hasOpenAIKey = !!(process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY);
+if (!hasOpenAIKey) {
+  console.warn('[OpenAI] No API key found (AI_INTEGRATIONS_OPENAI_API_KEY or OPENAI_API_KEY). AI features will be unavailable.');
+}
+
 const openai = new OpenAI({
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY || 'missing-key'
 });
 
 /**

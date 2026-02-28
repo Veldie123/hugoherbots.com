@@ -15,13 +15,11 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - **Design Audit: visuele verificatie** van 12+ pagina's in light/dark mode. Bevinding: de CSS custom properties (`hh-bg`, `hh-text`, etc.) maken dat dark mode veel beter werkt dan de "0.1% coverage" statistiek suggereert. Alle admin pagina's (dashboard, users, videos, sessions, analytics) zien er professioneel uit in dark mode.
 > - **Bestanden gewijzigd:** `src/contexts/UserContext.tsx`, `src/utils/supabase/client.ts`, `package.json`
 
-> **OPENSTAANDE VRAAG aan gebruiker:**
-> Het design audit rapport bevat 40+ pagina's. De meeste zien er al professioneel uit. Waar focus je op in de volgende sprint?
-> 1. Landing page & Pricing — prominentere CTAs en betere eerste indruk
-> 2. Admin pagina's — dark mode finetuning en kleine UI polish
-> 3. Mobile views — resterende responsive issues fixen
-> 4. Alles wat ik kan vinden — fix zoveel mogelijk
-> 5. Specifieke lijst van de gebruiker
+> **Extra fixes (op verzoek):**
+> - **EpicSlide type errors (3 stuks):** `api.ts` line 973 gaf `string` door aan `buildEpicSlideRichContent()` dat een `EpicSlide` object verwacht. Fix: eerst `getSlidesForTechnique()` aanroepen, dan per slide `buildEpicSlideRichContent()` mappen.
+> - **OPENAI_API_KEY graceful check:** `openai-client.ts` crashte als key ontbrak. Fix: fallback naar `OPENAI_API_KEY` env var, log warning als beide keys ontbreken, gebruik `'missing-key'` placeholder zodat de server opstart.
+> - **15 TypeScript errors in api.ts gefixt:** Express `req.params` geeft `string | string[]`, overal `as string` casts toegevoegd. `searchRag()` correct aangeroepen met `{ limit: 3 }` options. `buildSSOTContextForEvaluation([])` met verplichte parameter. `allUsers.users` correct getypeerd met `(allUsers as any)?.users`.
+> - **Bestanden gewijzigd:** `server/hugo-engine/api.ts`, `server/hugo-engine/openai-client.ts`, `server/hugo-engine/v2/epic-slides-service.ts`
 
 ---
 

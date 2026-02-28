@@ -969,13 +969,12 @@ app.post("/api/v2/session/message", async (req, res) => {
 
     if (richContent.length === 0 && (session.mode === 'COACH_CHAT' || session.mode === 'ROLEPLAY')) {
       try {
-        const { buildEpicSlideRichContent } = await import('./v2/epic-slides-service');
-        const slides = buildEpicSlideRichContent(
-          session.techniqueId,
-          session.contextState.gathered
-        );
-        if (slides.length > 0) {
-          richContent = slides;
+        const { getSlidesForTechnique, buildEpicSlideRichContent } = await import('./v2/epic-slides-service');
+        const matchedSlides = getSlidesForTechnique(session.techniqueId);
+        if (matchedSlides.length > 0) {
+          richContent = matchedSlides.map(slide =>
+            buildEpicSlideRichContent(slide, session.contextState.gathered)
+          );
         }
       } catch (err: any) {
         console.log('[API] Rich content generation skipped:', err.message);
@@ -3457,7 +3456,7 @@ app.post("/api/v2/analysis/retry/:conversationId", express.json(), async (req: R
       ['transcribing', conversationId]
     );
 
-    runFullAnalysis(conversationId, storageKey, analysis.user_id, analysis.title);
+    runFullAnalysis(conversationId as string, storageKey, analysis.user_id, analysis.title);
 
     res.json({
       success: true,
@@ -3474,7 +3473,7 @@ app.post("/api/v2/analysis/retry/:conversationId", express.json(), async (req: R
 app.post("/api/v2/analysis/regenerate-coach/:conversationId", express.json(), async (req: Request, res: Response) => {
   try {
     const { conversationId } = req.params;
-    const results = await getAnalysisResults(conversationId);
+    const results = await getAnalysisResults(conversationId as string);
     if (!results) {
       return res.status(404).json({ error: 'Analyse niet gevonden' });
     }
@@ -3493,12 +3492,12 @@ app.post("/api/v2/analysis/regenerate-coach/:conversationId", express.json(), as
     let ssotContext = '';
     let ragContext = '';
     try {
-      ssotContext = buildSSOTContextForEvaluation();
+      ssotContext = buildSSOTContextForEvaluation([]);
     } catch (e: any) { console.warn('[Regenerate] SSOT context error:', e.message); }
     try {
-      const ragResults = await searchRag('verkooptechnieken EPIC coaching', 3);
-      if (ragResults.length > 0) {
-        ragContext = '--- RAG CONTEXT ---\n' + ragResults.map((r: any) => r.content?.substring(0, 500)).join('\n\n');
+      const ragResults = await searchRag('verkooptechnieken EPIC coaching', { limit: 3 });
+      if (ragResults.documents && ragResults.documents.length > 0) {
+        ragContext = '--- RAG CONTEXT ---\n' + ragResults.documents.map((r: any) => r.content?.substring(0, 500)).join('\n\n');
       }
     } catch (e: any) { console.warn('[Regenerate] RAG context error:', e.message); }
 
@@ -3968,7 +3967,7 @@ app.patch("/api/v2/admin/corrections/:id", async (req: Request, res: Response) =
     const reviewer = status === 'pending' ? null : (reviewedBy || 'admin');
     const updateResult = await pool.query(
       `UPDATE admin_corrections SET status = $1, reviewed_by = $2, reviewed_at = $3 WHERE id = $4 RETURNING *`,
-      [status, reviewer, reviewedAt, parseInt(id)]
+      [status, reviewer, reviewedAt, parseInt(id as string)]
     );
     const correction = updateResult.rows[0];
     if (!correction) return res.status(404).json({ error: 'Correction not found' });
@@ -4125,7 +4124,7 @@ app.patch("/api/v2/admin/notifications/:id", async (req: Request, res: Response)
     const readValue = read !== undefined ? read : true;
     const result = await pool.query(
       `UPDATE admin_notifications SET read = $1 WHERE id = $2 RETURNING *`,
-      [readValue, parseInt(id)]
+      [readValue, parseInt(id as string)]
     );
     const notification = result.rows[0];
     if (!notification) return res.status(404).json({ error: 'Notification not found' });
@@ -4141,10 +4140,10 @@ app.delete("/api/v2/admin/notifications/:id", async (req: Request, res: Response
     const { id } = req.params;
     const result = await pool.query(
       `DELETE FROM admin_notifications WHERE id = $1 RETURNING id`,
-      [parseInt(id)]
+      [parseInt(id as string)]
     );
     if (result.rowCount === 0) return res.status(404).json({ error: 'Notification not found' });
-    res.json({ deleted: true, id: parseInt(id) });
+    res.json({ deleted: true, id: parseInt(id as string) });
   } catch (err: any) {
     console.error('[Admin] Notification delete error:', err.message);
     res.status(500).json({ error: err.message });
@@ -4157,16 +4156,17 @@ app.delete("/api/v2/admin/notifications/:id", async (req: Request, res: Response
 app.get("/api/v2/admin/stats", async (req: Request, res: Response) => {
   try {
     const { data: allUsers } = await supabase.auth.admin.listUsers({ perPage: 1000 });
-    const totalUsers = allUsers?.users?.length || 0;
+    const users = (allUsers as any)?.users || [];
+    const totalUsers = users.length || 0;
 
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    const activeUsers = allUsers?.users?.filter(u => 
+    const activeUsers = users.filter((u: any) => 
       u.last_sign_in_at && new Date(u.last_sign_in_at) > new Date(thirtyDaysAgo)
     ).length || 0;
 
-    const newUsersThisWeek = allUsers?.users?.filter(u => 
+    const newUsersThisWeek = users.filter((u: any) => 
       u.created_at && new Date(u.created_at) > new Date(sevenDaysAgo)
     ).length || 0;
 
@@ -4236,7 +4236,7 @@ app.get("/api/v2/admin/stats", async (req: Request, res: Response) => {
     if (allSessions && allSessions.length > 0) {
       for (const s of allSessions.slice(0, 3)) {
         const technique = getTechnique(s.technique_id);
-        const userName = allUsers?.users?.find(u => u.id === s.user_id);
+        const userName = users.find((u: any) => u.id === s.user_id);
         const name = userName ? [userName.user_metadata?.first_name, userName.user_metadata?.last_name].filter(Boolean).join(' ') || userName.email?.split('@')[0] || 'Anoniem' : 'Anoniem';
         topChatSessions.push({
           id: s.id,
