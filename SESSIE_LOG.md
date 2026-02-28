@@ -4,6 +4,20 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-28 — Admin Webinars mobiele layout fix
+
+**Vraag:** Webinar buttons rechts boven buiten beeld op mobiel, view toggle zichtbaar op mobiel, laadt niet automatisch in card view.
+
+> **Conclusie:**
+> - **Titel + buttons layout**: `flex items-start justify-between` → `flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3` zodat buttons onder de titel staan op mobiel
+> - **Button tekst op mobiel**: "Kalender" tekst verborgen (icon only), "Plan Nieuwe Sessie" → "Nieuw" op mobiel via `hidden sm:inline` / `sm:hidden`
+> - **View toggle verborgen**: `hidden sm:flex` toegevoegd aan toggle wrapper — consistent met alle andere modules
+> - **Auto card view op mobiel**: `useState("list")` → `useMobileViewMode("upcoming", "list")` zodat mobiel automatisch card view toont
+> - E2e test geslaagd (400px viewport)
+> - Bestand: `src/components/HH/AdminLiveSessions.tsx`
+
+---
+
 ## 28 FEB 2026 — Deployment Fix: Hugo Engine Pre-Compile
 
 **Vraag:** Publish faalt steeds — health check op '/' timeout door trage startup

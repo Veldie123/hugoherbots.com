@@ -27,6 +27,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -71,7 +72,7 @@ interface AdminLiveSessionsProps {
 export function AdminLiveSessions({ navigate, isSuperAdmin }: AdminLiveSessionsProps) {
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [editingSession, setEditingSession] = useState<LiveSession | null>(null);
-  const [view, setView] = useState<"list" | "upcoming">("list");
+  const [view, setView] = useMobileViewMode("upcoming", "list") as [string, (v: string) => void];
   const [showAdminCalendar, setShowAdminCalendar] = useState(false);
   const [adminCalendarMonth, setAdminCalendarMonth] = useState(() => new Date());
   const [adminSelectedDate, setAdminSelectedDate] = useState<Date | null>(null);
@@ -827,7 +828,7 @@ ${platformUrl}`;
   return (
     <AdminLayout currentPage="admin-live" navigate={navigate} isSuperAdmin={isSuperAdmin}>
       <div className="p-6 space-y-6">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div>
             <h1 className="text-[32px] leading-[40px] text-hh-text mb-2">
               Live Coaching Sessies
@@ -846,14 +847,15 @@ ${platformUrl}`;
               }}
             >
               <CalendarIcon className="w-4 h-4" />
-              Kalender
+              <span className="hidden sm:inline">Kalender</span>
             </Button>
             <Button
               className="gap-2 bg-purple-600 hover:bg-purple-700 text-white"
               onClick={openCreateModal}
             >
               <Plus className="w-4 h-4" />
-              Plan Nieuwe Sessie
+              <span className="hidden sm:inline">Plan Nieuwe Sessie</span>
+              <span className="sm:hidden">Nieuw</span>
             </Button>
           </div>
         </div>
@@ -923,7 +925,7 @@ ${platformUrl}`;
                 <SelectItem value="live">Live</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex border rounded-md">
+            <div className="hidden sm:flex border rounded-md">
               <Button
                 variant={view === "list" ? "default" : "ghost"}
                 size="sm"
