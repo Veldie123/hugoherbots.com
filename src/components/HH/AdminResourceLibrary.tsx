@@ -235,7 +235,11 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)' }}>
                 <FileText className="w-5 h-5" style={{ color: '#9333ea' }} />
               </div>
-              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px] px-2">
+              <Badge
+                variant="outline"
+                className="text-[11px] px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+              >
                 +12%
               </Badge>
             </div>
@@ -247,10 +251,14 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <Download className="w-5 h-5 text-emerald-500" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.1)' }}>
+                <Download className="w-5 h-5" style={{ color: '#059669' }} />
               </div>
-              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px] px-2">
+              <Badge
+                variant="outline"
+                className="text-[11px] px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+              >
                 +34%
               </Badge>
             </div>
@@ -265,7 +273,11 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
               <div className="w-10 h-10 rounded-full bg-hh-warn/10 flex items-center justify-center">
                 <Star className="w-5 h-5 text-hh-warn" />
               </div>
-              <Badge className="bg-hh-warn/10 text-hh-warn border-hh-warn/20 text-[11px] px-2">
+              <Badge
+                variant="outline"
+                className="text-[11px] px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B', borderColor: 'rgba(245, 158, 11, 0.2)' }}
+              >
                 Featured
               </Badge>
             </div>
@@ -280,7 +292,11 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
               <div className="w-10 h-10 rounded-full bg-hh-ocean-blue/10 flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-hh-ocean-blue" />
               </div>
-              <Badge className="bg-hh-ocean-blue/10 text-hh-ocean-blue border-hh-ocean-blue/20 text-[11px] px-2">
+              <Badge
+                variant="outline"
+                className="text-[11px] px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', borderColor: 'rgba(37, 99, 235, 0.2)' }}
+              >
                 Deze maand
               </Badge>
             </div>

@@ -4,6 +4,23 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 28 FEB 2026 — Mobiele UX Sprint + KPI Badge Kleuren Fix
+
+**Vraag:** 5 mobiele UX-problemen fixen: notificatie dropdown, hamburger menu, view toggles, dark mode analysis, config review cards + KPI badge kleuren
+
+> **Conclusie:**
+> - **KPI badge kleuren gefixed** op AdminUserManagement, AdminHelpCenter, AdminResourceLibrary — alle `bg-emerald-500/10` Tailwind classes vervangen door inline styles (`rgba(18,185,129,0.1)/#12B981`) die Badge `variant="outline"` overrides overleven
+> - **Icon kleuren** ook gefixed met inline styles (voorheen Tailwind classes die overridden werden)
+> - **AdminResourceLibrary** "Featured" (amber) en "Deze maand" (blauw) badges ook naar inline styles
+> - **T001 (notificatie dropdown)**: Was al responsive (`w-[calc(100vw-32px)] sm:w-80`)
+> - **T002 (hamburger menu)**: Was al groot genoeg (`w-6 h-6`, `p-2`)
+> - **T003 (view toggles)**: Alle 20 componenten hadden al `hidden sm:flex` — geen wijzigingen nodig
+> - **T004 (dark mode AnalysisResults)**: 2 kleine fixes — inactive tab kleur + spinner dark variant
+> - **T005 (config review cards)**: Was al geïmplementeerd met `md:hidden` card view
+> - Bestanden: `AdminUserManagement.tsx`, `AdminHelpCenter.tsx`, `AdminResourceLibrary.tsx`, `AnalysisResults.tsx`
+
+---
+
 ## 2026-02-28 — Dashboard vs Analytics stats inconsistentie fix
 
 **Vraag:** Stats in Analytics (DAU=0, MAU=0) komen niet overeen met Dashboard (Actieve Users=13).

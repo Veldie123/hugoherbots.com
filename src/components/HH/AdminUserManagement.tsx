@@ -227,7 +227,8 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
               >
                 +12%
               </Badge>
@@ -242,12 +243,13 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.1)' }}>
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#059669' }} />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
               >
                 +8%
               </Badge>
@@ -262,12 +264,13 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600/10 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)' }}>
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#2563eb' }} />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
               >
                 +3.2%
               </Badge>
@@ -282,12 +285,13 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-ocean-blue/10 flex items-center justify-center">
-                <Play className="w-4 h-4 sm:w-5 sm:h-5 text-hh-ocean-blue" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)' }}>
+                <Play className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#2563eb' }} />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
               >
                 +18%
               </Badge>

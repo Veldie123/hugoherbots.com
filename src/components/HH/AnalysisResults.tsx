@@ -935,7 +935,7 @@ export function AnalysisResults({
     return wrapLayout(
       <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 5rem)' }}>
         <div className="text-center space-y-4">
-          <Loader2 className={`w-8 h-8 ${adminColors ? 'text-purple-600' : 'text-hh-primary'} animate-spin mx-auto`} />
+          <Loader2 className={`w-8 h-8 ${adminColors ? 'text-purple-600 dark:text-purple-400' : 'text-hh-primary'} animate-spin mx-auto`} />
           <p className="text-hh-text font-medium">{processingStep || 'Resultaten laden...'}</p>
           {processingStep && (
             <p className="text-[14px] leading-[20px] text-hh-muted">
@@ -1236,7 +1236,7 @@ export function AnalysisResults({
               }`}
               style={activeTab === tab.value
                 ? { backgroundColor: adminColors ? '#9910FA' : '#3C9A6E', color: 'white' }
-                : { color: '#4B5563' }
+                : { color: isDark ? '#9CA3AF' : '#4B5563' }
               }
             >
               <tab.icon className="w-4 h-4" />

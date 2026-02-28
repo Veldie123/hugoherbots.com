@@ -252,7 +252,11 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)' }}>
                 <FileText className="w-5 h-5" style={{ color: '#9333ea' }} />
               </div>
-              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px] px-2">
+              <Badge
+                variant="outline"
+                className="text-[11px] px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+              >
                 +8%
               </Badge>
             </div>
@@ -264,10 +268,14 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.1)' }}>
+                <CheckCircle2 className="w-5 h-5" style={{ color: '#059669' }} />
               </div>
-              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px] px-2">
+              <Badge
+                variant="outline"
+                className="text-[11px] px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+              >
                 Live
               </Badge>
             </div>
@@ -279,10 +287,14 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-hh-ocean-blue/10 flex items-center justify-center">
-                <Eye className="w-5 h-5 text-hh-ocean-blue" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)' }}>
+                <Eye className="w-5 h-5" style={{ color: '#2563eb' }} />
               </div>
-              <Badge className="bg-hh-ocean-blue/10 text-hh-ocean-blue border-hh-ocean-blue/20 text-[11px] px-2">
+              <Badge
+                variant="outline"
+                className="text-[11px] px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+              >
                 +42%
               </Badge>
             </div>
@@ -294,10 +306,14 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <ThumbsUp className="w-5 h-5 text-emerald-500" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.1)' }}>
+                <ThumbsUp className="w-5 h-5" style={{ color: '#059669' }} />
               </div>
-              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px] px-2">
+              <Badge
+                variant="outline"
+                className="text-[11px] px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+              >
                 Excellent
               </Badge>
             </div>
