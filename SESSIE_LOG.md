@@ -4,6 +4,17 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-28 — Deployment health check fix + sidebar collapse
+
+**Vraag:** (1) Deployment failt op health checks — server start te traag. (2) Sidebar collapse werkt niet in user view (wel in admin view).
+
+> **Conclusie:**
+> - **Health check fix**: `server/production-server.js` — index.html wordt nu gecached bij startup (sync read) zodat `/` direct 200 teruggeeft. Nieuw `/healthz` endpoint toegevoegd voor snelle health checks. Deployment run command aangepast met gefaseerde startup: productieserver eerst, video-processor na 2s, hugo-engine na 3s
+> - **Sidebar collapse**: `src/components/HH/AppLayout.tsx` — logo-area veranderd van passieve `<div>` naar klikbare `<button>` met `onClick={() => setCollapsed(!collapsed)}`, consistent met AdminLayout patroon
+> - Bestanden: `server/production-server.js`, `src/components/HH/AppLayout.tsx`, `.replit` (deployment config)
+
+---
+
 ## 2026-02-28 — Mobiele UX verificatie (5 items)
 
 **Vraag:** Vijf mobiele UX-problemen fixen: notificatie dropdown, hamburger menu, view toggles, dark mode analysis results, admin config review card view.

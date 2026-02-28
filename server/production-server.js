@@ -5,6 +5,13 @@ const path = require('path');
 const PORT = 5000;
 const BUILD_DIR = path.join(__dirname, '..', 'build');
 
+let cachedIndexHtml = null;
+try {
+  cachedIndexHtml = fs.readFileSync(path.join(BUILD_DIR, 'index.html'));
+} catch (e) {
+  console.warn('[Production] index.html not found at startup, will retry on request');
+}
+
 const MIME_TYPES = {
   '.html': 'text/html',
   '.js': 'application/javascript',
@@ -85,6 +92,11 @@ function serveFile(filePath, res) {
 }
 
 function serveIndex(res) {
+  if (cachedIndexHtml) {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(cachedIndexHtml);
+    return;
+  }
   const indexPath = path.join(BUILD_DIR, 'index.html');
   fs.readFile(indexPath, (err, data) => {
     if (err) {
@@ -92,6 +104,7 @@ function serveIndex(res) {
       res.end('index.html not found');
       return;
     }
+    cachedIndexHtml = data;
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(data);
   });
@@ -100,6 +113,12 @@ function serveIndex(res) {
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const pathname = url.pathname;
+
+  if (pathname === '/healthz') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('ok');
+    return;
+  }
 
   if (shouldProxyTo3002(pathname)) {
     return proxyRequest(req, res, 3002);
