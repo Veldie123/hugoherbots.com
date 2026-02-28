@@ -84,7 +84,6 @@ export const auth = {
   getSession: async () => {
     try {
       const result = await supabase.auth.getSession()
-      console.log('🔐 Supabase getSession result:', result)
       return { session: result?.data?.session || null, error: result?.error || null }
     } catch (error) {
       console.error('🔐 Supabase getSession error:', error)
@@ -96,7 +95,6 @@ export const auth = {
   getUser: async () => {
     try {
       const result = await supabase.auth.getUser()
-      console.log('🔐 Supabase getUser result:', result)
       return { user: result?.data?.user || null, error: result?.error || null }
     } catch (error) {
       console.error('🔐 Supabase getUser error:', error)

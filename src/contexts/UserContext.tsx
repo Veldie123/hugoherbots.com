@@ -48,10 +48,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       let sessionResult = null;
       
       try {
-        console.log('📞 Calling auth.getSession()...');
         sessionResult = await auth.getSession();
-        console.log('📦 Raw session result type:', typeof sessionResult);
-        console.log('📦 Raw session result:', JSON.stringify(sessionResult, null, 2));
       } catch (err) {
         console.error('❌ auth.getSession() threw error:', err);
         setUser(null);
@@ -70,15 +67,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // Check what properties exist
-      console.log('🔍 sessionResult keys:', Object.keys(sessionResult));
-
-      // NOW access properties safely
       const currentSession = sessionResult.session ?? null;
       const sessionError = sessionResult.error ?? null;
-      
-      console.log('📦 Extracted session:', currentSession ? 'EXISTS' : 'NULL');
-      console.log('📦 Extracted error:', sessionError);
       
       if (sessionError) {
         console.log('❌ Session error:', sessionError);
