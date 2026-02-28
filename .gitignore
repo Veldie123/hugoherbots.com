@@ -4,6 +4,7 @@ node_modules/
 # Build output
 build/
 dist/
+server/hugo-engine/standalone.js
 
 # Environment files
 .env

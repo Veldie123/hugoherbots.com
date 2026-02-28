@@ -4,6 +4,19 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 28 FEB 2026 — Deployment Fix: Hugo Engine Pre-Compile
+
+**Vraag:** Publish faalt steeds — health check op '/' timeout door trage startup
+
+> **Conclusie:**
+> - **Root cause**: `npx tsx` compileert TypeScript on-the-fly bij elke startup → vreet CPU → health check timeout
+> - **Fix**: Hugo engine wordt nu **pre-compiled** met esbuild tijdens build stap (345ms) → `standalone.js` (2.4MB)
+> - **Run command**: `node standalone.js` ipv `npx tsx standalone.ts` — start in milliseconden
+> - **Stagger delays**: production-server → 3s → video-processor → 5s → hugo-engine
+> - Bestanden: `package.json` (build script), `.replit` (deployment config), `.gitignore`
+
+---
+
 ## 28 FEB 2026 — Mobiele UX Sprint + KPI Badge Kleuren Fix
 
 **Vraag:** 5 mobiele UX-problemen fixen: notificatie dropdown, hamburger menu, view toggles, dark mode analysis, config review cards + KPI badge kleuren

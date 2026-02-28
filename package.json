@@ -109,7 +109,7 @@
       },
       "scripts": {
             "dev": "vite",
-            "build": "vite build",
+            "build": "vite build && npx esbuild server/hugo-engine/standalone.ts --bundle --platform=node --target=node20 --outfile=server/hugo-engine/standalone.js --external:@neondatabase/serverless --external:ws --external:express --external:cors --external:openai --external:@supabase/supabase-js --external:@livekit/server-sdk --external:deepgram --external:stripe --format=cjs",
             "lint": "echo 'No linter configured' && exit 0",
             "typecheck": "npx tsc --noEmit",
             "test": "node scripts/config-lint.js",
