@@ -1508,7 +1508,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 <div className="flex items-center gap-0.5 mt-1.5">
                   <button
                     onClick={() => handleCopyMessage(message.id, message.text)}
-                    className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                    className="p-1.5 rounded-md text-hh-muted hover:text-hh-text hover:bg-hh-ui-100 transition-colors"
                     title="Kopieer"
                   >
                     {copiedMessageId === message.id ? (
@@ -1521,8 +1521,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     onClick={() => handleMessageFeedback(message.id, "up")}
                     className={`p-1.5 rounded-md transition-colors ${
                       message.feedback === "up"
-                        ? "text-green-600 bg-green-50"
-                        : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                        ? "text-green-600 bg-green-600/15"
+                        : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-100"
                     }`}
                     title="Goed antwoord"
                   >
@@ -1532,8 +1532,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     onClick={() => handleMessageFeedback(message.id, "down")}
                     className={`p-1.5 rounded-md transition-colors ${
                       message.feedback === "down"
-                        ? "text-red-500 bg-red-50"
-                        : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                        ? "text-red-500 bg-red-500/15"
+                        : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-100"
                     }`}
                     title="Slecht antwoord"
                   >
@@ -1546,7 +1546,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                         setInputText(lastUserMsg.text);
                       }
                     }}
-                    className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                    className="p-1.5 rounded-md text-hh-muted hover:text-hh-text hover:bg-hh-ui-100 transition-colors"
                     title="Opnieuw proberen"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
