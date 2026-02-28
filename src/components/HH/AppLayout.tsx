@@ -240,22 +240,19 @@ export function AppLayout({
           collapsed ? "w-[60px]" : "w-56"
         } bg-hh-bg border-r border-hh-border flex-col transition-all duration-300 flex-shrink-0`}
       >
-        <div className="h-16 flex items-center px-3 border-b border-hh-border flex-shrink-0">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="h-16 flex items-center justify-start px-3 border-b border-hh-border flex-shrink-0 hover:bg-hh-ui-50 transition-colors cursor-pointer"
+        >
           {!collapsed ? (
             <div className="flex flex-col items-start gap-0">
               <span className="text-[18px] leading-[22px] tracking-widest uppercase font-bold text-hh-ink">HUGO</span>
               <span className="text-[18px] leading-[22px] tracking-widest uppercase font-bold text-hh-ink">HERBOTS</span>
             </div>
           ) : (
-            <button
-              onClick={() => setCollapsed(false)}
-              className="w-full flex justify-center hover:opacity-70 transition-opacity"
-              aria-label="Expand sidebar"
-            >
-              <Logo variant="icon" className="w-8 h-8" />
-            </button>
+            <Logo variant="icon" className="w-8 h-8" />
           )}
-        </div>
+        </button>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
           {visibleMainNavItems.map((item) => {
