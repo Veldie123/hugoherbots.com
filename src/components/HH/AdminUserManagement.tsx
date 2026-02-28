@@ -634,7 +634,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
       {/* User Detail Modal */}
       <Dialog open={showUserDetail} onOpenChange={setShowUserDetail}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90dvh] sm:max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedUser?.name || "Gebruiker Details"}</DialogTitle>
             <DialogDescription>

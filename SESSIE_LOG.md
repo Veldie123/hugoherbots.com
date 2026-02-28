@@ -4,6 +4,19 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-28 — Mobile dialog scroll fix (user detail)
+
+**Vraag:** User detail dialog bugt op mobiel — geen scroll en geen navigatie mogelijk.
+
+> **Conclusie:**
+> - **Root cause**: Base `DialogContent` component in `dialog.tsx` had geen `max-h` of `overflow-y-auto`, waardoor grote dialogs op mobiel het scherm overnamen zonder scroll
+> - **Fix**: `max-h-[90dvh] overflow-y-auto` toegevoegd aan het base `DialogContent` component — dit fixt ALLE dialogs in de hele app op mobiel
+> - `dvh` (dynamic viewport height) werkt beter op mobiel dan `vh` omdat het rekening houdt met de browser toolbar
+> - User view variant: deze dialog bestaat alleen in admin view (AdminUserManagement.tsx) — gebruikers kunnen geen andere gebruikers bekijken
+> - Bestanden: `src/components/ui/dialog.tsx`, `src/components/HH/AdminUserManagement.tsx`
+
+---
+
 ## 2026-02-28 — Deployment health check fix + sidebar collapse
 
 **Vraag:** (1) Deployment failt op health checks — server start te traag. (2) Sidebar collapse werkt niet in user view (wel in admin view).
