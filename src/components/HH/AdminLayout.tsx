@@ -557,14 +557,13 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
           {/* Left: Hamburger (mobile) + Search */}
           <div className="flex items-center gap-3 flex-1">
             {/* Hamburger menu - mobile only */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden h-10 w-10"
+            <button
+              className="lg:hidden text-hh-text hover:text-hh-ink p-2 rounded-lg hover:bg-hh-ui-50 transition-colors"
               onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open menu"
             >
               <Menu className="w-6 h-6" />
-            </Button>
+            </button>
 
             {/* Search */}
             <div className="flex-1 max-w-md hidden sm:block">
