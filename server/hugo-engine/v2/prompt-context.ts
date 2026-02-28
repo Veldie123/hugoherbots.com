@@ -274,6 +274,53 @@ export function getVideosForTechnique(techniqueId: string): { title: string; bes
     .map((v: any) => ({ title: v.title || v.file_name, beschrijving: v.beschrijving || '' }));
 }
 
+export function buildFullVideoCatalog(): string {
+  const mapping = loadVideoMapping();
+  if (!mapping?.videos) return "Geen video mapping beschikbaar.";
+  
+  const videos = Object.values(mapping.videos)
+    .filter((v: any) => v.user_ready)
+    .sort((a: any, b: any) => {
+      const faseA = parseInt(a.fase || "99");
+      const faseB = parseInt(b.fase || "99");
+      if (faseA !== faseB) return faseA - faseB;
+      const techA = (a.techniek || "99").split(".").map(Number);
+      const techB = (b.techniek || "99").split(".").map(Number);
+      for (let i = 0; i < Math.max(techA.length, techB.length); i++) {
+        const na = techA[i] || 0;
+        const nb = techB[i] || 0;
+        if (na !== nb) return na - nb;
+      }
+      return 0;
+    });
+  
+  const faseNamen: Record<string, string> = {
+    "0": "Pre-contact",
+    "1": "Opening",
+    "2": "Ontdekking",
+    "3": "Aanbeveling",
+    "4": "Beslissing"
+  };
+  
+  let result = `VOLLEDIGE VIDEOCATALOGUS (${videos.length} cursus-video's in afspeelvolgorde):\n\n`;
+  let currentFase = "";
+  let nr = 1;
+  
+  for (const v of videos as any[]) {
+    const fase = v.fase || "?";
+    if (fase !== currentFase) {
+      currentFase = fase;
+      const faseLabel = faseNamen[fase] || `Fase ${fase}`;
+      result += `\n── Fase ${fase}: ${faseLabel} ──\n`;
+    }
+    const duur = v.duration_seconds ? `${Math.round(v.duration_seconds / 60)}min` : "";
+    result += `${nr}. "${v.title || v.file_name}" — techniek ${v.techniek || "?"} ${duur ? `(${duur})` : ""}\n`;
+    nr++;
+  }
+  
+  return result;
+}
+
 // ============================================================================
 // RICH CONTEXT BUILDERS - Build context from all loaded configs
 // ============================================================================

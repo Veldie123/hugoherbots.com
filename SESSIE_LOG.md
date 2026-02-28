@@ -4,6 +4,21 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-28 — AI Chat fix: video catalog voor admin modus
+
+**Vraag:** AI chat werkt niet echt — wanneer Hugo (admin) vraagt om alle video's in volgorde te tonen, geeft de AI placeholders (`[titel]`, `[fase/techniek]`) in plaats van echte videotitels.
+
+> **Conclusie:**
+> - Root cause: de coach engine injecteerde alleen video-statistieken (aantallen per fase) en maximaal 5 videos per techniek in de prompt. De AI had geen toegang tot alle 42 videotitels.
+> - Fix: `buildFullVideoCatalog()` functie toegevoegd in `server/hugo-engine/v2/prompt-context.ts` — genereert een gesorteerde lijst van alle 42 user-ready video's met titel, techniek-ID en duur, gegroepeerd per EPIC fase
+> - Geïnjecteerd op 2 plekken in `server/hugo-engine/v2/coach-engine.ts`:
+>   1. `buildNestedOpeningPrompt()` admin sectie (opening prompt)
+>   2. `buildSystemPrompt()` → admin mode enhancement (follow-up berichten)
+> - Inclusief instructie: "NOOIT placeholders als [titel] gebruiken"
+> - Code review: PASS
+
+---
+
 ## 2026-02-27 — Hero banner outline button hover fix
 
 **Vraag:** De rechtse outline button ("Chat met Hugo", "Bekijk Video's", "Opgenomen Webinars") op hero banners is slecht leesbaar bij hover — transparante achtergrond met donkere tekst op donkere foto. Aanpassen naar volledig wit met donkerblauwe tekst bij hover.

@@ -36,7 +36,8 @@ import {
   buildAttitudesContext,
   buildPersonaContext,
   buildEvaluationCriteria,
-  getVideosForTechnique
+  getVideosForTechnique,
+  buildFullVideoCatalog
 } from "./prompt-context";
 import { mergeUserAndSessionContext, getRequiredSlotsForTechnique } from './context_engine';
 import { getVideoLibraryStats, buildVideoStatsPrompt } from './content-assets';
@@ -326,6 +327,7 @@ REGELS IN ADMIN MODUS:
 - Wees direct, efficiënt en to-the-point. Geen coaching-vragen, geen Socratische methode richting Hugo.
 
 Dit is een echt gesprek met de baas. Praat zoals je zou praten tegen je schepper.\n\n`;
+    prompt += buildFullVideoCatalog() + "\n\n";
   } else {
     prompt += `Je zit met ${displayName} aan tafel. Dit is een echt gesprek, een dialoog. Praat zoals je zou praten, niet zoals je zou schrijven.
 
@@ -600,7 +602,8 @@ Je spreekt met Hugo Herbots, de eigenaar en bedenker van dit platform en de EPIC
 - Vraag NOOIT naar ervaringsniveau, sector, product, klanttype, of "wie ben je?".
 - De video's volgen de EPIC volgorde: per fase (0→1→2→3→4), binnen elke fase per techniek-nummer.
 - Er IS een cursusvolgorde die exact de technieken-nummering volgt.
-- Wees direct, efficiënt en behulpzaam. Geen coaching-vragen richting Hugo.`;
+- Wees direct, efficiënt en behulpzaam. Geen coaching-vragen richting Hugo.
+- Als Hugo om een lijst van video's vraagt, gebruik ALTIJD de videocatalogus hieronder. NOOIT placeholders als [titel] gebruiken.\n\n` + buildFullVideoCatalog();
   } else {
     enhancedSystemPrompt += `\n\n══ KRITIEKE REGEL: JE BENT EEN SALES COACH ══
 Je bent een sales coach. De persoon tegenover je is een VERKOPER die beter wil worden in sales.
