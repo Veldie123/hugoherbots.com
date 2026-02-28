@@ -3336,8 +3336,24 @@ Format: ["id1", "id2", "id3", ...]`;
           supabaseAdmin.from('video_views').select('id', { count: 'exact', head: true }).gte('created_at', new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toISOString()).lt('created_at', todayStart),
         ]);
 
-        const activeUsersThisWeek = new Set((viewsThisWeek.data || []).map(v => v.user_id).filter(Boolean)).size;
-        const activeUsersPrevWeek = new Set((viewsPrevWeek.data || []).map(v => v.user_id).filter(Boolean)).size;
+        const activeViewUsersThisWeek = new Set((viewsThisWeek.data || []).map(v => v.user_id).filter(Boolean));
+        const activeViewUsersPrevWeek = new Set((viewsPrevWeek.data || []).map(v => v.user_id).filter(Boolean));
+
+        // Also count recent logins as activity (last_sign_in_at from profiles or auth)
+        let recentLoginUsers = new Set();
+        let prevWeekLoginUsers = new Set();
+        try {
+          const profilesWithLogin = await supabaseAdmin.from('profiles').select('id, last_sign_in_at').not('last_sign_in_at', 'is', null);
+          const loginProfiles = profilesWithLogin.data || [];
+          loginProfiles.forEach(p => {
+            if (p.last_sign_in_at >= sevenDaysAgo.toISOString()) recentLoginUsers.add(p.id);
+            if (p.last_sign_in_at >= fourteenDaysAgo.toISOString() && p.last_sign_in_at < sevenDaysAgo.toISOString()) prevWeekLoginUsers.add(p.id);
+          });
+        } catch (e) { /* profiles may not have last_sign_in_at */ }
+
+        // Merge video views + logins for active users
+        const activeUsersThisWeek = new Set([...activeViewUsersThisWeek, ...recentLoginUsers]).size;
+        const activeUsersPrevWeek = new Set([...activeViewUsersPrevWeek, ...prevWeekLoginUsers]).size;
 
         const sessionsToday = viewsToday.count || 0;
         const sessionsYesterday = viewsYesterday.count || 0;
@@ -3377,9 +3393,8 @@ Format: ["id1", "id2", "id3", ...]`;
           return pct >= 0 ? `+${pct}%` : `${pct}%`;
         };
 
-        const displayActiveUsers = activeUsersThisWeek > 0 ? activeUsersThisWeek : totalUsers;
         const kpis = {
-          activeUsers: { value: displayActiveUsers, change: calcChange(activeUsersThisWeek, activeUsersPrevWeek) },
+          activeUsers: { value: activeUsersThisWeek, change: calcChange(activeUsersThisWeek, activeUsersPrevWeek) },
           sessionsToday: { value: sessionsToday, change: calcChange(sessionsToday, sessionsYesterday) },
           newSignups: { value: newSignupsThisMonth, change: calcChange(newSignupsThisMonth, newSignupsPrevMonth) },
           revenue: { value: revenueThisMonth, change: calcChange(revenueThisMonth, revenuePrevMonth), subscriptions: activeSubscriptions },
@@ -3654,6 +3669,16 @@ Format: ["id1", "id2", "id3", ...]`;
         const recentViews = recentActivityResult.data || [];
         const todayViewUsers = new Set(recentViews.filter(v => v.created_at >= todayStart).map(v => v.user_id));
         const monthViewUsers = new Set(recentViews.map(v => v.user_id));
+
+        // Also count logins as activity for DAU/MAU
+        try {
+          const profilesWithLogin = await supabaseAdmin.from('profiles').select('id, last_sign_in_at').not('last_sign_in_at', 'is', null);
+          const loginProfiles = profilesWithLogin.data || [];
+          loginProfiles.forEach(p => {
+            if (p.last_sign_in_at >= todayStart) todayViewUsers.add(p.id);
+            if (p.last_sign_in_at >= monthStart) monthViewUsers.add(p.id);
+          });
+        } catch (e) { /* profiles may not have last_sign_in_at */ }
         
         let analysisScores = [];
         try {

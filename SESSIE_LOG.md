@@ -4,6 +4,19 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-28 — Dashboard vs Analytics stats inconsistentie fix
+
+**Vraag:** Stats in Analytics (DAU=0, MAU=0) komen niet overeen met Dashboard (Actieve Users=13).
+
+> **Conclusie:**
+> - **Root cause**: Dashboard's "Actieve Users" had een misleidende fallback: als er geen video views waren in de afgelopen 7 dagen, toonde het het TOTAAL aantal profielen als "actief" (`displayActiveUsers = activeUsersThisWeek > 0 ? activeUsersThisWeek : totalUsers`). Analytics toonde correct 0 want er waren geen video views.
+> - **Fix 1**: Misleidende fallback verwijderd — Dashboard toont nu werkelijk actieve gebruikers, niet het totaal
+> - **Fix 2**: Beide endpoints (dashboard-stats + analytics/platform) tellen nu ook recente logins mee als activiteit (`profiles.last_sign_in_at`), niet alleen video views. Dit geeft een nauwkeuriger beeld van echte activiteit.
+> - **Fix 3**: Definities nu consistent — Dashboard=7d actief (views+logins), Analytics DAU=vandaag, MAU=30d
+> - Bestanden: `server/video-processor.js` (endpoints `/api/admin/dashboard-stats` en `/api/analytics/platform`)
+
+---
+
 ## 2026-02-28 — Mobile dialog scroll fix (user detail)
 
 **Vraag:** User detail dialog bugt op mobiel — geen scroll en geen navigatie mogelijk.
