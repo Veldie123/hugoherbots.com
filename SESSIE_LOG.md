@@ -4,6 +4,27 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-28 — Security fixes + Design Audit Sprint
+
+**Vraag:** Beveiligingsproblemen fixen + design sprint vervolg op basis van het Design Audit Rapport (27 feb).
+
+> **Gedaan:**
+> - **Security: Auth token logging verwijderd** — `UserContext.tsx` (line 51-54) logde het volledige sessie-object met `access_token` naar browser console. Verwijderd. Ook `supabase/client.ts` (line 87, 98) logde sessie- en user-resultaten met tokens. Verwijderd.
+> - **Security: jspdf geüpdatet** naar v4.2.0 (was 4.1.0)
+> - **Security: Valse meldingen beoordeeld** — `supabase/info.tsx` anon key is PUBLIC by design (Supabase). `pool.query()` warnings zijn vals (we gebruiken raw `pg`, niet Drizzle). Python subprocess calls zijn offline admin scripts (ffmpeg). SSRF patronen zijn interne API calls naar bekende diensten.
+> - **Design Audit: visuele verificatie** van 12+ pagina's in light/dark mode. Bevinding: de CSS custom properties (`hh-bg`, `hh-text`, etc.) maken dat dark mode veel beter werkt dan de "0.1% coverage" statistiek suggereert. Alle admin pagina's (dashboard, users, videos, sessions, analytics) zien er professioneel uit in dark mode.
+> - **Bestanden gewijzigd:** `src/contexts/UserContext.tsx`, `src/utils/supabase/client.ts`, `package.json`
+
+> **OPENSTAANDE VRAAG aan gebruiker:**
+> Het design audit rapport bevat 40+ pagina's. De meeste zien er al professioneel uit. Waar focus je op in de volgende sprint?
+> 1. Landing page & Pricing — prominentere CTAs en betere eerste indruk
+> 2. Admin pagina's — dark mode finetuning en kleine UI polish
+> 3. Mobile views — resterende responsive issues fixen
+> 4. Alles wat ik kan vinden — fix zoveel mogelijk
+> 5. Specifieke lijst van de gebruiker
+
+---
+
 ## 2026-02-28 — AI Chat fix: video catalog voor admin modus
 
 **Vraag:** AI chat werkt niet echt — wanneer Hugo (admin) vraagt om alle video's in volgorde te tonen, geeft de AI placeholders (`[titel]`, `[fase/techniek]`) in plaats van echte videotitels.
