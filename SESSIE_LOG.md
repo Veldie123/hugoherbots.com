@@ -4,6 +4,18 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-02-28 — Mobiele UX verificatie (5 items)
+
+**Vraag:** Vijf mobiele UX-problemen fixen: notificatie dropdown, hamburger menu, view toggles, dark mode analysis results, admin config review card view.
+
+> **Conclusie:**
+> - 4 van 5 items waren al geïmplementeerd in eerdere sessies: notificatie dropdown (`w-[calc(100vw-32px)] sm:w-80`), hamburger menu (`w-6 h-6` + goede touch targets), dark mode analysis results (alle bg-colors hebben `dark:` varianten), admin config review (mobile card view op lines 392+)
+> - **1 fix**: `Analysis.tsx` view toggle wrapper van `flex gap-1 shrink-0` → `hidden md:flex gap-1 shrink-0` — was de enige component waar de toggle wrapper niet verborgen was op mobiel (buttons zelf hadden al `hidden md:flex`, maar de lege wrapper div nam nog ruimte in)
+> - Visueel geverifieerd: dark mode analysis results, admin config review desktop, analysis pagina desktop
+> - Bestanden: `src/components/HH/Analysis.tsx`
+
+---
+
 ## 2026-02-28 — Security fixes + Design Audit Sprint
 
 **Vraag:** Beveiligingsproblemen fixen + design sprint vervolg op basis van het Design Audit Rapport (27 feb).

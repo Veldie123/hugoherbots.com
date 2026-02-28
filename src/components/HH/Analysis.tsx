@@ -390,7 +390,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                 </SelectContent>
               </Select>
               
-              <div className="flex gap-1 shrink-0">
+              <div className="hidden md:flex gap-1 shrink-0">
                 <Button
                   variant="ghost"
                   size="sm"

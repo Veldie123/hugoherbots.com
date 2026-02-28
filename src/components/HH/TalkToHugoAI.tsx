@@ -1635,7 +1635,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           </div>
         )}
 
-        <div className="p-4 flex gap-2 items-end">
+        <div className="p-4 border-t border-hh-border flex gap-2 items-end">
           <Button
             variant="outline"
             size="icon"

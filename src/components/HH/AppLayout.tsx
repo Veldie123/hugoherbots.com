@@ -364,10 +364,10 @@ export function AppLayout({
         </nav>
 
         {isAdmin && (
-          <div className="p-4 border-t border-hh-border flex-shrink-0">
+          <div className="px-4 py-[18px] border-t border-hh-border flex-shrink-0">
             <button
               onClick={() => navigate?.(onboardingMode ? "admin-videos" : "admin-dashboard")}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
+              className="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
             >
               <Eye className="w-4 h-4" />
               {!collapsed && <span>Admin View</span>}
