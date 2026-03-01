@@ -714,7 +714,6 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
       currentPage="coaching" 
       navigate={navigate}
       isAdmin={isAdmin}
-      onOpenFlowDrawer={activeTrainingMode ? () => setFlowDrawerOpen(true) : undefined}
     >
       {/* Split Screen Layout - Responsive */}
       <div className="flex h-full">

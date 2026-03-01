@@ -4,6 +4,19 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-01 — E.P.I.C. Sales Flow pijltje verwijderd
+
+**Vraag:** Verwijder het `<` pijltje naast het hamburgermenu op mobiel dat een oude E.P.I.C. Sales Flow drawer opende
+
+> **Conclusie:**
+> - Pijltje-knop verwijderd uit `AppLayout.tsx` header (verscheen op live/coaching/analysis-results pagina's)
+> - Flow drawer (Sheet + EPICSalesFlow component) verwijderd uit `LiveCoaching.tsx`
+> - "Bekijk EPIC flow" link verwijderd uit recording modal in `LiveCoaching.tsx`
+> - `onOpenFlowDrawer` prop verwijderd uit `AppLayout.tsx`, `LiveCoaching.tsx`, en `DigitalCoaching.tsx`
+> - Ongebruikte imports opgeruimd (Sheet, SheetContent, EPICSalesFlow, ExternalLink, ChevronLeft)
+
+---
+
 ## 2026-03-01 — Admin Onboarding Wizard: T007 Testen & Bug Fixes
 
 **Vraag:** T007 testing/verificatie voor de in-chat onboarding wizard + bug fixes van eerdere taken

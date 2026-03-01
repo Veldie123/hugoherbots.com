@@ -12,8 +12,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../ui/collapsible";
-import { Sheet, SheetContent } from "../ui/sheet";
-import { EPICSalesFlow } from "./EPICSalesFlow";
 import { PageFooter } from "./PageFooter";
 import { CustomDailyCall } from "./CustomDailyCall";
 import { PreJoinCheck } from "./PreJoinCheck";
@@ -37,7 +35,6 @@ import {
   BellOff,
   Play,
   Share2,
-  ExternalLink,
   Star,
   ChevronLeft,
   ChevronRight,
@@ -305,7 +302,6 @@ export function LiveCoaching({
   const [activeTab, setActiveTab] = useState<"chat" | "polls">("chat");
   const [sessionInfoOpen, setSessionInfoOpen] = useState(false);
   const [handRaised, setHandRaised] = useState(false);
-  const [flowDrawerOpen, setFlowDrawerOpen] = useState(false);
   const [recordingModalOpen, setRecordingModalOpen] = useState(false);
   const [selectedRecording, setSelectedRecording] = useState<LiveSession | null>(null);
 
@@ -811,7 +807,6 @@ export function LiveCoaching({
       navigate={navigate}
       isAdmin={isAdmin}
       onboardingMode={onboardingMode}
-      onOpenFlowDrawer={() => setFlowDrawerOpen(true)}
     >
       <div className="p-3 sm:p-4 lg:p-6 space-y-6 sm:space-y-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -1768,18 +1763,6 @@ export function LiveCoaching({
         )}
       </div>
 
-      <Sheet open={flowDrawerOpen} onOpenChange={setFlowDrawerOpen}>
-        <SheetContent
-          side="right"
-          className="w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl p-0"
-        >
-          <EPICSalesFlow
-            currentPhase="fase4"
-            currentStep="objection-handling"
-            onClose={() => setFlowDrawerOpen(false)}
-          />
-        </SheetContent>
-      </Sheet>
 
       <Dialog open={recordingModalOpen} onOpenChange={setRecordingModalOpen}>
         <DialogContent className="sm:max-w-4xl max-h-[85vh] overflow-y-auto">
@@ -1860,15 +1843,6 @@ export function LiveCoaching({
                       <p className="text-[13px] leading-[18px] text-hh-muted mb-2">
                         Deze sessie behandelt technieken uit de {selectedRecording.topic} fase van het EPIC verkoopmodel.
                       </p>
-                      <Button
-                        variant="link"
-                        size="sm"
-                        className="p-0 h-auto text-hh-primary"
-                        onClick={() => setFlowDrawerOpen(true)}
-                      >
-                        Bekijk EPIC flow
-                        <ExternalLink className="w-3 h-3 ml-1" />
-                      </Button>
                     </div>
                   </div>
                 </Card>

@@ -3,7 +3,6 @@ import {
   Search,
   Bell,
   Menu,
-  ChevronLeft,
   ChevronRight,
   FileSearch,
   Shield,
@@ -47,7 +46,6 @@ interface AppLayoutProps {
   children: React.ReactNode;
   currentPage?: string;
   navigate?: (page: string, data?: Record<string, any>) => void;
-  onOpenFlowDrawer?: () => void;
   isAdmin?: boolean;
   onboardingMode?: boolean;
   isPreview?: boolean;
@@ -90,7 +88,6 @@ export function AppLayout({
   children,
   currentPage = "home",
   navigate,
-  onOpenFlowDrawer,
   isAdmin,
   onboardingMode,
   isPreview,
@@ -520,15 +517,6 @@ export function AppLayout({
             >
               <Menu className="w-6 h-6" />
             </button>
-            {(currentPage === "coaching" || currentPage === "live" || currentPage === "analysis-results") && onOpenFlowDrawer && (
-              <button
-                onClick={onOpenFlowDrawer}
-                className="text-hh-muted hover:text-hh-text p-1.5 rounded-lg hover:bg-hh-ui-50 transition-colors border border-hh-border"
-                aria-label="Open Epic Sales Flow"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            )}
           </div>
 
           <div className="hidden lg:flex flex-1 max-w-md">
