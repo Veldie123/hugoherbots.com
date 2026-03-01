@@ -4,6 +4,18 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-01 — Dashboard webinars van statische data naar live Supabase API
+
+**Vraag:** De webinars op het Dashboard komen niet overeen met de Webinars module. De LiveCoaching pagina haalt real-time data op uit Supabase, maar het Dashboard importeerde uit een statisch bestand (`live-sessions-data.ts`) met hardcoded sessies van januari 2026. Maak het Dashboard consistent met de Webinars module.
+
+> **Conclusie:**
+> - **Nieuwe hook `useDashboardWebinars`**: Haalt webinars op via `liveCoachingApi.sessions.list()` — dezelfde Supabase query als de LiveCoaching pagina. Filtert upcoming/live sessies (max 5) en completed sessies met opname (max 5).
+> - **Dashboard.tsx aangepast**: Statische `import { liveSessions }` verwijderd, vervangen door `useDashboardWebinars()` hook. Loading state (spinner) en empty state ("Geen geplande webinars") toegevoegd.
+> - **Backwards compatible**: Het statische bestand `live-sessions-data.ts` is niet meer geïmporteerd in de actieve codebase.
+> - Files gewijzigd: `src/hooks/useDashboardWebinars.ts` (nieuw), `src/components/HH/Dashboard.tsx`
+
+---
+
 ## 2026-03-01 — UI tekst fixes + KPI cards 4x + Video Shorts V2 pipeline
 
 **Vraag:** (1) Waarom zijn er 3 ipv 4 KPI cards bij admin dashboard? Maak 4 KPI cards. (2) SESSIE_LOG.md wordt niet bijgewerkt — protocol violation. (3) Video shorts V2: persist ElevenLabs word-level start_time/end_time in RAG chunks. (4) "Train met Hugo" button → "Platform Tour" overal (landing, sticky header, about, pricing, mobile CTA). (5) "Welkom terug" → "Welkom!" voor anonieme/eerste bezoeker op dashboard. (6) "Talk to Myself" → "Talk to Hugo AI" (admin sessies button + admin agent header). (7) Dashboard video's/webinars mismatch met andere modules. (8) Dashboard laadt oude data.

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { getDailyQuote } from "../../data/hugoQuotes";
 import { getTechniekByNummer } from "../../data/technieken-service";
-import { liveSessions } from "../../data/live-sessions-data";
+import { useDashboardWebinars } from "../../hooks/useDashboardWebinars";
 import { getFaseBadgeColors } from "../../utils/phaseColors";
 import { useDashboardVideos } from "../../hooks/useDashboardVideos";
 import { useDashboardUserData } from "../../hooks/useDashboardUserData";
@@ -300,6 +300,7 @@ const HugoTrainingCard = ({
 export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview = false, onboardingMode }: DashboardProps) {
   const { videos: realVideos, featuredVideo, loading: videosLoading } = useDashboardVideos();
   const { firstName, loginStreak, phaseProgress, totalCompleted, totalVideos } = useDashboardUserData();
+  const { upcomingWebinars, completedWebinars, loading: webinarsLoading } = useDashboardWebinars();
   const displayName = isPreview ? "" : firstName;
 
   const getCompletedVideoIds = (): Set<string> => {
@@ -321,14 +322,6 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
     return completedVideoIds.has(realVideos[idx - 1].id);
   };
 
-  const upcomingWebinars = liveSessions
-    .filter(s => s.status === "upcoming" || s.status === "live" || s.status === "scheduled")
-    .slice(0, 5);
-  
-  const completedWebinars = liveSessions
-    .filter(s => s.status === "completed")
-    .slice(0, 5);
-  
   const continueWatching = realVideos.slice(0, 5).map((v, i) => ({
     ...v,
     progress: i === 0 ? 68 : i === 1 ? 45 : i === 2 ? 12 : 0
@@ -512,23 +505,31 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
           icon={Radio}
           onSeeAll={() => navigate?.("live")}
         >
-          {upcomingWebinars.map((webinar, index) => (
-            <WebinarCard
-              key={webinar.id || index}
-              title={webinar.title}
-              techniqueNumber={webinar.techniqueNumber}
-              date={webinar.date}
-              time={webinar.time}
-              isLive={webinar.status === "live"}
-              isRegistered={index < 2}
-              imageIndex={index}
-              onClick={() => navigate?.("live")}
-            />
-          ))}
+          {webinarsLoading ? (
+            <div className="flex items-center gap-2 py-4 px-2">
+              <Loader2 className="w-4 h-4 animate-spin text-hh-muted" />
+              <span className="text-[13px] text-hh-muted">Webinars laden...</span>
+            </div>
+          ) : upcomingWebinars.length === 0 ? (
+            <p className="text-[13px] text-hh-muted py-4 px-2">Geen geplande webinars</p>
+          ) : (
+            upcomingWebinars.map((webinar, index) => (
+              <WebinarCard
+                key={webinar.id || index}
+                title={webinar.title}
+                techniqueNumber={webinar.techniqueNumber}
+                date={webinar.date}
+                time={webinar.time}
+                isLive={webinar.status === "live"}
+                imageIndex={index}
+                onClick={() => navigate?.("live")}
+              />
+            ))
+          )}
         </ContentRow>
 
         {/* Terugkijken - Completed Webinars */}
-        {completedWebinars.length > 0 && (
+        {!webinarsLoading && completedWebinars.length > 0 && (
           <ContentRow 
             title="Terugkijken" 
             icon={Play}
