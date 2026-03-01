@@ -423,11 +423,16 @@ app.post("/api/v2/sessions", async (req, res) => {
     const nextSlot = isAdminSession ? null : getNextSlotKey(contextState);
     let initialMessage: string;
     
+    let richContent: any[] | undefined;
+    let onboardingStatus: any | undefined;
+
     if (isAdminSession) {
       session.mode = "COACH_CHAT";
       session.contextState.isComplete = true;
       const openingResult = await generateCoachOpening(coachContext);
       initialMessage = openingResult.message;
+      richContent = openingResult.richContent;
+      onboardingStatus = openingResult.onboardingStatus;
     } else if (nextSlot) {
       const questionResult = await generateQuestionForSlot(
         nextSlot,
@@ -460,6 +465,8 @@ app.post("/api/v2/sessions", async (req, res) => {
       sessionId,
       phase: session.mode,
       initialMessage,
+      richContent,
+      onboardingStatus,
       debug: isExpert ? {
         engine: "V2-FULL",
         technique: techniqueName,
@@ -4146,6 +4153,282 @@ app.delete("/api/v2/admin/notifications/:id", async (req: Request, res: Response
     res.json({ deleted: true, id: parseInt(id as string) });
   } catch (err: any) {
     console.error('[Admin] Notification delete error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ===========================================
+// ADMIN ONBOARDING WIZARD
+// ===========================================
+
+async function ensureOnboardingPopulated(adminUserId: string): Promise<void> {
+  const { rows } = await pool.query(
+    'SELECT COUNT(*) as count FROM admin_onboarding_progress WHERE admin_user_id = $1',
+    [adminUserId]
+  );
+  if (parseInt(rows[0].count) > 0) return;
+
+  const techPath = path.join(process.cwd(), 'config/ssot/technieken_index.json');
+  const techData = JSON.parse(fs.readFileSync(techPath, 'utf-8'));
+  const houdPath = path.join(process.cwd(), 'config/klant_houdingen.json');
+  const houdData = JSON.parse(fs.readFileSync(houdPath, 'utf-8'));
+
+  const values: string[] = [];
+  const params: any[] = [];
+  let idx = 1;
+
+  for (const [key, tech] of Object.entries(techData.technieken || {})) {
+    const t = tech as any;
+    values.push(`($${idx++}, $${idx++}, $${idx++}, $${idx++})`);
+    params.push(adminUserId, 'technieken', key, t.naam || key);
+  }
+
+  for (const [key, houd] of Object.entries(houdData.houdingen || {})) {
+    const h = houd as any;
+    values.push(`($${idx++}, $${idx++}, $${idx++}, $${idx++})`);
+    params.push(adminUserId, 'houdingen', h.id || key, h.naam || key);
+  }
+
+  if (values.length > 0) {
+    await pool.query(
+      `INSERT INTO admin_onboarding_progress (admin_user_id, module, item_key, item_name) VALUES ${values.join(', ')}`,
+      params
+    );
+    console.log(`[Onboarding] Populated ${values.length} items for admin ${adminUserId}`);
+  }
+}
+
+app.get("/api/v2/admin/onboarding/status", async (req: Request, res: Response) => {
+  try {
+    const adminUserId = (req.query.userId as string) || 'hugo';
+    await ensureOnboardingPopulated(adminUserId);
+
+    const { rows } = await pool.query(
+      `SELECT module, status, item_key, item_name FROM admin_onboarding_progress WHERE admin_user_id = $1 ORDER BY id ASC`,
+      [adminUserId]
+    );
+
+    const technieken = rows.filter(r => r.module === 'technieken');
+    const houdingen = rows.filter(r => r.module === 'houdingen');
+
+    const techReviewed = technieken.filter(r => r.status !== 'pending').length;
+    const houdReviewed = houdingen.filter(r => r.status !== 'pending').length;
+
+    const allReviewed = techReviewed + houdReviewed;
+    const allTotal = technieken.length + houdingen.length;
+    const isComplete = allReviewed >= allTotal;
+
+    let nextItem: { module: string; key: string; name: string } | null = null;
+    const pendingTech = technieken.find(r => r.status === 'pending');
+    if (pendingTech) {
+      nextItem = { module: 'technieken', key: pendingTech.item_key, name: pendingTech.item_name };
+    } else {
+      const pendingHoud = houdingen.find(r => r.status === 'pending');
+      if (pendingHoud) {
+        nextItem = { module: 'houdingen', key: pendingHoud.item_key, name: pendingHoud.item_name };
+      }
+    }
+
+    res.json({
+      technieken: { total: technieken.length, reviewed: techReviewed, pending: technieken.length - techReviewed },
+      houdingen: { total: houdingen.length, reviewed: houdReviewed, pending: houdingen.length - houdReviewed },
+      isComplete,
+      nextItem,
+      totalReviewed: allReviewed,
+      totalItems: allTotal
+    });
+  } catch (err: any) {
+    console.error('[Onboarding] Status error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/v2/admin/onboarding/approve", async (req: Request, res: Response) => {
+  try {
+    const { itemKey, module, userId } = req.body;
+    const adminUserId = userId || 'hugo';
+
+    if (!itemKey || !module) {
+      return res.status(400).json({ error: 'itemKey and module are required' });
+    }
+
+    const result = await pool.query(
+      `UPDATE admin_onboarding_progress SET status = 'approved', reviewed_at = NOW() WHERE admin_user_id = $1 AND module = $2 AND item_key = $3 RETURNING *`,
+      [adminUserId, module, itemKey]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    res.json({ success: true, item: result.rows[0] });
+  } catch (err: any) {
+    console.error('[Onboarding] Approve error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/v2/admin/onboarding/skip", async (req: Request, res: Response) => {
+  try {
+    const { itemKey, module, userId } = req.body;
+    const adminUserId = userId || 'hugo';
+
+    if (!itemKey || !module) {
+      return res.status(400).json({ error: 'itemKey and module are required' });
+    }
+
+    const result = await pool.query(
+      `UPDATE admin_onboarding_progress SET status = 'skipped', reviewed_at = NOW() WHERE admin_user_id = $1 AND module = $2 AND item_key = $3 RETURNING *`,
+      [adminUserId, module, itemKey]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    res.json({ success: true, item: result.rows[0] });
+  } catch (err: any) {
+    console.error('[Onboarding] Skip error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/v2/admin/onboarding/feedback", async (req: Request, res: Response) => {
+  try {
+    const { itemKey, module, feedbackText, userId } = req.body;
+    const adminUserId = userId || 'hugo';
+
+    if (!itemKey || !module || !feedbackText) {
+      return res.status(400).json({ error: 'itemKey, module, and feedbackText are required' });
+    }
+
+    let originalData: any = {};
+    let targetFile = '';
+    let targetKey = itemKey;
+    if (module === 'technieken') {
+      const techPath = path.join(process.cwd(), 'config/ssot/technieken_index.json');
+      const techData = JSON.parse(fs.readFileSync(techPath, 'utf-8'));
+      originalData = techData.technieken?.[itemKey] || {};
+      targetFile = 'config/ssot/technieken_index.json';
+    } else {
+      const houdPath = path.join(process.cwd(), 'config/klant_houdingen.json');
+      const houdData = JSON.parse(fs.readFileSync(houdPath, 'utf-8'));
+      const entry = Object.entries(houdData.houdingen || {}).find(([_, h]: [string, any]) => h.id === itemKey || _ === itemKey);
+      if (entry) {
+        originalData = entry[1];
+        targetKey = entry[0];
+      }
+      targetFile = 'config/klant_houdingen.json';
+    }
+
+    let aiInterpretation = '';
+    let proposedJson: any = null;
+    try {
+      const { getOpenAI } = await import('./openai-client');
+      const openai = getOpenAI();
+      const aiResponse = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `Je bent een assistent die feedback van Hugo (sales trainer) interpreteert en vertaalt naar concrete JSON wijzigingen. Geef een JSON object terug met alleen de velden die gewijzigd moeten worden. Antwoord ALLEEN met valid JSON, geen uitleg.`
+          },
+          {
+            role: 'user',
+            content: `Huidige data voor ${module === 'technieken' ? 'techniek' : 'klanthouding'} "${originalData.naam || itemKey}":\n${JSON.stringify(originalData, null, 2)}\n\nHugo's feedback: "${feedbackText}"\n\nWelke velden moeten aangepast worden? Geef alleen de gewijzigde velden als JSON.`
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 1000
+      });
+      const rawContent = aiResponse.choices[0]?.message?.content || '{}';
+      aiInterpretation = rawContent;
+      try {
+        const cleaned = rawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        proposedJson = JSON.parse(cleaned);
+      } catch {
+        proposedJson = { raw_feedback: feedbackText };
+      }
+    } catch (aiErr: any) {
+      console.error('[Onboarding] AI interpretation failed:', aiErr.message);
+      proposedJson = { raw_feedback: feedbackText };
+      aiInterpretation = 'AI interpretation unavailable';
+    }
+
+    const corrType = module === 'technieken' ? 'technique_edit' : 'attitude_edit';
+    const corrResult = await pool.query(
+      `INSERT INTO admin_corrections (type, field, original_value, new_value, context, submitted_by, source, target_file, target_key, original_json, new_json, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+       RETURNING *`,
+      [
+        corrType,
+        originalData.naam || itemKey,
+        JSON.stringify(originalData),
+        JSON.stringify(proposedJson),
+        feedbackText,
+        adminUserId,
+        'onboarding_review',
+        targetFile,
+        targetKey,
+        JSON.stringify(originalData),
+        JSON.stringify(proposedJson),
+        'pending'
+      ]
+    );
+    const correction = corrResult.rows[0];
+
+    await pool.query(
+      `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        'onboarding_feedback',
+        `Onboarding feedback: ${originalData.naam || itemKey}`,
+        `Hugo gaf feedback op ${module === 'technieken' ? 'techniek' : 'klanthouding'} "${originalData.naam || itemKey}": "${feedbackText}"`,
+        'content',
+        'warning',
+        correction.id,
+        'admin-config-review'
+      ]
+    );
+
+    await pool.query(
+      `UPDATE admin_onboarding_progress SET status = 'feedback_given', feedback_text = $1, correction_id = $2, reviewed_at = NOW() WHERE admin_user_id = $3 AND module = $4 AND item_key = $5`,
+      [feedbackText, correction.id, adminUserId, module, itemKey]
+    );
+
+    res.json({
+      success: true,
+      interpretation: aiInterpretation,
+      correctionId: correction.id,
+      proposedChanges: proposedJson
+    });
+  } catch (err: any) {
+    console.error('[Onboarding] Feedback error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/v2/admin/onboarding/item/:module/:key", async (req: Request, res: Response) => {
+  try {
+    const { module, key } = req.params;
+
+    if (module === 'technieken') {
+      const techPath = path.join(process.cwd(), 'config/ssot/technieken_index.json');
+      const techData = JSON.parse(fs.readFileSync(techPath, 'utf-8'));
+      const item = techData.technieken?.[key as string];
+      if (!item) return res.status(404).json({ error: 'Technique not found' });
+      res.json({ module: 'technieken', key, data: item });
+    } else if (module === 'houdingen') {
+      const houdPath = path.join(process.cwd(), 'config/klant_houdingen.json');
+      const houdData = JSON.parse(fs.readFileSync(houdPath, 'utf-8'));
+      const entry = Object.entries(houdData.houdingen || {}).find(([_, h]: [string, any]) => h.id === key || _ === key);
+      if (!entry) return res.status(404).json({ error: 'Attitude not found' });
+      res.json({ module: 'houdingen', key: entry[0], data: entry[1] });
+    } else {
+      res.status(400).json({ error: 'Invalid module. Use "technieken" or "houdingen"' });
+    }
+  } catch (err: any) {
+    console.error('[Onboarding] Item fetch error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });

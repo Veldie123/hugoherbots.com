@@ -38,7 +38,7 @@ function getVideoMappingFallback(techniqueId: string): RichContentItem | null {
 }
 
 export interface RichContentItem {
-  type: 'card' | 'video' | 'slide' | 'webinar' | 'action' | 'roleplay' | 'epic_slide';
+  type: 'card' | 'video' | 'slide' | 'webinar' | 'action' | 'roleplay' | 'epic_slide' | 'onboarding_review';
   data: Record<string, unknown>;
 }
 
@@ -115,6 +115,38 @@ function buildRoleplayItem(techniqueId: string, techniqueName?: string): RichCon
       description: 'Oefen deze techniek in een realistische verkoopsituatie',
       techniqueId,
       action: 'start_roleplay',
+    },
+  };
+}
+
+export function buildOnboardingReviewCard(item: any, module: 'technieken' | 'houdingen'): RichContentItem {
+  if (module === 'technieken') {
+    return {
+      type: 'onboarding_review',
+      data: {
+        module,
+        nummer: item.nummer,
+        naam: item.naam,
+        fase: item.fase,
+        doel: item.doel,
+        hoe: item.hoe,
+        stappenplan: item.stappenplan || [],
+        voorbeeld: item.voorbeeld || [],
+        tags: item.tags || [],
+      },
+    };
+  }
+  return {
+    type: 'onboarding_review',
+    data: {
+      module,
+      id: item.id,
+      naam: item.naam,
+      houding_beschrijving: item.houding_beschrijving,
+      semantic_markers: item.semantic_markers || [],
+      recommended_technique_ids: item.recommended_technique_ids || [],
+      fallback_response: item.fallback_response,
+      generation_examples: item.generation_examples || [],
     },
   };
 }

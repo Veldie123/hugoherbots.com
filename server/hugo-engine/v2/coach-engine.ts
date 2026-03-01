@@ -43,6 +43,7 @@ import { mergeUserAndSessionContext, getRequiredSlotsForTechnique } from './cont
 import { getVideoLibraryStats, buildVideoStatsPrompt } from './content-assets';
 import { storage } from '../storage';
 import { buildCoachingPrompt, buildFeedbackPrompt, getHugoIdentity, getHugoRole } from '../hugo-persona-loader';
+import { pool } from '../db';
 import { getHistoricalContext, type HistoricalContext } from './historical-context-service';
 import type { CustomerSignal, Persona, EpicPhase } from "./customer_engine";
 import type { CustomerDynamics } from "../houding-selector";
@@ -93,6 +94,163 @@ function loadCoachPromptConfig(): CoachPromptConfig {
   coachPromptConfig = config as CoachPromptConfig;
   console.log("[COACH] Loaded coach_prompt.json config (simplified v8.1)");
   return coachPromptConfig;
+}
+
+interface OnboardingPromptConfig {
+  _meta?: { version: string; purpose: string; last_updated: string };
+  welcome_first_time: string;
+  welcome_returning_incomplete: string;
+  technique_review_intro: string;
+  technique_fields_to_show: string[];
+  attitude_review_intro: string;
+  attitude_fields_to_show: string[];
+  feedback_acknowledge: string;
+  approve_acknowledge: string;
+  module_complete_technieken: string;
+  module_complete_houdingen: string;
+  all_complete: string;
+  skip_message: string;
+  onboarding_system_instruction: string;
+}
+
+let onboardingPromptConfig: OnboardingPromptConfig | null = null;
+
+function loadOnboardingPromptConfig(): OnboardingPromptConfig | null {
+  if (onboardingPromptConfig) return onboardingPromptConfig;
+  const configPath = path.join(process.cwd(), "config", "prompts", "admin_onboarding_prompt.json");
+  if (!fs.existsSync(configPath)) {
+    console.warn(`[COACH] Onboarding config not found: ${configPath}`);
+    return null;
+  }
+  onboardingPromptConfig = JSON.parse(fs.readFileSync(configPath, "utf-8")) as OnboardingPromptConfig;
+  console.log("[COACH] Loaded admin_onboarding_prompt.json config");
+  return onboardingPromptConfig;
+}
+
+interface OnboardingStatus {
+  technieken: { total: number; reviewed: number; pending: number };
+  houdingen: { total: number; reviewed: number; pending: number };
+  isComplete: boolean;
+  nextItem: { module: string; key: string; name: string } | null;
+  totalReviewed: number;
+  totalItems: number;
+}
+
+async function ensureOnboardingPopulatedInternal(adminUserId: string, techData: any, houdData: any): Promise<void> {
+  const { rows } = await pool.query(
+    'SELECT COUNT(*) as count FROM admin_onboarding_progress WHERE admin_user_id = $1',
+    [adminUserId]
+  );
+  if (parseInt(rows[0].count) > 0) return;
+
+  const values: string[] = [];
+  const params: any[] = [];
+  let idx = 1;
+
+  for (const [key, tech] of Object.entries(techData.technieken || {})) {
+    const t = tech as any;
+    values.push(`($${idx++}, $${idx++}, $${idx++}, $${idx++})`);
+    params.push(adminUserId, 'technieken', key, t.naam || key);
+  }
+
+  for (const [key, houd] of Object.entries(houdData.houdingen || {})) {
+    const h = houd as any;
+    values.push(`($${idx++}, $${idx++}, $${idx++}, $${idx++})`);
+    params.push(adminUserId, 'houdingen', h.id || key, h.naam || key);
+  }
+
+  if (values.length > 0) {
+    await pool.query(
+      `INSERT INTO admin_onboarding_progress (admin_user_id, module, item_key, item_name) VALUES ${values.join(', ')}`,
+      params
+    );
+    console.log(`[COACH] Auto-populated ${values.length} onboarding items for ${adminUserId}`);
+  }
+}
+
+async function getOnboardingStatusFromDB(adminUserId: string = 'hugo'): Promise<OnboardingStatus> {
+  const techPath = path.join(process.cwd(), 'config/ssot/technieken_index.json');
+  const houdPath = path.join(process.cwd(), 'config/klant_houdingen.json');
+  const techData = JSON.parse(fs.readFileSync(techPath, 'utf-8'));
+  const houdData = JSON.parse(fs.readFileSync(houdPath, 'utf-8'));
+
+  const techCount = Object.keys(techData.technieken || {}).length;
+  const houdCount = Object.keys(houdData.houdingen || {}).length;
+
+  try {
+    const tableCheck = await pool.query(
+      `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'admin_onboarding_progress') as exists`
+    );
+    if (!tableCheck.rows[0].exists) {
+      return {
+        technieken: { total: techCount, reviewed: 0, pending: techCount },
+        houdingen: { total: houdCount, reviewed: 0, pending: houdCount },
+        isComplete: false,
+        nextItem: null,
+        totalReviewed: 0,
+        totalItems: techCount + houdCount
+      };
+    }
+
+    await ensureOnboardingPopulatedInternal(adminUserId, techData, houdData);
+
+    const { rows } = await pool.query(
+      `SELECT module, status, item_key, item_name FROM admin_onboarding_progress WHERE admin_user_id = $1 ORDER BY id ASC`,
+      [adminUserId]
+    );
+
+    const technieken = rows.filter(r => r.module === 'technieken');
+    const houdingen = rows.filter(r => r.module === 'houdingen');
+    const techReviewed = technieken.filter(r => r.status !== 'pending').length;
+    const houdReviewed = houdingen.filter(r => r.status !== 'pending').length;
+    const totalReviewed = techReviewed + houdReviewed;
+    const totalItems = technieken.length + houdingen.length;
+
+    let nextItem: { module: string; key: string; name: string } | null = null;
+    const pendingTech = technieken.find(r => r.status === 'pending');
+    if (pendingTech) {
+      nextItem = { module: 'technieken', key: pendingTech.item_key, name: pendingTech.item_name };
+    } else {
+      const pendingHoud = houdingen.find(r => r.status === 'pending');
+      if (pendingHoud) {
+        nextItem = { module: 'houdingen', key: pendingHoud.item_key, name: pendingHoud.item_name };
+      }
+    }
+
+    return {
+      technieken: { total: technieken.length, reviewed: techReviewed, pending: technieken.length - techReviewed },
+      houdingen: { total: houdingen.length, reviewed: houdReviewed, pending: houdingen.length - houdReviewed },
+      isComplete: totalReviewed >= totalItems,
+      nextItem,
+      totalReviewed,
+      totalItems
+    };
+  } catch (err: any) {
+    console.error('[COACH] Onboarding DB check failed:', err.message);
+    return {
+      technieken: { total: techCount, reviewed: 0, pending: techCount },
+      houdingen: { total: houdCount, reviewed: 0, pending: houdCount },
+      isComplete: false,
+      nextItem: null,
+      totalReviewed: 0,
+      totalItems: techCount + houdCount
+    };
+  }
+}
+
+function getOnboardingItemData(module: string, key: string): any {
+  if (module === 'technieken') {
+    const techPath = path.join(process.cwd(), 'config/ssot/technieken_index.json');
+    const techData = JSON.parse(fs.readFileSync(techPath, 'utf-8'));
+    return techData.technieken?.[key] || null;
+  } else {
+    const houdPath = path.join(process.cwd(), 'config/klant_houdingen.json');
+    const houdData = JSON.parse(fs.readFileSync(houdPath, 'utf-8'));
+    const entry = Object.entries(houdData.houdingen || {}).find(
+      ([k, h]: [string, any]) => h.id === key || k === key
+    );
+    return entry ? entry[1] : null;
+  }
 }
 
 // Simple fallback messages for technical errors (not coaching, just error states)
@@ -211,7 +369,8 @@ function buildNestedOpeningPrompt(
   userName?: string,
   techniqueId?: string,
   videoStatsPromptStr?: string,
-  viewMode?: 'admin' | 'user'
+  viewMode?: 'admin' | 'user',
+  onboardingActive?: boolean
 ): string {
   let prompt = "";
   
@@ -327,6 +486,15 @@ REGELS IN ADMIN MODUS:
 - Wees direct, efficiënt en to-the-point. Geen coaching-vragen, geen Socratische methode richting Hugo.
 
 Dit is een echt gesprek met de baas. Praat zoals je zou praten tegen je schepper.\n\n`;
+
+    if (onboardingActive) {
+      const obConfig = loadOnboardingPromptConfig();
+      if (obConfig) {
+        prompt += `── ONBOARDING MODUS ACTIEF ──\n`;
+        prompt += obConfig.onboarding_system_instruction + "\n\n";
+      }
+    }
+
     prompt += buildFullVideoCatalog() + "\n\n";
   } else {
     prompt += `Je zit met ${displayName} aan tafel. Dit is een echt gesprek, een dialoog. Praat zoals je zou praten, niet zoals je zou schrijven.
@@ -542,6 +710,8 @@ export interface CoachResponse {
     userPrompt: string;
   };
   validatorInfo?: ValidatorDebugInfo;
+  richContent?: Array<{ type: string; data: Record<string, unknown> }>;
+  onboardingStatus?: OnboardingStatus;
 }
 
 // ============================================================================
@@ -914,6 +1084,28 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
   const videoStats = await getVideoLibraryStats();
   const videoStatsStr = buildVideoStatsPrompt(videoStats);
 
+  let onboardingActive = false;
+  let onboardingStatus: OnboardingStatus | null = null;
+  let onboardingItemData: any = null;
+  const obConfig = loadOnboardingPromptConfig();
+
+  if (context.viewMode === 'admin') {
+    try {
+      onboardingStatus = await getOnboardingStatusFromDB(context.userId || 'hugo');
+      if (!onboardingStatus.isComplete) {
+        onboardingActive = true;
+        if (onboardingStatus.nextItem) {
+          onboardingItemData = getOnboardingItemData(
+            onboardingStatus.nextItem.module,
+            onboardingStatus.nextItem.key
+          );
+        }
+      }
+    } catch (err: any) {
+      console.error('[COACH] Onboarding check failed:', err.message);
+    }
+  }
+
   const systemPrompt = buildNestedOpeningPrompt(
     coacheeContextStr, 
     fullTechniqueNarrative, 
@@ -923,14 +1115,50 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
     context.userName,
     context.techniqueId,
     videoStatsStr,
-    context.viewMode
+    context.viewMode,
+    onboardingActive
   );
   
   let openingPrompt = "";
   if (context.viewMode === 'admin') {
-    openingPrompt = "Begroet Hugo Herbots kort en professioneel. Geef een beknopt overzicht van het platform en vraag waarmee je kunt helpen. Geen coaching-vragen, geen vragen over ervaring of achtergrond.";
-    if (techniqueName) {
-      openingPrompt += ` De huidige focus is de techniek '${techniqueName}'.`;
+    if (onboardingActive && obConfig && onboardingStatus) {
+      const totalReviewed = onboardingStatus.totalReviewed || 0;
+      const totalItems = onboardingStatus.totalItems || 0;
+
+      if (totalReviewed === 0) {
+        openingPrompt = obConfig.welcome_first_time
+          .replace('{technieken_count}', String(onboardingStatus.technieken.total))
+          .replace('{houdingen_count}', String(onboardingStatus.houdingen.total));
+      } else {
+        openingPrompt = obConfig.welcome_returning_incomplete
+          .replace('{reviewed_count}', String(totalReviewed))
+          .replace('{total_count}', String(totalItems))
+          .replace('{next_item_name}', onboardingStatus.nextItem?.name || 'het volgende item');
+      }
+
+      if (onboardingStatus.nextItem && onboardingItemData) {
+        const ni = onboardingStatus.nextItem;
+        if (ni.module === 'technieken') {
+          openingPrompt += "\n\n" + obConfig.technique_review_intro
+            .replace('{nummer}', onboardingItemData.nummer || ni.key)
+            .replace('{naam}', onboardingItemData.naam || ni.name)
+            .replace('{fase}', onboardingItemData.fase || '');
+          openingPrompt += "\n\nPresenteer deze techniek aan Hugo met de volgende velden: " + obConfig.technique_fields_to_show.join(', ') + ".";
+          openingPrompt += "\nGebruik de data hieronder:\n" + JSON.stringify(onboardingItemData, null, 2);
+        } else {
+          openingPrompt += "\n\n" + obConfig.attitude_review_intro
+            .replace('{id}', onboardingItemData.id || ni.key)
+            .replace('{naam}', onboardingItemData.naam || ni.name);
+          openingPrompt += "\n\nPresenteer deze klanthouding aan Hugo met de volgende velden: " + obConfig.attitude_fields_to_show.join(', ') + ".";
+          openingPrompt += "\nGebruik de data hieronder:\n" + JSON.stringify(onboardingItemData, null, 2);
+        }
+        openingPrompt += "\n\nVraag Hugo om deze te beoordelen: goedkeuren (👍) of feedback geven (👎).";
+      }
+    } else {
+      openingPrompt = "Begroet Hugo Herbots kort en professioneel. Geef een beknopt overzicht van het platform en vraag waarmee je kunt helpen. Geen coaching-vragen, geen vragen over ervaring of achtergrond.";
+      if (techniqueName) {
+        openingPrompt += ` De huidige focus is de techniek '${techniqueName}'.`;
+      }
     }
   } else {
     openingPrompt = "Begin een coachend gesprek met de coachee";
@@ -1005,7 +1233,7 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
     
     const validatorInfo = buildValidatorDebugInfo("COACH_CHAT", repairResult);
 
-    return {
+    const result: CoachResponse = {
       message: repairResult.repairedResponse,
       ragContext: ragResult.documents,
       promptsUsed: {
@@ -1014,6 +1242,22 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
       },
       validatorInfo
     };
+
+    if (onboardingActive && onboardingItemData && onboardingStatus?.nextItem) {
+      try {
+        const { buildOnboardingReviewCard } = await import('./rich-response-builder');
+        const reviewCard = buildOnboardingReviewCard(
+          onboardingItemData,
+          onboardingStatus.nextItem.module as 'technieken' | 'houdingen'
+        );
+        result.richContent = [reviewCard];
+      } catch (err: any) {
+        console.error('[COACH] Failed to build onboarding review card:', err.message);
+      }
+      result.onboardingStatus = onboardingStatus;
+    }
+
+    return result;
   } catch (error) {
     console.error("[COACH] Error generating opening:", error);
     return {

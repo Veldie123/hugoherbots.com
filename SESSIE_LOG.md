@@ -4,6 +4,21 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-01 — Admin Onboarding Wizard: T007 Testen & Bug Fixes
+
+**Vraag:** T007 testing/verificatie voor de in-chat onboarding wizard + bug fixes van eerdere taken
+
+> **Conclusie:**
+> - **Bug fix: Onboarding DB population** — `getOnboardingStatusFromDB` in `coach-engine.ts` populeerde de tabel niet automatisch → `nextItem: null` bij eerste gebruik. Opgelost met `ensureOnboardingPopulatedInternal()` die de items aanmaakt als ze ontbreken.
+> - **Bug fix: DB unique constraint** — Toegevoegd: `UNIQUE(admin_user_id, module, item_key)` + index op `admin_onboarding_progress` om dubbele entries te voorkomen bij race conditions.
+> - **Nieuw: Skip endpoint** — `POST /api/v2/admin/onboarding/skip` met apart "skipped" status i.p.v. "approved" te hergebruiken. Frontend `handleOnboardingSkip` aangepast.
+> - **Fix: API response** — `totalReviewed` en `totalItems` toegevoegd aan status endpoint response.
+> - **Refactor handlers** — Approve/feedback/skip handlers herschreven met `fetchNextOnboardingCard()` helper die direct de volgende techniek-kaart ophaalt en toont, zonder AI engine call nodig.
+> - **E2E tests geslaagd** — 3x runTest: (1) initieel laden + card zichtbaar, (2) goedkeuren + volgende techniek, (3) finale comprehensive test — allemaal passed.
+> - Bestanden: `server/hugo-engine/v2/coach-engine.ts`, `server/hugo-engine/db.ts`, `server/hugo-engine/api.ts`, `src/components/HH/TalkToHugoAI.tsx`
+
+---
+
 ## 2026-03-01 — Admin Sessions KPI cards uniform maken (mobiel)
 
 **Vraag:** KPI cards bij Talk to Hugo AI (admin) zijn anders vormgegeven dan bij andere modules. Op mobiel compact inline pills i.p.v. standaard card grid.

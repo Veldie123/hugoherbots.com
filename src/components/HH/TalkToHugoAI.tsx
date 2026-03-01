@@ -185,6 +185,15 @@ export function TalkToHugoAI({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [onboardingStatus, setOnboardingStatus] = useState<{
+    technieken: { total: number; reviewed: number; pending: number };
+    houdingen: { total: number; reviewed: number; pending: number };
+    isComplete: boolean;
+    nextItem: { module: string; key: string; name: string } | null;
+  } | null>(null);
+  const [onboardingFeedbackInput, setOnboardingFeedbackInput] = useState<string | null>(null);
+  const [onboardingCurrentItem, setOnboardingCurrentItem] = useState<{ module: string; key: string; name: string } | null>(null);
+
   // HeyGen Streaming Avatar state
   const [heygenToken, setHeygenToken] = useState<string | null>(null);
   const [avatarSession, setAvatarSession] = useState<StreamingAvatar | null>(null);
@@ -343,6 +352,51 @@ export function TalkToHugoAI({
     }
 
     const loadPersonalizedWelcome = async () => {
+      if (isAdmin) {
+        try {
+          setIsLoading(true);
+          const session = await hugoApi.startSession({
+            techniqueId: 'general',
+            mode: 'COACH_CHAT',
+            isExpert: false,
+            modality: 'chat',
+            viewMode: 'admin',
+          });
+          setHasActiveSession(true);
+
+          const welcomeMsg: Message = {
+            id: `admin-welcome-${Date.now()}`,
+            sender: "ai",
+            text: session.message || session.initialMessage || "",
+            timestamp: new Date(),
+          };
+
+          if (session.richContent && session.richContent.length > 0) {
+            welcomeMsg.richContent = session.richContent;
+          }
+          if (session.onboardingStatus) {
+            setOnboardingStatus(session.onboardingStatus);
+            if (session.onboardingStatus.nextItem) {
+              setOnboardingCurrentItem(session.onboardingStatus.nextItem);
+            }
+          }
+
+          setMessages([welcomeMsg]);
+          console.log("[Hugo] Admin session started, onboarding:", session.onboardingStatus?.isComplete ? 'complete' : 'active');
+        } catch (e) {
+          console.warn("[Hugo] Failed to start admin session:", e);
+          setMessages([{
+            id: `welcome-${Date.now()}`,
+            sender: "ai",
+            text: "Dag Hugo! Welkom op je platform. Waarmee kan ik je helpen?",
+            timestamp: new Date(),
+          }]);
+        } finally {
+          setIsLoading(false);
+        }
+        return;
+      }
+
       try {
         const endpoint = `/api/v2/user/welcome${user?.id ? `?userId=${user.id}` : ''}`;
         const res = await fetch(endpoint);
@@ -369,7 +423,7 @@ export function TalkToHugoAI({
       }]);
     };
     loadPersonalizedWelcome();
-  }, [user?.id, navigationData]);
+  }, [user?.id, navigationData, isAdmin]);
 
   useEffect(() => {
     if (selectedTechnique || audioConnectionState === ConnectionState.Connected) {
@@ -1341,7 +1395,185 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     } catch {}
   };
 
+  const refreshOnboardingStatus = async () => {
+    try {
+      const res = await fetch(`/api/v2/admin/onboarding/status?userId=${user?.id || 'hugo'}`);
+      if (res.ok) {
+        const status = await res.json();
+        setOnboardingStatus(status);
+        if (status.nextItem) {
+          setOnboardingCurrentItem(status.nextItem);
+        }
+      }
+    } catch {}
+  };
+
+  const fetchNextOnboardingCard = async (): Promise<{ module: string; key: string; name: string; data: any } | null> => {
+    try {
+      const statusRes = await fetch(`/api/v2/admin/onboarding/status?userId=${user?.id || 'hugo'}`);
+      if (!statusRes.ok) return null;
+      const status = await statusRes.json();
+      setOnboardingStatus(status);
+      if (status.isComplete || !status.nextItem) {
+        setOnboardingCurrentItem(null);
+        return null;
+      }
+      setOnboardingCurrentItem(status.nextItem);
+      const itemRes = await fetch(`/api/v2/admin/onboarding/item/${status.nextItem.module}/${status.nextItem.key}`);
+      if (!itemRes.ok) return null;
+      const itemJson = await itemRes.json();
+      return { ...status.nextItem, data: itemJson.data || itemJson };
+    } catch { return null; }
+  };
+
+  const handleOnboardingApprove = async () => {
+    if (!onboardingCurrentItem) return;
+    try {
+      await fetch('/api/v2/admin/onboarding/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemKey: onboardingCurrentItem.key,
+          module: onboardingCurrentItem.module,
+          userId: user?.id || 'hugo',
+        }),
+      });
+      setOnboardingFeedbackInput(null);
+      setIsLoading(true);
+
+      const next = await fetchNextOnboardingCard();
+      if (next) {
+        const introText = next.module === 'technieken'
+          ? `Top! **${onboardingCurrentItem.name}** is goedgekeurd. Op naar de volgende!\n\nHier is techniek ${next.data.nummer || next.key}: **${next.data.naam || next.name}**`
+          : `Top! **${onboardingCurrentItem.name}** is goedgekeurd. Op naar de volgende!\n\nHier is klanthouding ${next.data.id || next.key}: **${next.data.naam || next.name}**`;
+        const aiMsg: Message = {
+          id: `onb-approve-${Date.now()}`,
+          sender: "ai",
+          text: introText,
+          timestamp: new Date(),
+          richContent: [{ type: 'onboarding_review', data: { ...next.data, module: next.module } }],
+        };
+        setMessages(prev => [...prev, aiMsg]);
+      } else {
+        setMessages(prev => [...prev, {
+          id: `onb-complete-${Date.now()}`,
+          sender: "ai",
+          text: "Hugo, we zijn klaar! Alle technieken en houdingen zijn gereviewd. Het platform is klaar om live te gaan. Je kunt nu gewoon met me chatten over alles wat je wilt.",
+          timestamp: new Date(),
+        }]);
+      }
+      setIsLoading(false);
+    } catch (err) {
+      console.error("[Onboarding] Approve failed:", err);
+      setIsLoading(false);
+    }
+  };
+
+  const handleOnboardingFeedback = async (feedbackText: string) => {
+    if (!onboardingCurrentItem || !feedbackText.trim()) return;
+    const currentName = onboardingCurrentItem.name;
+    try {
+      await fetch('/api/v2/admin/onboarding/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemKey: onboardingCurrentItem.key,
+          module: onboardingCurrentItem.module,
+          feedbackText: feedbackText.trim(),
+          userId: user?.id || 'hugo',
+        }),
+      });
+      setOnboardingFeedbackInput(null);
+      setIsLoading(true);
+
+      const next = await fetchNextOnboardingCard();
+      const confirmMsg: Message = {
+        id: `onb-fb-confirm-${Date.now()}`,
+        sender: "ai",
+        text: `Bedankt Hugo! Ik heb je feedback over **${currentName}** genoteerd. Dit wordt bekeken en verwerkt.`,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, confirmMsg]);
+
+      if (next) {
+        const introText = next.module === 'technieken'
+          ? `Op naar de volgende! Hier is techniek ${next.data.nummer || next.key}: **${next.data.naam || next.name}**`
+          : `Op naar de volgende! Hier is klanthouding ${next.data.id || next.key}: **${next.data.naam || next.name}**`;
+        setMessages(prev => [...prev, {
+          id: `onb-next-${Date.now()}`,
+          sender: "ai",
+          text: introText,
+          timestamp: new Date(),
+          richContent: [{ type: 'onboarding_review', data: { ...next.data, module: next.module } }],
+        }]);
+      } else {
+        setMessages(prev => [...prev, {
+          id: `onb-complete-${Date.now()}`,
+          sender: "ai",
+          text: "Hugo, we zijn klaar! Alle technieken en houdingen zijn gereviewd. Het platform is klaar om live te gaan!",
+          timestamp: new Date(),
+        }]);
+      }
+      setIsLoading(false);
+    } catch (err) {
+      console.error("[Onboarding] Feedback failed:", err);
+      setIsLoading(false);
+    }
+  };
+
+  const handleOnboardingSkip = async () => {
+    if (!onboardingCurrentItem) return;
+    try {
+      await fetch('/api/v2/admin/onboarding/skip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemKey: onboardingCurrentItem.key,
+          module: onboardingCurrentItem.module,
+          userId: user?.id || 'hugo',
+        }),
+      });
+      setOnboardingFeedbackInput(null);
+      setIsLoading(true);
+
+      const next = await fetchNextOnboardingCard();
+      if (next) {
+        const introText = next.module === 'technieken'
+          ? `Geen probleem, overgeslagen. Hier is techniek ${next.data.nummer || next.key}: **${next.data.naam || next.name}**`
+          : `Geen probleem, overgeslagen. Hier is klanthouding ${next.data.id || next.key}: **${next.data.naam || next.name}**`;
+        setMessages(prev => [...prev, {
+          id: `onb-skip-${Date.now()}`,
+          sender: "ai",
+          text: introText,
+          timestamp: new Date(),
+          richContent: [{ type: 'onboarding_review', data: { ...next.data, module: next.module } }],
+        }]);
+      } else {
+        setMessages(prev => [...prev, {
+          id: `onb-complete-${Date.now()}`,
+          sender: "ai",
+          text: "Hugo, we zijn klaar! Alle technieken en houdingen zijn gereviewd.",
+          timestamp: new Date(),
+        }]);
+      }
+      setIsLoading(false);
+    } catch (err) {
+      console.error("[Onboarding] Skip failed:", err);
+      setIsLoading(false);
+    }
+  };
+
   const handleMessageFeedback = async (messageId: string, feedback: "up" | "down") => {
+    if (isAdmin && onboardingStatus && !onboardingStatus.isComplete && onboardingCurrentItem) {
+      if (feedback === "up") {
+        handleOnboardingApprove();
+        return;
+      } else if (feedback === "down") {
+        setOnboardingFeedbackInput("");
+        return;
+      }
+    }
+
     setMessages(prev => prev.map(m => 
       m.id === messageId ? { ...m, feedback: m.feedback === feedback ? null : feedback } : m
     ));
@@ -1403,6 +1635,39 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               <Paperclip className="w-8 h-8 text-[#4F7396]" />
               <p className="text-[15px] font-medium text-hh-text">Sleep bestanden hier</p>
               <p className="text-[12px] text-hh-muted">Audio, documenten, afbeeldingen</p>
+            </div>
+          </div>
+        </div>
+      )}
+      {isAdmin && onboardingStatus && !onboardingStatus.isComplete && (
+        <div className="flex items-center justify-center gap-3 py-2 px-4 border-b border-hh-border bg-hh-ui-50/50">
+          <div className="flex items-center gap-2">
+            <span className="text-[12px] font-medium" style={{ color: '#7c3aed' }}>
+              Technieken {onboardingStatus.technieken.reviewed}/{onboardingStatus.technieken.total}
+            </span>
+            <div className="w-16 h-1.5 rounded-full bg-hh-ui-100 overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all"
+                style={{
+                  width: `${onboardingStatus.technieken.total > 0 ? (onboardingStatus.technieken.reviewed / onboardingStatus.technieken.total) * 100 : 0}%`,
+                  backgroundColor: '#7c3aed'
+                }}
+              />
+            </div>
+          </div>
+          <span className="text-hh-muted text-[11px]">·</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[12px] font-medium" style={{ color: '#0284c7' }}>
+              Houdingen {onboardingStatus.houdingen.reviewed}/{onboardingStatus.houdingen.total}
+            </span>
+            <div className="w-12 h-1.5 rounded-full bg-hh-ui-100 overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all"
+                style={{
+                  width: `${onboardingStatus.houdingen.total > 0 ? (onboardingStatus.houdingen.reviewed / onboardingStatus.houdingen.total) * 100 : 0}%`,
+                  backgroundColor: '#0284c7'
+                }}
+              />
             </div>
           </div>
         </div>
@@ -1497,6 +1762,167 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                             } : undefined}
                           />
                         );
+                      case 'onboarding_review': {
+                        const d = rc.data as Record<string, any>;
+                        const isTech = d.module === 'technieken';
+                        const faseColors: Record<string, string> = {
+                          '0': '#64748b', '1': '#059669', '2': '#2563eb', '3': '#d97706', '4': '#7c3aed'
+                        };
+                        const faseColor = faseColors[String(d.fase || '0').charAt(0)] || '#64748b';
+                        return (
+                          <div key={idx} className="rounded-xl border border-hh-border bg-hh-bg shadow-sm overflow-hidden" style={{ maxWidth: '100%' }}>
+                            <div className="px-4 py-3 border-b border-hh-border" style={{ backgroundColor: `${faseColor}08` }}>
+                              <div className="flex items-center gap-2 mb-1">
+                                {isTech && d.nummer && (
+                                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md text-white" style={{ backgroundColor: faseColor }}>
+                                    {d.nummer}
+                                  </span>
+                                )}
+                                {!isTech && d.id && (
+                                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md text-white" style={{ backgroundColor: '#0284c7' }}>
+                                    {d.id}
+                                  </span>
+                                )}
+                                <h3 className="text-[15px] font-semibold text-hh-text">{d.naam}</h3>
+                              </div>
+                              {isTech && d.fase && (
+                                <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ backgroundColor: `${faseColor}15`, color: faseColor }}>
+                                  Fase {d.fase}
+                                </span>
+                              )}
+                            </div>
+                            <div className="px-4 py-3 space-y-3 text-[13px] leading-[20px] text-hh-text">
+                              {d.doel && (
+                                <div>
+                                  <p className="font-semibold text-[12px] text-hh-muted uppercase tracking-wide mb-1">Doel</p>
+                                  <p>{d.doel}</p>
+                                </div>
+                              )}
+                              {d.houding_beschrijving && (
+                                <div>
+                                  <p className="font-semibold text-[12px] text-hh-muted uppercase tracking-wide mb-1">Beschrijving</p>
+                                  <p>{d.houding_beschrijving}</p>
+                                </div>
+                              )}
+                              {d.hoe && (
+                                <div>
+                                  <p className="font-semibold text-[12px] text-hh-muted uppercase tracking-wide mb-1">Hoe</p>
+                                  <p>{d.hoe}</p>
+                                </div>
+                              )}
+                              {d.stappenplan && d.stappenplan.length > 0 && (
+                                <div>
+                                  <p className="font-semibold text-[12px] text-hh-muted uppercase tracking-wide mb-1">Stappenplan</p>
+                                  <ol className="list-decimal list-inside space-y-0.5">
+                                    {d.stappenplan.map((s: string, si: number) => <li key={si}>{s}</li>)}
+                                  </ol>
+                                </div>
+                              )}
+                              {d.voorbeeld && d.voorbeeld.length > 0 && (
+                                <div>
+                                  <p className="font-semibold text-[12px] text-hh-muted uppercase tracking-wide mb-1">Voorbeelden</p>
+                                  <div className="space-y-1">
+                                    {d.voorbeeld.map((v: string, vi: number) => (
+                                      <div key={vi} className="pl-3 border-l-2 text-[13px] italic text-hh-muted" style={{ borderColor: faseColor }}>
+                                        {v}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {d.generation_examples && d.generation_examples.length > 0 && (
+                                <div>
+                                  <p className="font-semibold text-[12px] text-hh-muted uppercase tracking-wide mb-1">Voorbeelden</p>
+                                  <div className="space-y-1">
+                                    {d.generation_examples.slice(0, 3).map((v: string, vi: number) => (
+                                      <div key={vi} className="pl-3 border-l-2 text-[13px] italic text-hh-muted" style={{ borderColor: '#0284c7' }}>
+                                        {v}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {d.tags && d.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1 pt-1">
+                                  {d.tags.map((t: string, ti: number) => (
+                                    <span key={ti} className="text-[10px] px-2 py-0.5 rounded-full border border-hh-border text-hh-muted bg-hh-ui-50">
+                                      {t}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                              {d.semantic_markers && d.semantic_markers.length > 0 && (
+                                <div className="flex flex-wrap gap-1 pt-1">
+                                  {d.semantic_markers.slice(0, 8).map((t: string, ti: number) => (
+                                    <span key={ti} className="text-[10px] px-2 py-0.5 rounded-full border border-hh-border text-hh-muted bg-hh-ui-50">
+                                      {t}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <div className="px-4 py-3 border-t border-hh-border flex items-center gap-2">
+                              <button
+                                onClick={handleOnboardingApprove}
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-white transition-colors"
+                                style={{ backgroundColor: '#059669' }}
+                              >
+                                <ThumbsUp className="w-3.5 h-3.5" />
+                                Goedkeuren
+                              </button>
+                              <button
+                                onClick={() => setOnboardingFeedbackInput("")}
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-white transition-colors"
+                                style={{ backgroundColor: '#d97706' }}
+                              >
+                                <ThumbsDown className="w-3.5 h-3.5" />
+                                Feedback geven
+                              </button>
+                              <button
+                                onClick={handleOnboardingSkip}
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] text-hh-muted hover:bg-hh-ui-100 transition-colors"
+                              >
+                                Sla over
+                              </button>
+                            </div>
+                            {onboardingFeedbackInput !== null && (
+                              <div className="px-4 py-3 border-t border-hh-border bg-hh-ui-50/50">
+                                <p className="text-[12px] text-hh-muted mb-2">Wat zou je aanpassen, Hugo?</p>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={onboardingFeedbackInput}
+                                    onChange={(e) => setOnboardingFeedbackInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' && onboardingFeedbackInput?.trim()) {
+                                        handleOnboardingFeedback(onboardingFeedbackInput);
+                                      }
+                                    }}
+                                    placeholder="Bijv. 'Het doel moet korter' of 'Voeg een voorbeeld toe over...'"
+                                    className="flex-1 px-3 py-2 text-[13px] rounded-lg border border-hh-border bg-hh-bg text-hh-text placeholder:text-hh-muted focus:outline-none focus:ring-1"
+                                    style={{ focusRingColor: '#7c3aed' }}
+                                    autoFocus
+                                  />
+                                  <button
+                                    onClick={() => onboardingFeedbackInput?.trim() && handleOnboardingFeedback(onboardingFeedbackInput)}
+                                    disabled={!onboardingFeedbackInput?.trim()}
+                                    className="px-4 py-2 rounded-lg text-[13px] font-medium text-white disabled:opacity-50 transition-colors"
+                                    style={{ backgroundColor: '#7c3aed' }}
+                                  >
+                                    Verstuur
+                                  </button>
+                                  <button
+                                    onClick={() => setOnboardingFeedbackInput(null)}
+                                    className="px-3 py-2 rounded-lg text-[13px] text-hh-muted hover:bg-hh-ui-100 transition-colors"
+                                  >
+                                    Annuleer
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
                       default:
                         return null;
                     }

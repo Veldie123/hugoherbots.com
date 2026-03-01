@@ -17,12 +17,19 @@ export interface StartSessionResponse {
   sessionId: string;
   phase: string;
   message: string;
-  initialMessage?: string; // Alias for backwards compatibility
+  initialMessage?: string;
   type?: string;
   signal?: string;
   coachMode?: boolean;
   ragDocuments?: any[];
   contextLoaded?: boolean;
+  richContent?: Array<{ type: string; data: Record<string, unknown> }>;
+  onboardingStatus?: {
+    technieken: { total: number; reviewed: number; pending: number };
+    houdingen: { total: number; reviewed: number; pending: number };
+    isComplete: boolean;
+    nextItem: { module: string; key: string; name: string } | null;
+  };
   debug?: {
     persona?: any;
     attitude?: string | null;

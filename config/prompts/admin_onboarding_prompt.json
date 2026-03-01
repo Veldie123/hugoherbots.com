@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "purpose": "Onboarding wizard prompts voor admin (Hugo) SSOT review flow",
+    "last_updated": "2026-03-01"
+  },
+  "welcome_first_time": "Dag Hugo! Welkom op jouw platform :-) Ik ben de AI-versie van jou — gebouwd om jouw E.P.I.C. verkooptechnieken te onderwijzen aan verkopers wereldwijd. Voordat we live gaan, wil ik graag samen met jou alle content doorlopen. We hebben {technieken_count} verkooptechnieken en {houdingen_count} klanthoudingen om te reviewen. Per techniek laat ik je zien wat ik heb geleerd. Vind je het goed? Geef een 👍. Wil je iets aanpassen? Geef een 👎 en vertel me wat er anders moet. Klaar? Hier is de eerste techniek!",
+  "welcome_returning_incomplete": "Welkom terug Hugo! Vorige keer waren we bezig met de review. Je hebt al {reviewed_count} van de {total_count} items doorgenomen. We gaan verder met {next_item_name}.",
+  "technique_review_intro": "Hier is techniek {nummer}: **{naam}** (Fase: {fase})",
+  "technique_fields_to_show": ["naam", "doel", "hoe", "stappenplan", "voorbeeld", "tags"],
+  "attitude_review_intro": "Hier is klanthouding {id}: **{naam}**",
+  "attitude_fields_to_show": ["naam", "houding_beschrijving", "semantic_markers", "recommended_technique_ids", "fallback_response", "generation_examples"],
+  "feedback_acknowledge": "Bedankt Hugo! Ik heb je feedback genoteerd. Dit wordt bekeken en verwerkt. Op naar de volgende!",
+  "approve_acknowledge": "Top! **{naam}** is goedgekeurd ✓ Op naar de volgende!",
+  "module_complete_technieken": "Fantastisch Hugo! Alle {count} technieken zijn doorgenomen. Nu gaan we verder met de klanthoudingen.",
+  "module_complete_houdingen": "Geweldig! Alle {count} klanthoudingen zijn ook doorgenomen.",
+  "all_complete": "Hugo, we zijn klaar! Alle {technieken_count} technieken en {houdingen_count} houdingen zijn gereviewd. Het platform is klaar om live te gaan. Je kunt nu gewoon met me chatten over alles wat je wilt — video's, webinars, analyses, statistieken. Dit is jouw controlecentrum!",
+  "skip_message": "Geen probleem, we slaan deze over. Je kunt er later op terugkomen.",
+  "onboarding_system_instruction": "Je presenteert Hugo (jouw creator, 82 jaar oud) zijn E.P.I.C. technieken en klanthoudingen één voor één ter review. Wacht op zijn goedkeuring (👍) of feedback (👎). Bij feedback: interpreteer zijn woorden en stel concrete wijzigingen voor. Verwijs NOOIT naar 'Config Review', 'admin_corrections' of andere technische systemen. Houd het simpel en persoonlijk. Hugo hoeft de chat niet te verlaten."
+}

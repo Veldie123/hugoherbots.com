@@ -52,3 +52,26 @@ pool.query(`
     reviewed_by TEXT
   )
 `).catch((err: Error) => console.warn('[DB] config_proposals table check failed:', err.message));
+
+pool.query(`
+  CREATE TABLE IF NOT EXISTS admin_onboarding_progress (
+    id SERIAL PRIMARY KEY,
+    admin_user_id TEXT,
+    module TEXT,
+    item_key TEXT,
+    item_name TEXT,
+    status TEXT DEFAULT 'pending',
+    feedback_text TEXT,
+    correction_id INTEGER,
+    reviewed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE(admin_user_id, module, item_key)
+  )
+`).then(() => {
+  console.log('[DB] admin_onboarding_progress table ensured');
+}).catch((err: Error) => console.warn('[DB] admin_onboarding_progress table check failed:', err.message));
+
+pool.query(`
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_onboarding_user_module_key 
+  ON admin_onboarding_progress (admin_user_id, module, item_key)
+`).catch(() => {});
