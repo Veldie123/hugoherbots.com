@@ -2521,8 +2521,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         onStartPractice={startTechniqueChat}
       />
 
-      {/* Mobile Sidebar Sheet - hidden for admin */}
-      {!isAdmin && <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+      {/* Mobile Sidebar Sheet */}
+      <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
         <SheetContent side="left" className="w-[85%] sm:w-80 p-0 overflow-y-auto">
           <SheetHeader className="px-4 py-3 border-b border-hh-border">
             <SheetTitle className="text-left text-[16px]">E.P.I.C. TECHNIQUE</SheetTitle>
@@ -2562,7 +2562,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             isUserView={true}
           />
         </SheetContent>
-      </Sheet>}
+      </Sheet>
     </AppLayout>
   );
 }
