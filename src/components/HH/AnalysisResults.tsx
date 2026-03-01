@@ -571,7 +571,7 @@ export function AnalysisResults({
           const statusLabels: Record<string, string> = {
             'transcribing': 'Transcriberen...',
             'analyzing': 'Turns analyseren...',
-            'evaluating': 'EPIC technieken evalueren...',
+            'evaluating': 'E.P.I.C. TECHNIQUE evalueren...',
             'generating_report': 'Rapport genereren...',
           };
           setProcessingStep(statusLabels[data.status] || 'Bezig met verwerken...');

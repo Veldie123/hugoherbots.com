@@ -584,7 +584,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                 <div className="flex items-center gap-4 text-[12px]">
                                   {line.debugInfo.aiDecision.epicFase && (
                                     <div>
-                                      <span className="text-hh-muted">EPIC Fase:</span>
+                                      <span className="text-hh-muted">E.P.I.C. TECHNIQUE Fase:</span>
                                       <span className="font-medium ml-1">{line.debugInfo.aiDecision.epicFase}</span>
                                     </div>
                                   )}

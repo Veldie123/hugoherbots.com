@@ -693,11 +693,11 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                 <>
                   <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: '#4F7396' }}>
                     <BookOpen className="w-3 h-3 mr-1" />
-                    {(featuredVideo?.fase && featuredVideo.fase !== 'Onbekend') ? featuredVideo.fase : (continueWatching?.reason === 'continue' ? 'Ga verder' : 'EPIC Training')}
+                    {(featuredVideo?.fase && featuredVideo.fase !== 'Onbekend') ? featuredVideo.fase : (continueWatching?.reason === 'continue' ? 'Ga verder' : 'E.P.I.C. TECHNIQUE')}
                   </Badge>
                   
                   <h2 className="text-[20px] sm:text-[24px] font-bold leading-tight">
-                    {featuredVideo?.displayTitle || 'Leer de E.P.I.C. Techniques'}
+                    {featuredVideo?.displayTitle || 'Leer de E.P.I.C. TECHNIQUE'}
                   </h2>
                   
                   <p className="text-white/70 text-[13px] sm:text-[14px] leading-relaxed line-clamp-2">

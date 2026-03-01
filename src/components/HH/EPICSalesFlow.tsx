@@ -170,7 +170,7 @@ export function EPICSalesFlow(props: EPICSalesFlowProps) {
             <Circle className="w-5 h-5 text-hh-primary" />
           </div>
           <div>
-            <h2 className="text-[18px] leading-[26px] text-hh-text">E.P.I.C. Sales Flow</h2>
+            <h2 className="text-[18px] leading-[26px] text-hh-text">E.P.I.C. TECHNIQUE</h2>
             <p className="text-[12px] leading-[16px] text-hh-muted">
               {completedSteps} / {totalSteps} voltooid
             </p>

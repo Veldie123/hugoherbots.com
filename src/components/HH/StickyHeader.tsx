@@ -66,7 +66,7 @@ export function StickyHeader({ currentPage = "landing", navigate }: StickyHeader
 
   const landingAnchors = [
     { label: "Zo werkt het", id: "zo-werkt-het" },
-    { label: "E.P.I.C. Methode", id: "epic-methode" },
+    { label: "E.P.I.C. TECHNIQUE", id: "epic-methode" },
     { label: "Over Hugo", id: "over-hugo" },
     { label: "Testimonials", id: "testimonials" },
     { label: "FAQ", id: "faq" },

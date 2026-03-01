@@ -314,10 +314,10 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
         {/* Header */}
         <div>
           <h1 className="text-[32px] leading-[40px] text-hh-text mb-2">
-            E.P.I.C. Techniques
+            E.P.I.C. TECHNIQUE
           </h1>
           <p className="text-[16px] leading-[24px] text-hh-muted">
-            {totalTechnieken} E.P.I.C. techniques verdeeld over 5 fases
+            {totalTechnieken} E.P.I.C. TECHNIQUE verdeeld over 5 fases
           </p>
         </div>
 

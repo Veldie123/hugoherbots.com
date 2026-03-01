@@ -65,8 +65,8 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
     {
       id: 1,
       type: "PDF",
-      title: "EPIC Methodologie - Complete Gids",
-      description: "Volledige uitleg van de 4 fasen en 25 technieken van Hugo's EPIC sales methode",
+      title: "E.P.I.C. TECHNIQUE - Complete Gids",
+      description: "Volledige uitleg van de 4 fasen en 25 technieken van Hugo's E.P.I.C. TECHNIQUE",
       size: "2.4 MB",
       downloads: 1247,
       featured: true,

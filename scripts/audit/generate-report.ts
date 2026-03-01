@@ -357,7 +357,7 @@ function generateReport(): string {
 
   const userTitles: Record<string, string> = {
     dashboard: 'Dashboard',
-    technieken: 'E.P.I.C. Technieken',
+    technieken: 'E.P.I.C. TECHNIQUE',
     videos: "Video's",
     live: 'Live Coaching',
     team: 'Team Sessies',

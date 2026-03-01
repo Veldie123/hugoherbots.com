@@ -120,7 +120,7 @@ export function EpicSlideCard({ slide }: EpicSlideCardProps) {
           <path d="M8 1L10.5 5.5L15.5 6.5L12 10L12.5 15L8 13L3.5 15L4 10L0.5 6.5L5.5 5.5L8 1Z" fill={phaseStyle.border} />
         </svg>
         <span className="text-xs" style={{ color: '#8899AA' }}>
-          EPIC Sales Engine
+          E.P.I.C. TECHNIQUE
         </span>
       </div>
     </div>

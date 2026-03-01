@@ -28,6 +28,7 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { StopRoleplayDialog } from "./StopRoleplayDialog";
 import { TechniqueDetailsDialog } from "./TechniqueDetailsDialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
@@ -1990,25 +1991,31 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>
                   {!assistanceConfig.blindPlay && (
-                    <button
-                      onClick={() => {
-                        const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
-                        if (isDesktop) {
-                          setDesktopSidebarOpen(!desktopSidebarOpen);
-                        } else {
-                          setMobileSidebarOpen(!mobileSidebarOpen);
-                        }
-                      }}
-                      className={`p-1.5 rounded-md transition-colors ${
-                        (desktopSidebarOpen || mobileSidebarOpen)
-                          ? "bg-[#3C9A6E]/10"
-                          : "hover:bg-[#3C9A6E]/10"
-                      }`}
-                      style={{ color: '#3C9A6E' }}
-                      title="E.P.I.C. technieken bekijken"
-                    >
-                      <Lightbulb className="w-3.5 h-3.5" />
-                    </button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
+                            if (isDesktop) {
+                              setDesktopSidebarOpen(!desktopSidebarOpen);
+                            } else {
+                              setMobileSidebarOpen(!mobileSidebarOpen);
+                            }
+                          }}
+                          className={`p-1.5 rounded-md transition-colors ${
+                            (desktopSidebarOpen || mobileSidebarOpen)
+                              ? "bg-[#3C9A6E]/10"
+                              : "hover:bg-[#3C9A6E]/10"
+                          }`}
+                          style={{ color: '#3C9A6E' }}
+                        >
+                          <Lightbulb className="w-3.5 h-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" sideOffset={4}>
+                        E.P.I.C. TECHNIQUE bekijken
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                 </div>
               )}

@@ -98,7 +98,7 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
     },
     {
       id: "2",
-      title: "Overzicht van alle EPIC technieken",
+      title: "Overzicht van alle E.P.I.C. TECHNIQUE",
       excerpt: "Complete lijst met uitleg van alle 25 sales technieken",
       category: "Technieken",
       content: "...",

@@ -7,8 +7,8 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Badge } from "../ui/badge";
-import { Target, X, Pencil, ListOrdered, Quote } from "lucide-react";
-import { getCodeBadgeColors } from "../../utils/phaseColors";
+import { Target, X, Pencil, ListOrdered, Quote, FileText, HelpCircle, Clock, Wrench } from "lucide-react";
+import { getCodeBadgeColors, PHASE_COLORS } from "../../utils/phaseColors";
 
 const PHASE_LABELS: Record<string, string> = {
   '0': 'Pre-contactfase',
@@ -127,11 +127,27 @@ export function TechniqueDetailsDialog({
 
   const displayData = isEditing ? editedData : technique;
   const codeBadgeColors = getCodeBadgeColors(technique.nummer);
+  const phaseColor = PHASE_COLORS[String(technique.fase)] || "#64748b";
 
-  const accentBg = isAdmin ? "bg-purple-100" : "bg-hh-ink/10";
-  const accentText = isAdmin ? "text-purple-600" : "text-hh-ink";
+  const cardBg = isAdmin ? "bg-purple-500/[0.07]" : "bg-[#4F7396]/[0.06]";
+  const cardBorder = isAdmin ? "border-purple-500/15" : "border-[#4F7396]/15";
+  const iconColor = isAdmin ? "text-purple-600" : "text-[#4F7396]";
+  const headerColor = isAdmin ? "text-purple-600" : "text-[#4F7396]";
+  const bodyColor = isAdmin ? "text-purple-800" : "text-hh-text";
+  const stepCircleBg = isAdmin ? "bg-purple-600" : "bg-[#4F7396]";
+  const accentBtnBg = isAdmin ? "bg-purple-600 hover:bg-purple-700" : "bg-[#4F7396] hover:bg-[#3d6280]";
 
   const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
+
+  const SectionCard = ({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) => (
+    <div className={`${cardBg} ${cardBorder} border rounded-xl p-4`}>
+      <div className="flex items-center gap-2 mb-2.5">
+        <Icon className={`w-4 h-4 ${iconColor}`} />
+        <h4 className={`text-[13px] font-semibold uppercase tracking-wide ${headerColor}`}>{title}</h4>
+      </div>
+      {children}
+    </div>
+  );
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -142,12 +158,35 @@ export function TechniqueDetailsDialog({
       >
         <div className="flex flex-col h-full">
           <div className="flex-1 overflow-y-auto">
-            <div className="p-6 pb-5">
-              <div className="flex items-center gap-3 mb-2">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-[13px] font-bold shrink-0 ${codeBadgeColors}`}>
+            <div
+              className="p-6 pb-5"
+              style={{
+                background: `linear-gradient(135deg, ${phaseColor}12 0%, ${phaseColor}06 100%)`,
+                borderBottom: `1px solid ${phaseColor}20`,
+              }}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center text-[13px] font-bold shrink-0 border"
+                  style={{
+                    backgroundColor: `${phaseColor}18`,
+                    color: phaseColor,
+                    borderColor: `${phaseColor}30`,
+                  }}
+                >
                   {technique.nummer}
                 </div>
-                <span className="text-[13px] text-hh-muted">Fase {displayData.fase} · {PHASE_LABELS[String(displayData.fase)] || ''}</span>
+                <div className="flex flex-col">
+                  <span
+                    className="text-[11px] font-semibold uppercase tracking-wider"
+                    style={{ color: phaseColor }}
+                  >
+                    Fase {displayData.fase}
+                  </span>
+                  <span className="text-[12px] text-hh-muted">
+                    {PHASE_LABELS[String(displayData.fase)] || ''}
+                  </span>
+                </div>
               </div>
               
               {isEditing ? (
@@ -156,22 +195,26 @@ export function TechniqueDetailsDialog({
                   onChange={(e) =>
                     setEditedData({ ...editedData, naam: e.target.value })
                   }
-                  className="text-[26px] font-bold mt-2"
+                  className="text-[24px] font-bold mt-2"
                   placeholder="Techniek naam"
                 />
               ) : (
-                <h2 className="text-[26px] leading-[32px] font-bold text-hh-ink mt-1">
+                <h2 className="text-[24px] leading-[30px] font-bold text-hh-ink mt-1">
                   {displayData.naam}
                 </h2>
               )}
 
               {displayData.tags && displayData.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-4">
+                <div className="flex flex-wrap gap-1.5 mt-4">
                   {displayData.tags?.map((tag: string, index: number) => (
                     <Badge
                       key={index}
                       variant="outline"
-                      className="text-[12px] bg-hh-ui-50 text-hh-muted border-hh-border font-normal px-3 py-1 rounded-full"
+                      className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
+                        isAdmin
+                          ? 'bg-purple-500/10 text-purple-600 border-purple-500/20'
+                          : 'bg-[#4F7396]/10 text-[#4F7396] border-[#4F7396]/20'
+                      }`}
                     >
                       {tag}
                       {isEditing && (
@@ -200,13 +243,9 @@ export function TechniqueDetailsDialog({
               )}
             </div>
 
-            <div className="px-6 pb-8 space-y-7">
+            <div className="px-5 py-5 space-y-3">
               {displayData.doel && (
-                <div className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-5`}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Target className={`w-4 h-4 ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`} />
-                    <h4 className={`text-[14px] font-semibold ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`}>Doel</h4>
-                  </div>
+                <SectionCard icon={Target} title="Doel">
                   {isEditing ? (
                     <Textarea
                       value={displayData.doel}
@@ -218,16 +257,15 @@ export function TechniqueDetailsDialog({
                       className="text-[14px]"
                     />
                   ) : (
-                    <p className={`text-[14px] leading-[22px] ${isAdmin ? 'text-purple-700' : 'text-hh-text'}`}>
+                    <p className={`text-[14px] leading-[22px] ${bodyColor}`}>
                       {displayData.doel}
                     </p>
                   )}
-                </div>
+                </SectionCard>
               )}
 
               {displayData.wat && (
-                <div>
-                  <h4 className="text-[15px] font-semibold text-hh-ink mb-2">Wat</h4>
+                <SectionCard icon={FileText} title="Wat">
                   {isEditing ? (
                     <Textarea
                       value={displayData.wat}
@@ -239,16 +277,15 @@ export function TechniqueDetailsDialog({
                       className="text-[14px]"
                     />
                   ) : (
-                    <p className="text-[14px] leading-[22px] text-hh-text">
+                    <p className={`text-[14px] leading-[22px] ${bodyColor}`}>
                       {displayData.wat}
                     </p>
                   )}
-                </div>
+                </SectionCard>
               )}
 
               {displayData.waarom && (
-                <div>
-                  <h4 className="text-[15px] font-semibold text-hh-ink mb-2">Waarom</h4>
+                <SectionCard icon={HelpCircle} title="Waarom">
                   {isEditing ? (
                     <Textarea
                       value={displayData.waarom}
@@ -260,16 +297,15 @@ export function TechniqueDetailsDialog({
                       className="text-[14px]"
                     />
                   ) : (
-                    <p className="text-[14px] leading-[22px] text-hh-text">
+                    <p className={`text-[14px] leading-[22px] ${bodyColor}`}>
                       {displayData.waarom}
                     </p>
                   )}
-                </div>
+                </SectionCard>
               )}
 
               {displayData.wanneer && (
-                <div>
-                  <h4 className="text-[15px] font-semibold text-hh-ink mb-2">Wanneer</h4>
+                <SectionCard icon={Clock} title="Wanneer">
                   {isEditing ? (
                     <Textarea
                       value={displayData.wanneer}
@@ -281,16 +317,15 @@ export function TechniqueDetailsDialog({
                       className="text-[14px]"
                     />
                   ) : (
-                    <p className="text-[14px] leading-[22px] text-hh-text">
+                    <p className={`text-[14px] leading-[22px] ${bodyColor}`}>
                       {displayData.wanneer}
                     </p>
                   )}
-                </div>
+                </SectionCard>
               )}
 
               {displayData.hoe && (
-                <div>
-                  <h4 className="text-[15px] font-semibold text-hh-ink mb-2">Hoe</h4>
+                <SectionCard icon={Wrench} title="Hoe">
                   {isEditing ? (
                     <Textarea
                       value={displayData.hoe}
@@ -302,46 +337,42 @@ export function TechniqueDetailsDialog({
                       className="text-[14px]"
                     />
                   ) : (
-                    <p className="text-[14px] leading-[22px] text-hh-text">
+                    <p className={`text-[14px] leading-[22px] ${bodyColor}`}>
                       {displayData.hoe}
                     </p>
                   )}
-                </div>
+                </SectionCard>
               )}
 
               {displayData.stappenplan && displayData.stappenplan.length > 0 && (
-                <div className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-5`}>
-                  <div className="flex items-center gap-2 mb-4">
-                    <ListOrdered className={`w-4 h-4 ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`} />
-                    <h4 className={`text-[14px] font-semibold ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`}>Stappenplan</h4>
-                  </div>
-                  <ol className="space-y-3">
+                <SectionCard icon={ListOrdered} title="Stappenplan">
+                  <ol className="space-y-2.5">
                     {(Array.isArray(displayData.stappenplan) ? displayData.stappenplan : [displayData.stappenplan]).map((stap: string, idx: number) => (
                       <li key={idx} className="flex items-start gap-3">
-                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5 ${isAdmin ? 'bg-purple-600 text-white' : 'bg-hh-ink text-white'}`}>
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 ${stepCircleBg} text-white`}>
                           {idx + 1}
                         </span>
-                        <span className={`text-[14px] leading-[22px] ${isAdmin ? 'text-purple-700' : 'text-hh-text'}`}>{stap}</span>
+                        <span className={`text-[14px] leading-[22px] ${bodyColor}`}>{stap}</span>
                       </li>
                     ))}
                   </ol>
-                </div>
+                </SectionCard>
               )}
 
               {displayData.voorbeeld && (Array.isArray(displayData.voorbeeld) ? displayData.voorbeeld.length > 0 : true) && (
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Quote className={`w-4 h-4 ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`} />
-                    <h4 className={`text-[14px] font-semibold ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`}>Voorbeelden</h4>
+                  <div className="flex items-center gap-2 mb-3 px-1">
+                    <Quote className={`w-4 h-4 ${iconColor}`} />
+                    <h4 className={`text-[13px] font-semibold uppercase tracking-wide ${headerColor}`}>Voorbeelden</h4>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {(Array.isArray(displayData.voorbeeld) ? displayData.voorbeeld : [displayData.voorbeeld]).map((vb: string, idx: number) => (
                       <div
                         key={idx}
-                        className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-5`}
+                        className={`${cardBg} ${cardBorder} border rounded-xl p-4`}
                       >
-                        <p className={`text-[14px] leading-[22px] italic ${isAdmin ? 'text-purple-700' : 'text-hh-text'}`}>
-                          "{vb}"
+                        <p className={`text-[14px] leading-[22px] italic ${bodyColor}`}>
+                          &ldquo;{vb}&rdquo;
                         </p>
                       </div>
                     ))}
@@ -355,7 +386,7 @@ export function TechniqueDetailsDialog({
             {isEditing ? (
               <>
                 <Button
-                  className={`${isAdmin ? 'bg-purple-600 hover:bg-purple-700' : 'bg-hh-ink hover:bg-hh-ink/90'} px-6`}
+                  className={`${accentBtnBg} px-6`}
                   onClick={handleSave}
                 >
                   Opslaan
@@ -368,7 +399,7 @@ export function TechniqueDetailsDialog({
               <>
                 {isEditable && (
                   <Button
-                    className={`${isAdmin ? 'bg-purple-600 hover:bg-purple-700' : 'bg-hh-ink hover:bg-hh-ink/90'} px-6 gap-2`}
+                    className={`${accentBtnBg} px-6 gap-2`}
                     onClick={handleEdit}
                   >
                     <Pencil className="w-4 h-4" />

@@ -572,7 +572,7 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
         <Card className="p-4 rounded-xl border-hh-border bg-hh-ui-50/50">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="text-[14px] font-medium text-hh-text">E.P.I.C. Sales Flow</div>
+              <div className="text-[14px] font-medium text-hh-text">E.P.I.C. TECHNIQUE</div>
               <span className="text-[13px] text-hh-muted">{totalCompleted}/{totalVideos} video's • {totalVideos > 0 ? Math.round((totalCompleted / totalVideos) * 100) : 0}%</span>
             </div>
             <div className="flex gap-1 flex-1 max-w-md">

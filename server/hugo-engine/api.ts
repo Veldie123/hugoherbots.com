@@ -1748,7 +1748,7 @@ app.post("/api/session/:sessionId/evaluate", async (req, res) => {
         : "Blijf oefenen. Focus op het toepassen van de kernprincipes.",
       nextSteps: [
         "Oefen deze techniek in een echte verkoopsituatie",
-        "Probeer de volgende techniek in de E.P.I.C. flow"
+        "Probeer de volgende techniek in de E.P.I.C. TECHNIQUE flow"
       ]
     };
     

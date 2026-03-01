@@ -471,7 +471,7 @@ export function ConversationAnalysis({
           </h1>
           <p className="text-[14px] leading-[22px] sm:text-[16px] sm:leading-[24px] text-hh-muted">
             Upload een rollenspel of echt klantgesprek en krijg gedetailleerde
-            EPIC analyse van Hugo.
+            E.P.I.C. TECHNIQUE analyse van Hugo.
           </p>
         </div>
 
@@ -482,7 +482,7 @@ export function ConversationAnalysis({
                 Upload Rollenspel
               </h2>
               <p className="text-[14px] leading-[20px] text-hh-muted">
-                Audio/video • EPIC analyse
+                Audio/video • E.P.I.C. TECHNIQUE analyse
               </p>
             </div>
 

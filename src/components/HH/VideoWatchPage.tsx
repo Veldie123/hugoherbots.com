@@ -371,7 +371,7 @@ export function VideoWatchPage({
             <div className="px-3 py-2.5 border-b border-hh-border">
               <h2 className="text-xs font-bold text-hh-text flex items-center gap-1.5 uppercase tracking-wide">
                 <BookOpen className="w-3.5 h-3.5" />
-                E.P.I.C. Technique
+                E.P.I.C. TECHNIQUE
               </h2>
               <div className="flex items-center justify-between mt-0.5">
                 <p className="text-[10px] text-hh-muted">
@@ -755,7 +755,7 @@ export function VideoWatchPage({
                 <div className="px-3 py-2.5 border-b border-hh-border">
                   <h2 className="text-xs font-bold text-hh-text flex items-center gap-1.5 uppercase tracking-wide">
                     <BookOpen className="w-3.5 h-3.5" />
-                    E.P.I.C. Technique
+                    E.P.I.C. TECHNIQUE
                   </h2>
                   <div className="flex items-center justify-between mt-0.5">
                     <p className="text-[10px] text-hh-muted">

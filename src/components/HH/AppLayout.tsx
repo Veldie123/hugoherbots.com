@@ -68,7 +68,7 @@ function formatTimeAgo(dateStr: string): string {
 
 const mainNavItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "techniques", label: "E.P.I.C. techniques", icon: Target },
+  { id: "techniques", label: "E.P.I.C. TECHNIQUE", icon: Target },
   { id: "videos", label: "Video's", icon: Video },
   { id: "live", label: "Webinars", icon: Radio },
   { id: "analysis", label: "Gespreksanalyse", icon: FileSearch, historyType: "analysis" as const, overviewPage: "analysis" },

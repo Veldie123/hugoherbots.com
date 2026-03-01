@@ -238,7 +238,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
               Digital Coaching
             </h1>
             <p className="text-[14px] leading-[20px] text-hh-muted mt-1">
-              E.P.I.C. Sales Flow
+              E.P.I.C. TECHNIQUE
             </p>
           </div>
 

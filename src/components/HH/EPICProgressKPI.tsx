@@ -36,7 +36,7 @@ export function EPICProgressKPI({ phases, className = "" }: EPICProgressKPIProps
         {/* Left: Title */}
         <div className="flex-shrink-0">
           <h3 className="text-[14px] leading-[20px] text-hh-text font-medium whitespace-nowrap">
-            E.P.I.C. Sales Flow
+            E.P.I.C. TECHNIQUE
           </h3>
           <div className="text-[11px] text-hh-muted mt-0.5">
             {overallProgress}% voltooid

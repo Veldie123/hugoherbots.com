@@ -781,7 +781,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
             <Card className="p-4 rounded-[16px] border-hh-border">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[15px] leading-[20px] text-hh-text font-semibold">
-                  E.P.I.C. Sales Flow
+                  E.P.I.C. TECHNIQUE
                 </h3>
                 <div className="text-[12px] leading-[16px] text-hh-muted">
                   4/12 onderwerpen • 33%
@@ -1360,7 +1360,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
       <Sheet open={flowDrawerOpen} onOpenChange={setFlowDrawerOpen}>
         <SheetContent side="bottom" className="h-[85vh] p-0">
           <SheetHeader className="sr-only">
-            <SheetTitle>E.P.I.C. Sales Flow</SheetTitle>
+            <SheetTitle>E.P.I.C. TECHNIQUE</SheetTitle>
             <SheetDescription>
               Overzicht van alle salestechnieken per fase
             </SheetDescription>
@@ -1369,7 +1369,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
           <div className="h-full overflow-y-auto p-4">
             {/* Header */}
             <div className="mb-4">
-              <h2 className="text-[24px] leading-[32px] text-hh-text mb-1">E.P.I.C. Sales Flow</h2>
+              <h2 className="text-[24px] leading-[32px] text-hh-text mb-1">E.P.I.C. TECHNIQUE</h2>
               <p className="text-[14px] text-hh-muted">4/12 technieken • 33%</p>
             </div>
 

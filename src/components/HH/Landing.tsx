@@ -322,7 +322,7 @@ export function Landing({ navigate }: LandingProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection className="text-center mb-12 sm:mb-16">
             <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 mb-6 text-[14px] sm:text-[16px] px-4 py-1.5">
-              E.P.I.C. Techniques
+              E.P.I.C. TECHNIQUE
             </Badge>
             <h2 className="text-[32px] leading-[40px] sm:text-[36px] sm:leading-[44px] lg:text-[40px] lg:leading-[48px] text-hh-text mb-6">
               Mijn methode: 4 fasen, 54 technieken

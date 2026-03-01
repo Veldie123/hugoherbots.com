@@ -164,7 +164,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
 
   const allMainNavItems = [
     { id: "admin-dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "admin-techniques", label: "E.P.I.C. techniques", icon: Target, superAdminOnly: true },
+    { id: "admin-techniques", label: "E.P.I.C. TECHNIQUE", icon: Target, superAdminOnly: true },
     { id: "admin-videos", label: "Video's", icon: Video },
     { id: "admin-live", label: "Webinars", icon: Radio },
     { id: "admin-uploads", label: "Gespreksanalyse", icon: Upload, historyType: "analysis" as const, overviewPage: "admin-uploads", superAdminOnly: true },

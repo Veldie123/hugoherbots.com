@@ -21,7 +21,7 @@ export function HelpCenter({ navigate, isAdmin, onboardingMode }: HelpCenterProp
     {
       icon: Video,
       title: "Video cursussen",
-      description: "Begrijp de EPIC methodologie",
+      description: "Begrijp de E.P.I.C. TECHNIQUE",
       articles: 25,
       color: "bg-hh-accent/10 text-hh-accent",
     },
@@ -48,7 +48,7 @@ export function HelpCenter({ navigate, isAdmin, onboardingMode }: HelpCenterProp
       readTime: "5 min",
     },
     {
-      title: "Wat is de EPIC methodologie?",
+      title: "Wat is E.P.I.C. TECHNIQUE?",
       category: "Methodologie",
       readTime: "8 min",
     },

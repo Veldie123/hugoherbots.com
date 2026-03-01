@@ -17,6 +17,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Card } from "../ui/card";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { StopRoleplayDialog } from "./StopRoleplayDialog";
 import { TechniqueDetailsDialog } from "./TechniqueDetailsDialog";
@@ -424,7 +425,7 @@ export function AdminChatExpertMode({
           setMessages([{
             id: `welcome-${Date.now()}`,
             sender: "ai",
-            text: "Dag Hugo! Waar kan ik je vandaag mee helpen? Je kunt direct beginnen met chatten, of selecteer een techniek via het E.P.I.C. menu.",
+            text: "Dag Hugo! Waar kan ik je vandaag mee helpen? Je kunt direct beginnen met chatten, of selecteer een techniek via het E.P.I.C. TECHNIQUE menu.",
             timestamp: new Date(),
           }]);
         } finally {
@@ -1627,17 +1628,23 @@ export function AdminChatExpertMode({
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
                           </button>
-                          <button
-                            onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
-                            className="p-1.5 rounded-md transition-colors"
-                            style={{
-                              color: '#9910FA',
-                              backgroundColor: desktopSidebarOpen ? 'rgba(153,16,250,0.1)' : undefined,
-                            }}
-                            title="E.P.I.C. technieken bekijken"
-                          >
-                            <Lightbulb className="w-3.5 h-3.5" />
-                          </button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
+                                className="p-1.5 rounded-md transition-colors"
+                                style={{
+                                  color: '#9910FA',
+                                  backgroundColor: desktopSidebarOpen ? 'rgba(153,16,250,0.1)' : undefined,
+                                }}
+                              >
+                                <Lightbulb className="w-3.5 h-3.5" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" sideOffset={4}>
+                              E.P.I.C. TECHNIQUE bekijken
+                            </TooltipContent>
+                          </Tooltip>
                           {message.debugInfo && (
                             <button
                               onClick={() =>
@@ -2023,7 +2030,7 @@ export function AdminChatExpertMode({
                                   </Badge>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-hh-muted font-medium">EPIC Fase:</span>
+                                  <span className="text-hh-muted font-medium">E.P.I.C. TECHNIQUE Fase:</span>
                                   <Badge variant="outline" className="text-[11px] bg-hh-ui-100 text-hh-ink border-hh-border">
                                     {message.debugInfo.aiDecision?.epicFase || "onbekend"}
                                   </Badge>

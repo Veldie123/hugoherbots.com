@@ -145,7 +145,7 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
             <p className="font-medium text-slate-700 mb-1">AI Beslissingen</p>
             <div className="pl-2 space-y-1 text-slate-600">
               <div>
-                <span className="font-medium">EPIC Fase:</span> {debugData.aiDecisions.epicFase}
+                <span className="font-medium">E.P.I.C. TECHNIQUE Fase:</span> {debugData.aiDecisions.epicFase}
               </div>
               <div>
                 <span className="font-medium">Evaluatie:</span> {debugData.aiDecisions.evaluatie}
