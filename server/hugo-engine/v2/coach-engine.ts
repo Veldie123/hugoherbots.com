@@ -100,6 +100,12 @@ interface OnboardingPromptConfig {
   _meta?: { version: string; purpose: string; last_updated: string };
   welcome_first_time: string;
   welcome_returning_incomplete: string;
+  welcome_returning_onboarding?: string;
+  welcome_post_onboarding?: string;
+  platform_stats_section?: string;
+  attention_needed_section?: string;
+  no_attention_needed?: string;
+  top_analyses_section?: string;
   technique_review_intro: string;
   technique_fields_to_show: string[];
   attitude_review_intro: string;
@@ -147,14 +153,30 @@ async function ensureOnboardingPopulatedInternal(adminUserId: string, techData: 
   const params: any[] = [];
   let idx = 1;
 
-  for (const [key, tech] of Object.entries(techData.technieken || {})) {
-    const t = tech as any;
+  const sortedTechKeys = Object.keys(techData.technieken || {}).sort((a, b) => {
+    const partsA = a.split('.').map((p: string) => /^\d+$/.test(p) ? parseFloat(p) : p);
+    const partsB = b.split('.').map((p: string) => /^\d+$/.test(p) ? parseFloat(p) : p);
+    for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+      if (i >= partsA.length) return -1;
+      if (i >= partsB.length) return 1;
+      const ai = partsA[i], bi = partsB[i];
+      if (typeof ai === 'number' && typeof bi === 'number') { if (ai !== bi) return ai - bi; }
+      else if (typeof ai === 'number') return -1;
+      else if (typeof bi === 'number') return 1;
+      else { const cmp = String(ai).localeCompare(String(bi)); if (cmp !== 0) return cmp; }
+    }
+    return 0;
+  });
+
+  for (const key of sortedTechKeys) {
+    const t = (techData.technieken as any)[key];
     values.push(`($${idx++}, $${idx++}, $${idx++}, $${idx++})`);
     params.push(adminUserId, 'technieken', key, t.naam || key);
   }
 
-  for (const [key, houd] of Object.entries(houdData.houdingen || {})) {
-    const h = houd as any;
+  const sortedHoudKeys = Object.keys(houdData.houdingen || {}).sort((a, b) => a.localeCompare(b));
+  for (const key of sortedHoudKeys) {
+    const h = (houdData.houdingen as any)[key];
     values.push(`($${idx++}, $${idx++}, $${idx++}, $${idx++})`);
     params.push(adminUserId, 'houdingen', h.id || key, h.naam || key);
   }
@@ -1089,6 +1111,8 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
   let onboardingItemData: any = null;
   const obConfig = loadOnboardingPromptConfig();
 
+  let platformStatsStr = "";
+
   if (context.viewMode === 'admin') {
     try {
       onboardingStatus = await getOnboardingStatusFromDB(context.userId || 'hugo');
@@ -1103,6 +1127,40 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
       }
     } catch (err: any) {
       console.error('[COACH] Onboarding check failed:', err.message);
+    }
+
+    try {
+      const statsController = new AbortController();
+      const statsTimeout = setTimeout(() => statsController.abort(), 5000);
+      const statsRes = await fetch('http://localhost:3002/api/v2/admin/stats', { signal: statsController.signal });
+      clearTimeout(statsTimeout);
+      if (statsRes.ok) {
+        const stats = await statsRes.json();
+        const avgScoreText = stats.analyses?.avgScore ? ` — gem. score: ${stats.analyses.avgScore}%` : '';
+        platformStatsStr = (obConfig?.platform_stats_section || '')
+          .replace('{total_users}', String(stats.platform?.totalUsers || 0))
+          .replace('{new_users_week}', String(stats.platform?.newUsersThisWeek || 0))
+          .replace('{active_users}', String(stats.platform?.activeUsers || 0))
+          .replace('{total_sessions}', String(stats.sessions?.total || 0))
+          .replace('{recent_sessions}', String(stats.sessions?.recentWeek || 0))
+          .replace('{total_analyses}', String(stats.analyses?.total || 0))
+          .replace('{avg_score_text}', avgScoreText);
+
+        if (stats.pendingReviews > 0 && obConfig?.attention_needed_section) {
+          platformStatsStr += '\n\n' + obConfig.attention_needed_section
+            .replace('{pending_reviews}', String(stats.pendingReviews));
+        }
+
+        if (stats.topAnalyses?.length > 0 && obConfig?.top_analyses_section) {
+          const list = stats.topAnalyses
+            .map((a: any) => `• "${a.title}" van ${a.userName}${a.score !== null ? ` — ${a.score}%` : ' — wacht op resultaat'}`)
+            .join('\n');
+          platformStatsStr += '\n\n' + obConfig.top_analyses_section
+            .replace('{analyses_list}', list);
+        }
+      }
+    } catch (err: any) {
+      console.log('[COACH] Platform stats fetch failed (non-critical):', err.message);
     }
   }
 
@@ -1126,18 +1184,35 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
       const totalItems = onboardingStatus.totalItems || 0;
 
       if (totalReviewed === 0) {
-        openingPrompt = obConfig.welcome_first_time
+        const welcomeText = obConfig.welcome_first_time
           .replace('{technieken_count}', String(onboardingStatus.technieken.total))
-          .replace('{houdingen_count}', String(onboardingStatus.houdingen.total));
+          .replace('{houdingen_count}', String(onboardingStatus.houdingen.total))
+          .replace('{fases_count}', '5');
+
+        openingPrompt = "BELANGRIJK: Je antwoord moet BEGINNEN met de volgende welkomsttekst (je mag de tekst licht parafraseren maar alle inhoud moet erin zitten). Begin hier ALTIJD mee voordat je de eerste techniek toont:\n\n";
+        openingPrompt += "── WELKOMSTTEKST ──\n" + welcomeText + "\n── EINDE WELKOMSTTEKST ──";
+
+        if (platformStatsStr) {
+          openingPrompt += "\n\nVoeg ook deze platformstatistieken toe in je welkomst:\n" + platformStatsStr;
+        }
       } else {
-        openingPrompt = obConfig.welcome_returning_incomplete
+        const reviewPercentage = totalItems > 0 ? Math.round((totalReviewed / totalItems) * 100) : 0;
+        const returningText = (obConfig.welcome_returning_onboarding || obConfig.welcome_returning_incomplete)
           .replace('{reviewed_count}', String(totalReviewed))
           .replace('{total_count}', String(totalItems))
-          .replace('{next_item_name}', onboardingStatus.nextItem?.name || 'het volgende item');
+          .replace('{review_percentage}', String(reviewPercentage))
+          .replace('{next_item_name}', onboardingStatus.nextItem?.name || 'het volgende item')
+          .replace('{platform_stats}', platformStatsStr || 'Geen stats beschikbaar');
+
+        openingPrompt = "BELANGRIJK: Je antwoord moet BEGINNEN met de volgende welkomsttekst (je mag licht parafraseren maar alle inhoud moet erin). Begin hier ALTIJD mee:\n\n";
+        openingPrompt += "── WELKOMSTTEKST ──\n" + returningText + "\n── EINDE WELKOMSTTEKST ──";
       }
 
       if (onboardingStatus.nextItem && onboardingItemData) {
         const ni = onboardingStatus.nextItem;
+        if (totalReviewed === 0) {
+          openingPrompt += "\n\nAls Hugo aangeeft klaar te zijn (of niet expliciet iets anders kiest), presenteer dan DIRECT na de welkomsttekst de eerste techniek hieronder. Eindig je bericht met de welkomsttekst + de eerste techniek:";
+        }
         if (ni.module === 'technieken') {
           openingPrompt += "\n\n" + obConfig.technique_review_intro
             .replace('{nummer}', onboardingItemData.nummer || ni.key)
@@ -1155,7 +1230,16 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
         openingPrompt += "\n\nVraag Hugo om deze te beoordelen: goedkeuren (👍) of feedback geven (👎).";
       }
     } else {
-      openingPrompt = "Begroet Hugo Herbots kort en professioneel. Geef een beknopt overzicht van het platform en vraag waarmee je kunt helpen. Geen coaching-vragen, geen vragen over ervaring of achtergrond.";
+      if (obConfig?.welcome_post_onboarding && platformStatsStr) {
+        const attentionStr = platformStatsStr.includes('Aandacht nodig')
+          ? ''
+          : (obConfig.no_attention_needed || '');
+        openingPrompt = obConfig.welcome_post_onboarding
+          .replace('{platform_stats}', platformStatsStr)
+          .replace('{attention_needed}', attentionStr);
+      } else {
+        openingPrompt = "Begroet Hugo Herbots kort en professioneel. Geef een beknopt overzicht van het platform en vraag waarmee je kunt helpen. Geen coaching-vragen, geen vragen over ervaring of achtergrond.";
+      }
       if (techniqueName) {
         openingPrompt += ` De huidige focus is de techniek '${techniqueName}'.`;
       }

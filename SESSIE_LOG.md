@@ -4,6 +4,22 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-01 — Dynamische welkomst-briefing + EPIC volgorde fix + platform stats integratie
+
+**Vraag:** de intro tekst verwelkomt Hugo de eerste keer op het platform, legt uit dat dit zijn HQ is en dat hij alle functionaliteit kan aanroepen vanuit de chat. typend of pratend. en dan de uitleg over wat hij allemaal kan doen (webinars plannen, video volgorde, details van technieken aanpassen, gesprekken van gerbruikers analyseren en de ai interpretaite van de techniek verbeteren, etc etc.) maar alvorens we dat doen moeten we samen door de techniek lopen. stephane heeft zijn best gedaan om die zo goed als mogelijk te vertalen maar jij moet natuurlijk controleren of zijn interpretatie 100% overeenkomt met jouw visie over E.P.I.C. technique. klaar om te starten? we gaan er samen door: er zijn x technieken over x fases en x houdingen. jij reageert met duimpje naar boven als het prima is en duiimpje naar beneden als je iets wil aanpassen of een nuance wil leggen. je typt gewoon je opmerking en die wordt bij gehouden en finaal naar stephane doorgestuurd zodat hij ook op de hoogte is. ready to go of wil je eerst graag iets anders doen? zoiets. remember? en die welkomsttekst moet doorheen het ganse traject van Hugo (kan jaren zijn) dynamisch aangepast worden aan wat hij gedaan heeft in het platform en wat hij nog moet doen. in functie van de activiteit in het platform (gespreksanalyses en chats die te reviewen zijn, webinars die gepland moeten worden, etc.) en in het begin SSOT's die moeten gecontroleerd worden. analytics die hij wil / kan raadplegen? goed nieuws : x aantal gebruikers gisteren. etc. hoe zorg ik dat dit dynamisch (en verslavend) is voor Hugo?
+
+Samenvatting: Volledige welkomst-briefing + dynamisch controlecentrum voor Hugo geïmplementeerd.
+
+> **Conclusie:**
+> - `config/prompts/admin_onboarding_prompt.json` uitgebreid met v2.0: `welcome_first_time` (volledige HQ briefing met Stéphane-uitleg), `welcome_returning_onboarding` (terugkerend + stats + voortgang), `welcome_post_onboarding` (dagelijkse briefing na onboarding), `platform_stats_section`, `attention_needed_section`, `top_analyses_section`
+> - `server/hugo-engine/v2/coach-engine.ts`: EPIC volgorde fix (numerieke sort op techniek-keys), deterministisch houdingen-ordering, platform stats integratie via fetch naar `/api/v2/admin/stats` met 5s timeout, OnboardingPromptConfig interface uitgebreid
+> - De AI genereert nu een warme welkomst met: HQ uitleg, mogelijkheden-overzicht, Stéphane-context, 👍/👎 instructies, live platform stats (gebruikers, sessies, analyses, correcties), en de eerste techniek (fase 0: Pre-contactfase)
+> - Database reset: `admin_onboarding_progress` tabel gewist en opnieuw gevuld in EPIC volgorde
+> - Bestaande code hergebruikt: `/api/v2/admin/stats` endpoint + `/api/v2/admin/welcome` fallback bleven intact
+> - E2E test geslaagd: alle verwachte elementen aanwezig in de AI output
+
+---
+
 ## 2026-03-01 — Verwijder custom onboarding UI elementen uit admin chat
 
 **Vraag:** in de vorige brief over de onboarding fase met Hugo had ik expliciet gevraagd om geen nieuwe UX UI front end elementen toe te voegen aan de chat. hooguit front end elementen van op andere plaatsen van uit de app in een kader laden (.ppt, video, analysis results, detail van een techniek, houding, etc.). hugo zou dan op het bestaande duimpje naar omhoog of naar beneden klikken om feedback te geven. alle volgende printscreens zijn nieuwe ux ui front end elementen die je gebouwd hebt en die ik niet wil. 1/ die houdingen en technieken status bar bovenaan: weg ermee. je kan dit wel vermelden in tekst. 2/ maak je nog een tweede kader die hetzelfde (maar beperkter herhaalt)? dat is nutteloos. verwijder dat en verwijder ook al die andere buttons en tekstvakken onderaan dat vak. conclusie: hugo typt waar hij altijd typt! in het tektvak helemaal onderaan. hij kan chatten door te typen, of door te praten of te videocallen. geen nieuwe front end te bouwen.
