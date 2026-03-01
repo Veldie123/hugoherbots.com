@@ -348,8 +348,8 @@ export default function App() {
           {currentPage === "admin-sessions" && <AdminSessions navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-config-review" && <AdminConfigReview navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-notifications" && <AdminNotifications navigate={navigate} isSuperAdmin={isSuperAdmin} />}
-          {currentPage === "admin-chat-expert" && <AdminChatExpertMode sessionId="default" sessionTitle="Talk to myself AI" navigate={navigate} isSuperAdmin={isSuperAdmin} />}
-          {currentPage === "admin-hugo-agent" && <AdminChatExpertMode sessionId="hugo-agent" sessionTitle="Talk to Myself AI" navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-chat-expert" && <AdminChatExpertMode sessionId="default" sessionTitle="Talk to Hugo AI" navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-hugo-agent" && <AdminChatExpertMode sessionId="hugo-agent" sessionTitle="Talk to Hugo AI" navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-rag-review" && <AdminRAGReview navigate={navigate} currentPage={currentPage} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-conflicts" && <AdminConflicts navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-analysis-results" && <AnalysisResults navigate={navigate} isAdmin={true} isSuperAdmin={isSuperAdmin} navigationData={navigationData} />}
@@ -361,7 +361,7 @@ export default function App() {
           {currentPage === "upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "privacy-policy" && <PrivacyPolicy navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "hugo-overview" && <HugoAIOverview navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "talk-to-hugo" && <TalkToHugoAI navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "talk-to-hugo" && <TalkToHugoAI navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} adminViewMode={false} />}
           {currentPage === "techniques" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "library" && <Library navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "notifications" && <UserNotifications navigate={navigate} isAdmin={isAdmin} />}

@@ -96,6 +96,7 @@ interface Message {
   attachments?: MessageAttachment[];
   correctionData?: CorrectionData;
   analysisCards?: AnalysisCard[];
+  richContent?: import("@/types/crossPlatform").RichContent[];
 }
 
 interface MessageAttachment {
@@ -230,6 +231,14 @@ export function AdminChatExpertMode({
   const [isLoading, setIsLoading] = useState(false); // Loading state for API calls
   const [attachedFiles, setAttachedFiles] = useState<FileAttachment[]>([]);
   const [isRecording, setIsRecording] = useState(false);
+  const [onboardingStatus, setOnboardingStatus] = useState<{
+    isComplete: boolean;
+    technieken: { total: number; reviewed: number };
+    houdingen: { total: number; reviewed: number };
+    nextItem?: { module: string; key: string; name: string };
+  } | null>(null);
+  const [onboardingCurrentItem, setOnboardingCurrentItem] = useState<{ module: string; key: string; name: string } | null>(null);
+  const [onboardingFeedbackInput, setOnboardingFeedbackInput] = useState("");
   const [correctionMessageId, setCorrectionMessageId] = useState<string | null>(null);
   const [correctionText, setCorrectionText] = useState("");
   const [correctionTechnique, setCorrectionTechnique] = useState<string>("");
@@ -357,26 +366,61 @@ export function AdminChatExpertMode({
     if (!practiceRaw) {
       (async () => {
         try {
-          const res = await fetch('/api/v2/admin/welcome');
-          if (res.ok) {
-            const data = await res.json();
-            setMessages([{
-              id: `welcome-${Date.now()}`,
-              sender: "ai",
-              text: data.welcomeMessage,
-              timestamp: new Date(),
-            }]);
-            return;
+          setIsLoading(true);
+          const session = await hugoApi.startSession({
+            techniqueId: 'general',
+            mode: 'COACH_CHAT',
+            isExpert: false,
+            modality: 'chat',
+            viewMode: 'admin',
+          });
+          setHasActiveSession(true);
+
+          const welcomeMsg: Message = {
+            id: `admin-welcome-${Date.now()}`,
+            sender: "ai",
+            text: session.message || session.initialMessage || "",
+            timestamp: new Date(),
+          };
+
+          if (session.richContent && session.richContent.length > 0) {
+            welcomeMsg.richContent = session.richContent;
           }
+          if (session.onboardingStatus) {
+            setOnboardingStatus(session.onboardingStatus);
+            if (session.onboardingStatus.nextItem) {
+              setOnboardingCurrentItem(session.onboardingStatus.nextItem);
+            }
+          }
+
+          setMessages([welcomeMsg]);
+          console.log("[Admin] Session started, onboarding:", session.onboardingStatus?.isComplete ? 'complete' : 'active');
         } catch (e) {
-          console.warn("[Admin] Failed to load agent-first welcome:", e);
+          console.warn("[Admin] Failed to start admin session:", e);
+          try {
+            const res = await fetch('/api/v2/admin/welcome');
+            if (res.ok) {
+              const data = await res.json();
+              setMessages([{
+                id: `welcome-${Date.now()}`,
+                sender: "ai",
+                text: data.welcomeMessage,
+                timestamp: new Date(),
+              }]);
+              return;
+            }
+          } catch (e2) {
+            console.warn("[Admin] Fallback welcome also failed:", e2);
+          }
+          setMessages([{
+            id: `welcome-${Date.now()}`,
+            sender: "ai",
+            text: "Dag Hugo! Waar kan ik je vandaag mee helpen? Je kunt direct beginnen met chatten, of selecteer een techniek via het E.P.I.C. menu.",
+            timestamp: new Date(),
+          }]);
+        } finally {
+          setIsLoading(false);
         }
-        setMessages([{
-          id: `welcome-${Date.now()}`,
-          sender: "ai",
-          text: "Dag Hugo! Waar kan ik je vandaag mee helpen? Je kunt direct beginnen met chatten, of selecteer een techniek via het E.P.I.C. menu.",
-          timestamp: new Date(),
-        }]);
       })();
     }
 
@@ -491,6 +535,114 @@ export function AdminChatExpertMode({
       toast.error('Feedback opslaan mislukt');
       return false;
     }
+  };
+
+  const handleOnboardingApprove = async () => {
+    if (!onboardingCurrentItem) return;
+    try {
+      const res = await fetch('/api/v2/onboarding/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemKey: onboardingCurrentItem.key,
+          module: onboardingCurrentItem.module,
+          action: 'approve',
+        }),
+      });
+      const data = await res.json();
+      if (data.status) setOnboardingStatus(data.status);
+      const next = data.next;
+      if (next) {
+        setOnboardingCurrentItem({ module: next.module, key: next.key, name: next.data?.naam || next.name || next.key });
+        const label = next.module === 'technieken'
+          ? `Top! **${onboardingCurrentItem.name}** is goedgekeurd. Op naar de volgende!\n\nHier is techniek ${next.data.nummer || next.key}: **${next.data.naam || next.name}**`
+          : `Top! **${onboardingCurrentItem.name}** is goedgekeurd. Op naar de volgende!\n\nHier is klanthouding ${next.data.id || next.key}: **${next.data.naam || next.name}**`;
+        setMessages(prev => [...prev, {
+          id: `onboarding-${Date.now()}`,
+          sender: "ai",
+          text: label,
+          timestamp: new Date(),
+          richContent: [{ type: 'onboarding_review', data: { ...next.data, module: next.module } }],
+        }]);
+      } else {
+        setOnboardingCurrentItem(null);
+        setMessages(prev => [...prev, {
+          id: `onboarding-complete-${Date.now()}`,
+          sender: "ai",
+          text: "Fantastisch Hugo! Je hebt alle content doorgenomen. Het platform is klaar voor je klanten!",
+          timestamp: new Date(),
+        }]);
+      }
+    } catch (e) { console.error("[Onboarding] Approve failed:", e); }
+  };
+
+  const handleOnboardingFeedback = async (feedbackText: string) => {
+    if (!onboardingCurrentItem || !feedbackText.trim()) return;
+    const currentName = onboardingCurrentItem.name;
+    try {
+      const res = await fetch('/api/v2/onboarding/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemKey: onboardingCurrentItem.key,
+          module: onboardingCurrentItem.module,
+          action: 'feedback',
+          feedback: feedbackText,
+        }),
+      });
+      const data = await res.json();
+      if (data.status) setOnboardingStatus(data.status);
+      const next = data.next;
+      setOnboardingFeedbackInput("");
+      if (next) {
+        setOnboardingCurrentItem({ module: next.module, key: next.key, name: next.data?.naam || next.name || next.key });
+        setMessages(prev => [...prev, {
+          id: `onboarding-fb-${Date.now()}`,
+          sender: "ai",
+          text: `Bedankt voor je feedback op **${currentName}**! Ik sla dit op voor Stéphane. Door naar de volgende!`,
+          timestamp: new Date(),
+          richContent: [{ type: 'onboarding_review', data: { ...next.data, module: next.module } }],
+        }]);
+      } else {
+        setOnboardingCurrentItem(null);
+        setMessages(prev => [...prev, {
+          id: `onboarding-complete-${Date.now()}`,
+          sender: "ai",
+          text: `Bedankt voor je feedback op **${currentName}**! Alle items zijn doorgenomen. Het platform is klaar!`,
+          timestamp: new Date(),
+        }]);
+      }
+    } catch (e) { console.error("[Onboarding] Feedback failed:", e); }
+  };
+
+  const handleOnboardingSkip = async () => {
+    if (!onboardingCurrentItem) return;
+    try {
+      const res = await fetch('/api/v2/onboarding/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemKey: onboardingCurrentItem.key,
+          module: onboardingCurrentItem.module,
+          action: 'skip',
+        }),
+      });
+      const data = await res.json();
+      if (data.status) setOnboardingStatus(data.status);
+      const next = data.next;
+      if (next) {
+        setOnboardingCurrentItem({ module: next.module, key: next.key, name: next.data?.naam || next.name || next.key });
+        setMessages(prev => [...prev, {
+          id: `onboarding-skip-${Date.now()}`,
+          sender: "ai",
+          text: `Overgeslagen. Hier is de volgende:`,
+          timestamp: new Date(),
+          richContent: [{ type: 'onboarding_review', data: { ...next.data, module: next.module } }],
+        }]);
+      } else {
+        setOnboardingCurrentItem(null);
+      }
+    } catch (e) { console.error("[Onboarding] Skip failed:", e); }
   };
 
   // LiveKit Audio Functions
@@ -1238,6 +1390,37 @@ export function AdminChatExpertMode({
           </div>
         </div>
 
+        {onboardingStatus && !onboardingStatus.isComplete && (
+          <div className="flex items-center justify-center gap-3 py-2 px-4 border-b border-hh-border bg-hh-ui-50/50">
+            <div className="flex items-center gap-2">
+              <span className="text-[12px] font-medium" style={{ color: '#7c3aed' }}>
+                Technieken {onboardingStatus.technieken.reviewed}/{onboardingStatus.technieken.total}
+              </span>
+              <div className="w-16 h-1.5 rounded-full bg-hh-ui-100 overflow-hidden">
+                <div className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${onboardingStatus.technieken.total > 0 ? (onboardingStatus.technieken.reviewed / onboardingStatus.technieken.total) * 100 : 0}%`,
+                    backgroundColor: '#7c3aed'
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[12px] font-medium" style={{ color: '#7c3aed' }}>
+                Houdingen {onboardingStatus.houdingen.reviewed}/{onboardingStatus.houdingen.total}
+              </span>
+              <div className="w-16 h-1.5 rounded-full bg-hh-ui-100 overflow-hidden">
+                <div className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${onboardingStatus.houdingen.total > 0 ? (onboardingStatus.houdingen.reviewed / onboardingStatus.houdingen.total) * 100 : 0}%`,
+                    backgroundColor: '#7c3aed'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Body: EPIC sidebar + Chat */}
         <div className="flex flex-1 overflow-hidden min-h-0">
           {desktopSidebarOpen && (
@@ -1519,6 +1702,104 @@ export function AdminChatExpertMode({
                               </div>
                             </button>
                           ))}
+                        </div>
+                      )}
+                      {message.richContent && message.richContent.length > 0 && (
+                        <div className="mt-3 space-y-3">
+                          {message.richContent.map((rc, idx) => {
+                            if (rc.type === 'onboarding_review' && rc.data) {
+                              const d = rc.data;
+                              const isTechniek = d.module === 'technieken' || d.nummer;
+                              return (
+                                <div key={idx} className="rounded-xl border-2 p-4" style={{ borderColor: '#7c3aed', backgroundColor: 'rgba(124,58,237,0.03)' }}>
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-[13px] font-bold" style={{ color: '#7c3aed' }}>
+                                      {isTechniek ? `${d.nummer || ''} ${d.fase_naam || ''}` : `Klanthouding`}
+                                    </span>
+                                    {d.fase && <Badge variant="outline" className="text-[10px]">Fase {d.fase}</Badge>}
+                                  </div>
+                                  <h4 className="text-[16px] font-bold text-hh-ink mb-1">{d.naam || d.name}</h4>
+                                  {d.beschrijving && <p className="text-[13px] text-hh-muted mb-2">{d.beschrijving}</p>}
+                                  {d.doel && (
+                                    <div className="mb-2">
+                                      <span className="text-[11px] font-semibold uppercase text-hh-muted tracking-wide">DOEL</span>
+                                      <p className="text-[13px] text-hh-ink">{d.doel}</p>
+                                    </div>
+                                  )}
+                                  {d.hoe && (
+                                    <div className="mb-2">
+                                      <span className="text-[11px] font-semibold uppercase text-hh-muted tracking-wide">HOE</span>
+                                      <p className="text-[13px] text-hh-ink">{d.hoe}</p>
+                                    </div>
+                                  )}
+                                  {d.stappenplan && d.stappenplan.length > 0 && (
+                                    <div className="mb-2">
+                                      <span className="text-[11px] font-semibold uppercase text-hh-muted tracking-wide">STAPPENPLAN</span>
+                                      <ol className="list-decimal list-inside text-[13px] text-hh-ink space-y-0.5 mt-1">
+                                        {d.stappenplan.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                                      </ol>
+                                    </div>
+                                  )}
+                                  {d.voorbeelden && d.voorbeelden.length > 0 && (
+                                    <div className="mb-2">
+                                      <span className="text-[11px] font-semibold uppercase text-hh-muted tracking-wide">VOORBEELDEN</span>
+                                      <div className="mt-1 space-y-1">
+                                        {d.voorbeelden.map((v: string, i: number) => (
+                                          <p key={i} className="text-[13px] italic text-hh-muted border-l-2 pl-2" style={{ borderColor: '#7c3aed' }}>{v}</p>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                  {d.kernwoorden && d.kernwoorden.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mt-2">
+                                      {d.kernwoorden.map((kw: string, i: number) => (
+                                        <span key={i} className="text-[11px] px-2 py-0.5 rounded-full bg-hh-ui-100 text-hh-muted">{kw}</span>
+                                      ))}
+                                    </div>
+                                  )}
+                                  {onboardingCurrentItem && (
+                                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-hh-border">
+                                      <Button size="sm" onClick={handleOnboardingApprove}
+                                        className="text-white text-[13px]" style={{ backgroundColor: '#16a34a' }}>
+                                        <Check className="w-3.5 h-3.5 mr-1" /> Goedkeuren
+                                      </Button>
+                                      <Button size="sm" variant="outline" onClick={() => setOnboardingFeedbackInput("")}
+                                        className="text-[13px]" style={{ borderColor: '#f59e0b', color: '#f59e0b' }}>
+                                        Feedback geven
+                                      </Button>
+                                      <button onClick={handleOnboardingSkip}
+                                        className="text-[12px] text-hh-muted hover:text-hh-ink ml-1">
+                                        Sla over
+                                      </button>
+                                    </div>
+                                  )}
+                                  {onboardingFeedbackInput !== undefined && onboardingCurrentItem && (
+                                    <div className="mt-2">
+                                      <div className="flex gap-2">
+                                        <Input
+                                          placeholder="Typ je feedback..."
+                                          value={onboardingFeedbackInput}
+                                          onChange={(e) => setOnboardingFeedbackInput(e.target.value)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && onboardingFeedbackInput?.trim()) {
+                                              handleOnboardingFeedback(onboardingFeedbackInput);
+                                            }
+                                          }}
+                                          className="text-[13px]"
+                                        />
+                                        <Button size="sm" disabled={!onboardingFeedbackInput?.trim()}
+                                          onClick={() => onboardingFeedbackInput?.trim() && handleOnboardingFeedback(onboardingFeedbackInput)}
+                                          style={{ backgroundColor: '#f59e0b' }} className="text-white text-[13px]">
+                                          <Send className="w-3.5 h-3.5" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
                         </div>
                       )}
                     </div>

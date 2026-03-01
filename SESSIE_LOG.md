@@ -4,17 +4,17 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
-## 2026-03-01 — Sidebar spacing, user view chat fix, sessie log format
+## 2026-03-01 — Sidebar spacing, user view chat fix, sessie log format, rename Talk to Hugo AI
 
-**Vraag:** ben jij nog alles altijd aan het loggin in sessie_log.md? kan je ook ipv de titel en onder jouw samenvatting van mijn vraag altijd letterlijk mijn vraag weergeven? kan je dit updaten? zie biljage. 2/ zie printscreen er is iets mis met de sidebar in user view. vergelijk met de sidebar in admin view : in de tweede printzscreen. zie detail oprintscreen 3 = uer view. lijntje plakt tegen admin view button. en vergelijk met detail in admin view (daar wel juist) in prinscreen 4. alhoewel: is nog altijd niet 100% juist want het lijntje boven user view zou 100% moeten gelijk lopen met het lijntje boven "typ je bericht" in printscreen 5. (in de tatlk to hugo ai) zowel in admin view als in user view. (totaal niet het geval in printscreen 6 (user view). 3/ bekijk printscreen 7 talk to hugo ai. als hugo in "user view" is, moet altijd 100% de user view en user experience krijgen. de echte user experience. als hij in "admin view" zit, kriijgt hij de admin experience. nu krijgt hij de admin experiencde in user view. dat kan niet. nooit. hij moet daar behandeld worden als verkoper. als nieuwe klant. daarom is het ook de user view. als hij op admin view klikt, krijgt hij het soort vragen die je nu hebt doen verschijnen in user view.
+**Vraag:** er is iets mis met de sidebar in user view. vergelijk met de sidebar in admin view. lijntje plakt tegen admin view button... het lijntje boven user view zou 100% moeten gelijk lopen met het lijntje boven 'typ je bericht' in de talk to hugo ai... als hugo in user view is, moet altijd 100% de user view en user experience krijgen. de echte user experience. als hij in admin view zit, krijgt hij de admin experience. nu krijgt hij de admin experience in user view.
 
-Samenvatting: Drie fixes — sidebar divider spacing, Talk to Hugo user view = user experience, sessie log format update.
+Samenvatting: Sidebar divider spacing gefixed (`px-3 py-3`), user view Talk to Hugo toont nu coaching experience ipv admin onboarding, "Talk to myself AI" hernoemd naar "Talk to Hugo AI".
 
 > **Conclusie:**
-> - **Sidebar spacing**: `py-[18px]` → `pt-4 pb-4` in `AppLayout.tsx` en `AdminLayout.tsx` voor meer ademruimte boven de Admin/User View toggle knop. Knop styling consistent gemaakt (centered, `h-9`)
-> - **Talk to Hugo user view**: Nieuwe `adminViewMode` prop toegevoegd aan `TalkToHugoAI.tsx` (default `false`). Admin sessie init, onboarding UI, en feedback handling werken nu alleen als `adminViewMode=true`. User view toont nu altijd de coaching experience, niet de admin stats/onboarding
-> - **Sessie log protocol**: `replit.md` protocol bijgewerkt — `**Vraag:**` bevat nu altijd de letterlijke, ongewijzigde tekst van de gebruiker
-> - Bestanden: `AppLayout.tsx`, `AdminLayout.tsx`, `TalkToHugoAI.tsx`, `replit.md`
+> - **Sidebar divider**: `px-4 pt-4 pb-4` → `px-3 py-3` in `AppLayout.tsx` en `AdminLayout.tsx` — nettere spacing, lijntje plakt niet meer tegen de knop
+> - **User view = coaching experience**: `adminViewMode={false}` expliciet meegegeven aan `TalkToHugoAI` in `App.tsx` voor `talk-to-hugo` pagina. Hugo krijgt nu user coaching welcome ("Hé daar! We kunnen sparren...") ipv admin onboarding
+> - **Rename**: "Talk to myself AI" → "Talk to Hugo AI" in `App.tsx` (sessionTitle props) en `AdminChatExpertModeSidebar.tsx` (sidebar header)
+> - Bestanden: `AppLayout.tsx`, `AdminLayout.tsx`, `App.tsx`, `AdminChatExpertModeSidebar.tsx`
 
 ---
 
