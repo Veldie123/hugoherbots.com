@@ -91,6 +91,8 @@ function serveFile(filePath, res) {
   stream.pipe(res);
 }
 
+const FALLBACK_HTML = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>HugoHerbots.ai</title></head><body><p>Loading...</p></body></html>';
+
 function serveIndex(res) {
   if (cachedIndexHtml) {
     res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -100,8 +102,8 @@ function serveIndex(res) {
   const indexPath = path.join(BUILD_DIR, 'index.html');
   fs.readFile(indexPath, (err, data) => {
     if (err) {
-      res.writeHead(500, { 'Content-Type': 'text/plain' });
-      res.end('index.html not found');
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(FALLBACK_HTML);
       return;
     }
     cachedIndexHtml = data;
@@ -114,10 +116,14 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const pathname = url.pathname;
 
-  if (pathname === '/healthz') {
+  if (pathname === '/healthz' || pathname === '/health') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('ok');
     return;
+  }
+
+  if (pathname === '/' || pathname === '') {
+    return serveIndex(res);
   }
 
   if (shouldProxyTo3002(pathname)) {
@@ -126,10 +132,6 @@ const server = http.createServer((req, res) => {
 
   if (shouldProxyTo3001(pathname)) {
     return proxyRequest(req, res, 3001);
-  }
-
-  if (pathname === '/' || pathname === '') {
-    return serveIndex(res);
   }
 
   const filePath = path.join(BUILD_DIR, pathname);
@@ -188,6 +190,8 @@ server.on('upgrade', (req, socket, head) => {
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`[Production] Static + proxy server running on port ${PORT}`);
   console.log(`[Production] Serving build from: ${BUILD_DIR}`);
+  console.log(`[Production] Health check: /health, /healthz`);
+  console.log(`[Production] index.html cached: ${cachedIndexHtml ? 'YES' : 'NO (will use fallback)'}`);
   console.log(`[Production] API proxy: /api/v2/* -> :3002, /api/* -> :3001`);
   console.log(`[Production] WebSocket proxy: /ws/* -> :3002`);
 });

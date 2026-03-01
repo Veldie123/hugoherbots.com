@@ -4,6 +4,20 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-01 — Deployment health check fix
+
+**Vraag:** Deployment faalt op health checks — `/` reageert niet snel genoeg met 200.
+
+> **Conclusie:**
+> - **`/health` endpoint toegevoegd** naast bestaand `/healthz` — beide geven direct `200 ok`
+> - **`/` prioriteit verhoogd** — root path check staat nu vóór API proxy checks, zodat health check op `/` nooit wacht op backend services
+> - **Fallback HTML** — als `index.html` nog niet bestaat bij startup (build nog bezig), retourneert server een minimale `200 OK` HTML pagina in plaats van `500` error
+> - **Startup logging** verbeterd — logt of index.html gecached is bij startup
+> - Alle 3 endpoints getest: `/health`, `/healthz`, `/` → 200 OK
+> - Bestand: `server/production-server.js`
+
+---
+
 ## 2026-02-28 — Admin Webinars mobiele layout fix
 
 **Vraag:** Webinar buttons rechts boven buiten beeld op mobiel, view toggle zichtbaar op mobiel, laadt niet automatisch in card view.
