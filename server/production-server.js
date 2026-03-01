@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 
 const PORT = 5000;
 const BUILD_DIR = path.join(__dirname, '..', 'build');
@@ -82,7 +83,7 @@ function shouldProxyTo3001(pathname) {
 function serveFile(filePath, res) {
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-  
+
   const stream = fs.createReadStream(filePath);
   stream.on('error', () => {
     serveIndex(res);
@@ -116,14 +117,14 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const pathname = url.pathname;
 
-  if (pathname === '/healthz' || pathname === '/health') {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('ok');
+  if (pathname === '/' || pathname === '' || pathname === '/healthz' || pathname === '/health') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    if (cachedIndexHtml) {
+      res.end(cachedIndexHtml);
+    } else {
+      res.end(FALLBACK_HTML);
+    }
     return;
-  }
-
-  if (pathname === '/' || pathname === '') {
-    return serveIndex(res);
   }
 
   if (shouldProxyTo3002(pathname)) {
@@ -135,7 +136,7 @@ const server = http.createServer((req, res) => {
   }
 
   const filePath = path.join(BUILD_DIR, pathname);
-  
+
   const normalizedPath = path.resolve(filePath);
   if (!normalizedPath.startsWith(path.resolve(BUILD_DIR))) {
     res.writeHead(403);
@@ -187,11 +188,50 @@ server.on('upgrade', (req, socket, head) => {
   }
 });
 
+function spawnService(name, command, args, delay) {
+  setTimeout(() => {
+    console.log(`[Production] Starting ${name}...`);
+    const child = spawn(command, args, {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: process.env,
+    });
+
+    child.stdout.on('data', (data) => {
+      const lines = data.toString().trim().split('\n');
+      lines.forEach(line => {
+        if (line.trim()) console.log(`[${name}] ${line}`);
+      });
+    });
+
+    child.stderr.on('data', (data) => {
+      const lines = data.toString().trim().split('\n');
+      lines.forEach(line => {
+        if (line.trim()) console.error(`[${name}] ${line}`);
+      });
+    });
+
+    child.on('exit', (code, signal) => {
+      console.error(`[Production] ${name} exited (code=${code}, signal=${signal}). Restarting in 5s...`);
+      spawnService(name, command, args, 5000);
+    });
+  }, delay);
+}
+
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`[Production] Static + proxy server running on port ${PORT}`);
+  console.log(`[Production] Server listening on port ${PORT} - health check ready`);
   console.log(`[Production] Serving build from: ${BUILD_DIR}`);
-  console.log(`[Production] Health check: /health, /healthz`);
-  console.log(`[Production] index.html cached: ${cachedIndexHtml ? 'YES' : 'NO (will use fallback)'}`);
-  console.log(`[Production] API proxy: /api/v2/* -> :3002, /api/* -> :3001`);
-  console.log(`[Production] WebSocket proxy: /ws/* -> :3002`);
+  console.log(`[Production] index.html cached: ${cachedIndexHtml ? 'YES' : 'NO (using fallback)'}`);
+
+  spawnService('video-processor', 'node', [path.join(__dirname, 'video-processor.js')], 2000);
+  spawnService('hugo-engine', 'node', [path.join(__dirname, 'hugo-engine', 'standalone.js')], 4000);
+});
+
+process.on('SIGTERM', () => {
+  console.log('[Production] SIGTERM received, shutting down...');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('[Production] SIGINT received, shutting down...');
+  process.exit(0);
 });
