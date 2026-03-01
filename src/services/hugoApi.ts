@@ -145,6 +145,62 @@ class HugoApiService {
     return data;
   }
 
+  async startSessionStream(
+    request: StartSessionRequest,
+    onToken: (token: string) => void,
+    onDone?: (meta?: { onboardingStatus?: any }) => void
+  ): Promise<string> {
+    const response = await fetch(`${API_BASE}/v2/sessions/stream`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to start streaming session: ${response.statusText}`);
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error("No response body");
+
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let sessionId = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n\n");
+      buffer = lines.pop() || "";
+
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.type === "session") {
+              sessionId = data.sessionId;
+              this.currentSessionId = sessionId;
+            } else if (data.type === "token" && data.content) {
+              onToken(data.content);
+            } else if (data.type === "done" && onDone) {
+              onDone({ onboardingStatus: data.onboardingStatus });
+            } else if (data.type === "error") {
+              throw new Error(data.error);
+            }
+          } catch (e: any) {
+            if (e.message && !e.message.includes("JSON")) throw e;
+            console.error("Failed to parse SSE data:", e);
+          }
+        }
+      }
+    }
+
+    if (!sessionId) throw new Error("No session ID received");
+    return sessionId;
+  }
+
   async sendMessage(content: string, isExpert = false, systemContext?: string): Promise<SendMessageResponse> {
     if (!this.currentSessionId) {
       throw new Error("No active session. Call startSession first.");

@@ -357,34 +357,44 @@ export function TalkToHugoAI({
       if (isAdmin && adminViewMode) {
         try {
           setIsLoading(true);
-          const session = await hugoApi.startSession({
-            techniqueId: 'general',
-            mode: 'COACH_CHAT',
-            isExpert: false,
-            modality: 'chat',
-            viewMode: 'admin',
-          });
-          setHasActiveSession(true);
 
           const welcomeMsg: Message = {
             id: `admin-welcome-${Date.now()}`,
             sender: "ai",
-            text: session.message || session.initialMessage || "",
+            text: "",
             timestamp: new Date(),
           };
-
-          if (session.richContent && session.richContent.length > 0) {
-            welcomeMsg.richContent = session.richContent;
-          }
-          if (session.onboardingStatus) {
-            setOnboardingStatus(session.onboardingStatus);
-            if (session.onboardingStatus.nextItem) {
-              setOnboardingCurrentItem(session.onboardingStatus.nextItem);
-            }
-          }
-
           setMessages([welcomeMsg]);
-          console.log("[Hugo] Admin session started, onboarding:", session.onboardingStatus?.isComplete ? 'complete' : 'active');
+
+          await hugoApi.startSessionStream(
+            {
+              techniqueId: 'general',
+              mode: 'COACH_CHAT',
+              isExpert: false,
+              modality: 'chat',
+              viewMode: 'admin',
+            },
+            (token) => {
+              setMessages(prev => {
+                const updated = [...prev];
+                const lastMsg = updated[updated.length - 1];
+                if (lastMsg && lastMsg.id === welcomeMsg.id) {
+                  updated[updated.length - 1] = { ...lastMsg, text: lastMsg.text + token };
+                }
+                return updated;
+              });
+            },
+            (meta) => {
+              if (meta?.onboardingStatus) {
+                setOnboardingStatus(meta.onboardingStatus);
+                if (meta.onboardingStatus.nextItem) {
+                  setOnboardingCurrentItem(meta.onboardingStatus.nextItem);
+                }
+              }
+            }
+          );
+          setHasActiveSession(true);
+          console.log("[Hugo] Admin streaming session started");
         } catch (e) {
           console.warn("[Hugo] Failed to start admin session:", e);
           setMessages([{

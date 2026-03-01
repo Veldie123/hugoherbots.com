@@ -484,6 +484,123 @@ app.post("/api/v2/sessions", async (req, res) => {
   }
 });
 
+// POST /api/v2/sessions/stream - Streaming version of session creation
+app.post("/api/v2/sessions/stream", async (req, res) => {
+  try {
+    const { techniqueId = "general", mode = "COACH_CHAT", isExpert = false, modality = "chat", viewMode = "user", userId } = req.body;
+    
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const techniqueName = techniqueId !== 'general' ? (() => {
+      try {
+        const techData = JSON.parse(require('fs').readFileSync(require('path').join(process.cwd(), 'config/ssot/technieken_index.json'), 'utf-8'));
+        return techData.technieken?.[techniqueId]?.naam || techniqueId;
+      } catch { return techniqueId; }
+    })() : '';
+
+    const contextState = {
+      gathered: { sector: '', product: '', klant_type: '', verkoopkanaal: '', ervaring: '' },
+      questionsAnswered: [] as string[],
+      currentQuestionKey: null as string | null,
+      isComplete: viewMode === 'admin',
+      startTime: Date.now()
+    };
+
+    if (userId) {
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (supabaseUrl && supabaseKey) {
+          const supabase = createClient(supabaseUrl, supabaseKey);
+          const { data } = await supabase.from('user_context').select('sector, product, klant_type').eq('user_id', userId).single();
+          if (data) {
+            if (data.sector) { contextState.gathered.sector = data.sector; contextState.questionsAnswered.push('sector'); }
+            if (data.product) { contextState.gathered.product = data.product; contextState.questionsAnswered.push('product'); }
+            if (data.klant_type) { contextState.gathered.klant_type = data.klant_type; contextState.questionsAnswered.push('klant_type'); }
+          }
+        }
+      } catch (e: any) {
+        console.warn("[API] Could not load context for streaming session:", e.message);
+      }
+    }
+
+    const session: any = {
+      id: sessionId,
+      techniqueId,
+      techniqueName,
+      mode: viewMode === 'admin' ? 'COACH_CHAT' : mode,
+      isExpert,
+      modality,
+      viewMode,
+      userId: userId || null,
+      userName: null,
+      conversationHistory: [],
+      contextState,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    sessions.set(sessionId, session);
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
+
+    let clientDisconnected = false;
+    req.on('close', () => { clientDisconnected = true; });
+
+    res.write(`data: ${JSON.stringify({ type: "session", sessionId })}\n\n`);
+
+    const { generateCoachOpeningStream } = await import('./v2/coach-engine');
+
+    const coachContext: CoachContext = {
+      userId: session.userId,
+      techniqueId: session.techniqueId,
+      techniqueName: session.techniqueName,
+      userName: session.userName,
+      sector: contextState.gathered.sector,
+      product: contextState.gathered.product,
+      klantType: contextState.gathered.klant_type,
+      sessionContext: contextState.gathered,
+      viewMode: session.viewMode || 'user',
+    };
+
+    await generateCoachOpeningStream(
+      coachContext,
+      (token) => {
+        if (!clientDisconnected) {
+          res.write(`data: ${JSON.stringify({ type: "token", content: token })}\n\n`);
+        }
+      },
+      async (fullText, meta) => {
+        session.conversationHistory.push({ role: "assistant", content: fullText });
+        await saveSessionToDb(session);
+        
+        res.write(`data: ${JSON.stringify({ 
+          type: "done",
+          onboardingStatus: meta?.onboardingStatus || null,
+        })}\n\n`);
+        res.end();
+      },
+      (error) => {
+        console.error("[API] Streaming session error:", error.message);
+        res.write(`data: ${JSON.stringify({ type: "error", error: error.message })}\n\n`);
+        res.end();
+      }
+    );
+    
+  } catch (error: any) {
+    console.error("[API] Streaming session setup error:", error.message, error.stack);
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.write(`data: ${JSON.stringify({ type: "error", error: error.message })}\n\n`);
+      res.end();
+    }
+  }
+});
+
 // Send a message - FULL ENGINE with validation loop
 app.post("/api/v2/message", async (req, res) => {
   try {
@@ -917,6 +1034,53 @@ app.post("/api/v2/session/message", async (req, res) => {
             userWantsWebinar: msgIntentResult.contentSuggestions.some(s => s.type === 'webinar'),
           } : {}),
         };
+        
+        if (isAdminView) {
+          try {
+            const { getOnboardingStatusFromDB, getOnboardingItemData, loadOnboardingPromptConfig } = await import('./v2/coach-engine');
+            const obStatus = await getOnboardingStatusFromDB(session.userId || 'hugo');
+            if (!obStatus.isComplete && obStatus.nextItem) {
+              const lowerMsg = message.toLowerCase().trim();
+              const isStartIntent = /^(ja|yes|start|laten we|ga maar|ok|oké|begin|verder|door|go|let'?s go|klaar|ready|absolutely|zeker|natuurlijk|prima|goed|top|volgende|next)/i.test(lowerMsg) 
+                || /start/i.test(lowerMsg) || /verder/i.test(lowerMsg) || /volgende/i.test(lowerMsg);
+              
+              if (isStartIntent) {
+                const obConfig = loadOnboardingPromptConfig();
+                const itemData = getOnboardingItemData(obStatus.nextItem.module, obStatus.nextItem.key);
+                if (itemData && obConfig) {
+                  const ni = obStatus.nextItem;
+                  let onboardingInstruction = '';
+                  if (ni.module === 'technieken') {
+                    onboardingInstruction = obConfig.technique_review_intro
+                      .replace('{nummer}', itemData.nummer || ni.key)
+                      .replace('{naam}', itemData.naam || ni.name)
+                      .replace('{fase}', itemData.fase || '');
+                    onboardingInstruction += "\n\nPresenteer deze techniek aan Hugo met de volgende velden: " + obConfig.technique_fields_to_show.join(', ') + ".";
+                    onboardingInstruction += "\nGebruik de data hieronder:\n" + JSON.stringify(itemData, null, 2);
+                  } else {
+                    onboardingInstruction = obConfig.attitude_review_intro
+                      .replace('{id}', itemData.id || ni.key)
+                      .replace('{naam}', itemData.naam || ni.name);
+                    onboardingInstruction += "\n\nPresenteer deze klanthouding aan Hugo met de volgende velden: " + obConfig.attitude_fields_to_show.join(', ') + ".";
+                    onboardingInstruction += "\nGebruik de data hieronder:\n" + JSON.stringify(itemData, null, 2);
+                  }
+                  onboardingInstruction += "\n\nVraag Hugo om deze te beoordelen: goedkeuren (👍) of feedback geven (👎).";
+                  onboardingInstruction += "\n\n" + obConfig.onboarding_system_instruction;
+                  
+                  session.conversationHistory.push({
+                    role: "system",
+                    content: onboardingInstruction
+                  });
+                  console.log(`[API] Injected onboarding context for ${ni.module}/${ni.key} (start intent detected)`);
+                }
+              } else {
+                console.log(`[API] Onboarding active but no start intent detected in: "${lowerMsg.substring(0, 50)}"`);
+              }
+            }
+          } catch (err: any) {
+            console.log('[API] Onboarding context injection skipped:', err.message);
+          }
+        }
         
         const coachHistory: CoachMessage[] = session.conversationHistory.map(m => ({
           role: m.role as 'user' | 'assistant',

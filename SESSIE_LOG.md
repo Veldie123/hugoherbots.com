@@ -4,6 +4,20 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-01 — Opening opsplitsen + Correctie via chat input + Streaming SSE
+
+**Vraag:** Drie verbeteringen aan de admin chat-ervaring: (0) Opening opsplitsen — welkomst-briefing eindigt met "Klaar om te starten?" en WACHT op Hugo's antwoord, pas na "ja/start" de eerste techniek tonen (nu plakt de AI alles in één enorm bericht). (1) Correctie via chat input — het popup-venster verwijderen, als Hugo op 👎 klikt schakelt het bestaande chat-inputveld onderaan over naar correctie-modus. (2) 8-seconden laadtijd oplossen — streaming implementeren zodat de tekst woord-voor-woord verschijnt.
+
+> **Conclusie:**
+> - **Opening opsplitsen**: `generateCoachOpening` toont nu ALLEEN welkomst + "Klaar om te starten?" ZONDER techniek-data. Techniek wordt pas geïnjecteerd als system message in de message handler wanneer Hugo antwoordt met start-intent ("ja", "start", "laten we", etc.). Regex-gebaseerde start intent detectie in `/api/v2/session/message`.
+> - **Correctie via chat input**: Inline correctie-popup verwijderd. 👎 klik → `correctionMessageId` gezet → chat input krijgt paarse border + "Typ je correctie..." placeholder + banner boven input ("Correctie modus — Esc om te annuleren"). Submit → `handleSubmitCorrection` aangeroepen → state reset.
+> - **Streaming SSE**: Nieuw endpoint `POST /api/v2/sessions/stream` met SSE format: `{type:"session"}` → `{type:"token"}` → `{type:"done"}`. Pre-work geparalleliseerd met `Promise.all`. Frontend `startSessionStream` in hugoApi.ts met `ReadableStream` parsing. Eerste token na ~1-2s i.p.v. 8s wachten. Client disconnect handling toegevoegd.
+> - **Import fix**: `getUserContextFromSupabase` import verwijderd (module bestond niet), vervangen door directe Supabase client query in streaming endpoint.
+> - Files gewijzigd: `server/hugo-engine/api.ts`, `server/hugo-engine/v2/coach-engine.ts`, `src/components/HH/AdminChatExpertMode.tsx`, `src/components/HH/TalkToHugoAI.tsx`, `src/services/hugoApi.ts`
+> - E2E + curl tests geslaagd: opening zonder techniek ✓, start intent triggert techniek ✓, non-start intent triggert geen techniek ✓, streaming tokens ✓
+
+---
+
 ## 2026-03-01 — Dynamische welkomst-briefing + EPIC volgorde fix + platform stats integratie
 
 **Vraag:** de intro tekst verwelkomt Hugo de eerste keer op het platform, legt uit dat dit zijn HQ is en dat hij alle functionaliteit kan aanroepen vanuit de chat. typend of pratend. en dan de uitleg over wat hij allemaal kan doen (webinars plannen, video volgorde, details van technieken aanpassen, gesprekken van gerbruikers analyseren en de ai interpretaite van de techniek verbeteren, etc etc.) maar alvorens we dat doen moeten we samen door de techniek lopen. stephane heeft zijn best gedaan om die zo goed als mogelijk te vertalen maar jij moet natuurlijk controleren of zijn interpretatie 100% overeenkomt met jouw visie over E.P.I.C. technique. klaar om te starten? we gaan er samen door: er zijn x technieken over x fases en x houdingen. jij reageert met duimpje naar boven als het prima is en duiimpje naar beneden als je iets wil aanpassen of een nuance wil leggen. je typt gewoon je opmerking en die wordt bij gehouden en finaal naar stephane doorgestuurd zodat hij ook op de hoogte is. ready to go of wil je eerst graag iets anders doen? zoiets. remember? en die welkomsttekst moet doorheen het ganse traject van Hugo (kan jaren zijn) dynamisch aangepast worden aan wat hij gedaan heeft in het platform en wat hij nog moet doen. in functie van de activiteit in het platform (gespreksanalyses en chats die te reviewen zijn, webinars die gepland moeten worden, etc.) en in het begin SSOT's die moeten gecontroleerd worden. analytics die hij wil / kan raadplegen? goed nieuws : x aantal gebruikers gisteren. etc. hoe zorg ik dat dit dynamisch (en verslavend) is voor Hugo?

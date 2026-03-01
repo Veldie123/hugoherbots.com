@@ -366,34 +366,44 @@ export function AdminChatExpertMode({
       (async () => {
         try {
           setIsLoading(true);
-          const session = await hugoApi.startSession({
-            techniqueId: 'general',
-            mode: 'COACH_CHAT',
-            isExpert: false,
-            modality: 'chat',
-            viewMode: 'admin',
-          });
-          setHasActiveSession(true);
 
           const welcomeMsg: Message = {
             id: `admin-welcome-${Date.now()}`,
             sender: "ai",
-            text: session.message || session.initialMessage || "",
+            text: "",
             timestamp: new Date(),
           };
-
-          if (session.richContent && session.richContent.length > 0) {
-            welcomeMsg.richContent = session.richContent;
-          }
-          if (session.onboardingStatus) {
-            setOnboardingStatus(session.onboardingStatus);
-            if (session.onboardingStatus.nextItem) {
-              setOnboardingCurrentItem(session.onboardingStatus.nextItem);
-            }
-          }
-
           setMessages([welcomeMsg]);
-          console.log("[Admin] Session started, onboarding:", session.onboardingStatus?.isComplete ? 'complete' : 'active');
+
+          await hugoApi.startSessionStream(
+            {
+              techniqueId: 'general',
+              mode: 'COACH_CHAT',
+              isExpert: false,
+              modality: 'chat',
+              viewMode: 'admin',
+            },
+            (token) => {
+              setMessages(prev => {
+                const updated = [...prev];
+                const lastMsg = updated[updated.length - 1];
+                if (lastMsg && lastMsg.id === welcomeMsg.id) {
+                  updated[updated.length - 1] = { ...lastMsg, text: lastMsg.text + token };
+                }
+                return updated;
+              });
+            },
+            (meta) => {
+              if (meta?.onboardingStatus) {
+                setOnboardingStatus(meta.onboardingStatus);
+                if (meta.onboardingStatus.nextItem) {
+                  setOnboardingCurrentItem(meta.onboardingStatus.nextItem);
+                }
+              }
+            }
+          );
+          setHasActiveSession(true);
+          console.log("[Admin] Streaming session started");
         } catch (e) {
           console.warn("[Admin] Failed to start admin session:", e);
           try {
@@ -872,6 +882,12 @@ export function AdminChatExpertMode({
   const handleSendMessage = async () => {
     if (!inputText.trim() || isLoading) return;
 
+    if (correctionMessageId) {
+      await handleSubmitCorrection(correctionMessageId, inputText);
+      setInputText("");
+      return;
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       sender: "hugo",
@@ -1023,14 +1039,16 @@ export function AdminChatExpertMode({
     }
   };
 
-  const handleSubmitCorrection = async (messageId: string) => {
+  const handleSubmitCorrection = async (messageId: string, overrideText?: string) => {
     const message = messages.find(m => m.id === messageId);
     if (!message) return;
+    
+    const finalCorrectionText = overrideText ?? correctionText;
     
     const correctionData: CorrectionData = {
       selectedTechnique: correctionTechnique || undefined,
       selectedTechniqueName: correctionTechniqueName || undefined,
-      correctionText: correctionText || undefined,
+      correctionText: finalCorrectionText || undefined,
       timestamp: new Date(),
     };
 
@@ -1047,8 +1065,8 @@ export function AdminChatExpertMode({
           field: correctionTechnique ? 'technique_correction' : 'general_feedback',
           originalValue: message.text.slice(0, 200),
           newValue: correctionTechnique 
-            ? `${correctionTechnique}: ${correctionTechniqueName}${correctionText ? ` — ${correctionText}` : ''}`
-            : correctionText || 'Incorrect response',
+            ? `${correctionTechnique}: ${correctionTechniqueName}${finalCorrectionText ? ` — ${finalCorrectionText}` : ''}`
+            : finalCorrectionText || 'Incorrect response',
           context: JSON.stringify({ messageId, sessionId: null }),
           submittedBy: 'admin',
         }),
@@ -1643,54 +1661,10 @@ export function AdminChatExpertMode({
                           )}
                         </div>
 
-                        {/* Correction panel — shown when admin clicks thumbs down */}
+                        {/* Correction active indicator — shown inline when admin clicks thumbs down */}
                         {correctionMessageId === message.id && (
-                          <div className="mt-2 p-3 rounded-lg border transition-all" style={{ borderColor: 'rgba(153,16,250,0.3)', backgroundColor: 'rgba(153,16,250,0.04)' }}>
-                            <p className="text-[12px] font-medium text-hh-muted mb-2">Correctie toevoegen</p>
-                            {correctionTechnique && (
-                              <div className="flex items-center gap-1.5 mb-2">
-                                <span className="text-[11px] text-hh-muted">Techniek:</span>
-                                <span className="text-[12px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(153,16,250,0.1)', color: '#9910FA' }}>
-                                  {correctionTechnique} {correctionTechniqueName}
-                                </span>
-                                <button onClick={() => { setCorrectionTechnique(""); setCorrectionTechniqueName(""); }} className="text-hh-muted hover:text-hh-muted">
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </div>
-                            )}
-                            {!correctionTechnique && (
-                              <p className="text-[11px] text-hh-muted mb-2 italic">
-                                Selecteer optioneel de juiste techniek via het lampje (E.P.I.C. sidebar)
-                              </p>
-                            )}
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                value={correctionText}
-                                onChange={(e) => setCorrectionText(e.target.value)}
-                                placeholder="Wat klopt er niet? (optioneel)"
-                                className="flex-1 text-[13px] px-3 py-1.5 rounded-md border border-hh-border focus:outline-none focus:border-purple-300 bg-hh-bg text-hh-ink"
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') handleSubmitCorrection(message.id);
-                                  if (e.key === 'Escape') handleCancelCorrection();
-                                }}
-                              />
-                              <button
-                                onClick={() => handleSubmitCorrection(message.id)}
-                                className="p-1.5 rounded-md transition-colors hover:bg-purple-100"
-                                style={{ color: '#9910FA' }}
-                                title="Correctie bevestigen"
-                              >
-                                <Check className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={handleCancelCorrection}
-                                className="p-1.5 rounded-md text-hh-muted hover:text-hh-ink hover:bg-hh-ui-100 transition-colors"
-                                title="Annuleren"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
+                          <div className="mt-1 flex items-center gap-1.5 text-[11px]" style={{ color: '#9910FA' }}>
+                            <span>Correctie modus actief — typ je opmerking onderaan</span>
                           </div>
                         )}
 
@@ -2374,6 +2348,12 @@ export function AdminChatExpertMode({
                 ))}
               </div>
             )}
+            {correctionMessageId && (
+              <div className="flex items-center justify-between px-3 py-1.5 rounded-t-md text-[12px]" style={{ backgroundColor: 'rgba(153,16,250,0.08)', color: '#9910FA' }}>
+                <span>Correctie modus — typ je opmerking en druk Enter</span>
+                <button onClick={handleCancelCorrection} className="hover:opacity-70 text-[11px] underline">Annuleren (Esc)</button>
+              </div>
+            )}
             <div className="flex gap-2 items-center">
               {/* Paperclip - file upload */}
               <button
@@ -2394,8 +2374,10 @@ export function AdminChatExpertMode({
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && !isLoading && handleSendMessage()}
-                placeholder={isLoading ? "Hugo denkt na..." : "Typ je bericht..."}
+                onKeyDown={(e) => { if (e.key === 'Escape' && correctionMessageId) { handleCancelCorrection(); } }}
+                placeholder={isLoading ? "Hugo denkt na..." : correctionMessageId ? "Typ je correctie..." : "Typ je bericht..."}
                 className="flex-1 min-w-0 text-hh-ink bg-hh-bg"
+                style={correctionMessageId ? { borderColor: '#9910FA', boxShadow: '0 0 0 1px rgba(153,16,250,0.3)' } : undefined}
                 disabled={isLoading}
               />
               {/* Microphone - dictation */}

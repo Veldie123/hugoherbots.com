@@ -121,7 +121,7 @@ interface OnboardingPromptConfig {
 
 let onboardingPromptConfig: OnboardingPromptConfig | null = null;
 
-function loadOnboardingPromptConfig(): OnboardingPromptConfig | null {
+export function loadOnboardingPromptConfig(): OnboardingPromptConfig | null {
   if (onboardingPromptConfig) return onboardingPromptConfig;
   const configPath = path.join(process.cwd(), "config", "prompts", "admin_onboarding_prompt.json");
   if (!fs.existsSync(configPath)) {
@@ -190,7 +190,7 @@ async function ensureOnboardingPopulatedInternal(adminUserId: string, techData: 
   }
 }
 
-async function getOnboardingStatusFromDB(adminUserId: string = 'hugo'): Promise<OnboardingStatus> {
+export async function getOnboardingStatusFromDB(adminUserId: string = 'hugo'): Promise<OnboardingStatus> {
   const techPath = path.join(process.cwd(), 'config/ssot/technieken_index.json');
   const houdPath = path.join(process.cwd(), 'config/klant_houdingen.json');
   const techData = JSON.parse(fs.readFileSync(techPath, 'utf-8'));
@@ -260,7 +260,7 @@ async function getOnboardingStatusFromDB(adminUserId: string = 'hugo'): Promise<
   }
 }
 
-function getOnboardingItemData(module: string, key: string): any {
+export function getOnboardingItemData(module: string, key: string): any {
   if (module === 'technieken') {
     const techPath = path.join(process.cwd(), 'config/ssot/technieken_index.json');
     const techData = JSON.parse(fs.readFileSync(techPath, 'utf-8'));
@@ -1189,12 +1189,14 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
           .replace('{houdingen_count}', String(onboardingStatus.houdingen.total))
           .replace('{fases_count}', '5');
 
-        openingPrompt = "BELANGRIJK: Je antwoord moet BEGINNEN met de volgende welkomsttekst (je mag de tekst licht parafraseren maar alle inhoud moet erin zitten). Begin hier ALTIJD mee voordat je de eerste techniek toont:\n\n";
+        openingPrompt = "BELANGRIJK: Je antwoord moet BEGINNEN met de volgende welkomsttekst (je mag de tekst licht parafraseren maar alle inhoud moet erin zitten). Begin hier ALTIJD mee:\n\n";
         openingPrompt += "── WELKOMSTTEKST ──\n" + welcomeText + "\n── EINDE WELKOMSTTEKST ──";
 
         if (platformStatsStr) {
           openingPrompt += "\n\nVoeg ook deze platformstatistieken toe in je welkomst:\n" + platformStatsStr;
         }
+
+        openingPrompt += "\n\nBELANGRIJK: Eindig met de vraag of Hugo klaar is om te starten. Presenteer NIET de eerste techniek — wacht tot Hugo bevestigt dat hij wil starten. De techniek wordt pas in het volgende bericht getoond.";
       } else {
         const reviewPercentage = totalItems > 0 ? Math.round((totalReviewed / totalItems) * 100) : 0;
         const returningText = (obConfig.welcome_returning_onboarding || obConfig.welcome_returning_incomplete)
@@ -1206,28 +1208,8 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
 
         openingPrompt = "BELANGRIJK: Je antwoord moet BEGINNEN met de volgende welkomsttekst (je mag licht parafraseren maar alle inhoud moet erin). Begin hier ALTIJD mee:\n\n";
         openingPrompt += "── WELKOMSTTEKST ──\n" + returningText + "\n── EINDE WELKOMSTTEKST ──";
-      }
 
-      if (onboardingStatus.nextItem && onboardingItemData) {
-        const ni = onboardingStatus.nextItem;
-        if (totalReviewed === 0) {
-          openingPrompt += "\n\nAls Hugo aangeeft klaar te zijn (of niet expliciet iets anders kiest), presenteer dan DIRECT na de welkomsttekst de eerste techniek hieronder. Eindig je bericht met de welkomsttekst + de eerste techniek:";
-        }
-        if (ni.module === 'technieken') {
-          openingPrompt += "\n\n" + obConfig.technique_review_intro
-            .replace('{nummer}', onboardingItemData.nummer || ni.key)
-            .replace('{naam}', onboardingItemData.naam || ni.name)
-            .replace('{fase}', onboardingItemData.fase || '');
-          openingPrompt += "\n\nPresenteer deze techniek aan Hugo met de volgende velden: " + obConfig.technique_fields_to_show.join(', ') + ".";
-          openingPrompt += "\nGebruik de data hieronder:\n" + JSON.stringify(onboardingItemData, null, 2);
-        } else {
-          openingPrompt += "\n\n" + obConfig.attitude_review_intro
-            .replace('{id}', onboardingItemData.id || ni.key)
-            .replace('{naam}', onboardingItemData.naam || ni.name);
-          openingPrompt += "\n\nPresenteer deze klanthouding aan Hugo met de volgende velden: " + obConfig.attitude_fields_to_show.join(', ') + ".";
-          openingPrompt += "\nGebruik de data hieronder:\n" + JSON.stringify(onboardingItemData, null, 2);
-        }
-        openingPrompt += "\n\nVraag Hugo om deze te beoordelen: goedkeuren (👍) of feedback geven (👎).";
+        openingPrompt += "\n\nBELANGRIJK: Eindig met de vraag of Hugo verder wil gaan met de review. Presenteer NIET de volgende techniek/houding — wacht tot Hugo bevestigt. De techniek wordt pas in het volgende bericht getoond.";
       }
     } else {
       if (obConfig?.welcome_post_onboarding && platformStatsStr) {
@@ -1327,17 +1309,7 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
       validatorInfo
     };
 
-    if (onboardingActive && onboardingItemData && onboardingStatus?.nextItem) {
-      try {
-        const { buildOnboardingReviewCard } = await import('./rich-response-builder');
-        const reviewCard = buildOnboardingReviewCard(
-          onboardingItemData,
-          onboardingStatus.nextItem.module as 'technieken' | 'houdingen'
-        );
-        result.richContent = [reviewCard];
-      } catch (err: any) {
-        console.error('[COACH] Failed to build onboarding review card:', err.message);
-      }
+    if (onboardingActive && onboardingStatus) {
       result.onboardingStatus = onboardingStatus;
     }
 
@@ -1347,6 +1319,234 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
     return {
       message: TECHNICAL_FALLBACKS.error_generic,
     };
+  }
+}
+
+/**
+ * Streaming version of generateCoachOpening — sends tokens as they arrive from OpenAI
+ */
+export async function generateCoachOpeningStream(
+  context: CoachContext,
+  onToken: (token: string) => void,
+  onDone: (fullText: string, meta?: { onboardingStatus?: OnboardingStatus }) => void,
+  onError: (error: Error) => void
+): Promise<void> {
+  const client = getOpenAIClient();
+  
+  if (!client) {
+    onToken(TECHNICAL_FALLBACKS.client_unavailable);
+    onDone(TECHNICAL_FALLBACKS.client_unavailable);
+    return;
+  }
+
+  const technique = context.techniqueId ? getTechnique(context.techniqueId) : null;
+  const techniqueName = technique?.naam || context.techniqueName || "";
+  
+  let mergedContext: Record<string, string> = {};
+  if (context.userId) {
+    const sessionContext = context.sessionContext || {
+      sector: context.sector || "",
+      product: context.product || "",
+      klant_type: context.klantType || ""
+    };
+    mergedContext = await mergeUserAndSessionContext(context.userId, sessionContext);
+  } else {
+    mergedContext = {
+      sector: context.sector || "",
+      product: context.product || "",
+      klant_type: context.klantType || ""
+    };
+  }
+
+  const [ragResult, videoStats] = await Promise.all([
+    techniqueName ? searchRag(techniqueName, { limit: 2, threshold: 0.3 }) : Promise.resolve({ documents: [] as RagDocument[], searchTimeMs: 0 }),
+    getVideoLibraryStats(),
+  ]);
+
+  const coacheeContextStr = buildCoacheeContext(mergedContext, context.userName);
+  const fullTechniqueNarrative = buildFullTechniqueNarrative(technique as FullTechnique || null);
+  
+  let historicalScoreContext = "";
+  if (context.userId && context.techniqueId) {
+    historicalScoreContext = await buildHistoricalScoreContext(context.userId, context.techniqueId, techniqueName);
+  }
+
+  let ragContextStr = ragResult.documents.length > 0
+    ? ragResult.documents.map((doc, i) => `[Fragment ${i + 1}] ${doc.title || INLINE_DEFAULTS.document_title_fallback}:\n${doc.content}`).join("\n\n")
+    : INLINE_DEFAULTS.no_context_found;
+  
+  let videoContextStr = INLINE_DEFAULTS.no_videos_available;
+  if (context.techniqueId) {
+    const videos = getVideosForTechnique(context.techniqueId);
+    if (videos.length > 0) {
+      videoContextStr = videos.map(v => `- "${v.title}": ${v.beschrijving}`).join("\n");
+    }
+  }
+  
+  const videoStatsStr = buildVideoStatsPrompt(videoStats);
+
+  let onboardingActive = false;
+  let onboardingStatus: OnboardingStatus | null = null;
+  const obConfig = loadOnboardingPromptConfig();
+  let platformStatsStr = "";
+
+  if (context.viewMode === 'admin') {
+    const [obResult, statsResult] = await Promise.all([
+      (async () => {
+        try {
+          const status = await getOnboardingStatusFromDB(context.userId || 'hugo');
+          return status;
+        } catch (err: any) {
+          console.error('[COACH] Onboarding check failed:', err.message);
+          return null;
+        }
+      })(),
+      (async () => {
+        try {
+          const statsController = new AbortController();
+          const statsTimeout = setTimeout(() => statsController.abort(), 5000);
+          const statsRes = await fetch('http://localhost:3002/api/v2/admin/stats', { signal: statsController.signal });
+          clearTimeout(statsTimeout);
+          if (statsRes.ok) return await statsRes.json();
+          return null;
+        } catch (err: any) {
+          console.log('[COACH] Platform stats fetch failed (non-critical):', err.message);
+          return null;
+        }
+      })(),
+    ]);
+
+    if (obResult && !obResult.isComplete) {
+      onboardingActive = true;
+      onboardingStatus = obResult;
+    } else if (obResult) {
+      onboardingStatus = obResult;
+    }
+
+    if (statsResult) {
+      const stats = statsResult;
+      const avgScoreText = stats.analyses?.avgScore ? ` — gem. score: ${stats.analyses.avgScore}%` : '';
+      platformStatsStr = (obConfig?.platform_stats_section || '')
+        .replace('{total_users}', String(stats.platform?.totalUsers || 0))
+        .replace('{new_users_week}', String(stats.platform?.newUsersThisWeek || 0))
+        .replace('{active_users}', String(stats.platform?.activeUsers || 0))
+        .replace('{total_sessions}', String(stats.sessions?.total || 0))
+        .replace('{recent_sessions}', String(stats.sessions?.recentWeek || 0))
+        .replace('{total_analyses}', String(stats.analyses?.total || 0))
+        .replace('{avg_score_text}', avgScoreText);
+
+      if (stats.pendingReviews > 0 && obConfig?.attention_needed_section) {
+        platformStatsStr += '\n\n' + obConfig.attention_needed_section
+          .replace('{pending_reviews}', String(stats.pendingReviews));
+      }
+
+      if (stats.topAnalyses?.length > 0 && obConfig?.top_analyses_section) {
+        const list = stats.topAnalyses
+          .map((a: any) => `• "${a.title}" van ${a.userName}${a.score !== null ? ` — ${a.score}%` : ' — wacht op resultaat'}`)
+          .join('\n');
+        platformStatsStr += '\n\n' + obConfig.top_analyses_section.replace('{analyses_list}', list);
+      }
+    }
+  }
+
+  const systemPrompt = buildNestedOpeningPrompt(
+    coacheeContextStr, fullTechniqueNarrative, historicalScoreContext,
+    videoContextStr, ragContextStr, context.userName, context.techniqueId,
+    videoStatsStr, context.viewMode, onboardingActive
+  );
+  
+  let openingPrompt = "";
+  if (context.viewMode === 'admin') {
+    if (onboardingActive && obConfig && onboardingStatus) {
+      const totalReviewed = onboardingStatus.totalReviewed || 0;
+      const totalItems = onboardingStatus.totalItems || 0;
+
+      if (totalReviewed === 0) {
+        const welcomeText = obConfig.welcome_first_time
+          .replace('{technieken_count}', String(onboardingStatus.technieken.total))
+          .replace('{houdingen_count}', String(onboardingStatus.houdingen.total))
+          .replace('{fases_count}', '5');
+
+        openingPrompt = "BELANGRIJK: Je antwoord moet BEGINNEN met de volgende welkomsttekst (je mag de tekst licht parafraseren maar alle inhoud moet erin zitten). Begin hier ALTIJD mee:\n\n";
+        openingPrompt += "── WELKOMSTTEKST ──\n" + welcomeText + "\n── EINDE WELKOMSTTEKST ──";
+
+        if (platformStatsStr) {
+          openingPrompt += "\n\nVoeg ook deze platformstatistieken toe in je welkomst:\n" + platformStatsStr;
+        }
+
+        openingPrompt += "\n\nBELANGRIJK: Eindig met de vraag of Hugo klaar is om te starten. Presenteer NIET de eerste techniek — wacht tot Hugo bevestigt dat hij wil starten. De techniek wordt pas in het volgende bericht getoond.";
+      } else {
+        const reviewPercentage = totalItems > 0 ? Math.round((totalReviewed / totalItems) * 100) : 0;
+        const returningText = (obConfig.welcome_returning_onboarding || obConfig.welcome_returning_incomplete)
+          .replace('{reviewed_count}', String(totalReviewed))
+          .replace('{total_count}', String(totalItems))
+          .replace('{review_percentage}', String(reviewPercentage))
+          .replace('{next_item_name}', onboardingStatus.nextItem?.name || 'het volgende item')
+          .replace('{platform_stats}', platformStatsStr || 'Geen stats beschikbaar');
+
+        openingPrompt = "BELANGRIJK: Je antwoord moet BEGINNEN met de volgende welkomsttekst (je mag licht parafraseren maar alle inhoud moet erin). Begin hier ALTIJD mee:\n\n";
+        openingPrompt += "── WELKOMSTTEKST ──\n" + returningText + "\n── EINDE WELKOMSTTEKST ──";
+
+        openingPrompt += "\n\nBELANGRIJK: Eindig met de vraag of Hugo verder wil gaan met de review. Presenteer NIET de volgende techniek/houding — wacht tot Hugo bevestigt. De techniek wordt pas in het volgende bericht getoond.";
+      }
+    } else {
+      if (obConfig?.welcome_post_onboarding && platformStatsStr) {
+        const attentionStr = platformStatsStr.includes('Aandacht nodig') ? '' : (obConfig.no_attention_needed || '');
+        openingPrompt = obConfig.welcome_post_onboarding
+          .replace('{platform_stats}', platformStatsStr)
+          .replace('{attention_needed}', attentionStr);
+      } else {
+        openingPrompt = "Begroet Hugo Herbots kort en professioneel. Geef een beknopt overzicht van het platform en vraag waarmee je kunt helpen. Geen coaching-vragen, geen vragen over ervaring of achtergrond.";
+      }
+      if (techniqueName) {
+        openingPrompt += ` De huidige focus is de techniek '${techniqueName}'.`;
+      }
+    }
+  } else {
+    openingPrompt = context.userName ? `Begin een coachend gesprek met ${context.userName}` : "Begin een coachend gesprek met de coachee";
+    if (techniqueName) {
+      openingPrompt += ` over de techniek '${techniqueName}'.`;
+    } else {
+      openingPrompt += ".";
+    }
+    openingPrompt += " Begroet warm en kort. Behandel de gebruiker als een verkoper die sales coaching wil. Vraag naar hun concrete verkoopsituatie (welke klant, welk product, welke uitdaging). Stel GEEN meta-vragen over het platform of over wat voor soort gesprek ze willen. Ga direct aan de slag als sales coach.";
+  }
+  
+  if (context.contextGatheringHistory && context.contextGatheringHistory.length > 0) {
+    openingPrompt += "\n\n── WAT ER AL BESPROKEN IS ──\nDit gesprek is al begonnen. Hier is wat er tot nu toe is gezegd:\n\n";
+    openingPrompt += context.contextGatheringHistory.map(msg => {
+      const speaker = msg.role === 'customer' ? 'Hugo' : 'Coachee';
+      return `${speaker}: ${msg.content}`;
+    }).join("\n\n");
+    openingPrompt += "\n\n(Dit gesprek loopt al. Bouw voort op wat er gezegd is.)";
+  }
+
+  try {
+    const stream = await client.chat.completions.create({
+      model: "gpt-5.1",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: openingPrompt },
+      ],
+      max_completion_tokens: 4000,
+      stream: true,
+    });
+
+    let fullText = "";
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content;
+      if (delta) {
+        fullText += delta;
+        onToken(delta);
+      }
+    }
+
+    onDone(fullText || TECHNICAL_FALLBACKS.error_generic, {
+      onboardingStatus: onboardingStatus || undefined,
+    });
+  } catch (error: any) {
+    console.error("[COACH] Streaming opening error:", error);
+    onError(error);
   }
 }
 
