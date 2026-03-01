@@ -119,6 +119,7 @@ interface TalkToHugoAIProps {
   isAdmin?: boolean;
   navigationData?: Record<string, any>;
   onboardingMode?: boolean;
+  adminViewMode?: boolean;
 }
 
 export function TalkToHugoAI({
@@ -126,6 +127,7 @@ export function TalkToHugoAI({
   isAdmin,
   navigationData,
   onboardingMode,
+  adminViewMode = false,
 }: TalkToHugoAIProps) {
   const { user } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -352,7 +354,7 @@ export function TalkToHugoAI({
     }
 
     const loadPersonalizedWelcome = async () => {
-      if (isAdmin) {
+      if (isAdmin && adminViewMode) {
         try {
           setIsLoading(true);
           const session = await hugoApi.startSession({
@@ -423,7 +425,7 @@ export function TalkToHugoAI({
       }]);
     };
     loadPersonalizedWelcome();
-  }, [user?.id, navigationData, isAdmin]);
+  }, [user?.id, navigationData, isAdmin, adminViewMode]);
 
   useEffect(() => {
     if (selectedTechnique || audioConnectionState === ConnectionState.Connected) {
@@ -1564,7 +1566,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
   };
 
   const handleMessageFeedback = async (messageId: string, feedback: "up" | "down") => {
-    if (isAdmin && onboardingStatus && !onboardingStatus.isComplete && onboardingCurrentItem) {
+    if (isAdmin && adminViewMode && onboardingStatus && !onboardingStatus.isComplete && onboardingCurrentItem) {
       if (feedback === "up") {
         handleOnboardingApprove();
         return;
@@ -1639,7 +1641,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           </div>
         </div>
       )}
-      {isAdmin && onboardingStatus && !onboardingStatus.isComplete && (
+      {isAdmin && adminViewMode && onboardingStatus && !onboardingStatus.isComplete && (
         <div className="flex items-center justify-center gap-3 py-2 px-4 border-b border-hh-border bg-hh-ui-50/50">
           <div className="flex items-center gap-2">
             <span className="text-[12px] font-medium" style={{ color: '#7c3aed' }}>

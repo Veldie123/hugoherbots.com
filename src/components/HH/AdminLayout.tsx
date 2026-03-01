@@ -538,10 +538,10 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
           })}
         </nav>
 
-        <div className="p-3 border-t border-hh-border flex-shrink-0">
+        <div className="px-4 pt-4 pb-4 border-t border-hh-border flex-shrink-0">
           <button
             onClick={() => navigate?.(isSuperAdminProp ? "analysis" : "dashboard")}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
+            className="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
           >
             <Eye className="w-4 h-4" />
             {!collapsed && <span>User View</span>}

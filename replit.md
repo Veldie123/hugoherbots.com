@@ -108,7 +108,7 @@ Key features include a unified video system (Google Drive to Mux), Live Coaching
 1. Schrijf een entry naar `SESSIE_LOG.md` in de root van het project
 2. Formaat per entry:
    - `## DATUM — Korte titel`
-   - `**Vraag:**` de originele vraag van de gebruiker (ingekort indien nodig)
+   - `**Vraag:**` de LETTERLIJKE, ongewijzigde, volledige tekst van de gebruiker — NOOIT samenvatten of herformuleren. Kopieer exact wat de gebruiker heeft getypt/gestuurd. Als de vraag lang is, neem ALLES op. Onder de letterlijke vraag, schrijf een korte samenvatting van wat er is opgeleverd
    - `> **Conclusie:**` ingesprongen bullets met wat er gedaan is, welke bestanden, en de kosten
 3. Dit document is het permanente overzicht voor de gebruiker om snel terug te vinden wat er gedaan is
 4. Doe dit ALTIJD, ook als er geen code wijzigingen waren (bijv. "geen wijzigingen nodig — was al geïmplementeerd")
