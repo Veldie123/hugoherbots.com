@@ -12,6 +12,7 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 > - **Punt 1 (domeinnaam)**: Dit is de automatische Replit subdomain naam gebaseerd op de Repl-naam. Je kunt het niet wijzigen via de Manage knop. Gebruik hugoherbots.com (custom domain, DNS verificatie via Combell).
 > - **Punt 2 (technique detail breedte)**: `TechniqueDetailsDialog.tsx` gewijzigd van vaste Tailwind classes naar inline style met `calc(60px + (100vw - 60px) / 3)` op desktop (= sidebar + 1/3 content area). Mobiel blijft full width. E2E test bevestigt panel ~467px breed op 1280px viewport.
 > - **Punt 3 (analyse scores)**: SQL query in admin stats endpoint gecorrigeerd van `result->>'overallScore'` naar `COALESCE(result->'insights'->>'overallScore', result->>'overallScore')`. De score zat genest onder `insights`, niet op top-level. Ook JS falsy fix: `row.score ?` → `row.score !== null` om score=0 correct te tonen.
+> - **Punt 4 (design audit detail-paneel)**: Spacing verhoogd: `space-y-5` → `space-y-7` tussen secties, `p-4` → `p-5` in kaders, `pb-6` → `pb-8` onderaan, `mb-3` → `mb-4` voor lijsten, `space-y-2` → `space-y-3` tussen items. "Oefen deze techniek" knop verwijderd (alle commando's via chat). Footer nu `justify-end` met alleen Sluiten.
 > - Files gewijzigd: `src/components/HH/TechniqueDetailsDialog.tsx`, `server/hugo-engine/api.ts`
 > - Scores tonen nu correct: "cvcv — 28%", "Nico - Michiel — 28%", "sdge — 28%" i.p.v. "wacht op resultaat"
 

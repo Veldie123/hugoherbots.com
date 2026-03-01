@@ -2,13 +2,12 @@ import { useState, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
-  SheetFooter,
 } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Badge } from "../ui/badge";
-import { Target, X, Info, Clock, Lightbulb, Pencil, Play, ListOrdered, Quote } from "lucide-react";
+import { Target, X, Pencil, ListOrdered, Quote } from "lucide-react";
 import { getCodeBadgeColors } from "../../utils/phaseColors";
 
 const PHASE_LABELS: Record<string, string> = {
@@ -51,7 +50,6 @@ export function TechniqueDetailsDialog({
   onSave,
   isEditable = false,
   isAdmin = false,
-  onStartPractice,
 }: TechniqueDetailsDialogProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<any>(null);
@@ -130,7 +128,6 @@ export function TechniqueDetailsDialog({
   const displayData = isEditing ? editedData : technique;
   const codeBadgeColors = getCodeBadgeColors(technique.nummer);
 
-  const accentColor = isAdmin ? "purple-600" : "hh-ink";
   const accentBg = isAdmin ? "bg-purple-100" : "bg-hh-ink/10";
   const accentText = isAdmin ? "text-purple-600" : "text-hh-ink";
 
@@ -144,8 +141,8 @@ export function TechniqueDetailsDialog({
         style={isDesktop ? { width: 'calc(60px + (100vw - 60px) / 3)', maxWidth: 'none' } : { width: '100%' }}
       >
         <div className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto pb-6">
-            <div className="p-6 pb-4">
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-6 pb-5">
               <div className="flex items-center gap-3 mb-2">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-[13px] font-bold shrink-0 ${codeBadgeColors}`}>
                   {technique.nummer}
@@ -203,10 +200,10 @@ export function TechniqueDetailsDialog({
               )}
             </div>
 
-            <div className="px-6 pb-6 space-y-5">
+            <div className="px-6 pb-8 space-y-7">
               {displayData.doel && (
-                <div className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-4`}>
-                  <div className="flex items-center gap-2 mb-2">
+                <div className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-5`}>
+                  <div className="flex items-center gap-2 mb-3">
                     <Target className={`w-4 h-4 ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`} />
                     <h4 className={`text-[14px] font-semibold ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`}>Doel</h4>
                   </div>
@@ -313,12 +310,12 @@ export function TechniqueDetailsDialog({
               )}
 
               {displayData.stappenplan && displayData.stappenplan.length > 0 && (
-                <div className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-4`}>
-                  <div className="flex items-center gap-2 mb-3">
+                <div className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-5`}>
+                  <div className="flex items-center gap-2 mb-4">
                     <ListOrdered className={`w-4 h-4 ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`} />
                     <h4 className={`text-[14px] font-semibold ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`}>Stappenplan</h4>
                   </div>
-                  <ol className="space-y-2">
+                  <ol className="space-y-3">
                     {(Array.isArray(displayData.stappenplan) ? displayData.stappenplan : [displayData.stappenplan]).map((stap: string, idx: number) => (
                       <li key={idx} className="flex items-start gap-3">
                         <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5 ${isAdmin ? 'bg-purple-600 text-white' : 'bg-hh-ink text-white'}`}>
@@ -333,15 +330,15 @@ export function TechniqueDetailsDialog({
 
               {displayData.voorbeeld && (Array.isArray(displayData.voorbeeld) ? displayData.voorbeeld.length > 0 : true) && (
                 <div>
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-2 mb-4">
                     <Quote className={`w-4 h-4 ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`} />
                     <h4 className={`text-[14px] font-semibold ${isAdmin ? 'text-purple-600' : 'text-hh-ink'}`}>Voorbeelden</h4>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {(Array.isArray(displayData.voorbeeld) ? displayData.voorbeeld : [displayData.voorbeeld]).map((vb: string, idx: number) => (
                       <div
                         key={idx}
-                        className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-4`}
+                        className={`${isAdmin ? 'bg-purple-500/10 border-purple-500/20' : 'bg-hh-ui-50 border-hh-border'} border rounded-xl p-5`}
                       >
                         <p className={`text-[14px] leading-[22px] italic ${isAdmin ? 'text-purple-700' : 'text-hh-text'}`}>
                           "{vb}"
@@ -354,7 +351,7 @@ export function TechniqueDetailsDialog({
             </div>
           </div>
 
-          <div className="p-6 pt-4 border-t border-hh-border/50 flex flex-row justify-between gap-3">
+          <div className="p-5 pt-4 border-t border-hh-border/50 flex flex-row justify-end gap-3">
             {isEditing ? (
               <>
                 <Button
@@ -369,19 +366,6 @@ export function TechniqueDetailsDialog({
               </>
             ) : (
               <>
-                {onStartPractice && technique && (
-                  <Button
-                    className="px-6 gap-2 text-white"
-                    style={{ backgroundColor: isAdmin ? '#9910FA' : '#3C9A6E' }}
-                    onClick={() => {
-                      onStartPractice(technique.nummer, technique.naam);
-                      onOpenChange(false);
-                    }}
-                  >
-                    <Play className="w-4 h-4" />
-                    Oefen deze techniek
-                  </Button>
-                )}
                 {isEditable && (
                   <Button
                     className={`${isAdmin ? 'bg-purple-600 hover:bg-purple-700' : 'bg-hh-ink hover:bg-hh-ink/90'} px-6 gap-2`}
