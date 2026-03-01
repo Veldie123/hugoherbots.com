@@ -134,9 +134,15 @@ export function TechniqueDetailsDialog({
   const accentBg = isAdmin ? "bg-purple-100" : "bg-hh-ink/10";
   const accentText = isAdmin ? "text-purple-600" : "text-hh-ink";
 
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="p-0 overflow-hidden !w-full md:!w-[40vw] md:!max-w-[520px]">
+      <SheetContent 
+        side="left" 
+        className="p-0 overflow-hidden"
+        style={isDesktop ? { width: 'calc(60px + (100vw - 60px) / 3)', maxWidth: 'none' } : { width: '100%' }}
+      >
         <div className="flex flex-col h-full">
           <div className="flex-1 overflow-y-auto pb-6">
             <div className="p-6 pb-4">

@@ -4641,7 +4641,7 @@ app.get("/api/v2/admin/stats", async (req: Request, res: Response) => {
       completedAnalyses = parseInt(uploadResult.rows[0]?.completed || '0');
       
       const scoreResult = await pool.query(
-        "SELECT AVG((result->>'overallScore')::numeric) as avg_score FROM conversation_analyses WHERE id NOT LIKE 'session-%' AND status = 'completed' AND result->>'overallScore' IS NOT NULL"
+        "SELECT AVG(COALESCE((result->'insights'->>'overallScore')::numeric, (result->>'overallScore')::numeric)) as avg_score FROM conversation_analyses WHERE id NOT LIKE 'session-%' AND status = 'completed' AND (result->'insights'->>'overallScore' IS NOT NULL OR result->>'overallScore' IS NOT NULL)"
       );
       avgAnalysisScore = Math.round(parseFloat(scoreResult.rows[0]?.avg_score || '0'));
 
@@ -4654,7 +4654,7 @@ app.get("/api/v2/admin/stats", async (req: Request, res: Response) => {
     const topAnalyses: Array<{id: string; title: string; score: number | null; userName: string}> = [];
     try {
       const { rows } = await pool.query(
-        `SELECT id, title, user_id, (result->>'overallScore')::numeric as score 
+        `SELECT id, title, user_id, COALESCE((result->'insights'->>'overallScore')::numeric, (result->>'overallScore')::numeric) as score 
          FROM conversation_analyses 
          WHERE status = 'completed' AND id NOT LIKE 'session-%'
          ORDER BY created_at DESC LIMIT 3`
@@ -4671,7 +4671,7 @@ app.get("/api/v2/admin/stats", async (req: Request, res: Response) => {
         topAnalyses.push({
           id: row.id,
           title: row.title || 'Untitled',
-          score: row.score ? Math.round(row.score) : null,
+          score: row.score !== null && row.score !== undefined ? Math.round(row.score) : null,
           userName: userMap[row.user_id] || 'Anoniem',
         });
       }

@@ -4,6 +4,19 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-01 — Technique panel breedte + Analyse scores fix
+
+**Vraag:** (1) Hoe verander ik de naam van video-webinar naar hugoherbots.replit.app? (2) Op desktop mag de techniek-detail niet full width zijn, moet tot tegen de zijkant van het chatvenster komen. Mobiel mag full width. (3) "Recente analyses" toont altijd "wacht op resultaat" terwijl het resultaat al lang binnen is.
+
+> **Conclusie:**
+> - **Punt 1 (domeinnaam)**: Dit is de automatische Replit subdomain naam gebaseerd op de Repl-naam. Je kunt het niet wijzigen via de Manage knop. Gebruik hugoherbots.com (custom domain, DNS verificatie via Combell).
+> - **Punt 2 (technique detail breedte)**: `TechniqueDetailsDialog.tsx` gewijzigd van vaste Tailwind classes naar inline style met `calc(60px + (100vw - 60px) / 3)` op desktop (= sidebar + 1/3 content area). Mobiel blijft full width. E2E test bevestigt panel ~467px breed op 1280px viewport.
+> - **Punt 3 (analyse scores)**: SQL query in admin stats endpoint gecorrigeerd van `result->>'overallScore'` naar `COALESCE(result->'insights'->>'overallScore', result->>'overallScore')`. De score zat genest onder `insights`, niet op top-level. Ook JS falsy fix: `row.score ?` → `row.score !== null` om score=0 correct te tonen.
+> - Files gewijzigd: `src/components/HH/TechniqueDetailsDialog.tsx`, `server/hugo-engine/api.ts`
+> - Scores tonen nu correct: "cvcv — 28%", "Nico - Michiel — 28%", "sdge — 28%" i.p.v. "wacht op resultaat"
+
+---
+
 ## 2026-03-01 — Opening opsplitsen + Correctie via chat input + Streaming SSE
 
 **Vraag:** Drie verbeteringen aan de admin chat-ervaring: (0) Opening opsplitsen — welkomst-briefing eindigt met "Klaar om te starten?" en WACHT op Hugo's antwoord, pas na "ja/start" de eerste techniek tonen (nu plakt de AI alles in één enorm bericht). (1) Correctie via chat input — het popup-venster verwijderen, als Hugo op 👎 klikt schakelt het bestaande chat-inputveld onderaan over naar correctie-modus. (2) 8-seconden laadtijd oplossen — streaming implementeren zodat de tekst woord-voor-woord verschijnt.
