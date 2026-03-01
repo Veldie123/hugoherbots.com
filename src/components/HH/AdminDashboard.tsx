@@ -247,10 +247,11 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                 })}
               </div>
             ) : (
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {[
                   { label: "Actieve Video's", icon: Video, color: "#9333ea", bgColor: "rgba(147, 51, 234, 0.1)", note: "Beheer via Video's" },
                   { label: "Live Webinars", icon: Radio, color: "#2563eb", bgColor: "rgba(37, 99, 235, 0.1)", note: "Beheer via Webinars" },
+                  { label: "Coaching Sessies", icon: MessageSquare, color: "#ea580c", bgColor: "rgba(234, 88, 12, 0.1)", note: "Talk to Hugo AI" },
                   { label: "Platform Users", icon: Users, color: "#059669", bgColor: "rgba(5, 150, 105, 0.1)", note: "Ingeschreven gebruikers" },
                 ].map((kpi) => {
                   const Icon = kpi.icon;

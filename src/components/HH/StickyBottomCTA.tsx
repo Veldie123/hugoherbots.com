@@ -59,7 +59,7 @@ export function StickyBottomCTA({ navigate, heroButtonId = "hero-cta" }: StickyB
         className="w-full gap-2 h-14 text-[16px] font-[600] shadow-lg"
         onClick={() => navigate?.("preview")}
       >
-        Train met Hugo <ArrowRight className="w-5 h-5" />
+        Platform Tour <ArrowRight className="w-5 h-5" />
       </Button>
     </div>
   );

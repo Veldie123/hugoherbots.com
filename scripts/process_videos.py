@@ -816,8 +816,12 @@ def upload_to_mux(video_path: Path, title: str) -> dict:
         return {"asset_id": None, "playback_id": None}
 
 
-def transcribe_with_elevenlabs(audio_path: Path) -> str | None:
-    """Transcribe audio using ElevenLabs Scribe API."""
+def transcribe_with_elevenlabs(audio_path: Path) -> dict | None:
+    """Transcribe audio using ElevenLabs Scribe API.
+    
+    Returns dict with 'text' and 'words' (word-level timestamps).
+    Each word entry: {word, start, end, type, speaker_id}.
+    """
     print(f"  Transcriberen met ElevenLabs...", end=" ", flush=True)
     
     api_key = os.environ.get("ELEVENLABS_API_KEY")
@@ -840,10 +844,11 @@ def transcribe_with_elevenlabs(audio_path: Path) -> str | None:
     
     result = response.json()
     transcript = result.get("text", "")
+    words = result.get("words", [])
     
     word_count = len(transcript.split())
-    print(f"✓ ({word_count} woorden)")
-    return transcript
+    print(f"✓ ({word_count} woorden, {len(words)} timestamps)")
+    return {"text": transcript, "words": words}
 
 
 def generate_embedding(text: str) -> list[float]:
@@ -903,13 +908,25 @@ def match_best_technique(transcript_embedding: list[float]) -> tuple[str | None,
         return None, 0.0
 
 
-def store_in_rag(job: dict, transcript: str) -> tuple[str | None, str | None, float]:
+def store_in_rag(job: dict, transcript_data: dict | str) -> tuple[str | None, str | None, float]:
     """
     Store transcript and embedding in RAG database.
     Also matches transcript to best technique using cosine similarity.
     
+    transcript_data: dict with 'text' and 'words', or plain string (legacy).
     Returns: (rag_document_id, ai_suggested_techniek_id, ai_confidence)
     """
+    if isinstance(transcript_data, str):
+        transcript = transcript_data
+        word_timestamps = None
+    else:
+        transcript = transcript_data.get("text", "")
+        word_timestamps = transcript_data.get("words")
+    
+    if not transcript:
+        print("FOUT: Geen transcript tekst beschikbaar")
+        return None, None, 0.0
+    
     print(f"  RAG embedding genereren...", end=" ", flush=True)
     
     embedding = generate_embedding(transcript)
@@ -927,6 +944,14 @@ def store_in_rag(job: dict, transcript: str) -> tuple[str | None, str | None, fl
         "embedding": embedding,
         "word_count": len(transcript.split()),
     }
+    
+    if word_timestamps:
+        timestamps_clean = [
+            {"word": w.get("text", w.get("word", "")), "start": w.get("start", w.get("start_time")), "end": w.get("end", w.get("end_time"))}
+            for w in word_timestamps
+            if w.get("type", "word") == "word" or "text" in w or "word" in w
+        ]
+        record["word_timestamps"] = timestamps_clean
     
     existing = supabase.table("rag_documents").select("id").eq("source_id", source_id).execute()
     
@@ -1064,10 +1089,12 @@ def process_single_job(job: dict, access_token: str):
         video_path.unlink()
         
         update_job_status(job_id, "transcribing")
-        transcript = transcribe_with_elevenlabs(audio_path)
-        if not transcript:
+        transcript_data = transcribe_with_elevenlabs(audio_path)
+        if not transcript_data:
             update_job_status(job_id, "failed", "Transcriptie mislukt")
             return False
+        
+        transcript = transcript_data["text"]
         
         audio_path.unlink()
         
@@ -1090,7 +1117,7 @@ def process_single_job(job: dict, access_token: str):
             return True
         
         update_job_status(job_id, "embedding", transcript=transcript)
-        rag_id, ai_techniek_id, ai_confidence = store_in_rag(job, transcript)
+        rag_id, ai_techniek_id, ai_confidence = store_in_rag(job, transcript_data)
         if not rag_id:
             update_job_status(job_id, "failed", "RAG embedding opslaan mislukt")
             return False

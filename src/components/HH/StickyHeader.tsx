@@ -122,7 +122,7 @@ export function StickyHeader({ currentPage = "landing", navigate }: StickyHeader
                 onClick={() => navigate("preview")}
                 className="px-6 h-[48px] text-[16px] leading-[24px] font-[400] bg-hh-ink text-hh-bg rounded-2xl hover:bg-hh-ui-700 transition-colors shadow-hh-md"
               >
-                Train met Hugo
+                Platform Tour
               </button>
             </div>
           </div>
@@ -186,7 +186,7 @@ export function StickyHeader({ currentPage = "landing", navigate }: StickyHeader
                   }}
                   className="w-full px-6 py-4 bg-hh-ink text-white rounded-2xl hover:bg-hh-ink/90 transition-all shadow-hh-md text-[16px] leading-[24px] font-[600]"
                 >
-                  Train met Hugo
+                  Platform Tour
                 </button>
               </div>
             </div>

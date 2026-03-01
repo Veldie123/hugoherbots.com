@@ -56,12 +56,19 @@ async def transcribe_one(path: Path):
             txt_path = OUT_DIR / f"{path.stem}.txt"
             txt_path.write_text(result["text"], encoding="utf-8")
             
+            words_clean = [
+                {"word": w.get("text", w.get("word", "")), "start": w.get("start", w.get("start_time")), "end": w.get("end", w.get("end_time"))}
+                for w in result.get("words", [])
+                if w.get("type", "word") == "word" or "text" in w or "word" in w
+            ]
+            
             json_path = OUT_DIR / f"{path.stem}.json"
             json_path.write_text(json.dumps({
                 "source_file": path.name,
                 "transcribed_at": datetime.now().isoformat(),
                 "language_code": result["language_code"],
                 "text": result["text"],
+                "words": words_clean,
             }, ensure_ascii=False, indent=2), encoding="utf-8")
             
             processed_count += 1

@@ -276,6 +276,7 @@ export const ragDocuments = pgTable("rag_documents", {
   fase: text("fase"),
   categorie: text("categorie"),
   wordCount: integer("word_count"),
+  wordTimestamps: jsonb("word_timestamps"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

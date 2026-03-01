@@ -57,7 +57,7 @@ export function About({ navigate }: AboutProps) {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button size="lg" variant="ink" className="gap-2 w-full sm:w-auto" onClick={() => handleNavigate("preview")}>
-                Train met Hugo <ArrowRight className="w-4 h-4" />
+                Platform Tour <ArrowRight className="w-4 h-4" />
               </Button>
               <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto" onClick={() => handleNavigate("login")}>
                 Inloggen

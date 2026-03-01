@@ -139,7 +139,7 @@ export function AdminHugoAgent({ navigate }: Props) {
             <Bot size={22} color="white" />
           </div>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: "#111827", margin: 0 }}>Talk to Myself AI</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: "#111827", margin: 0 }}>Talk to Hugo AI</h1>
             <p style={{ fontSize: 14, color: "#6b7280", margin: 0 }}>Uw persoonlijke platformassistent</p>
           </div>
         </div>

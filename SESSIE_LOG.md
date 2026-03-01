@@ -4,6 +4,22 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-01 — UI tekst fixes + KPI cards 4x + Video Shorts V2 pipeline
+
+**Vraag:** (1) Waarom zijn er 3 ipv 4 KPI cards bij admin dashboard? Maak 4 KPI cards. (2) SESSIE_LOG.md wordt niet bijgewerkt — protocol violation. (3) Video shorts V2: persist ElevenLabs word-level start_time/end_time in RAG chunks. (4) "Train met Hugo" button → "Platform Tour" overal (landing, sticky header, about, pricing, mobile CTA). (5) "Welkom terug" → "Welkom!" voor anonieme/eerste bezoeker op dashboard. (6) "Talk to Myself" → "Talk to Hugo AI" (admin sessies button + admin agent header). (7) Dashboard video's/webinars mismatch met andere modules. (8) Dashboard laadt oude data.
+
+> **Conclusie:**
+> - **KPI cards (4x)**: Admin dashboard grid `lg:grid-cols-3` → `lg:grid-cols-4`. Vierde kaart "Coaching Sessies" (MessageSquare icon, oranje `#ea580c`) toegevoegd met note "Talk to Hugo AI".
+> - **"Train met Hugo" → "Platform Tour"**: Alle 9 instances vervangen: hero CTA, "Waarom AI?" sectie, 4x pricing tiers, bottom CTA, sticky header (desktop + mobile), StickyBottomCTA, About page.
+> - **"Welkom terug" → "Welkom!"**: Dashboard.tsx: `Welkom terug, ${displayName}` → `Welkom, ${displayName}`, fallback `Welkom terug` → `Welkom!`.
+> - **"Talk to Myself" → "Talk to Hugo AI"**: AdminHugoAgent.tsx header tekst + AdminSessions.tsx button tekst aangepast.
+> - **Video Shorts V2 pipeline**: `transcribe_with_elevenlabs()` retourneert nu `{text, words}` dict i.p.v. plain string. `store_in_rag()` accepteert dict of string (backwards compatible), slaat `word_timestamps` JSONB kolom op in `rag_documents`. `batch_transcribe.py` schrijft `words` array naar JSON output. `shared/schema.ts` bijgewerkt met `wordTimestamps: jsonb("word_timestamps")`. SQL migratie script aangemaakt: `scripts/sql/add_word_timestamps.sql`.
+> - **Dashboard data**: "Verder kijken" gebruikt dezelfde API als Videos pagina (eerste 5 getoond). Webinars op dashboard gebruiken nog statische dummy data uit `live-sessions-data.ts` — dit is een bekende placeholder die vervangen wordt zodra de Live Coaching API beschikbaar is.
+> - **SESSIE_LOG.md protocol hersteld**: Logboek wordt nu weer bijgewerkt bij elke sessie.
+> - Files gewijzigd: `src/components/HH/Landing.tsx`, `src/components/HH/StickyHeader.tsx`, `src/components/HH/StickyBottomCTA.tsx`, `src/components/HH/About.tsx`, `src/components/HH/Dashboard.tsx`, `src/components/HH/AdminDashboard.tsx`, `src/components/HH/AdminHugoAgent.tsx`, `src/components/HH/AdminSessions.tsx`, `scripts/process_videos.py`, `scripts/batch_transcribe.py`, `shared/schema.ts`, `scripts/sql/add_word_timestamps.sql`
+
+---
+
 ## 2026-03-01 — Technique panel breedte + Analyse scores fix
 
 **Vraag:** (1) Hoe verander ik de naam van video-webinar naar hugoherbots.replit.app? (2) Op desktop mag de techniek-detail niet full width zijn, moet tot tegen de zijkant van het chatvenster komen. Mobiel mag full width. (3) "Recente analyses" toont altijd "wacht op resultaat" terwijl het resultaat al lang binnen is.

@@ -119,7 +119,7 @@ export function Landing({ navigate }: LandingProps) {
                       boxShadow: '0 8px 24px rgba(27,42,74,0.45)',
                     }}
                   >
-                    Train met Hugo <ArrowRight className="w-6 h-6" />
+                    Platform Tour <ArrowRight className="w-6 h-6" />
                   </button>
                 </motion.div>
 
@@ -290,7 +290,7 @@ export function Landing({ navigate }: LandingProps) {
                   className="text-[16px] h-12 px-6"
                   onClick={() => handleNavigate("preview")}
                 >
-                  Train met Hugo
+                  Platform Tour
                 </Button>
               </div>
             </AnimatedSection>
@@ -514,7 +514,7 @@ export function Landing({ navigate }: LandingProps) {
                 "Email support",
                 "Exports & rapportages",
               ]}
-              cta="Train met Hugo"
+              cta="Platform Tour"
               onCtaClick={() => handleNavigate("preview")}
             />
           </AnimatedSection>
@@ -533,7 +533,7 @@ export function Landing({ navigate }: LandingProps) {
                 "Priority support",
                 "Founder community toegang",
               ]}
-              cta="Train met Hugo"
+              cta="Platform Tour"
               highlighted
               badge="Populair"
               onCtaClick={() => handleNavigate("preview")}
@@ -574,7 +574,7 @@ export function Landing({ navigate }: LandingProps) {
               "Email support",
               "Exports & rapportages",
             ]}
-            cta="Train met Hugo"
+            cta="Platform Tour"
             onCtaClick={() => handleNavigate("preview")}
           />
           <PricingTier
@@ -591,7 +591,7 @@ export function Landing({ navigate }: LandingProps) {
               "Priority support",
               "Founder community toegang",
             ]}
-            cta="Train met Hugo"
+            cta="Platform Tour"
             highlighted
             badge="Populair"
             onCtaClick={() => handleNavigate("preview")}
@@ -703,7 +703,7 @@ export function Landing({ navigate }: LandingProps) {
               className="text-[18px] h-14 px-8"
               onClick={() => handleNavigate("preview")}
             >
-              Train met Hugo <ArrowRight className="w-5 h-5 ml-2" />
+              Platform Tour <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </AnimatedSection>
         </div>

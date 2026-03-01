@@ -544,7 +544,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               </Button>
               <Button className="gap-2 text-white" size="sm" style={{ backgroundColor: '#7e22ce' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6b21a8')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7e22ce')} onClick={() => navigate?.("admin-chat-expert")}>
                 <Sparkles className="w-4 h-4" />
-                Talk to Myself <sup className="text-[10px]">AI</sup>
+                Talk to Hugo <sup className="text-[10px]">AI</sup>
               </Button>
             </div>
           </div>
