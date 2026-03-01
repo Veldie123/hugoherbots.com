@@ -1628,6 +1628,7 @@ export function AdminChatExpertMode({
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
                           </button>
+                          {(message.debugInfo?.expectedTechniqueId || message.debugInfo?.aiDecision?.epicFase || message.debugInfo?.aiDecision?.evaluatie) && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <button
@@ -1645,6 +1646,7 @@ export function AdminChatExpertMode({
                               E.P.I.C. TECHNIQUE bekijken
                             </TooltipContent>
                           </Tooltip>
+                          )}
                           {message.debugInfo && (
                             <button
                               onClick={() =>

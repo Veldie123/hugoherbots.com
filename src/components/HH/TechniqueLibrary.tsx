@@ -68,9 +68,11 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
   }, []);
 
   useEffect(() => {
-    const storedTechniqueNumber = localStorage.getItem('selectedTechniqueNumber');
+    const urlParams = new URLSearchParams(window.location.search);
+    const devTechnique = urlParams.get('detail');
+    const storedTechniqueNumber = devTechnique || localStorage.getItem('selectedTechniqueNumber');
     if (storedTechniqueNumber) {
-      localStorage.removeItem('selectedTechniqueNumber');
+      if (!devTechnique) localStorage.removeItem('selectedTechniqueNumber');
       const allTechnieken = getAllTechnieken();
       const technique = allTechnieken.find(t => t.nummer === storedTechniqueNumber);
       if (technique) {
@@ -714,7 +716,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
           onOpenChange={setDetailsDialogOpen}
           technique={{
             id: selectedTechnique.nummer,
-            number: selectedTechnique.nummer,
+            nummer: selectedTechnique.nummer,
             naam: selectedTechnique.naam,
             fase: selectedTechnique.fase || "1",
             tags: selectedTechnique.tags,

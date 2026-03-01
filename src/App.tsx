@@ -77,6 +77,16 @@ export default function App() {
         localStorage.setItem('dev_watch_first', 'true');
         pageName = 'videos';
       }
+      const detailMatch = pageName.match(/^techniques\/(.+)$/);
+      if (detailMatch) {
+        localStorage.setItem('selectedTechniqueNumber', detailMatch[1]);
+        pageName = 'techniques';
+      }
+      const devParams = new URLSearchParams(window.location.search);
+      const detailParam = devParams.get('detail');
+      if (detailParam) {
+        localStorage.setItem('selectedTechniqueNumber', detailParam);
+      }
       console.log('🔧 Dev preview mode activated via path:', pageName);
       return pageName as Page;
     }

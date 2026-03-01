@@ -1990,7 +1990,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>
-                  {!assistanceConfig.blindPlay && (
+                  {!assistanceConfig.blindPlay && (message.debugInfo?.expectedTechniqueId || message.debugInfo?.epicFase || message.debugInfo?.evaluatie) && (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button

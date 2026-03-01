@@ -69,7 +69,7 @@ The Replit project comprises three primary services:
 The Hugo Engine V2 is a modular system composed of a Coach Engine, Context Engine, Analysis Service, Evaluator, RAG Service, Rich Response Builder, Intent Detector, and Roleplay Engine, providing comprehensive AI coaching capabilities.
 
 ### SSOT Configuration
-All AI engine and content configurations, including Hugo's persona, coaching rules, evaluation criteria, sales techniques, intent detection triggers, customer attitudes, personas, dynamics, RAG heuristics, video mappings, EPIC slides, and global settings, are stored in JSON files under `config/ssot/` and `config/prompts/`. This ensures that `.ts` engine files contain only logic.
+All AI engine and content configurations, including Hugo's persona, coaching rules, evaluation criteria, sales techniques, intent detection triggers, customer attitudes, personas, dynamics, RAG heuristics, video mappings, EPIC slides, and global settings, are stored in JSON files under `config/ssot/` and `config/prompts/`. This ensures that `.ts` engine files contain only logic. The Vite alias `@config` resolves to the `config/` directory, allowing frontend components to import SSOT JSON directly (e.g., `import data from "@config/epic_slides.json"`). The `src/data/epic-slides-service.ts` provides typed access to EPIC slide data for the TechniqueDetailsDialog.
 
 ### Multi-Modal Capabilities
 The platform supports Chat Mode (text), Audio Mode (WebRTC, Deepgram Nova 3 for STT, ElevenLabs for TTS), and Video Mode (HeyGen Streaming Avatar SDK).
