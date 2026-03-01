@@ -653,7 +653,7 @@ export function AppLayout({
           </div>
         </div>
 
-        <div className={contentClassName || "flex-1 overflow-y-auto min-h-0"}>
+        <div className={contentClassName || "flex-1 overflow-y-auto min-h-0 pb-24 lg:pb-8"}>
           {children}
         </div>
       </div>

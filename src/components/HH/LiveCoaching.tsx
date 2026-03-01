@@ -14,6 +14,7 @@ import {
 } from "../ui/collapsible";
 import { Sheet, SheetContent } from "../ui/sheet";
 import { EPICSalesFlow } from "./EPICSalesFlow";
+import { PageFooter } from "./PageFooter";
 import { CustomDailyCall } from "./CustomDailyCall";
 import { PreJoinCheck } from "./PreJoinCheck";
 import {
@@ -377,6 +378,10 @@ export function LiveCoaching({
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const handleRegisterSession = (session: LiveSession) => {
+    if (isPreview) {
+      navigate?.("landing", { showSignup: true });
+      return;
+    }
     setSelectedSessionForRegistration(session);
     setRegistrationSuccess(false);
     setShowRegistrationDialog(true);
@@ -2252,6 +2257,7 @@ export function LiveCoaching({
           })()}
         </DialogContent>
       </Dialog>
+      <PageFooter />
     </AppLayout>
   );
 }

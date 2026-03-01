@@ -9,6 +9,7 @@ import {
   Techniek,
 } from "@/data/technieken-service";
 import { DetailsSheet, TechniqueContent } from "./DetailsSheet";
+import { PageFooter } from "./PageFooter";
 import {
   ChevronLeft,
   ChevronDown,
@@ -915,6 +916,7 @@ export function VideoWatchPage({
               </div>
             )}
           </div>
+          <PageFooter />
         </div>
       </div>
 

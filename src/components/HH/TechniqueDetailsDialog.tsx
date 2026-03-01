@@ -136,9 +136,9 @@ export function TechniqueDetailsDialog({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="p-0 overflow-hidden" style={{ width: '100%', maxWidth: 'calc(64px + (100vw - 64px) * 0.3333)' }}>
+      <SheetContent side="left" className="p-0 overflow-hidden !w-full md:!w-[40vw] md:!max-w-[520px]">
         <div className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto pb-6">
             <div className="p-6 pb-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-[13px] font-bold shrink-0 ${codeBadgeColors}`}>

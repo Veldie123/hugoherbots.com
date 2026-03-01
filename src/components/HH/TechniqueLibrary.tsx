@@ -39,6 +39,7 @@ import {
   Radio,
 } from "lucide-react";
 import { TechniqueDetailsDialog } from "./TechniqueDetailsDialog";
+import { PageFooter } from "./PageFooter";
 import { getAllTechnieken, getTechniekenByFase } from "../../data/technieken-service";
 import { videoApi } from "../../services/videoApi";
 
@@ -733,6 +734,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
           }}
         />
       )}
+      <PageFooter />
     </AppLayout>
   );
 }

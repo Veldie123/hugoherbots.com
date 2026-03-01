@@ -1,4 +1,5 @@
 import { AppLayout } from "./AppLayout";
+import { PageFooter } from "./PageFooter";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -590,6 +591,7 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
           </div>
         </Card>
       </div>
+      <PageFooter />
     </AppLayout>
   );
 }
