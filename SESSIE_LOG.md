@@ -4,6 +4,21 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-01 — Verwijder custom onboarding UI elementen uit admin chat
+
+**Vraag:** in de vorige brief over de onboarding fase met Hugo had ik expliciet gevraagd om geen nieuwe UX UI front end elementen toe te voegen aan de chat. hooguit front end elementen van op andere plaatsen van uit de app in een kader laden (.ppt, video, analysis results, detail van een techniek, houding, etc.). hugo zou dan op het bestaande duimpje naar omhoog of naar beneden klikken om feedback te geven. alle volgende printscreens zijn nieuwe ux ui front end elementen die je gebouwd hebt en die ik niet wil. 1/ die houdingen en technieken status bar bovenaan: weg ermee. je kan dit wel vermelden in tekst. 2/ maak je nog een tweede kader die hetzelfde (maar beperkter herhaalt)? dat is nutteloos. verwijder dat en verwijder ook al die andere buttons en tekstvakken onderaan dat vak. conclusie: hugo typt waar hij altijd typt! in het tektvak helemaal onderaan. hij kan chatten door te typen, of door te praten of te videocallen. geen nieuwe front end te bouwen.
+
+Samenvatting: Drie custom onboarding UI elementen verwijderd uit AdminChatExpertMode.tsx. Hugo interageert puur via de bestaande chat interface.
+
+> **Conclusie:**
+> - **Progress bar verwijderd**: De "Technieken X/55" + "Houdingen X/9" status bar bovenaan de chat is verwijderd
+> - **Review card verwijderd**: De paarse kaart met techniek-details, "Goedkeuren", "Feedback geven", "Sla over" buttons en "Typ je feedback..." input veld is verwijderd
+> - **Handlers opgeruimd**: `handleOnboardingApprove`, `handleOnboardingFeedback`, `handleOnboardingSkip` en `onboardingFeedbackInput` state verwijderd — dode code opgeruimd
+> - Hugo gebruikt het bestaande duimpje omhoog/omlaag en het bestaande tekstvak onderaan om te reageren
+> - Bestanden: `AdminChatExpertMode.tsx`
+
+---
+
 ## 2026-03-01 — Sidebar spacing, user view chat fix, sessie log format, rename Talk to Hugo AI
 
 **Vraag:** er is iets mis met de sidebar in user view. vergelijk met de sidebar in admin view. lijntje plakt tegen admin view button... het lijntje boven user view zou 100% moeten gelijk lopen met het lijntje boven 'typ je bericht' in de talk to hugo ai... als hugo in user view is, moet altijd 100% de user view en user experience krijgen. de echte user experience. als hij in admin view zit, krijgt hij de admin experience. nu krijgt hij de admin experience in user view.
