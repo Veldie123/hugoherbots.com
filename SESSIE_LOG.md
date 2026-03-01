@@ -4,6 +4,21 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-01 — Admin Sessions KPI cards uniform maken (mobiel)
+
+**Vraag:** KPI cards bij Talk to Hugo AI (admin) zijn anders vormgegeven dan bij andere modules. Op mobiel compact inline pills i.p.v. standaard card grid.
+
+> **Conclusie:**
+> - **Root cause**: `AdminSessions.tsx` had twee aparte layouts: desktop-only KPI cards (`hidden lg:grid`) + mobiele compact pill-strip (`flex lg:hidden`). Alle andere admin pagina's gebruiken één responsive `grid grid-cols-2 lg:grid-cols-4`.
+> - **Fix**: Compact pill-strip verwijderd, desktop cards responsive gemaakt met `grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4`
+> - Icon kleuren: inline styles i.p.v. Tailwind classes (consistent met andere pagina's)
+> - Badge kleuren: inline styles met semantische kleuren (groen voor positief, rood voor negatief)
+> - Labels vertaald: "Excellent Quality" → "Uitstekend", "Needs Improvement" → "Verbetering Nodig", "Total Sessies" → "Totaal Sessies"
+> - E2e test geslaagd (400px viewport): 2-kolom grid, geen pills meer
+> - Bestand: `src/components/HH/AdminSessions.tsx`
+
+---
+
 ## 2026-03-01 — Deployment health check fix
 
 **Vraag:** Deployment faalt op health checks — `/` reageert niet snel genoeg met 200.

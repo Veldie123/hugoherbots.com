@@ -564,72 +564,48 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
           </p>
         </div>
 
-        {/* Statistics - Desktop: full cards */}
-        <div className="hidden lg:grid grid-cols-4 gap-4">
-          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-purple-600/10 flex items-center justify-center">
-                <MessageSquare className="w-5 h-5 text-purple-600" />
+        {/* KPI Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.12)' }}>
+                <MessageSquare className="w-5 h-5" style={{ color: '#9333ea' }} />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">+15%</Badge>
+              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>+15%</span>
             </div>
-            <p className="text-[13px] text-hh-muted mb-2">Total Sessies</p>
-            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.totalSessions}</p>
+            <p className="text-[13px] leading-[18px] text-hh-muted">Totaal Sessies</p>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stats.totalSessions}</p>
           </Card>
-          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-hh-success/10 flex items-center justify-center">
-                <CheckCircle2 className="w-5 h-5 text-hh-success" />
+          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.12)' }}>
+                <CheckCircle2 className="w-5 h-5" style={{ color: '#059669' }} />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">+8%</Badge>
+              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>+8%</span>
             </div>
-            <p className="text-[13px] text-hh-muted mb-2">Excellent Quality</p>
-            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.excellentCount}</p>
+            <p className="text-[13px] leading-[18px] text-hh-muted">Uitstekend</p>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stats.excellentCount}</p>
           </Card>
-          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-purple-600/10 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-purple-600" />
+          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(2, 132, 199, 0.12)' }}>
+                <BarChart3 className="w-5 h-5" style={{ color: '#0284c7' }} />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">+2.3%</Badge>
+              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>+2.3%</span>
             </div>
-            <p className="text-[13px] text-hh-muted mb-2">Gem. Score</p>
-            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.avgScore}%</p>
+            <p className="text-[13px] leading-[18px] text-hh-muted">Gem. Score</p>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stats.avgScore}%</p>
           </Card>
-          <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-full bg-hh-warn/10 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-hh-warn" />
+          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(234, 88, 12, 0.12)' }}>
+                <AlertTriangle className="w-5 h-5" style={{ color: '#ea580c' }} />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-error/10 text-hh-error border-hh-error/20">-5%</Badge>
+              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}>-5%</span>
             </div>
-            <p className="text-[13px] text-hh-muted mb-2">Needs Improvement</p>
-            <p className="text-[28px] leading-[36px]" style={{ color: '#7c3aed' }}>{stats.needsWorkCount}</p>
+            <p className="text-[13px] leading-[18px] text-hh-muted">Verbetering Nodig</p>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stats.needsWorkCount}</p>
           </Card>
-        </div>
-
-        {/* Mobile: compact horizontal stat strip */}
-        <div className="flex lg:hidden items-center gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-purple-600/10 rounded-lg flex-shrink-0">
-            <MessageSquare className="w-3.5 h-3.5 text-purple-600" />
-            <span className="text-[12px] text-hh-muted">Sessies</span>
-            <span className="text-[14px] font-semibold text-hh-ink">{stats.totalSessions}</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-hh-success/10 rounded-lg flex-shrink-0">
-            <CheckCircle2 className="w-3.5 h-3.5 text-hh-success" />
-            <span className="text-[12px] text-hh-muted">Excellent</span>
-            <span className="text-[14px] font-semibold text-hh-ink">{stats.excellentCount}</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-600/10 rounded-lg flex-shrink-0">
-            <BarChart3 className="w-3.5 h-3.5 text-blue-600" />
-            <span className="text-[12px] text-hh-muted">Score</span>
-            <span className="text-[14px] font-semibold text-hh-ink">{stats.avgScore}%</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-hh-warn/10 rounded-lg flex-shrink-0">
-            <AlertTriangle className="w-3.5 h-3.5 text-hh-warn" />
-            <span className="text-[12px] text-hh-muted">Needs Work</span>
-            <span className="text-[14px] font-semibold text-hh-ink">{stats.needsWorkCount}</span>
-          </div>
         </div>
 
         {/* Filters */}
