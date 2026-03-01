@@ -1,59 +1,62 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { UserProvider } from "./contexts/UserContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { ThemeProvider } from "./components/HH/ThemeProvider";
 import { auth } from "./utils/supabase/client";
-import { Login } from "./components/HH/Login";
-import { Signup } from "./components/HH/Signup";
-import { AuthCallback } from "./components/HH/AuthCallback";
-import { Landing } from "./components/HH/Landing";
-import { ProductShowcase } from "./components/HH/ProductShowcase";
-import { About } from "./components/HH/About";
-import { Pricing } from "./components/HH/Pricing";
-import { Onboarding } from "./components/HH/Onboarding";
-import { AppPreview } from "./components/HH/AppPreview";
-import { Dashboard } from "./components/HH/Dashboard";
-import { RolePlay } from "./components/HH/RolePlay";
-import { RolePlayChat } from "./components/HH/RolePlayChat";
-import { OverviewProgress } from "./components/HH/OverviewProgress";
-import { ScenarioBuilder } from "./components/HH/ScenarioBuilder";
-import { VideoLibrary } from "./components/HH/VideoLibrary";
-import { LiveCoaching } from "./components/HH/LiveCoaching";
-import { TeamSessions } from "./components/HH/TeamSessions";
-import { Analytics } from "./components/HH/Analytics";
-import { Settings } from "./components/HH/Settings";
-import { DigitalCoaching } from "./components/HH/DigitalCoaching";
-import { Analysis } from "./components/HH/Analysis";
-import { UploadAnalysis } from "./components/HH/UploadAnalysis";
-import { AnalysisResults } from "./components/HH/AnalysisResults";
-import { AdminDashboard } from "./components/HH/AdminDashboard";
-import { AdminVideoManagement } from "./components/HH/AdminVideoManagement";
-import { AdminLiveSessions } from "./components/HH/AdminLiveSessions";
-import { AdminUserManagement } from "./components/HH/AdminUserManagement";
-import { AdminTechniqueManagement } from "./components/HH/AdminTechniqueManagement";
-import { AdminContentLibrary } from "./components/HH/AdminContentLibrary";
-import { AdminAnalytics } from "./components/HH/AdminAnalytics";
-import { AdminSettings } from "./components/HH/AdminSettings";
-import { AdminSessionTranscripts } from "./components/HH/AdminSessionTranscripts";
-import { HelpCenter } from "./components/HH/HelpCenter";
-import { Resources } from "./components/HH/Resources";
-import { AdminHelpCenter } from "./components/HH/AdminHelpCenter";
-import { AdminResourceLibrary } from "./components/HH/AdminResourceLibrary";
-import { AdminProgress } from "./components/HH/AdminProgress";
-import { AdminUploads } from "./components/HH/AdminUploads";
-import { TechniqueLibrary } from "./components/HH/TechniqueLibrary";
-import { HugoAIOverview } from "./components/HH/HugoAIOverview";
-import { TalkToHugoAI } from "./components/HH/TalkToHugoAI";
-import { AdminSessions } from "./components/HH/AdminSessions";
-import { AdminConfigReview } from "./components/HH/AdminConfigReview";
-import { AdminNotifications } from "./components/HH/AdminNotifications";
-import { UserNotifications } from "./components/HH/UserNotifications";
-import { Library } from "./components/HH/Library";
-import { PrivacyPolicy } from "./components/HH/PrivacyPolicy";
-import { AdminChatExpertMode } from "./components/HH/AdminChatExpertMode";
-import { AdminRAGReview } from "./components/HH/AdminRAGReview";
-import { AdminConflicts } from "./components/HH/AdminConflicts";
-import { SSOValidate } from "./components/HH/SSOValidate";
+
+const Login = lazy(() => import("./components/HH/Login").then(m => ({ default: m.Login })));
+const Signup = lazy(() => import("./components/HH/Signup").then(m => ({ default: m.Signup })));
+const AuthCallback = lazy(() => import("./components/HH/AuthCallback").then(m => ({ default: m.AuthCallback })));
+const Landing = lazy(() => import("./components/HH/Landing").then(m => ({ default: m.Landing })));
+const ProductShowcase = lazy(() => import("./components/HH/ProductShowcase").then(m => ({ default: m.ProductShowcase })));
+const About = lazy(() => import("./components/HH/About").then(m => ({ default: m.About })));
+const Pricing = lazy(() => import("./components/HH/Pricing").then(m => ({ default: m.Pricing })));
+const Onboarding = lazy(() => import("./components/HH/Onboarding").then(m => ({ default: m.Onboarding })));
+const AppPreview = lazy(() => import("./components/HH/AppPreview").then(m => ({ default: m.AppPreview })));
+
+const Dashboard = lazy(() => import("./components/HH/Dashboard").then(m => ({ default: m.Dashboard })));
+const RolePlay = lazy(() => import("./components/HH/RolePlay").then(m => ({ default: m.RolePlay })));
+const RolePlayChat = lazy(() => import("./components/HH/RolePlayChat").then(m => ({ default: m.RolePlayChat })));
+const OverviewProgress = lazy(() => import("./components/HH/OverviewProgress").then(m => ({ default: m.OverviewProgress })));
+const ScenarioBuilder = lazy(() => import("./components/HH/ScenarioBuilder").then(m => ({ default: m.ScenarioBuilder })));
+const VideoLibrary = lazy(() => import("./components/HH/VideoLibrary").then(m => ({ default: m.VideoLibrary })));
+const LiveCoaching = lazy(() => import("./components/HH/LiveCoaching").then(m => ({ default: m.LiveCoaching })));
+const TeamSessions = lazy(() => import("./components/HH/TeamSessions").then(m => ({ default: m.TeamSessions })));
+const Analytics = lazy(() => import("./components/HH/Analytics").then(m => ({ default: m.Analytics })));
+const Settings = lazy(() => import("./components/HH/Settings").then(m => ({ default: m.Settings })));
+const DigitalCoaching = lazy(() => import("./components/HH/DigitalCoaching").then(m => ({ default: m.DigitalCoaching })));
+const Analysis = lazy(() => import("./components/HH/Analysis").then(m => ({ default: m.Analysis })));
+const UploadAnalysis = lazy(() => import("./components/HH/UploadAnalysis").then(m => ({ default: m.UploadAnalysis })));
+const AnalysisResults = lazy(() => import("./components/HH/AnalysisResults").then(m => ({ default: m.AnalysisResults })));
+const TechniqueLibrary = lazy(() => import("./components/HH/TechniqueLibrary").then(m => ({ default: m.TechniqueLibrary })));
+const HugoAIOverview = lazy(() => import("./components/HH/HugoAIOverview").then(m => ({ default: m.HugoAIOverview })));
+const TalkToHugoAI = lazy(() => import("./components/HH/TalkToHugoAI").then(m => ({ default: m.TalkToHugoAI })));
+const HelpCenter = lazy(() => import("./components/HH/HelpCenter").then(m => ({ default: m.HelpCenter })));
+const Resources = lazy(() => import("./components/HH/Resources").then(m => ({ default: m.Resources })));
+const Library = lazy(() => import("./components/HH/Library").then(m => ({ default: m.Library })));
+const PrivacyPolicy = lazy(() => import("./components/HH/PrivacyPolicy").then(m => ({ default: m.PrivacyPolicy })));
+const UserNotifications = lazy(() => import("./components/HH/UserNotifications").then(m => ({ default: m.UserNotifications })));
+const SSOValidate = lazy(() => import("./components/HH/SSOValidate").then(m => ({ default: m.SSOValidate })));
+
+const AdminDashboard = lazy(() => import("./components/HH/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
+const AdminVideoManagement = lazy(() => import("./components/HH/AdminVideoManagement").then(m => ({ default: m.AdminVideoManagement })));
+const AdminLiveSessions = lazy(() => import("./components/HH/AdminLiveSessions").then(m => ({ default: m.AdminLiveSessions })));
+const AdminUserManagement = lazy(() => import("./components/HH/AdminUserManagement").then(m => ({ default: m.AdminUserManagement })));
+const AdminTechniqueManagement = lazy(() => import("./components/HH/AdminTechniqueManagement").then(m => ({ default: m.AdminTechniqueManagement })));
+const AdminContentLibrary = lazy(() => import("./components/HH/AdminContentLibrary").then(m => ({ default: m.AdminContentLibrary })));
+const AdminAnalytics = lazy(() => import("./components/HH/AdminAnalytics").then(m => ({ default: m.AdminAnalytics })));
+const AdminSettings = lazy(() => import("./components/HH/AdminSettings").then(m => ({ default: m.AdminSettings })));
+const AdminSessionTranscripts = lazy(() => import("./components/HH/AdminSessionTranscripts").then(m => ({ default: m.AdminSessionTranscripts })));
+const AdminHelpCenter = lazy(() => import("./components/HH/AdminHelpCenter").then(m => ({ default: m.AdminHelpCenter })));
+const AdminResourceLibrary = lazy(() => import("./components/HH/AdminResourceLibrary").then(m => ({ default: m.AdminResourceLibrary })));
+const AdminProgress = lazy(() => import("./components/HH/AdminProgress").then(m => ({ default: m.AdminProgress })));
+const AdminUploads = lazy(() => import("./components/HH/AdminUploads").then(m => ({ default: m.AdminUploads })));
+const AdminSessions = lazy(() => import("./components/HH/AdminSessions").then(m => ({ default: m.AdminSessions })));
+const AdminConfigReview = lazy(() => import("./components/HH/AdminConfigReview").then(m => ({ default: m.AdminConfigReview })));
+const AdminNotifications = lazy(() => import("./components/HH/AdminNotifications").then(m => ({ default: m.AdminNotifications })));
+const AdminChatExpertMode = lazy(() => import("./components/HH/AdminChatExpertMode").then(m => ({ default: m.AdminChatExpertMode })));
+const AdminRAGReview = lazy(() => import("./components/HH/AdminRAGReview").then(m => ({ default: m.AdminRAGReview })));
+const AdminConflicts = lazy(() => import("./components/HH/AdminConflicts").then(m => ({ default: m.AdminConflicts })));
 type Page = "landing" | "pricing" | "about" | "login" | "signup" | "authcallback" | "preview" | "onboarding" | "dashboard" | "technieken" | "techniques" | "coaching" | "roleplay" | "roleplays" | "roleplaychat" | "roleplays-chat" | "overviewprogress" | "builder" | "videos" | "live" | "team" | "analytics" | "settings" | "analysis" | "analysis-results" | "upload-analysis" | "privacy-policy" | "help" | "resources" | "hugo-overview" | "talk-to-hugo" | "library" | "notifications" | "admin-dashboard" | "admin-videos" | "admin-live" | "admin-progress" | "admin-users" | "admin-techniques" | "admin-transcripts" | "admin-uploads" | "admin-content" | "admin-analytics" | "admin-settings" | "admin-help" | "admin-resources" | "admin-sessions" | "admin-config-review" | "admin-notifications" | "admin-chat-expert" | "admin-rag-review" | "admin-conflicts" | "admin-analysis-results" | "admin-upload-analysis" | "admin-hugo-agent" | "sso-validate" | "showcase" | "showcase-video" | "showcase-roleplay" | "showcase-analysis";
 
 export default function App() {
@@ -219,7 +222,14 @@ export default function App() {
 
       {/* Render pages only after auth check */}
       {!isCheckingAuth && (
-        <>
+        <Suspense fallback={
+          <div className="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-hh-ocean-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-hh-slate-600 dark:text-gray-400">Laden...</p>
+            </div>
+          </div>
+        }>
           {/* Login page */}
           {currentPage === "login" && (
             <Login
@@ -365,7 +375,7 @@ export default function App() {
           {currentPage === "techniques" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "library" && <Library navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "notifications" && <UserNotifications navigate={navigate} isAdmin={isAdmin} />}
-        </>
+        </Suspense>
       )}
     </NotificationProvider>
     </UserProvider>

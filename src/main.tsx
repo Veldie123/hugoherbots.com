@@ -1,11 +1,16 @@
 import { createRoot } from "react-dom/client";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { setupGlobalErrorHandlers } from "./services/errorReporter";
 import App from "./App.tsx";
 
-// Laad theme stylesheet VÓÓR eigen CSS
 import "@mux/mux-player/themes/classic";
 
-// Dan pas eigen CSS (zodat je kunt overriden)
 import "./index.css";
 
-createRoot(document.getElementById("root")!).render(<App />);
-  
+setupGlobalErrorHandlers();
+
+createRoot(document.getElementById("root")!).render(
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
+);

@@ -57,7 +57,7 @@ The HugoHerbots.ai Sales Coach App is an AI-powered platform designed to provide
 The frontend adheres to the HugoHerbots branding with a "final" design, utilizing Radix UI / Shadcn components. It supports light and dark themes and defaults to Dutch. User interfaces are visually distinct: blue for user views and purple for admin views, with green indicating success states. Mobile views consistently use a card/grid layout.
 
 ### Technical Implementations
-The frontend is developed with React 18, TypeScript, Vite 6, and Tailwind CSS v4. Sales techniques are centrally managed through `config/ssot/technieken_index.json`, serving as the Single Source of Truth (SSOT).
+The frontend is developed with React 18, TypeScript, Vite 6, and Tailwind CSS v4. Sales techniques are centrally managed through `config/ssot/technieken_index.json`, serving as the Single Source of Truth (SSOT). All 50+ page components use `React.lazy()` with `Suspense` for code splitting. Vite is configured with manual chunks for vendor splitting.
 
 ### Backend Architecture
 The Replit project comprises three primary services:
@@ -71,14 +71,8 @@ The Hugo Engine V2 is a modular system composed of a Coach Engine, Context Engin
 ### SSOT Configuration
 All AI engine and content configurations, including Hugo's persona, coaching rules, evaluation criteria, sales techniques, intent detection triggers, customer attitudes, personas, dynamics, RAG heuristics, video mappings, EPIC slides, and global settings, are stored in JSON files under `config/ssot/` and `config/prompts/`. This ensures that `.ts` engine files contain only logic.
 
-### Frontend Routes
-Public routes are dedicated to authentication and onboarding. User-facing pages include a dashboard, techniques library, videos, live coaching, conversation analysis, AI chat, and settings. Admin pages cover video management, user management, session tracking, analytics, and content libraries. Development access is provided via `/_dev/{page-name}`.
-
 ### Multi-Modal Capabilities
-The platform supports:
--   **Chat Mode**: Text-based coaching with rich content and audio analysis.
--   **Audio Mode**: Leverages WebRTC, Deepgram Nova 3 for Speech-to-Text (STT), and ElevenLabs for Text-to-Speech (TTS).
--   **Video Mode**: Integrates the HeyGen Streaming Avatar SDK for interactive video experiences.
+The platform supports Chat Mode (text), Audio Mode (WebRTC, Deepgram Nova 3 for STT, ElevenLabs for TTS), and Video Mode (HeyGen Streaming Avatar SDK).
 
 ### Database Usage
 Supabase serves as the primary remote database. A local Replit PostgreSQL instance is utilized for `conversation_analyses`, `admin_corrections`, `admin_notifications`, `chat_feedback`, and `config_proposals`, accessed directly by `hugo-engine/api.ts`.
@@ -87,14 +81,7 @@ Supabase serves as the primary remote database. A local Replit PostgreSQL instan
 The `server/video-processor.js` manages AutoHeal for generating missing AI summaries and titles, and AutoBatch for processing pending video jobs via Google Cloud Run. It excludes archived videos and populates `config/video_mapping.json` from Supabase.
 
 ### Feature Specifications
-Key features include a unified video system (Google Drive to Mux), Live Coaching via Daily.co, an AI-powered Roleplay System, an AI Chat/RAG System using `pgvector`, a two-stage Analysis System for sales conversations, Admin Analytics dashboards, and a specialized Hugo Onboarding Mode. Stripe manages subscriptions, and Supabase Auth handles user profile data.
-
-### Hugo's Dynamic Admin Briefing System
-The admin chat opening provides a dynamic, personalized briefing based on Hugo's lifecycle stage:
-- **First time (onboarding)**: A comprehensive welcome explaining platform capabilities, the SSOT review process, and Stéphane's translation context, including live platform statistics and the first technique for review.
-- **Returning (onboarding in progress)**: Updated platform statistics, onboarding progress (X/64 reviewed), and the next technique for review.
-- **Post-onboarding**: A daily briefing with platform statistics, attention items, and recent analyses.
-Templates are defined in `config/prompts/admin_onboarding_prompt.json` (SSOT). Statistics are fetched from `/api/v2/admin/stats` at session start. The `admin_onboarding_progress` table (local PostgreSQL) tracks review status. Techniques are inserted in EPIC numerical order. Hugo interacts via existing chat with 👍/👎 icons and text input, without custom UI elements.
+Key features include a unified video system (Google Drive to Mux), Live Coaching via Daily.co, an AI-powered Roleplay System, an AI Chat/RAG System using `pgvector`, a two-stage Analysis System for sales conversations, Admin Analytics dashboards, and a specialized Hugo Onboarding Mode. Stripe manages subscriptions, and Supabase Auth handles user profile data. The admin chat opening provides dynamic, personalized briefings based on Hugo's lifecycle stage, with templates defined in `config/prompts/admin_onboarding_prompt.json`.
 
 ## External Dependencies
 -   **OpenAI (gpt-5.1)**: AI engine for coaching, evaluation, and analysis.

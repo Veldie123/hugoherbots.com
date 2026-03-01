@@ -305,6 +305,17 @@ setInterval(() => {
 }, 30 * 60 * 1000); // Run every 30 minutes
 
 // ===========================================
+// ERROR COLLECTION ENDPOINT
+// ===========================================
+app.post("/api/v2/errors", (req: Request, res: Response) => {
+  const { message, stack, source, timestamp, url, userAgent, componentStack } = req.body;
+  console.error(`[CLIENT ERROR] ${source || 'unknown'}: ${message}`);
+  if (stack) console.error(`[CLIENT ERROR] Stack: ${stack}`);
+  if (componentStack) console.error(`[CLIENT ERROR] Component: ${componentStack}`);
+  res.status(204).end();
+});
+
+// ===========================================
 // TECHNIEKEN ENDPOINT (for sidebar)
 // ===========================================
 app.get("/api/technieken", async (req, res) => {

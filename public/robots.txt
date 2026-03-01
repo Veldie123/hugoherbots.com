@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /coaching
+Disallow: /roleplay
+Disallow: /analysis
+Disallow: /upload-analysis
+Disallow: /notifications
+
+Sitemap: https://hugoherbots.ai/sitemap.xml
