@@ -636,3 +636,18 @@ Samenvatting: Sidebar divider spacing gefixed (`px-3 py-3`), user view Talk to H
 > - Paarse highlight op `selectedTechnique === technique.naam`
 > - Alle technieken hebben `cursor-pointer`
 > - Correctie-panel toont geselecteerde techniek na klik
+
+---
+
+## 2026-03-01 — SSE streaming fix voor admin chat (empty bubble bug)
+
+**Vraag:** 8-seconden laadtijd oplossen door streaming te implementeren zodat tekst woord-voor-woord verschijnt i.p.v. 8 seconden wachten. Empty bubble bug fixen.
+
+> **Conclusie:**
+> - **Root cause**: Express `res.write()` calls werden gebufferd door Node.js — tokens bereikten de client nooit individueel. Alleen de eerste write (session) en laatste write+end (done) kwamen door.
+> - **Fix backend** (`server/hugo-engine/api.ts`): Alle SSE token events worden nu gebatcht in één enkele `res.write()` call. Dit voorkomt het verlies van individuele writes.
+> - **Fix frontend** (`src/services/hugoApi.ts`): `startSessionStream` verzamelt alle tokens uit de SSE stream, en rendert ze daarna progressief met kleine delays (15ms per 3 chunks) via `setTimeout`. Dit geeft een typewriter-effect.
+> - **Resultaat**: Welkomstbericht verschijnt correct (was voorheen leeg). ~70 SSE chunks met 557+ woorden worden succesvol afgeleverd.
+> - **T001 (Opening split)**: Reeds geïmplementeerd — welkomst bevat geen techniek-details
+> - **T002 (Correctie via chat input)**: Reeds geïmplementeerd — 👎 activeert correctie-modus in bestaand inputveld
+> - Bestanden: `server/hugo-engine/api.ts`, `src/services/hugoApi.ts`

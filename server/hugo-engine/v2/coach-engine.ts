@@ -1521,6 +1521,10 @@ export async function generateCoachOpeningStream(
     openingPrompt += "\n\n(Dit gesprek loopt al. Bouw voort op wat er gezegd is.)";
   }
 
+  console.log("[COACH-STREAM] Starting OpenAI streaming call...");
+  console.log("[COACH-STREAM] System prompt length:", systemPrompt.length);
+  console.log("[COACH-STREAM] Opening prompt length:", openingPrompt.length);
+
   try {
     const stream = await client.chat.completions.create({
       model: "gpt-5.1",
@@ -1533,19 +1537,32 @@ export async function generateCoachOpeningStream(
     });
 
     let fullText = "";
+    let chunkCount = 0;
+    console.log("[COACH-STREAM] onToken type:", typeof onToken, "is function:", typeof onToken === 'function');
     for await (const chunk of stream) {
       const delta = chunk.choices[0]?.delta?.content;
       if (delta) {
+        chunkCount++;
         fullText += delta;
-        onToken(delta);
+        try {
+          onToken(delta);
+          if (chunkCount === 1) console.log("[COACH-STREAM] First onToken call succeeded for:", delta.substring(0, 20));
+        } catch (e: any) {
+          if (chunkCount <= 3) console.error("[COACH-STREAM] onToken threw:", e.message);
+        }
       }
+    }
+
+    console.log("[COACH-STREAM] Streaming complete. Chunks:", chunkCount, "Full text length:", fullText.length);
+    if (fullText.length === 0) {
+      console.warn("[COACH-STREAM] WARNING: No tokens received from OpenAI!");
     }
 
     onDone(fullText || TECHNICAL_FALLBACKS.error_generic, {
       onboardingStatus: onboardingStatus || undefined,
     });
   } catch (error: any) {
-    console.error("[COACH] Streaming opening error:", error);
+    console.error("[COACH-STREAM] Streaming opening error:", error);
     onError(error);
   }
 }

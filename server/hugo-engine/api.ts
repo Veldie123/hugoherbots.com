@@ -35,6 +35,7 @@ import {
   generateCoachResponse,
   generateCoachResponseStream,
   generateCoachOpening,
+  generateCoachOpeningStream,
   type CoachContext,
   type CoachMessage,
   type CoachResponse
@@ -545,14 +546,14 @@ app.post("/api/v2/sessions/stream", async (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+    if (req.socket) req.socket.setNoDelay(true);
     res.flushHeaders();
 
     let clientDisconnected = false;
     req.on('close', () => { clientDisconnected = true; });
 
     res.write(`data: ${JSON.stringify({ type: "session", sessionId })}\n\n`);
-
-    const { generateCoachOpeningStream } = await import('./v2/coach-engine');
 
     const coachContext: CoachContext = {
       userId: session.userId,
@@ -566,29 +567,33 @@ app.post("/api/v2/sessions/stream", async (req, res) => {
       viewMode: session.viewMode || 'user',
     };
 
-    await generateCoachOpeningStream(
-      coachContext,
-      (token) => {
-        if (!clientDisconnected) {
-          res.write(`data: ${JSON.stringify({ type: "token", content: token })}\n\n`);
-        }
-      },
-      async (fullText, meta) => {
-        session.conversationHistory.push({ role: "assistant", content: fullText });
-        await saveSessionToDb(session);
-        
-        res.write(`data: ${JSON.stringify({ 
-          type: "done",
-          onboardingStatus: meta?.onboardingStatus || null,
-        })}\n\n`);
-        res.end();
-      },
-      (error) => {
-        console.error("[API] Streaming session error:", error.message);
-        res.write(`data: ${JSON.stringify({ type: "error", error: error.message })}\n\n`);
-        res.end();
+    try {
+      const result = await generateCoachOpening(coachContext);
+      const fullText = result.message || '';
+
+      session.conversationHistory.push({ role: "assistant", content: fullText });
+      await saveSessionToDb(session);
+
+      let ssePayload = '';
+      const CHUNK_SIZE = 8;
+      const words = fullText.split(/(\s+)/).filter(w => w.length > 0);
+      for (let i = 0; i < words.length; i += CHUNK_SIZE) {
+        const chunk = words.slice(i, i + CHUNK_SIZE).join('');
+        ssePayload += `data: ${JSON.stringify({ type: "token", content: chunk })}\n\n`;
       }
-    );
+      ssePayload += `data: ${JSON.stringify({ 
+        type: "done",
+        onboardingStatus: result.onboardingStatus || null,
+      })}\n\n`;
+
+      res.write(ssePayload);
+      res.end();
+      console.log(`[API] Stream session complete: ${words.length} words`);
+    } catch (streamErr: any) {
+      console.error("[API] Streaming session error:", streamErr.message);
+      res.write(`data: ${JSON.stringify({ type: "error", error: streamErr.message })}\n\n`);
+      res.end();
+    }
     
   } catch (error: any) {
     console.error("[API] Streaming session setup error:", error.message, error.stack);
@@ -1842,7 +1847,14 @@ app.post("/api/session/:sessionId/message/stream", async (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+    if (req.socket) req.socket.setNoDelay(true);
     res.flushHeaders();
+
+    const flushWrite = (data: string) => {
+      res.write(data);
+      if (typeof (res as any).flush === 'function') (res as any).flush();
+    };
     
     session.conversationHistory.push({
       role: "user",
@@ -1866,7 +1878,7 @@ app.post("/api/session/:sessionId/message/stream", async (req, res) => {
       session.conversationHistory,
       coachContext,
       (token) => {
-        res.write(`data: ${JSON.stringify({ token })}\n\n`);
+        flushWrite(`data: ${JSON.stringify({ token })}\n\n`);
       },
       async (fullText, debug) => {
         session!.conversationHistory.push({
@@ -1875,7 +1887,7 @@ app.post("/api/session/:sessionId/message/stream", async (req, res) => {
         });
         await saveSessionToDb(session!);
         
-        res.write(`data: ${JSON.stringify({ 
+        flushWrite(`data: ${JSON.stringify({ 
           done: true,
           phase: session!.mode,
           debug: isExpert ? {
@@ -1886,7 +1898,7 @@ app.post("/api/session/:sessionId/message/stream", async (req, res) => {
       },
       (error) => {
         console.error("[API] Streaming error:", error.message);
-        res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+        flushWrite(`data: ${JSON.stringify({ error: error.message })}\n\n`);
         res.end();
       }
     );

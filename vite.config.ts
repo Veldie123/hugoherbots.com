@@ -126,10 +126,31 @@ export default defineConfig({
       '/api/v2': {
         target: 'http://localhost:3002',
         changeOrigin: true,
+        configure: (proxy: any) => {
+          proxy.on('proxyReq', (proxyReq: any, req: any) => {
+            if (req.url?.includes('stream')) {
+              proxyReq.setHeader('X-Accel-Buffering', 'no');
+            }
+          });
+          proxy.on('proxyRes', (proxyRes: any, req: any) => {
+            if (req.url?.includes('stream') || proxyRes.headers['content-type']?.includes('text/event-stream')) {
+              proxyRes.headers['cache-control'] = 'no-cache';
+              proxyRes.headers['x-accel-buffering'] = 'no';
+            }
+          });
+        },
       },
       '/api/session': {
         target: 'http://localhost:3002',
         changeOrigin: true,
+        configure: (proxy: any) => {
+          proxy.on('proxyRes', (proxyRes: any, req: any) => {
+            if (req.url?.includes('stream') || proxyRes.headers['content-type']?.includes('text/event-stream')) {
+              proxyRes.headers['cache-control'] = 'no-cache';
+              proxyRes.headers['x-accel-buffering'] = 'no';
+            }
+          });
+        },
       },
       '/api/sessions': {
         target: 'http://localhost:3002',

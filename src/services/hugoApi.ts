@@ -166,6 +166,8 @@ class HugoApiService {
     const decoder = new TextDecoder();
     let buffer = "";
     let sessionId = "";
+    const pendingTokens: string[] = [];
+    let doneMeta: { onboardingStatus?: any } | null = null;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -183,9 +185,9 @@ class HugoApiService {
               sessionId = data.sessionId;
               this.currentSessionId = sessionId;
             } else if (data.type === "token" && data.content) {
-              onToken(data.content);
-            } else if (data.type === "done" && onDone) {
-              onDone({ onboardingStatus: data.onboardingStatus });
+              pendingTokens.push(data.content);
+            } else if (data.type === "done") {
+              doneMeta = { onboardingStatus: data.onboardingStatus };
             } else if (data.type === "error") {
               throw new Error(data.error);
             }
@@ -196,6 +198,18 @@ class HugoApiService {
         }
       }
     }
+
+    if (pendingTokens.length > 0) {
+      const TOKEN_DELAY = 15;
+      for (let i = 0; i < pendingTokens.length; i++) {
+        onToken(pendingTokens[i]);
+        if (i % 3 === 0 && i > 0) {
+          await new Promise(r => setTimeout(r, TOKEN_DELAY));
+        }
+      }
+    }
+
+    if (doneMeta && onDone) onDone(doneMeta);
 
     if (!sessionId) throw new Error("No session ID received");
     return sessionId;
