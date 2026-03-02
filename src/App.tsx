@@ -8,6 +8,7 @@ const Login = lazy(() => import("./components/HH/Login").then(m => ({ default: m
 const Signup = lazy(() => import("./components/HH/Signup").then(m => ({ default: m.Signup })));
 const AuthCallback = lazy(() => import("./components/HH/AuthCallback").then(m => ({ default: m.AuthCallback })));
 const Landing = lazy(() => import("./components/HH/Landing").then(m => ({ default: m.Landing })));
+const ComingSoon = lazy(() => import("./components/HH/ComingSoon").then(m => ({ default: m.ComingSoon })));
 const LandingV2 = lazy(() => import("./components/HH/LandingV2").then(m => ({ default: m.LandingV2 })));
 const ProductShowcase = lazy(() => import("./components/HH/ProductShowcase").then(m => ({ default: m.ProductShowcase })));
 const About = lazy(() => import("./components/HH/About").then(m => ({ default: m.About })));
@@ -314,8 +315,9 @@ export default function App() {
             <AuthCallback navigate={navigate} />
           )}
 
-          {/* Landing page - met navigate prop */}
-          {currentPage === "landing" && <Landing navigate={navigate} />}
+          {/* Coming Soon page (tijdelijk — verwijder deze lijn en uncomment Landing om terug te schakelen) */}
+          {currentPage === "landing" && <ComingSoon navigate={navigate} />}
+          {/* {currentPage === "landing" && <Landing navigate={navigate} />} */}
           {currentPage === "landing-v2" && <LandingV2 navigate={navigate} />}
 
           {/* Dev showcase preview */}
