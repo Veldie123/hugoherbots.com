@@ -12,6 +12,7 @@
 import { WebSocket as WS, WebSocketServer } from "ws";
 import type { Server } from "http";
 import OpenAI from "openai";
+import { supabase } from "./supabase-client";
 import { storage } from "./storage";
 import * as v2Engine from "./v2";
 
@@ -96,7 +97,28 @@ export function setupStreamingResponseWebSocket(server: Server) {
     path: "/ws/stream-response"
   });
 
-  wss.on("connection", (clientWs, req) => {
+  wss.on("connection", async (clientWs, req) => {
+    // SEC-050: Verify JWT token from query string
+    const url = new URL(req.url || '', `http://${req.headers.host}`);
+    const token = url.searchParams.get('token');
+    if (!token) {
+      clientWs.send(JSON.stringify({ type: "error", message: "Authentication required" }));
+      clientWs.close();
+      return;
+    }
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser(token);
+      if (error || !user) {
+        clientWs.send(JSON.stringify({ type: "error", message: "Invalid token" }));
+        clientWs.close();
+        return;
+      }
+    } catch {
+      clientWs.send(JSON.stringify({ type: "error", message: "Auth failed" }));
+      clientWs.close();
+      return;
+    }
+
     // SEC-055: Reject if too many concurrent connections
     if (connections.size >= MAX_STREAM_CONNECTIONS) {
       console.warn(`[StreamResponse] Connection limit reached (${MAX_STREAM_CONNECTIONS}). Rejecting.`);

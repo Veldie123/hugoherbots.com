@@ -208,13 +208,14 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
     setSyncing(true);
     try {
       toast.info("Google Drive synchronisatie gestart...");
-      
-      const processorSecret = import.meta.env.VITE_VIDEO_PROCESSOR_SECRET || "hugo-video-processor-2024";
-      const response = await fetch("/api/video-processor/sync", {
+
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token || '';
+      const response = await fetch("/api/admin-video/video-processor/sync", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${processorSecret}`
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ folderId })
       });
@@ -281,22 +282,23 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
 
     setProcessing(true);
     try {
-      const processorSecret = import.meta.env.VITE_VIDEO_PROCESSOR_SECRET || "hugo-video-processor-2024";
-      const response = await fetch("/api/video-processor/start", {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token || '';
+      const response = await fetch("/api/admin-video/video-processor/start", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${processorSecret}`
+          "Authorization": `Bearer ${token}`
         },
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         toast.success("Video verwerking gestart! Dit kan enkele minuten duren.");
         const checkInterval = setInterval(async () => {
           await fetchJobs();
-          const statusRes = await fetch("/api/video-processor/status");
+          const statusRes = await fetch("/api/admin-video/video-processor/status");
           const status = await statusRes.json();
           if (!status.processing) {
             clearInterval(checkInterval);

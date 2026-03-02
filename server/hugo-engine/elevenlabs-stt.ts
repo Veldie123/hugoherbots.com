@@ -10,6 +10,7 @@
 
 import { WebSocket as WS, WebSocketServer } from "ws";
 import type { Server } from "http";
+import { supabase } from "./supabase-client";
 
 interface ScribeConnection {
   clientWs: WS;
@@ -26,7 +27,28 @@ export function setupScribeWebSocket(server: Server) {
     path: "/ws/scribe"
   });
 
-  wss.on("connection", (clientWs, req) => {
+  wss.on("connection", async (clientWs, req) => {
+    // SEC-050: Verify JWT token from query string
+    const url = new URL(req.url || '', `http://${req.headers.host}`);
+    const token = url.searchParams.get('token');
+    if (!token) {
+      clientWs.send(JSON.stringify({ message_type: "error", error: "Authentication required" }));
+      clientWs.close();
+      return;
+    }
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser(token);
+      if (error || !user) {
+        clientWs.send(JSON.stringify({ message_type: "error", error: "Invalid token" }));
+        clientWs.close();
+        return;
+      }
+    } catch {
+      clientWs.send(JSON.stringify({ message_type: "error", error: "Auth failed" }));
+      clientWs.close();
+      return;
+    }
+
     // SEC-055: Reject if too many concurrent connections
     if (connections.size >= MAX_WS_CONNECTIONS) {
       console.warn(`[Scribe] Connection limit reached (${MAX_WS_CONNECTIONS}). Rejecting new connection.`);

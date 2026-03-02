@@ -64,15 +64,17 @@ export default function App() {
   // Development screenshot bypass: check URL path immediately (synchronously)
   const getDevPreviewPage = (): Page | null => {
     if (typeof window === 'undefined') return null;
+    // SEC-003: Only allow dev preview routes in development or on Replit
+    const isDev = import.meta.env.DEV || window.location.hostname.includes('replit');
     const path = window.location.pathname;
-    if (path.startsWith('/_dark/')) {
+    if (path.startsWith('/_dark/') && isDev) {
       localStorage.setItem('hh-theme', 'dark');
       document.documentElement.classList.add('dark');
       const pageName = path.replace('/_dark/', '');
       console.log('🌙 Dark mode dev preview:', pageName);
       return pageName as Page;
     }
-    if (path.startsWith('/_dev/')) {
+    if (path.startsWith('/_dev/') && isDev) {
       let pageName = path.replace('/_dev/', '');
       if (pageName === 'videos/watch') {
         localStorage.setItem('dev_watch_first', 'true');
@@ -92,7 +94,7 @@ export default function App() {
       return pageName as Page;
     }
     // Check for Hugo onboarding paths: /_hugo/dashboard, /_hugo/videos, etc.
-    if (path.startsWith('/_hugo/')) {
+    if (path.startsWith('/_hugo/') && isDev) {
       const pageName = path.replace('/_hugo/', '');
       console.log('👋 Hugo onboarding preview activated via path:', pageName);
       localStorage.setItem('hugo_onboarding_mode', 'true');
@@ -127,6 +129,7 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(!!devPage); // Track if current user is admin (dev mode = admin)
   const [isSuperAdmin, setIsSuperAdmin] = useState(!!devPage && !isHugoDevPath); // Stéphane only — full access
   const [onboardingMode, setOnboardingMode] = useState(isHugoDevPath); // Simplified UI for Hugo's onboarding
+  const [viewMode, setViewMode] = useState<'admin' | 'user'>(devPage && String(devPage).startsWith('admin-') ? 'admin' : 'user'); // Tracks admin/user view for Talk to Hugo
 
   console.log('📍 App.tsx rendered, currentPage:', currentPage);
 
@@ -163,6 +166,7 @@ export default function App() {
             localStorage.removeItem('hugo_onboarding_mode');
             if (userIsAdmin) {
               console.log('✅ Admin user logged in, route to admin-dashboard');
+              setViewMode('admin');
               setCurrentPage("admin-dashboard");
             } else {
               console.log('✅ User is logged in, route to dashboard');
@@ -200,10 +204,17 @@ export default function App() {
       setIsAdmin(false);
       setIsSuperAdmin(false);
       setOnboardingMode(false);
+      setViewMode('user');
       setNavigationData(undefined);
       setCurrentPage("landing");
       window.scrollTo(0, 0);
       return;
+    }
+    // Track admin/user view mode based on target page
+    if (typeof page === 'string' && page.startsWith('admin-')) {
+      setViewMode('admin');
+    } else if (page === 'dashboard' || page === 'analysis' || page === 'roleplay' || page === 'videos') {
+      setViewMode('user');
     }
     setNavigationData(data);
     if (page.startsWith("settings:")) {
@@ -256,17 +267,20 @@ export default function App() {
                   setIsAdmin(true);
                   setIsSuperAdmin(false);
                   setOnboardingMode(true);
+                  setViewMode('user');
                   localStorage.setItem('hugo_onboarding_mode', 'true');
                   navigate("dashboard");
                 } else if (isHugobotsAdmin) {
                   setIsAdmin(true);
                   setIsSuperAdmin(superAdmin);
                   setOnboardingMode(false);
+                  setViewMode('admin');
                   localStorage.removeItem('hugo_onboarding_mode');
                   navigate("admin-dashboard");
                 } else {
                   setIsAdmin(false);
                   setIsSuperAdmin(false);
+                  setViewMode('user');
                   navigate("dashboard");
                 }
               }}
@@ -383,7 +397,7 @@ export default function App() {
           {currentPage === "upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "privacy-policy" && <PrivacyPolicy navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "hugo-overview" && <HugoAIOverview navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "talk-to-hugo" && <TalkToHugoAI navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} adminViewMode={false} />}
+          {currentPage === "talk-to-hugo" && <TalkToHugoAI navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} adminViewMode={viewMode === 'admin'} />}
           {currentPage === "techniques" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "library" && <Library navigate={navigate} isAdmin={isAdmin} />}
           {currentPage === "notifications" && <UserNotifications navigate={navigate} isAdmin={isAdmin} />}

@@ -266,39 +266,33 @@ def init_clients():
 
 
 def get_google_access_token() -> str:
-    """Get Google Drive access token from Replit connector."""
-    hostname = os.environ.get("REPLIT_CONNECTORS_HOSTNAME")
-    repl_identity = os.environ.get("REPL_IDENTITY")
-    web_renewal = os.environ.get("WEB_REPL_RENEWAL")
-    
-    if repl_identity:
-        x_replit_token = f"repl {repl_identity}"
-    elif web_renewal:
-        x_replit_token = f"depl {web_renewal}"
-    else:
-        raise ValueError("Replit connector credentials niet beschikbaar")
-    
-    if not hostname:
-        raise ValueError("REPLIT_CONNECTORS_HOSTNAME niet beschikbaar")
-    
-    response = requests.get(
-        f"https://{hostname}/api/v2/connection?include_secrets=true&connector_names=google-drive",
-        headers={
-            "Accept": "application/json",
-            "X_REPLIT_TOKEN": x_replit_token
-        }
+    """Get Google Drive access token via service account (GOOGLE_CLOUD_SECRET)."""
+    from google.oauth2 import service_account
+    from google.auth.transport.requests import Request
+
+    secret = os.environ.get("GOOGLE_CLOUD_SECRET")
+    if not secret:
+        raise ValueError("GOOGLE_CLOUD_SECRET niet ingesteld — kan niet authenticeren met Google Drive")
+
+    try:
+        key_data = json.loads(secret)
+    except json.JSONDecodeError:
+        try:
+            key_data = json.loads(base64.b64decode(secret))
+        except Exception:
+            raise ValueError("GOOGLE_CLOUD_SECRET is geen geldige JSON of base64")
+
+    credentials = service_account.Credentials.from_service_account_info(
+        key_data,
+        scopes=["https://www.googleapis.com/auth/drive.readonly"]
     )
-    
-    data = response.json()
-    connection = data.get("items", [{}])[0]
-    settings = connection.get("settings", {})
-    
-    access_token = settings.get("access_token") or settings.get("oauth", {}).get("credentials", {}).get("access_token")
-    
-    if not access_token:
-        raise ValueError("Google Drive niet verbonden - controleer connector in Replit")
-    
-    return access_token
+    credentials.refresh(Request())
+
+    if not credentials.token:
+        raise ValueError("Kon geen Google Drive access token verkrijgen via service account")
+
+    print(f"[GoogleAuth] Token verkregen voor {key_data.get('client_email', 'unknown')}")
+    return credentials.token
 
 
 def download_video_from_drive(file_id: str, access_token: str, output_path: Path, max_retries: int = 5) -> bool:

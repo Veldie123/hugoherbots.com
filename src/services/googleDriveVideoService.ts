@@ -9,52 +9,43 @@ interface VideoIngestJob {
   rag_document_id?: string;
 }
 
-let connectionSettings: any;
+let cachedAuth: { client: any; expiry: number } | null = null;
 
-async function getAccessToken(): Promise<string> {
-  if (connectionSettings && connectionSettings.settings.expires_at && 
-      new Date(connectionSettings.settings.expires_at).getTime() > Date.now()) {
-    return connectionSettings.settings.access_token;
-  }
-  
-  const hostname = (import.meta as any).env?.VITE_REPLIT_CONNECTORS_HOSTNAME || 
-                   (typeof process !== 'undefined' ? process.env.REPLIT_CONNECTORS_HOSTNAME : null);
-  const xReplitToken = typeof process !== 'undefined' 
-    ? (process.env.REPL_IDENTITY ? 'repl ' + process.env.REPL_IDENTITY 
-       : process.env.WEB_REPL_RENEWAL ? 'depl ' + process.env.WEB_REPL_RENEWAL : null)
-    : null;
-
-  if (!xReplitToken || !hostname) {
-    throw new Error('Replit connector credentials niet beschikbaar');
+async function getServiceAccountAuth() {
+  if (cachedAuth && Date.now() < cachedAuth.expiry) {
+    return cachedAuth.client;
   }
 
-  const response = await fetch(
-    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=google-drive',
-    {
-      headers: {
-        'Accept': 'application/json',
-        'X_REPLIT_TOKEN': xReplitToken
-      }
+  const secret = typeof process !== 'undefined' ? process.env.GOOGLE_CLOUD_SECRET : null;
+  if (!secret) {
+    throw new Error('GOOGLE_CLOUD_SECRET niet ingesteld — kan niet authenticeren met Google Drive');
+  }
+
+  let keyData: Record<string, any>;
+  try {
+    keyData = JSON.parse(secret);
+  } catch {
+    try {
+      keyData = JSON.parse(Buffer.from(secret, 'base64').toString());
+    } catch {
+      throw new Error('GOOGLE_CLOUD_SECRET is geen geldige JSON of base64');
     }
-  );
-
-  const data = await response.json();
-  connectionSettings = data.items?.[0];
-
-  const accessToken = connectionSettings?.settings?.access_token || 
-                      connectionSettings?.settings?.oauth?.credentials?.access_token;
-
-  if (!connectionSettings || !accessToken) {
-    throw new Error('Google Drive niet verbonden');
   }
-  return accessToken;
+
+  const auth = new google.auth.GoogleAuth({
+    credentials: keyData,
+    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+  });
+
+  const client = await auth.getClient();
+  cachedAuth = { client, expiry: Date.now() + 55 * 60_000 };
+  console.log(`[GoogleAuth] Token verkregen voor ${keyData.client_email}`);
+  return client;
 }
 
 async function getGoogleDriveClient(): Promise<drive_v3.Drive> {
-  const accessToken = await getAccessToken();
-  const oauth2Client = new google.auth.OAuth2();
-  oauth2Client.setCredentials({ access_token: accessToken });
-  return google.drive({ version: 'v3', auth: oauth2Client });
+  const authClient = await getServiceAccountAuth();
+  return google.drive({ version: 'v3', auth: authClient });
 }
 
 export interface VideoFile {

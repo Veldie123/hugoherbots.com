@@ -1,8 +1,10 @@
 import type { Express } from "express";
+import rateLimit from "express-rate-limit";
 import { createServer, type Server } from "http";
 import * as fs from "fs";
 import * as path from "path";
 import { storage } from "./storage";
+import { requireAuth, requireAdmin } from "./auth-middleware";
 import { getAllowedTechniques, loadFases, loadTechniquesCatalog, loadAiPrompt, getContextSlotsForPhase, getTechniqueFromCatalog } from "./config-loader";
 
 function applyTemplate(template: string, vars: Record<string, string>): string {
@@ -71,6 +73,40 @@ async function getSupabaseSession(sessionId: string): Promise<any | null> {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // JWT Authentication — applied to all /api/ routes with exemptions for public endpoints
+  app.use('/api', (req, res, next) => {
+    const publicPaths = ['/health', '/technieken', '/techniques', '/fases'];
+    if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
+      return next();
+    }
+    requireAuth(req, res, next);
+  });
+
+  // SEC-049: Rate limiting
+  const globalLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => (req as any).userId || req.ip || 'unknown',
+    message: { error: 'Too many requests, try again later' },
+  });
+  app.use('/api', globalLimiter);
+
+  // Stricter limit for AI/session endpoints
+  const aiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => (req as any).userId || req.ip || 'unknown',
+    message: { error: 'AI rate limit exceeded, try again in a minute' },
+  });
+  app.use('/api/session', aiLimiter);
+  app.use('/api/v2/session', aiLimiter);
+  app.use('/api/chat', aiLimiter);
+  app.use('/api/livekit/token', aiLimiter);
+
   // GET /api/fases - get phase configuration data
   app.get("/api/fases", async (req, res) => {
     try {
@@ -150,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/context - Get user's saved context
   app.get("/api/user/context", async (req, res) => {
     try {
-      const userId = (req.query.userId as string) || "demo-user";
+      const userId = req.userId!;
       const context = await storage.getUserContext(userId);
       res.json(context || null);
     } catch (error: any) {
@@ -161,9 +197,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/user/context - Save/update user context
   app.post("/api/user/context", async (req, res) => {
     try {
-      const { userId, product, klantType, sector, setting, additionalContext } = req.body;
-      const userIdToUse = userId || "demo-user";
-      
+      const { product, klantType, sector, setting, additionalContext } = req.body;
+      const userIdToUse = req.userId!;
+
       const context = await storage.createOrUpdateUserContext(userIdToUse, {
         product,
         klantType,
@@ -181,21 +217,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/session/technique-training - create a technique-specific training session
   app.post("/api/session/technique-training", async (req, res) => {
     try {
-      const { techniqueId, userId } = req.body;
-      
+      const { techniqueId } = req.body;
+
       if (!techniqueId) {
         return res.status(400).json({ error: "techniqueId is required" });
       }
-      
+
       // Determine phase from technique ID (e.g., "2.1.8" -> phase 2)
       const fase = parseInt(techniqueId.split('.')[0]);
-      
+
       // REFACTORED: scenarios.json removed - use synthetic ID and config-loader helpers
       const selectedScenarioId = `technique-${techniqueId}`;
       // houding comes from persona_templates.json defaults (via generateCustomerProfile)
       const selectedHouding = "neutraal, bewuste_kunde";
-      
-      const userIdToUse = userId || "demo-user";
+
+      const userIdToUse = req.userId!;
       
       // Check if we have existing context for this technique
       const existingTechniqueContext = await storage.getTechniqueSession(
@@ -383,27 +419,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/session - create a new training session (REFACTORED: no longer requires scenarioId)
   app.post("/api/session", async (req, res) => {
     try {
-      const { scenarioId, techniqueId, userId, fase, houding } = req.body;
-      
+      const { scenarioId, techniqueId, fase, houding } = req.body;
+
       if (!techniqueId) {
         return res.status(400).json({ error: "techniqueId is required for roleplay sessions" });
       }
 
       // REFACTORED: Derive fase from techniqueId if not provided
       const sessionFase = fase || parseInt(techniqueId.split('.')[0]) || 1;
-      
+
       // REFACTORED: scenarios.json removed - use defaults
       const sessionHouding = houding || "neutraal, bewuste_kunde";
-      
+
       // REFACTORED: Get context slots from config-loader based on phase
       const contextSlots = getContextSlotsForPhase(sessionFase);
       const requiresContext = contextSlots.length > 0;
-      
+
       // v4.0: Start with COACH_CHAT if context gathering needed, otherwise ROLEPLAY
       const initialMode = requiresContext ? "COACH_CHAT" : "ROLEPLAY";
 
       // PERSONA ENGINE: Generate hidden customer profile for roleplay
-      const userIdToUse = userId || "demo-user";
+      const userIdToUse = req.userId!;
       const customerProfile = await generateCustomerProfile(userIdToUse);
 
       // REFACTORED: Use synthetic scenarioId based on techniqueId
@@ -1529,7 +1565,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Track technique attempt for analytics (non-blocking)
       if (evaluation.appliedTechnique) {
-        const userId = session.userId || "demo-user";
+        const userId = session.userId || req.userId!;
         const attemptScore = evaluation.scoreDelta > 0 ? Math.min(100, 50 + evaluation.scoreDelta * 10) : 30;
         const success = evaluation.scoreDelta > 0;
         
@@ -2415,7 +2451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { watchedSeconds, lastPosition } = req.body;
       const videoId = req.params.id;
-      const userId = "demo-user"; // TODO: Get from auth
+      const userId = req.userId!;
       
       // Get video to check duration
       const video = await storage.getVideo(videoId);
@@ -2477,8 +2513,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/videos/:id/progress", async (req, res) => {
     try {
       const videoId = req.params.id;
-      const userId = "demo-user"; // TODO: Get from auth
-      
+      const userId = req.userId!;
+
       const progress = await storage.getVideoProgress(userId, videoId);
       
       res.json(progress || { 
@@ -2494,8 +2530,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/video-stats - get aggregate video stats for a user
   app.get("/api/user/video-stats", async (req, res) => {
     try {
-      const userId = "demo-user"; // TODO: Get from auth
-      
+      const userId = req.userId!;
+
       const videos = await storage.getVideos();
       const userProgress = await storage.getUserVideoProgress(userId);
       
@@ -2718,7 +2754,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/live-sessions/:id/join", async (req, res) => {
     try {
       const sessionId = req.params.id;
-      const userId = req.body.userId || "demo-user";
+      const userId = req.userId!;
       const userName = req.body.userName || "Deelnemer";
       
       const session = await storage.getLiveSession(sessionId);
@@ -2753,8 +2789,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/live-sessions/:id/leave", async (req, res) => {
     try {
       const sessionId = req.params.id;
-      const userId = req.body.userId || "demo-user";
-      
+      const userId = req.userId!;
+
       await storage.leaveLiveSession(sessionId, userId);
       res.json({ success: true });
     } catch (error: any) {
@@ -2766,8 +2802,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/live-sessions/:id/reminder", async (req, res) => {
     try {
       const sessionId = req.params.id;
-      const userId = req.body.userId || "demo-user";
-      
+      const userId = req.userId!;
+
       await storage.setReminder(sessionId, userId);
       res.json({ success: true });
     } catch (error: any) {
@@ -2985,7 +3021,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/live-sessions/:id/chat", async (req, res) => {
     try {
       const { message, userName, userInitials, isHost } = req.body;
-      const userId = req.body.userId || "demo-user";
+      const userId = req.userId!;
       
       if (!message || !userName) {
         return res.status(400).json({ error: "message and userName are required" });
@@ -3010,7 +3046,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/live-sessions/:id/polls", async (req, res) => {
     try {
       const polls = await storage.getSessionPolls(req.params.id);
-      const userId = (req.query.userId as string) || "demo-user";
+      const userId = req.userId!;
       
       // Enrich with options and user vote status
       const enrichedPolls = await Promise.all(polls.map(async (poll) => {
@@ -3069,7 +3105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const pollId = req.params.id;
       const { optionId } = req.body;
-      const userId = req.body.userId || "demo-user";
+      const userId = req.userId!;
       
       if (!optionId) {
         return res.status(400).json({ error: "optionId is required" });
@@ -3238,8 +3274,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/stats - get aggregated user statistics
   app.get("/api/user/stats", async (req, res) => {
     try {
-      const userId = "demo-user"; // TODO: Get from auth
-      
+      const userId = req.userId!;
+
       const stats = await storage.getUserStats(userId);
       const sessionsThisWeek = await storage.getUserSessionsThisWeek(userId);
       const weeklyHistory = await storage.getUserSessionsByWeek(userId, 8);
@@ -3290,7 +3326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/technique-mastery - get technique mastery breakdown
   app.get("/api/user/technique-mastery", async (req, res) => {
     try {
-      const userId = "demo-user"; // TODO: Get from auth
+      const userId = req.userId!;
       const masteries = await storage.getUserTechniqueMasteries(userId);
       res.json(masteries);
     } catch (error: any) {
@@ -3301,7 +3337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/activity-log - get recent activity
   app.get("/api/user/activity-log", async (req, res) => {
     try {
-      const userId = "demo-user"; // TODO: Get from auth
+      const userId = req.userId!;
       const limit = parseInt(req.query.limit as string) || 50;
       const activities = await storage.getUserActivityLog(userId, limit);
       res.json(activities);
@@ -3313,7 +3349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/user/activity - log a user activity
   app.post("/api/user/activity", async (req, res) => {
     try {
-      const userId = "demo-user"; // TODO: Get from auth
+      const userId = req.userId!;
       const { eventType, entityType, entityId, durationSeconds, score, metadata } = req.body;
       
       if (!eventType) {
@@ -3350,7 +3386,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/user/technique-attempt - record a technique attempt
   app.post("/api/user/technique-attempt", async (req, res) => {
     try {
-      const userId = "demo-user"; // TODO: Get from auth
+      const userId = req.userId!;
       const { techniqueId, techniqueName, score, success } = req.body;
       
       if (!techniqueId) {
@@ -3374,7 +3410,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/evolution - get score evolution over time
   app.get("/api/user/evolution", async (req, res) => {
     try {
-      const userId = "demo-user"; // TODO: Get from auth
+      const userId = req.userId!;
       const weeklyHistory = await storage.getUserSessionsByWeek(userId, 12);
       const masteries = await storage.getUserTechniqueMasteries(userId);
       
@@ -3724,16 +3760,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/v2/session/start - Start a V2 roleplay session
   app.post("/api/v2/session/start", async (req, res) => {
     try {
-      const { techniqueId, userId = "demo-user", expertMode = false } = req.body;
-      
+      const { techniqueId, expertMode = false } = req.body;
+      const userId = req.userId!;
+
       if (!techniqueId) {
         return res.status(400).json({ error: "techniqueId is required" });
       }
-      
+
       // SEQUENCE ENFORCEMENT: Check if user can access this technique
-      // Expert mode, demo-user, and livekit-user bypass sequence check
-      const isDemoUser = userId === "demo-user" || userId.startsWith("demo-");
-      const isLiveKitUser = userId === "livekit-user" || userId.startsWith("livekit-");
+      // Expert mode bypasses sequence check
+      const isDemoUser = false;
+      const isLiveKitUser = false;
       if (!expertMode && !isDemoUser && !isLiveKitUser) {
         const accessCheck = await canAccessTechnique(userId, techniqueId);
         if (!accessCheck.canAccess) {
@@ -4068,7 +4105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.endV2Session(sessionId);
       }
       
-      const userId = "demo-user";
+      const userId = req.userId!;
       const newSessionId = `v2-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       
       // Load existing context unless clearContext is true
@@ -4860,7 +4897,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { AccessToken, RoomServiceClient, AgentDispatchClient } = await import("livekit-server-sdk");
       
-      const { techniqueId = "2.1", userId = "user" } = req.body;
+      const { techniqueId = "2.1" } = req.body;
+      const userId = req.userId!;
       
       const apiKey = process.env.LIVEKIT_API_KEY;
       const apiSecret = process.env.LIVEKIT_API_SECRET;

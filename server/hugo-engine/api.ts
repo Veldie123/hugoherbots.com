@@ -25,11 +25,13 @@
 
 import express, { type Request, Response, NextFunction } from "express";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
 import os from "os";
 import { nanoid } from "nanoid";
+import { requireAuth, requireAdmin, optionalAuth } from "./auth-middleware";
 
 // FULL ENGINE IMPORTS - Replacing simplified versions
 import { 
@@ -203,6 +205,44 @@ app.use((req, res, next) => {
   next();
 });
 
+// SEC-053: HTTPS enforcement in production (behind reverse proxy)
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] === 'http') {
+      return res.redirect(301, `https://${req.headers.host}${req.url}`);
+    }
+    next();
+  });
+}
+
+// SEC-049: Rate limiting
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.userId || req.ip || 'unknown',
+  message: { error: 'Too many requests, try again later' },
+});
+app.use('/api', globalLimiter);
+
+// Stricter rate limit for AI/token-consuming endpoints
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.userId || req.ip || 'unknown',
+  message: { error: 'AI rate limit exceeded, try again in a minute' },
+});
+app.use('/api/v2/chat', aiLimiter);
+app.use('/api/v2/sessions', aiLimiter);
+app.use('/api/v2/roleplay', aiLimiter);
+app.use('/api/v2/analysis', aiLimiter);
+app.use('/api/chat', aiLimiter);
+app.use('/api/v2/briefs', aiLimiter);
+app.use('/api/livekit/token', aiLimiter);
+
 // Logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
@@ -214,6 +254,20 @@ app.use((req, res, next) => {
   });
   next();
 });
+
+// JWT Authentication — applied to all /api/ routes with exemptions
+app.use('/api', (req: Request, res: Response, next: NextFunction) => {
+  // Skip auth for health checks, Stripe webhooks, and platform sync
+  const publicPaths = ['/health', '/stripe/webhook', '/platform-sync/'];
+  if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
+    return next();
+  }
+  requireAuth(req, res, next);
+});
+
+// Admin-only routes
+app.use('/api/admin', requireAdmin);
+app.use('/api/v2/admin', requireAdmin);
 
 // ===========================================
 // SESSION STORAGE (database-backed with in-memory cache)
@@ -240,7 +294,7 @@ async function saveSessionToDb(session: Session): Promise<void> {
   try {
     const sessionData = {
       id: session.id,
-      user_id: session.userId || 'anonymous',
+      user_id: session.userId || 'anonymous',  // fallback for legacy sessions without userId
       technique_id: session.techniqueId,
       mode: session.mode,
       current_mode: session.mode,
@@ -381,23 +435,24 @@ app.get("/api/technieken", async (req, res) => {
 // Start a new session with FULL engine
 app.post("/api/v2/sessions", async (req, res) => {
   try {
-    const { techniqueId, mode = "COACH_CHAT", isExpert = false, userId, userName, viewMode } = req.body;
-    
+    const { techniqueId, mode = "COACH_CHAT", isExpert = false, userName, viewMode } = req.body;
+    const userId = req.userId!;
+
     if (!techniqueId) {
       return res.status(400).json({ error: "techniqueId is required" });
     }
-    
+
     const sessionId = `session-${nanoid(12)}`;
-    
+
     // Get technique info from SSOT
     const technique = getTechnique(techniqueId);
     const techniqueName = technique?.naam || techniqueId;
-    
+
     // Create context state for context gathering
-    const contextState = createContextState(userId || 'anonymous', sessionId, techniqueId);
-    
+    const contextState = createContextState(userId, sessionId, techniqueId);
+
     // Load existing user context from Supabase and pre-fill gathered slots
-    const userIdForContext = userId || 'anonymous';
+    const userIdForContext = userId;
     try {
       const { data: row } = await supabase
         .from('user_context')
@@ -530,7 +585,8 @@ app.post("/api/v2/sessions", async (req, res) => {
 // POST /api/v2/sessions/stream - Streaming version of session creation
 app.post("/api/v2/sessions/stream", async (req, res) => {
   try {
-    const { techniqueId = "general", mode = "COACH_CHAT", isExpert = false, modality = "chat", viewMode = "user", userId } = req.body;
+    const { techniqueId = "general", mode = "COACH_CHAT", isExpert = false, modality = "chat", viewMode = "user" } = req.body;
+    const userId = req.userId!;
     
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
     const techniqueName = techniqueId !== 'general' ? (() => {
@@ -575,7 +631,7 @@ app.post("/api/v2/sessions/stream", async (req, res) => {
       isExpert,
       modality,
       viewMode,
-      userId: userId || null,
+      userId,
       userName: null,
       conversationHistory: [],
       contextState,
@@ -1319,8 +1375,11 @@ app.get("/api/sessions/stats", async (req, res) => {
 // Get all sessions list (from Supabase)
 app.get("/api/sessions", async (req, res) => {
   try {
-    const userId = req.query.userId as string;
-    
+    // Admins can filter by any userId; regular users only see their own sessions
+    const userId = req.isAdmin && req.query.userId
+      ? (req.query.userId as string)
+      : req.userId!;
+
     // Query Supabase for sessions
     let query = supabase
       .from('v2_sessions')
@@ -1328,7 +1387,7 @@ app.get("/api/sessions", async (req, res) => {
       .eq('is_active', 1)
       .order('created_at', { ascending: false })
       .limit(100);
-    
+
     if (userId) {
       query = query.eq('user_id', userId);
     }
@@ -1446,8 +1505,8 @@ app.get("/api/sessions", async (req, res) => {
 // Get sessions for a specific user (user view) - Supabase
 app.get("/api/user/sessions", async (req, res) => {
   try {
-    const userId = req.query.userId as string || 'anonymous';
-    
+    const userId = req.userId!;
+
     const { data: rows, error } = await supabase
       .from('v2_sessions')
       .select('id, technique_id, current_mode, phase, turn_number, conversation_history, context, total_score, created_at, updated_at')
@@ -1595,8 +1654,8 @@ app.get("/api/live-sessions/recordings", async (req, res) => {
 // Get user context from Supabase
 app.get("/api/user/context", async (req, res) => {
   try {
-    const userId = req.query.userId as string || "default";
-    
+    const userId = req.userId!;
+
     const { data: row, error } = await supabase
       .from('user_context')
       .select('sector, product, klant_type, setting, additional_context')
@@ -1626,7 +1685,8 @@ app.get("/api/user/context", async (req, res) => {
 // Save user context to Supabase
 app.post("/api/user/context", async (req, res) => {
   try {
-    const { userId = "default", context } = req.body;
+    const { context } = req.body;
+    const userId = req.userId!;
     
     // Extract known fields and additional context
     const { sector, product, klantType, setting, ...additional } = context;
@@ -2081,7 +2141,8 @@ setInterval(() => {
 // Start a new roleplay session
 app.post("/api/v2/roleplay/start", async (req, res) => {
   try {
-    const { techniqueId, userId = "demo-user", existingContext } = req.body;
+    const { techniqueId, existingContext } = req.body;
+    const userId = req.userId!;
     
     if (!techniqueId) {
       return res.status(400).json({ error: "techniqueId is required" });
@@ -2387,11 +2448,12 @@ app.get("/api/v2/golden-standard/all", (req, res) => {
 // POST /api/v2/artifacts - Save an artifact
 app.post("/api/v2/artifacts", async (req, res) => {
   try {
-    const { sessionId, userId, artifactType, techniqueId, content, epicPhase } = req.body;
-    
-    if (!sessionId || !userId || !artifactType || !techniqueId || !content) {
-      return res.status(400).json({ 
-        error: "Missing required fields: sessionId, userId, artifactType, techniqueId, content" 
+    const { sessionId, artifactType, techniqueId, content, epicPhase } = req.body;
+    const userId = req.userId!;
+
+    if (!sessionId || !artifactType || !techniqueId || !content) {
+      return res.status(400).json({
+        error: "Missing required fields: sessionId, artifactType, techniqueId, content"
       });
     }
     
@@ -2500,12 +2562,13 @@ app.get("/api/v2/artifacts/:sessionId/:artifactType", async (req, res) => {
 // POST /api/v2/briefs/discovery - Generate discovery brief from conversation
 app.post("/api/v2/briefs/discovery", async (req, res) => {
   try {
-    const { sessionId, userId, techniqueId, conversationHistory } = req.body;
-    
-    if (!sessionId || !userId || !conversationHistory) {
-      return res.status(400).json({ error: "sessionId, userId, and conversationHistory are required" });
+    const { sessionId, techniqueId, conversationHistory } = req.body;
+    const userId = req.userId!;
+
+    if (!sessionId || !conversationHistory) {
+      return res.status(400).json({ error: "sessionId and conversationHistory are required" });
     }
-    
+
     console.log(`[briefs] Generating discovery brief for session ${sessionId}`);
     const brief = await generateDiscoveryBrief(
       sessionId,
@@ -2525,10 +2588,11 @@ app.post("/api/v2/briefs/discovery", async (req, res) => {
 // POST /api/v2/briefs/offer - Generate offer brief from conversation
 app.post("/api/v2/briefs/offer", async (req, res) => {
   try {
-    const { sessionId, userId, techniqueId, conversationHistory, discoveryBrief } = req.body;
-    
-    if (!sessionId || !userId || !conversationHistory) {
-      return res.status(400).json({ error: "sessionId, userId, and conversationHistory are required" });
+    const { sessionId, techniqueId, conversationHistory, discoveryBrief } = req.body;
+    const userId = req.userId!;
+
+    if (!sessionId || !conversationHistory) {
+      return res.status(400).json({ error: "sessionId and conversationHistory are required" });
     }
     
     console.log(`[briefs] Generating offer brief for session ${sessionId}`);
@@ -2630,12 +2694,13 @@ app.get("/api/v2/context/flow-rules", async (req, res) => {
 // POST /api/v2/context/snapshot - Save scenario snapshot as artifact
 app.post("/api/v2/context/snapshot", async (req, res) => {
   try {
-    const { sessionId, userId, techniqueId, contextLayers } = req.body;
-    
-    if (!sessionId || !userId || !contextLayers) {
-      return res.status(400).json({ error: "sessionId, userId, and contextLayers are required" });
+    const { sessionId, techniqueId, contextLayers } = req.body;
+    const userId = req.userId!;
+
+    if (!sessionId || !contextLayers) {
+      return res.status(400).json({ error: "sessionId and contextLayers are required" });
     }
-    
+
     console.log(`[context] Saving scenario snapshot for session ${sessionId}`);
     await generateScenarioSnapshot(sessionId, userId, techniqueId || "1", contextLayers);
     
@@ -2939,11 +3004,11 @@ import { performanceTracker } from "./v2/performance-tracker";
 // GET /api/v2/user/level - Get current competence level
 app.get("/api/v2/user/level", async (req, res) => {
   try {
-    const userId = (req.query.userId as string) || "demo-user";
+    const userId = req.userId!;
     const level = await performanceTracker.getCurrentLevel(userId);
     const levelName = performanceTracker.getLevelName(level);
     const assistanceConfig = performanceTracker.getAssistanceConfig(level);
-    
+
     res.json({
       userId,
       level,
@@ -2959,7 +3024,8 @@ app.get("/api/v2/user/level", async (req, res) => {
 // POST /api/v2/user/performance - Record performance and check for level transition
 app.post("/api/v2/user/performance", async (req, res) => {
   try {
-    const { userId = "demo-user", techniqueId, techniqueName, score, struggleSignals } = req.body;
+    const { techniqueId, techniqueName, score, struggleSignals } = req.body;
+    const userId = req.userId!;
     
     if (!techniqueId || score === undefined) {
       return res.status(400).json({ error: "techniqueId and score are required" });
@@ -3000,10 +3066,10 @@ app.post("/api/v2/user/performance", async (req, res) => {
 // GET /api/v2/user/mastery - Get technique mastery summary
 app.get("/api/v2/user/mastery", async (req, res) => {
   try {
-    const userId = (req.query.userId as string) || "demo-user";
+    const userId = req.userId!;
     const mastery = await performanceTracker.getTechniqueMasterySummary(userId);
     const level = await performanceTracker.getCurrentLevel(userId);
-    
+
     res.json({
       userId,
       currentLevel: level,
@@ -3021,12 +3087,8 @@ app.get("/api/v2/user/mastery", async (req, res) => {
 // ===========================================
 
 app.get("/api/v2/user/activity-summary", async (req, res) => {
-  const userId = req.query.userId as string;
-  
-  if (!userId) {
-    return res.status(400).json({ error: "userId required" });
-  }
-  
+  const userId = req.userId!;
+
   try {
     let rpcData = null;
     const rpcResult = await supabase
@@ -3171,10 +3233,11 @@ app.get("/api/v2/user/activity-summary", async (req, res) => {
 });
 
 app.post("/api/v2/user/activity", async (req, res) => {
-  const { userId, activityType, entityType, entityId, durationSeconds, score, metadata, sourceApp } = req.body;
-  
-  if (!userId || !activityType) {
-    return res.status(400).json({ error: "userId and activityType required" });
+  const { activityType, entityType, entityId, durationSeconds, score, metadata, sourceApp } = req.body;
+  const userId = req.userId!;
+
+  if (!activityType) {
+    return res.status(400).json({ error: "activityType required" });
   }
   
   try {
@@ -3230,12 +3293,8 @@ app.post("/api/v2/user/activity", async (req, res) => {
 });
 
 app.get("/api/v2/user/hugo-context", async (req, res) => {
-  const userId = req.query.userId as string;
-  
-  if (!userId) {
-    return res.status(400).json({ error: "userId required" });
-  }
-  
+  const userId = req.userId!;
+
   try {
     let rpcData = null;
     try {
@@ -3330,7 +3389,8 @@ app.post("/api/v2/analysis/upload", upload.single('file'), async (req: Request, 
       return res.status(400).json({ error: 'Geen bestand ontvangen' });
     }
 
-    const { title, context, userId, consentConfirmed } = req.body;
+    const { title, context, consentConfirmed } = req.body;
+    const effectiveUserId = req.userId!;
 
     if (!consentConfirmed || consentConfirmed === 'false') {
       return res.status(400).json({ error: 'Toestemming is vereist voor het uploaden van gesprekken' });
@@ -3339,8 +3399,6 @@ app.post("/api/v2/analysis/upload", upload.single('file'), async (req: Request, 
     if (!title) {
       return res.status(400).json({ error: 'Titel is verplicht' });
     }
-
-    const effectiveUserId = userId || 'anonymous';
 
     console.log(`[Analysis] Upload started: "${title}" by ${effectiveUserId}, file: ${file.originalname} (${(file.size / 1024 / 1024).toFixed(1)}MB)`);
 
@@ -3379,9 +3437,9 @@ app.post("/api/v2/analysis/inline", upload.single('file'), async (req: Request, 
       return res.status(400).json({ error: 'Geen bestand ontvangen' });
     }
 
-    const { title, userId } = req.body;
+    const { title } = req.body;
     const effectiveTitle = title || file.originalname?.replace(/\.[^/.]+$/, '') || `Analyse ${new Date().toLocaleDateString('nl-NL')}`;
-    const effectiveUserId = userId || 'anonymous';
+    const effectiveUserId = req.userId!;
 
     console.log(`[Analysis:Inline] Starting inline analysis: "${effectiveTitle}" by ${effectiveUserId}, file: ${file.originalname} (${(file.size / 1024 / 1024).toFixed(1)}MB)`);
 
@@ -3486,7 +3544,8 @@ app.post("/api/v2/analysis/upload/chunk", chunkUpload.single('chunk'), (req: Req
 
 app.post("/api/v2/analysis/upload/complete", express.json(), async (req: Request, res: Response) => {
   try {
-    const { uploadId, title, context, userId, consentConfirmed } = req.body;
+    const { uploadId, title, context, consentConfirmed } = req.body;
+    const effectiveUserId = req.userId!;
 
     if (!uploadId) {
       return res.status(400).json({ error: 'uploadId is vereist' });
@@ -3498,8 +3557,8 @@ app.post("/api/v2/analysis/upload/complete", express.json(), async (req: Request
     }
 
     if (uploadInfo.chunks.size !== uploadInfo.totalChunks) {
-      return res.status(400).json({ 
-        error: `Niet alle chunks ontvangen: ${uploadInfo.chunks.size}/${uploadInfo.totalChunks}` 
+      return res.status(400).json({
+        error: `Niet alle chunks ontvangen: ${uploadInfo.chunks.size}/${uploadInfo.totalChunks}`
       });
     }
 
@@ -3510,8 +3569,6 @@ app.post("/api/v2/analysis/upload/complete", express.json(), async (req: Request
     if (!title) {
       return res.status(400).json({ error: 'Titel is verplicht' });
     }
-
-    const effectiveUserId = userId || 'anonymous';
 
     const ext = path.extname(uploadInfo.fileName).toLowerCase() || '.m4a';
     const assembledPath = path.join(uploadInfo.tmpDir, `assembled${ext}`);
@@ -3761,8 +3818,8 @@ app.post("/api/v2/analysis/regenerate-coach/:conversationId", express.json(), as
 
 app.post("/api/v2/analysis/chat-session", express.json(), async (req: Request, res: Response) => {
   try {
-    const { sessionId, userId } = req.body;
-    
+    const { sessionId } = req.body;
+
     if (!sessionId) {
       return res.status(400).json({ error: 'sessionId is vereist' });
     }
@@ -3800,7 +3857,7 @@ app.post("/api/v2/analysis/chat-session", express.json(), async (req: Request, r
       return res.status(400).json({ error: 'Geen berichten in de sessie' });
     }
 
-    const effectiveUserId = userId || session.user_id || 'anonymous';
+    const effectiveUserId = req.userId!;
     const techniqueName = getTechnique(session.technique_id)?.naam || session.technique_id || 'Algemeen';
     const title = techniqueName;
 
@@ -3825,7 +3882,10 @@ app.post("/api/v2/analysis/chat-session", express.json(), async (req: Request, r
 
 app.get("/api/v2/analysis/list", async (req: Request, res: Response) => {
   try {
-    const userId = req.query.userId as string;
+    // Admins can filter by any userId; regular users only see their own analyses
+    const userId = req.isAdmin && req.query.userId
+      ? (req.query.userId as string)
+      : req.userId!;
     const source = req.query.source as string;
 
     let queryText = 'SELECT id, user_id, title, status, error, created_at, completed_at, result FROM conversation_analyses';
@@ -4054,7 +4114,8 @@ Output als JSON: {"response": "...", "reasoning": "..."}`
 
 app.post("/api/v2/chat/feedback", express.json(), async (req: Request, res: Response) => {
   try {
-    const { messageId, sessionId, userId, feedback, messageText, debugInfo } = req.body;
+    const { messageId, sessionId, feedback, messageText, debugInfo } = req.body;
+    const userId = req.userId!;
 
     if (!messageId || !feedback) {
       return res.status(400).json({ error: 'messageId and feedback are required' });
@@ -4422,7 +4483,7 @@ async function ensureOnboardingPopulated(adminUserId: string): Promise<void> {
 
 app.get("/api/v2/admin/onboarding/status", async (req: Request, res: Response) => {
   try {
-    const adminUserId = (req.query.userId as string) || 'hugo';
+    const adminUserId = req.userId!;
     await ensureOnboardingPopulated(adminUserId);
 
     const { rows } = await pool.query(
@@ -4467,8 +4528,8 @@ app.get("/api/v2/admin/onboarding/status", async (req: Request, res: Response) =
 
 app.post("/api/v2/admin/onboarding/approve", async (req: Request, res: Response) => {
   try {
-    const { itemKey, module, userId } = req.body;
-    const adminUserId = userId || 'hugo';
+    const { itemKey, module } = req.body;
+    const adminUserId = req.userId!;
 
     if (!itemKey || !module) {
       return res.status(400).json({ error: 'itemKey and module are required' });
@@ -4492,8 +4553,8 @@ app.post("/api/v2/admin/onboarding/approve", async (req: Request, res: Response)
 
 app.post("/api/v2/admin/onboarding/skip", async (req: Request, res: Response) => {
   try {
-    const { itemKey, module, userId } = req.body;
-    const adminUserId = userId || 'hugo';
+    const { itemKey, module } = req.body;
+    const adminUserId = req.userId!;
 
     if (!itemKey || !module) {
       return res.status(400).json({ error: 'itemKey and module are required' });
@@ -4517,8 +4578,8 @@ app.post("/api/v2/admin/onboarding/skip", async (req: Request, res: Response) =>
 
 app.post("/api/v2/admin/onboarding/feedback", async (req: Request, res: Response) => {
   try {
-    const { itemKey, module, feedbackText, userId } = req.body;
-    const adminUserId = userId || 'hugo';
+    const { itemKey, module, feedbackText } = req.body;
+    const adminUserId = req.userId!;
 
     if (!itemKey || !module || !feedbackText) {
       return res.status(400).json({ error: 'itemKey, module, and feedbackText are required' });
@@ -4840,8 +4901,8 @@ app.get("/api/v2/admin/welcome", async (req: Request, res: Response) => {
 // ===========================================
 app.get("/api/v2/user/welcome", async (req: Request, res: Response) => {
   try {
-    const userId = req.query.userId as string;
-    
+    const userId = req.userId!;
+
     let userName = 'daar';
     let sessionsPlayed = 0;
     let avgScore = 0;
@@ -4976,10 +5037,11 @@ const PORT = parseInt(process.env.API_PORT || "3001", 10);
 // Primary endpoint for .com platform: /api/v2/chat
 // Returns rich responses with content suggestions (videos, slides, webinars, roleplay)
 app.post("/api/v2/chat", async (req, res) => {
-  const { message, userId, sessionId, conversationHistory, techniqueContext, sourceApp } = req.body;
-  
-  console.log(`[API] /api/v2/chat from ${sourceApp || 'unknown'}, userId: ${userId || 'anonymous'}`);
-  
+  const { message, sessionId, conversationHistory, techniqueContext, sourceApp } = req.body;
+  const userId = req.userId!;
+
+  console.log(`[API] /api/v2/chat from ${sourceApp || 'unknown'}, userId: ${userId}`);
+
   if (!message) {
     return res.status(400).json({ error: "message is required" });
   }
@@ -4989,13 +5051,13 @@ app.post("/api/v2/chat", async (req, res) => {
       role: m.role as 'user' | 'assistant',
       content: m.content
     }));
-    
+
     const techniqueId = techniqueContext?.techniqueId || techniqueContext || undefined;
     const techniqueName = techniqueContext?.techniqueName || undefined;
     const phase = techniqueContext?.phase || undefined;
-    
+
     const coachResult = await generateCoachResponse(message, history, {
-      userId: userId || undefined,
+      userId,
       techniqueId
     });
 
@@ -5013,7 +5075,7 @@ app.post("/api/v2/chat", async (req, res) => {
         techniqueId,
         techniqueName,
         phase,
-        userId: userId || undefined
+        userId
       }
     );
 
@@ -5047,10 +5109,11 @@ app.post("/api/v2/chat", async (req, res) => {
 
 // Alias: /api/chat → same as /api/v2/chat
 app.post("/api/chat", async (req, res) => {
-  const { message, userId, conversationHistory, techniqueContext, sourceApp } = req.body;
-  
+  const { message, conversationHistory, techniqueContext, sourceApp } = req.body;
+  const userId = req.userId!;
+
   console.log(`[API] /api/chat from ${sourceApp || 'unknown'}`);
-  
+
   if (!message) {
     return res.status(400).json({ error: "message is required" });
   }
@@ -5060,9 +5123,9 @@ app.post("/api/chat", async (req, res) => {
       role: m.role as 'user' | 'assistant',
       content: m.content
     }));
-    
+
     const coachResult = await generateCoachResponse(message, history, {
-      userId: userId || undefined,
+      userId,
       techniqueId: techniqueContext || undefined
     });
 
@@ -5085,8 +5148,9 @@ app.post("/api/chat", async (req, res) => {
 
 // Alias: /api/chat/message → uses V2 coach engine
 app.post("/api/chat/message", async (req, res) => {
-  const { message, userId, conversationHistory } = req.body;
-  
+  const { message, conversationHistory } = req.body;
+  const userId = req.userId!;
+
   if (!message) {
     return res.status(400).json({ error: "message is required" });
   }
@@ -5096,9 +5160,9 @@ app.post("/api/chat/message", async (req, res) => {
       role: m.role as 'user' | 'assistant',
       content: m.content
     }));
-    
+
     const coachResult = await generateCoachResponse(message, history, {
-      userId: userId || undefined
+      userId
     });
 
     res.json({
@@ -5117,12 +5181,8 @@ app.post("/api/chat/message", async (req, res) => {
 
 // Alias: /api/user/activity-summary → forwards to v2 endpoint
 app.get("/api/user/activity-summary", async (req, res) => {
-  const userId = req.query.userId as string;
-  
-  if (!userId) {
-    return res.status(400).json({ error: "userId required" });
-  }
-  
+  const userId = req.userId!;
+
   try {
     let rpcData = null;
     const rpcResult = await supabase
@@ -5333,11 +5393,8 @@ app.get("/api/platform-sync/status", async (req, res) => {
 // POST /api/sso/generate-token - Generate SSO handoff token for cross-platform auth
 app.post("/api/sso/generate-token", async (req, res) => {
   try {
-    const { userId, sourcePlatform, targetPlatform, targetPath, ttlSeconds = 60 } = req.body;
-
-    if (!userId) {
-      return res.status(400).json({ error: "userId is required" });
-    }
+    const { sourcePlatform, targetPlatform, targetPath, ttlSeconds = 60 } = req.body;
+    const userId = req.userId!;
 
     // Validate platforms
     const validPlatforms = ['com', 'ai'];
@@ -5525,6 +5582,37 @@ async function startServer() {
     } catch (error: any) {
       console.error("[API] Slides error:", error.message);
       res.status(500).json({ error: "Failed to load slides" });
+    }
+  });
+
+  // ============================================
+  // ADMIN VIDEO PROXY — SEC-029
+  // Proxies admin video requests to video-processor (port 3001)
+  // with server-side VIDEO_PROCESSOR_SECRET, removing the need
+  // for the frontend to know the secret.
+  // ============================================
+  app.all("/api/admin-video/{*splat}", async (req: Request, res: Response) => {
+    const targetPath = req.path.replace("/api/admin-video", "/api");
+    const targetUrl = `http://localhost:3001${targetPath}`;
+
+    try {
+      const fetchOptions: RequestInit = {
+        method: req.method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.VIDEO_PROCESSOR_SECRET || ''}`
+        },
+      };
+      if (req.method !== 'GET' && req.method !== 'HEAD') {
+        fetchOptions.body = JSON.stringify(req.body);
+      }
+
+      const response = await fetch(targetUrl, fetchOptions);
+      const data = await response.json();
+      res.status(response.status).json(data);
+    } catch (err: any) {
+      console.error('[Admin Video Proxy] Error:', err.message);
+      res.status(502).json({ error: 'Video processor unavailable' });
     }
   });
 

@@ -28,29 +28,30 @@ const SKIP_FOLDER_NAMES = new Set([
 ]);
 
 async function getGoogleDriveAccessToken() {
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
-  const replIdentity = process.env.REPL_IDENTITY;
-  const webRenewal = process.env.WEB_REPL_RENEWAL;
+  const { google } = require('googleapis');
+  const secret = process.env.GOOGLE_CLOUD_SECRET;
+  if (!secret) throw new Error('GOOGLE_CLOUD_SECRET niet ingesteld — kan niet authenticeren met Google Drive');
 
-  if (!hostname) throw new Error('REPLIT_CONNECTORS_HOSTNAME niet beschikbaar');
+  let keyData;
+  try {
+    keyData = JSON.parse(secret);
+  } catch {
+    try {
+      keyData = JSON.parse(Buffer.from(secret, 'base64').toString());
+    } catch {
+      throw new Error('GOOGLE_CLOUD_SECRET is geen geldige JSON of base64');
+    }
+  }
 
-  const xReplitToken = replIdentity ? `repl ${replIdentity}`
-    : webRenewal ? `depl ${webRenewal}`
-    : null;
-  if (!xReplitToken) throw new Error('Replit connector credentials niet beschikbaar');
-
-  const response = await fetch(
-    `https://${hostname}/api/v2/connection?include_secrets=true&connector_names=google-drive`,
-    { headers: { 'Accept': 'application/json', 'X_REPLIT_TOKEN': xReplitToken } }
-  );
-
-  const data = await response.json();
-  const connection = (data.items || [])[0] || {};
-  const settings = connection.settings || {};
-  const accessToken = settings.access_token || settings.oauth?.credentials?.access_token;
-
-  if (!accessToken) throw new Error('Google Drive niet verbonden');
-  return accessToken;
+  const auth = new google.auth.GoogleAuth({
+    credentials: keyData,
+    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+  });
+  const client = await auth.getClient();
+  const tokenResponse = await client.getAccessToken();
+  if (!tokenResponse.token) throw new Error('Kon geen Google Drive access token verkrijgen via service account');
+  console.log(`[GoogleAuth] Token verkregen voor ${keyData.client_email}`);
+  return tokenResponse.token;
 }
 
 async function driveList(query, fields, accessToken) {
