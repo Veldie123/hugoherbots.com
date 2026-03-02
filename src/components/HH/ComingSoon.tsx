@@ -30,7 +30,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to right, #070707 0%, #070707 25%, transparent 50%)",
+              "linear-gradient(to right, #070707 0%, #070707 50%, transparent 68%)",
             pointerEvents: "none",
           }}
         />
@@ -143,7 +143,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
               }}
             >
               <a
-                href="mailto:info@hugoherbots.com"
+                href="mailto:hugo@hugoherbots.com"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
