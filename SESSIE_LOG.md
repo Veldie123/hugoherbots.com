@@ -4,6 +4,21 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-02 — TechniqueDetailsDialog user view redesign naar clean admin layout
+
+**Vraag:** "what de fuck is dit? pritnscreen 1 is user view techniek detail en printscreen 2 is admin view techniek detail die je (gelukkig) niet hebt aangepast. dit trekt echt op niks. wat is hier gebeurd?"
+
+> **Conclusie:**
+> - De user view `TechniqueDetailsDialog` had een over-designed layout met cramped icon+uppercase+colored labels, phase-colored left borders, timeline dots voor stappenplan, en decoratieve quote marks. De admin view (`DetailsSheet`/`TechniqueContent`) had een clean, professionele layout die veel leesbaarder was.
+> - **Fix**: Content secties (Doel, Wat, Waarom, Wanneer, Hoe, Stappenplan, Voorbeelden, Presentatie) herschreven naar het clean admin patroon: simpele bold `h4` labels, `p-3 rounded-lg` secties met subtiele achtergrond, genummerde lijst voor stappenplan, simpele cards voor voorbeelden.
+> - Header met fase badge/nummer en tags behouden (die was goed).
+> - Editing functionaliteit (isEditing state, Input/Textarea velden) volledig intact.
+> - EPIC Slides Presentatie sectie vereenvoudigd naar clean stijl.
+> - Ongebruikte icon imports verwijderd (Target, Quote, FileText, HelpCircle, Clock, Wrench, Presentation).
+> - Files gewijzigd: `src/components/HH/TechniqueDetailsDialog.tsx`
+
+---
+
 ## 2026-03-01 — Dashboard webinars van statische data naar live Supabase API
 
 **Vraag:** De webinars op het Dashboard komen niet overeen met de Webinars module. De LiveCoaching pagina haalt real-time data op uit Supabase, maar het Dashboard importeerde uit een statisch bestand (`live-sessions-data.ts`) met hardcoded sessies van januari 2026. Maak het Dashboard consistent met de Webinars module.

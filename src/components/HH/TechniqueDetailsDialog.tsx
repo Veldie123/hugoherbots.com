@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Badge } from "../ui/badge";
-import { Target, X, Pencil, Quote, FileText, HelpCircle, Clock, Wrench, Presentation } from "lucide-react";
+import { X, Pencil } from "lucide-react";
 import { PHASE_COLORS } from "../../utils/phaseColors";
 import { getEpicSlides, type EpicSlide } from "../../data/epic-slides-service";
 
@@ -239,20 +239,11 @@ export function TechniqueDetailsDialog({
               )}
             </div>
 
-            <div className="px-5 py-5 space-y-5">
+            <div className="p-6 space-y-5">
 
               {displayData.doel && (
-                <div
-                  className="rounded-xl p-4"
-                  style={{
-                    backgroundColor: `${phaseColor}0A`,
-                    borderLeft: `4px solid ${phaseColor}`,
-                  }}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="w-4 h-4" style={{ color: phaseColor }} />
-                    <h4 className="text-[12px] font-semibold uppercase tracking-wider" style={{ color: phaseColor }}>Doel</h4>
-                  </div>
+                <div>
+                  <h4 className="font-semibold text-hh-text mb-2 text-sm">Doel</h4>
                   {isEditing ? (
                     <Textarea
                       value={displayData.doel}
@@ -261,98 +252,40 @@ export function TechniqueDetailsDialog({
                       }
                       placeholder="Beschrijf het doel..."
                       rows={3}
-                      className="text-[15px]"
+                      className="text-sm"
                     />
                   ) : (
-                    <p className="text-[15px] leading-[24px] text-hh-ink font-medium">
+                    <p className="text-sm text-hh-text p-3 rounded-lg" style={{ backgroundColor: `${phaseColor}0A` }}>
                       {displayData.doel}
                     </p>
                   )}
                 </div>
               )}
 
-              {(displayData.wat || displayData.wanneer || displayData.hoe) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {displayData.wat && (
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5" style={{ color: phaseColor }} />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: phaseColor }}>Wat</span>
-                      </div>
-                      {isEditing ? (
-                        <Textarea
-                          value={displayData.wat}
-                          onChange={(e) =>
-                            setEditedData({ ...editedData, wat: e.target.value })
-                          }
-                          placeholder="Wat houdt dit in..."
-                          rows={2}
-                          className="text-[13px]"
-                        />
-                      ) : (
-                        <p className="text-[13px] leading-[20px] text-hh-text">{displayData.wat}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {displayData.wanneer && (
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5" style={{ color: phaseColor }} />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: phaseColor }}>Wanneer</span>
-                      </div>
-                      {isEditing ? (
-                        <Textarea
-                          value={displayData.wanneer}
-                          onChange={(e) =>
-                            setEditedData({ ...editedData, wanneer: e.target.value })
-                          }
-                          placeholder="Wanneer pas je dit toe..."
-                          rows={2}
-                          className="text-[13px]"
-                        />
-                      ) : (
-                        <p className="text-[13px] leading-[20px] text-hh-text">{displayData.wanneer}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {displayData.hoe && (
-                    <div className="space-y-1.5 sm:col-span-2">
-                      <div className="flex items-center gap-1.5">
-                        <Wrench className="w-3.5 h-3.5" style={{ color: phaseColor }} />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: phaseColor }}>Hoe</span>
-                      </div>
-                      {isEditing ? (
-                        <Textarea
-                          value={displayData.hoe}
-                          onChange={(e) =>
-                            setEditedData({ ...editedData, hoe: e.target.value })
-                          }
-                          placeholder="Beschrijf hoe..."
-                          rows={4}
-                          className="text-[13px]"
-                        />
-                      ) : (
-                        <p className="text-[13px] leading-[20px] text-hh-text">{displayData.hoe}</p>
-                      )}
-                    </div>
+              {displayData.wat && (
+                <div>
+                  <h4 className="font-semibold text-hh-text mb-2 text-sm">Wat</h4>
+                  {isEditing ? (
+                    <Textarea
+                      value={displayData.wat}
+                      onChange={(e) =>
+                        setEditedData({ ...editedData, wat: e.target.value })
+                      }
+                      placeholder="Wat houdt dit in..."
+                      rows={2}
+                      className="text-sm"
+                    />
+                  ) : (
+                    <p className="text-sm text-hh-text p-3 rounded-lg" style={{ backgroundColor: 'var(--hh-ui-50)' }}>
+                      {displayData.wat}
+                    </p>
                   )}
                 </div>
               )}
 
               {displayData.waarom && (
-                <div
-                  className="rounded-lg p-4"
-                  style={{
-                    backgroundColor: `${phaseColor}08`,
-                    borderLeft: `4px solid ${phaseColor}60`,
-                  }}
-                >
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <HelpCircle className="w-3.5 h-3.5" style={{ color: `${phaseColor}CC` }} />
-                    <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: `${phaseColor}CC` }}>Waarom</span>
-                  </div>
+                <div>
+                  <h4 className="font-semibold text-hh-text mb-2 text-sm">Waarom</h4>
                   {isEditing ? (
                     <Textarea
                       value={displayData.waarom}
@@ -361,11 +294,53 @@ export function TechniqueDetailsDialog({
                       }
                       placeholder="Waarom is dit belangrijk..."
                       rows={2}
-                      className="text-[14px]"
+                      className="text-sm"
                     />
                   ) : (
-                    <p className="text-[14px] leading-[22px] text-hh-text italic">
+                    <p className="text-sm text-hh-text p-3 rounded-lg" style={{ backgroundColor: 'var(--hh-ui-50)' }}>
                       {displayData.waarom}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {displayData.wanneer && (
+                <div>
+                  <h4 className="font-semibold text-hh-text mb-2 text-sm">Wanneer</h4>
+                  {isEditing ? (
+                    <Textarea
+                      value={displayData.wanneer}
+                      onChange={(e) =>
+                        setEditedData({ ...editedData, wanneer: e.target.value })
+                      }
+                      placeholder="Wanneer pas je dit toe..."
+                      rows={2}
+                      className="text-sm"
+                    />
+                  ) : (
+                    <p className="text-sm text-hh-text p-3 rounded-lg" style={{ backgroundColor: 'var(--hh-ui-50)' }}>
+                      {displayData.wanneer}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {displayData.hoe && (
+                <div>
+                  <h4 className="font-semibold text-hh-text mb-2 text-sm">Hoe</h4>
+                  {isEditing ? (
+                    <Textarea
+                      value={displayData.hoe}
+                      onChange={(e) =>
+                        setEditedData({ ...editedData, hoe: e.target.value })
+                      }
+                      placeholder="Beschrijf hoe..."
+                      rows={4}
+                      className="text-sm"
+                    />
+                  ) : (
+                    <p className="text-sm text-hh-text p-3 rounded-lg" style={{ backgroundColor: 'var(--hh-ui-50)' }}>
+                      {displayData.hoe}
                     </p>
                   )}
                 </div>
@@ -373,56 +348,26 @@ export function TechniqueDetailsDialog({
 
               {displayData.stappenplan && displayData.stappenplan.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-1.5 mb-3 px-1">
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: phaseColor }}>
-                      <span className="text-[9px] font-bold text-white">#</span>
-                    </div>
-                    <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: phaseColor }}>Stappenplan</span>
-                  </div>
-                  <div className="relative ml-[7px]">
-                    <div
-                      className="absolute left-[13px] top-0 bottom-0 w-[2px]"
-                      style={{ backgroundColor: `${phaseColor}25` }}
-                    />
-                    <ol className="space-y-3 relative">
-                      {(Array.isArray(displayData.stappenplan) ? displayData.stappenplan : [displayData.stappenplan]).map((stap: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-3">
-                          <span
-                            className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0 text-white relative z-10"
-                            style={{ backgroundColor: phaseColor }}
-                          >
-                            {idx + 1}
-                          </span>
-                          <span className="text-[13px] leading-[20px] text-hh-text pt-1">{stap}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
+                  <h4 className="font-semibold text-hh-text mb-2 text-sm">Stappenplan</h4>
+                  <ol className="list-decimal list-inside space-y-1 text-sm text-hh-text p-3 rounded-lg" style={{ backgroundColor: 'var(--hh-ui-50)' }}>
+                    {(Array.isArray(displayData.stappenplan) ? displayData.stappenplan : [displayData.stappenplan]).map((stap: string, idx: number) => (
+                      <li key={idx}>{stap}</li>
+                    ))}
+                  </ol>
                 </div>
               )}
 
               {displayData.voorbeeld && (Array.isArray(displayData.voorbeeld) ? displayData.voorbeeld.length > 0 : true) && (
                 <div>
-                  <div className="flex items-center gap-1.5 mb-3 px-1">
-                    <Quote className="w-3.5 h-3.5" style={{ color: phaseColor }} />
-                    <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: phaseColor }}>Voorbeelden</span>
-                  </div>
-                  <div className="space-y-2.5">
+                  <h4 className="font-semibold text-hh-text mb-2 text-sm">Voorbeelden</h4>
+                  <div className="space-y-2">
                     {(Array.isArray(displayData.voorbeeld) ? displayData.voorbeeld : [displayData.voorbeeld]).map((vb: string, idx: number) => (
                       <div
                         key={idx}
-                        className="relative rounded-lg p-4 overflow-hidden"
-                        style={{ backgroundColor: `${phaseColor}08` }}
+                        className="text-sm text-hh-text p-3 rounded-lg"
+                        style={{ backgroundColor: `${phaseColor}0A` }}
                       >
-                        <span
-                          className="absolute top-1 left-3 text-[48px] leading-none font-serif select-none pointer-events-none"
-                          style={{ color: `${phaseColor}18` }}
-                        >
-                          &ldquo;
-                        </span>
-                        <p className="text-[14px] leading-[22px] italic text-hh-text relative z-10 pl-2">
-                          {vb}
-                        </p>
+                        "{vb}"
                       </div>
                     ))}
                   </div>
@@ -431,41 +376,32 @@ export function TechniqueDetailsDialog({
 
               {matchingSlides.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-1.5 mb-3 px-1">
-                    <Presentation className="w-3.5 h-3.5" style={{ color: phaseColor }} />
-                    <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: phaseColor }}>Presentatie</span>
-                  </div>
-                  <div className="space-y-2.5">
+                  <h4 className="font-semibold text-hh-text mb-2 text-sm">Presentatie</h4>
+                  <div className="space-y-2">
                     {matchingSlides.map((slide: EpicSlide) => (
                       <div
                         key={slide.id}
-                        className="rounded-lg p-4 border border-hh-border/50"
-                        style={{ borderLeftWidth: '3px', borderLeftColor: `${phaseColor}80` }}
+                        className="rounded-lg p-3 border border-hh-border/50"
                       >
-                        <div className="flex items-start justify-between gap-2 mb-1.5">
-                          <h5 className="text-[14px] font-semibold text-hh-ink">{slide.titel}</h5>
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h5 className="text-sm font-semibold text-hh-ink">{slide.titel}</h5>
                           {slide.visual_type && (
                             <Badge
                               variant="outline"
-                              className="text-[10px] px-2 py-0 rounded-full shrink-0"
-                              style={{
-                                color: phaseColor,
-                                borderColor: `${phaseColor}40`,
-                                backgroundColor: `${phaseColor}0A`,
-                              }}
+                              className="text-xs px-2 py-0 rounded-full shrink-0"
                             >
                               {VISUAL_TYPE_LABELS[slide.visual_type] || slide.visual_type}
                             </Badge>
                           )}
                         </div>
-                        <p className="text-[13px] leading-[20px] text-hh-muted mb-2">
+                        <p className="text-sm text-hh-muted mb-2">
                           {slide.kernboodschap}
                         </p>
                         {slide.bulletpoints && slide.bulletpoints.length > 0 && (
                           <ul className="space-y-1">
                             {slide.bulletpoints.map((bp, bpIdx) => (
-                              <li key={bpIdx} className="flex items-start gap-2 text-[12px] leading-[18px] text-hh-text">
-                                <span className="w-1 h-1 rounded-full shrink-0 mt-2" style={{ backgroundColor: `${phaseColor}80` }} />
+                              <li key={bpIdx} className="flex items-start gap-2 text-xs text-hh-text">
+                                <span className="w-1 h-1 rounded-full shrink-0 mt-1.5 bg-hh-muted" />
                                 {bp}
                               </li>
                             ))}
