@@ -10,7 +10,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
   return (
     <div
       className="relative min-h-screen overflow-hidden"
-      style={{ backgroundColor: "#000", color: "#fff" }}
+      style={{ backgroundColor: "#070707", color: "#fff" }}
     >
       {/* Hugo photo — full body, right side */}
       <motion.div
@@ -30,7 +30,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to right, #000 0%, #000 25%, transparent 50%)",
+              "linear-gradient(to right, #070707 0%, #070707 25%, transparent 50%)",
             pointerEvents: "none",
           }}
         />
@@ -126,9 +126,10 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
                 fontWeight: 300,
               }}
             >
-              40 jaar verkoopervaring, gebundeld in een AI-gestuurd
-              coaching platform. Hugo Herbots helpt jouw team beter
-              verkopen &mdash; digitaal, persoonlijk, en op maat.
+              Meer dan 40 jaar verkooptraining ervaring, gebundeld
+              in een door AI ondersteund coaching platform. Hugo Herbots
+              helpt jouw team beter verkopen &mdash; digitaal,
+              persoonlijk, en op maat.
             </motion.p>
 
             {/* CTA */}
