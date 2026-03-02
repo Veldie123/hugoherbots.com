@@ -116,7 +116,7 @@ export default defineConfig({
   server: {
     port: 5000,
     host: '0.0.0.0',
-    allowedHosts: true,
+    allowedHosts: ['localhost', '127.0.0.1', '.hugoherbots.ai', '.hugoherbots.com', '.replit.dev', '.replit.app'],
     proxy: {
       '/api/video-processor': {
         target: 'http://localhost:3001',
