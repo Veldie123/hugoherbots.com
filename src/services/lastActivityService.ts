@@ -113,7 +113,10 @@ export const lastActivityService = {
 
   async fetchActivitySummary(userId: string): Promise<ActivitySummary | null> {
     try {
-      const response = await fetch(`/api/v2/user/activity-summary?userId=${userId}`);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2000);
+      const response = await fetch(`/api/v2/user/activity-summary?userId=${userId}`, { signal: controller.signal });
+      clearTimeout(timeout);
       if (!response.ok) {
         console.warn('[LastActivity] Failed to fetch activity summary:', response.status);
         return null;

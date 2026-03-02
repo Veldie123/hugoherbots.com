@@ -5,6 +5,13 @@ import { projectId } from '@/utils/supabase/info';
 const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-b9a572ea/api/videos`;
 const LOCAL_API_BASE = '/api/videos';
 
+// Module-level promise cache — prevents duplicate fetches on navigation between Dashboard and VideoLibrary
+const libraryCache = new Map<string, Promise<any[]>>();
+
+export function clearLibraryCache(): void {
+  libraryCache.clear();
+}
+
 async function getAuthHeaders(): Promise<HeadersInit> {
   const { data: { session } } = await supabase.auth.getSession();
   return {
@@ -149,11 +156,16 @@ export const videoApi = {
     if (status) params.append('status', status);
     if (fase) params.append('fase', fase);
     if (includeHidden) params.append('include_hidden', 'true');
-    
+
     const url = params.toString() ? `${LOCAL_API_BASE}/library?${params}` : `${LOCAL_API_BASE}/library`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch video library');
-    return response.json();
+    const cacheKey = url;
+    if (libraryCache.has(cacheKey)) return libraryCache.get(cacheKey)!;
+    const promise = fetch(url).then(r => {
+      if (!r.ok) throw new Error('Failed to fetch video library');
+      return r.json();
+    });
+    libraryCache.set(cacheKey, promise);
+    return promise;
   },
 
   async getVideosByTechnique(techniqueId: string): Promise<Array<{
@@ -195,6 +207,7 @@ export const videoApi = {
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Video bijwerken mislukt');
+    clearLibraryCache();
     return response.json();
   },
 
@@ -208,6 +221,7 @@ export const videoApi = {
       const errData = await response.json().catch(() => ({}));
       throw new Error(errData.message || 'Video verwijderen mislukt');
     }
+    clearLibraryCache();
   },
 
   async updateTitle(id: string, title: string): Promise<{ success: boolean; title: string }> {
@@ -220,6 +234,7 @@ export const videoApi = {
       const errData = await response.json().catch(() => ({}));
       throw new Error(errData.message || 'Titel bijwerken mislukt');
     }
+    clearLibraryCache();
     return response.json();
   },
 
@@ -230,6 +245,7 @@ export const videoApi = {
       body: JSON.stringify({ videoId: id, isHidden }),
     });
     if (!response.ok) throw new Error('Video verbergen/tonen mislukt');
+    clearLibraryCache();
   },
 
   async getPlaybackOrder(): Promise<Array<{

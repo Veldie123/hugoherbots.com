@@ -1050,51 +1050,33 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
   const technique = context.techniqueId ? getTechnique(context.techniqueId) : null;
   const techniqueName = technique?.naam || context.techniqueName || "";
   
-  let mergedContext: Record<string, string> = {};
-  if (context.userId) {
-    const sessionContext = context.sessionContext || {
-      sector: context.sector || "",
-      product: context.product || "",
-      klant_type: context.klantType || ""
-    };
-    mergedContext = await mergeUserAndSessionContext(context.userId, sessionContext);
-  } else {
-    mergedContext = {
-      sector: context.sector || "",
-      product: context.product || "",
-      klant_type: context.klantType || ""
-    };
-  }
+  const sessionContext = context.sessionContext || {
+    sector: context.sector || "",
+    product: context.product || "",
+    klant_type: context.klantType || ""
+  };
 
-  let ragResult = { documents: [] as RagDocument[], searchTimeMs: 0 };
-  if (techniqueName) {
-    ragResult = await searchRag(techniqueName, {
-      limit: 2,
-      threshold: 0.3,
-    });
-  }
+  const [mergedContext, ragResult, videoStats, historicalScoreContext] = await Promise.all([
+    context.userId
+      ? mergeUserAndSessionContext(context.userId, sessionContext)
+      : Promise.resolve(sessionContext as Record<string, string>),
+    techniqueName
+      ? searchRag(techniqueName, { limit: 2, threshold: 0.3 })
+      : Promise.resolve({ documents: [] as RagDocument[], searchTimeMs: 0 }),
+    getVideoLibraryStats(),
+    (context.userId && context.techniqueId)
+      ? buildHistoricalScoreContext(context.userId, context.techniqueId, techniqueName)
+      : Promise.resolve(""),
+  ]);
 
   const coacheeContextStr = buildCoacheeContext(mergedContext, context.userName);
   const fullTechniqueNarrative = buildFullTechniqueNarrative(technique as FullTechnique || null);
-  
-  let historicalScoreContext = "";
-  if (context.userId && context.techniqueId) {
-    historicalScoreContext = await buildHistoricalScoreContext(
-      context.userId, 
-      context.techniqueId, 
-      techniqueName
-    );
-  }
+  const videoStatsStr = buildVideoStatsPrompt(videoStats);
 
-  let ragContextStr = "";
-  if (ragResult.documents.length > 0) {
-    ragContextStr = ragResult.documents
-      .map((doc, i) => `[Fragment ${i + 1}] ${doc.title || INLINE_DEFAULTS.document_title_fallback}:\n${doc.content}`)
-      .join("\n\n");
-  } else {
-    ragContextStr = INLINE_DEFAULTS.no_context_found;
-  }
-  
+  let ragContextStr = ragResult.documents.length > 0
+    ? ragResult.documents.map((doc, i) => `[Fragment ${i + 1}] ${doc.title || INLINE_DEFAULTS.document_title_fallback}:\n${doc.content}`).join("\n\n")
+    : INLINE_DEFAULTS.no_context_found;
+
   let videoContextStr = INLINE_DEFAULTS.no_videos_available;
   if (context.techniqueId) {
     const videos = getVideosForTechnique(context.techniqueId);
@@ -1102,9 +1084,6 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
       videoContextStr = videos.map(v => `- "${v.title}": ${v.beschrijving}`).join("\n");
     }
   }
-  
-  const videoStats = await getVideoLibraryStats();
-  const videoStatsStr = buildVideoStatsPrompt(videoStats);
 
   let onboardingActive = false;
   let onboardingStatus: OnboardingStatus | null = null;
@@ -1114,53 +1093,64 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
   let platformStatsStr = "";
 
   if (context.viewMode === 'admin') {
-    try {
-      onboardingStatus = await getOnboardingStatusFromDB(context.userId || 'hugo');
-      if (!onboardingStatus.isComplete) {
+    const [obResult, statsResult] = await Promise.all([
+      (async () => {
+        try {
+          return await getOnboardingStatusFromDB(context.userId || 'hugo');
+        } catch (err: any) {
+          console.error('[COACH] Onboarding check failed:', err.message);
+          return null;
+        }
+      })(),
+      (async () => {
+        try {
+          const statsController = new AbortController();
+          const statsTimeout = setTimeout(() => statsController.abort(), 1500);
+          const statsRes = await fetch('http://localhost:3002/api/v2/admin/stats', { signal: statsController.signal });
+          clearTimeout(statsTimeout);
+          if (statsRes.ok) return await statsRes.json();
+          return null;
+        } catch (err: any) {
+          console.log('[COACH] Platform stats fetch failed (non-critical):', err.message);
+          return null;
+        }
+      })(),
+    ]);
+
+    if (obResult) {
+      onboardingStatus = obResult;
+      if (!obResult.isComplete) {
         onboardingActive = true;
-        if (onboardingStatus.nextItem) {
-          onboardingItemData = getOnboardingItemData(
-            onboardingStatus.nextItem.module,
-            onboardingStatus.nextItem.key
-          );
+        if (obResult.nextItem) {
+          onboardingItemData = getOnboardingItemData(obResult.nextItem.module, obResult.nextItem.key);
         }
       }
-    } catch (err: any) {
-      console.error('[COACH] Onboarding check failed:', err.message);
     }
 
-    try {
-      const statsController = new AbortController();
-      const statsTimeout = setTimeout(() => statsController.abort(), 5000);
-      const statsRes = await fetch('http://localhost:3002/api/v2/admin/stats', { signal: statsController.signal });
-      clearTimeout(statsTimeout);
-      if (statsRes.ok) {
-        const stats = await statsRes.json();
-        const avgScoreText = stats.analyses?.avgScore ? ` — gem. score: ${stats.analyses.avgScore}%` : '';
-        platformStatsStr = (obConfig?.platform_stats_section || '')
-          .replace('{total_users}', String(stats.platform?.totalUsers || 0))
-          .replace('{new_users_week}', String(stats.platform?.newUsersThisWeek || 0))
-          .replace('{active_users}', String(stats.platform?.activeUsers || 0))
-          .replace('{total_sessions}', String(stats.sessions?.total || 0))
-          .replace('{recent_sessions}', String(stats.sessions?.recentWeek || 0))
-          .replace('{total_analyses}', String(stats.analyses?.total || 0))
-          .replace('{avg_score_text}', avgScoreText);
+    if (statsResult) {
+      const stats = statsResult;
+      const avgScoreText = stats.analyses?.avgScore ? ` — gem. score: ${stats.analyses.avgScore}%` : '';
+      platformStatsStr = (obConfig?.platform_stats_section || '')
+        .replace('{total_users}', String(stats.platform?.totalUsers || 0))
+        .replace('{new_users_week}', String(stats.platform?.newUsersThisWeek || 0))
+        .replace('{active_users}', String(stats.platform?.activeUsers || 0))
+        .replace('{total_sessions}', String(stats.sessions?.total || 0))
+        .replace('{recent_sessions}', String(stats.sessions?.recentWeek || 0))
+        .replace('{total_analyses}', String(stats.analyses?.total || 0))
+        .replace('{avg_score_text}', avgScoreText);
 
-        if (stats.pendingReviews > 0 && obConfig?.attention_needed_section) {
-          platformStatsStr += '\n\n' + obConfig.attention_needed_section
-            .replace('{pending_reviews}', String(stats.pendingReviews));
-        }
-
-        if (stats.topAnalyses?.length > 0 && obConfig?.top_analyses_section) {
-          const list = stats.topAnalyses
-            .map((a: any) => `• "${a.title}" van ${a.userName}${a.score !== null ? ` — ${a.score}%` : ' — wacht op resultaat'}`)
-            .join('\n');
-          platformStatsStr += '\n\n' + obConfig.top_analyses_section
-            .replace('{analyses_list}', list);
-        }
+      if (stats.pendingReviews > 0 && obConfig?.attention_needed_section) {
+        platformStatsStr += '\n\n' + obConfig.attention_needed_section
+          .replace('{pending_reviews}', String(stats.pendingReviews));
       }
-    } catch (err: any) {
-      console.log('[COACH] Platform stats fetch failed (non-critical):', err.message);
+
+      if (stats.topAnalyses?.length > 0 && obConfig?.top_analyses_section) {
+        const list = stats.topAnalyses
+          .map((a: any) => `• "${a.title}" van ${a.userName}${a.score !== null ? ` — ${a.score}%` : ' — wacht op resultaat'}`)
+          .join('\n');
+        platformStatsStr += '\n\n' + obConfig.top_analyses_section
+          .replace('{analyses_list}', list);
+      }
     }
   }
 
@@ -1342,34 +1332,27 @@ export async function generateCoachOpeningStream(
   const technique = context.techniqueId ? getTechnique(context.techniqueId) : null;
   const techniqueName = technique?.naam || context.techniqueName || "";
   
-  let mergedContext: Record<string, string> = {};
-  if (context.userId) {
-    const sessionContext = context.sessionContext || {
-      sector: context.sector || "",
-      product: context.product || "",
-      klant_type: context.klantType || ""
-    };
-    mergedContext = await mergeUserAndSessionContext(context.userId, sessionContext);
-  } else {
-    mergedContext = {
-      sector: context.sector || "",
-      product: context.product || "",
-      klant_type: context.klantType || ""
-    };
-  }
+  const sessionContext = context.sessionContext || {
+    sector: context.sector || "",
+    product: context.product || "",
+    klant_type: context.klantType || ""
+  };
 
-  const [ragResult, videoStats] = await Promise.all([
-    techniqueName ? searchRag(techniqueName, { limit: 2, threshold: 0.3 }) : Promise.resolve({ documents: [] as RagDocument[], searchTimeMs: 0 }),
-    getVideoLibraryStats(),
+  const [mergedContext, [ragResult, videoStats], historicalScoreContext] = await Promise.all([
+    context.userId
+      ? mergeUserAndSessionContext(context.userId, sessionContext)
+      : Promise.resolve(sessionContext as Record<string, string>),
+    Promise.all([
+      techniqueName ? searchRag(techniqueName, { limit: 2, threshold: 0.3 }) : Promise.resolve({ documents: [] as RagDocument[], searchTimeMs: 0 }),
+      getVideoLibraryStats(),
+    ]),
+    (context.userId && context.techniqueId)
+      ? buildHistoricalScoreContext(context.userId, context.techniqueId, techniqueName)
+      : Promise.resolve(""),
   ]);
 
   const coacheeContextStr = buildCoacheeContext(mergedContext, context.userName);
   const fullTechniqueNarrative = buildFullTechniqueNarrative(technique as FullTechnique || null);
-  
-  let historicalScoreContext = "";
-  if (context.userId && context.techniqueId) {
-    historicalScoreContext = await buildHistoricalScoreContext(context.userId, context.techniqueId, techniqueName);
-  }
 
   let ragContextStr = ragResult.documents.length > 0
     ? ragResult.documents.map((doc, i) => `[Fragment ${i + 1}] ${doc.title || INLINE_DEFAULTS.document_title_fallback}:\n${doc.content}`).join("\n\n")
@@ -1404,7 +1387,7 @@ export async function generateCoachOpeningStream(
       (async () => {
         try {
           const statsController = new AbortController();
-          const statsTimeout = setTimeout(() => statsController.abort(), 5000);
+          const statsTimeout = setTimeout(() => statsController.abort(), 1500);
           const statsRes = await fetch('http://localhost:3002/api/v2/admin/stats', { signal: statsController.signal });
           clearTimeout(statsTimeout);
           if (statsRes.ok) return await statsRes.json();

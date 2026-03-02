@@ -116,16 +116,23 @@ export function useDashboardUserData(): DashboardUserData {
 
   async function fetchEpicProgress(userId: string) {
     try {
+      const [videosDetRes, activitiesRes] = await Promise.all([
+        supabase
+          .from('videos')
+          .select('id, technique_id, detected_technieken')
+          .eq('status', 'completed')
+          .not('mux_playback_id', 'is', null),
+        supabase
+          .from('user_activity')
+          .select('video_id')
+          .eq('user_id', userId)
+          .eq('activity_type', 'video_view')
+          .not('video_id', 'is', null),
+      ]);
+
       let allVideos: any[] = [];
-
-      const { data: vWithDet, error: vWithDetErr } = await supabase
-        .from('videos')
-        .select('id, technique_id, detected_technieken')
-        .eq('status', 'completed')
-        .not('mux_playback_id', 'is', null);
-
-      if (!vWithDetErr && vWithDet) {
-        allVideos = vWithDet;
+      if (!videosDetRes.error && videosDetRes.data) {
+        allVideos = videosDetRes.data;
       } else {
         const { data: vBasic, error: vBasicErr } = await supabase
           .from('videos')
@@ -170,16 +177,9 @@ export function useDashboardUserData(): DashboardUserData {
         }
       });
 
-      const { data: completedActivities, error: actError } = await supabase
-        .from('user_activity')
-        .select('video_id')
-        .eq('user_id', userId)
-        .eq('activity_type', 'video_view')
-        .not('video_id', 'is', null);
-
       const watchedVideoIds = new Set<string>();
-      if (!actError && completedActivities) {
-        completedActivities.forEach(a => {
+      if (!activitiesRes.error && activitiesRes.data) {
+        activitiesRes.data.forEach(a => {
           if (a.video_id) watchedVideoIds.add(a.video_id);
         });
       }

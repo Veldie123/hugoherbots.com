@@ -28,9 +28,10 @@ function getFaseFromTechnique(techniqueId: string | null): number {
   return isNaN(fase) ? 2 : fase;
 }
 
-function getMuxThumbnail(playbackId: string | null): string {
+function getMuxThumbnail(playbackId: string | null, size: 'card' | 'hero' = 'card'): string {
   if (!playbackId) return '';
-  return `https://image.mux.com/${playbackId}/thumbnail.jpg?time=5&width=320&height=180`;
+  const dims = size === 'hero' ? 'width=800&height=450' : 'width=320&height=180';
+  return `https://image.mux.com/${playbackId}/thumbnail.jpg?time=5&${dims}`;
 }
 
 function isRawFilename(title: string): boolean {
@@ -91,7 +92,7 @@ export function useDashboardVideos() {
         
         if (mappedVideos.length > 0) {
           const featured = mappedVideos.find(v => v.techniqueNumber === '2.1.1') || mappedVideos[0];
-          setFeaturedVideo(featured);
+          setFeaturedVideo({ ...featured, thumbnail: getMuxThumbnail(featured.muxPlaybackId, 'hero') });
         }
         
         setError(null);
