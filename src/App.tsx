@@ -8,6 +8,7 @@ const Login = lazy(() => import("./components/HH/Login").then(m => ({ default: m
 const Signup = lazy(() => import("./components/HH/Signup").then(m => ({ default: m.Signup })));
 const AuthCallback = lazy(() => import("./components/HH/AuthCallback").then(m => ({ default: m.AuthCallback })));
 const Landing = lazy(() => import("./components/HH/Landing").then(m => ({ default: m.Landing })));
+const LandingV2 = lazy(() => import("./components/HH/LandingV2").then(m => ({ default: m.LandingV2 })));
 const ProductShowcase = lazy(() => import("./components/HH/ProductShowcase").then(m => ({ default: m.ProductShowcase })));
 const About = lazy(() => import("./components/HH/About").then(m => ({ default: m.About })));
 const Pricing = lazy(() => import("./components/HH/Pricing").then(m => ({ default: m.Pricing })));
@@ -57,7 +58,7 @@ const AdminNotifications = lazy(() => import("./components/HH/AdminNotifications
 const AdminChatExpertMode = lazy(() => import("./components/HH/AdminChatExpertMode").then(m => ({ default: m.AdminChatExpertMode })));
 const AdminRAGReview = lazy(() => import("./components/HH/AdminRAGReview").then(m => ({ default: m.AdminRAGReview })));
 const AdminConflicts = lazy(() => import("./components/HH/AdminConflicts").then(m => ({ default: m.AdminConflicts })));
-type Page = "landing" | "pricing" | "about" | "login" | "signup" | "authcallback" | "preview" | "onboarding" | "dashboard" | "technieken" | "techniques" | "coaching" | "roleplay" | "roleplays" | "roleplaychat" | "roleplays-chat" | "overviewprogress" | "builder" | "videos" | "live" | "team" | "analytics" | "settings" | "analysis" | "analysis-results" | "upload-analysis" | "privacy-policy" | "help" | "resources" | "hugo-overview" | "talk-to-hugo" | "library" | "notifications" | "admin-dashboard" | "admin-videos" | "admin-live" | "admin-progress" | "admin-users" | "admin-techniques" | "admin-transcripts" | "admin-uploads" | "admin-content" | "admin-analytics" | "admin-settings" | "admin-help" | "admin-resources" | "admin-sessions" | "admin-config-review" | "admin-notifications" | "admin-chat-expert" | "admin-rag-review" | "admin-conflicts" | "admin-analysis-results" | "admin-upload-analysis" | "admin-hugo-agent" | "sso-validate" | "showcase" | "showcase-video" | "showcase-roleplay" | "showcase-analysis";
+type Page = "landing" | "landing-v2" | "pricing" | "about" | "login" | "signup" | "authcallback" | "preview" | "onboarding" | "dashboard" | "technieken" | "techniques" | "coaching" | "roleplay" | "roleplays" | "roleplaychat" | "roleplays-chat" | "overviewprogress" | "builder" | "videos" | "live" | "team" | "analytics" | "settings" | "analysis" | "analysis-results" | "upload-analysis" | "privacy-policy" | "help" | "resources" | "hugo-overview" | "talk-to-hugo" | "library" | "notifications" | "admin-dashboard" | "admin-videos" | "admin-live" | "admin-progress" | "admin-users" | "admin-techniques" | "admin-transcripts" | "admin-uploads" | "admin-content" | "admin-analytics" | "admin-settings" | "admin-help" | "admin-resources" | "admin-sessions" | "admin-config-review" | "admin-notifications" | "admin-chat-expert" | "admin-rag-review" | "admin-conflicts" | "admin-analysis-results" | "admin-upload-analysis" | "admin-hugo-agent" | "sso-validate" | "showcase" | "showcase-video" | "showcase-roleplay" | "showcase-analysis";
 
 export default function App() {
   // Development screenshot bypass: check URL path immediately (synchronously)
@@ -301,6 +302,7 @@ export default function App() {
 
           {/* Landing page - met navigate prop */}
           {currentPage === "landing" && <Landing navigate={navigate} />}
+          {currentPage === "landing-v2" && <LandingV2 navigate={navigate} />}
 
           {/* Dev showcase preview */}
           {currentPage === "showcase" && (
