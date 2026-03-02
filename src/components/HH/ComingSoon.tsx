@@ -19,9 +19,9 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
       {/* Background photo — right side on desktop, full on mobile */}
       <div className="absolute inset-0 md:left-[45%]">
         <img
-          src="/images/Hugo-Herbots-WEB-0461.JPG"
+          src="/images/Hugo-Herbots-WEB-0444.JPG"
           alt="Hugo Herbots"
-          className="w-full h-full object-cover object-top"
+          className="w-full h-full object-cover object-center"
         />
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent md:via-[#0a0a0a]/40" />
@@ -37,7 +37,9 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="p-6 md:p-10"
         >
-          <Logo variant="horizontal" className="h-8 text-white/90" />
+          <div onClick={() => navigate?.("login")} className="cursor-pointer">
+            <Logo variant="horizontal" className="h-8 text-white/90" />
+          </div>
         </motion.header>
 
         {/* Main content */}
@@ -124,7 +126,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
           className="p-6 md:p-10 flex items-center justify-between text-[11px] text-white/25 tracking-wider uppercase"
         >
           <span>&copy; {new Date().getFullYear()} Hugo Herbots</span>
-          <span>Antwerpen, Belgi&euml;</span>
+          <span>Belgi&euml;</span>
         </motion.footer>
       </div>
     </div>
