@@ -8,7 +8,7 @@ interface ComingSoonProps {
 
 export function ComingSoon({ navigate }: ComingSoonProps) {
   return (
-    <div className="relative min-h-screen bg-[#0a0a0a] overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden" style={{ backgroundColor: '#0a0a0a' }}>
       {/* Hugo photo — full body, right side, black bg blends with page */}
       <motion.div
         initial={{ opacity: 0 }}
