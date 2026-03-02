@@ -8,8 +8,11 @@ interface ComingSoonProps {
 
 export function ComingSoon({ navigate }: ComingSoonProps) {
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ backgroundColor: '#0a0a0a' }}>
-      {/* Hugo photo — full body, right side, black bg blends with page */}
+    <div
+      className="relative min-h-screen overflow-hidden"
+      style={{ backgroundColor: "#000", color: "#fff" }}
+    >
+      {/* Hugo photo — full body, right side */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -36,20 +39,38 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
             onClick={() => navigate?.("login")}
             className="cursor-pointer inline-block"
           >
-            <Logo variant="horizontal" className="h-8 text-white/90" />
+            <Logo
+              variant="horizontal"
+              className="h-8"
+              style={{ color: "rgba(255,255,255,0.9)" }}
+            />
           </div>
         </motion.header>
 
         {/* Main content — left side */}
         <div className="flex-1 flex items-end md:items-center pb-32 md:pb-0 px-6 md:px-10 lg:px-16">
-          <div className="max-w-xl">
+          <div style={{ maxWidth: "540px" }}>
             {/* Tagline */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
+              transition={{
+                duration: 0.7,
+                delay: 0.5,
+                ease: [0.25, 0.4, 0.25, 1],
+              }}
             >
-              <span className="inline-block text-[11px] md:text-[13px] tracking-[0.3em] uppercase text-white/40 mb-6 font-light">
+              <span
+                style={{
+                  display: "inline-block",
+                  fontSize: "13px",
+                  letterSpacing: "0.3em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.45)",
+                  marginBottom: "24px",
+                  fontWeight: 300,
+                }}
+              >
                 Sales coaching &middot; Reimagined
               </span>
             </motion.div>
@@ -58,8 +79,19 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.7, ease: [0.25, 0.4, 0.25, 1] }}
-              className="text-[44px] leading-[1.02] sm:text-[62px] lg:text-[80px] text-white tracking-tight font-light mb-6"
+              transition={{
+                duration: 0.7,
+                delay: 0.7,
+                ease: [0.25, 0.4, 0.25, 1],
+              }}
+              style={{
+                fontSize: "clamp(44px, 8vw, 80px)",
+                lineHeight: 1.02,
+                color: "#fff",
+                letterSpacing: "-0.02em",
+                fontWeight: 300,
+                marginBottom: "24px",
+              }}
             >
               Binnenkort
               <br />
@@ -70,8 +102,19 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.9, ease: [0.25, 0.4, 0.25, 1] }}
-              className="text-[16px] md:text-[18px] leading-[1.6] text-white/70 mb-10 max-w-md font-light"
+              transition={{
+                duration: 0.7,
+                delay: 0.9,
+                ease: [0.25, 0.4, 0.25, 1],
+              }}
+              style={{
+                fontSize: "17px",
+                lineHeight: 1.65,
+                color: "rgba(255,255,255,0.7)",
+                marginBottom: "40px",
+                maxWidth: "420px",
+                fontWeight: 300,
+              }}
             >
               40 jaar verkoopervaring, gebundeld in een AI-gestuurd
               coaching platform. Hugo Herbots helpt jouw team beter
@@ -82,14 +125,37 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 1.1, ease: [0.25, 0.4, 0.25, 1] }}
+              transition={{
+                duration: 0.7,
+                delay: 1.1,
+                ease: [0.25, 0.4, 0.25, 1],
+              }}
             >
               <a
                 href="mailto:info@hugoherbots.com"
-                className="inline-flex items-center justify-center gap-2 px-6 h-[48px] text-[16px] font-normal bg-white text-[#0a0a0a] rounded-2xl transition-all duration-200 hover:bg-white/90"
-                style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.3)" }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "0 24px",
+                  height: "48px",
+                  fontSize: "16px",
+                  fontWeight: 400,
+                  backgroundColor: "#fff",
+                  color: "#000",
+                  borderRadius: "16px",
+                  textDecoration: "none",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                  transition: "opacity 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.opacity = "0.88")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.opacity = "1")
+                }
               >
-                Neem contact op <ArrowRight className="w-5 h-5" />
+                Neem contact op <ArrowRight size={20} />
               </a>
             </motion.div>
           </div>
@@ -100,7 +166,13 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 1.4 }}
-          className="p-6 md:p-10 flex items-center justify-between text-[12px] text-white/25 tracking-wider uppercase"
+          className="p-6 md:p-10 flex items-center justify-between"
+          style={{
+            fontSize: "12px",
+            color: "rgba(255,255,255,0.3)",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+          }}
         >
           <span>&copy; {new Date().getFullYear()} Hugo Herbots</span>
           <span>Belgi&euml;</span>
