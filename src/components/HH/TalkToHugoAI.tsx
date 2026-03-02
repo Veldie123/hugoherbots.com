@@ -72,6 +72,16 @@ import { InlineAnalysisCard } from "./InlineAnalysisCard";
 import type { EpicSlideContent, VideoEmbed, WebinarLink, AnalysisResultEmbed, RichContent } from "@/types/crossPlatform";
 import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
 import { lastActivityService } from "../../services/lastActivityService";
+import { supabase } from "../../utils/supabase/client";
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || '';
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+  };
+}
 import StreamingAvatar, { AvatarQuality, StreamingEvents, TaskType } from "@heygen/streaming-avatar";
 import { Room, RoomEvent, Track, ConnectionState } from "livekit-client";
 
@@ -599,9 +609,9 @@ export function TalkToHugoAI({
       await navigator.mediaDevices.getUserMedia({ audio: true });
       
       // Get token from backend
-      const response = await fetch("/api/livekit/token", { 
+      const response = await fetch("/api/livekit/token", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({ techniqueId: selectedTechnique || "general" })
       });
       
@@ -889,8 +899,11 @@ export function TalkToHugoAI({
       formData.append('title', title);
       formData.append('userId', user?.id || 'anonymous');
 
+      const { data: { session: authSession } } = await supabase.auth.getSession();
+      const authToken = authSession?.access_token || '';
       const response = await fetch('/api/v2/analysis/inline', {
         method: 'POST',
+        headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
         body: formData,
       });
 
@@ -1410,7 +1423,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
   const refreshOnboardingStatus = async () => {
     try {
-      const res = await fetch(`/api/v2/admin/onboarding/status?userId=${user?.id || 'hugo'}`);
+      const headers = await getAuthHeaders();
+      const res = await fetch(`/api/v2/admin/onboarding/status?userId=${user?.id || 'hugo'}`, { headers });
       if (res.ok) {
         const status = await res.json();
         setOnboardingStatus(status);
@@ -1423,7 +1437,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
   const fetchNextOnboardingCard = async (): Promise<{ module: string; key: string; name: string; data: any } | null> => {
     try {
-      const statusRes = await fetch(`/api/v2/admin/onboarding/status?userId=${user?.id || 'hugo'}`);
+      const headers = await getAuthHeaders();
+      const statusRes = await fetch(`/api/v2/admin/onboarding/status?userId=${user?.id || 'hugo'}`, { headers });
       if (!statusRes.ok) return null;
       const status = await statusRes.json();
       setOnboardingStatus(status);
@@ -1432,7 +1447,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         return null;
       }
       setOnboardingCurrentItem(status.nextItem);
-      const itemRes = await fetch(`/api/v2/admin/onboarding/item/${status.nextItem.module}/${status.nextItem.key}`);
+      const itemRes = await fetch(`/api/v2/admin/onboarding/item/${status.nextItem.module}/${status.nextItem.key}`, { headers });
       if (!itemRes.ok) return null;
       const itemJson = await itemRes.json();
       return { ...status.nextItem, data: itemJson.data || itemJson };
@@ -1444,7 +1459,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     try {
       await fetch('/api/v2/admin/onboarding/approve', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({
           itemKey: onboardingCurrentItem.key,
           module: onboardingCurrentItem.module,
@@ -1488,7 +1503,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     try {
       await fetch('/api/v2/admin/onboarding/feedback', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({
           itemKey: onboardingCurrentItem.key,
           module: onboardingCurrentItem.module,
@@ -1539,7 +1554,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     try {
       await fetch('/api/v2/admin/onboarding/skip', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({
           itemKey: onboardingCurrentItem.key,
           module: onboardingCurrentItem.module,
@@ -1599,7 +1614,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     try {
       await fetch('/api/v2/chat/feedback', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({
           messageId,
           sessionId: null,
