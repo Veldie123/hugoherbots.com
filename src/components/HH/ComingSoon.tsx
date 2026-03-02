@@ -27,6 +27,17 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
         />
       </motion.div>
 
+      {/* Mobile: dark gradient from bottom so text is readable over photo */}
+      <div
+        className="md:hidden absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to top, #070707 0%, rgba(7,7,7,0.9) 30%, rgba(7,7,7,0.5) 55%, transparent 75%)",
+          zIndex: 5,
+          pointerEvents: "none",
+        }}
+      />
+
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Header */}
