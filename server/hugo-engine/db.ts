@@ -10,7 +10,7 @@ function convertToPoolerUrl(directUrl: string): string {
     const projectRef = hostMatch[1];
     const password = decodeURIComponent(url.password);
     const region = process.env.SUPABASE_DB_REGION || 'aws-1-eu-west-3';
-    return `postgresql://postgres.${projectRef}:${encodeURIComponent(password)}@${region}.pooler.supabase.com:6543/postgres`;
+    return `postgresql://postgres.${projectRef}:${encodeURIComponent(password)}@${region}.pooler.supabase.com:5432/postgres`;
   } catch {
     return directUrl;
   }
@@ -31,7 +31,7 @@ function buildSupabaseConnectionString(): string | null {
 function getConnectionString(): { url: string; source: string } {
   const supabaseUrl = buildSupabaseConnectionString();
   if (supabaseUrl) {
-    return { url: supabaseUrl, source: 'supabase-pooler' };
+    return { url: supabaseUrl, source: 'supabase-session-pooler' };
   }
 
   if (process.env.DATABASE_URL) {
@@ -44,7 +44,7 @@ function getConnectionString(): { url: string; source: string } {
 }
 
 const conn = getConnectionString();
-const isSupabase = conn.source === 'supabase-pooler';
+const isSupabase = conn.source === 'supabase-session-pooler';
 
 console.log(`[DB] Connecting to ${conn.source}`);
 
