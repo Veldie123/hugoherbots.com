@@ -28,17 +28,17 @@ function buildSupabaseConnectionString(): string | null {
 }
 
 function getConnectionString(): { url: string; source: string } {
-  if (process.env.DATABASE_URL) {
-    return { url: process.env.DATABASE_URL, source: 'local' };
-  }
-
   const supabaseUrl = buildSupabaseConnectionString();
   if (supabaseUrl) {
     return { url: supabaseUrl, source: 'supabase-pooler' };
   }
 
+  if (process.env.DATABASE_URL) {
+    return { url: process.env.DATABASE_URL, source: 'local' };
+  }
+
   throw new Error(
-    "No database connection available. Set DATABASE_URL or PostgreSQL_connection_string_supabase + SUPABASE_YOUR_PASSWORD.",
+    "No database connection available. Set PostgreSQL_connection_string_supabase + SUPABASE_YOUR_PASSWORD, or DATABASE_URL.",
   );
 }
 
