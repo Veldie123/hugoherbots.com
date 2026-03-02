@@ -9,7 +9,8 @@ function convertToPoolerUrl(directUrl: string): string {
     if (!hostMatch) return directUrl;
     const projectRef = hostMatch[1];
     const password = decodeURIComponent(url.password);
-    return `postgresql://postgres.${projectRef}:${encodeURIComponent(password)}@aws-0-eu-central-1.pooler.supabase.com:6543/postgres`;
+    const region = process.env.SUPABASE_DB_REGION || 'aws-1-eu-west-3';
+    return `postgresql://postgres.${projectRef}:${encodeURIComponent(password)}@${region}.pooler.supabase.com:6543/postgres`;
   } catch {
     return directUrl;
   }

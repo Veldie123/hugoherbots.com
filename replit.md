@@ -75,7 +75,7 @@ All AI engine and content configurations, including Hugo's persona, coaching rul
 The platform supports Chat Mode (text), Audio Mode (WebRTC, Deepgram Nova 3 for STT, ElevenLabs for TTS), and Video Mode (HeyGen Streaming Avatar SDK).
 
 ### Database Usage
-Supabase is the sole production database. The backend (`server/hugo-engine/db.ts`) automatically switches between `DATABASE_URL` (Replit PostgreSQL) for local fallback and `PostgreSQL_connection_string_supabase` + `SUPABASE_YOUR_PASSWORD` secrets for Supabase Pooler connections in VS Code/Deployment. Migration SQL scripts are provided for Supabase.
+Supabase is the sole production database. The backend (`server/hugo-engine/db.ts`) connects via Supabase Transaction Pooler (region: `aws-1-eu-west-3`, port 6543). Connection priority: (1) Supabase pooler via `PostgreSQL_connection_string_supabase` + `SUPABASE_YOUR_PASSWORD` secrets, (2) `DATABASE_URL` as local fallback only. The `convertToPoolerUrl()` function automatically converts direct Supabase URLs to pooler format with username `postgres.{projectRef}`. All 33+ tables exist in Supabase. Migration SQL: `scripts/sql/migrate_to_supabase.sql`. Seed data: `scripts/sql/seed_data_from_local.sql`.
 
 ### Automated Video Pipeline
 The `server/video-processor.js` manages AutoHeal for generating missing AI summaries and titles, and AutoBatch for processing pending video jobs via Google Cloud Run. It excludes archived videos and populates `config/video_mapping.json` from Supabase. The transcription pipeline (`scripts/process_videos.py`) uses ElevenLabs Scribe to transcribe audio and persists word-level timestamps in `rag_documents`.
