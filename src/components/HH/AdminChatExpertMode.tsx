@@ -72,6 +72,7 @@ import {
 } from "../../utils/displayMappings";
 import { EPICSidebar } from "./AdminChatExpertModeSidebar";
 import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
+import { supabase } from "../../utils/supabase/client";
 import { Loader2 } from "lucide-react";
 import { LiveAvatarComponent } from "./LiveAvatarComponent";
 
@@ -1053,19 +1054,37 @@ export function AdminChatExpertMode({
       timestamp: new Date(),
     };
 
-    setMessages(prev => prev.map(m => 
+    setMessages(prev => prev.map(m =>
       m.id === messageId ? { ...m, correctionData } : m
     ));
 
+    // Fix 2: Toon correctie-tekst als zichtbaar chatbericht
+    if (finalCorrectionText?.trim()) {
+      const correctionMsg: Message = {
+        id: `correction-${Date.now()}`,
+        sender: "hugo",
+        text: finalCorrectionText.trim(),
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, correctionMsg]);
+    }
+
     try {
+      const { data: { session: authSession } } = await supabase.auth.getSession();
+      const authToken = authSession?.access_token || '';
+      const authHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+      };
+
       const response = await fetch('/api/v2/admin/corrections', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders,
         body: JSON.stringify({
           type: 'chat_feedback',
           field: correctionTechnique ? 'technique_correction' : 'general_feedback',
           originalValue: message.text.slice(0, 200),
-          newValue: correctionTechnique 
+          newValue: correctionTechnique
             ? `${correctionTechnique}: ${correctionTechniqueName}${finalCorrectionText ? ` — ${finalCorrectionText}` : ''}`
             : finalCorrectionText || 'Incorrect response',
           context: JSON.stringify({ messageId, sessionId: null }),
@@ -1073,9 +1092,56 @@ export function AdminChatExpertMode({
         }),
       });
       if (response.ok) {
-        toast.success("Correctie opgeslagen voor review");
+        toast.success("Correctie opgeslagen");
       } else {
         toast.error("Fout bij opslaan correctie");
+      }
+
+      // Fix 4: Na correctie → doorgaan naar volgende techniek als onboarding actief
+      if (onboardingStatus && !onboardingStatus.isComplete && onboardingCurrentItem) {
+        // Meld feedback aan onboarding backend
+        try {
+          await fetch('/api/v2/admin/onboarding/feedback', {
+            method: 'POST',
+            headers: authHeaders,
+            body: JSON.stringify({
+              itemKey: onboardingCurrentItem.key,
+              module: onboardingCurrentItem.module,
+              feedbackText: finalCorrectionText?.trim() || 'Correctie',
+              userId: 'hugo',
+            }),
+          });
+        } catch (e) {
+          console.warn("[Admin] Onboarding feedback failed:", e);
+        }
+
+        // Stuur AI door naar volgende techniek
+        try {
+          setIsLoading(true);
+          const aiResponse = await hugoApi.sendMessage("Ik heb mijn feedback gegeven. Ga verder met de volgende techniek.", false, "ONBOARDING_NEXT");
+          const aiMsg: Message = {
+            id: `onb-next-${Date.now()}`,
+            sender: "ai",
+            text: aiResponse.response,
+            timestamp: new Date(),
+            debugInfo: buildDebugInfo(currentPhase, aiResponse),
+          };
+          setMessages(prev => [...prev, aiMsg]);
+
+          // Update onboarding status
+          const statusRes = await fetch(`/api/v2/admin/onboarding/status?userId=hugo`, {
+            headers: authHeaders,
+          });
+          if (statusRes.ok) {
+            const status = await statusRes.json();
+            setOnboardingStatus(status);
+            if (status.nextItem) setOnboardingCurrentItem(status.nextItem);
+          }
+        } catch (e) {
+          console.warn("[Admin] Next onboarding item failed:", e);
+        } finally {
+          setIsLoading(false);
+        }
       }
     } catch (err) {
       console.error("[Admin] Failed to save correction:", err);
@@ -1628,7 +1694,7 @@ export function AdminChatExpertMode({
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
                           </button>
-                          {(message.debugInfo?.expectedTechniqueId || message.debugInfo?.aiDecision?.epicFase || message.debugInfo?.aiDecision?.evaluatie) && (
+                          {!(onboardingStatus && !onboardingStatus.isComplete) && (message.debugInfo?.expectedTechniqueId || message.debugInfo?.aiDecision?.epicFase || message.debugInfo?.aiDecision?.evaluatie) && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <button
@@ -1647,7 +1713,7 @@ export function AdminChatExpertMode({
                             </TooltipContent>
                           </Tooltip>
                           )}
-                          {message.debugInfo && (
+                          {message.debugInfo && !(onboardingStatus && !onboardingStatus.isComplete) && (
                             <button
                               onClick={() =>
                                 setExpandedDebug(expandedDebug === message.id ? null : message.id)
@@ -1689,8 +1755,8 @@ export function AdminChatExpertMode({
                   </div>
                 </div>
 
-                {/* Debug Info (collapsible) - Purple admin styling */}
-                {message.debugInfo && expandedDebug === message.id && (
+                {/* Debug Info (collapsible) - Purple admin styling — hidden during onboarding */}
+                {message.debugInfo && expandedDebug === message.id && !(onboardingStatus && !onboardingStatus.isComplete) && (
                   <div className={`${message.sender === "hugo" ? "flex justify-end" : ""}`}>
                     <div className="bg-purple-600/10 border border-purple-600/20 rounded-lg p-3 max-w-[300px] text-hh-ink">
                         <div className="space-y-3 text-[13px] leading-[18px]">
@@ -2355,12 +2421,6 @@ export function AdminChatExpertMode({
                     </button>
                   </div>
                 ))}
-              </div>
-            )}
-            {correctionMessageId && (
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-t-md text-[12px]" style={{ backgroundColor: 'rgba(153,16,250,0.08)', color: '#9910FA' }}>
-                <span>Correctie modus — typ je opmerking en druk Enter</span>
-                <button onClick={handleCancelCorrection} className="hover:opacity-70 text-[11px] underline">Annuleren (Esc)</button>
               </div>
             )}
             <div className="flex gap-2 items-center">
