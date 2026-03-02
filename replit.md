@@ -1,7 +1,7 @@
 # HugoHerbots.ai Sales Coach App
 
 ## Overview
-The HugoHerbots.ai Sales Coach App is an AI-powered platform designed to provide personalized and scalable sales coaching. It integrates AI Chat (text, audio, video), a Video Platform, Live Coaching, Roleplay, and Transcript Upload functionalities. The platform utilizes Hugo Herbots' proprietary training content and EPIC sales methodology to improve sales performance, with the strategic goal of becoming a leading AI sales coaching solution and acquiring a substantial user base.
+The HugoHerbots.ai Sales Coach App is an AI-powered platform providing personalized and scalable sales coaching. It integrates AI Chat (text, audio, video), a Video Platform, Live Coaching, Roleplay, and Transcript Upload functionalities. The platform leverages Hugo Herbots' proprietary training content and EPIC sales methodology to enhance sales performance, aiming to become a leading AI sales coaching solution and acquire a significant user base.
 
 ## User Preferences
 1. **SUPABASE IS DE ENIGE DATABASE** - Er is GEEN lokale PostgreSQL voor productiedata. Alle database operaties gaan via Supabase. Schema wijzigingen moeten in de Supabase SQL Editor. **BELANGRIJK: NOOIT de execute_sql_tool gebruiken** - deze gaat naar een automatische Replit dev database, NIET naar Supabase. Query Supabase altijd via de backend API endpoints of Python scripts met de Supabase client.
@@ -54,38 +54,38 @@ The HugoHerbots.ai Sales Coach App is an AI-powered platform designed to provide
 ## System Architecture
 
 ### UI/UX Decisions
-The frontend adheres to the HugoHerbots branding with a "final" design, utilizing Radix UI / Shadcn components. It supports light and dark themes and defaults to Dutch. User interfaces are visually distinct: blue for user views and purple for admin views, with green indicating success states. Mobile views consistently use a card/grid layout.
+The frontend adheres to HugoHerbots branding with a "final" design, using Radix UI / Shadcn components. It supports light and dark themes and defaults to Dutch. User interfaces are visually distinct: blue for user views and purple for admin views. Mobile views consistently use a card/grid layout.
 
 ### Technical Implementations
-The frontend is developed with React 18, TypeScript, Vite 6, and Tailwind CSS v4. Sales techniques are centrally managed through `config/ssot/technieken_index.json`, serving as the Single Source of Truth (SSOT). All 50+ page components use `React.lazy()` with `Suspense` for code splitting. Vite is configured with manual chunks for vendor splitting.
+The frontend is developed with React 18, TypeScript, Vite 6, and Tailwind CSS v4. Sales techniques are centrally managed through `config/ssot/technieken_index.json` (Single Source of Truth). All 50+ page components use `React.lazy()` with `Suspense` for code splitting, and Vite is configured with manual chunks for vendor splitting.
 
 ### Backend Architecture
-The Replit project comprises three primary services:
+The Replit project has three primary services:
 -   **Vite Dev Server** (port 5000): Hosts the frontend.
--   **Video Processor** (port 3001): Manages the video pipeline, Mux integration, RAG search, platform sync, SSO, Stripe, admin dashboard statistics, and admin Daily.co endpoints.
--   **Hugo Engine V2** (port 3002): An AI coaching engine (TypeScript/Express) that handles nested prompts, RAG-grounding, validation, LiveKit audio, HeyGen video, analysis, roleplay, and user Daily.co Live Coaching endpoints.
+-   **Video Processor** (port 3001): Manages video pipeline, Mux integration, RAG search, platform sync, SSO, Stripe, admin dashboard statistics, and admin Daily.co endpoints.
+-   **Hugo Engine V2** (port 3002): An AI coaching engine (TypeScript/Express) handling nested prompts, RAG-grounding, validation, LiveKit audio, HeyGen video, analysis, roleplay, and user Daily.co Live Coaching endpoints.
 
 ### Core V2 Engine Components
-The Hugo Engine V2 is a modular system composed of a Coach Engine, Context Engine, Analysis Service, Evaluator, RAG Service, Rich Response Builder, Intent Detector, and Roleplay Engine, providing comprehensive AI coaching capabilities.
+The Hugo Engine V2 is a modular system comprising a Coach Engine, Context Engine, Analysis Service, Evaluator, RAG Service, Rich Response Builder, Intent Detector, and Roleplay Engine.
 
 ### SSOT Configuration
-All AI engine and content configurations, including Hugo's persona, coaching rules, evaluation criteria, sales techniques, intent detection triggers, customer attitudes, personas, dynamics, RAG heuristics, video mappings, EPIC slides, and global settings, are stored in JSON files under `config/ssot/` and `config/prompts/`. This ensures that `.ts` engine files contain only logic. The Vite alias `@config` resolves to the `config/` directory, allowing frontend components to import SSOT JSON directly (e.g., `import data from "@config/epic_slides.json"`). The `src/data/epic-slides-service.ts` provides typed access to EPIC slide data for the TechniqueDetailsDialog.
+All AI engine and content configurations, including Hugo's persona, coaching rules, evaluation criteria, sales techniques, intent detection triggers, customer attitudes, personas, dynamics, RAG heuristics, video mappings, EPIC slides, and global settings, are stored in JSON files under `config/ssot/` and `config/prompts/`. This ensures that `.ts` engine files contain only logic. The Vite alias `@config` resolves to the `config/` directory.
 
 ### Multi-Modal Capabilities
 The platform supports Chat Mode (text), Audio Mode (WebRTC, Deepgram Nova 3 for STT, ElevenLabs for TTS), and Video Mode (HeyGen Streaming Avatar SDK).
 
 ### Database Usage
-Supabase serves as the primary remote database. A local Replit PostgreSQL instance is utilized for `conversation_analyses`, `admin_corrections`, `admin_notifications`, `chat_feedback`, and `config_proposals`, accessed directly by `hugo-engine/api.ts`.
+Supabase is the sole production database. The backend (`server/hugo-engine/db.ts`) automatically switches between `DATABASE_URL` (Replit PostgreSQL) for local fallback and `PostgreSQL_connection_string_supabase` + `SUPABASE_YOUR_PASSWORD` secrets for Supabase Pooler connections in VS Code/Deployment. Migration SQL scripts are provided for Supabase.
 
 ### Automated Video Pipeline
-The `server/video-processor.js` manages AutoHeal for generating missing AI summaries and titles, and AutoBatch for processing pending video jobs via Google Cloud Run. It excludes archived videos and populates `config/video_mapping.json` from Supabase. The transcription pipeline (`scripts/process_videos.py`) uses ElevenLabs Scribe to transcribe audio, and now persists word-level timestamps (`word_timestamps` JSONB column in `rag_documents`) for future technique shorts. The `transcribe_with_elevenlabs()` function returns `{text, words}` dict; `store_in_rag()` accepts both dict and legacy string format. SQL migration: `scripts/sql/add_word_timestamps.sql` (must be run in Supabase SQL Editor).
+The `server/video-processor.js` manages AutoHeal for generating missing AI summaries and titles, and AutoBatch for processing pending video jobs via Google Cloud Run. It excludes archived videos and populates `config/video_mapping.json` from Supabase. The transcription pipeline (`scripts/process_videos.py`) uses ElevenLabs Scribe to transcribe audio and persists word-level timestamps in `rag_documents`.
 
 ### Feature Specifications
-Key features include a unified video system (Google Drive to Mux), Live Coaching via Daily.co, an AI-powered Roleplay System, an AI Chat/RAG System using `pgvector`, a two-stage Analysis System for sales conversations, Admin Analytics dashboards, and a specialized Hugo Onboarding Mode. Stripe manages subscriptions, and Supabase Auth handles user profile data. The admin chat opening provides dynamic, personalized briefings based on Hugo's lifecycle stage, with templates defined in `config/prompts/admin_onboarding_prompt.json`.
+Key features include a unified video system (Google Drive to Mux), Live Coaching via Daily.co, an AI-powered Roleplay System, an AI Chat/RAG System using `pgvector`, a two-stage Analysis System for sales conversations, Admin Analytics dashboards, and a specialized Hugo Onboarding Mode. Stripe manages subscriptions, and Supabase Auth handles user profile data. The admin chat opening provides dynamic, personalized briefings.
 
 ## External Dependencies
 -   **OpenAI (gpt-5.1)**: AI engine for coaching, evaluation, and analysis.
--   **Supabase**: Authentication, database (BaaS), RAG storage, session management.
+-   **Supabase**: Authentication, database, RAG storage, session management.
 -   **LiveKit Cloud**: WebRTC audio transport.
 -   **ElevenLabs**: Text-to-Speech (Hugo voice clone) and Speech-to-Text (Scribe).
 -   **HeyGen**: Streaming video avatar integration.
@@ -95,4 +95,3 @@ Key features include a unified video system (Google Drive to Mux), Live Coaching
 -   **Google Cloud Run**: External worker for video processing.
 -   **Google Drive**: Source for Hugo's training videos.
 -   **Stripe**: Payments and subscriptions.
--   **Replit PostgreSQL**: Local database for specific analytics and feedback tables.

@@ -15,37 +15,52 @@ function convertToPoolerUrl(directUrl: string): string {
   }
 }
 
-function getConnectionString(): string {
+function buildSupabaseConnectionString(): string | null {
   const supabaseConnStr = process.env.PostgreSQL_connection_string_supabase;
   const supabasePassword = process.env.SUPABASE_YOUR_PASSWORD;
+  if (!supabaseConnStr) return null;
+  let resolved = supabaseConnStr;
+  if (supabasePassword && resolved.includes('[YOUR-PASSWORD]')) {
+    resolved = resolved.replace('[YOUR-PASSWORD]', supabasePassword);
+  }
+  if (resolved.includes('[YOUR-PASSWORD]')) return null;
+  return convertToPoolerUrl(resolved);
+}
 
-  if (supabaseConnStr) {
-    let resolved = supabaseConnStr;
-    if (supabasePassword && resolved.includes('[YOUR-PASSWORD]')) {
-      resolved = resolved.replace('[YOUR-PASSWORD]', supabasePassword);
-    }
-
-    if (!resolved.includes('[YOUR-PASSWORD]')) {
-      resolved = convertToPoolerUrl(resolved);
-      console.log('[DB] Using Supabase PostgreSQL connection (pooler)');
-      return resolved;
-    }
+function getConnectionString(): { url: string; source: string } {
+  if (process.env.DATABASE_URL) {
+    return { url: process.env.DATABASE_URL, source: 'local' };
   }
 
-  if (process.env.DATABASE_URL) {
-    console.log('[DB] Falling back to local DATABASE_URL');
-    return process.env.DATABASE_URL;
+  const supabaseUrl = buildSupabaseConnectionString();
+  if (supabaseUrl) {
+    return { url: supabaseUrl, source: 'supabase-pooler' };
   }
 
   throw new Error(
-    "No database connection available. Set PostgreSQL_connection_string_supabase + SUPABASE_YOUR_PASSWORD, or DATABASE_URL.",
+    "No database connection available. Set DATABASE_URL or PostgreSQL_connection_string_supabase + SUPABASE_YOUR_PASSWORD.",
   );
 }
 
-const connectionString = getConnectionString();
+const conn = getConnectionString();
+const isSupabase = conn.source === 'supabase-pooler';
 
-export const pool = new Pool({ connectionString, ssl: connectionString.includes('supabase') ? { rejectUnauthorized: false } : undefined });
+console.log(`[DB] Connecting to ${conn.source}`);
+
+export const pool = new Pool({
+  connectionString: conn.url,
+  ssl: isSupabase ? { rejectUnauthorized: false } : undefined,
+});
 export const db = drizzle(pool, { schema });
+
+pool.query('SELECT 1').then(() => {
+  console.log(`[DB] Connection verified (${conn.source})`);
+}).catch((err: Error) => {
+  console.error(`[DB] Connection test FAILED (${conn.source}): ${err.message}`);
+  if (isSupabase && process.env.DATABASE_URL) {
+    console.log('[DB] TIP: Fix SUPABASE_YOUR_PASSWORD secret to use Supabase. Currently falling back is not possible after pool creation.');
+  }
+});
 
 pool.query(`
   CREATE TABLE IF NOT EXISTS config_proposals (
