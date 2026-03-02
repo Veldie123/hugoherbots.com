@@ -12,7 +12,13 @@ WORKDIR /app
 
 RUN pip install flask requests mux_python openai google-cloud-tasks google-auth supabase google-cloud-secret-manager
 
+# Run as non-root user for security (SEC-052)
+RUN adduser --disabled-password --gecos '' appuser
+
 COPY worker.py .
 COPY backgrounds/ ./backgrounds/
+
+RUN chown -R appuser:appuser /app
+USER appuser
 
 CMD ["python", "worker.py"]

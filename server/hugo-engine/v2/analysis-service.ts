@@ -1330,6 +1330,8 @@ Gebruik de methodiek-context om je coaching te gronden in het Hugo Herbots frame
   }
 }
 
+const ALLOWED_STATUS_COLUMNS = new Set(['result', 'completed_at', 'error', 'storage_key', 'status']);
+
 async function persistStatusToDb(conversationId: string, status: string, extra?: Record<string, any>): Promise<void> {
   try {
     const sets = ['status = $1'];
@@ -1338,6 +1340,7 @@ async function persistStatusToDb(conversationId: string, status: string, extra?:
 
     if (extra) {
       for (const [key, val] of Object.entries(extra)) {
+        if (!ALLOWED_STATUS_COLUMNS.has(key)) continue; // SEC-026: whitelist column names
         sets.push(`${key} = $${idx}`);
         values.push(key === 'result' ? JSON.stringify(val) : val);
         idx++;

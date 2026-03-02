@@ -17,17 +17,26 @@ interface ScribeConnection {
   isConnected: boolean;
 }
 
+const MAX_WS_CONNECTIONS = 50; // SEC-055: limit concurrent WebSocket connections
 const connections = new Map<string, ScribeConnection>();
 
 export function setupScribeWebSocket(server: Server) {
-  const wss = new WebSocketServer({ 
-    server, 
-    path: "/ws/scribe" 
+  const wss = new WebSocketServer({
+    server,
+    path: "/ws/scribe"
   });
 
   wss.on("connection", (clientWs, req) => {
+    // SEC-055: Reject if too many concurrent connections
+    if (connections.size >= MAX_WS_CONNECTIONS) {
+      console.warn(`[Scribe] Connection limit reached (${MAX_WS_CONNECTIONS}). Rejecting new connection.`);
+      clientWs.send(JSON.stringify({ message_type: "error", error: "Server at capacity. Try again later." }));
+      clientWs.close();
+      return;
+    }
+
     const connectionId = `scribe-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    console.log(`[Scribe] Client connected: ${connectionId}`);
+    console.log(`[Scribe] Client connected: ${connectionId} (${connections.size + 1}/${MAX_WS_CONNECTIONS})`);
 
     const apiKey = process.env.ELEVENLABS_API_KEY;
     if (!apiKey) {

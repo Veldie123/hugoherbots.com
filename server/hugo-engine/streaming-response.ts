@@ -23,6 +23,7 @@ interface StreamConnection {
   fullResponse: string;
 }
 
+const MAX_STREAM_CONNECTIONS = 50; // SEC-055: limit concurrent WebSocket connections
 const connections = new Map<string, StreamConnection>();
 
 let openaiClient: OpenAI | null = null;
@@ -96,8 +97,16 @@ export function setupStreamingResponseWebSocket(server: Server) {
   });
 
   wss.on("connection", (clientWs, req) => {
+    // SEC-055: Reject if too many concurrent connections
+    if (connections.size >= MAX_STREAM_CONNECTIONS) {
+      console.warn(`[StreamResponse] Connection limit reached (${MAX_STREAM_CONNECTIONS}). Rejecting.`);
+      clientWs.send(JSON.stringify({ type: "error", message: "Server at capacity. Try again later." }));
+      clientWs.close();
+      return;
+    }
+
     const connectionId = `stream-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    console.log(`[StreamResponse] Client connected: ${connectionId}`);
+    console.log(`[StreamResponse] Client connected: ${connectionId} (${connections.size + 1}/${MAX_STREAM_CONNECTIONS})`);
 
     const connection: StreamConnection = {
       clientWs,

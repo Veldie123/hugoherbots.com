@@ -2689,7 +2689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { title, description, topic, level, scheduledDate, duration, hostKey } = req.body;
       
       // Basic host authentication - in production use proper auth
-      if (hostKey !== process.env.HOST_SECRET_KEY && hostKey !== "demo-host-key") {
+      if (hostKey !== process.env.HOST_SECRET_KEY) {
         return res.status(403).json({ error: "Unauthorized - host access required" });
       }
       
@@ -2781,7 +2781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { hostKey } = req.body;
       
       // Host authentication required
-      if (hostKey !== process.env.HOST_SECRET_KEY && hostKey !== "demo-host-key") {
+      if (hostKey !== process.env.HOST_SECRET_KEY) {
         return res.status(403).json({ error: "Unauthorized - host access required" });
       }
       
@@ -2852,7 +2852,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { hostKey } = req.body;
       
       // Host authentication required
-      if (hostKey !== process.env.HOST_SECRET_KEY && hostKey !== "demo-host-key") {
+      if (hostKey !== process.env.HOST_SECRET_KEY) {
         return res.status(403).json({ error: "Unauthorized - host access required" });
       }
       
@@ -2933,7 +2933,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { hostKey } = req.body;
       
-      if (hostKey !== process.env.HOST_SECRET_KEY && hostKey !== "demo-host-key") {
+      if (hostKey !== process.env.HOST_SECRET_KEY) {
         return res.status(403).json({ error: "Unauthorized - host access required" });
       }
       
@@ -3039,7 +3039,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { question, options, hostKey } = req.body;
       
       // Host authentication required
-      if (hostKey !== process.env.HOST_SECRET_KEY && hostKey !== "demo-host-key") {
+      if (hostKey !== process.env.HOST_SECRET_KEY) {
         return res.status(403).json({ error: "Unauthorized - host access required" });
       }
       
@@ -3149,7 +3149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { hostKey } = req.body;
       
-      if (hostKey !== process.env.HOST_SECRET_KEY && hostKey !== "demo-host-key") {
+      if (hostKey !== process.env.HOST_SECRET_KEY) {
         return res.status(403).json({ error: "Unauthorized - host access required" });
       }
       

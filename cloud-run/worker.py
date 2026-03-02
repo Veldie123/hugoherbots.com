@@ -1000,31 +1000,9 @@ def update_progress(job_id, message):
 
 @app.route('/health', methods=['GET'])
 def health():
-    try:
-        result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True)
-        ffmpeg_version = result.stdout.split('\n')[0] if result.returncode == 0 else 'unknown'
-    except:
-        ffmpeg_version = 'not installed'
-    
-    batch_state = get_batch_state()
-    
-    sa_info = get_service_account_info()
-    sa_email = sa_info.get('client_email', 'none') if sa_info else 'failed_to_load'
-    
     return jsonify({
         'status': 'ok',
-        'version': '8.2-performance',
-        'ffmpeg_version': ffmpeg_version,
-        'has_mux': bool(MUX_TOKEN_ID and MUX_TOKEN_SECRET),
-        'has_elevenlabs': bool(ELEVENLABS_API_KEY),
-        'has_openai': bool(OPENAI_API_KEY),
-        'has_supabase_url': bool(SUPABASE_URL),
-        'has_supabase_key': bool(SUPABASE_KEY),
-        'supabase_ready': bool(SUPABASE_URL and SUPABASE_KEY),
-        'cloud_tasks_available': CLOUD_TASKS_AVAILABLE,
-        'worker_url': WORKER_URL[:50] + '...' if WORKER_URL else None,
-        'batch_active': batch_state.get('batch_active', False),
-        'service_account': sa_email
+        'service': 'video-processor'
     })
 
 
@@ -1744,6 +1722,10 @@ def schedule_next_and_update_state(success):
 @app.route('/test-supabase', methods=['POST'])
 def test_supabase():
     """Test endpoint to verify Supabase connection"""
+    auth = request.headers.get('Authorization', '')
+    if not WORKER_SECRET or auth != f'Bearer {WORKER_SECRET}':
+        return jsonify({'error': 'Unauthorized'}), 401
+
     data = request.json or {}
     job_id = data.get('job_id', 'test-job-id')
     
