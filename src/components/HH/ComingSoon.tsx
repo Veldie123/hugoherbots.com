@@ -24,6 +24,16 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
           alt="Hugo Herbots"
           className="absolute right-0 top-0 h-full object-contain object-right"
         />
+        {/* Gradient blend — hides seam between photo black and page black */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to right, #000 0%, #000 25%, transparent 50%)",
+            pointerEvents: "none",
+          }}
+        />
       </motion.div>
 
       {/* Content */}
