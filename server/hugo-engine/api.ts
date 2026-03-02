@@ -579,31 +579,40 @@ app.post("/api/v2/sessions/stream", async (req, res) => {
     };
 
     try {
-      const result = await generateCoachOpening(coachContext);
-      const fullText = result.message || '';
+      await generateCoachOpeningStream(
+        coachContext,
+        (token: string) => {
+          if (!clientDisconnected) {
+            res.write(`data: ${JSON.stringify({ type: "token", content: token })}\n\n`);
+          }
+        },
+        async (fullText: string, meta?: { onboardingStatus?: any }) => {
+          session.conversationHistory.push({ role: "assistant", content: fullText });
+          await saveSessionToDb(session);
 
-      session.conversationHistory.push({ role: "assistant", content: fullText });
-      await saveSessionToDb(session);
-
-      let ssePayload = '';
-      const CHUNK_SIZE = 8;
-      const words = fullText.split(/(\s+)/).filter(w => w.length > 0);
-      for (let i = 0; i < words.length; i += CHUNK_SIZE) {
-        const chunk = words.slice(i, i + CHUNK_SIZE).join('');
-        ssePayload += `data: ${JSON.stringify({ type: "token", content: chunk })}\n\n`;
-      }
-      ssePayload += `data: ${JSON.stringify({ 
-        type: "done",
-        onboardingStatus: result.onboardingStatus || null,
-      })}\n\n`;
-
-      res.write(ssePayload);
-      res.end();
-      console.log(`[API] Stream session complete: ${words.length} words`);
+          if (!clientDisconnected) {
+            res.write(`data: ${JSON.stringify({
+              type: "done",
+              onboardingStatus: meta?.onboardingStatus || null,
+            })}\n\n`);
+            res.end();
+          }
+          console.log(`[API] Stream session complete: ${fullText.length} chars (real streaming)`);
+        },
+        (error: Error) => {
+          console.error("[API] Streaming session error:", error.message);
+          if (!clientDisconnected) {
+            res.write(`data: ${JSON.stringify({ type: "error", error: error.message })}\n\n`);
+            res.end();
+          }
+        }
+      );
     } catch (streamErr: any) {
       console.error("[API] Streaming session error:", streamErr.message);
-      res.write(`data: ${JSON.stringify({ type: "error", error: streamErr.message })}\n\n`);
-      res.end();
+      if (!clientDisconnected) {
+        res.write(`data: ${JSON.stringify({ type: "error", error: streamErr.message })}\n\n`);
+        res.end();
+      }
     }
     
   } catch (error: any) {

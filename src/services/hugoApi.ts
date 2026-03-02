@@ -166,7 +166,6 @@ class HugoApiService {
     const decoder = new TextDecoder();
     let buffer = "";
     let sessionId = "";
-    const pendingTokens: string[] = [];
     let doneMeta: { onboardingStatus?: any } | null = null;
 
     while (true) {
@@ -185,7 +184,7 @@ class HugoApiService {
               sessionId = data.sessionId;
               this.currentSessionId = sessionId;
             } else if (data.type === "token" && data.content) {
-              pendingTokens.push(data.content);
+              onToken(data.content);
             } else if (data.type === "done") {
               doneMeta = { onboardingStatus: data.onboardingStatus };
             } else if (data.type === "error") {
@@ -195,16 +194,6 @@ class HugoApiService {
             if (e.message && !e.message.includes("JSON")) throw e;
             console.error("Failed to parse SSE data:", e);
           }
-        }
-      }
-    }
-
-    if (pendingTokens.length > 0) {
-      const TOKEN_DELAY = 15;
-      for (let i = 0; i < pendingTokens.length; i++) {
-        onToken(pendingTokens[i]);
-        if (i % 3 === 0 && i > 0) {
-          await new Promise(r => setTimeout(r, TOKEN_DELAY));
         }
       }
     }

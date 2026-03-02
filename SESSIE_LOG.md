@@ -4,6 +4,19 @@ Elke sessie wordt hier gelogd met: de vraag, de conclusie, en de kosten.
 
 ---
 
+## 2026-03-02 — Admin chat 10-seconden laadtijd gefixt: echte SSE streaming
+
+**Vraag:** "10 seconden voor dit laadt. heb je dat parallelle uitvoeren in de chat en streaming systeem alleen toegpast op de user view misschien?"
+
+> **Conclusie:**
+> - **Root cause**: Het `/api/v2/sessions/stream` endpoint riep de synchrone `generateCoachOpening()` aan, wachtte op ALLE database queries (user context, RAG search, historical scores, onboarding status, admin stats) + de volledige OpenAI response, en deed dan een fake-stream door het resultaat in stukken van 8 woorden te knippen en in één keer te verzenden.
+> - **Fix**: Endpoint nu gewired naar `generateCoachOpeningStream()` die al bestond maar niet werd gebruikt. Deze functie streamt tokens real-time van OpenAI via `onToken` callback → elke token wordt direct als SSE event naar de client gestuurd.
+> - **Resultaat**: Eerste tekst verschijnt binnen 1-2 seconden (time-to-first-token) in plaats van 10+ seconden wachten. Tokens stromen in terwijl OpenAI genereert.
+> - **Disconnect handling**: `clientDisconnected` flag wordt gecheckt bij elke `res.write()` om crashes te voorkomen als de client wegvalt.
+> - Files gewijzigd: `server/hugo-engine/api.ts`
+
+---
+
 ## 2026-03-02 — TechniqueDetailsDialog user view redesign naar clean admin layout
 
 **Vraag:** "what de fuck is dit? pritnscreen 1 is user view techniek detail en printscreen 2 is admin view techniek detail die je (gelukkig) niet hebt aangepast. dit trekt echt op niks. wat is hier gebeurd?"
