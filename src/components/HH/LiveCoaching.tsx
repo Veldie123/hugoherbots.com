@@ -1627,7 +1627,7 @@ export function LiveCoaching({
                     <h2 className="text-[24px] leading-[32px] text-hh-text font-semibold">
                       Opgenomen Webinars
                     </h2>
-                    <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-hh-primary/10 text-hh-primary border border-hh-primary/20">
+                    <span className="text-[11px] font-medium px-3.5 py-1 rounded-full bg-hh-primary/10 text-hh-primary border border-hh-primary/20">
                       Coming Soon
                     </span>
                   </div>
