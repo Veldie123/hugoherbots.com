@@ -601,8 +601,8 @@ export function CustomDailyCall({
     <div 
       ref={containerRef}
       className={cn(
-        "flex flex-col bg-hh-bg rounded-lg overflow-hidden border border-hh-border",
-        isFullscreen ? "fixed inset-0 z-50 rounded-none" : "h-[600px]"
+        "flex flex-col bg-hh-bg rounded-lg border border-hh-border",
+        isFullscreen ? "fixed inset-0 z-50 rounded-none overflow-hidden" : "h-[600px]"
       )}
     >
       <div className="flex items-center justify-between px-4 py-3 bg-hh-bg border-b border-hh-border">

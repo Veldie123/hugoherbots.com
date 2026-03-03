@@ -938,12 +938,16 @@ export function TalkToHugoAI({
 
       const pollInterval = setInterval(async () => {
         try {
-          const statusRes = await fetch(`/api/v2/analysis/status/${conversationId}`);
+          const statusRes = await fetch(`/api/v2/analysis/status/${conversationId}`, {
+            headers: await getAuthHeaders(),
+          });
           const statusData = await statusRes.json();
 
           if (statusData.status === 'completed') {
             clearInterval(pollInterval);
-            const resultsRes = await fetch(`/api/v2/analysis/results/${conversationId}`);
+            const resultsRes = await fetch(`/api/v2/analysis/results/${conversationId}`, {
+              headers: await getAuthHeaders(),
+            });
             const results = await resultsRes.json();
 
             const analysisEmbed: AnalysisResultEmbed = {

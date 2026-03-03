@@ -823,7 +823,7 @@ export function LiveCoaching({
             {liveSession && (
               <Button
                 variant="default"
-                className="gap-2 text-white animate-pulse cursor-default bg-hh-primary"
+                className="gap-2 text-white animate-pulse cursor-default bg-hh-success"
               >
                 <Radio className="w-4 h-4" />
                 <span>LIVE NU</span>
@@ -910,7 +910,7 @@ export function LiveCoaching({
                   <div className="absolute inset-0 flex items-center justify-center z-20">
                     <Button
                       size="lg"
-                      className="text-white gap-3 px-10 py-7 text-xl shadow-2xl bg-hh-primary hover:bg-hh-primary/90"
+                      className="text-white gap-3 px-10 py-7 text-xl shadow-2xl bg-hh-success hover:bg-hh-success/90"
                       onClick={() => handleJoinLiveSession(liveSession)}
                       disabled={joiningCall}
                     >

@@ -641,7 +641,7 @@ ${platformUrl}`;
                                     })}
                                   </span>
                                 </div>
-                                <p className="text-sm text-hh-ink">{msg.message}</p>
+                                <p className="text-sm text-hh-text">{msg.message}</p>
                               </div>
                             </div>
                           ))}

@@ -483,14 +483,6 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
           </div>
           <div className="flex gap-2">
             <Button
-              variant="outline"
-              className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
-              onClick={() => { setBulkDialogOpen(true); setBulkFiles([]); setBulkRunning(false); setBulkPaused(false); setBulkSkippedErrors([]); bulkAbortRef.current = false; }}
-            >
-              <Files className="w-4 h-4" />
-              Bulk Upload
-            </Button>
-            <Button
               className="gap-2 text-white"
               style={{ backgroundColor: "#7e22ce" }}
               onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) =>
@@ -499,10 +491,10 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
               onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) =>
                 (e.currentTarget.style.backgroundColor = "#7e22ce")
               }
-              onClick={() => navigate?.("admin-upload-analysis")}
+              onClick={() => { setBulkDialogOpen(true); setBulkFiles([]); setBulkRunning(false); setBulkPaused(false); setBulkSkippedErrors([]); bulkAbortRef.current = false; }}
             >
-              <Upload className="w-4 h-4" />
-              Analyseer gesprek
+              <Files className="w-4 h-4" />
+              Bulk Upload
             </Button>
           </div>
         </div>
