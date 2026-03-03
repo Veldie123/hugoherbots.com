@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 const { spawn } = require('child_process');
 
 const PORT = parseInt(process.env.PORT || '5000', 10);
@@ -38,8 +39,37 @@ const MIME_TYPES = {
   '.webm': 'video/webm', '.py': 'text/plain',
 };
 
+// Extensions that benefit from gzip compression
+const COMPRESSIBLE_EXTENSIONS = new Set(['.html', '.js', '.css', '.json', '.svg', '.py']);
+
+function getCacheControl(pathname, ext) {
+  // Vite hashed assets — immutable, cache forever
+  if (pathname.startsWith('/assets/')) {
+    return 'public, max-age=31536000, immutable';
+  }
+  // Images — cache for 1 day
+  if (['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.ico'].includes(ext)) {
+    return 'public, max-age=86400';
+  }
+  // Fonts — cache for 1 year (they rarely change)
+  if (['.woff', '.woff2', '.ttf'].includes(ext)) {
+    return 'public, max-age=31536000, immutable';
+  }
+  // HTML — always revalidate so deploys are instant
+  if (ext === '.html') {
+    return 'no-cache';
+  }
+  // Default — short cache
+  return 'public, max-age=3600';
+}
+
+function supportsGzip(req) {
+  const accept = req.headers['accept-encoding'] || '';
+  return accept.includes('gzip');
+}
+
 const PORT_3002_PREFIXES = [
-  '/api/v2/', '/api/session/', '/api/sessions/', '/api/user/',
+  '/api/v2/', '/api/v3/', '/api/session/', '/api/sessions/', '/api/user/',
   '/api/technieken/', '/api/heygen/', '/api/livekit/', '/api/health/',
   '/api/live-sessions/', '/api/roleplay/', '/api/live/',
 ];
@@ -53,8 +83,20 @@ function handleRequest(req, res) {
   }
 
   if (pathname === '/' || pathname === '' || pathname === '/healthz' || pathname === '/health') {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(cachedIndexHtml || FALLBACK_HTML);
+    const headers = { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' };
+    const body = cachedIndexHtml || FALLBACK_HTML;
+    if (supportsGzip(req)) {
+      zlib.gzip(body, (err, compressed) => {
+        if (err) { res.writeHead(200, headers); res.end(body); return; }
+        headers['Content-Encoding'] = 'gzip';
+        headers['Vary'] = 'Accept-Encoding';
+        res.writeHead(200, headers);
+        res.end(compressed);
+      });
+    } else {
+      res.writeHead(200, headers);
+      res.end(body);
+    }
     return;
   }
 
@@ -78,16 +120,41 @@ function handleRequest(req, res) {
     if (!err && stats.isFile()) {
       const ext = path.extname(filePath).toLowerCase();
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+      const headers = {
+        'Content-Type': contentType,
+        'Cache-Control': getCacheControl(pathname, ext),
+      };
       const stream = fs.createReadStream(filePath);
       stream.on('error', () => {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
         res.end(cachedIndexHtml || FALLBACK_HTML);
       });
-      res.writeHead(200, { 'Content-Type': contentType });
-      stream.pipe(res);
+      // Gzip compressible text-based files
+      if (COMPRESSIBLE_EXTENSIONS.has(ext) && supportsGzip(req)) {
+        headers['Content-Encoding'] = 'gzip';
+        headers['Vary'] = 'Accept-Encoding';
+        res.writeHead(200, headers);
+        stream.pipe(zlib.createGzip()).pipe(res);
+      } else {
+        res.writeHead(200, headers);
+        stream.pipe(res);
+      }
     } else {
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(cachedIndexHtml || FALLBACK_HTML);
+      // SPA fallback — serve index.html for client-side routes
+      const headers = { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' };
+      const body = cachedIndexHtml || FALLBACK_HTML;
+      if (supportsGzip(req)) {
+        zlib.gzip(body, (gzErr, compressed) => {
+          if (gzErr) { res.writeHead(200, headers); res.end(body); return; }
+          headers['Content-Encoding'] = 'gzip';
+          headers['Vary'] = 'Accept-Encoding';
+          res.writeHead(200, headers);
+          res.end(compressed);
+        });
+      } else {
+        res.writeHead(200, headers);
+        res.end(body);
+      }
     }
   });
 }

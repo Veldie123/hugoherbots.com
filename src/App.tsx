@@ -233,12 +233,27 @@ export default function App() {
     <ThemeProvider>
     <UserProvider>
     <NotificationProvider>
-      {/* Show loading while checking auth */}
+      {/* Show app shell skeleton while checking auth */}
       {isCheckingAuth && (
-        <div className="flex items-center justify-center min-h-screen bg-white">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-hh-ocean-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-hh-slate-600">HugoHerbots.ai laden...</p>
+        <div className="flex min-h-screen bg-hh-bg">
+          {/* Sidebar skeleton */}
+          <div className="hidden lg:flex flex-col w-64 bg-hh-card border-r border-hh-border p-4 space-y-4">
+            <div className="h-8 w-32 bg-hh-border/50 rounded animate-pulse" />
+            <div className="space-y-2 mt-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-9 bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
+              ))}
+            </div>
+          </div>
+          {/* Content skeleton */}
+          <div className="flex-1 p-6 space-y-6">
+            <div className="h-8 w-48 bg-hh-border/50 rounded animate-pulse" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-32 bg-hh-card rounded-xl border border-hh-border animate-pulse" style={{ animationDelay: `${i * 100}ms` }} />
+              ))}
+            </div>
+            <div className="h-64 bg-hh-card rounded-xl border border-hh-border animate-pulse" style={{ animationDelay: '300ms' }} />
           </div>
         </div>
       )}
@@ -246,10 +261,10 @@ export default function App() {
       {/* Render pages only after auth check */}
       {!isCheckingAuth && (
         <Suspense fallback={
-          <div className="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900">
+          <div className="flex items-center justify-center min-h-screen bg-hh-bg">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-hh-ocean-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-hh-slate-600 dark:text-gray-400">Laden...</p>
+              <p className="text-hh-muted">Laden...</p>
             </div>
           </div>
         }>

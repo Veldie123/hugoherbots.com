@@ -396,8 +396,15 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
         {/* Hero Banner - Netflix Style */}
         <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px] dark:ring-1 dark:ring-white/10">
           {videosLoading ? (
-            <div className="absolute inset-0 bg-hh-ink flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-white/60 animate-spin" />
+            <div className="absolute inset-0 bg-hh-ink">
+              <div className="relative h-full flex items-center p-6 sm:p-8">
+                <div className="space-y-3 max-w-lg">
+                  <div className="h-5 w-28 bg-white/10 rounded animate-pulse" />
+                  <div className="h-7 w-64 bg-white/15 rounded animate-pulse" style={{ animationDelay: '100ms' }} />
+                  <div className="h-4 w-80 bg-white/10 rounded animate-pulse" style={{ animationDelay: '200ms' }} />
+                  <div className="h-9 w-36 bg-white/10 rounded-lg animate-pulse mt-2" style={{ animationDelay: '300ms' }} />
+                </div>
+              </div>
             </div>
           ) : (
             <>
@@ -469,9 +476,13 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
           }}
         >
           {videosLoading ? (
-            <div className="flex items-center justify-center w-full py-8">
-              <Loader2 className="w-6 h-6 text-hh-muted animate-spin" />
-            </div>
+            <>{[...Array(4)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-[180px] space-y-2">
+                <div className="h-[100px] bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
+                <div className="h-3 w-24 bg-hh-border/30 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 40}ms` }} />
+                <div className="h-3 w-16 bg-hh-border/20 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 80}ms` }} />
+              </div>
+            ))}</>
           ) : continueWatching.length > 0 ? (
             continueWatching.map((video, index) => {
               const locked = !isVideoUnlocked(video.id);
@@ -506,10 +517,12 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
           onSeeAll={() => navigate?.("live")}
         >
           {webinarsLoading ? (
-            <div className="flex items-center gap-2 py-4 px-2">
-              <Loader2 className="w-4 h-4 animate-spin text-hh-muted" />
-              <span className="text-[13px] text-hh-muted">Webinars laden...</span>
-            </div>
+            <>{[...Array(3)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-[200px] p-3 bg-hh-card rounded-lg border border-hh-border space-y-2">
+                <div className="h-4 w-32 bg-hh-border/30 rounded animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
+                <div className="h-3 w-20 bg-hh-border/20 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 40}ms` }} />
+              </div>
+            ))}</>
           ) : upcomingWebinars.length === 0 ? (
             <p className="text-[13px] text-hh-muted py-4 px-2">Geen geplande webinars</p>
           ) : (

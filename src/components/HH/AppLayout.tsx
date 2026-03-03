@@ -33,6 +33,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { useNotifications } from "../../contexts/NotificationContext";
 import { getHiddenIds } from "../../utils/hiddenItems";
 import { useTheme } from "./ThemeProvider";
+import { getAuthHeaders } from "../../services/hugoApi";
 
 interface HistoryItem {
   id: string;
@@ -145,9 +146,20 @@ export function AppLayout({
 
   useEffect(() => {
     if (analysisHistoryProp) return;
+    // Stale-while-revalidate: show cached data instantly, refresh in background
+    try {
+      const cached = sessionStorage.getItem('hh_analysis_history');
+      if (cached) {
+        const { items, totalCount } = JSON.parse(cached);
+        setFetchedAnalysisHistory(items);
+        setAnalysisTotalCount(totalCount);
+      }
+    } catch { }
     const fetchHistory = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list?source=upload');
+        const res = await fetch('/api/v2/analysis/list?source=upload', {
+          headers: await getAuthHeaders(),
+        });
         if (!res.ok) return;
         const data = await res.json();
         const items: HistoryItem[] = (data.analyses || []).slice(0, 5).map((a: any) => ({
@@ -157,8 +169,10 @@ export function AppLayout({
           score: a.overallScore ?? undefined,
           date: a.createdAt ? new Date(a.createdAt).toISOString().split('T')[0] : '',
         }));
+        const totalCount = data.totalCount || data.analyses?.length || 0;
         setFetchedAnalysisHistory(items);
-        setAnalysisTotalCount(data.totalCount || data.analyses?.length || 0);
+        setAnalysisTotalCount(totalCount);
+        try { sessionStorage.setItem('hh_analysis_history', JSON.stringify({ items, totalCount })); } catch { }
       } catch { }
     };
     fetchHistory();
@@ -166,9 +180,20 @@ export function AppLayout({
 
   useEffect(() => {
     if (chatHistoryProp.length > 0) return;
+    // Stale-while-revalidate: show cached data instantly, refresh in background
+    try {
+      const cached = sessionStorage.getItem('hh_chat_history');
+      if (cached) {
+        const { items, totalCount } = JSON.parse(cached);
+        setFetchedChatHistory(items);
+        setChatTotalCount(totalCount);
+      }
+    } catch { }
     const fetchChatHistory = async () => {
       try {
-        const res = await fetch('/api/user/sessions');
+        const res = await fetch('/api/user/sessions', {
+          headers: await getAuthHeaders(),
+        });
         if (!res.ok) return;
         const data = await res.json();
         const items: HistoryItem[] = (data.sessions || []).slice(0, 5).map((s: any) => ({
@@ -178,8 +203,10 @@ export function AppLayout({
           score: s.score ?? undefined,
           date: s.date || '',
         }));
+        const totalCount = data.total || data.sessions?.length || 0;
         setFetchedChatHistory(items);
-        setChatTotalCount(data.total || data.sessions?.length || 0);
+        setChatTotalCount(totalCount);
+        try { sessionStorage.setItem('hh_chat_history', JSON.stringify({ items, totalCount })); } catch { }
       } catch { }
     };
     fetchChatHistory();
@@ -263,10 +290,9 @@ export function AppLayout({
                   onClick={() => handleNavigate(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                     isActive
-                      ? "text-white font-medium"
+                      ? "text-white font-medium bg-hh-primary"
                       : "text-hh-text hover:bg-hh-ui-50"
                   }`}
-                  style={isActive ? { backgroundColor: '#4F7396' } : undefined}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
                   {!collapsed && (
@@ -340,10 +366,9 @@ export function AppLayout({
                 onClick={() => navigate?.(item.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                   isActive
-                    ? "text-white font-medium"
+                    ? "text-white font-medium bg-hh-primary"
                     : "text-hh-text hover:bg-hh-ui-50"
                 }`}
-                style={isActive ? { backgroundColor: '#4F7396' } : undefined}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
                 {!collapsed && (
@@ -396,10 +421,9 @@ export function AppLayout({
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                       isActive
-                        ? "text-white font-medium"
+                        ? "text-white font-medium bg-hh-primary"
                         : "text-hh-text hover:bg-hh-ui-50"
                     }`}
-                    style={isActive ? { backgroundColor: '#4F7396' } : undefined}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     <span className="text-[14px] leading-[20px]">
@@ -476,10 +500,9 @@ export function AppLayout({
                   }}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                     isActive
-                      ? "text-white font-medium"
+                      ? "text-white font-medium bg-hh-primary"
                       : "text-hh-text hover:bg-hh-ui-50"
                   }`}
-                  style={isActive ? { backgroundColor: '#4F7396' } : undefined}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
                   <span className="text-[14px] leading-[20px] whitespace-nowrap">
