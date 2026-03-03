@@ -70,7 +70,8 @@ router.post(
     // Auto-send opening message with context-aware prompt
     try {
       let openingPrompt: string;
-      if (techniqueId) {
+      const hasSpecificTechnique = techniqueId && techniqueId !== "general";
+      if (hasSpecificTechnique) {
         openingPrompt = `De seller wil werken aan techniek ${techniqueId}. Begroet hem kort en natuurlijk als Hugo. Verwijs naar wat je weet over deze seller uit je briefing.`;
       } else if (briefing && !briefing.isNewUser) {
         openingPrompt = `Je hebt zojuist de briefing van deze seller gelezen in je system prompt. Begroet hem kort en natuurlijk als Hugo. Verwijs naar iets concreets uit zijn geschiedenis en stel een logische volgende stap voor. Eindig met "of zit je ergens anders mee?" zodat hij ook vrij kan kiezen.`;
