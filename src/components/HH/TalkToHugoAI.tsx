@@ -128,6 +128,7 @@ type ChatMode = "chat" | "audio" | "video";
 interface TalkToHugoAIProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  isSuperAdmin?: boolean;
   navigationData?: Record<string, any>;
   onboardingMode?: boolean;
   adminViewMode?: boolean;
@@ -136,6 +137,7 @@ interface TalkToHugoAIProps {
 export function TalkToHugoAI({
   navigate,
   isAdmin,
+  isSuperAdmin,
   navigationData,
   onboardingMode,
   adminViewMode = false,
@@ -179,6 +181,15 @@ export function TalkToHugoAI({
       window.dispatchEvent(new CustomEvent('sidebar-collapse-request', { detail: { collapsed: true } }));
     }
   }, []);
+
+  // Activate V3 mode for superadmin
+  useEffect(() => {
+    if (isSuperAdmin) {
+      hugoApi.setV3Mode(true);
+    }
+    return () => { hugoApi.setV3Mode(false); };
+  }, [isSuperAdmin]);
+
   const [activeHelpMessageId, setActiveHelpMessageId] = useState<string | null>(null);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [chatMode, setChatMode] = useState<ChatMode>("chat");

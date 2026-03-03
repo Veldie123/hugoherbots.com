@@ -6,7 +6,7 @@ import { supabase } from '../utils/supabase/client';
 
 const API_BASE = "/api";
 
-async function getAuthHeaders(): Promise<Record<string, string>> {
+export async function getAuthHeaders(): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession();
   const token = session?.access_token || '';
   return {
@@ -138,8 +138,18 @@ export interface EvaluationResult {
 
 class HugoApiService {
   private currentSessionId: string | null = null;
+  private useV3 = false;
+
+  setV3Mode(enabled: boolean): void {
+    this.useV3 = enabled;
+    console.log(`[HugoApi] V3 mode ${enabled ? 'enabled' : 'disabled'}`);
+  }
 
   async startSession(request: StartSessionRequest): Promise<StartSessionResponse> {
+    if (this.useV3) {
+      return this.startSessionV3(request);
+    }
+
     const response = await fetch(`${API_BASE}/v2/sessions`, {
       method: "POST",
       headers: await getAuthHeaders(),
@@ -155,11 +165,45 @@ class HugoApiService {
     return data;
   }
 
+  private async startSessionV3(request: StartSessionRequest): Promise<StartSessionResponse> {
+    const response = await fetch(`${API_BASE}/v3/session`, {
+      method: "POST",
+      headers: await getAuthHeaders(),
+      body: JSON.stringify({
+        techniqueId: request.techniqueId,
+        userProfile: {},
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to start V3 session: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    this.currentSessionId = data.sessionId;
+
+    // Map V3 response to V2 format expected by frontend
+    return {
+      sessionId: data.sessionId,
+      phase: "COACH_CHAT",
+      message: data.opening?.text || "",
+      initialMessage: data.opening?.text || "",
+    };
+  }
+
   async startSessionStream(
     request: StartSessionRequest,
     onToken: (token: string) => void,
     onDone?: (meta?: { onboardingStatus?: any }) => void
   ): Promise<string> {
+    if (this.useV3) {
+      // V3 doesn't have streaming yet — simulate with non-streaming call
+      const result = await this.startSessionV3(request);
+      if (result.message) onToken(result.message);
+      if (onDone) onDone();
+      return result.sessionId;
+    }
+
     const response = await fetch(`${API_BASE}/v2/sessions/stream`, {
       method: "POST",
       headers: await getAuthHeaders(),
@@ -219,6 +263,10 @@ class HugoApiService {
       throw new Error("No active session. Call startSession first.");
     }
 
+    if (this.useV3) {
+      return this.sendMessageV3(content);
+    }
+
     const body: Record<string, unknown> = {
       sessionId: this.currentSessionId,
       message: content,
@@ -242,14 +290,42 @@ class HugoApiService {
     return response.json();
   }
 
+  private async sendMessageV3(content: string): Promise<SendMessageResponse> {
+    const response = await fetch(`${API_BASE}/v3/session/${this.currentSessionId}/message`, {
+      method: "POST",
+      headers: await getAuthHeaders(),
+      body: JSON.stringify({ message: content }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to send V3 message: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // Map V3 response to V2 format expected by frontend
+    return {
+      response: data.response?.text || "",
+      phase: "COACH_CHAT",
+    };
+  }
+
   async sendMessageStream(
-    content: string, 
+    content: string,
     isExpert = false,
     onToken: (token: string) => void,
     onDone?: (debug?: any) => void
   ): Promise<void> {
     if (!this.currentSessionId) {
       throw new Error("No active session. Call startSession first.");
+    }
+
+    if (this.useV3) {
+      // V3 doesn't have streaming yet — simulate with non-streaming call
+      const result = await this.sendMessageV3(content);
+      if (result.response) onToken(result.response);
+      if (onDone) onDone();
+      return;
     }
 
     const response = await fetch(`${API_BASE}/session/${this.currentSessionId}/message/stream`, {

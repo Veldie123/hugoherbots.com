@@ -1,3 +1,4 @@
+import { getAuthHeaders } from "../../services/hugoApi";
 import { AdminLayout } from "./AdminLayout";
 import { useState, useEffect, useMemo } from "react";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
@@ -189,7 +190,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
     try {
       const response = await fetch('/api/v2/analysis/chat-session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({ sessionId }),
       });
       const data = await safeJsonParse(response);
@@ -217,7 +218,9 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
 
       const pollInterval = setInterval(async () => {
         try {
-          const statusRes = await fetch(`/api/v2/analysis/status/${sessionId}`);
+          const statusRes = await fetch(`/api/v2/analysis/status/${sessionId}`, {
+            headers: await getAuthHeaders(),
+          });
           const statusData = await safeJsonParse(statusRes);
 
           if (statusData.status === 'completed') {
@@ -261,7 +264,9 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
     async function fetchSessions() {
       try {
         setLoading(true);
-        const response = await fetch('/api/sessions');
+        const response = await fetch('/api/sessions', {
+          headers: await getAuthHeaders(),
+        });
         if (!response.ok) throw new Error('Failed to fetch sessions');
         const data = await response.json();
         

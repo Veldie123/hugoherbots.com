@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { getAuthHeaders } from "../../services/hugoApi";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
 import { Card } from "../ui/card";
@@ -83,13 +84,18 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
 
   const retryAnalysis = async (conversationId: string) => {
     try {
-      const res = await fetch(`/api/v2/analysis/retry/${conversationId}`, { method: 'POST' });
+      const res = await fetch(`/api/v2/analysis/retry/${conversationId}`, {
+        method: 'POST',
+        headers: await getAuthHeaders(),
+      });
       if (!res.ok) {
         const data = await res.json();
         alert(data.error || 'Opnieuw proberen mislukt');
         return;
       }
-      const listRes = await fetch('/api/v2/analysis/list?source=upload');
+      const listRes = await fetch('/api/v2/analysis/list?source=upload', {
+        headers: await getAuthHeaders(),
+      });
       if (listRes.ok) {
         const data = await listRes.json();
         const mapped: ConversationRecord[] = (data.analyses || []).map((a: any) => ({
@@ -123,7 +129,9 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
   useEffect(() => {
     const fetchAnalyses = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list?source=upload');
+        const res = await fetch('/api/v2/analysis/list?source=upload', {
+          headers: await getAuthHeaders(),
+        });
         if (!res.ok) throw new Error('Analyses ophalen mislukt');
         const data = await res.json();
         
@@ -168,7 +176,9 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
     let timeoutId: ReturnType<typeof setTimeout>;
     const poll = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list?source=upload');
+        const res = await fetch('/api/v2/analysis/list?source=upload', {
+          headers: await getAuthHeaders(),
+        });
         if (res.ok) {
           const data = await res.json();
           const mapped: ConversationRecord[] = (data.analyses || []).map((a: any) => ({

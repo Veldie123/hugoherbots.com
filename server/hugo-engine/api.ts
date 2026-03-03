@@ -118,8 +118,29 @@ import {
   generateCoachArtifacts,
   type ConversationAnalysis,
 } from "./v2/analysis-service";
+import { runFullAnalysisV3 } from "./v3/analysis-service";
+import { isV3Available } from "./v3/anthropic-client";
 import multer from "multer";
+
+const SUPERADMIN_EMAIL = "stephane@hugoherbots.com";
+
+/** Route analysis through V3 (Claude) for superadmin, V2 (GPT) for others */
+function runAnalysisForUser(
+  conversationId: string,
+  storageKey: string,
+  userId: string,
+  userEmail: string | undefined,
+  title?: string
+): void {
+  if (userEmail?.toLowerCase() === SUPERADMIN_EMAIL && isV3Available()) {
+    console.log(`[Analysis] Routing to V3 (Claude) for superadmin: ${conversationId}`);
+    runFullAnalysisV3(conversationId, storageKey, userId, title);
+  } else {
+    runFullAnalysis(conversationId, storageKey, userId, title);
+  }
+}
 import { hugoAgentRouter } from "./hugo-agent";
+import { v3Routes } from "./v3/routes";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -3413,14 +3434,14 @@ app.post("/api/v2/analysis/upload", upload.single('file'), async (req: Request, 
 
     const conversationId = crypto.randomUUID();
 
-    runFullAnalysis(conversationId, storageKey, effectiveUserId, title);
+    runAnalysisForUser(conversationId, storageKey, effectiveUserId, req.userEmail, title);
 
     res.json({
       success: true,
       conversationId,
       storageKey,
       status: 'transcribing',
-      message: compressed.compressed 
+      message: compressed.compressed
         ? 'Upload succesvol! Bestand gecomprimeerd en analyse wordt gestart...'
         : 'Upload succesvol! Analyse wordt gestart...'
     });
@@ -3454,7 +3475,7 @@ app.post("/api/v2/analysis/inline", upload.single('file'), async (req: Request, 
 
     const conversationId = crypto.randomUUID();
 
-    runFullAnalysis(conversationId, storageKey, effectiveUserId, effectiveTitle);
+    runAnalysisForUser(conversationId, storageKey, effectiveUserId, req.userEmail, effectiveTitle);
 
     res.json({
       success: true,
@@ -3596,7 +3617,7 @@ app.post("/api/v2/analysis/upload/complete", express.json(), async (req: Request
     );
 
     const conversationId = crypto.randomUUID();
-    runFullAnalysis(conversationId, storageKey, effectiveUserId, title);
+    runAnalysisForUser(conversationId, storageKey, effectiveUserId, req.userEmail, title);
 
     try { fs.rmSync(uploadInfo.tmpDir, { recursive: true, force: true }); } catch {}
     activeChunkedUploads.delete(uploadId);
@@ -3742,7 +3763,7 @@ app.post("/api/v2/analysis/retry/:conversationId", express.json(), async (req: R
       ['transcribing', conversationId]
     );
 
-    runFullAnalysis(conversationId as string, storageKey, analysis.user_id, analysis.title);
+    runAnalysisForUser(conversationId as string, storageKey, analysis.user_id, req.userEmail, analysis.title);
 
     res.json({
       success: true,
@@ -5019,6 +5040,9 @@ app.get("/api/health", (req, res) => {
 
 // Hugo Agent router — platform management chat for Hugo Herbots
 app.use("/api/hugo-agent", hugoAgentRouter);
+
+// V3 Agent router — Claude-powered coaching agent (superadmin only)
+app.use("/api/v3", v3Routes);
 
 // Error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
