@@ -22,7 +22,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
         <img
           src="/images/Hugo-Herbots-WEB-0444.JPG"
           alt="Hugo Herbots"
-          className="absolute inset-0 w-full h-full object-contain object-right"
+          className="absolute right-0 top-0 h-full w-auto object-contain object-right"
           style={{ mixBlendMode: "lighten" }}
         />
       </motion.div>
