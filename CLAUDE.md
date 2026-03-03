@@ -16,7 +16,7 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 
 | Token | Hex | Gebruik |
 |-------|-----|---------|
-| `hh-primary` | #4F7396 (steel blue) | Interactieve elementen, links, actieve states |
+| `hh-primary` | #4F7396 (steel blue) | Interactieve elementen, links, actieve states. In `.admin-session` context: #8B5CF6 (purple) |
 | `hh-success` | #10B981 (emerald) | Positieve acties, CTA buttons, bevestigingen |
 | `hh-error` | #EF4444 | Foutmeldingen, destructieve acties |
 | `hh-warning` | #F59E0B | Waarschuwingen |
@@ -31,9 +31,9 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 
 | Aspect | User View | Admin View |
 |--------|-----------|------------|
-| Primary accent | `hh-primary` (steel blue) | `hh-primary` (steel blue) |
-| CTA buttons | `bg-hh-success` (emerald groen) | `bg-hh-primary` (steel blue) |
-| Purple (#8B5CF6) | **NOOIT** | Mag als accent voor premium/speciale features |
+| Primary accent | `hh-primary` (steel blue) | `hh-primary` overridden naar purple via `.admin-session` class |
+| CTA buttons | `bg-hh-success` (emerald groen) | `bg-hh-primary` (purple in admin-session context) |
+| Purple (#8B5CF6) | **NOOIT** | Automatisch via `.admin-session` CSS class op host/admin components |
 | HOST badge | `bg-hh-primary` | `bg-hh-primary` |
 
 ### Typografie
@@ -92,6 +92,14 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 - **Geen `console.log`** in productie code
 - **Build check:** `npm run build` moet slagen voor elke commit
 - **Commit message stijl:** Korte imperatief ("Fix X", "Add Y", "Update Z")
+
+## Database & Migrations
+
+- **NOOIT de gebruiker vragen om SQL handmatig te draaien.** Voer migrations zelf uit via de credentials in `.env`.
+- **Neon (primaire server storage):** Connectie via `PGHOST`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` env vars. Gebruik `pg` (node-postgres) Client.
+- **Supabase (frontend + admin):** Connectie via `postgresql://postgres:{SUPABASE_YOUR_PASSWORD}@db.{project-ref}.supabase.co:5432/postgres`. Password staat in `SUPABASE_YOUR_PASSWORD`.
+- **Beide databases moeten gesynchroniseerd worden** — `live_sessions` tabel bestaat in Neon én Supabase. Run migrations altijd op beide.
+- Migration bestanden opslaan in `src/supabase/migrations/` voor documentatie.
 
 ## Key Files
 
