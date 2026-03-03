@@ -176,7 +176,8 @@ class HugoApiService {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to start V3 session: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.details || errorData.error || `Failed to start V3 session: ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -298,7 +299,8 @@ class HugoApiService {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to send V3 message: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.details || errorData.error || `Failed to send V3 message: ${response.statusText}`);
     }
 
     const data = await response.json();

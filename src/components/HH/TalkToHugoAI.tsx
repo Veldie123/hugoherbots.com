@@ -70,7 +70,7 @@ import { InlineVideoPlayer } from "./InlineVideoPlayer";
 import { InlineWebinarCard } from "./InlineWebinarCard";
 import { InlineAnalysisCard } from "./InlineAnalysisCard";
 import type { EpicSlideContent, VideoEmbed, WebinarLink, AnalysisResultEmbed, RichContent } from "@/types/crossPlatform";
-import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
+import { hugoApi, getAuthHeaders, type AssistanceConfig } from "../../services/hugoApi";
 import { lastActivityService } from "../../services/lastActivityService";
 import { supabase } from "../../utils/supabase/client";
 
@@ -182,10 +182,17 @@ export function TalkToHugoAI({
     }
   }, []);
 
-  // Activate V3 mode for superadmin
+  // Activate V3 mode for superadmin + health check
+  const [v3Warning, setV3Warning] = useState<string | null>(null);
   useEffect(() => {
     if (isSuperAdmin) {
       hugoApi.setV3Mode(true);
+      fetch("/api/v3/status")
+        .then(r => r.json())
+        .then(data => {
+          if (!data.available) setV3Warning(data.message || "V3 niet beschikbaar");
+        })
+        .catch(() => setV3Warning("V3 status check mislukt"));
     }
     return () => { hugoApi.setV3Mode(false); };
   }, [isSuperAdmin]);
@@ -433,7 +440,7 @@ export function TalkToHugoAI({
 
       try {
         const endpoint = `/api/v2/user/welcome${user?.id ? `?userId=${user.id}` : ''}`;
-        const res = await fetch(endpoint);
+        const res = await fetch(endpoint, { headers: await getAuthHeaders() });
         if (res.ok) {
           const data = await res.json();
           setMessages([{
@@ -1080,8 +1087,15 @@ export function TalkToHugoAI({
         });
         setHasActiveSession(true);
         console.log("[Hugo] Auto-started coach session");
-      } catch (error) {
+      } catch (error: any) {
         console.error("[Hugo] Failed to start session:", error);
+        setMessages(prev => [...prev, {
+          id: (Date.now() + 1).toString(),
+          sender: "ai" as const,
+          text: `Kon geen sessie starten: ${error.message || "onbekende fout"}`,
+          timestamp: new Date(),
+        }]);
+        return;
       }
     }
 
@@ -2437,8 +2451,11 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             <div className="flex items-center gap-2 lg:gap-3 min-w-0">
               {/* E.P.I.C. sidebar toggle removed from header — accessible via lightbulb action button under messages */}
               <span className="text-[13px] text-hh-muted font-medium whitespace-nowrap flex items-center gap-1">
-                HugoGPT <span className="text-[11px] text-hh-muted/60 font-normal">v1.0</span>
+                HugoGPT <span className="text-[11px] text-hh-muted/60 font-normal">{isSuperAdmin ? 'v3' : 'v1.0'}</span>
               </span>
+              {v3Warning && (
+                <span className="text-[11px] text-red-400 ml-2">{v3Warning}</span>
+              )}
             </div>
             
             {/* Right: Mode toggle + Stop (Niveau is now auto-adaptive, hidden) */}

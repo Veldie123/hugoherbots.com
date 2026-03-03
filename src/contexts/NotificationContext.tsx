@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from "react";
+import { getAuthHeaders } from "../services/hugoApi";
 
 export interface Notification {
   id: string;
@@ -177,7 +178,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const fetchAdminNotifications = useCallback(async () => {
     try {
-      const res = await fetch('/api/v2/admin/notifications');
+      const res = await fetch('/api/v2/admin/notifications', {
+        headers: await getAuthHeaders(),
+      });
       if (!res.ok) return;
       const data = await res.json();
       const backendNotifs: any[] = data.notifications || [];

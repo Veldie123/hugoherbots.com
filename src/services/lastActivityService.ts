@@ -1,3 +1,5 @@
+import { getAuthHeaders } from "./hugoApi";
+
 export interface LastActivity {
   type: 'technique' | 'video' | 'webinar';
   id: string;
@@ -115,7 +117,10 @@ export const lastActivityService = {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 2000);
-      const response = await fetch(`/api/v2/user/activity-summary?userId=${userId}`, { signal: controller.signal });
+      const response = await fetch(`/api/v2/user/activity-summary?userId=${userId}`, {
+        headers: await getAuthHeaders(),
+        signal: controller.signal,
+      });
       clearTimeout(timeout);
       if (!response.ok) {
         console.warn('[LastActivity] Failed to fetch activity summary:', response.status);
