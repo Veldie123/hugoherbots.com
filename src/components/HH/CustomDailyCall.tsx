@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import DailyIframe, { DailyCall, DailyParticipant, DailyEventObjectParticipant } from "@daily-co/daily-js";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -113,6 +114,7 @@ export function CustomDailyCall({
   const [waitingParticipants, setWaitingParticipants] = useState<{ id: string; name: string }[]>([]);
   const [activeSpeakerId, setActiveSpeakerId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const bgPickerBtnRef = useRef<HTMLButtonElement>(null);
   const isMountedRef = useRef(true);
   const hasLoggedWebinarAttend = useRef(false);
 
@@ -601,8 +603,8 @@ export function CustomDailyCall({
     <div 
       ref={containerRef}
       className={cn(
-        "flex flex-col bg-hh-bg rounded-lg border border-hh-border",
-        isFullscreen ? "fixed inset-0 z-50 rounded-none overflow-hidden" : "h-[600px]"
+        "flex flex-col bg-hh-bg rounded-lg overflow-hidden border border-hh-border",
+        isFullscreen ? "fixed inset-0 z-50 rounded-none" : "h-[600px]"
       )}
     >
       <div className="flex items-center justify-between px-4 py-3 bg-hh-bg border-b border-hh-border">
@@ -778,102 +780,113 @@ export function CustomDailyCall({
           {isCameraOff ? <VideoOff className="w-6 h-6" /> : <Video className="w-6 h-6" />}
         </Button>
 
-        <div className="relative">
-          <Button
-            size="lg"
-            variant={virtualBg !== 'none' ? "default" : "secondary"}
-            onClick={() => setShowBgPicker(!showBgPicker)}
-            disabled={bgLoading}
-            className={cn(
-              "w-14 h-14 rounded-full p-0",
-              virtualBg !== 'none' && "bg-hh-primary hover:bg-hh-primary/90 text-white"
-            )}
-            title="Virtuele achtergrond"
-          >
-            {bgLoading ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
-            ) : (
-              <ImageIcon className="w-6 h-6" />
-            )}
-          </Button>
+        {isHost && (
+          <div className="relative">
+            <Button
+              ref={bgPickerBtnRef}
+              size="lg"
+              variant={virtualBg !== 'none' ? "default" : "secondary"}
+              onClick={() => setShowBgPicker(!showBgPicker)}
+              disabled={bgLoading}
+              className={cn(
+                "w-14 h-14 rounded-full p-0",
+                virtualBg !== 'none' && "bg-hh-primary hover:bg-hh-primary/90 text-white"
+              )}
+              title="Virtuele achtergrond"
+            >
+              {bgLoading ? (
+                <Loader2 className="w-6 h-6 animate-spin" />
+              ) : (
+                <ImageIcon className="w-6 h-6" />
+              )}
+            </Button>
 
-          {showBgPicker && (
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[280px] z-50">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[13px] font-semibold text-hh-text">Hugo's Kantoor</p>
-                <button onClick={() => setShowBgPicker(false)} className="p-1 rounded hover:bg-hh-ui-50">
-                  <X className="w-3.5 h-3.5 text-hh-muted" />
-                </button>
-              </div>
-
-              <button
-                onClick={() => { applyVirtualBackground('auto'); setShowBgPicker(false); }}
-                className={cn(
-                  "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors mb-1",
-                  virtualBg === 'auto' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
-                )}
+            {showBgPicker && createPortal(
+              <div
+                className="fixed bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[280px] z-[9999]"
+                style={(() => {
+                  const rect = bgPickerBtnRef.current?.getBoundingClientRect();
+                  if (!rect) return {};
+                  return { bottom: window.innerHeight - rect.top + 12, left: rect.left + rect.width / 2 - 140 };
+                })()}
               >
-                <Sun className="w-4 h-4" />
-                Automatisch (tijdsgebonden)
-                {virtualBg === 'auto' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
-              </button>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[13px] font-semibold text-hh-text">Hugo's Kantoor</p>
+                  <button onClick={() => setShowBgPicker(false)} className="p-1 rounded hover:bg-hh-ui-50">
+                    <X className="w-3.5 h-3.5 text-hh-muted" />
+                  </button>
+                </div>
 
-              <div className="grid grid-cols-2 gap-1.5 mb-2">
-                {Object.entries(VIRTUAL_BACKGROUNDS).map(([key, bg]) => {
-                  const Icon = bg.icon;
-                  const isActive = virtualBg === key;
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => { applyVirtualBackground(key as VirtualBgOption); setShowBgPicker(false); }}
-                      className={cn(
-                        "relative rounded-lg overflow-hidden border-2 transition-all aspect-video",
-                        isActive ? "border-hh-primary ring-2 ring-hh-primary/30" : "border-transparent hover:border-hh-primary/50"
-                      )}
-                    >
-                      <img src={bg.image} alt={bg.label} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-1.5 flex items-center gap-1">
-                        <Icon className="w-3 h-3 text-white" />
-                        <span className="text-[10px] text-white font-medium">{bg.label}</span>
-                      </div>
-                      {isActive && (
-                        <div className="absolute top-1 right-1 w-5 h-5 bg-hh-primary rounded-full flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
+                <button
+                  onClick={() => { applyVirtualBackground('auto'); setShowBgPicker(false); }}
+                  className={cn(
+                    "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors mb-1",
+                    virtualBg === 'auto' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
+                  )}
+                >
+                  <Sun className="w-4 h-4" />
+                  Automatisch (tijdsgebonden)
+                  {virtualBg === 'auto' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
+                </button>
+
+                <div className="grid grid-cols-2 gap-1.5 mb-2">
+                  {Object.entries(VIRTUAL_BACKGROUNDS).map(([key, bg]) => {
+                    const Icon = bg.icon;
+                    const isActive = virtualBg === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => { applyVirtualBackground(key as VirtualBgOption); setShowBgPicker(false); }}
+                        className={cn(
+                          "relative rounded-lg overflow-hidden border-2 transition-all aspect-video",
+                          isActive ? "border-hh-primary ring-2 ring-hh-primary/30" : "border-transparent hover:border-hh-primary/50"
+                        )}
+                      >
+                        <img src={bg.image} alt={bg.label} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-1.5 flex items-center gap-1">
+                          <Icon className="w-3 h-3 text-white" />
+                          <span className="text-[10px] text-white font-medium">{bg.label}</span>
                         </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+                        {isActive && (
+                          <div className="absolute top-1 right-1 w-5 h-5 bg-hh-primary rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
 
-              <div className="border-t border-hh-border pt-2 space-y-0.5">
-                <button
-                  onClick={() => { applyVirtualBackground('blur'); setShowBgPicker(false); }}
-                  className={cn(
-                    "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
-                    virtualBg === 'blur' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
-                  )}
-                >
-                  <div className="w-4 h-4 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 blur-[1px]" />
-                  Achtergrond vervagen
-                  {virtualBg === 'blur' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
-                </button>
-                <button
-                  onClick={() => { applyVirtualBackground('none'); setShowBgPicker(false); }}
-                  className={cn(
-                    "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
-                    virtualBg === 'none' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
-                  )}
-                >
-                  <VideoOff className="w-4 h-4" />
-                  Geen achtergrond
-                  {virtualBg === 'none' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+                <div className="border-t border-hh-border pt-2 space-y-0.5">
+                  <button
+                    onClick={() => { applyVirtualBackground('blur'); setShowBgPicker(false); }}
+                    className={cn(
+                      "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
+                      virtualBg === 'blur' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
+                    )}
+                  >
+                    <div className="w-4 h-4 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 blur-[1px]" />
+                    Achtergrond vervagen
+                    {virtualBg === 'blur' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
+                  </button>
+                  <button
+                    onClick={() => { applyVirtualBackground('none'); setShowBgPicker(false); }}
+                    className={cn(
+                      "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
+                      virtualBg === 'none' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
+                    )}
+                  >
+                    <VideoOff className="w-4 h-4" />
+                    Geen achtergrond
+                    {virtualBg === 'none' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
+                  </button>
+                </div>
+              </div>,
+              document.body
+            )}
+          </div>
+        )}
 
         <div className="relative">
           <Button

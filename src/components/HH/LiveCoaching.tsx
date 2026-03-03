@@ -829,16 +829,18 @@ export function LiveCoaching({
                 <span>LIVE NU</span>
               </Button>
             )}
-            <Button
-              onClick={() => {
-                setShowCalendar(!showCalendar);
-                if (showCalendar) setSelectedCalendarDate(null);
-              }}
-              className="gap-2 transition-colors bg-hh-primary hover:bg-hh-primary/90 text-white"
-            >
-              <CalendarIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">Kalender</span>
-            </Button>
+            {!liveSession && (
+              <Button
+                onClick={() => {
+                  setShowCalendar(!showCalendar);
+                  if (showCalendar) setSelectedCalendarDate(null);
+                }}
+                className="gap-2 transition-colors bg-hh-primary hover:bg-hh-primary/90 text-white"
+              >
+                <CalendarIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Kalender</span>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -853,7 +855,7 @@ export function LiveCoaching({
         */}
         
         {liveSession && (
-          <div className="flex gap-4">
+          <div className="flex flex-col lg:flex-row gap-4">
             {/* Main Video Area - Shrinks when chat is open */}
             <div className={`relative rounded-[16px] overflow-hidden shadow-hh-md transition-all duration-300 ${chatPanelOpen ? 'flex-1' : 'w-full'}`} style={{ minHeight: '70vh' }}>
               {preJoinSession ? (
@@ -942,7 +944,7 @@ export function LiveCoaching({
             {/* Chat Panel - Side by side with video */}
             {chatPanelOpen && (
             <div 
-              className="w-[350px] bg-hh-bg rounded-[16px] shadow-hh-md border border-hh-border flex-shrink-0"
+              className="w-full lg:w-[350px] bg-hh-bg rounded-[16px] shadow-hh-md border border-hh-border flex-shrink-0"
               style={{ minHeight: '70vh' }}
             >
               <div className="flex flex-col h-full">
