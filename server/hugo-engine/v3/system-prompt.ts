@@ -8,6 +8,7 @@
  */
 import { readFileSync } from "fs";
 import { join } from "path";
+import { type UserBriefing, formatBriefingForPrompt } from "./user-briefing";
 
 interface UserProfile {
   name?: string;
@@ -34,7 +35,7 @@ function loadPersona(): any {
  * No methodology dump, no technique lists, no customer attitudes.
  * Those come via tools when the agent needs them.
  */
-export function buildV3SystemPrompt(userProfile?: UserProfile): string {
+export function buildV3SystemPrompt(userProfile?: UserProfile, briefing?: UserBriefing): string {
   const persona = loadPersona();
 
   const parts: string[] = [];
@@ -90,8 +91,11 @@ TOON & STIJL:
 ${persona.rag.instructie}
 Spreek Nederlands. Wees warm, direct, en concreet. Gebruik Hugo's typische aanpak: LSD (Luisteren, Samenvatten, Doorvragen). Stel één vraag tegelijk. Geen opsommingen of lijstjes — dat is geen coaching, dat is doceren.`);
 
-  // User context if available
-  if (userProfile && Object.values(userProfile).some(v => v)) {
+  // Rich user briefing (preferred — pre-fetched at session start)
+  if (briefing) {
+    parts.push(`\nDEZE SELLER — BRIEFING:\n${formatBriefingForPrompt(briefing)}`);
+  } else if (userProfile && Object.values(userProfile).some(v => v)) {
+    // Fallback: basic user context if no briefing available
     const contextParts: string[] = [];
     if (userProfile.name) contextParts.push(`Naam: ${userProfile.name}`);
     if (userProfile.bedrijfsnaam) contextParts.push(`Bedrijf: ${userProfile.bedrijfsnaam}`);
