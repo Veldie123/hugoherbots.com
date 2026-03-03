@@ -172,7 +172,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
       <AppLayout currentPage="coaching" navigate={navigate} isAdmin={isAdmin}>
         <div className="h-[calc(100vh-64px)] flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-hh-border bg-white">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-hh-border bg-hh-bg">
             <div className="flex items-center gap-3">
               <Badge className="bg-hh-primary text-white">
                 {selectedTechnique.nummer}
@@ -198,7 +198,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
                 <div className={`max-w-[70%] p-3 rounded-lg ${
                   msg.role === "user" 
                     ? "bg-hh-primary text-white" 
-                    : "bg-white text-hh-text border border-hh-border"
+                    : "bg-card text-hh-text border border-hh-border"
                 }`}>
                   <p className="text-[14px] leading-[20px]">{msg.text}</p>
                 </div>
@@ -207,7 +207,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
           </div>
 
           {/* Input */}
-          <div className="p-6 border-t border-hh-border bg-white">
+          <div className="p-6 border-t border-hh-border bg-hh-bg">
             <div className="flex gap-2">
               <Input
                 value={chatInput}
@@ -231,7 +231,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
     <AppLayout currentPage="coaching" navigate={navigate} isAdmin={isAdmin}>
       <div className="h-[calc(100vh-64px)] flex">
         {/* Sidebar - Hierarchische lijst */}
-        <div className="w-[320px] border-r border-hh-border bg-white flex flex-col">
+        <div className="w-[320px] border-r border-hh-border bg-hh-bg flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-hh-border">
             <h1 className="text-[24px] leading-[32px] text-hh-text font-[700]">

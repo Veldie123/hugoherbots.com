@@ -44,6 +44,7 @@ import { toast } from "sonner";
 import MuxPlayer from "@mux/mux-player-react";
 import { getTechniekByNummer, getAllTechnieken, getTechniekenByFase } from "../../data/technieken-service";
 import { useTheme } from "./ThemeProvider";
+import { getAuthHeaders } from "../../services/hugoApi";
 import { EPICSidebar } from "./AdminChatExpertModeSidebar";
 import technieken_index from "../../data/technieken_index.json";
 import { KLANT_HOUDINGEN as KLANT_HOUDINGEN_DATA } from "../../data/klant_houdingen";
@@ -389,7 +390,7 @@ export function AnalysisResults({
     try {
       const response = await fetch('/api/v2/admin/corrections', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({
           analysisId: result?.conversation?.id || conversationId,
           type,
@@ -433,7 +434,7 @@ export function AnalysisResults({
       const techniqueIds = evaluation?.techniques.map(t => t.id) || [];
       const res = await fetch('/api/v2/session/save-reference', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({
           sessionId: conversationId,
           techniqueId: techniqueIds[0] || 'unknown',
@@ -464,7 +465,7 @@ export function AnalysisResults({
 
       await fetch('/api/v2/admin/corrections', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({
           analysisId: conversationId,
           type: correctionType,
@@ -478,7 +479,7 @@ export function AnalysisResults({
 
       await fetch('/api/v2/session/save-reference', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({
           sessionId: conversationId,
           techniqueId: correctionType === 'technique' ? correctionValue : (evaluation?.techniques[0]?.id || 'unknown'),
@@ -537,7 +538,9 @@ export function AnalysisResults({
     }
     const loadFirst = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list?source=upload');
+        const res = await fetch('/api/v2/analysis/list?source=upload', {
+          headers: await getAuthHeaders(),
+        });
         if (!res.ok) { setError('Kon analyses niet ophalen'); setLoading(false); return; }
         const data = await res.json();
         const analyses = data.analyses || [];
@@ -564,7 +567,9 @@ export function AnalysisResults({
 
     const fetchResults = async () => {
       try {
-        const response = await fetch(`/api/v2/analysis/results/${resolvedConversationId}`);
+        const response = await fetch(`/api/v2/analysis/results/${resolvedConversationId}`, {
+          headers: await getAuthHeaders(),
+        });
         const data = await response.json();
 
         if (response.status === 202) {
@@ -592,7 +597,7 @@ export function AnalysisResults({
           try {
             const triggerRes = await fetch('/api/v2/analysis/chat-session', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: await getAuthHeaders(),
               body: JSON.stringify({ sessionId: resolvedConversationId }),
             });
             const triggerData = await triggerRes.json();
@@ -640,10 +645,14 @@ export function AnalysisResults({
 
   useEffect(() => {
     if (!resolvedConversationId || !result) return;
-    fetch(`/api/v2/analysis/percentile/${resolvedConversationId}?period=${percentilePeriod}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setPercentileData(data); })
-      .catch(() => {});
+    (async () => {
+      try {
+        const r = await fetch(`/api/v2/analysis/percentile/${resolvedConversationId}?period=${percentilePeriod}`, {
+          headers: await getAuthHeaders(),
+        });
+        if (r.ok) { const data = await r.json(); if (data) setPercentileData(data); }
+      } catch {}
+    })();
   }, [resolvedConversationId, result, percentilePeriod]);
 
   useEffect(() => {
@@ -653,25 +662,27 @@ export function AnalysisResults({
     if (!resolvedConversationId) return;
     
     setRegeneratingCoach(true);
-    fetch(`/api/v2/analysis/regenerate-coach/${resolvedConversationId}`, { method: 'POST' })
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          // Refetch the full results to get updated data
-          return fetch(`/api/v2/analysis/results/${resolvedConversationId}`)
-            .then(r => r.json())
-            .then(updatedData => {
-              if (updatedData.insights) {
-                setResult(updatedData);
-              }
-            });
-        }
+    (async () => {
+      const headers = await getAuthHeaders();
+      fetch(`/api/v2/analysis/regenerate-coach/${resolvedConversationId}`, { method: 'POST', headers })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            return fetch(`/api/v2/analysis/results/${resolvedConversationId}`, { headers })
+              .then(r => r.json())
+              .then(updatedData => {
+                if (updatedData.insights) {
+                  setResult(updatedData);
+                }
+              });
+          }
       })
       .catch(err => console.warn('[Coach] Regeneration failed:', err))
       .finally(() => {
         setRegeneratingCoach(false);
         setCoachRegenerated(true);
       });
+    })();
   }, [activeTab, result, resolvedConversationId, regeneratingCoach, coachRegenerated]);
 
   useEffect(() => {
@@ -905,7 +916,7 @@ export function AnalysisResults({
     try {
       const res = await fetch('/api/v2/analysis/coach-action', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await getAuthHeaders(),
         body: JSON.stringify({ analysisId: resolvedConversationId, momentId, actionType }),
       });
       if (!res.ok) throw new Error('Action failed');
@@ -1132,7 +1143,7 @@ export function AnalysisResults({
                   <button
                     onClick={async () => {
                       try {
-                        const res = await fetch(`/api/v2/analysis/retry/${conversationId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+                        const res = await fetch(`/api/v2/analysis/retry/${conversationId}`, { method: 'POST', headers: await getAuthHeaders() });
                         const data = await res.json();
                         if (res.ok) {
                           toast?.('Analyse wordt opnieuw gestart...', { description: 'De pagina wordt automatisch ververst.' });

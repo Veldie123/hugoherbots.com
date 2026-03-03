@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { Logo } from "./Logo";
 import React, { useState, useEffect } from "react";
+import { getAuthHeaders } from "../../services/hugoApi";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
@@ -60,6 +61,23 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isSuperAdminProp }: AdminLayoutProps) {
   const { theme, toggleTheme } = useTheme();
+
+  // Module mapping: admin view → user view equivalent
+  const adminToUserMap: Record<string, string> = {
+    'admin-dashboard': 'dashboard',
+    'admin-techniques': 'techniques',
+    'admin-videos': 'videos',
+    'admin-live': 'live',
+    'admin-uploads': 'analysis',
+    'admin-upload-analysis': 'upload-analysis',
+    'admin-analysis-results': 'analysis-results',
+    'admin-sessions': 'hugo-overview',
+    'admin-chat-expert': 'talk-to-hugo',
+    'admin-settings': 'settings',
+    'admin-help': 'help',
+    'admin-resources': 'resources',
+  };
+
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -99,7 +117,9 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
   useEffect(() => {
     const fetchChatSessions = async () => {
       try {
-        const res = await fetch('/api/user/sessions');
+        const res = await fetch('/api/user/sessions', {
+          headers: await getAuthHeaders(),
+        });
         if (!res.ok) return;
         const data = await res.json();
         const items: HistoryItem[] = (data.sessions || []).slice(0, 5).map((s: any) => ({
@@ -113,7 +133,9 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
     };
     const fetchAnalyses = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list?source=upload');
+        const res = await fetch('/api/v2/analysis/list?source=upload', {
+          headers: await getAuthHeaders(),
+        });
         if (!res.ok) return;
         const data = await res.json();
         const items: HistoryItem[] = (data.analyses || []).slice(0, 5).map((a: any) => ({
@@ -410,7 +432,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 <Button
                   variant="outline"
                   className="w-full gap-2 justify-start h-12"
-                  onClick={() => handleNavigate(isSuperAdminProp ? "analysis" : "dashboard")}
+                  onClick={() => handleNavigate(adminToUserMap[currentPage] || "dashboard")}
                 >
                   <Eye className="w-5 h-5" />
                   <span className="text-[16px] font-normal">User View</span>
@@ -540,7 +562,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
 
         <div className="p-4 border-t border-hh-border flex-shrink-0">
           <button
-            onClick={() => navigate?.(isSuperAdminProp ? "analysis" : "dashboard")}
+            onClick={() => navigate?.(adminToUserMap[currentPage] || "dashboard")}
             className="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-lg border border-hh-border text-hh-muted hover:bg-hh-ui-50 hover:text-hh-text transition-colors text-[14px]"
           >
             <Eye className="w-4 h-4" />
@@ -727,7 +749,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>Admin Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate?.("analysis")}>
+                <DropdownMenuItem onClick={() => navigate?.(adminToUserMap[currentPage] || "dashboard")}>
                   <Eye className="w-4 h-4 mr-2" />
                   Switch to User View
                 </DropdownMenuItem>

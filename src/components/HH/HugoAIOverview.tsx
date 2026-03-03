@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
+import { getAuthHeaders } from "../../services/hugoApi";
 import { AppLayout } from "./AppLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -172,7 +173,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
         });
         sessionStorage.setItem('analysisId', sessionId);
         sessionStorage.setItem('analysisFromHugo', 'true');
-        if (navigate) navigate('analysis-results');
+        if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
         return;
       }
 
@@ -200,7 +201,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
             });
             sessionStorage.setItem('analysisId', sessionId);
             sessionStorage.setItem('analysisFromHugo', 'true');
-            if (navigate) navigate('analysis-results');
+            if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
           } else if (statusData.status === 'failed') {
             clearInterval(pollInterval);
             setAnalyzingSessionIds(prev => {
@@ -253,7 +254,9 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('/api/user/sessions');
+        const response = await fetch('/api/user/sessions', {
+          headers: await getAuthHeaders(),
+        });
         if (!response.ok) throw new Error('Failed to fetch sessions');
         const data = await response.json();
         
@@ -295,12 +298,14 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
     }
 
     try {
-      const statusRes = await fetch(`/api/v2/analysis/status/${sessionId}`);
+      const statusRes = await fetch(`/api/v2/analysis/status/${sessionId}`, {
+        headers: await getAuthHeaders(),
+      });
       const statusData = await safeJsonParse(statusRes);
       if (statusData.status === 'completed') {
         sessionStorage.setItem('analysisId', sessionId);
         sessionStorage.setItem('analysisFromHugo', 'true');
-        if (navigate) navigate('analysis-results');
+        if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
         return;
       }
       if (statusData.status === 'failed') {
@@ -318,7 +323,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
               setAnalyzingSessionIds(prev => { const n = new Set(prev); n.delete(sessionId); return n; });
               sessionStorage.setItem('analysisId', sessionId);
               sessionStorage.setItem('analysisFromHugo', 'true');
-              if (navigate) navigate('analysis-results');
+              if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
             } else if (data.status === 'failed') {
               clearInterval(pollInterval);
               setAnalyzingSessionIds(prev => { const n = new Set(prev); n.delete(sessionId); return n; });

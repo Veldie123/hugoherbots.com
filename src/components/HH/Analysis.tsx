@@ -331,22 +331,8 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                 Upload gesprekken voor AI-analyse en feedback
               </p>
             </div>
-            {!isAdmin && (
-              <Button
-                className="gap-2 text-white shrink-0 hidden sm:flex"
-                style={{ backgroundColor: '#059669' }}
-                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#047857')}
-                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#059669')}
-                onClick={() => navigate?.("upload-analysis")}
-              >
-                <Upload className="w-4 h-4 text-white" />
-                Analyseer gesprek
-              </Button>
-            )}
-          </div>
-          {!isAdmin && (
             <Button
-              className="gap-2 text-white w-full sm:hidden"
+              className="gap-2 text-white shrink-0 hidden sm:flex"
               style={{ backgroundColor: '#059669' }}
               onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#047857')}
               onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#059669')}
@@ -355,7 +341,17 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
               <Upload className="w-4 h-4 text-white" />
               Analyseer gesprek
             </Button>
-          )}
+          </div>
+          <Button
+            className="gap-2 text-white w-full sm:hidden"
+            style={{ backgroundColor: '#059669' }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#047857')}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#059669')}
+            onClick={() => navigate?.("upload-analysis")}
+          >
+            <Upload className="w-4 h-4 text-white" />
+            Analyseer gesprek
+          </Button>
         </div>
 
         {/* KPI Cards */}

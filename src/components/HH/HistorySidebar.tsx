@@ -40,7 +40,7 @@ export function HistorySidebar({ type, items, onSelectItem, onOpenFullView }: Hi
 
   return (
     <>
-      <div className="hidden lg:flex flex-col items-center py-4 gap-2 w-14 border-r border-hh-border bg-white flex-shrink-0">
+      <div className="hidden lg:flex flex-col items-center py-4 gap-2 w-14 border-r border-hh-border bg-hh-bg flex-shrink-0">
         <button
           onClick={() => setIsExpanded(true)}
           className="w-10 h-10 rounded-lg bg-hh-ui-50 hover:bg-hh-primary/10 flex items-center justify-center transition-colors"
@@ -80,8 +80,8 @@ export function HistorySidebar({ type, items, onSelectItem, onOpenFullView }: Hi
             onClick={() => setIsExpanded(false)}
           />
           
-          <div className="fixed left-16 top-16 bottom-0 w-[380px] bg-white shadow-xl z-50 hidden lg:flex flex-col border-r border-hh-border animate-in slide-in-from-left-2 duration-200">
-            <div className="p-4 border-b border-hh-border bg-gradient-to-r from-hh-bg to-white flex items-center justify-between">
+          <div className="fixed left-16 top-16 bottom-0 w-[380px] bg-hh-bg shadow-xl z-50 hidden lg:flex flex-col border-r border-hh-border animate-in slide-in-from-left-2 duration-200">
+            <div className="p-4 border-b border-hh-border bg-gradient-to-r from-hh-bg to-hh-bg flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-hh-ink">
                   {type === "chat" ? "Gesprekshistoriek" : "Gespreksanalyse"}
@@ -99,7 +99,7 @@ export function HistorySidebar({ type, items, onSelectItem, onOpenFullView }: Hi
             </div>
             
             <div className="grid grid-cols-2 gap-3 p-4 border-b border-hh-border bg-hh-bg/30">
-              <Card className="p-3 bg-white border-hh-border/50">
+              <Card className="p-3 bg-card border-hh-border/50">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-8 h-8 rounded-lg bg-hh-primary/10 flex items-center justify-center">
                     <FileAudio className="w-4 h-4 text-hh-primary" />
@@ -109,7 +109,7 @@ export function HistorySidebar({ type, items, onSelectItem, onOpenFullView }: Hi
                 <p className="text-xl font-semibold text-hh-ink">{totalItems}</p>
               </Card>
               
-              <Card className="p-3 bg-white border-hh-border/50">
+              <Card className="p-3 bg-card border-hh-border/50">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
                     <BarChart3 className="w-4 h-4 text-green-600" />
@@ -119,7 +119,7 @@ export function HistorySidebar({ type, items, onSelectItem, onOpenFullView }: Hi
                 <p className="text-xl font-semibold text-hh-ink">{completedItems}</p>
               </Card>
               
-              <Card className="p-3 bg-white border-hh-border/50">
+              <Card className="p-3 bg-card border-hh-border/50">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
                     <Clock className="w-4 h-4 text-orange-500" />
@@ -129,7 +129,7 @@ export function HistorySidebar({ type, items, onSelectItem, onOpenFullView }: Hi
                 <p className="text-xl font-semibold text-orange-500">+{Math.min(totalItems, 3)}</p>
               </Card>
               
-              <Card className="p-3 bg-white border-hh-border/50">
+              <Card className="p-3 bg-card border-hh-border/50">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
                     <TrendingUp className="w-4 h-4 text-blue-600" />
@@ -179,7 +179,7 @@ export function HistorySidebar({ type, items, onSelectItem, onOpenFullView }: Hi
               ))}
             </div>
 
-            <div className="p-4 border-t border-hh-border bg-white">
+            <div className="p-4 border-t border-hh-border bg-hh-bg">
               <Button 
                 onClick={() => {
                   onOpenFullView();

@@ -267,7 +267,7 @@ export function ScenarioFlowTracker({
 
               {/* Phase Content - Expandable */}
               {isExpanded && (
-                <div className="bg-white">
+                <div className="bg-hh-bg">
                   {/* Phase explanation */}
                   {phase.uitleg && (
                     <div className="px-4 py-2 bg-hh-ui-50/30 border-y border-hh-border">
@@ -406,7 +406,7 @@ export function ScenarioFlowTracker({
                           <Badge
                             key={idx}
                             variant="outline"
-                            className="text-[11px] px-2 py-0.5 h-6 bg-white border-hh-border text-hh-text"
+                            className="text-[11px] px-2 py-0.5 h-6 bg-card border-hh-border text-hh-text"
                           >
                             {thema}
                           </Badge>

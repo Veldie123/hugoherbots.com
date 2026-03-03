@@ -325,7 +325,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
     return (
       <div className="h-full flex flex-col bg-hh-bg">
         {/* Training Header */}
-        <div className="p-3 sm:p-4 border-b border-hh-border bg-white">
+        <div className="p-3 sm:p-4 border-b border-hh-border bg-hh-bg">
           <div className="flex items-center justify-between mb-2 sm:mb-3">
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <Badge className="bg-teal-100 text-teal-600 border-0 text-[9px] sm:text-[10px] flex-shrink-0 rounded-full px-2">{activeTechnique.nummer}</Badge>
@@ -444,7 +444,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
               </div>
 
               {/* Chat Input - WhatsApp style */}
-              <div className="p-4 border-t border-hh-border bg-white">
+              <div className="p-4 border-t border-hh-border bg-hh-bg">
                 <div className="flex gap-2 items-end">
                   <Input
                     placeholder="Type je antwoord..."
@@ -1102,7 +1102,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
 
         {/* Right Panel - Training Interface (Fullscreen on mobile, 60% on desktop) */}
         {activeTrainingMode && (
-          <div className="w-full lg:w-[60%] border-l border-hh-border bg-white">
+          <div className="w-full lg:w-[60%] border-l border-hh-border bg-hh-bg">
             {renderTrainingInterface()}
           </div>
         )}
@@ -1452,7 +1452,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
                     openDetails(technique);
                     setFlowDrawerOpen(false);
                   }}
-                  className="w-full p-3 bg-white border border-hh-border rounded-lg hover:border-hh-primary/30 transition-all text-left"
+                  className="w-full p-3 bg-card border border-hh-border rounded-lg hover:border-hh-primary/30 transition-all text-left"
                 >
                   <div className="flex items-center gap-3">
                     {getStatusIcon(technique.status)}

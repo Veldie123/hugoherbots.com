@@ -1207,7 +1207,8 @@ export function LiveCoaching({
                     variant="ghost"
                     size="sm"
                     onClick={() => setViewMode("list")}
-                    className={`${viewMode === "list" ? "bg-hh-primary text-white hover:bg-hh-primary/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
+                    style={viewMode === "list" ? { backgroundColor: '#059669', color: 'white' } : {}}
+                    className={`${viewMode !== "list" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}`}
                   >
                     <List className="w-4 h-4" />
                   </Button>
@@ -1215,7 +1216,8 @@ export function LiveCoaching({
                     variant="ghost"
                     size="sm"
                     onClick={() => setViewMode("grid")}
-                    className={`${viewMode === "grid" ? "bg-hh-primary text-white hover:bg-hh-primary/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
+                    style={viewMode === "grid" ? { backgroundColor: '#059669', color: 'white' } : {}}
+                    className={`${viewMode !== "grid" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}`}
                   >
                     <LayoutGrid className="w-4 h-4" />
                   </Button>

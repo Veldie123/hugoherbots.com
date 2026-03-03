@@ -2649,6 +2649,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/admin/sessions/:id/approve-recording - Approve a processed recording for user-facing display
+  app.post("/api/admin/sessions/:id/approve-recording", async (req, res) => {
+    try {
+      const sessionId = req.params.id;
+      const { approved } = req.body;
+      const isApproved = approved !== false; // default to true
+
+      const SUPABASE_URL = process.env.SUPABASE_URL;
+      const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+        return res.status(500).json({ error: "Supabase not configured" });
+      }
+
+      const url = `${SUPABASE_URL}/rest/v1/live_sessions?id=eq.${sessionId}`;
+      const r = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_SERVICE_ROLE_KEY,
+          'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation',
+        },
+        body: JSON.stringify({ recording_approved: isApproved }),
+      });
+
+      if (!r.ok) {
+        const err = await r.text();
+        return res.status(r.status).json({ error: err });
+      }
+
+      const rows = await r.json();
+      res.json({ success: true, session: rows[0] });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // GET /api/live-sessions - get all live sessions
   app.get("/api/live-sessions", async (req, res) => {
     try {
@@ -2675,7 +2712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/live-sessions/recordings", async (req, res) => {
     try {
       // Query Supabase directly since admin frontend stores sessions there
-      const rows = await getSupabaseSessions('mux_playback_id=not.is.null&');
+      const rows = await getSupabaseSessions('mux_playback_id=not.is.null&recording_approved=eq.true&');
       // Map snake_case Supabase fields to camelCase for frontend
       const recordings = rows.map((s: any) => ({
         id: s.id,

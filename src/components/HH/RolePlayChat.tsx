@@ -355,7 +355,7 @@ export function RolePlayChat({ navigate, isAdmin }: RolePlayChatProps) {
                           <div
                             className={`max-w-[70%] rounded-[16px] p-4 ${
                               message.sender === "hugo"
-                                ? "bg-white shadow-hh-sm"
+                                ? "bg-card shadow-hh-sm"
                                 : "bg-hh-primary text-white"
                             }`}
                           >
@@ -378,7 +378,7 @@ export function RolePlayChat({ navigate, isAdmin }: RolePlayChatProps) {
                           <Avatar className="w-10 h-10 flex-shrink-0">
                             <AvatarFallback className="bg-hh-primary text-white">HH</AvatarFallback>
                           </Avatar>
-                          <div className="bg-white shadow-hh-sm rounded-[16px] p-4">
+                          <div className="bg-card shadow-hh-sm rounded-[16px] p-4">
                             <div className="flex gap-1">
                               <div className="w-2 h-2 bg-hh-muted rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                               <div className="w-2 h-2 bg-hh-muted rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -393,7 +393,7 @@ export function RolePlayChat({ navigate, isAdmin }: RolePlayChatProps) {
 
                     {/* Input Area */}
                     {state === "active" && (
-                      <div className="border-t border-hh-border bg-white p-4">
+                      <div className="border-t border-hh-border bg-hh-bg p-4">
                         <div className="flex gap-3 max-w-4xl mx-auto">
                           <Input
                             placeholder="Type je antwoord..."
@@ -439,7 +439,7 @@ export function RolePlayChat({ navigate, isAdmin }: RolePlayChatProps) {
 
                     {/* Completed controls */}
                     {state === "completed" && (
-                      <div className="border-t border-hh-border bg-white p-4">
+                      <div className="border-t border-hh-border bg-hh-bg p-4">
                         <div className="flex gap-3 justify-center">
                           <Button onClick={retrySession} variant="outline" className="gap-2">
                             <RotateCcw className="w-4 h-4" /> Opnieuw

@@ -104,7 +104,6 @@ export function CustomDailyCall({
   const hasAppliedInitialSettings = useRef(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [recordingLoading, setRecordingLoading] = useState(false);
   const [virtualBg, setVirtualBg] = useState<VirtualBgOption>('none');
   const [showBgPicker, setShowBgPicker] = useState(false);
   const [bgLoading, setBgLoading] = useState(false);
@@ -429,35 +428,8 @@ export function CustomDailyCall({
     return () => clearInterval(interval);
   }, [sessionId, fetchRecordingStatus]);
 
-  // Auto-start recording when host connects
-  const hasAutoStartedRecording = useRef(false);
-  useEffect(() => {
-    if (
-      connectionState === "connected" && 
-      isHost && 
-      !isRecording && 
-      !recordingLoading &&
-      !hasAutoStartedRecording.current &&
-      sessionId
-    ) {
-      hasAutoStartedRecording.current = true;
-      console.log("[Recording] Auto-starting recording for host");
-      
-      // Start recording with a small delay to ensure connection is stable
-      const timer = setTimeout(async () => {
-        try {
-          await liveCoachingApi.recording.start(sessionId);
-          await fetchRecordingStatus();
-          console.log("[Recording] Auto-started successfully");
-        } catch (err) {
-          console.error("[Recording] Auto-start failed:", err);
-          // Don't show error toast - recording can still be started manually
-        }
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [connectionState, isHost, isRecording, recordingLoading, sessionId, fetchRecordingStatus]);
+  // Recording is managed server-side: auto-starts when session starts,
+  // auto-stops when session ends. No frontend toggle needed.
 
   const handleToggleMute = useCallback(() => {
     if (callObjectRef.current) {
@@ -516,27 +488,6 @@ export function CustomDailyCall({
     }
   }, []);
 
-  const handleToggleRecording = useCallback(async () => {
-    if (!sessionId || recordingLoading) return;
-    
-    setRecordingLoading(true);
-    try {
-      if (isRecording) {
-        await liveCoachingApi.recording.stop(sessionId);
-        toast.success("Opname gestopt");
-      } else {
-        await liveCoachingApi.recording.start(sessionId);
-        toast.success("Opname gestart");
-      }
-      await fetchRecordingStatus();
-    } catch (err: any) {
-      console.error("[Recording] Error:", err);
-      toast.error(err.message || "Opname fout");
-      await fetchRecordingStatus();
-    } finally {
-      setRecordingLoading(false);
-    }
-  }, [sessionId, isRecording, recordingLoading, fetchRecordingStatus]);
 
   const participantList = Array.from(participants.values());
   const localParticipant = participantList.find(p => p.isLocal);
@@ -602,11 +553,12 @@ export function CustomDailyCall({
   }
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={cn(
         "flex flex-col bg-hh-bg rounded-lg overflow-hidden border border-hh-border",
-        isFullscreen ? "fixed inset-0 z-50 rounded-none" : "h-full"
+        isFullscreen ? "fixed inset-0 z-50 rounded-none" : "h-full",
+        isHost && "admin-session"
       )}
     >
       {isHost && waitingParticipants.length > 0 && (
@@ -670,9 +622,9 @@ export function CustomDailyCall({
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               <span className="text-white text-sm font-medium">LIVE</span>
               {isRecording && (
-                <div className="flex items-center gap-1 bg-red-600 text-white text-[11px] font-medium px-1.5 py-0.5 rounded">
+                <div className="flex items-center gap-1.5 bg-red-600 text-white text-[11px] font-semibold px-2 py-1 rounded animate-pulse">
                   <Circle className="w-2.5 h-2.5 fill-current" />
-                  REC
+                  REC — Opname actief
                 </div>
               )}
               <span className="text-white/70 text-sm truncate max-w-[200px]">{sessionTitle}</span>
@@ -770,10 +722,10 @@ export function CustomDailyCall({
 
         {/* Session actions */}
         <div className="flex items-center gap-2">
-          <div className="relative">
+          <div className="relative w-12 h-12 flex-shrink-0">
             <Button
               size="lg"
-              variant={isHandRaised ? "default" : "secondary"}
+              variant="secondary"
               onClick={handleToggleHandRaise}
               className={cn(
                 "w-12 h-12 rounded-full p-0",
@@ -781,10 +733,10 @@ export function CustomDailyCall({
               )}
               title={isHandRaised ? "Hand laten zakken" : "Hand opsteken"}
             >
-              <Hand className={cn("w-5 h-5", isHandRaised && "animate-bounce")} />
+              <Hand className="w-5 h-5" />
             </Button>
             {isHandRaised && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full animate-ping" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full animate-ping pointer-events-none" />
             )}
           </div>
 
@@ -811,7 +763,7 @@ export function CustomDailyCall({
 
               {showBgPicker && createPortal(
                 <div
-                  className="fixed bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[280px] z-[9999]"
+                  className="fixed bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[280px] max-h-[min(400px,70vh)] overflow-y-auto z-[9999]"
                   style={(() => {
                     const rect = bgPickerBtnRef.current?.getBoundingClientRect();
                     if (!rect) return {};
@@ -948,25 +900,7 @@ export function CustomDailyCall({
             </div>
           )}
 
-          {isHost && (
-            <Button
-              size="lg"
-              variant={isRecording ? "destructive" : "secondary"}
-              onClick={handleToggleRecording}
-              disabled={recordingLoading}
-              className={cn(
-                "w-12 h-12 rounded-full p-0",
-                isRecording && "bg-red-600 hover:bg-red-700 animate-pulse"
-              )}
-              title={isRecording ? "Stop opname" : "Start opname"}
-            >
-              {recordingLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Circle className={cn("w-5 h-5", isRecording && "fill-current")} />
-              )}
-            </Button>
-          )}
+          {/* Recording is automatic — no manual toggle button */}
         </div>
 
         <div className="w-px h-8 bg-hh-border mx-3" />
@@ -1026,7 +960,7 @@ function VideoTile({ participant, isLarge = false, hasHandRaised = false, isSpea
       className={cn(
         "relative bg-hh-ink rounded-lg overflow-hidden w-full transition-shadow duration-300",
         isLarge ? "h-full min-h-[300px]" : "h-full min-h-[150px]",
-        isSpeaking && "ring-2 ring-hh-primary shadow-[0_0_12px_rgba(var(--hh-primary-rgb,79,139,179),0.4)]"
+        isSpeaking && "ring-2 ring-hh-primary shadow-[0_0_12px_rgba(var(--hh-primary-rgb),0.4)]"
       )}
       style={{ aspectRatio: isLarge ? "16/9" : "4/3" }}
     >
