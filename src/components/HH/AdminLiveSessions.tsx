@@ -564,7 +564,7 @@ ${platformUrl}`;
           </Button>
           
           <div className="flex flex-col lg:flex-row gap-4">
-            <div className="w-full lg:w-[60%]">
+            <div className="w-full lg:w-[60%] h-[50vh] lg:h-[calc(100vh-12rem)]">
               <CustomDailyCall
                 roomUrl={activeCall.roomUrl}
                 token={activeCall.token}
@@ -576,7 +576,7 @@ ${platformUrl}`;
               />
             </div>
 
-            <div className="w-full lg:w-[40%] h-[60vh] lg:h-[600px]">
+            <div className="w-full lg:w-[40%] h-[50vh] lg:h-[calc(100vh-12rem)]">
               <Card className="rounded-[16px] shadow-md border overflow-hidden flex flex-col h-full">
                 <Tabs
                   value={activeTab}
@@ -587,14 +587,14 @@ ${platformUrl}`;
                     <TabsList className="w-full bg-hh-ui-100">
                       <TabsTrigger
                         value="chat"
-                        className="flex-1 data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                        className="flex-1 text-hh-text data-[state=active]:bg-hh-primary data-[state=active]:text-white"
                       >
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Chat
                       </TabsTrigger>
                       <TabsTrigger
                         value="polls"
-                        className="flex-1 data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                        className="flex-1 text-hh-text data-[state=active]:bg-hh-primary data-[state=active]:text-white"
                       >
                         <ThumbsUp className="w-4 h-4 mr-2" />
                         Polls ({polls.length})

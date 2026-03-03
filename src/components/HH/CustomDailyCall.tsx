@@ -169,7 +169,7 @@ export function CustomDailyCall({
         const bg = VIRTUAL_BACKGROUNDS[resolvedOption];
         if (bg) {
           await call.updateInputSettings({
-            video: { processor: { type: 'background-image', config: { source: bg.image } } },
+            video: { processor: { type: 'background-image', config: { source: `${window.location.origin}${bg.image}` } } },
           });
         }
       }
@@ -200,12 +200,14 @@ export function CustomDailyCall({
     }, '*');
 
     if (newState) {
+      toast.success('Hand opgestoken');
       setRaisedHands(prev => [...prev, {
         sessionId: localParticipant?.session_id || '',
         userName,
         timestamp: Date.now(),
       }]);
     } else {
+      toast.info('Hand neergelaten');
       setRaisedHands(prev => prev.filter(h => h.sessionId !== localParticipant?.session_id));
     }
   }, [isHandRaised]);
@@ -578,8 +580,8 @@ export function CustomDailyCall({
     return (
       <Card className="p-8 bg-hh-bg border border-hh-border shadow-lg">
         <div className="text-center max-w-md mx-auto">
-          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+          <div className="w-16 h-16 bg-hh-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Loader2 className="w-8 h-8 text-hh-primary animate-spin" />
           </div>
           <h3 className="text-xl font-semibold text-hh-text mb-2">
             Verbinden met sessie
@@ -588,7 +590,7 @@ export function CustomDailyCall({
             Even geduld, we stellen de verbinding in...
           </p>
           <div className="flex items-center justify-center gap-2 text-sm text-hh-muted">
-            <Radio className="w-4 h-4 animate-pulse text-purple-500" />
+            <Radio className="w-4 h-4 animate-pulse text-hh-primary" />
             <span>{sessionTitle}</span>
           </div>
           <Button variant="ghost" onClick={onLeave} className="mt-6 text-hh-muted">
@@ -604,57 +606,9 @@ export function CustomDailyCall({
       ref={containerRef}
       className={cn(
         "flex flex-col bg-hh-bg rounded-lg overflow-hidden border border-hh-border",
-        isFullscreen ? "fixed inset-0 z-50 rounded-none" : "h-[600px]"
+        isFullscreen ? "fixed inset-0 z-50 rounded-none" : "h-full"
       )}
     >
-      <div className="flex items-center justify-between px-4 py-3 bg-hh-bg border-b border-hh-border">
-        <div className="flex items-center gap-3">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={handleLeave}
-            className="text-hh-muted hover:text-hh-text"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Terug
-          </Button>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-            <span className="text-hh-text font-medium text-sm">LIVE</span>
-          </div>
-          {isRecording && (
-            <div className="flex items-center gap-1.5 bg-red-600 text-white text-xs font-medium px-2 py-1 rounded animate-pulse">
-              <Circle className="w-3 h-3 fill-current" />
-              REC
-            </div>
-          )}
-          <span className="text-hh-muted text-sm">{sessionTitle}</span>
-          {isHost && (
-            <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-0.5 rounded">
-              HOST
-            </span>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-sm text-hh-muted mr-2">
-            <Users className="w-4 h-4" />
-            <span>{participants.size}</span>
-          </div>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={toggleFullscreen}
-            className="text-hh-muted hover:text-hh-text"
-          >
-            <Maximize2 className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
       {isHost && waitingParticipants.length > 0 && (
         <div className="mx-4 mt-2 bg-hh-primary/10 border border-hh-primary/30 rounded-lg px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -708,7 +662,36 @@ export function CustomDailyCall({
         </div>
       )}
 
-      <div className="flex-1 p-4 overflow-hidden min-h-[400px]">
+      <div className="flex-1 relative overflow-hidden p-3">
+        {/* Session info overlay */}
+        <div className="absolute top-0 left-0 right-0 z-10 px-4 py-2.5 bg-gradient-to-b from-black/50 to-transparent pointer-events-none">
+          <div className="flex items-center justify-between pointer-events-auto">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              <span className="text-white text-sm font-medium">LIVE</span>
+              {isRecording && (
+                <div className="flex items-center gap-1 bg-red-600 text-white text-[11px] font-medium px-1.5 py-0.5 rounded">
+                  <Circle className="w-2.5 h-2.5 fill-current" />
+                  REC
+                </div>
+              )}
+              <span className="text-white/70 text-sm truncate max-w-[200px]">{sessionTitle}</span>
+              {isHost && (
+                <span className="bg-white/20 text-white text-[11px] font-medium px-1.5 py-0.5 rounded">HOST</span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 text-white/70 text-sm">
+                <Users className="w-3.5 h-3.5" />
+                <span>{participants.size}</span>
+              </div>
+              <button onClick={toggleFullscreen} className="p-1.5 rounded-lg hover:bg-white/20 text-white/70 hover:text-white transition-colors">
+                <Maximize2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className={cn(
           "grid gap-3 h-full",
           participantList.length === 0 && "grid-cols-1",
@@ -759,231 +742,245 @@ export function CustomDailyCall({
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-3 px-4 py-4 bg-hh-bg border-t border-hh-border">
-        <Button
-          size="lg"
-          variant={isMuted ? "destructive" : "secondary"}
-          onClick={handleToggleMute}
-          className="w-14 h-14 rounded-full p-0"
-          title={isMuted ? "Microfoon aan" : "Microfoon uit"}
-        >
-          {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-        </Button>
-
-        <Button
-          size="lg"
-          variant={isCameraOff ? "destructive" : "secondary"}
-          onClick={handleToggleCamera}
-          className="w-14 h-14 rounded-full p-0"
-          title={isCameraOff ? "Camera aan" : "Camera uit"}
-        >
-          {isCameraOff ? <VideoOff className="w-6 h-6" /> : <Video className="w-6 h-6" />}
-        </Button>
-
-        {isHost && (
-          <div className="relative">
-            <Button
-              ref={bgPickerBtnRef}
-              size="lg"
-              variant={virtualBg !== 'none' ? "default" : "secondary"}
-              onClick={() => setShowBgPicker(!showBgPicker)}
-              disabled={bgLoading}
-              className={cn(
-                "w-14 h-14 rounded-full p-0",
-                virtualBg !== 'none' && "bg-hh-primary hover:bg-hh-primary/90 text-white"
-              )}
-              title="Virtuele achtergrond"
-            >
-              {bgLoading ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : (
-                <ImageIcon className="w-6 h-6" />
-              )}
-            </Button>
-
-            {showBgPicker && createPortal(
-              <div
-                className="fixed bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[280px] z-[9999]"
-                style={(() => {
-                  const rect = bgPickerBtnRef.current?.getBoundingClientRect();
-                  if (!rect) return {};
-                  return { bottom: window.innerHeight - rect.top + 12, left: rect.left + rect.width / 2 - 140 };
-                })()}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[13px] font-semibold text-hh-text">Hugo's Kantoor</p>
-                  <button onClick={() => setShowBgPicker(false)} className="p-1 rounded hover:bg-hh-ui-50">
-                    <X className="w-3.5 h-3.5 text-hh-muted" />
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => { applyVirtualBackground('auto'); setShowBgPicker(false); }}
-                  className={cn(
-                    "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors mb-1",
-                    virtualBg === 'auto' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
-                  )}
-                >
-                  <Sun className="w-4 h-4" />
-                  Automatisch (tijdsgebonden)
-                  {virtualBg === 'auto' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
-                </button>
-
-                <div className="grid grid-cols-2 gap-1.5 mb-2">
-                  {Object.entries(VIRTUAL_BACKGROUNDS).map(([key, bg]) => {
-                    const Icon = bg.icon;
-                    const isActive = virtualBg === key;
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => { applyVirtualBackground(key as VirtualBgOption); setShowBgPicker(false); }}
-                        className={cn(
-                          "relative rounded-lg overflow-hidden border-2 transition-all aspect-video",
-                          isActive ? "border-hh-primary ring-2 ring-hh-primary/30" : "border-transparent hover:border-hh-primary/50"
-                        )}
-                      >
-                        <img src={bg.image} alt={bg.label} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-1.5 flex items-center gap-1">
-                          <Icon className="w-3 h-3 text-white" />
-                          <span className="text-[10px] text-white font-medium">{bg.label}</span>
-                        </div>
-                        {isActive && (
-                          <div className="absolute top-1 right-1 w-5 h-5 bg-hh-primary rounded-full flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="border-t border-hh-border pt-2 space-y-0.5">
-                  <button
-                    onClick={() => { applyVirtualBackground('blur'); setShowBgPicker(false); }}
-                    className={cn(
-                      "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
-                      virtualBg === 'blur' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
-                    )}
-                  >
-                    <div className="w-4 h-4 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 blur-[1px]" />
-                    Achtergrond vervagen
-                    {virtualBg === 'blur' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
-                  </button>
-                  <button
-                    onClick={() => { applyVirtualBackground('none'); setShowBgPicker(false); }}
-                    className={cn(
-                      "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
-                      virtualBg === 'none' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
-                    )}
-                  >
-                    <VideoOff className="w-4 h-4" />
-                    Geen achtergrond
-                    {virtualBg === 'none' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
-                  </button>
-                </div>
-              </div>,
-              document.body
-            )}
-          </div>
-        )}
-
-        <div className="relative">
+      <div className="flex items-center justify-center px-4 py-3 bg-hh-bg border-t border-hh-border">
+        {/* Media controls */}
+        <div className="flex items-center gap-2">
           <Button
             size="lg"
-            variant={isHandRaised ? "default" : "secondary"}
-            onClick={handleToggleHandRaise}
-            className={cn(
-              "w-14 h-14 rounded-full p-0",
-              isHandRaised && "bg-amber-500 hover:bg-amber-600 text-white"
-            )}
-            title={isHandRaised ? "Hand laten zakken" : "Hand opsteken"}
+            variant={isMuted ? "destructive" : "secondary"}
+            onClick={handleToggleMute}
+            className="w-12 h-12 rounded-full p-0"
+            title={isMuted ? "Microfoon aan" : "Microfoon uit"}
           >
-            <Hand className={cn("w-6 h-6", isHandRaised && "animate-bounce")} />
+            {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
           </Button>
-          {isHandRaised && (
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full animate-ping" />
+
+          <Button
+            size="lg"
+            variant={isCameraOff ? "destructive" : "secondary"}
+            onClick={handleToggleCamera}
+            className="w-12 h-12 rounded-full p-0"
+            title={isCameraOff ? "Camera aan" : "Camera uit"}
+          >
+            {isCameraOff ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
+          </Button>
+        </div>
+
+        <div className="w-px h-8 bg-hh-border mx-3" />
+
+        {/* Session actions */}
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Button
+              size="lg"
+              variant={isHandRaised ? "default" : "secondary"}
+              onClick={handleToggleHandRaise}
+              className={cn(
+                "w-12 h-12 rounded-full p-0",
+                isHandRaised && "bg-amber-500 hover:bg-amber-600 text-white"
+              )}
+              title={isHandRaised ? "Hand laten zakken" : "Hand opsteken"}
+            >
+              <Hand className={cn("w-5 h-5", isHandRaised && "animate-bounce")} />
+            </Button>
+            {isHandRaised && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full animate-ping" />
+            )}
+          </div>
+
+          {isHost && (
+            <div className="relative">
+              <Button
+                ref={bgPickerBtnRef}
+                size="lg"
+                variant={virtualBg !== 'none' ? "default" : "secondary"}
+                onClick={() => setShowBgPicker(!showBgPicker)}
+                disabled={bgLoading}
+                className={cn(
+                  "w-12 h-12 rounded-full p-0",
+                  virtualBg !== 'none' && "bg-hh-primary hover:bg-hh-primary/90 text-white"
+                )}
+                title="Virtuele achtergrond"
+              >
+                {bgLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <ImageIcon className="w-5 h-5" />
+                )}
+              </Button>
+
+              {showBgPicker && createPortal(
+                <div
+                  className="fixed bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[280px] z-[9999]"
+                  style={(() => {
+                    const rect = bgPickerBtnRef.current?.getBoundingClientRect();
+                    if (!rect) return {};
+                    const left = Math.max(8, Math.min(rect.left + rect.width / 2 - 140, window.innerWidth - 288));
+                    if (rect.top > 320) {
+                      return { bottom: window.innerHeight - rect.top + 8, left };
+                    }
+                    return { top: rect.bottom + 8, left };
+                  })()}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[13px] font-semibold text-hh-text">Hugo's Kantoor</p>
+                    <button onClick={() => setShowBgPicker(false)} className="p-1 rounded hover:bg-hh-ui-50">
+                      <X className="w-3.5 h-3.5 text-hh-muted" />
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => { applyVirtualBackground('auto'); setShowBgPicker(false); }}
+                    className={cn(
+                      "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors mb-1",
+                      virtualBg === 'auto' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
+                    )}
+                  >
+                    <Sun className="w-4 h-4" />
+                    Automatisch (tijdsgebonden)
+                    {virtualBg === 'auto' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
+                  </button>
+
+                  <div className="grid grid-cols-2 gap-1.5 mb-2">
+                    {Object.entries(VIRTUAL_BACKGROUNDS).map(([key, bg]) => {
+                      const Icon = bg.icon;
+                      const isActive = virtualBg === key;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => { applyVirtualBackground(key as VirtualBgOption); setShowBgPicker(false); }}
+                          className={cn(
+                            "relative rounded-lg overflow-hidden border-2 transition-all aspect-video",
+                            isActive ? "border-hh-primary ring-2 ring-hh-primary/30" : "border-transparent hover:border-hh-primary/50"
+                          )}
+                        >
+                          <img src={bg.image} alt={bg.label} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-1.5 flex items-center gap-1">
+                            <Icon className="w-3 h-3 text-white" />
+                            <span className="text-[10px] text-white font-medium">{bg.label}</span>
+                          </div>
+                          {isActive && (
+                            <div className="absolute top-1 right-1 w-5 h-5 bg-hh-primary rounded-full flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="border-t border-hh-border pt-2 space-y-0.5">
+                    <button
+                      onClick={() => { applyVirtualBackground('blur'); setShowBgPicker(false); }}
+                      className={cn(
+                        "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
+                        virtualBg === 'blur' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
+                      )}
+                    >
+                      <div className="w-4 h-4 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 blur-[1px]" />
+                      Achtergrond vervagen
+                      {virtualBg === 'blur' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
+                    </button>
+                    <button
+                      onClick={() => { applyVirtualBackground('none'); setShowBgPicker(false); }}
+                      className={cn(
+                        "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-colors",
+                        virtualBg === 'none' ? "bg-hh-primary/10 text-hh-primary" : "hover:bg-hh-ui-50 text-hh-text"
+                      )}
+                    >
+                      <VideoOff className="w-4 h-4" />
+                      Geen achtergrond
+                      {virtualBg === 'none' && <Check className="w-3.5 h-3.5 ml-auto text-hh-primary" />}
+                    </button>
+                  </div>
+                </div>,
+                document.body
+              )}
+            </div>
+          )}
+
+          {isHost && raisedHands.length > 0 && (
+            <div className="relative">
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={() => setShowHandsList(!showHandsList)}
+                className="w-12 h-12 rounded-full p-0 relative"
+                title="Opgestoken handen"
+              >
+                <Hand className="w-5 h-5 text-amber-600" />
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {raisedHands.length}
+                </span>
+              </Button>
+
+              {showHandsList && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[220px] z-50">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[13px] font-semibold text-hh-text flex items-center gap-1.5">
+                      <Hand className="w-4 h-4 text-amber-500" />
+                      Opgestoken handen
+                    </p>
+                    <button onClick={() => setShowHandsList(false)} className="p-1 rounded hover:bg-hh-ui-50">
+                      <X className="w-3.5 h-3.5 text-hh-muted" />
+                    </button>
+                  </div>
+                  <div className="space-y-1 max-h-[200px] overflow-y-auto">
+                    {raisedHands.sort((a, b) => a.timestamp - b.timestamp).map((hand, idx) => (
+                      <div key={hand.sessionId} className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-hh-ui-50">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-medium text-amber-600 w-4">{idx + 1}.</span>
+                          <span className="text-[12px] text-hh-text font-medium truncate max-w-[120px]">{hand.userName}</span>
+                        </div>
+                        <button
+                          onClick={() => handleDismissHand(hand.sessionId)}
+                          className="text-hh-muted hover:text-hh-text p-0.5"
+                          title="Verwijder"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {isHost && (
+            <Button
+              size="lg"
+              variant={isRecording ? "destructive" : "secondary"}
+              onClick={handleToggleRecording}
+              disabled={recordingLoading}
+              className={cn(
+                "w-12 h-12 rounded-full p-0",
+                isRecording && "bg-red-600 hover:bg-red-700 animate-pulse"
+              )}
+              title={isRecording ? "Stop opname" : "Start opname"}
+            >
+              {recordingLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Circle className={cn("w-5 h-5", isRecording && "fill-current")} />
+              )}
+            </Button>
           )}
         </div>
 
-        {isHost && raisedHands.length > 0 && (
-          <div className="relative">
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() => setShowHandsList(!showHandsList)}
-              className="w-14 h-14 rounded-full p-0 relative"
-              title="Opgestoken handen"
-            >
-              <Hand className="w-6 h-6 text-amber-600" />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                {raisedHands.length}
-              </span>
-            </Button>
+        <div className="w-px h-8 bg-hh-border mx-3" />
 
-            {showHandsList && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-hh-bg rounded-xl shadow-2xl border border-hh-border p-3 w-[220px] z-50">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[13px] font-semibold text-hh-text flex items-center gap-1.5">
-                    <Hand className="w-4 h-4 text-amber-500" />
-                    Opgestoken handen
-                  </p>
-                  <button onClick={() => setShowHandsList(false)} className="p-1 rounded hover:bg-hh-ui-50">
-                    <X className="w-3.5 h-3.5 text-hh-muted" />
-                  </button>
-                </div>
-                <div className="space-y-1 max-h-[200px] overflow-y-auto">
-                  {raisedHands.sort((a, b) => a.timestamp - b.timestamp).map((hand, idx) => (
-                    <div key={hand.sessionId} className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-hh-ui-50">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-medium text-amber-600 w-4">{idx + 1}.</span>
-                        <span className="text-[12px] text-hh-text font-medium truncate max-w-[120px]">{hand.userName}</span>
-                      </div>
-                      <button
-                        onClick={() => handleDismissHand(hand.sessionId)}
-                        className="text-hh-muted hover:text-hh-text p-0.5"
-                        title="Verwijder"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {isHost && (
-          <Button
-            size="lg"
-            variant={isRecording ? "destructive" : "secondary"}
-            onClick={handleToggleRecording}
-            disabled={recordingLoading}
-            className={cn(
-              "w-14 h-14 rounded-full p-0",
-              isRecording && "bg-red-600 hover:bg-red-700 animate-pulse"
-            )}
-            title={isRecording ? "Stop opname" : "Start opname"}
-          >
-            {recordingLoading ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
-            ) : (
-              <Circle className={cn("w-6 h-6", isRecording && "fill-current")} />
-            )}
-          </Button>
-        )}
-
+        {/* Leave */}
         <Button
           size="lg"
           variant="destructive"
           onClick={isHost && onEndSession ? handleEndSession : handleLeave}
-          className="w-14 h-14 rounded-full p-0 bg-red-600 hover:bg-red-700"
+          className="w-12 h-12 rounded-full p-0 bg-red-600 hover:bg-red-700"
           title={isHost ? "Sessie beëindigen" : "Verlaten"}
         >
-          <PhoneOff className="w-6 h-6" />
+          <PhoneOff className="w-5 h-5" />
         </Button>
-
       </div>
     </div>
   );
@@ -1070,7 +1067,7 @@ function VideoTile({ participant, isLarge = false, hasHandRaised = false, isSpea
               {participant.isLocal && " (Jij)"}
             </span>
             {participant.isOwner && (
-              <span className="bg-purple-500 text-white text-xs px-1.5 py-0.5 rounded">
+              <span className="bg-hh-primary text-white text-xs px-1.5 py-0.5 rounded">
                 Host
               </span>
             )}
