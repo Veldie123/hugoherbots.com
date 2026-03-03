@@ -226,7 +226,7 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
         style={{ objectPosition: '50% 35%' }}
       />
       {/* Gradient overlay - dark to light from left */}
-      <div className="absolute inset-0 bg-gradient-to-r from-hh-ink via-hh-ink/80 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
       
       {/* Content */}
       <div className="relative h-full flex items-center p-6 sm:p-8">
@@ -272,13 +272,13 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
               </Button>
             )}
             {hasPastSessions && (
-              <button 
-                className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border border-white/30 transition-colors cursor-pointer"
-                style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+              <button
+                className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border border-white/60 backdrop-blur-sm transition-colors cursor-pointer"
+                style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
                 onFocus={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+                onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
                 onClick={onScrollToRecordings}
               >
                 <Play className="w-4 h-4" />
@@ -750,6 +750,7 @@ export function LiveCoaching({
       initialCameraEnabled: devices.isCameraEnabled,
       initialMicEnabled: devices.isMicEnabled,
     });
+    setChatPanelOpen(true);
     setPreJoinSession(null);
   };
 
@@ -855,9 +856,9 @@ export function LiveCoaching({
         */}
         
         {liveSession && (
-          <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-4 max-h-[calc(100vh-10rem)]">
             {/* Main Video Area - Shrinks when chat is open */}
-            <div className={`relative rounded-[16px] overflow-hidden shadow-hh-md transition-all duration-300 ${chatPanelOpen ? 'flex-1' : 'w-full'}`} style={{ minHeight: '70vh' }}>
+            <div className={`relative rounded-[16px] overflow-hidden shadow-hh-md transition-all duration-300 ${chatPanelOpen ? 'flex-1' : 'w-full'}`} style={{ minHeight: '50vh', maxHeight: 'calc(100vh - 12rem)' }}>
               {preJoinSession ? (
                 <PreJoinCheck
                   sessionTitle={preJoinSession.session.title}
@@ -878,7 +879,7 @@ export function LiveCoaching({
                   initialMicEnabled={activeCall.initialMicEnabled}
                 />
               ) : (
-                <div className="w-full h-full bg-hh-ink flex items-center justify-center relative overflow-hidden" style={{ minHeight: '70vh' }}>
+                <div className="w-full h-full bg-hh-ink flex items-center justify-center relative overflow-hidden" style={{ minHeight: '50vh' }}>
                   <img
                     src={hugoLivePhoto}
                     alt="Hugo Herbots Webinar"
@@ -904,7 +905,14 @@ export function LiveCoaching({
                           <span className="text-white text-[14px]">{liveSession.viewerCount}</span>
                         </div>
                       )}
-                      {/* Chat toggle verwijderd - chat alleen in sidebar */}
+                      <button
+                        onClick={() => setChatPanelOpen(!chatPanelOpen)}
+                        className="bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 hover:bg-black/70 transition-colors"
+                        title={chatPanelOpen ? "Chat sluiten" : "Chat openen"}
+                      >
+                        <MessageCircle className="w-4 h-4 text-white" />
+                        <span className="text-white text-[14px]">{chatPanelOpen ? 'Chat' : 'Chat'}</span>
+                      </button>
                     </div>
                   </div>
                   
@@ -945,7 +953,7 @@ export function LiveCoaching({
             {chatPanelOpen && (
             <div 
               className="w-full lg:w-[350px] bg-hh-bg rounded-[16px] shadow-hh-md border border-hh-border flex-shrink-0"
-              style={{ minHeight: '70vh' }}
+              style={{ height: 'calc(100vh - 16rem)' }}
             >
               <div className="flex flex-col h-full">
                 {/* Chat Header */}
@@ -1081,7 +1089,16 @@ export function LiveCoaching({
             </div>
             )}
             
-            {/* Chat Toggle FAB verwijderd - chat is nu alleen in sidebar */}
+            {/* Floating chat toggle when chat is closed and in a call */}
+            {activeCall && !chatPanelOpen && (
+              <button
+                onClick={() => setChatPanelOpen(true)}
+                className="fixed bottom-6 right-6 z-30 w-14 h-14 bg-hh-primary hover:bg-hh-primary/90 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105"
+                title="Chat openen"
+              >
+                <MessageCircle className="w-6 h-6" />
+              </button>
+            )}
           </div>
         )}
         
@@ -1606,9 +1623,14 @@ export function LiveCoaching({
                   <Video className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-[24px] leading-[32px] text-hh-text font-semibold">
-                    Opgenomen Webinars
-                  </h2>
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-[24px] leading-[32px] text-hh-text font-semibold">
+                      Opgenomen Webinars
+                    </h2>
+                    <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-hh-primary/10 text-hh-primary border border-hh-primary/20">
+                      Coming Soon
+                    </span>
+                  </div>
                   <p className="text-[13px] leading-[18px] text-hh-muted">
                     {recordings.length} {recordings.length === 1 ? 'opname' : 'opnames'} beschikbaar
                   </p>
@@ -1644,7 +1666,7 @@ export function LiveCoaching({
                       
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
                         <div 
-                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100 bg-hh-ink"
+                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100 bg-black/80"
                         >
                           <Play className="w-5 h-5 text-white ml-0.5" />
                         </div>
@@ -1719,7 +1741,7 @@ export function LiveCoaching({
                       
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
                         <div 
-                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100 bg-hh-ink"
+                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100 bg-black/80"
                         >
                           <Play className="w-5 h-5 text-white ml-0.5" />
                         </div>
