@@ -81,7 +81,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(3);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [recentChatSessions, setRecentChatSessions] = useState<HistoryItem[]>([]);
   const [recentAnalyses, setRecentAnalyses] = useState<HistoryItem[]>([]);
   const [analysisTotalCount, setAnalysisTotalCount] = useState(0);
@@ -245,7 +245,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
     setUnreadCount(0);
   };
 
-  const notifications = [
+  const allNotifications = [
     {
       id: "rag-review",
       title: "RAG techniek review vraagt jouw aandacht",
@@ -254,6 +254,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
       type: "rag",
       severity: "medium",
       read: false,
+      superAdminOnly: true,
     },
     {
       id: "config-1",
@@ -263,6 +264,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
       type: "config",
       severity: "high",
       read: false,
+      superAdminOnly: true,
     },
     {
       id: "config-2",
@@ -272,6 +274,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
       type: "config",
       severity: "medium",
       read: false,
+      superAdminOnly: true,
     },
     {
       id: "config-3",
@@ -281,6 +284,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
       type: "config",
       severity: "high",
       read: false,
+      superAdminOnly: true,
     },
     {
       id: "1",
@@ -314,7 +318,13 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
       type: "video",
       read: true,
     },
-  ];
+  ].filter((n): n is typeof n & { superAdminOnly?: boolean } => isSuperAdminProp || !n.superAdminOnly);
+  const notifications = allNotifications;
+
+  // Set initial unread count based on filtered notifications
+  useEffect(() => {
+    setUnreadCount(allNotifications.filter(n => !n.read).length);
+  }, [isSuperAdminProp]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="flex h-screen bg-hh-bg">

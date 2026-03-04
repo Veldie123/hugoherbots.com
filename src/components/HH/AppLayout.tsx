@@ -155,7 +155,7 @@ export function AppLayout({
   const { notifications, unreadCount, markAsRead, markAllRead, removeNotification, setIsAdmin } = useNotifications();
 
   useEffect(() => {
-    const isAdminPage = isAdmin || currentPage.startsWith('admin-');
+    const isAdminPage = currentPage.startsWith('admin-');
     setIsAdmin(isAdminPage);
   }, [isAdmin, currentPage, setIsAdmin]);
 
@@ -341,12 +341,10 @@ export function AppLayout({
                               return;
                             }
                             if (item.historyType === 'chat') {
-                              sessionStorage.setItem('analysisId', histItem.id);
-                              sessionStorage.setItem('analysisFromHugo', 'true');
+                              navigate?.('talk-to-hugo', { loadSessionId: histItem.id });
                             } else {
-                              sessionStorage.removeItem('analysisFromHugo');
+                              navigate?.('talk-to-hugo', { loadAnalysisId: histItem.id });
                             }
-                            navigate?.('analysis-results', { conversationId: histItem.id });
                           }
                         }}
                         className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-md text-left hover:bg-hh-ui-50 transition-colors group cursor-pointer"
@@ -467,15 +465,14 @@ export function AppLayout({
                             } else {
                               if (/^\d+$/.test(histItem.id)) {
                                 navigate?.(item.overviewPage || 'hugo-overview');
+                                setMobileMenuOpen(false);
                                 return;
                               }
                               if (item.historyType === 'chat') {
-                                sessionStorage.setItem('analysisId', histItem.id);
-                                sessionStorage.setItem('analysisFromHugo', 'true');
+                                navigate?.('talk-to-hugo', { loadSessionId: histItem.id });
                               } else {
-                                sessionStorage.removeItem('analysisFromHugo');
+                                navigate?.('talk-to-hugo', { loadAnalysisId: histItem.id });
                               }
-                              navigate?.('analysis-results', { conversationId: histItem.id });
                             }
                             setMobileMenuOpen(false);
                           }}
