@@ -64,6 +64,7 @@ except ImportError:
     print("WARNING: google-cloud-tasks not installed, batch processing disabled")
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # SEC-011: 10MB max (JSON payloads only, videos come via Google Drive download)
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY')

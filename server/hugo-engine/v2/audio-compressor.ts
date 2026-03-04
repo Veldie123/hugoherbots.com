@@ -1,10 +1,10 @@
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 const COMPRESSION_THRESHOLD = 24 * 1024 * 1024; // 24MB
 
@@ -77,10 +77,12 @@ async function compressAudioFile(
 
   console.log(`[Compressor] Compressing ${originalName} (${sizeMB.toFixed(1)}MB) to ${bitrate} MP3...`);
 
-  await execAsync(
-    `ffmpeg -i "${inputPath}" -vn -ac 1 -ar 16000 -b:a ${bitrate} -y "${outputPath}"`,
-    { timeout: 300000 }
-  );
+  await execFileAsync('ffmpeg', [
+    '-i', inputPath,
+    '-vn', '-ac', '1', '-ar', '16000',
+    '-b:a', bitrate,
+    '-y', outputPath
+  ], { timeout: 300000 });
 
   const compressedBuffer = await fs.promises.readFile(outputPath);
   const compressedMB = compressedBuffer.length / (1024 * 1024);

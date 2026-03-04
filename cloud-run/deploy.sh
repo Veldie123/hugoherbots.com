@@ -215,7 +215,7 @@ gcloud run deploy video-worker \
     --image gcr.io/$PROJECT_ID/video-worker \
     --region europe-west1 \
     --platform managed \
-    --allow-unauthenticated \
+    --no-allow-unauthenticated \
     --memory 2Gi \
     --timeout 900 \
     --set-env-vars "WORKER_SECRET=$WORKER_SECRET"

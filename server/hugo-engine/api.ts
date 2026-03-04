@@ -1603,6 +1603,51 @@ app.get("/api/user/sessions", async (req, res) => {
   }
 });
 
+// GET /api/user/sessions/:id - Get single session with conversation history (user view)
+app.get("/api/user/sessions/:id", async (req, res) => {
+  try {
+    const userId = req.userId!;
+    const sessionId = req.params.id;
+
+    const { data: row, error } = await supabase
+      .from('v2_sessions')
+      .select('id, technique_id, current_mode, phase, turn_number, conversation_history, context, total_score, created_at, updated_at')
+      .eq('id', sessionId)
+      .eq('user_id', userId)
+      .single();
+
+    if (error || !row) {
+      return res.status(404).json({ error: "Sessie niet gevonden" });
+    }
+
+    const conversationHistory = row.conversation_history || [];
+    const technique = getTechnique(row.technique_id);
+
+    const messages = conversationHistory.map((msg: any, idx: number) => ({
+      id: `msg-${idx}`,
+      role: msg.role,
+      content: typeof msg.content === 'string' ? msg.content : (msg.content?.[0]?.text || ''),
+      timestamp: row.created_at,
+    }));
+
+    res.json({
+      id: row.id,
+      techniqueId: row.technique_id,
+      techniqueName: technique?.naam || row.technique_id,
+      mode: row.current_mode,
+      phase: row.phase,
+      turnNumber: row.turn_number,
+      score: row.total_score,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      messages,
+    });
+  } catch (error: any) {
+    console.error("[API] Error fetching session:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // POST /api/admin/sessions/process-recording - Trigger webinar recording processing pipeline
 // Used by AdminLiveSessions.tsx "Verwerk opname" button
 app.post("/api/admin/sessions/process-recording", async (req, res) => {

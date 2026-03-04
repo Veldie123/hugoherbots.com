@@ -23,7 +23,7 @@ steps:
       - '2'
       - '--timeout'
       - '3600'
-      - '--allow-unauthenticated'
+      - '--no-allow-unauthenticated'
 
 options:
   logging: CLOUD_LOGGING_ONLY

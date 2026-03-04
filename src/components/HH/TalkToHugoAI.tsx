@@ -20,7 +20,7 @@
  * Frontend koppeling: Dit IS de frontend component
  */
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, Fragment } from "react";
 import { useUser } from "../../contexts/UserContext";
 import { renderSimpleMarkdown } from "../../utils/renderMarkdown";
 import { AppLayout } from "./AppLayout";
@@ -70,10 +70,10 @@ import { InlineVideoPlayer } from "./InlineVideoPlayer";
 import { InlineWebinarCard } from "./InlineWebinarCard";
 import { InlineAnalysisCard } from "./InlineAnalysisCard";
 import type { EpicSlideContent, VideoEmbed, WebinarLink, AnalysisResultEmbed, RichContent } from "@/types/crossPlatform";
-import { hugoApi, getAuthHeaders, type AssistanceConfig } from "../../services/hugoApi";
+import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
+import { CoachViewSummary } from "./CoachViewSummary";
 import { lastActivityService } from "../../services/lastActivityService";
 import { supabase } from "../../utils/supabase/client";
-import { toast } from "sonner";
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession();
@@ -183,17 +183,10 @@ export function TalkToHugoAI({
     }
   }, []);
 
-  // Activate V3 mode for superadmin + health check
-  const [v3Warning, setV3Warning] = useState<string | null>(null);
+  // Activate V3 mode for superadmin
   useEffect(() => {
     if (isSuperAdmin) {
       hugoApi.setV3Mode(true);
-      fetch("/api/v3/status")
-        .then(r => r.json())
-        .then(data => {
-          if (!data.available) setV3Warning(data.message || "V3 niet beschikbaar");
-        })
-        .catch(() => setV3Warning("V3 status check mislukt"));
     }
     return () => { hugoApi.setV3Mode(false); };
   }, [isSuperAdmin]);
@@ -254,12 +247,128 @@ export function TalkToHugoAI({
         const levelData = await hugoApi.getUserLevel();
         setDifficultyLevel(levelData.levelName);
         setAssistanceConfig(levelData.assistance);
+        console.log("[Performance] Loaded user level:", levelData.level, levelData.levelName);
       } catch (error) {
         console.error("[Performance] Failed to load user level:", error);
       }
     };
     loadUserLevel();
   }, []);
+
+  // Load historical session or analysis when navigated from sidebar/table
+  useEffect(() => {
+    if (navigationData?.loadSessionId) {
+      const loadSession = async () => {
+        try {
+          setIsLoading(true);
+          const headers = await getAuthHeaders();
+          const res = await fetch(`/api/user/sessions/${navigationData.loadSessionId}`, { headers });
+          if (!res.ok) throw new Error('Sessie niet gevonden');
+          const session = await res.json();
+
+          const historyMessages: Message[] = session.messages.map((msg: any, idx: number) => ({
+            id: `hist-${idx}`,
+            sender: msg.role === 'assistant' ? 'ai' as const : 'hugo' as const,
+            text: msg.content,
+            timestamp: new Date(session.createdAt),
+          }));
+
+          setMessages(historyMessages);
+          hugoApi.setCurrentSessionId(session.id);
+          setHasActiveSession(true);
+
+          // Check if this session has been analyzed
+          try {
+            const analysisRes = await fetch(`/api/v2/analysis/results/${session.id}`, { headers });
+            if (analysisRes.status === 200) {
+              const analysisData = await analysisRes.json();
+              setAnalysisResult(analysisData);
+            }
+          } catch {
+            // No analysis available — that's fine
+          }
+
+          // Add a divider message to indicate continuation
+          setMessages(prev => [...prev, {
+            id: `continue-divider-${Date.now()}`,
+            sender: 'ai' as const,
+            text: `Gesprek hervat — ${session.techniqueName || 'Chat'}. Typ een bericht om verder te gaan.`,
+            timestamp: new Date(),
+          }]);
+        } catch (err) {
+          setMessages([{
+            id: `error-${Date.now()}`,
+            sender: 'ai' as const,
+            text: 'Kon het gesprek niet laden. Start een nieuw gesprek.',
+            timestamp: new Date(),
+          }]);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadSession();
+      return;
+    }
+
+    if (navigationData?.loadAnalysisId) {
+      const loadAnalysis = async () => {
+        try {
+          setIsLoading(true);
+          const headers = await getAuthHeaders();
+          const res = await fetch(`/api/v2/analysis/results/${navigationData.loadAnalysisId}`, { headers });
+          if (res.status === 202) {
+            setMessages([{
+              id: `analysis-loading-${Date.now()}`,
+              sender: 'ai' as const,
+              text: 'Deze analyse wordt nog verwerkt. Even geduld...',
+              timestamp: new Date(),
+            }]);
+            return;
+          }
+          if (!res.ok) throw new Error('Analyse niet gevonden');
+          const analysisData = await res.json();
+
+          // Build messages from analysis transcript
+          const transcript = analysisData.transcript || [];
+          const historyMessages: Message[] = transcript.map((turn: any, idx: number) => ({
+            id: `analysis-turn-${idx}`,
+            sender: turn.speaker === 'customer' ? 'ai' as const : 'hugo' as const,
+            text: turn.text,
+            timestamp: new Date(analysisData.conversation?.createdAt || Date.now()),
+            isTranscriptReplay: true,
+            transcriptRole: turn.speaker === 'customer' ? 'Klant' : 'Jij',
+          }));
+
+          setMessages(historyMessages);
+          setAnalysisResult(analysisData);
+
+          // Add a message from Hugo about the analysis
+          const score = analysisData.insights?.overallScore;
+          setMessages(prev => [...prev, {
+            id: `analysis-summary-${Date.now()}`,
+            sender: 'ai' as const,
+            text: `Dit is je geanalyseerde gesprek${analysisData.conversation?.title ? ` "${analysisData.conversation.title}"` : ''}${score ? ` — score: **${score}/100**` : ''}. Stel gerust vragen over de analyse, of klik op een coaching moment hierboven om te oefenen.`,
+            timestamp: new Date(),
+          }]);
+          setHasActiveSession(true);
+        } catch (err) {
+          setMessages([{
+            id: `error-${Date.now()}`,
+            sender: 'ai' as const,
+            text: 'Kon de analyse niet laden. Probeer het opnieuw.',
+            timestamp: new Date(),
+          }]);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadAnalysis();
+      return;
+    }
+  }, [navigationData?.loadSessionId, navigationData?.loadAnalysisId]);
+
+  // State for loaded analysis data (Coach View)
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   // Hugo starts conversation proactively based on cross-platform activity
   useEffect(() => {
@@ -336,6 +445,7 @@ export function TalkToHugoAI({
               setIsLoading(false);
             }
           })();
+          console.log("[Hugo] Practice context loaded from analysis:", ctx.practiceLabel, "turns:", turns.length);
           return;
         }
       } catch (e) {
@@ -377,6 +487,7 @@ export function TalkToHugoAI({
         text: welcomeText,
         timestamp: new Date(),
       }]);
+      console.log("[Hugo] Analysis discussion loaded for:", title);
       return;
     }
 
@@ -421,7 +532,9 @@ export function TalkToHugoAI({
             }
           );
           setHasActiveSession(true);
+          console.log("[Hugo] Admin streaming session started");
         } catch (e) {
+          console.warn("[Hugo] Failed to start admin session:", e);
           setMessages([{
             id: `welcome-${Date.now()}`,
             sender: "ai",
@@ -436,7 +549,7 @@ export function TalkToHugoAI({
 
       try {
         const endpoint = `/api/v2/user/welcome${user?.id ? `?userId=${user.id}` : ''}`;
-        const res = await fetch(endpoint, { headers: await getAuthHeaders() });
+        const res = await fetch(endpoint);
         if (res.ok) {
           const data = await res.json();
           setMessages([{
@@ -445,10 +558,11 @@ export function TalkToHugoAI({
             text: data.welcomeMessage,
             timestamp: new Date(),
           }]);
+          console.log("[Hugo] User welcome loaded, userId:", user?.id);
           return;
         }
       } catch (e) {
-        // Fall back to lastActivityService welcome
+        console.warn("[Hugo] Failed to load user welcome, falling back:", e);
       }
       const { message, summary } = await lastActivityService.getPersonalizedWelcome(user?.id || null);
       setMessages([{
@@ -497,6 +611,8 @@ export function TalkToHugoAI({
       const { token, avatarId } = await tokenResponse.json();
       setHeygenToken(token);
       
+      console.log("[HeyGen] Token received, avatarId:", avatarId || "not configured");
+      
       // Create avatar instance
       const avatar = new StreamingAvatar({ token });
       
@@ -510,23 +626,31 @@ export function TalkToHugoAI({
       });
       
       avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
+        console.log("[HeyGen] Stream disconnected");
         setAvatarSession(null);
       });
       
       avatar.on(StreamingEvents.STREAM_READY, (event: any) => {
+        console.log("[HeyGen] Stream ready, event:", event);
         // Try multiple ways to get the stream
         const stream = event.detail?.stream || event.detail || (avatar as any).mediaStream;
-
+        console.log("[HeyGen] Stream object:", stream, "typeof:", typeof stream);
+        console.log("[HeyGen] Avatar properties:", Object.keys(avatar));
+        
         if (videoRef.current && stream instanceof MediaStream) {
+          console.log("[HeyGen] Attaching MediaStream to video element");
           videoRef.current.srcObject = stream;
           videoRef.current.onloadedmetadata = () => {
             videoRef.current?.play().catch(e => console.error("[HeyGen] Play error:", e));
           };
+        } else {
+          console.warn("[HeyGen] MediaStream not found in event, will try from avatar instance after start");
         }
       });
       
       // Start avatar session - use custom avatar from backend or fallback to public avatar
       const avatarName = avatarId || "Shawn_Therapist_public";
+      console.log("[HeyGen] Starting avatar session with:", avatarName);
       
       const sessionData = await avatar.createStartAvatar({
         quality: AvatarQuality.Medium,
@@ -534,12 +658,19 @@ export function TalkToHugoAI({
         language: "nl",
       });
       
+      console.log("[HeyGen] Session data:", sessionData);
+      console.log("[HeyGen] Avatar after start:", Object.keys(avatar));
+      
       // Get mediaStream from avatar instance - this is how HeyGen SDK exposes the stream
       const avatarStream = (avatar as any).mediaStream;
+      console.log("[HeyGen] Avatar mediaStream:", avatarStream);
+      console.log("[HeyGen] Is MediaStream?", avatarStream instanceof MediaStream);
       
       if (videoRef.current && avatarStream) {
+        console.log("[HeyGen] Attaching mediaStream to video element");
         videoRef.current.srcObject = avatarStream;
         videoRef.current.onloadedmetadata = () => {
+          console.log("[HeyGen] Video metadata loaded, calling play()");
           videoRef.current?.play().catch(e => console.error("[HeyGen] Play error:", e));
         };
       } else {
@@ -551,6 +682,7 @@ export function TalkToHugoAI({
       }
       
       setAvatarSession(avatar);
+      console.log("[HeyGen] Avatar session started successfully");
     } catch (error: any) {
       console.error("[HeyGen] Error:", error);
       setAvatarError(error.message || "Kon video avatar niet starten");
@@ -628,6 +760,7 @@ export function TalkToHugoAI({
       
       // Setup event listeners
       room.on(RoomEvent.ConnectionStateChanged, (state) => {
+        console.log("[LiveKit] Connection state:", state);
         setAudioConnectionState(state);
         if (state === ConnectionState.Connected) {
           setIsAudioConnecting(false);
@@ -635,6 +768,7 @@ export function TalkToHugoAI({
       });
       
       room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+        console.log("[LiveKit] Track subscribed:", track.kind);
         if (track.kind === Track.Kind.Audio) {
           // Attach audio track
           const audioElement = track.attach();
@@ -657,14 +791,17 @@ export function TalkToHugoAI({
       });
       
       room.on(RoomEvent.Disconnected, () => {
+        console.log("[LiveKit] Disconnected");
         setAudioConnectionState(ConnectionState.Disconnected);
       });
       
       // Connect to room
       await room.connect(url, token);
-
+      console.log("[LiveKit] Connected to room");
+      
       // Enable microphone
       await room.localParticipant.setMicrophoneEnabled(true);
+      console.log("[LiveKit] Microphone enabled");
       
       setLiveKitRoom(room);
       
@@ -902,6 +1039,7 @@ export function TalkToHugoAI({
       }
 
       const { conversationId } = await response.json();
+      console.log('[Hugo] Inline analysis started:', conversationId);
 
       setMessages(prev => prev.map(m => {
         if (m.id !== analysisMessageId) return m;
@@ -1057,15 +1195,9 @@ export function TalkToHugoAI({
           viewMode: 'user',
         });
         setHasActiveSession(true);
-      } catch (error: any) {
+        console.log("[Hugo] Auto-started coach session");
+      } catch (error) {
         console.error("[Hugo] Failed to start session:", error);
-        setMessages(prev => [...prev, {
-          id: (Date.now() + 1).toString(),
-          sender: "ai" as const,
-          text: `Kon geen sessie starten: ${error.message || "onbekende fout"}`,
-          timestamp: new Date(),
-        }]);
-        return;
       }
     }
 
@@ -1243,7 +1375,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
-      toast.error("Je browser ondersteunt spraakherkenning niet. Gebruik Chrome of Edge.");
+      alert("Je browser ondersteunt spraakherkenning niet. Gebruik Chrome of Edge.");
       return;
     }
 
@@ -1704,8 +1836,56 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         </div>
       )}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.map((message) => (
-          <div key={message.id} className={`group flex ${message.sender === "hugo" ? "justify-end" : "justify-start"}`}>
+        {/* Coach View Summary — shown when analysis data is loaded */}
+        {analysisResult?.insights && (
+          <CoachViewSummary
+            insights={analysisResult.insights}
+            title={analysisResult.conversation?.title}
+            onMomentClick={(turnIndex) => {
+              const el = document.getElementById(`msg-turn-${turnIndex}`);
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('ring-2', 'ring-hh-primary/40');
+                setTimeout(() => el.classList.remove('ring-2', 'ring-hh-primary/40'), 2000);
+              }
+            }}
+          />
+        )}
+        {messages.map((message, msgIdx) => {
+          // Phase divider from analysis data
+          const phaseLabels: Record<number, string> = {
+            1: 'Fase 1: Opening', 2: 'Fase 2: EPIC', 3: 'Fase 3: Aanbeveling', 4: 'Fase 4: Beslissing',
+          };
+          const phaseColors: Record<number, string> = {
+            1: '#2563eb', 2: '#059669', 3: '#9333ea', 4: '#d97706',
+          };
+          let phaseDivider = null;
+          if (analysisResult?.signals) {
+            const signalForTurn = analysisResult.signals.find((s: any) => s.turnIdx === msgIdx);
+            if (signalForTurn?.currentPhase && msgIdx > 0) {
+              const prevSignal = analysisResult.signals.find((s: any) => s.turnIdx === msgIdx - 1);
+              if (!prevSignal || prevSignal.currentPhase !== signalForTurn.currentPhase) {
+                const phase = signalForTurn.currentPhase;
+                phaseDivider = (
+                  <div className="flex items-center gap-3 py-2 my-1">
+                    <div className="h-px flex-1 bg-hh-border" />
+                    <span
+                      className="text-[11px] font-semibold px-3 py-1 rounded-full"
+                      style={{ backgroundColor: `${phaseColors[phase] || '#6b7280'}10`, color: phaseColors[phase] || '#6b7280' }}
+                    >
+                      {phaseLabels[phase] || `Fase ${phase}`}
+                    </span>
+                    <div className="h-px flex-1 bg-hh-border" />
+                  </div>
+                );
+              }
+            }
+          }
+
+          return (
+          <Fragment key={message.id}>
+          {phaseDivider}
+          <div id={`msg-turn-${msgIdx}`} className={`group flex ${message.sender === "hugo" ? "justify-end" : "justify-start"} transition-all rounded-xl`}>
             <div className={`flex flex-col ${message.sender === "hugo" ? "items-end" : "items-start"}`} style={{ maxWidth: '75%' }}>
               {message.isTranscriptReplay && message.transcriptRole && (
                 <span className="text-[11px] font-medium mb-0.5 px-1" style={{ color: message.transcriptRole === 'Klant' ? '#4F7396' : '#3C9A6E' }}>
@@ -1961,6 +2141,44 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 </div>
               )}
               
+              {/* Technique & houding annotations from analysis */}
+              {analysisResult && (() => {
+                const evalForTurn = analysisResult.evaluations?.find((e: any) => e.turnIdx === msgIdx);
+                const signalForTurn = analysisResult.signals?.find((s: any) => s.turnIdx === msgIdx);
+                if (!evalForTurn && !signalForTurn) return null;
+                return (
+                  <div className="flex flex-wrap gap-1 mt-1 px-1">
+                    {evalForTurn?.techniques?.map((tech: any, ti: number) => {
+                      const qualityColors: Record<string, { bg: string; text: string }> = {
+                        'perfect': { bg: '#ECFDF5', text: '#047857' },
+                        'goed': { bg: '#ECFDF5', text: '#059669' },
+                        'bijna': { bg: '#FFFBEB', text: '#B45309' },
+                        'gemist': { bg: '#FFF1F2', text: '#BE123C' },
+                      };
+                      const colors = qualityColors[tech.quality] || qualityColors['bijna'];
+                      const qualityIcon = tech.quality === 'perfect' || tech.quality === 'goed' ? '✓' : tech.quality === 'gemist' ? '✗' : '~';
+                      return (
+                        <span
+                          key={ti}
+                          className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
+                          style={{ backgroundColor: colors.bg, color: colors.text }}
+                        >
+                          {qualityIcon} {tech.naam}
+                        </span>
+                      );
+                    })}
+                    {signalForTurn && (
+                      <span
+                        className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
+                        style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8' }}
+                      >
+                        {signalForTurn.houding}
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
+
               {message.sender === "ai" && !message.isTranscriptReplay && (
                 <div className="flex items-center gap-0.5 mt-1.5">
                   <button
@@ -2039,7 +2257,9 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               )}
             </div>
           </div>
-        ))}
+          </Fragment>
+          );
+        })}
         {isStreaming && streamingText && (
           <div className="flex justify-start">
             <div className="p-3 rounded-2xl bg-hh-ui-50 text-hh-text rounded-bl-md" style={{ maxWidth: '75%' }}>
@@ -2425,11 +2645,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             <div className="flex items-center gap-2 lg:gap-3 min-w-0">
               {/* E.P.I.C. sidebar toggle removed from header — accessible via lightbulb action button under messages */}
               <span className="text-[13px] text-hh-muted font-medium whitespace-nowrap flex items-center gap-1">
-                HugoGPT <span className="text-[11px] text-hh-muted/60 font-normal">{isSuperAdmin ? 'v3' : 'v1.0'}</span>
+                HugoGPT <span className="text-[11px] text-hh-muted/60 font-normal">v1.0</span>
               </span>
-              {v3Warning && (
-                <span className="text-[11px] text-red-400 ml-2">{v3Warning}</span>
-              )}
             </div>
             
             {/* Right: Mode toggle + Stop (Niveau is now auto-adaptive, hidden) */}
