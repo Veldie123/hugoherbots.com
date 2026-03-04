@@ -98,6 +98,47 @@ pool.query(`
 }).catch((err: Error) => console.warn('[DB] admin_onboarding_progress table check failed:', err.message));
 
 pool.query(`
-  CREATE UNIQUE INDEX IF NOT EXISTS idx_onboarding_user_module_key 
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_onboarding_user_module_key
   ON admin_onboarding_progress (admin_user_id, module, item_key)
 `).catch(() => {});
+
+pool.query(`
+  CREATE TABLE IF NOT EXISTS admin_corrections (
+    id SERIAL PRIMARY KEY,
+    analysis_id VARCHAR(255),
+    type VARCHAR(100) NOT NULL,
+    field VARCHAR(100) NOT NULL,
+    original_value TEXT,
+    new_value TEXT NOT NULL,
+    context TEXT,
+    submitted_by VARCHAR(100) DEFAULT 'admin',
+    status VARCHAR(20) DEFAULT 'pending',
+    reviewed_by VARCHAR(100),
+    reviewed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    source VARCHAR(100) DEFAULT 'analysis',
+    target_file VARCHAR(255),
+    target_key VARCHAR(255),
+    original_json TEXT,
+    new_json TEXT
+  )
+`).then(() => {
+  console.log('[DB] admin_corrections table ensured');
+}).catch((err: Error) => console.warn('[DB] admin_corrections table check failed:', err.message));
+
+pool.query(`
+  CREATE TABLE IF NOT EXISTS admin_notifications (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(100) NOT NULL,
+    title VARCHAR(500) NOT NULL,
+    message TEXT,
+    category VARCHAR(100) DEFAULT 'content',
+    severity VARCHAR(20) DEFAULT 'info',
+    related_id INTEGER,
+    related_page VARCHAR(100),
+    read BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  )
+`).then(() => {
+  console.log('[DB] admin_notifications table ensured');
+}).catch((err: Error) => console.warn('[DB] admin_notifications table check failed:', err.message));

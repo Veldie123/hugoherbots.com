@@ -32,6 +32,7 @@ function mapRowToSession(row: any): LiveSession {
     muxAssetId: row.mux_asset_id,
     transcript: row.transcript,
     aiSummary: row.ai_summary,
+    recordingApproved: row.recording_approved ?? false,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -45,10 +46,23 @@ export const liveCoachingApi = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId })
       });
-      
+
       const result = await response.json();
       if (!response.ok || !result.success) {
         throw new Error(result.message || 'Proces triggeren mislukt');
+      }
+      return { success: true };
+    },
+    approveRecording: async (sessionId: string, approved: boolean = true): Promise<{ success: boolean }> => {
+      const response = await fetch(`/api/admin/sessions/${sessionId}/approve-recording`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approved })
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Goedkeuring mislukt');
       }
       return { success: true };
     },

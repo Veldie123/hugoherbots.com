@@ -474,76 +474,72 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
           </div>
         )}
 
-        {/* Controls row */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 gap-3">
-          {/* Device selectors — hidden on mobile */}
-          <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
-            <Select
-              value={selectedVideoDevice}
-              onValueChange={handleVideoDeviceChange}
-              disabled={!isCameraOn || videoDevices.length === 0}
-            >
-              <SelectTrigger className="h-8 w-[160px] text-xs border-hh-border">
-                <SelectValue placeholder="Camera" />
-              </SelectTrigger>
-              <SelectContent>
-                {videoDevices.map((device) => (
-                  <SelectItem key={device.deviceId} value={device.deviceId} className="text-xs">
-                    {device.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={selectedAudioDevice}
-              onValueChange={handleAudioDeviceChange}
-              disabled={!isMicOn || audioDevices.length === 0}
-            >
-              <SelectTrigger className="h-8 w-[160px] text-xs border-hh-border">
-                <SelectValue placeholder="Microfoon" />
-              </SelectTrigger>
-              <SelectContent>
-                {audioDevices.map((device) => (
-                  <SelectItem key={device.deviceId} value={device.deviceId} className="text-xs">
-                    {device.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {isMicOn && audioLevel > 5 && (
-              <div className="flex items-center gap-1 text-xs text-hh-success">
-                <CheckCircle className="w-3.5 h-3.5" />
-                <span className="hidden lg:inline">Geluid gedetecteerd</span>
-              </div>
-            )}
-          </div>
+        {/* Device selectors row — separate from controls */}
+        <div className="hidden sm:flex items-center justify-center gap-3 px-4 pt-3 pb-1">
+          <Select
+            value={selectedVideoDevice}
+            onValueChange={handleVideoDeviceChange}
+            disabled={!isCameraOn || videoDevices.length === 0}
+          >
+            <SelectTrigger className="h-8 w-[180px] text-xs border-hh-border">
+              <SelectValue placeholder="Camera" />
+            </SelectTrigger>
+            <SelectContent>
+              {videoDevices.map((device) => (
+                <SelectItem key={device.deviceId} value={device.deviceId} className="text-xs">
+                  {device.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={selectedAudioDevice}
+            onValueChange={handleAudioDeviceChange}
+            disabled={!isMicOn || audioDevices.length === 0}
+          >
+            <SelectTrigger className="h-8 w-[180px] text-xs border-hh-border">
+              <SelectValue placeholder="Microfoon" />
+            </SelectTrigger>
+            <SelectContent>
+              {audioDevices.map((device) => (
+                <SelectItem key={device.deviceId} value={device.deviceId} className="text-xs">
+                  {device.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {isMicOn && audioLevel > 5 && (
+            <div className="flex items-center gap-1 text-xs text-hh-success">
+              <CheckCircle className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline">Geluid gedetecteerd</span>
+            </div>
+          )}
+        </div>
 
-          {/* Toggle buttons — center */}
-          <div className="flex items-center gap-3">
-            <Button
-              size="lg"
-              variant={isCameraOn ? "secondary" : "destructive"}
-              onClick={handleToggleCamera}
-              className="w-12 h-12 rounded-full p-0"
-              title={isCameraOn ? "Camera uit" : "Camera aan"}
-            >
-              {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
-            </Button>
-            <Button
-              size="lg"
-              variant={isMicOn ? "secondary" : "destructive"}
-              onClick={handleToggleMic}
-              className="w-12 h-12 rounded-full p-0"
-              title={isMicOn ? "Microfoon uit" : "Microfoon aan"}
-            >
-              {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
-            </Button>
-          </div>
-
-          {/* Join CTA — right */}
+        {/* Main controls row — stable layout */}
+        <div className="flex items-center justify-center px-4 py-3 gap-3">
+          <Button
+            size="lg"
+            variant={isCameraOn ? "secondary" : "destructive"}
+            onClick={handleToggleCamera}
+            className="w-12 h-12 rounded-full p-0"
+            title={isCameraOn ? "Camera uit" : "Camera aan"}
+          >
+            {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+          </Button>
+          <Button
+            size="lg"
+            variant={isMicOn ? "secondary" : "destructive"}
+            onClick={handleToggleMic}
+            className="w-12 h-12 rounded-full p-0"
+            title={isMicOn ? "Microfoon uit" : "Microfoon aan"}
+          >
+            {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+          </Button>
+          <div className="w-px h-8 bg-hh-border mx-2" />
           <Button
             onClick={handleJoin}
-            className="h-10 sm:h-11 gap-2 px-6 sm:px-8 bg-hh-success hover:bg-hh-success/90 text-white font-medium rounded-full shadow-lg flex-shrink-0"
+            className="h-11 gap-2 px-8 bg-hh-success hover:bg-hh-success/90 text-white font-medium rounded-full shadow-lg"
             disabled={permissionState === "requesting"}
           >
             {permissionState === "requesting" ? (

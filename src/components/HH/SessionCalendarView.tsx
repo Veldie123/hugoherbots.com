@@ -55,7 +55,7 @@ function getStatusColor(status: string): { bg: string; text: string; border: str
       return { bg: "bg-red-50", text: "text-red-700", border: "border-l-red-500", label: "Live" };
     case "ended":
     case "completed":
-      return { bg: "bg-slate-50", text: "text-slate-600", border: "border-l-slate-400", label: "Voltooid" };
+      return { bg: "bg-hh-ui-50", text: "text-hh-muted", border: "border-l-hh-border", label: "Voltooid" };
     default:
       return { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-l-emerald-500", label: "Gepland" };
   }
@@ -141,7 +141,7 @@ export function SessionCalendarView({
   return (
     <div className="space-y-4">
       <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
-        <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-hh-border bg-white">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-hh-border bg-hh-bg">
           <div className="flex items-center gap-2 sm:gap-3">
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToPrevWeek}>
               <ChevronLeft className="w-4 h-4" />
@@ -167,7 +167,7 @@ export function SessionCalendarView({
             return (
               <button
                 key={idx}
-                className={`flex flex-col items-center py-2.5 sm:py-3 transition-colors hover:bg-slate-100 relative ${
+                className={`flex flex-col items-center py-2.5 sm:py-3 transition-colors hover:bg-hh-ui-50 relative ${
                   isToday ? "bg-hh-primary/5" : ""
                 }`}
                 onClick={() => {
@@ -248,7 +248,7 @@ export function SessionCalendarView({
                         return (
                           <div
                             key={session.id}
-                            className={`rounded-xl border border-hh-border border-l-[3px] ${statusInfo.border} bg-white hover:shadow-sm transition-all overflow-hidden`}
+                            className={`rounded-xl border border-hh-border border-l-[3px] ${statusInfo.border} bg-card hover:shadow-sm transition-all overflow-hidden`}
                           >
                             <div
                               className="flex items-center gap-3 p-3 sm:p-3.5 cursor-pointer"

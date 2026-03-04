@@ -245,7 +245,7 @@ export function UserMenu({ navigate, onLogout }: UserMenuProps) {
 
       {/* Workspace Selector Dialog */}
       <Dialog open={workspaceDialogOpen} onOpenChange={setWorkspaceDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white">
+        <DialogContent className="sm:max-w-[500px] bg-hh-bg">
           <DialogHeader>
             <DialogTitle className="text-[24px] leading-[32px] text-hh-text">
               Change Workspace

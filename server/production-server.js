@@ -100,7 +100,7 @@ function handleRequest(req, res) {
     return;
   }
 
-  if (PORT_3002_PREFIXES.some(p => pathname.startsWith(p))) {
+  if (PORT_3002_PREFIXES.some(p => pathname.startsWith(p) || pathname + '/' === p)) {
     return proxyRequest(req, res, 3002);
   }
 

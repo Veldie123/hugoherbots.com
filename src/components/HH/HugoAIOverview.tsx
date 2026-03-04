@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
+import { getAuthHeaders } from "../../services/hugoApi";
 import { AppLayout } from "./AppLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -173,7 +174,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
         });
         sessionStorage.setItem('analysisId', sessionId);
         sessionStorage.setItem('analysisFromHugo', 'true');
-        if (navigate) navigate('analysis-results');
+        if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
         return;
       }
 
@@ -201,7 +202,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
             });
             sessionStorage.setItem('analysisId', sessionId);
             sessionStorage.setItem('analysisFromHugo', 'true');
-            if (navigate) navigate('analysis-results');
+            if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
           } else if (statusData.status === 'failed') {
             clearInterval(pollInterval);
             setAnalyzingSessionIds(prev => {
@@ -254,7 +255,9 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('/api/user/sessions');
+        const response = await fetch('/api/user/sessions', {
+          headers: await getAuthHeaders(),
+        });
         if (!response.ok) throw new Error('Failed to fetch sessions');
         const data = await response.json();
         
@@ -296,12 +299,14 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
     }
 
     try {
-      const statusRes = await fetch(`/api/v2/analysis/status/${sessionId}`);
+      const statusRes = await fetch(`/api/v2/analysis/status/${sessionId}`, {
+        headers: await getAuthHeaders(),
+      });
       const statusData = await safeJsonParse(statusRes);
       if (statusData.status === 'completed') {
         sessionStorage.setItem('analysisId', sessionId);
         sessionStorage.setItem('analysisFromHugo', 'true');
-        if (navigate) navigate('analysis-results');
+        if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
         return;
       }
       if (statusData.status === 'failed') {
@@ -319,7 +324,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
               setAnalyzingSessionIds(prev => { const n = new Set(prev); n.delete(sessionId); return n; });
               sessionStorage.setItem('analysisId', sessionId);
               sessionStorage.setItem('analysisFromHugo', 'true');
-              if (navigate) navigate('analysis-results');
+              if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
             } else if (data.status === 'failed') {
               clearInterval(pollInterval);
               setAnalyzingSessionIds(prev => { const n = new Set(prev); n.delete(sessionId); return n; });
@@ -441,50 +446,89 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
 
   return (
     <Layout {...layoutProps}>
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between">
+      <div className="p-3 sm:p-4 lg:p-6 space-y-6">
+        {/* Header with compact KPI pills */}
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
           <div>
-            <h1 className="text-[32px] leading-[40px] text-hh-text mb-2">
+            <h1 className="text-[24px] sm:text-[28px] lg:text-[32px] leading-[40px] text-hh-text mb-2">
               Talk to Hugo <sup className="text-[18px]">AI</sup>
             </h1>
             <p className="text-[16px] leading-[24px] text-hh-muted">
               Alle training sessies: AI roleplay, uploads en live analyses
             </p>
           </div>
-          <Button
-            style={{ backgroundColor: '#3C9A6E', color: 'white' }}
-            className="gap-2"
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#2D7F57')}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#3C9A6E')}
-            onClick={() => navigate?.("talk-to-hugo")}
-          >
-            <MessageSquare className="w-4 h-4 text-white" />
-            Talk to Hugo <sup>AI</sup>
-          </Button>
+          <div className="grid grid-cols-2 sm:flex gap-2 sm:flex-wrap lg:flex-nowrap">
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-hh-ink/10 flex items-center justify-center">
+                <MessageSquare className="w-3 h-3 text-hh-ink" />
+              </div>
+              <div>
+                <p className="text-[10px] text-hh-muted leading-none">Sessies</p>
+                <p className="text-[14px] font-semibold text-hh-ink leading-tight">{sessions.length}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-hh-success/10 flex items-center justify-center">
+                <CheckCircle2 className="w-3 h-3 text-hh-success" />
+              </div>
+              <div>
+                <p className="text-[10px] text-hh-muted leading-none">Excellent</p>
+                <p className="text-[14px] font-semibold text-hh-ink leading-tight">{sessions.filter(s => s.quality === "excellent").length}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                <TrendingUp className="w-3 h-3 text-hh-primary" />
+              </div>
+              <div>
+                <p className="text-[10px] text-hh-muted leading-none">Gem. Score</p>
+                <p className="text-[14px] font-semibold text-hh-ink leading-tight">{sessions.length > 0 ? Math.round(sessions.reduce((acc, s) => acc + s.score, 0) / sessions.length) : 0}%</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-hh-warning/10 flex items-center justify-center">
+                <AlertTriangle className="w-3 h-3 text-hh-warning" />
+              </div>
+              <div>
+                <p className="text-[10px] text-hh-muted leading-none">Verbeter</p>
+                <p className="text-[14px] font-semibold text-hh-ink leading-tight">{sessions.filter(s => s.quality === "needs-improvement").length}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {[
-            { name: 'Totaal Sessies', value: sessions.length, icon: MessageSquare, bgColor: 'rgba(37, 99, 235, 0.12)', color: '#2563eb', badge: '+15%', badgePositive: true },
-            { name: 'Uitstekende Kwaliteit', value: sessions.filter(s => s.quality === "excellent").length, icon: CheckCircle2, bgColor: 'rgba(5, 150, 105, 0.12)', color: '#059669', badge: '+8%', badgePositive: true },
-            { name: 'Gem. Score', value: `${sessions.length > 0 ? Math.round(sessions.reduce((acc, s) => acc + s.score, 0) / sessions.length) : 0}%`, icon: TrendingUp, bgColor: 'rgba(2, 132, 199, 0.12)', color: '#0284c7', badge: '+2.3%', badgePositive: true },
-            { name: 'Verbetering Nodig', value: sessions.filter(s => s.quality === "needs-improvement").length, icon: AlertTriangle, bgColor: 'rgba(234, 88, 12, 0.12)', color: '#ea580c', badge: '-5%', badgePositive: false },
-          ].map(stat => (
-            <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-              <div className="flex items-start justify-between mb-2 sm:mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColor, color: stat.color }}>
-                  <stat.icon className="w-5 h-5" />
-                </div>
-                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={stat.badgePositive ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' } : { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
-                  {stat.badge}
-                </span>
-              </div>
-              <p className="text-[13px] leading-[18px] text-hh-muted">{stat.name}</p>
-              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stat.value}</p>
-            </Card>
-          ))}
+        {/* Hero Banner */}
+        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px]">
+          <img
+            src="/images/Hugo-Herbots-WEB-0461.JPG"
+            alt="Hugo Herbots AI Coach"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: '50% 25%' }}
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+          <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+          <div className="relative h-full flex items-center p-6 sm:p-8">
+            <div className="text-white space-y-3 max-w-lg">
+              <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: '#4F7396' }}>
+                <Sparkles className="w-3 h-3 mr-1" />
+                AI Sales Coach
+              </Badge>
+              <h2 className="text-[20px] sm:text-[24px] font-bold leading-tight">
+                Oefen met Hugo
+              </h2>
+              <p className="text-white/70 text-[13px] sm:text-[14px] leading-relaxed line-clamp-2">
+                Train je sales skills met AI-gestuurde rollenspellen en ontvang realtime feedback op je technieken.
+              </p>
+              <Button
+                className="gap-2 text-white border-0 bg-hh-success hover:bg-hh-success/90"
+                onClick={() => navigate?.("talk-to-hugo")}
+              >
+                <MessageSquare className="w-4 h-4" />
+                Start nieuw gesprek
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Filters & Search */}

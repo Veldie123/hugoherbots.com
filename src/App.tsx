@@ -152,7 +152,8 @@ export default function App() {
           
           if (isHugoOnboarding) {
             localStorage.setItem('hugo_onboarding_mode', 'true');
-            setCurrentPage("dashboard");
+            setViewMode('admin');
+            setCurrentPage("talk-to-hugo");
           } else {
             localStorage.removeItem('hugo_onboarding_mode');
             if (userIsAdmin) {
@@ -268,9 +269,9 @@ export default function App() {
                   setIsAdmin(true);
                   setIsSuperAdmin(false);
                   setOnboardingMode(true);
-                  setViewMode('user');
+                  setViewMode('admin');
                   localStorage.setItem('hugo_onboarding_mode', 'true');
-                  navigate("dashboard");
+                  navigate("talk-to-hugo");
                 } else if (isHugobotsAdmin) {
                   setIsAdmin(true);
                   setIsSuperAdmin(superAdmin);

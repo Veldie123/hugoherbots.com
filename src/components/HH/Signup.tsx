@@ -122,7 +122,7 @@ export function Signup({ onLoginClick, onSignupSuccess, navigate }: SignupProps)
   };
 
   return (
-    <div className="min-h-screen bg-hh-bg">
+    <div className="min-h-screen bg-hh-bg" data-theme="light">
       {/* Navigation Header */}
       {navigate && <StickyHeader currentPage="signup" navigate={navigate} />}
       

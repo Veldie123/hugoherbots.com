@@ -1,7 +1,7 @@
 /* Import Hypatia Sans fonts - Replace with actual font files if available */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *):not([data-theme="light"] *):not([data-theme="light"]));
 
 :root {
   /* HH Brand Colors - Sophisticated Monochrome Palette */
@@ -45,6 +45,7 @@
   --hh-ink: var(--hh-mirage);
   --hh-primary: var(--hh-steel-blue);      /* Steel blue for CTAs & interactive */
   --hh-primary-hover: var(--hh-steel-blue-hover);
+  --hh-primary-rgb: 79, 115, 150;          /* RGB for shadows/glows */
   --hh-secondary: var(--hh-slate-gray);
   --hh-ui-50: var(--hh-slate-50);
   --hh-ui-100: var(--hh-slate-100);
@@ -151,6 +152,13 @@
   --sidebar-accent-foreground: var(--hh-text);
   --sidebar-border: #2A3142;
   --sidebar-ring: var(--hh-primary);
+}
+
+/* Admin/host webinar session — purple accent instead of steel blue */
+.admin-session {
+  --hh-primary: #8B5CF6;
+  --hh-primary-hover: #7C3AED;
+  --hh-primary-rgb: 139, 92, 246;
 }
 
 /* Force light mode on specific elements (e.g. landing page) */

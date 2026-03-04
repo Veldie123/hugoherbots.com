@@ -15,7 +15,7 @@ function ScoreDonut({ score }: { score: number }) {
   return (
     <div className="relative flex-shrink-0" style={{ width: 72, height: 72 }}>
       <svg viewBox="0 0 72 72" className="w-full h-full">
-        <circle cx="36" cy="36" r={radius} fill="none" stroke="#E2E8F0" strokeWidth="5" />
+        <circle cx="36" cy="36" r={radius} fill="none" className="stroke-hh-ui-200" strokeWidth="5" />
         <circle
           cx="36" cy="36" r={radius} fill="none" stroke={color} strokeWidth="5"
           strokeDasharray={circumference}
@@ -35,14 +35,14 @@ function ScoreDonut({ score }: { score: number }) {
 function PhaseBar({ label, score, color }: { label: string; score: number; color: string }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-slate-500 flex-shrink-0" style={{ width: 20 }}>{label}</span>
-      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+      <span className="text-xs text-hh-muted flex-shrink-0" style={{ width: 20 }}>{label}</span>
+      <div className="flex-1 h-1.5 bg-hh-ui-100 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-700"
           style={{ width: `${Math.max(score, 3)}%`, backgroundColor: color }}
         />
       </div>
-      <span className="text-xs font-medium text-slate-600" style={{ width: 28, textAlign: "right" }}>{Math.round(score)}%</span>
+      <span className="text-xs font-medium text-hh-text" style={{ width: 28, textAlign: "right" }}>{Math.round(score)}%</span>
     </div>
   );
 }
@@ -60,7 +60,7 @@ export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardP
     const statusInfo = STATUS_MAP[analysis.status] || STATUS_MAP.analyzing;
     return (
       <div
-        className="rounded-xl border-2 bg-white p-4"
+        className="rounded-xl border-2 bg-card p-4"
         style={{ maxWidth: 520, borderColor: statusInfo.color + "40" }}
       >
         <div className="flex items-center gap-3">
@@ -68,11 +68,11 @@ export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardP
             {statusInfo.icon}
           </div>
           <div>
-            <p className="font-medium text-sm text-slate-800">{analysis.title}</p>
+            <p className="font-medium text-sm text-hh-text">{analysis.title}</p>
             <p className="text-xs mt-0.5" style={{ color: statusInfo.color }}>{statusInfo.label}</p>
           </div>
         </div>
-        <div className="mt-3 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="mt-3 h-1.5 bg-hh-ui-100 rounded-full overflow-hidden">
           <div className="h-full rounded-full animate-pulse" style={{ width: "60%", backgroundColor: statusInfo.color }} />
         </div>
       </div>
@@ -86,15 +86,15 @@ export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardP
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden" style={{ maxWidth: 520 }}>
-      <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: "1px solid #E2E8F0" }}>
+    <div className="rounded-xl border border-hh-border bg-card overflow-hidden" style={{ maxWidth: 520 }}>
+      <div className="px-4 py-3 flex items-center gap-3 border-b border-hh-border">
         <div className="rounded-lg flex items-center justify-center flex-shrink-0" style={{ width: 36, height: 36, backgroundColor: "#EBF5F0" }}>
           <BarChart3 className="w-4 h-4" style={{ color: "#3C9A6E" }} />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-sm text-slate-800 truncate">{analysis.title}</p>
+          <p className="font-medium text-sm text-hh-text truncate">{analysis.title}</p>
           {analysis.coachOneliner && (
-            <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{analysis.coachOneliner}</p>
+            <p className="text-xs text-hh-muted mt-0.5 line-clamp-1">{analysis.coachOneliner}</p>
           )}
         </div>
       </div>
@@ -117,11 +117,11 @@ export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardP
         <div className="px-4 pb-2">
           <div className="space-y-1.5">
             {analysis.moments.slice(0, 3).map((moment, idx) => (
-              <div key={idx} className="flex items-start gap-2 rounded-lg bg-slate-50 p-2">
+              <div key={idx} className="flex items-start gap-2 rounded-lg bg-hh-ui-50 p-2">
                 <div className="mt-0.5">{momentIcons[moment.type]}</div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium text-slate-700 line-clamp-1">{moment.label}</p>
-                  <p className="text-xs text-slate-500 line-clamp-1">{moment.whyItMatters}</p>
+                  <p className="text-xs font-medium text-hh-text line-clamp-1">{moment.label}</p>
+                  <p className="text-xs text-hh-muted line-clamp-1">{moment.whyItMatters}</p>
                 </div>
               </div>
             ))}
@@ -132,8 +132,7 @@ export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardP
       {onViewFull && (
         <button
           onClick={() => onViewFull(analysis.conversationId)}
-          className="w-full px-4 py-2.5 flex items-center justify-center gap-2 text-sm font-medium transition-colors hover:bg-slate-50"
-          style={{ borderTop: "1px solid #E2E8F0", color: "#3C9A6E" }}
+          className="w-full px-4 py-2.5 flex items-center justify-center gap-2 text-sm font-medium transition-colors hover:bg-hh-ui-50 border-t border-hh-border text-hh-success"
         >
           Bekijk volledige analyse
           <ExternalLink className="w-3.5 h-3.5" />

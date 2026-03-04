@@ -285,8 +285,8 @@ app.use((req, res, next) => {
 
 // JWT Authentication — applied to all /api/ routes with exemptions
 app.use('/api', (req: Request, res: Response, next: NextFunction) => {
-  // Skip auth for health checks, Stripe webhooks, and platform sync
-  const publicPaths = ['/health', '/stripe/webhook', '/platform-sync/'];
+  // Skip auth for health checks, Stripe webhooks, platform sync, and V3 status
+  const publicPaths = ['/health', '/stripe/webhook', '/platform-sync/', '/v3/status'];
   if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
     return next();
   }
@@ -1562,7 +1562,22 @@ app.get("/api/user/sessions", async (req, res) => {
       return {
         id: row.id,
         nummer: technique?.nummer || row.technique_id,
-        naam: technique?.naam || row.technique_id,
+        naam: (() => {
+          if (row.technique_id === 'general') {
+            try {
+              const firstUserMsg = conversationHistory?.find((m: any) => m.role === 'user');
+              if (firstUserMsg?.content) {
+                const text = typeof firstUserMsg.content === 'string'
+                  ? firstUserMsg.content
+                  : firstUserMsg.content[0]?.text || '';
+                const trimmed = text.trim().slice(0, 50);
+                return trimmed.length < text.trim().length ? trimmed + '…' : trimmed || 'Nieuw gesprek';
+              }
+            } catch {}
+            return 'Nieuw gesprek';
+          }
+          return technique?.naam || row.technique_id;
+        })(),
         fase: technique?.fase || parseInt(row.technique_id?.split('.')[0]) || 1,
         type: 'ai-chat' as const, // TODO: detect from session metadata
         score,

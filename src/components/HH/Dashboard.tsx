@@ -88,7 +88,7 @@ const VideoCard = ({
     className={`flex-shrink-0 w-[200px] group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
     onClick={locked ? undefined : onClick}
   >
-    <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-ink to-hh-primary/80 aspect-video mb-2">
+    <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
       {thumbnail ? (
         <img src={thumbnail} alt={title} className={`w-full h-full object-cover ${locked ? 'grayscale' : ''}`} loading="lazy" />
       ) : (
@@ -111,7 +111,7 @@ const VideoCard = ({
       ) : (
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
           <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-            <Play className="w-6 h-6 text-hh-ink ml-0.5" />
+            <Play className="w-6 h-6 ml-0.5" style={{ color: '#1e293b' }} />
           </div>
         </div>
       )}
@@ -201,7 +201,7 @@ const WebinarCard = ({
       )}
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
         <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-          <Play className="w-6 h-6 text-hh-ink ml-0.5" />
+          <Play className="w-6 h-6 ml-0.5" style={{ color: '#1e293b' }} />
         </div>
       </div>
     </div>
@@ -362,7 +362,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
 
   return (
     <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} isPreview={isPreview}>
-      <div className="p-4 sm:p-5 lg:p-6 space-y-6">
+      <div className="p-3 sm:p-4 lg:p-6 space-y-6">
         {/* Header with streak + E.P.I.C. progress */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -411,17 +411,15 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
             </div>
           ) : (
             <>
-              {featuredVideo?.thumbnail && (
-                <img 
-                  src={featuredVideo.thumbnail.replace('width=320&height=180', 'width=800&height=450')} 
-                  alt="Featured video"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ objectPosition: '50% 35%' }}
-                  loading="eager"
-                />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-r from-hh-ink via-hh-ink/80 to-transparent" />
-              <div className="absolute inset-0 bg-black/20 dark:bg-black/40 pointer-events-none" />
+              <img
+                src="/images/Hugo-Herbots-WEB-0197.JPG"
+                alt="Hugo Herbots"
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ objectPosition: '50% 20%' }}
+                loading="eager"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+              <div className="absolute inset-0 bg-black/20 pointer-events-none" />
               <div className="relative h-full flex items-center p-6 sm:p-8">
                 <div className="text-white space-y-3 max-w-lg">
                   <Badge className="text-white border-0" style={{ backgroundColor: '#4F7396' }}>
@@ -450,13 +448,13 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
                       <Play className="w-4 h-4" />
                       Verder kijken
                     </Button>
-                    <button 
-                      className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border border-white/30 transition-colors cursor-pointer"
-                      style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                    <button
+                      className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white backdrop-blur-sm transition-colors cursor-pointer"
+                      style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
                       onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
                       onFocus={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                      onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
                       onClick={() => navigate?.("talk-to-hugo")}
                     >
                       <MessageSquare className="w-4 h-4" />

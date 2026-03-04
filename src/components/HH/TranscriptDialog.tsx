@@ -459,7 +459,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                           value={feedbackText}
                           onChange={(e) => setFeedbackText(e.target.value)}
                           placeholder="Beschrijf de fout of verbeterpunt..."
-                          className="text-[13px] bg-white border-red-200 focus:border-red-400 min-h-[60px]"
+                          className="text-[13px] bg-hh-bg border-red-200 focus:border-red-400 min-h-[60px]"
                         />
                         <div className="flex gap-2 mt-2">
                           <Button
@@ -497,7 +497,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                       </button>
 
                       {expandedDebug === lineId && (
-                        <Card className="mt-2 p-4 border-2 border-dashed border-hh-ink/20 bg-hh-ui-50/30 text-slate-800">
+                        <Card className="mt-2 p-4 border-2 border-dashed border-hh-ink/20 bg-hh-ui-50/30 text-hh-text">
                           <div className="space-y-3 text-[13px] leading-[18px]">
                             {/* Signaal */}
                             <div className="flex items-center gap-2">
@@ -639,10 +639,10 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                         setEditState({...editState, signal: value})
                                       }
                                     >
-                                      <SelectTrigger className="h-8 text-[12px] bg-white border-slate-300 text-slate-800 cursor-pointer hover:border-purple-400">
+                                      <SelectTrigger className="h-8 text-[12px] bg-hh-bg border-hh-border text-hh-text cursor-pointer hover:border-purple-400">
                                         <SelectValue />
                                       </SelectTrigger>
-                                      <SelectContent className="bg-white border-slate-300">
+                                      <SelectContent className="bg-hh-bg border-hh-border">
                                         <SelectItem value="positief" className="cursor-pointer">Positief</SelectItem>
                                         <SelectItem value="neutraal" className="cursor-pointer">Neutraal</SelectItem>
                                         <SelectItem value="negatief" className="cursor-pointer">Negatief</SelectItem>
@@ -656,10 +656,10 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                       value={editState.expectedTechnique}
                                       onValueChange={(value: string) => setEditState({...editState, expectedTechnique: value})}
                                     >
-                                      <SelectTrigger className="h-8 text-[12px] bg-white border-slate-300 text-slate-800 cursor-pointer hover:border-purple-400">
+                                      <SelectTrigger className="h-8 text-[12px] bg-hh-bg border-hh-border text-hh-text cursor-pointer hover:border-purple-400">
                                         <SelectValue placeholder="Selecteer techniek" />
                                       </SelectTrigger>
-                                      <SelectContent className="bg-white border-slate-300 max-h-[300px]">
+                                      <SelectContent className="bg-hh-bg border-hh-border max-h-[300px]">
                                         {allTechnieken.map((tech) => (
                                           <SelectItem key={tech.nummer} value={tech.nummer} className="cursor-pointer">
                                             {tech.nummer} - {tech.naam}
@@ -675,10 +675,10 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                       value={editState.detectedTechnique || "none"}
                                       onValueChange={(value: string) => setEditState({...editState, detectedTechnique: value === "none" ? "" : value})}
                                     >
-                                      <SelectTrigger className="h-8 text-[12px] bg-white border-slate-300 text-slate-800 cursor-pointer hover:border-purple-400">
+                                      <SelectTrigger className="h-8 text-[12px] bg-hh-bg border-hh-border text-hh-text cursor-pointer hover:border-purple-400">
                                         <SelectValue placeholder="Geen / Onbekend" />
                                       </SelectTrigger>
-                                      <SelectContent className="bg-white border-slate-300 max-h-[300px]">
+                                      <SelectContent className="bg-hh-bg border-hh-border max-h-[300px]">
                                         <SelectItem value="none" className="cursor-pointer">Geen / Onbekend</SelectItem>
                                         {allTechnieken.map((tech) => (
                                           <SelectItem key={tech.nummer} value={tech.nummer} className="cursor-pointer">

@@ -57,8 +57,8 @@ export function SSOValidate({ navigate, onSSOLogin }: SSOValidateProps) {
   }, [navigate, onSSOLogin]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
+    <div className="min-h-screen bg-gradient-to-br from-hh-bg to-hh-ui-50 flex items-center justify-center p-4">
+      <div className="bg-card rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
         {status === "validating" && (
           <>
             <div className="w-16 h-16 border-4 border-hh-ocean-blue border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>

@@ -182,7 +182,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
 
   return (
     <AppLayout currentPage="techniques" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
-      <div className="p-3 sm:p-4 lg:p-6 space-y-4">
+      <div className="p-3 sm:p-4 lg:p-6 space-y-6">
         {/* Header with compact KPI cards on the right */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-2">
           <div>
@@ -236,8 +236,8 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
             style={{ objectPosition: '50% 30%' }}
           />
           {/* Gradient overlay - dark to light from left */}
-          <div className="absolute inset-0 bg-gradient-to-r from-hh-ink via-hh-ink/80 to-transparent" />
-          <div className="absolute inset-0 bg-black/20 dark:bg-black/40 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+          <div className="absolute inset-0 bg-black/20 pointer-events-none" />
           
           {/* Content */}
           <div className="relative h-full flex items-center p-6 sm:p-8">
@@ -257,13 +257,13 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
               </p>
               
               <div className="flex flex-wrap gap-3 pt-1">
-                <button 
-                  className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border border-white/30 transition-colors cursor-pointer"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                <button
+                  className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border border-white/60 backdrop-blur-sm transition-colors cursor-pointer"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
                   onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
                   onFocus={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                  onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+                  onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
                   onClick={() => navigate?.("videos")}
                 >
                   <Play className="w-4 h-4" />

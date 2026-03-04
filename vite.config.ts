@@ -160,6 +160,10 @@ export default defineConfig({
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
+      '/api/v3': {
+        target: 'http://localhost:3002',
+        changeOrigin: true,
+      },
       '/api/v2': {
         target: 'http://localhost:3002',
         changeOrigin: true,

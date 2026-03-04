@@ -26,6 +26,7 @@ export interface LiveSession {
   muxAssetId?: string | null;
   transcript?: string | null;
   aiSummary?: string | null;
+  recordingApproved?: boolean;
 }
 
 export interface LiveChatMessage {

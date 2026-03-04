@@ -11,7 +11,7 @@ export function InlineWebinarCard({ webinar }: InlineWebinarCardProps) {
       href={webinar.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors p-3 flex items-center gap-3 text-left w-full group no-underline"
+      className="rounded-xl border border-hh-border bg-card hover:bg-hh-ui-50 transition-colors p-3 flex items-center gap-3 text-left w-full group no-underline"
       style={{ maxWidth: 480 }}
     >
       <div
@@ -24,12 +24,12 @@ export function InlineWebinarCard({ webinar }: InlineWebinarCardProps) {
         />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="font-medium text-sm text-slate-800 truncate">{webinar.title}</p>
+        <p className="font-medium text-sm text-hh-text truncate">{webinar.title}</p>
         {webinar.description && (
-          <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{webinar.description}</p>
+          <p className="text-xs text-hh-muted mt-0.5 line-clamp-2">{webinar.description}</p>
         )}
         {webinar.date && (
-          <p className="text-xs text-slate-400 mt-0.5">{webinar.date}</p>
+          <p className="text-xs text-hh-muted mt-0.5">{webinar.date}</p>
         )}
       </div>
       <div className="flex items-center gap-1 flex-shrink-0">
@@ -38,7 +38,7 @@ export function InlineWebinarCard({ webinar }: InlineWebinarCardProps) {
             LIVE
           </span>
         )}
-        <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+        <ExternalLink className="w-4 h-4 text-hh-muted group-hover:text-hh-text" />
       </div>
     </a>
   );

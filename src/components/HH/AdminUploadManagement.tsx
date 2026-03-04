@@ -24,6 +24,7 @@ import {
 import { CustomCheckbox } from "../ui/custom-checkbox";
 import { useState, useEffect, useRef } from "react";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
+import { getAuthHeaders } from "../../services/hugoApi";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -88,7 +89,9 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
     const fetchAnalyses = async () => {
       try {
         setLoading(true);
-        const res = await fetch('/api/v2/analysis/list');
+        const res = await fetch('/api/v2/analysis/list', {
+          headers: await getAuthHeaders(),
+        });
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
 
@@ -140,7 +143,9 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
     let timeoutId: ReturnType<typeof setTimeout>;
     const poll = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list');
+        const res = await fetch('/api/v2/analysis/list', {
+          headers: await getAuthHeaders(),
+        });
         if (res.ok) {
           const data = await res.json();
           const mapped: UploadItem[] = (data.analyses || []).map((a: any) => {

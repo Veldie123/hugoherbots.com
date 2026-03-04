@@ -455,13 +455,51 @@ ${platformUrl}`;
     }
   };
 
+  const handleApproveRecording = async (e: React.MouseEvent, sessionId: string, approved: boolean) => {
+    e.stopPropagation();
+    try {
+      await liveCoachingApi.sessions.approveRecording(sessionId, approved);
+      toast.success(approved ? "Opname goedgekeurd" : "Opname afgewezen");
+      loadSessions();
+    } catch (error: any) {
+      toast.error(error.message || "Actie mislukt");
+    }
+  };
+
   const getRecordingStatus = (session: LiveSession) => {
     if (session.muxPlaybackId) {
+      if (session.recordingApproved) {
+        return (
+          <Badge className="bg-green-500/10 text-green-600 border-green-500/20 gap-1">
+            <CheckCircle2 className="w-3 h-3" />
+            Goedgekeurd
+          </Badge>
+        );
+      }
       return (
-        <Badge className="bg-green-500/10 text-green-600 border-green-500/20 gap-1">
-          <CheckCircle2 className="w-3 h-3" />
-          Verwerkt
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 gap-1">
+            Wacht op goedkeuring
+          </Badge>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 px-2 text-[11px] gap-1 border-green-300 text-green-700 hover:bg-green-500/10"
+            onClick={(e) => handleApproveRecording(e, session.id, true)}
+          >
+            <CheckCircle2 className="w-3 h-3" />
+            Goedkeuren
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 px-2 text-[11px] gap-1 border-red-300 text-red-700 hover:bg-red-500/10"
+            onClick={(e) => handleApproveRecording(e, session.id, false)}
+          >
+            <X className="w-3 h-3" />
+            Afwijzen
+          </Button>
+        </div>
       );
     }
     
@@ -544,7 +582,7 @@ ${platformUrl}`;
   if (activeCall) {
     return (
       <AdminLayout currentPage="admin-live" navigate={navigate} isSuperAdmin={isSuperAdmin}>
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 admin-session">
           <Button
             variant="outline"
             size="sm"
@@ -554,7 +592,7 @@ ${platformUrl}`;
             <ArrowLeft className="w-4 h-4" />
             Terug naar overzicht
           </Button>
-          
+
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="w-full lg:w-[60%] h-[50vh] lg:h-[calc(100vh-12rem)]">
               <CustomDailyCall

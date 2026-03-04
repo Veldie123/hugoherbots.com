@@ -1500,7 +1500,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     if (!onboardingCurrentItem || !feedbackText.trim()) return;
     const currentName = onboardingCurrentItem.name;
     try {
-      await fetch('/api/v2/admin/onboarding/feedback', {
+      const fbRes = await fetch('/api/v2/admin/onboarding/feedback', {
         method: 'POST',
         headers: await getAuthHeaders(),
         body: JSON.stringify({
@@ -1510,6 +1510,10 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           userId: user?.id || 'hugo',
         }),
       });
+      if (!fbRes.ok) {
+        const errData = await fbRes.json().catch(() => ({}));
+        throw new Error(errData.error || `Feedback opslaan mislukt (${fbRes.status})`);
+      }
       setOnboardingFeedbackInput(null);
       setIsLoading(true);
 
@@ -1781,7 +1785,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                             analysis={rc.data as AnalysisResultEmbed}
                             onViewFull={rc.type === 'analysis_result' ? (convId) => {
                               if (navigate) {
-                                navigate('analysis-results');
+                                navigate(adminViewMode ? 'admin-analysis-results' : 'analysis-results', { conversationId: convId });
                                 setTimeout(() => {
                                   window.dispatchEvent(new CustomEvent('navigate-analysis', { detail: { conversationId: convId } }));
                                 }, 100);

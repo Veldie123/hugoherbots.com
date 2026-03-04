@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useMobileViewMode } from "@/hooks/useMobileViewMode";
+import { getAuthHeaders } from "../../services/hugoApi";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -153,7 +154,9 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
     setError(null);
 
     try {
-      const res = await fetch("/api/v2/analysis/list?source=upload");
+      const res = await fetch("/api/v2/analysis/list?source=upload", {
+        headers: await getAuthHeaders(),
+      });
       if (!res.ok) throw new Error("Analyses ophalen mislukt");
       const data = await res.json();
       setAnalyses(data.analyses || []);
@@ -571,7 +574,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-9 w-9 rounded-none ${viewMode === "list" ? "bg-purple-100 text-purple-700" : "text-hh-muted hover:text-purple-600"}`}
+                  className={`h-9 w-9 rounded-none ${viewMode === "list" ? "bg-purple-600 text-white hover:bg-purple-700" : "text-hh-muted hover:text-purple-600"}`}
                   onClick={() => setViewMode("list")}
                 >
                   <List className="w-4 h-4" />
@@ -579,7 +582,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-9 w-9 rounded-none ${viewMode === "grid" ? "bg-purple-100 text-purple-700" : "text-hh-muted hover:text-purple-600"}`}
+                  className={`h-9 w-9 rounded-none ${viewMode === "grid" ? "bg-purple-600 text-white hover:bg-purple-700" : "text-hh-muted hover:text-purple-600"}`}
                   onClick={() => setViewMode("grid")}
                 >
                   <LayoutGrid className="w-4 h-4" />
