@@ -30,8 +30,8 @@ export async function compressAudioIfNeeded(
     console.error('[Compressor] Compression failed, using original:', err.message);
     return { buffer, mimetype, originalName, compressed: false };
   } finally {
-    try { await fs.promises.unlink(inputPath); } catch {}
-    try { await fs.promises.unlink(outputPath); } catch {}
+    try { await fs.promises.unlink(inputPath); } catch { /* cleanup best-effort */ }
+    try { await fs.promises.unlink(outputPath); } catch { /* cleanup best-effort */ }
   }
 }
 
@@ -60,7 +60,7 @@ export async function compressAudioFileFromPath(
     const buffer = await fs.promises.readFile(inputPath);
     return { buffer, mimetype: 'audio/mp4', originalName, compressed: false };
   } finally {
-    try { await fs.promises.unlink(outputPath); } catch {}
+    try { await fs.promises.unlink(outputPath); } catch { /* cleanup best-effort */ }
   }
 }
 

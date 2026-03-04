@@ -151,7 +151,7 @@ export function UserNotifications({ navigate, isAdmin }: UserNotificationsProps)
   const videosCount = notifications.filter((n) => n.category === "videos").length;
 
   const markAllAsRead = () => {
-    console.log("Marking all as read");
+    // TODO: implement mark-all-as-read API call
   };
 
   const handleNotificationClick = (notification: typeof notifications[0]) => {

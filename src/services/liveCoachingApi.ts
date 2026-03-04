@@ -107,7 +107,6 @@ export const liveCoachingApi = {
         throw new Error('Kon sessie niet aanmaken: ' + error.message);
       }
       
-      console.log('✅ Session created:', session.id);
       return mapRowToSession(session);
     },
 
@@ -133,7 +132,6 @@ export const liveCoachingApi = {
         throw new Error('Kon sessie niet bijwerken: ' + error.message);
       }
       
-      console.log('✅ Session updated:', id);
       return mapRowToSession(session);
     },
 
@@ -149,7 +147,6 @@ export const liveCoachingApi = {
         throw new Error('Kon sessie niet verwijderen: ' + (result.message || 'Onbekende fout'));
       }
       
-      console.log('✅ Session deleted:', id);
       return { success: true };
     },
 
@@ -166,7 +163,6 @@ export const liveCoachingApi = {
         throw new Error('Kon sessie niet starten: ' + (result.message || 'Onbekende fout'));
       }
       
-      console.log('✅ Session started:', id);
       const session = result.session;
       return {
         id: session.id,
@@ -201,7 +197,6 @@ export const liveCoachingApi = {
         throw new Error('Kon sessie niet beëindigen: ' + (result.message || 'Onbekende fout'));
       }
       
-      console.log('✅ Session ended:', id);
       return mapRowToSession(result.session);
     },
 
@@ -472,8 +467,6 @@ export const liveCoachingApi = {
 
   recording: {
     start: async (sessionId: string, roomName?: string): Promise<{ success: boolean; recording: { id: string; status: string } }> => {
-      console.log('Recording start requested for session:', sessionId, 'room:', roomName);
-      
       if (!roomName) {
         const { data: session } = await supabase
           .from('live_sessions')
@@ -503,8 +496,6 @@ export const liveCoachingApi = {
     },
 
     stop: async (sessionId: string, roomName?: string): Promise<{ success: boolean }> => {
-      console.log('Recording stop requested for session:', sessionId, 'room:', roomName);
-      
       if (!roomName) {
         const { data: session } = await supabase
           .from('live_sessions')

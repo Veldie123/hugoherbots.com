@@ -21,9 +21,6 @@ export function SSOValidate({ navigate, onSSOLogin }: SSOValidateProps) {
           return;
         }
 
-        console.log("[SSO] Validating token:", token.substring(0, 10) + "...");
-        console.log("[SSO] Full URL:", window.location.href);
-
         const response = await fetch(`/api/sso/validate?token=${token}`);
         const data = await response.json();
 
@@ -32,8 +29,6 @@ export function SSOValidate({ navigate, onSSOLogin }: SSOValidateProps) {
           setErrorMessage(data.error || "Token is ongeldig of verlopen");
           return;
         }
-
-        console.log("[SSO] Token valid for user:", data.userId);
 
         localStorage.setItem('sso_user_id', data.userId);
         localStorage.setItem('sso_user', JSON.stringify(data.user || {}));

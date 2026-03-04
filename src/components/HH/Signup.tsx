@@ -36,8 +36,6 @@ export function Signup({ onLoginClick, onSignupSuccess, navigate }: SignupProps)
     setError('');
     setIsLoading(true);
 
-    console.log('🚀 Starting signup process...');
-
     try {
       // 1. Call backend signup route
       const signupResponse = await fetch(
@@ -57,25 +55,18 @@ export function Signup({ onLoginClick, onSignupSuccess, navigate }: SignupProps)
         }
       );
 
-      console.log(`📡 Signup response status: ${signupResponse.status}`);
       const signupData = await signupResponse.json();
-      console.log('📡 Signup response data:', signupData);
 
       if (!signupResponse.ok) {
         throw new Error(signupData.message || 'Signup failed');
       }
-
-      console.log('✅ Signup success:', signupData);
 
       // 2. Use session from signup response (no separate login needed!)
       if (!signupData.session) {
         throw new Error('No session returned from signup');
       }
 
-      console.log('✅ Session received from signup');
-
       // 3. Fetch workspaces
-      console.log('📁 Fetching workspaces...');
       const workspacesResponse = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-b9a572ea/workspaces`,
         {
@@ -90,21 +81,17 @@ export function Signup({ onLoginClick, onSignupSuccess, navigate }: SignupProps)
       }
 
       const workspacesData = await workspacesResponse.json();
-      console.log('✅ Workspaces fetched:', workspacesData.workspaces);
 
       // 4. Store workspace in localStorage
       if (workspacesData.workspaces && workspacesData.workspaces.length > 0) {
         localStorage.setItem('hh_workspace', JSON.stringify(workspacesData.workspaces[0]));
-        console.log('📦 Workspace stored:', workspacesData.workspaces[0]);
       }
 
       // 5. Navigate based on user type (admin or regular)
       const isAdmin = email.endsWith('@hugoherbots.com');
       if (isAdmin) {
-        console.log('🎉 Signup complete! Admin user - navigating to admin-dashboard...');
         navigate('admin-dashboard');
       } else {
-        console.log('🎉 Signup complete! Navigating to talk-to-hugo...');
         navigate('talk-to-hugo');
       }
 

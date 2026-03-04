@@ -753,7 +753,7 @@ export async function runFullAnalysisV3(
       if (fs.existsSync(cleanupPath)) {
         fs.unlinkSync(cleanupPath);
       }
-    } catch {}
+    } catch { /* cleanup best-effort */ }
 
     console.log(
       `[V3 Analysis] Complete: ${conversationId} — score ${insights.overallScore}%`
@@ -784,5 +784,5 @@ async function persistStatus(
       "UPDATE conversation_analyses SET status = $1 WHERE id = $2",
       [status, conversationId]
     );
-  } catch {}
+  } catch (e) { console.error('[V3 Analysis] Error updating analysis status:', e); }
 }

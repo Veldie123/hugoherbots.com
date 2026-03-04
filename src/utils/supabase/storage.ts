@@ -178,41 +178,31 @@ export async function uploadConversation(
   const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
   const filePath = `${userId}/${fileName}`
 
-  console.log('📤 [v2] Uploading conversation file:', { fileName, fileSize: file.size, fileType: file.type })
-
   // Normalize MIME type to Supabase-supported types
   let contentType = file.type
-  
+
   // M4A files often have problematic MIME types - normalize them
   if (fileExt === 'm4a' || file.type === 'audio/x-m4a' || file.type === 'audio/m4a') {
     contentType = 'audio/mp4' // Supabase accepts audio/mp4 for M4A
-    console.log('🔄 Normalized M4A MIME type from', file.type, 'to', contentType)
   }
-  
+
   // MP3 files sometimes have incorrect MIME types
   if (fileExt === 'mp3' && (!file.type || file.type === 'audio/mp3')) {
     contentType = 'audio/mpeg' // Standard MP3 MIME type
-    console.log('🔄 Normalized MP3 MIME type from', file.type, 'to', contentType)
   }
-  
+
   // MOV files
   if (fileExt === 'mov' && (!file.type || file.type !== 'video/quicktime')) {
     contentType = 'video/quicktime'
-    console.log('🔄 Normalized MOV MIME type from', file.type, 'to', contentType)
   }
-  
+
   // WAV files
   if (fileExt === 'wav' && (!file.type || file.type === 'audio/x-wav')) {
     contentType = 'audio/wav'
-    console.log('🔄 Normalized WAV MIME type from', file.type, 'to', contentType)
   }
-
-  console.log('📤 Final upload details:', { filePath, contentType, size: file.size })
 
   // Create a new Blob with the correct MIME type to ensure Supabase accepts it
   const fileBlob = new Blob([file], { type: contentType })
-  
-  console.log('📦 Created blob with MIME type:', fileBlob.type)
 
   const { data, error } = await supabase.storage
     .from(BUCKETS.CONVERSATION_UPLOADS)
@@ -227,6 +217,5 @@ export async function uploadConversation(
     return { path: null, error }
   }
 
-  console.log('✅ Conversation uploaded successfully:', data.path)
   return { path: data.path, error: null }
 }

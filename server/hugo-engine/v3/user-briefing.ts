@@ -174,7 +174,7 @@ async function fetchUserName(userId: string): Promise<{
         [userId]
       );
       context = contextResult.rows[0]?.context;
-    } catch {}
+    } catch (e) { console.error('[UserBriefing] Error fetching session context:', e); }
 
     return {
       name: name || "daar",

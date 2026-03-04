@@ -592,7 +592,7 @@ Antwoord als JSON: {"houding": "..."}`
       const parsed = JSON.parse(jsonMatch[0]);
       return (parsed.houding || 'ontwijkend') as CustomerSignal;
     }
-  } catch {}
+  } catch { /* AI signal detection fallback to default */ }
 
   return 'ontwijkend';
 }
@@ -996,8 +996,9 @@ Klant: "${m.customerSaid.substring(0, 150)}"`).join('\n\n');
               toEnrich[idx].betterQuestion = s.betterQuestion || '';
             }
           }
-        } catch {}
-      } catch {
+        } catch { /* JSON parse fallback - suggestions skipped */ }
+      } catch (e) {
+        console.error('[Analysis] Error enriching missed moments:', e);
       }
     }
   }
@@ -1527,7 +1528,7 @@ export async function runFullAnalysis(
         fs.unlinkSync(cleanupPath);
         console.log(`[Analysis] Temp file cleaned up after success: ${storageKey}`);
       }
-    } catch {}
+    } catch { /* cleanup best-effort */ }
   } catch (err: any) {
     job.status = 'failed';
     job.error = err.message || 'Onbekende fout';

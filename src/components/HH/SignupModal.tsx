@@ -11,8 +11,6 @@ interface SignupModalProps {
 }
 
 export function SignupModal({ open, onClose, onSignup, variant = "first" }: SignupModalProps) {
-  console.log("SignupModal render - open:", open, "variant:", variant);
-  
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden max-h-[85vh] overflow-y-auto z-[9999]" aria-describedby={undefined}>

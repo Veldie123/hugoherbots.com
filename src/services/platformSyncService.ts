@@ -28,7 +28,6 @@ export const platformSyncService = {
         return null;
       }
 
-      console.log('[PlatformSync] Message sent:', data);
       return data;
     } catch (error) {
       console.error('[PlatformSync] Failed to send message:', error);
@@ -136,7 +135,6 @@ export const platformSyncService = {
           filter: `target_platform=in.(com,both)`,
         },
         (payload) => {
-          console.log('[PlatformSync] New message received:', payload);
           callback(payload.new as SyncMessage);
         }
       )

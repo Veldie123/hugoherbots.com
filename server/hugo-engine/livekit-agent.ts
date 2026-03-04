@@ -302,7 +302,7 @@ export default defineAgent({
       console.error('[LiveKit Agent] Failed to start V2 session:', error);
       try {
         await session.say('Sorry, er ging iets mis.');
-      } catch (_) {}
+      } catch (_) { /* TTS fallback - session may already be disconnected */ }
     }
     
     console.log('[LiveKit Agent] Ready');

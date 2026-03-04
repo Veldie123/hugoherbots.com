@@ -1699,6 +1699,11 @@ const server = http.createServer((req, res) => {
   
   // PATCH /api/admin/sessions/:id — update webinar title, date, description
   if (pathname.match(/^\/api\/admin\/sessions\/[^/]+$/) && req.method === 'PATCH') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     const sessionId = pathname.replace('/api/admin/sessions/', '');
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -1739,6 +1744,11 @@ const server = http.createServer((req, res) => {
 
   // POST /api/admin/sessions — create new webinar
   if (pathname === '/api/admin/sessions' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
@@ -1777,8 +1787,13 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname.startsWith('/api/admin/sessions/') && req.method === 'DELETE') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     const sessionId = pathname.replace('/api/admin/sessions/', '');
-    
+
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
@@ -1812,8 +1827,13 @@ const server = http.createServer((req, res) => {
   
   // Start session endpoint - uses service role to bypass RLS
   if (pathname.match(/^\/api\/admin\/sessions\/[^/]+\/start$/) && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     const sessionId = pathname.split('/')[4];
-    
+
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
@@ -1916,8 +1936,13 @@ const server = http.createServer((req, res) => {
   
   // Get meeting token endpoint - generates Daily meeting token
   if (pathname.match(/^\/api\/admin\/sessions\/[^/]+\/token$/) && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     const sessionId = pathname.split('/')[4];
-    
+
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
@@ -1989,8 +2014,13 @@ const server = http.createServer((req, res) => {
   // End session endpoint - uses service role to bypass RLS
   // Also fetches Daily.co recording and schedules pipeline processing
   if (pathname.match(/^\/api\/admin\/sessions\/[^/]+\/end$/) && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     const sessionId = pathname.split('/')[4];
-    
+
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
@@ -2178,6 +2208,11 @@ const server = http.createServer((req, res) => {
   
   // Playback Order endpoint - returns ready videos sorted by playback_order
   if (pathname === '/api/videos/playback-order' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -2291,6 +2326,11 @@ const server = http.createServer((req, res) => {
 
   // Reorder videos - update playback_order for multiple videos
   if (pathname === '/api/videos/reorder' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -2652,6 +2692,11 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // Unified Video Library endpoint - uses Supabase for correct database
   if (pathname === '/api/videos/library' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -2893,6 +2938,11 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Delete videos by criteria (for cleanup)
   if (pathname === '/api/videos/cleanup' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -2945,6 +2995,11 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Delete video (admin only - uses service role, soft delete by setting status to 'deleted')
   if (pathname === '/api/videos/delete' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -2991,6 +3046,11 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Toggle video hidden status (admin only - uses service role)
   if (pathname === '/api/videos/toggle-hidden' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -3029,6 +3089,11 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Update video title (admin)
   if (pathname === '/api/videos/update-title' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -3284,6 +3349,11 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Admin Dashboard Stats - KPIs, recent activity, notifications, top content
   if (pathname === '/api/admin/dashboard-stats' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -3620,6 +3690,11 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // Platform Analytics - Aggregated metrics (bypasses RLS with service role)
   if (pathname === '/api/analytics/platform' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -3727,6 +3802,11 @@ Format: ["id1", "id2", "id3", ...]`;
   }
 
   if (pathname === '/api/analytics/user' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -3846,6 +3926,11 @@ Format: ["id1", "id2", "id3", ...]`;
   }
 
   if (pathname === '/api/analytics/users' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -3937,6 +4022,11 @@ Format: ["id1", "id2", "id3", ...]`;
   }
 
   if (pathname === '/api/analytics/content-performance' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {

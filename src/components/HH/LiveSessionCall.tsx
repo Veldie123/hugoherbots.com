@@ -41,8 +41,8 @@ export function LiveSessionCall({
     if (frameRef.current) {
       try {
         frameRef.current.destroy();
-      } catch (e) {
-        console.warn("Error destroying Daily frame:", e);
+      } catch {
+        // intentionally ignored - frame may already be destroyed
       }
       frameRef.current = null;
     }
@@ -73,7 +73,6 @@ export function LiveSessionCall({
 
       frame.on("joined-meeting", async () => {
         setIsJoined(true);
-        console.log("Joined Daily meeting");
         if (!hasLoggedWebinarAttend.current) {
           hasLoggedWebinarAttend.current = true;
           await activityService.logWebinarAttend(sessionId, sessionTitle);
@@ -93,7 +92,6 @@ export function LiveSessionCall({
 
       await frame.join({ url: roomUrl, token });
       setCallFrame(frame);
-      console.log("Daily frame joined successfully");
     } catch (err: any) {
       console.error("Failed to join Daily room:", err);
       destroyFrame();

@@ -142,7 +142,6 @@ class HugoApiService {
 
   setV3Mode(enabled: boolean): void {
     this.useV3 = enabled;
-    console.log(`[HugoApi] V3 mode ${enabled ? 'enabled' : 'disabled'}`);
   }
 
   async startSession(request: StartSessionRequest): Promise<StartSessionResponse> {

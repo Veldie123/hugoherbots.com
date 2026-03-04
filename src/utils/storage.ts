@@ -37,7 +37,6 @@ export async function uploadAvatar(
       return { error: data.error || 'Upload failed' };
     }
 
-    console.log('✅ Avatar uploaded:', data.avatarUrl);
     return { avatarUrl: data.avatarUrl };
 
   } catch (error: any) {
@@ -111,7 +110,6 @@ export async function uploadScenarioAsset(
       return { error: data.error || 'Upload failed' };
     }
 
-    console.log('✅ Scenario asset uploaded:', data.path);
     return { url: data.url, path: data.path };
 
   } catch (error: any) {

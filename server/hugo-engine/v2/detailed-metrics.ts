@@ -668,7 +668,7 @@ Let op:
           quality: o.quality || 'generiek',
           explanation: o.explanation || '',
         }));
-      } catch {}
+      } catch { /* JSON parse fallback - OVB checks skipped */ }
     } catch (err) {
       console.warn('[DetailedMetrics] Impact AI analysis failed:', err);
     }

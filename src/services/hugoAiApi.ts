@@ -10,8 +10,7 @@ export type { ChatMessage, ChatResponse, ActivitySummary, HugoContext };
 
 async function apiCall(endpoint: string, options: RequestInit = {}): Promise<Response> {
   const url = endpoint;
-  console.log(`[HugoAI] Calling: ${url}`);
-  
+
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -70,7 +69,7 @@ export const hugoAiApi = {
           });
           if (response.ok) break;
         } catch {
-          console.log(`[HugoAI] Endpoint ${endpoint} failed, trying next...`);
+          // endpoint failed, try next
         }
       }
 
@@ -79,8 +78,7 @@ export const hugoAiApi = {
       }
 
       const data = await response.json();
-      console.log('[HugoAI] Chat response received');
-      
+
       return {
         message: data.response || data.message || data.content || data.text || 'Sorry, ik kon geen antwoord genereren.',
         sessionId: data.sessionId,
@@ -134,7 +132,6 @@ export const hugoAiApi = {
       });
       
       if (!response.ok) {
-        console.log('[HugoAI] Activity summary endpoint returned', response.status);
         return null;
       }
 

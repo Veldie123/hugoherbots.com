@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Send, Bot, User, Loader2, AlertTriangle, Info, ChevronUp, ChevronDown, Save, Play, ExternalLink, CheckCircle, Clock, BarChart3 } from "lucide-react";
+import { getAuthHeaders } from "../../services/hugoApi";
 
 interface Message {
   role: "user" | "assistant";
@@ -26,7 +27,7 @@ interface Props {
   isSuperAdmin?: boolean;
 }
 
-const AGENT_BASE = "http://localhost:3002";
+const AGENT_BASE = "";
 
 export function AdminHugoAgent({ navigate }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -443,9 +444,9 @@ function WebinarListCard({ data }: { data: any[] }) {
     if (!patch || !Object.keys(patch).length) return;
     setSaving(id);
     try {
-      const res = await fetch(`http://localhost:3001/api/admin/sessions/${id}`, {
+      const res = await fetch(`/api/admin-video/admin/sessions/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { ...await getAuthHeaders() },
         body: JSON.stringify(patch)
       });
       const result = await res.json();
@@ -565,9 +566,9 @@ function VideoOrderCard({ data }: { data: any[] }) {
     setSaving(true);
     try {
       const items = videos.map((v, i) => ({ id: v.id, playback_order: i + 1 }));
-      await fetch("http://localhost:3001/api/videos/reorder", {
+      await fetch("/api/admin-video/videos/reorder", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { ...await getAuthHeaders() },
         body: JSON.stringify({ videos: items })
       });
       setIsDirty(false);
@@ -695,9 +696,9 @@ function StartWebinarCard({ data, navigate }: { data: any; navigate?: (page: str
   const handleStart = async () => {
     setStarting(true);
     try {
-      const res = await fetch(`http://localhost:3001/api/admin/sessions/${data.session_id}/start`, {
+      const res = await fetch(`/api/admin-video/admin/sessions/${data.session_id}/start`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" }
+        headers: { ...await getAuthHeaders() }
       });
       const result = await res.json();
       if (result.success) {

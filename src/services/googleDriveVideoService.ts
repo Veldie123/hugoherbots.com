@@ -39,7 +39,6 @@ async function getServiceAccountAuth() {
 
   const client = await auth.getClient();
   cachedAuth = { client, expiry: Date.now() + 55 * 60_000 };
-  console.log(`[GoogleAuth] Token verkregen voor ${keyData.client_email}`);
   return client;
 }
 
@@ -133,7 +132,6 @@ export async function listVideosInFolder(folderId: string, recursive: boolean = 
   
   await scanFolder(folderId);
   
-  console.log(`[GoogleDrive] Gevonden: ${videos.length} video's${recursive ? ' (recursief)' : ''}`);
   return videos;
 }
 

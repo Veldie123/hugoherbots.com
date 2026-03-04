@@ -1060,7 +1060,6 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
       const result = await response.json();
       
       if (!response.ok && response.status !== 202) {
-        console.warn('Sync mislukt:', result.message);
         throw new Error(result.message);
       }
       
@@ -1083,8 +1082,6 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
       
       const totalArchived = result.archived?.length || 0;
       const totalDeleted = result.deleted?.length || 0;
-      
-      console.log(`Sync result: +${totalAdded} added, ${totalArchived} archived, ${totalDeleted} deleted, ${totalUnchanged} unchanged`);
       
       await fetchVideos();
       

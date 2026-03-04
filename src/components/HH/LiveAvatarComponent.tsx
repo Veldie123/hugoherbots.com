@@ -68,8 +68,7 @@ export function LiveAvatarComponent({
       }
       
       const { session_token } = await response.json();
-      console.log("[LiveAvatar] Got session token");
-      
+
       const session = new LiveAvatarSession(session_token, {
         voiceChat: true
       });
@@ -77,7 +76,6 @@ export function LiveAvatarComponent({
       sessionRef.current = session;
       
       session.on(SessionEvent.SESSION_STATE_CHANGED, (state: SessionState) => {
-        console.log("[LiveAvatar] State changed:", state);
         if (state === SessionState.CONNECTED) {
           setStatus("connected");
         } else if (state === SessionState.DISCONNECTED) {
@@ -86,29 +84,24 @@ export function LiveAvatarComponent({
       });
       
       session.on(SessionEvent.SESSION_STREAM_READY, () => {
-        console.log("[LiveAvatar] Stream ready");
         if (videoRef.current) {
           session.attach(videoRef.current);
         }
       });
       
-      session.on(SessionEvent.SESSION_DISCONNECTED, (reason) => {
-        console.log("[LiveAvatar] Disconnected:", reason);
+      session.on(SessionEvent.SESSION_DISCONNECTED, () => {
         setStatus("disconnected");
       });
       
       session.on(AgentEventsEnum.AVATAR_SPEAK_STARTED, () => {
-        console.log("[LiveAvatar] Avatar started speaking");
         setIsAvatarTalking(true);
       });
       
       session.on(AgentEventsEnum.AVATAR_SPEAK_ENDED, () => {
-        console.log("[LiveAvatar] Avatar stopped speaking");
         setIsAvatarTalking(false);
       });
       
       session.on(AgentEventsEnum.AVATAR_TRANSCRIPTION, (event) => {
-        console.log("[LiveAvatar] Avatar transcription:", event.text);
         setTranscript(prev => [...prev, {
           role: "avatar",
           text: event.text,
@@ -118,17 +111,14 @@ export function LiveAvatarComponent({
       });
       
       session.on(AgentEventsEnum.USER_SPEAK_STARTED, () => {
-        console.log("[LiveAvatar] User started speaking");
         setIsUserTalking(true);
       });
       
       session.on(AgentEventsEnum.USER_SPEAK_ENDED, () => {
-        console.log("[LiveAvatar] User stopped speaking");
         setIsUserTalking(false);
       });
       
       session.on(AgentEventsEnum.USER_TRANSCRIPTION, (event) => {
-        console.log("[LiveAvatar] User transcription:", event.text);
         setTranscript(prev => [...prev, {
           role: "user",
           text: event.text,
@@ -138,8 +128,7 @@ export function LiveAvatarComponent({
       });
       
       await session.start();
-      
-      console.log("[LiveAvatar] Session started");
+
       setStatus("connected");
       
     } catch (error: any) {
