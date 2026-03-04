@@ -32,7 +32,7 @@ export function EPICProgressKPI({ phases, className = "" }: EPICProgressKPIProps
 
   return (
     <Card className={`p-4 rounded-[16px] shadow-hh-sm border-hh-border ${className}`}>
-      <div className="flex items-center gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
         {/* Left: Title */}
         <div className="flex-shrink-0">
           <h3 className="text-[14px] leading-[20px] text-hh-text font-medium whitespace-nowrap">
@@ -74,7 +74,7 @@ export function EPICProgressKPI({ phases, className = "" }: EPICProgressKPIProps
           <div className="flex items-center gap-1 mt-1.5">
             {phases.map((phase) => (
               <div key={phase.phaseNumber} className="flex-1 text-center">
-                <span className="text-[9px] text-hh-muted">
+                <span className="text-[11px] sm:text-[9px] text-hh-muted">
                   {phase.phaseNumber === -1 ? "Voorb" : phase.phaseNumber === 1 ? "Open" : phase.phaseNumber === 2 ? "Ontd" : phase.phaseNumber === 3 ? "Voor" : "Afsl"}
                 </span>
               </div>
@@ -83,25 +83,25 @@ export function EPICProgressKPI({ phases, className = "" }: EPICProgressKPIProps
         </div>
 
         {/* Right: Compact Stats */}
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-3 flex-shrink-0 justify-between sm:justify-start">
           <div className="text-center">
             <div className="text-[16px] leading-[20px] font-bold text-hh-text">{totalVideos}</div>
-            <div className="text-[9px] text-hh-muted">video's</div>
+            <div className="text-[11px] sm:text-[9px] text-hh-muted">video's</div>
           </div>
           <div className="w-px h-8 bg-hh-border" />
           <div className="text-center">
             <div className="text-[16px] leading-[20px] font-bold text-hh-text">{totalLive}</div>
-            <div className="text-[9px] text-hh-muted">live</div>
+            <div className="text-[11px] sm:text-[9px] text-hh-muted">live</div>
           </div>
           <div className="w-px h-8 bg-hh-border" />
           <div className="text-center">
             <div className="text-[16px] leading-[20px] font-bold text-hh-text">{totalAnalyses}</div>
-            <div className="text-[9px] text-hh-muted">analyses</div>
+            <div className="text-[11px] sm:text-[9px] text-hh-muted">analyses</div>
           </div>
           <div className="w-px h-8 bg-hh-border" />
           <div className="text-center">
             <div className="text-[16px] leading-[20px] font-bold text-hh-text">{totalChats}</div>
-            <div className="text-[9px] text-hh-muted">chats</div>
+            <div className="text-[11px] sm:text-[9px] text-hh-muted">chats</div>
           </div>
         </div>
       </div>

@@ -766,7 +766,7 @@ function PricingSection({ navigate }: { navigate: (page: Page) => void }) {
           <FadeIn delay={0}>
             <PricingTier
               name="Pro"
-              price={isYearly ? "€29" : "€49"}
+              price={isYearly ? "€49" : "€98"}
               period="/maand"
               priceNote={isYearly ? "Gefactureerd jaarlijks" : undefined}
               features={[
@@ -782,7 +782,7 @@ function PricingSection({ navigate }: { navigate: (page: Page) => void }) {
           <FadeIn delay={0.1}>
             <PricingTier
               name="Founder"
-              price={isYearly ? "€249,50" : "€499"}
+              price={isYearly ? "€249" : "€498"}
               period="/maand"
               priceNote={isYearly ? "Gefactureerd jaarlijks" : undefined}
               subtitleNote="Beperkt tot 100 leden"
@@ -803,7 +803,7 @@ function PricingSection({ navigate }: { navigate: (page: Page) => void }) {
           <FadeIn delay={0.2}>
             <PricingTier
               name="Inner Circle"
-              price={isYearly ? "€1.249" : "€1.499"}
+              price={isYearly ? "€1.249" : "€2.498"}
               period="/maand"
               priceNote={isYearly ? "Gefactureerd jaarlijks" : undefined}
               subtitleNote="Exclusief — max 20 leden"
@@ -843,7 +843,7 @@ function FooterCTASection({ navigate }: { navigate: (page: Page) => void }) {
             style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.1 }}
           >
             Train elke dag met Hugo.<br />
-            <span className="font-semibold">Vanaf €29/maand.</span>
+            <span className="font-semibold">Vanaf €49/maand.</span>
           </h2>
         </FadeIn>
         <FadeIn delay={0.2}>

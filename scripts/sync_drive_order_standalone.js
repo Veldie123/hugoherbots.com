@@ -63,7 +63,7 @@ async function listDriveSubfolders(folderId, accessToken) {
     pageToken = data.nextPageToken || null;
   } while (pageToken);
 
-  return folders.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+  return folders.sort((a, b) => a.name.localeCompare(b.name, 'nl', { numeric: true, sensitivity: 'base' }));
 }
 
 async function listDriveVideosInFolder(folderId, accessToken) {
@@ -87,7 +87,7 @@ async function listDriveVideosInFolder(folderId, accessToken) {
     pageToken = data.nextPageToken || null;
   } while (pageToken);
 
-  return videos.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+  return videos.sort((a, b) => a.name.localeCompare(b.name, 'nl', { numeric: true, sensitivity: 'base' }));
 }
 
 async function scanFolder(folderId, accessToken, depth = 0) {
@@ -153,12 +153,13 @@ async function main() {
   const newVideos = [];
 
   // Process Drive videos: add new ones, update order
-  for (let i = 0; i < allActiveVideos.length; i++) {
-    const video = allActiveVideos[i];
+  let orderIndex = 0;
+  for (const video of allActiveVideos) {
     if (video.name.startsWith('Kopie van ')) continue;
+    orderIndex++;
 
     const existing = existingMap.get(video.id);
-    const playback_order = i + 1;
+    const playback_order = orderIndex;
 
     if (!existing) {
       // New video

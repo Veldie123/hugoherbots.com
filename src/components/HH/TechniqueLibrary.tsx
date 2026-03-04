@@ -605,7 +605,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
           </div>
         )}
         {viewMode === "grid" && filteredTechnieken.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 pb-8">
             {filteredTechnieken.map((techniek) => {
               const getPhaseImage = (code: string) => {
                 const phase = code.split('.')[0];
@@ -648,8 +648,8 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                     }
                   }}
                 >
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-110"
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-110 bg-gradient-to-br from-[#1e293b] to-hh-primary/80"
                     style={{ backgroundImage: `url(${getPhaseImage(techniek.code)})` }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />

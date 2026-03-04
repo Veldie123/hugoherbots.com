@@ -9,22 +9,13 @@ import {
   Upload,
   FileAudio,
   FileVideo,
-  Calendar,
   Clock,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Play,
-  Trash2,
-  Eye,
-  Download,
   CheckCircle2,
   Loader2,
   AlertCircle,
   Sparkles,
   Mic,
   MicOff,
-  Phone,
   MessageSquare,
   Lock,
   Target,
@@ -34,20 +25,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "../../contexts/UserContext";
 import { useNotifications } from "../../contexts/NotificationContext";
-import { getAllTechnieken, getTechniekByNummer, getFaseNaam } from "../../data/technieken-service";
-
-interface UploadedAnalysis {
-  id: string;
-  title: string;
-  type: "audio" | "video";
-  uploadDate: string;
-  duration: string;
-  status: "processing" | "completed" | "failed";
-  overallScore?: number;
-  scoreDelta?: "up" | "down" | "neutral";
-  topTechnique?: string;
-  phase?: string;
-}
+import { getAuthHeaders } from "../../services/hugoApi";
 
 interface UploadAnalysisProps {
   navigate?: (page: string, data?: any) => void;
@@ -120,61 +98,6 @@ export function UploadAnalysis({
     text: string; 
     timestamp: string;
   }>>([]);
-
-  const analyses: UploadedAnalysis[] = [
-    {
-      id: "1",
-      title: "Discovery call - Acme Inc",
-      type: "audio",
-      uploadDate: "12 jan 2025",
-      duration: "24:18",
-      status: "completed",
-      overallScore: 78,
-      scoreDelta: "up",
-      topTechnique: getTechniekByNummer("2.1.2")?.naam || "Meningsgerichte vragen",
-      phase: "Fase 2 • Ontdekking",
-    },
-    {
-      id: "2",
-      title: "Closing meeting - TechCorp",
-      type: "video",
-      uploadDate: "10 jan 2025",
-      duration: "18:45",
-      status: "completed",
-      overallScore: 85,
-      scoreDelta: "up",
-      topTechnique: getTechniekByNummer("4.2.3")?.naam || "Poging tot uitstel",
-      phase: "Fase 4 • Afsluiting",
-    },
-    {
-      id: "3",
-      title: "Cold call - ScaleUp BV",
-      type: "audio",
-      uploadDate: "8 jan 2025",
-      duration: "12:34",
-      status: "processing",
-    },
-    {
-      id: "4",
-      title: "Proposal presentation - GrowCo",
-      type: "video",
-      uploadDate: "5 jan 2025",
-      duration: "32:12",
-      status: "completed",
-      overallScore: 72,
-      scoreDelta: "down",
-      topTechnique: getTechniekByNummer("3.2")?.naam || "Oplossing",
-      phase: "Fase 3 • Voorstel",
-    },
-    {
-      id: "5",
-      title: "Follow-up call - SalesForce",
-      type: "audio",
-      uploadDate: "3 jan 2025",
-      duration: "15:23",
-      status: "failed",
-    },
-  ];
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -267,6 +190,8 @@ export function UploadAnalysis({
 
   const uploadChunked = async (file: File, userId: string): Promise<any> => {
     const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    const authHeaders = await getAuthHeaders();
+    const { 'Content-Type': _, ...formDataAuth } = authHeaders;
 
     setAnalysisStatus({
       conversationId: '',
@@ -276,7 +201,7 @@ export function UploadAnalysis({
 
     const initRes = await fetch('/api/v2/analysis/upload/init', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders,
       body: JSON.stringify({
         fileName: file.name,
         fileSize: file.size,
@@ -302,6 +227,7 @@ export function UploadAnalysis({
 
       const chunkRes = await fetch('/api/v2/analysis/upload/chunk', {
         method: 'POST',
+        headers: formDataAuth,
         body: formData,
       });
       if (!chunkRes.ok) {
@@ -325,7 +251,7 @@ export function UploadAnalysis({
 
     const completeRes = await fetch('/api/v2/analysis/upload/complete', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders,
       body: JSON.stringify({
         uploadId,
         title,
@@ -375,6 +301,9 @@ export function UploadAnalysis({
           step: `Uploaden & comprimeren...`,
         });
 
+        const authHeaders = await getAuthHeaders();
+        const { 'Content-Type': _, ...formDataAuth } = authHeaders;
+
         const formData = new FormData();
         formData.append('file', selectedFile);
         formData.append('title', title);
@@ -384,6 +313,7 @@ export function UploadAnalysis({
 
         const response = await fetch('/api/v2/analysis/upload', {
           method: 'POST',
+          headers: formDataAuth,
           body: formData,
         });
 
@@ -475,32 +405,6 @@ export function UploadAnalysis({
     }, 3000);
 
     pollIntervalRef.current = interval;
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle2 className="w-5 h-5 text-hh-success" />;
-      case "processing":
-        return <Loader2 className="w-5 h-5 text-hh-primary animate-spin" />;
-      case "failed":
-        return <AlertCircle className="w-5 h-5 text-hh-destructive" />;
-      default:
-        return null;
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "Analyse compleet";
-      case "processing":
-        return "Analyseren...";
-      case "failed":
-        return "Analyse mislukt";
-      default:
-        return status;
-    }
   };
 
   return (

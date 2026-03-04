@@ -1153,59 +1153,25 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     checkCredentials();
   }, []);
 
-  // Auto-sync on mount and every 60 minutes
+  // Drive sync now runs server-side in video-processor.js (every SYNC_INTERVAL_MINUTES)
+  // Manual sync still available via "Sync Drive" button
+  // Fetch Drive total count on mount for stats display
   useEffect(() => {
-    const autoSync = async () => {
+    const fetchDriveCount = async () => {
       try {
         const token = await getAuthToken();
-        const response = await fetch("/api/admin-video/video-processor/sync", {
+        const resp = await fetch("/api/admin-video/video-processor/sync-preview", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
           body: JSON.stringify({ folderIds: SYNC_FOLDERS.map(f => f.id) })
         });
-        const result = await response.json();
-        if (response.ok && result.added?.length > 0) {
-          toast.success(`${result.added.length} nieuwe video's gevonden in Drive`);
-          await fetchVideos();
-          try {
-            await fetch('/api/admin-video/video-processor/batch/start', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify({ intervalMinutes: 15 })
-            });
-          } catch (e) { /* silent */ }
+        const result = await resp.json();
+        if (resp.ok) {
+          setDriveTotalCount(result.summary?.activeInDrive || result.summary?.totalInDrive || null);
         }
-        // Also update the drive total count via preview
-        try {
-          const previewResp = await fetch("/api/admin-video/video-processor/sync-preview", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ folderIds: SYNC_FOLDERS.map(f => f.id) })
-          });
-          const previewResult = await previewResp.json();
-          if (previewResp.ok) {
-            setDriveTotalCount(previewResult.summary?.activeInDrive || previewResult.summary?.totalInDrive || null);
-          }
-        } catch (e) { /* silent */ }
-      } catch (e) { /* silent background sync */ }
+      } catch (e) { /* silent */ }
     };
-    
-    const initialTimeout = setTimeout(autoSync, 3000);
-    const interval = setInterval(autoSync, 60 * 60 * 1000);
-    
-    return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
-    };
+    fetchDriveCount();
   }, []);
 
   // Handle video processing - starts Cloud Run batch queue

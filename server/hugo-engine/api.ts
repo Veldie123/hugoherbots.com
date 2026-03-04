@@ -5581,7 +5581,7 @@ async function startServer() {
       res.status(response.status).json(data);
     } catch (err: any) {
       console.error('[Admin Video Proxy] Error:', err.message);
-      res.status(502).json({ error: 'Video processor unavailable' });
+      res.status(502).json({ success: false, message: 'Video processor niet bereikbaar (poort 3001). Start de video-processor service.' });
     }
   });
 

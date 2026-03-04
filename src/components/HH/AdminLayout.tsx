@@ -332,9 +332,12 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-full p-0 flex flex-col bg-hh-bg">
           <SheetHeader className="px-6 py-4 border-b border-hh-border flex-shrink-0">
-            <SheetTitle className="flex items-center gap-2">
-              <Logo variant="horizontal" className="text-hh-ink text-[16px]" />
-              <Badge className="bg-purple-600 text-white border-0 text-[10px] px-2 py-0.5">
+            <SheetTitle className="flex items-center gap-3">
+              <div className="flex flex-col items-start gap-0">
+                <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HUGO</span>
+                <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HERBOTS</span>
+              </div>
+              <Badge className="bg-purple-600 text-white border-0 text-[10px] px-2 py-0.5 self-start mt-0.5">
                 ADMIN
               </Badge>
             </SheetTitle>
@@ -465,9 +468,12 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
           className="h-16 flex items-center justify-start px-3 border-b border-hh-border flex-shrink-0 hover:bg-hh-ui-50 transition-colors cursor-pointer"
         >
           {!collapsed ? (
-            <div className="flex items-center gap-2">
-              <Logo variant="horizontal" className="text-hh-ink text-[14px]" />
-              <Badge className="bg-purple-600 text-white border-0 text-[10px] px-2 py-0.5">
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col items-start gap-0">
+                <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HUGO</span>
+                <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HERBOTS</span>
+              </div>
+              <Badge className="bg-purple-600 text-white border-0 text-[10px] px-2 py-0.5 self-start mt-0.5">
                 ADMIN
               </Badge>
             </div>

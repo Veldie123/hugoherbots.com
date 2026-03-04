@@ -288,8 +288,8 @@ export function AppLayout({
         >
           {!collapsed ? (
             <div className="flex flex-col items-start gap-0">
-              <span className="text-[18px] leading-[22px] tracking-widest uppercase font-bold text-hh-ink">HUGO</span>
-              <span className="text-[18px] leading-[22px] tracking-widest uppercase font-bold text-hh-ink">HERBOTS</span>
+              <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HUGO</span>
+              <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HERBOTS</span>
             </div>
           ) : (
             <Logo variant="icon" className="w-8 h-8" />
@@ -416,8 +416,8 @@ export function AppLayout({
           <SheetHeader className="px-4 py-4 border-b border-hh-border flex-shrink-0">
             <SheetTitle className="flex items-center justify-between">
               <div className="flex flex-col items-start gap-0">
-                <span className="text-[18px] leading-[22px] tracking-widest uppercase font-bold text-hh-ink">HUGO</span>
-                <span className="text-[18px] leading-[22px] tracking-widest uppercase font-bold text-hh-ink">HERBOTS</span>
+                <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HUGO</span>
+                <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HERBOTS</span>
               </div>
             </SheetTitle>
           </SheetHeader>

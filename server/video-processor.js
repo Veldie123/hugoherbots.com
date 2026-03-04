@@ -1347,12 +1347,13 @@ async function syncVideosFromDrive(folderIdOrIds) {
   // allActiveVideos is already in Drive folder order (orderBy=name, depth-first traversal)
   console.log(`[Sync] Assigning playback_order for ${allActiveVideos.length} active videos...`);
   const orderUpdates = [];
-  for (let i = 0; i < allActiveVideos.length; i++) {
-    const video = allActiveVideos[i];
+  let orderIndex = 0;
+  for (const video of allActiveVideos) {
     if (video.name.startsWith('Kopie van ')) continue;
+    orderIndex++;
     const job = existingMap.get(video.id);
     if (job) {
-      orderUpdates.push({ id: job.id, playback_order: i + 1, drive_file_name: video.name });
+      orderUpdates.push({ id: job.id, playback_order: orderIndex, drive_file_name: video.name });
     }
   }
   
@@ -3347,6 +3348,186 @@ Format: ["id1", "id2", "id3", ...]`;
     return;
   }
   
+  // ─── ADMIN PLATFORM SETTINGS ──────────────────────────────────────────────
+
+  // GET /api/admin/settings — Read all platform settings
+  if (pathname === '/api/admin/settings' && req.method === 'GET') {
+    (async () => {
+      try {
+        const result = await query('SELECT key, value FROM platform_settings');
+        const settings = {};
+        for (const row of result.rows) {
+          settings[row.key] = row.value;
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, settings }));
+      } catch (err) {
+        console.error('[Admin] Settings read error:', err.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
+  // PUT /api/admin/settings — Save platform settings
+  if (pathname === '/api/admin/settings' && req.method === 'PUT') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const { settings } = JSON.parse(body);
+        if (!settings || typeof settings !== 'object') {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'settings object is verplicht' }));
+          return;
+        }
+        for (const [key, value] of Object.entries(settings)) {
+          await query(
+            `INSERT INTO platform_settings (key, value, updated_at) VALUES ($1, $2, NOW())
+             ON CONFLICT (key) DO UPDATE SET value = $2, updated_at = NOW()`,
+            [key, JSON.stringify(value)]
+          );
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        console.error('[Admin] Settings save error:', err.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // GET /api/admin/admins — List admin users
+  if (pathname === '/api/admin/admins' && req.method === 'GET') {
+    (async () => {
+      try {
+        const result = await query(
+          `SELECT id, email, first_name, last_name, admin_role, avatar_url, created_at
+           FROM profiles WHERE admin_role IS NOT NULL ORDER BY created_at ASC`
+        );
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, admins: result.rows }));
+      } catch (err) {
+        console.error('[Admin] List admins error:', err.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
+  // POST /api/admin/admins — Add admin user
+  if (pathname === '/api/admin/admins' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const { email, role } = JSON.parse(body);
+        if (!email || !role) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'email en role zijn verplicht' }));
+          return;
+        }
+        const validRoles = ['super_admin', 'content_manager', 'support_agent'];
+        if (!validRoles.includes(role)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'Ongeldige role' }));
+          return;
+        }
+        const result = await query(
+          'UPDATE profiles SET admin_role = $1 WHERE email = $2 RETURNING id, email, admin_role',
+          [role, email]
+        );
+        if (result.rowCount === 0) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'Gebruiker niet gevonden' }));
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, admin: result.rows[0] }));
+      } catch (err) {
+        console.error('[Admin] Add admin error:', err.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // DELETE /api/admin/admins/:id — Remove admin role
+  if (pathname.match(/^\/api\/admin\/admins\/[^/]+$/) && req.method === 'DELETE') {
+    const adminId = pathname.split('/').pop();
+    (async () => {
+      try {
+        await query('UPDATE profiles SET admin_role = NULL WHERE id = $1', [adminId]);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        console.error('[Admin] Remove admin error:', err.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
+  // ─── ADMIN USER MANAGEMENT ──────────────────────────────────────────────
+
+  // POST /api/admin/users/:id/suspend — Suspend user
+  if (pathname.match(/^\/api\/admin\/users\/[^/]+\/suspend$/) && req.method === 'POST') {
+    const userId = pathname.split('/')[4];
+    (async () => {
+      try {
+        await query('UPDATE profiles SET status = $1 WHERE id = $2', ['suspended', userId]);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        console.error('[Admin] Suspend user error:', err.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
+  // POST /api/admin/users/:id/activate — Reactivate user
+  if (pathname.match(/^\/api\/admin\/users\/[^/]+\/activate$/) && req.method === 'POST') {
+    const userId = pathname.split('/')[4];
+    (async () => {
+      try {
+        await query('UPDATE profiles SET status = $1 WHERE id = $2', ['active', userId]);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        console.error('[Admin] Activate user error:', err.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
+  // DELETE /api/admin/users/:id — Delete user
+  if (pathname.match(/^\/api\/admin\/users\/[^/]+$/) && req.method === 'DELETE') {
+    const userId = pathname.split('/').pop();
+    (async () => {
+      try {
+        // Delete from profiles (cascades through foreign keys)
+        await query('DELETE FROM profiles WHERE id = $1', [userId]);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        console.error('[Admin] Delete user error:', err.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
   // Admin Dashboard Stats - KPIs, recent activity, notifications, top content
   if (pathname === '/api/admin/dashboard-stats' && req.method === 'GET') {
     if (!checkAuth(req)) {
@@ -6800,4 +6981,26 @@ server.listen(PORT, '0.0.0.0', () => {
   setInterval(pollWebinarRecordings, 2 * 60 * 1000);
   // Run once after 60s on startup
   setTimeout(pollWebinarRecordings, 60 * 1000);
+
+  // Server-side auto-sync: sync Google Drive → database every SYNC_INTERVAL_MINUTES (default: 60)
+  const SYNC_FOLDER_IDS = ['1Oaww3IMBcFZ1teFvSoqAUART2B6Q6VrT', '1iaRAByySJPXpcJ6I3aoXwlb0SR3q3wKZ'];
+  const SYNC_INTERVAL_MINUTES = parseInt(process.env.SYNC_INTERVAL_MINUTES || '60', 10);
+
+  const runAutoSync = () => {
+    console.log('[AutoSync] Starting scheduled Google Drive sync...');
+    const { spawn } = require('child_process');
+    const child = spawn('node', ['scripts/sync_drive_order_standalone.js', ...SYNC_FOLDER_IDS], {
+      detached: true,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: process.env
+    });
+    child.stdout.on('data', d => process.stdout.write('[AutoSync] ' + d));
+    child.stderr.on('data', d => process.stderr.write('[AutoSync] ' + d));
+    child.on('close', code => console.log(`[AutoSync] Drive sync completed (exit code ${code})`));
+    child.unref();
+  };
+
+  setTimeout(runAutoSync, 45 * 1000);
+  setInterval(runAutoSync, SYNC_INTERVAL_MINUTES * 60 * 1000);
+  console.log(`[AutoSync] Drive sync scheduled every ${SYNC_INTERVAL_MINUTES} minutes`);
 });

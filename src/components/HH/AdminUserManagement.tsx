@@ -24,6 +24,7 @@ import {
   ArrowDown,
   Edit,
 } from "lucide-react";
+import { toast } from "sonner";
 import { CustomCheckbox } from "../ui/custom-checkbox";
 import { useState, useEffect } from "react";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
@@ -104,6 +105,99 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
         setIsLoading(false);
       });
   }, []);
+
+  // Helper: map plan slug to Dutch display name
+  const getPlanDisplayName = (plan: string): string => {
+    const planMap: Record<string, string> = {
+      free: "Gratis",
+      pro: "Pro",
+      founder: "Founder",
+      inner_circle: "Inner Circle",
+      starter: "Starter",
+      team: "Team",
+    };
+    return planMap[plan.toLowerCase()] || plan;
+  };
+
+  // Refetch user list (reused after mutations)
+  const refetchUsers = () => {
+    fetch("/api/analytics/users")
+      .then((res) => res.json())
+      .then((data: any) => {
+        const usersList = Array.isArray(data) ? data : data.users || [];
+        const mapped = usersList.map((u: any) => ({
+          id: u.id,
+          name: u.name || u.email || "Onbekend",
+          email: u.email || "",
+          company: "Niet beschikbaar",
+          role: u.role || "Gebruiker",
+          plan: u.plan || "Starter",
+          planPrice: "",
+          sessions: u.totalActivities || 0,
+          avgScore: u.totalVideoViews || 0,
+          scoreDelta: 0,
+          streak: 0,
+          topTechnique: "Niet beschikbaar",
+          status: u.status || "inactive",
+          joined: u.createdAt
+            ? new Date(u.createdAt).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })
+            : "Onbekend",
+          lastLogin: u.lastActive
+            ? new Date(u.lastActive).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })
+            : "Niet beschikbaar",
+        }));
+        setUsers(mapped);
+      })
+      .catch(() => {
+        toast.error("Kon gebruikerslijst niet vernieuwen");
+      });
+  };
+
+  // Action handlers
+  const handleSuspendUser = (user: any) => {
+    if (!window.confirm(`Weet je zeker dat je "${user.name}" wilt opschorten?`)) return;
+    fetch(`/api/admin/users/${user.id}/suspend`, { method: "POST" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Suspend failed");
+        toast.success(`${user.name} is opgeschort`);
+        refetchUsers();
+        setShowUserDetail(false);
+      })
+      .catch(() => {
+        toast.error(`Kon ${user.name} niet opschorten`);
+      });
+  };
+
+  const handleActivateUser = (user: any) => {
+    fetch(`/api/admin/users/${user.id}/activate`, { method: "POST" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Activate failed");
+        toast.success(`${user.name} is geactiveerd`);
+        refetchUsers();
+        setShowUserDetail(false);
+      })
+      .catch(() => {
+        toast.error(`Kon ${user.name} niet activeren`);
+      });
+  };
+
+  const handleDeleteUser = (user: any) => {
+    if (!window.confirm(`Weet je zeker dat je "${user.name}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`)) return;
+    fetch(`/api/admin/users/${user.id}`, { method: "DELETE" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Delete failed");
+        toast.success(`${user.name} is verwijderd`);
+        refetchUsers();
+        setShowUserDetail(false);
+      })
+      .catch(() => {
+        toast.error(`Kon ${user.name} niet verwijderen`);
+      });
+  };
+
+  const handleEmailUser = (user: any) => {
+    window.open(`mailto:${user.email}`);
+  };
 
   const selectionMode = selectedIds.length > 0;
 
@@ -222,8 +316,8 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)' }}>
-                <Users className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#9333ea' }} />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-hh-primary/10">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-hh-primary" />
               </div>
               <Badge
                 variant="outline"
@@ -345,12 +439,11 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               <Button
                 variant="ghost"
                 size="sm"
-                style={viewMode === "list" ? { backgroundColor: '#9333ea', color: 'white' } : {}}
-                className={`${
-                  viewMode === "list" 
-                    ? "" 
+                className={
+                  viewMode === "list"
+                    ? "bg-hh-primary text-white"
                     : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }`}
+                }
                 onClick={() => setViewMode("list")}
               >
                 <List className="w-4 h-4" />
@@ -358,12 +451,11 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               <Button
                 variant="ghost"
                 size="sm"
-                style={viewMode === "grid" ? { backgroundColor: '#9333ea', color: 'white' } : {}}
-                className={`${
-                  viewMode === "grid" 
-                    ? "" 
+                className={
+                  viewMode === "grid"
+                    ? "bg-hh-primary text-white"
                     : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }`}
+                }
                 onClick={() => setViewMode("grid")}
               >
                 <LayoutGrid className="w-4 h-4" />
@@ -461,7 +553,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <Avatar className="w-10 h-10">
-                            <AvatarFallback className="text-[13px]" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea' }}>
+                            <AvatarFallback className="text-[13px] bg-hh-primary/10 text-hh-primary">
                               {user.name
                                 .split(" ")
                                 .map((n) => n[0])
@@ -485,11 +577,13 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                       </td>
                       <td className="py-3 px-4">
                         <p className="text-[14px] leading-[20px] text-hh-text font-medium">
-                          {user.plan}
+                          {getPlanDisplayName(user.plan)}
                         </p>
-                        <p className="text-[12px] leading-[16px] text-hh-muted">
-                          {user.planPrice}
-                        </p>
+                        {user.planPrice && (
+                          <p className="text-[12px] leading-[16px] text-hh-muted">
+                            {user.planPrice}
+                          </p>
+                        )}
                       </td>
                       <td className="py-3 px-4">{getStatusBadge(user.status)}</td>
                       <td className="py-3 px-4">
@@ -507,19 +601,26 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => viewUserDetail(user)}>
                               <Eye className="w-4 h-4 mr-2" />
-                              View Details
+                              Bekijk Details
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEmailUser(user)}>
                               <Mail className="w-4 h-4 mr-2" />
-                              Send Email
+                              Email verzenden
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
-                              <Ban className="w-4 h-4 mr-2" />
-                              Suspend
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
+                            {user.status === "active" ? (
+                              <DropdownMenuItem className="text-hh-error" onClick={() => handleSuspendUser(user)}>
+                                <Ban className="w-4 h-4 mr-2" />
+                                Opschorten
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem onClick={() => handleActivateUser(user)}>
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Activeren
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem className="text-hh-error" onClick={() => handleDeleteUser(user)}>
                               <Trash2 className="w-4 h-4 mr-2" />
-                              Delete
+                              Verwijderen
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -557,7 +658,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-4">
                   <Avatar className="w-12 h-12">
-                    <AvatarFallback className="text-[14px] font-semibold" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea' }}>
+                    <AvatarFallback className="text-[14px] font-semibold bg-hh-primary/10 text-hh-primary">
                       {user.name.split(" ").map((n) => n[0]).join("")}
                     </AvatarFallback>
                   </Avatar>
@@ -576,8 +677,8 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
                 {/* Plan & Status */}
                 <div className="flex items-center gap-2 mb-4">
-                  <Badge className="text-[11px]" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
-                    {user.plan} - {user.planPrice}
+                  <Badge className="text-[11px] bg-hh-primary/10 text-hh-primary border border-hh-primary/20">
+                    {getPlanDisplayName(user.plan)}{user.planPrice ? ` - ${user.planPrice}` : ""}
                   </Badge>
                   {getStatusBadge(user.status)}
                 </div>
@@ -615,15 +716,22 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                         <Eye className="w-4 h-4 mr-2" />
                         Bekijk Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                        <Edit className="w-4 h-4 mr-2" />
-                        Bewerken
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                      <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleEmailUser(user); }}>
                         <Mail className="w-4 h-4 mr-2" />
                         Email verzenden
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e: React.MouseEvent) => e.stopPropagation()} className="text-hh-error">
+                      {user.status === "active" ? (
+                        <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleSuspendUser(user); }} className="text-hh-error">
+                          <Ban className="w-4 h-4 mr-2" />
+                          Opschorten
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleActivateUser(user); }}>
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Activeren
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleDeleteUser(user); }} className="text-hh-error">
                         <Trash2 className="w-4 h-4 mr-2" />
                         Verwijderen
                       </DropdownMenuItem>
@@ -652,7 +760,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
                 <div className="flex items-start gap-4">
                   <Avatar className="w-16 h-16">
-                    <AvatarFallback className="text-white text-[20px]" style={{ backgroundColor: '#9333ea' }}>
+                    <AvatarFallback className="text-white text-[20px] bg-hh-primary">
                       {selectedUser.name
                         .split(" ")
                         .map((n: string) => n[0])
@@ -677,8 +785,8 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                       <span>Laatste login: {selectedUser.lastLogin}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-3">
-                      <Badge style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
-                        {selectedUser.plan} - {selectedUser.planPrice}
+                      <Badge className="bg-hh-primary/10 text-hh-primary border border-hh-primary/20">
+                        {getPlanDisplayName(selectedUser.plan)}{selectedUser.planPrice ? ` - ${selectedUser.planPrice}` : ""}
                       </Badge>
                       {getStatusBadge(selectedUser.status)}
                     </div>
@@ -689,7 +797,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               {/* Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <Card className="p-4 rounded-[12px] shadow-hh-sm border-hh-border text-center">
-                  <Play className="w-5 h-5 mx-auto mb-2" style={{ color: '#9333ea' }} />
+                  <Play className="w-5 h-5 mx-auto mb-2 text-hh-primary" />
                   <p className="text-[24px] leading-[32px] text-hh-ink">
                     {selectedUser.sessions}
                   </p>
@@ -720,7 +828,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
               {/* Actions */}
               <div className="flex gap-3">
-                <Button className="flex-1 gap-2">
+                <Button className="flex-1 gap-2" onClick={() => handleEmailUser(selectedUser)}>
                   <Mail className="w-4 h-4" />
                   Stuur Email
                 </Button>
@@ -731,13 +839,32 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" className="flex-1 gap-2 text-red-600 border-red-600 hover:bg-red-500/10">
-                  <Ban className="w-4 h-4" />
-                  Suspend Account
-                </Button>
-                <Button variant="outline" className="flex-1 gap-2 text-red-600 border-red-600 hover:bg-red-500/10">
+                {selectedUser.status === "active" ? (
+                  <Button
+                    variant="outline"
+                    className="flex-1 gap-2 text-hh-error border-hh-error hover:bg-hh-error/10"
+                    onClick={() => handleSuspendUser(selectedUser)}
+                  >
+                    <Ban className="w-4 h-4" />
+                    Opschorten
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="flex-1 gap-2 text-hh-success border-hh-success hover:bg-hh-success/10"
+                    onClick={() => handleActivateUser(selectedUser)}
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Activeren
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2 text-hh-error border-hh-error hover:bg-hh-error/10"
+                  onClick={() => handleDeleteUser(selectedUser)}
+                >
                   <Trash2 className="w-4 h-4" />
-                  Delete Account
+                  Verwijderen
                 </Button>
               </div>
             </div>

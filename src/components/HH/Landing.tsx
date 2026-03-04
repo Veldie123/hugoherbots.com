@@ -276,7 +276,7 @@ export function Landing({ navigate }: LandingProps) {
                   Waarom nu? Waarom AI?
                 </h3>
                 <p className="text-[16px] leading-[26px] sm:text-[18px] sm:leading-[28px] text-hh-text">
-                  Dankzij AI train je met mij — niet een keer per week in een groep, maar <span className="font-[700]">elke dag, prive, van thuis.</span> Met directe feedback zoals ik die live zou geven. Vanaf €29 per maand, 24/7 beschikbaar
+                  Dankzij AI train je met mij — niet een keer per week in een groep, maar <span className="font-[700]">elke dag, prive, van thuis.</span> Met directe feedback zoals ik die live zou geven. Vanaf €49 per maand, 24/7 beschikbaar
                 </p>
                 <p className="text-[16px] leading-[26px] sm:text-[18px] sm:leading-[28px] text-hh-text">
                   Ik ben in het laatste hoofdstuk van mijn leven. 40 jaar verfijnde scripts, 54 technieken, 20.000+ sessies — het zou jammer zijn, moest deze kennis verdwijnen.
@@ -473,7 +473,7 @@ export function Landing({ navigate }: LandingProps) {
             Kies je plan
           </Badge>
           <h2 className="text-[32px] leading-[40px] sm:text-[36px] sm:leading-[44px] lg:text-[40px] lg:leading-[48px] text-hh-text mb-6">
-            Vroeger: €1.500 per halve dag. Nu: vanaf €29/maand.
+            Vroeger: €1.500 per halve dag. Nu: vanaf €49/maand.
           </h2>
           <p className="text-[16px] leading-[24px] sm:text-[16px] sm:leading-[26px] lg:text-[18px] lg:leading-[28px] text-hh-muted max-w-3xl mx-auto mb-8">
             Live met Hugo kost €1.500 per halve dag. Met de AI-salescoach oefen je elke dag — wanneer het jou past.
@@ -494,7 +494,7 @@ export function Landing({ navigate }: LandingProps) {
             </span>
             {isYearly && (
               <Badge className="bg-hh-warn/10 text-hh-warn border-hh-warn/20 ml-2">
-                Bespaar tot 40%
+                Bespaar tot 50%
               </Badge>
             )}
           </div>
@@ -505,7 +505,7 @@ export function Landing({ navigate }: LandingProps) {
           <AnimatedSection delay={0}>
             <PricingTier
               name="Pro"
-              price={isYearly ? "€29" : "€49"}
+              price={isYearly ? "€49" : "€98"}
               period="/maand"
               priceNote={isYearly ? "Gefactureerd jaarlijks" : undefined}
               features={[
@@ -521,7 +521,7 @@ export function Landing({ navigate }: LandingProps) {
           <AnimatedSection delay={0.1}>
             <PricingTier
               name="Founder"
-              price={isYearly ? "€249,50" : "€499"}
+              price={isYearly ? "€249" : "€498"}
               period="/maand"
               priceNote={isYearly ? "Gefactureerd jaarlijks" : undefined}
               subtitleNote="Beperkt tot 100 leden"
@@ -542,7 +542,7 @@ export function Landing({ navigate }: LandingProps) {
           <AnimatedSection delay={0.2}>
             <PricingTier
               name="Inner Circle"
-              price={isYearly ? "€1.249" : "€1.499"}
+              price={isYearly ? "€1.249" : "€2.498"}
               period="/maand"
               priceNote={isYearly ? "Gefactureerd jaarlijks" : undefined}
               subtitleNote="Exclusief — max 20 leden"
@@ -565,7 +565,7 @@ export function Landing({ navigate }: LandingProps) {
         <div className="lg:hidden space-y-4">
           <PricingTier
             name="Pro"
-            price={isYearly ? "€29" : "€49"}
+            price={isYearly ? "€49" : "€98"}
             period="/maand"
             priceNote={isYearly ? "Gefactureerd jaarlijks" : undefined}
             features={[
@@ -579,7 +579,7 @@ export function Landing({ navigate }: LandingProps) {
           />
           <PricingTier
             name="Founder"
-            price={isYearly ? "€249,50" : "€499"}
+            price={isYearly ? "€249" : "€498"}
             period="/maand"
             priceNote={isYearly ? "Gefactureerd jaarlijks" : undefined}
             subtitleNote="Beperkt tot 100 leden"
@@ -598,7 +598,7 @@ export function Landing({ navigate }: LandingProps) {
           />
           <PricingTier
             name="Inner Circle"
-            price={isYearly ? "€1.249" : "€1.499"}
+            price={isYearly ? "€1.249" : "€2.498"}
             period="/maand"
             priceNote={isYearly ? "Gefactureerd jaarlijks" : undefined}
             subtitleNote="Exclusief — max 20 leden"
@@ -692,7 +692,7 @@ export function Landing({ navigate }: LandingProps) {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>
             <h2 className="text-[36px] leading-[44px] sm:text-[44px] sm:leading-[52px] lg:text-[56px] lg:leading-[64px] text-white mb-6">
-              54 technieken. 4 fasen. Vanaf €29/maand.
+              54 technieken. 4 fasen. Vanaf €49/maand.
             </h2>
             <p className="text-[16px] leading-[26px] sm:text-[18px] sm:leading-[28px] text-hh-ui-300 mb-10 max-w-2xl mx-auto">
               Sales is mensenwerk. 'People buy people' — en de psychologie leer je hier.

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { AppLayout } from "./AppLayout";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -24,11 +24,37 @@ import {
   Plus,
   Loader2,
   Crown,
+  ExternalLink,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { auth } from "../../utils/supabase/client";
 import { uploadAvatar } from "../../utils/supabase/storage";
 import { useUser } from "../../contexts/UserContext";
+import { toast } from "sonner";
+
+interface StripeSubscription {
+  id: string;
+  status: string;
+  currentPeriodEnd: string;
+  customerId: string;
+  product: { id: string; name: string };
+  price: { unitAmount: number; currency: string; recurring: { interval: string } | null };
+}
+
+interface StripePlan {
+  name: string;
+  tier: string;
+  monthlyPrice: string;
+  yearlyPrice: string;
+  description: string;
+  priceIds: { month?: string; year?: string };
+}
+
+const PLAN_DETAILS: Record<string, { description: string; order: number }> = {
+  pro: { description: "AI coaching, video's, transcript analyse", order: 1 },
+  founder: { description: "Alles van Pro + live sessies, Founder community", order: 2 },
+  inner_circle: { description: "Alles van Founder + 1-op-1 coaching met Hugo", order: 3 },
+};
 
 interface NotificationPreferences {
   email_notifications: boolean;
@@ -57,7 +83,6 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
   const { user, workspace, session, logout, refreshUser } = useUser();
   const [activeSection, setActiveSection] = useState(initialSection);
   const [changePlanModalOpen, setChangePlanModalOpen] = useState(false);
-  const [paymentMethodModalOpen, setPaymentMethodModalOpen] = useState(false);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -71,7 +96,100 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
   const [notifications, setNotifications] = useState<NotificationPreferences>(DEFAULT_NOTIFICATIONS);
   const [notifSaving, setNotifSaving] = useState(false);
 
-  const isTeamPlan = workspace?.plan_tier === "team" || workspace?.plan_tier === "enterprise";
+  const [subscription, setSubscription] = useState<StripeSubscription | null>(null);
+  const [stripePlans, setStripePlans] = useState<StripePlan[]>([]);
+  const [loadingCheckout, setLoadingCheckout] = useState<string | null>(null);
+
+  const currentTier = subscription?.product?.name?.toLowerCase().replace(/\s+/g, '_') || workspace?.plan_tier || "free";
+  const isTeamPlan = currentTier === "founder" || currentTier === "inner_circle" || workspace?.plan_tier === "team" || workspace?.plan_tier === "enterprise";
+
+  // Fetch Stripe subscription data
+  useEffect(() => {
+    if (!user?.email) return;
+    fetch(`/api/stripe/subscription?email=${encodeURIComponent(user.email)}`)
+      .then(r => r.json())
+      .then(data => { if (data.subscription) setSubscription(data.subscription); })
+      .catch(() => {});
+  }, [user?.email]);
+
+  // Fetch Stripe products for plan change modal
+  useEffect(() => {
+    fetch("/api/stripe/products")
+      .then(r => r.json())
+      .then(data => {
+        const products = data.data || [];
+        const plans: StripePlan[] = [];
+        for (const product of products) {
+          const tier = product.metadata?.tier || product.name.toLowerCase().replace(/\s+/g, '_');
+          if (!PLAN_DETAILS[tier]) continue;
+          const priceIds: { month?: string; year?: string } = {};
+          let monthlyAmount = 0;
+          let yearlyAmount = 0;
+          for (const price of product.prices || []) {
+            const interval = price.recurring?.interval;
+            if (interval === 'month') { priceIds.month = price.id; monthlyAmount = price.unit_amount; }
+            if (interval === 'year') { priceIds.year = price.id; yearlyAmount = price.unit_amount; }
+          }
+          plans.push({
+            name: product.name,
+            tier,
+            monthlyPrice: `€${(monthlyAmount / 100).toLocaleString('nl-BE')}`,
+            yearlyPrice: yearlyAmount ? `€${(yearlyAmount / 100 / 12).toLocaleString('nl-BE', { maximumFractionDigits: 0 })}` : '',
+            description: PLAN_DETAILS[tier].description,
+            priceIds,
+          });
+        }
+        plans.sort((a, b) => (PLAN_DETAILS[a.tier]?.order || 0) - (PLAN_DETAILS[b.tier]?.order || 0));
+        setStripePlans(plans);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handlePlanCheckout = useCallback(async (tier: string, priceId: string) => {
+    setLoadingCheckout(tier);
+    try {
+      const resp = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          priceId,
+          customerEmail: user?.email,
+          successUrl: window.location.origin + "/settings?section=subscription&success=true",
+          cancelUrl: window.location.origin + "/settings?section=subscription",
+        }),
+      });
+      const data = await resp.json();
+      if (data.url) window.location.href = data.url;
+      else toast.error("Kon checkout niet starten");
+    } catch {
+      toast.error("Er ging iets mis bij het starten van de checkout");
+    } finally {
+      setLoadingCheckout(null);
+    }
+  }, [user?.email]);
+
+  const handleManageBilling = useCallback(async () => {
+    const customerId = subscription?.customerId;
+    if (!customerId) {
+      toast.error("Geen actief abonnement gevonden");
+      return;
+    }
+    try {
+      const resp = await fetch("/api/stripe/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId,
+          returnUrl: window.location.origin + "/settings?section=subscription",
+        }),
+      });
+      const data = await resp.json();
+      if (data.url) window.location.href = data.url;
+      else toast.error("Kon billing portal niet openen");
+    } catch {
+      toast.error("Er ging iets mis");
+    }
+  }, [subscription?.customerId]);
 
   useEffect(() => {
     if (user) {
@@ -529,29 +647,40 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
               </div>
 
               <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-hh-ui-50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-[16px] leading-[24px] text-hh-text mb-1">
-                        Hugo Herbots Pro
-                      </p>
-                      <p className="text-[14px] leading-[20px] text-hh-muted">
-                        Maandelijks abonnement • €149/maand
-                      </p>
+                {subscription ? (
+                  <div className="p-4 rounded-lg bg-hh-ui-50">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <p className="text-[16px] leading-[24px] text-hh-text mb-1">
+                          {subscription.product.name}
+                        </p>
+                        <p className="text-[14px] leading-[20px] text-hh-muted">
+                          {subscription.price.recurring?.interval === 'year' ? 'Jaarabonnement' : 'Maandabonnement'} • €{((subscription.price.unitAmount || 0) / 100).toLocaleString('nl-BE')}/{subscription.price.recurring?.interval === 'year' ? 'jaar' : 'maand'}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[24px] leading-[32px] text-hh-text">
+                          €{((subscription.price.unitAmount || 0) / 100).toLocaleString('nl-BE')}
+                        </p>
+                        <p className="text-[12px] leading-[16px] text-hh-muted">
+                          per {subscription.price.recurring?.interval === 'year' ? 'jaar' : 'maand'}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-[24px] leading-[32px] text-hh-text">
-                        €149
-                      </p>
+                    {subscription.currentPeriodEnd && (
                       <p className="text-[12px] leading-[16px] text-hh-muted">
-                        per maand
+                        Volgende betaling: {new Date(subscription.currentPeriodEnd).toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </p>
-                    </div>
+                    )}
                   </div>
-                  <p className="text-[12px] leading-[16px] text-hh-muted">
-                    Volgende betaling: 6 februari 2025
-                  </p>
-                </div>
+                ) : (
+                  <div className="p-4 rounded-lg bg-hh-ui-50">
+                    <p className="text-[16px] leading-[24px] text-hh-text mb-1">Gratis plan</p>
+                    <p className="text-[14px] leading-[20px] text-hh-muted">
+                      Upgrade naar Pro om alle features te ontgrendelen
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex gap-3">
                   <Button
@@ -559,27 +688,32 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                     className="flex-1"
                     onClick={() => setChangePlanModalOpen(true)}
                   >
-                    Wijzig plan
+                    {subscription ? 'Wijzig plan' : 'Upgrade'}
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setPaymentMethodModalOpen(true)}
-                  >
-                    Betalingsmethode
-                  </Button>
+                  {subscription && (
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={handleManageBilling}
+                    >
+                      <ExternalLink className="w-4 h-4 mr-1" /> Beheer betaling
+                    </Button>
+                  )}
                 </div>
 
-                <Separator />
-
-                <div className="space-y-2">
-                  <p className="text-[14px] leading-[20px] text-hh-text">
-                    Facturen & betaalgeschiedenis
-                  </p>
-                  <Button variant="ghost" size="sm">
-                    Bekijk alle facturen →
-                  </Button>
-                </div>
+                {subscription && (
+                  <>
+                    <Separator />
+                    <div className="space-y-2">
+                      <p className="text-[14px] leading-[20px] text-hh-text">
+                        Facturen & betaalgeschiedenis
+                      </p>
+                      <Button variant="ghost" size="sm" onClick={handleManageBilling}>
+                        Bekijk in Stripe Portal →
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
             </Card>
 
@@ -714,156 +848,78 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            {/* Current Plan */}
-            <div className="p-4 rounded-lg border-2 border-hh-primary bg-hh-primary/5">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-[18px] leading-[24px] text-hh-text font-semibold">
-                      Pro
-                    </p>
-                    <span className="px-2 py-0.5 bg-hh-primary text-white text-[10px] rounded">
-                      HUIDIG
-                    </span>
+            {stripePlans.length === 0 ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-hh-muted" />
+              </div>
+            ) : (
+              stripePlans.map((plan) => {
+                const isCurrent = currentTier === plan.tier;
+                const isHigher = (PLAN_DETAILS[plan.tier]?.order || 0) > (PLAN_DETAILS[currentTier]?.order || 0);
+                return (
+                  <div
+                    key={plan.tier}
+                    className={`p-4 rounded-lg transition-all ${
+                      isCurrent
+                        ? 'border-2 border-hh-primary bg-hh-primary/5'
+                        : 'border border-hh-border hover:border-hh-primary cursor-pointer'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-[18px] leading-[24px] text-hh-text font-semibold">
+                            {plan.name}
+                          </p>
+                          {isCurrent && (
+                            <span className="px-2 py-0.5 bg-hh-primary text-white text-[10px] rounded">
+                              HUIDIG
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[14px] leading-[20px] text-hh-muted">
+                          {plan.description}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[24px] leading-[30px] text-hh-text font-bold">
+                          {plan.monthlyPrice}
+                        </p>
+                        <p className="text-[12px] leading-[16px] text-hh-muted">
+                          per maand
+                        </p>
+                      </div>
+                    </div>
+                    {!isCurrent && (
+                      subscription ? (
+                        <Button
+                          variant={isHigher ? "default" : "outline"}
+                          className="w-full mt-3"
+                          disabled={loadingCheckout === plan.tier}
+                          onClick={handleManageBilling}
+                        >
+                          {loadingCheckout === plan.tier && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                          {isHigher ? `Upgrade naar ${plan.name}` : `Wijzig naar ${plan.name}`}
+                        </Button>
+                      ) : (
+                        <Button
+                          className="w-full mt-3"
+                          disabled={loadingCheckout === plan.tier}
+                          onClick={() => plan.priceIds.month && handlePlanCheckout(plan.tier, plan.priceIds.month)}
+                        >
+                          {loadingCheckout === plan.tier && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                          Start met {plan.name}
+                        </Button>
+                      )
+                    )}
                   </div>
-                  <p className="text-[14px] leading-[20px] text-hh-muted">
-                    Voor individuele gebruikers
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[24px] leading-[30px] text-hh-text font-bold">
-                    €149
-                  </p>
-                  <p className="text-[12px] leading-[16px] text-hh-muted">
-                    per maand
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Team Plan */}
-            <div className="p-4 rounded-lg border border-hh-border hover:border-hh-primary transition-all cursor-pointer">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <p className="text-[18px] leading-[24px] text-hh-text font-semibold mb-1">
-                    Team
-                  </p>
-                  <p className="text-[14px] leading-[20px] text-hh-muted">
-                    Voor teams van 5+ leden
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[24px] leading-[30px] text-hh-text font-bold">
-                    €499
-                  </p>
-                  <p className="text-[12px] leading-[16px] text-hh-muted">
-                    per maand
-                  </p>
-                </div>
-              </div>
-              <Button className="w-full mt-3">
-                Upgrade naar Team
-              </Button>
-            </div>
-
-            {/* Starter Plan */}
-            <div className="p-4 rounded-lg border border-hh-border hover:border-hh-primary transition-all cursor-pointer opacity-60">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <p className="text-[18px] leading-[24px] text-hh-text font-semibold mb-1">
-                    Starter
-                  </p>
-                  <p className="text-[14px] leading-[20px] text-hh-muted">
-                    Basis features
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[24px] leading-[30px] text-hh-text font-bold">
-                    €49
-                  </p>
-                  <p className="text-[12px] leading-[16px] text-hh-muted">
-                    per maand
-                  </p>
-                </div>
-              </div>
-              <Button variant="outline" className="w-full mt-3">
-                Downgrade naar Starter
-              </Button>
-            </div>
+                );
+              })
+            )}
 
             <div className="flex justify-end gap-3 pt-4 border-t">
               <Button variant="ghost" onClick={() => setChangePlanModalOpen(false)}>
                 Annuleer
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Payment Method Modal */}
-      <Dialog open={paymentMethodModalOpen} onOpenChange={setPaymentMethodModalOpen}>
-        <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Betalingsmethode wijzigen</DialogTitle>
-            <DialogDescription>
-              Update je betaalgegevens
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            {/* Current Payment Method */}
-            <div className="p-4 rounded-lg bg-hh-ui-50">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-8 bg-gradient-to-r from-blue-600 to-blue-400 rounded flex items-center justify-center">
-                    <CreditCard className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[14px] leading-[20px] text-hh-text font-medium">
-                      Visa •••• 1234
-                    </p>
-                    <p className="text-[12px] leading-[16px] text-hh-muted">
-                      Verloopt 12/2026
-                    </p>
-                  </div>
-                </div>
-                <Check className="w-5 h-5 text-hh-success" />
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Add New Payment Method */}
-            <div className="space-y-3">
-              <Label>Nieuwe betaalmethode toevoegen</Label>
-              
-              <div className="space-y-2">
-                <Label htmlFor="cardNumber">Kaartnummer</Label>
-                <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="expiry">Vervaldatum</Label>
-                  <Input id="expiry" placeholder="MM/JJ" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cvc">CVC</Label>
-                  <Input id="cvc" placeholder="123" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="name">Naam op kaart</Label>
-                <Input id="name" placeholder={user?.full_name || "Naam op kaart"} />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="ghost" onClick={() => setPaymentMethodModalOpen(false)}>
-                Annuleer
-              </Button>
-              <Button onClick={() => setPaymentMethodModalOpen(false)}>
-                Opslaan
               </Button>
             </div>
           </div>

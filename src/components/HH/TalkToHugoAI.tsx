@@ -369,6 +369,8 @@ export function TalkToHugoAI({
 
   // State for loaded analysis data (Coach View)
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  // Active coaching moment for inline practice
+  const [activeCoachingMoment, setActiveCoachingMoment] = useState<any>(null);
 
   // Hugo starts conversation proactively based on cross-platform activity
   useEffect(() => {
@@ -1357,17 +1359,149 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     }
   };
 
+  // Poll for analysis results after triggering auto-analysis
+  const analysisPollRef = useRef<NodeJS.Timeout | null>(null);
+  const [analysisPolling, setAnalysisPolling] = useState(false);
+  const [analysisSuggested, setAnalysisSuggested] = useState(false);
+
+  const pollForAnalysis = useCallback(async (analysisId: string) => {
+    setAnalysisPolling(true);
+    if (analysisPollRef.current) clearInterval(analysisPollRef.current);
+
+    let attempts = 0;
+    analysisPollRef.current = setInterval(async () => {
+      attempts++;
+      if (attempts > 18) { // max 3 min
+        clearInterval(analysisPollRef.current!);
+        analysisPollRef.current = null;
+        setAnalysisPolling(false);
+        return;
+      }
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`/api/v2/analysis/results/${analysisId}`, { headers });
+        if (res.status === 200) {
+          const data = await res.json();
+          setAnalysisResult(data);
+          setAnalysisPolling(false);
+          clearInterval(analysisPollRef.current!);
+          analysisPollRef.current = null;
+          // Replace loading message with Coach View ready message
+          setMessages(prev => {
+            const filtered = prev.filter(m => !m.id.startsWith('analysis-started-'));
+            return [...filtered, {
+              id: `analysis-ready-${Date.now()}`,
+              sender: 'ai' as const,
+              text: `Je analyse is klaar! Bekijk je resultaten hierboven.`,
+              timestamp: new Date(),
+            }];
+          });
+        }
+      } catch {
+        // Retry next interval
+      }
+    }, 10000);
+  }, []);
+
+  // Cleanup poll on unmount
+  useEffect(() => {
+    return () => {
+      if (analysisPollRef.current) clearInterval(analysisPollRef.current);
+    };
+  }, []);
+
+  // Suggest analysis after 10+ user turns in coaching chats (non-roleplay)
+  useEffect(() => {
+    if (analysisSuggested || selectedTechnique || !hasActiveSession) return;
+    const userMessages = messages.filter(m => m.sender === 'hugo' && !m.isTranscriptReplay);
+    if (userMessages.length >= 10) {
+      setAnalysisSuggested(true);
+      setMessages(prev => [...prev, {
+        id: `suggest-analysis-${Date.now()}`,
+        sender: 'ai' as const,
+        text: `We hebben al een goed gesprek gehad! Wil je dat ik dit gesprek analyseer? Ik kan je sterke punten en verbeterpunten in kaart brengen.`,
+        timestamp: new Date(),
+        richContent: [{
+          type: 'action_button' as any,
+          data: { label: 'Analyseer dit gesprek', action: 'triggerAnalysis' },
+        }],
+      }]);
+    }
+  }, [messages.length, analysisSuggested, selectedTechnique, hasActiveSession]);
+
+  const handleTriggerAnalysis = useCallback(async () => {
+    const sessionId = hugoApi.getSessionId();
+    if (!sessionId) return;
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch('/api/v2/analysis/chat-session', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ sessionId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const analysisId = data.analysisId || data.id || sessionId;
+        setMessages(prev => [...prev, {
+          id: `analysis-started-${Date.now()}`,
+          sender: 'ai' as const,
+          text: `Analyse gestart! Even geduld terwijl ik je gesprek analyseer...`,
+          timestamp: new Date(),
+        }]);
+        pollForAnalysis(analysisId);
+      }
+    } catch {
+      setMessages(prev => [...prev, {
+        id: `analysis-error-${Date.now()}`,
+        sender: 'ai' as const,
+        text: `Kon de analyse niet starten. Probeer het later opnieuw.`,
+        timestamp: new Date(),
+      }]);
+    }
+  }, [pollForAnalysis]);
+
   const handleStopRoleplay = () => {
     setStopRoleplayDialogOpen(true);
   };
 
-  const confirmStopRoleplay = () => {
-    setMessages([]);
+  const confirmStopRoleplay = async () => {
+    // Auto-trigger analysis for roleplay sessions before clearing
+    const sessionId = hugoApi.getSessionId();
+    if (sessionId && selectedTechnique) {
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch('/api/v2/analysis/chat-session', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ sessionId }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const analysisId = data.analysisId || data.id || sessionId;
+          // Show analysis-in-progress message before clearing
+          setMessages([{
+            id: `analysis-started-${Date.now()}`,
+            sender: 'ai' as const,
+            text: `Je rollenspel is geanalyseerd! Even geduld terwijl de resultaten worden verwerkt...`,
+            timestamp: new Date(),
+          }]);
+          // Poll for analysis results
+          pollForAnalysis(analysisId);
+        }
+      } catch (e) {
+        // Analysis trigger failed — just clear silently
+      }
+    }
+
     setInputText("");
     setSelectedTechnique("");
     setSelectedTechniqueName("");
     setSessionTimer(0);
     setChatMode("chat");
+    if (!selectedTechnique) {
+      // Only clear messages if no analysis was triggered
+      setMessages([]);
+    }
     hugoApi.clearSession();
   };
 
@@ -1842,6 +1976,9 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             insights={analysisResult.insights}
             title={analysisResult.conversation?.title}
             onMomentClick={(turnIndex) => {
+              // Find the moment data
+              const moment = analysisResult.insights?.moments?.find((m: any) => m.turnIndex === turnIndex);
+              setActiveCoachingMoment(moment || null);
               const el = document.getElementById(`msg-turn-${turnIndex}`);
               if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1850,6 +1987,12 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               }
             }}
           />
+        )}
+        {analysisPolling && !analysisResult && (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-hh-ui-50 border border-hh-border text-[13px] text-hh-muted">
+            <Loader2 className="w-4 h-4 animate-spin text-hh-primary" />
+            <span>Analyse wordt verwerkt...</span>
+          </div>
         )}
         {messages.map((message, msgIdx) => {
           // Phase divider from analysis data
@@ -2134,13 +2277,29 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                           </div>
                         );
                       }
+                      case 'action_button': {
+                        const btnData = rc.data as Record<string, any>;
+                        if (btnData.action === 'triggerAnalysis') {
+                          return (
+                            <button
+                              key={idx}
+                              onClick={handleTriggerAnalysis}
+                              disabled={analysisPolling}
+                              className="mt-1 px-4 py-2 rounded-full text-[13px] font-medium text-white bg-hh-primary hover:bg-hh-primary/90 transition-colors disabled:opacity-50"
+                            >
+                              {analysisPolling ? 'Analyse bezig...' : (btnData.label || 'Analyseer')}
+                            </button>
+                          );
+                        }
+                        return null;
+                      }
                       default:
                         return null;
                     }
                   })}
                 </div>
               )}
-              
+
               {/* Technique & houding annotations from analysis */}
               {analysisResult && (() => {
                 const evalForTurn = analysisResult.evaluations?.find((e: any) => e.turnIdx === msgIdx);
@@ -2257,6 +2416,108 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               )}
             </div>
           </div>
+
+          {/* Inline coaching moment card */}
+          {activeCoachingMoment && activeCoachingMoment.turnIndex === msgIdx && (
+            <div className="mx-4 my-2 rounded-xl border border-hh-primary/20 bg-hh-primary/5 p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-4 h-4 text-hh-primary" />
+                <span className="text-[13px] font-semibold text-hh-text">{activeCoachingMoment.label}</span>
+                <button onClick={() => setActiveCoachingMoment(null)} className="ml-auto p-1 rounded-md hover:bg-hh-ui-50">
+                  <X className="w-3.5 h-3.5 text-hh-muted" />
+                </button>
+              </div>
+              {activeCoachingMoment.whyItMatters && (
+                <p className="text-[12px] text-hh-muted leading-[18px]">{activeCoachingMoment.whyItMatters}</p>
+              )}
+              {activeCoachingMoment.betterAlternative && (
+                <div className="text-[12px] leading-[18px]">
+                  <span className="font-medium text-hh-success">Beter alternatief: </span>
+                  <span className="text-hh-text">{activeCoachingMoment.betterAlternative}</span>
+                </div>
+              )}
+              {activeCoachingMoment.recommendedTechniques?.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {activeCoachingMoment.recommendedTechniques.map((t: string, i: number) => (
+                    <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-hh-primary/10 text-hh-primary font-medium">{t}</span>
+                  ))}
+                </div>
+              )}
+              <button
+                onClick={async () => {
+                  const moment = activeCoachingMoment;
+                  setActiveCoachingMoment(null);
+                  setAnalysisResult(null);
+
+                  // Build practice transcript from moment context
+                  const turns = [
+                    moment.customerText ? { speaker: 'customer', text: moment.customerText } : null,
+                    moment.sellerText ? { speaker: 'seller', text: moment.sellerText } : null,
+                  ].filter(Boolean) as Array<{ speaker: string; text: string }>;
+
+                  const practiceMessages: Message[] = [{
+                    id: `practice-header-${Date.now()}`,
+                    sender: 'ai',
+                    text: `Laten we dit moment oefenen: **${moment.label}**\n\nHieronder zie je het oorspronkelijke gespreksfragment. Geef een betere reactie — ik speel de klant.`,
+                    timestamp: new Date(),
+                  }];
+                  turns.forEach((t, i) => {
+                    practiceMessages.push({
+                      id: `practice-turn-${Date.now()}-${i}`,
+                      sender: t.speaker === 'customer' ? 'ai' : 'hugo',
+                      text: t.text,
+                      timestamp: new Date(),
+                      isTranscriptReplay: true,
+                      transcriptRole: t.speaker === 'customer' ? 'Klant' : 'Jij',
+                    });
+                  });
+
+                  setMessages(practiceMessages);
+                  setHasActiveSession(true);
+                  setIsLoading(true);
+
+                  try {
+                    const techniqueId = moment.recommendedTechniques?.[0] || 'general';
+                    await hugoApi.startSession({
+                      techniqueId,
+                      mode: 'COACH_CHAT',
+                      isExpert: false,
+                      modality: 'chat',
+                      viewMode: 'user',
+                    });
+
+                    const transcriptText = turns.map(t =>
+                      `${t.speaker === 'customer' ? 'Klant' : 'Verkoper'}: ${t.text}`
+                    ).join('\n');
+                    const systemContext = `BELANGRIJK: Je bent nu in ROLEPLAY MODUS. Je speelt de KLANT. Stel GEEN context-gathering vragen. Blijf in karakter als klant.\n\nDe gebruiker oefent dit coachingmoment: "${moment.label}". Beter alternatief: ${moment.betterAlternative || 'nvt'}.\n\nTranscript:\n${transcriptText}\n\nSpeel de klant realistisch verder. Wacht op de reactie van de verkoper.`;
+                    const response = await hugoApi.sendMessage(
+                      'Dit was het oorspronkelijke gesprek. Ik wil nu een betere reactie geven. Speel de klant.',
+                      false,
+                      systemContext
+                    );
+                    setMessages(prev => [...prev, {
+                      id: `practice-ai-${Date.now()}`,
+                      sender: 'ai',
+                      text: response.response || 'Ga je gang — geef je reactie en ik speel de klant verder.',
+                      timestamp: new Date(),
+                    }]);
+                  } catch {
+                    setMessages(prev => [...prev, {
+                      id: `practice-err-${Date.now()}`,
+                      sender: 'ai',
+                      text: 'Ik speel de klant. Geef je reactie!',
+                      timestamp: new Date(),
+                    }]);
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+                className="w-full mt-1 px-4 py-2 rounded-full text-[13px] font-medium text-white bg-hh-success hover:bg-hh-success/90 transition-colors"
+              >
+                Oefen dit moment
+              </button>
+            </div>
+          )}
           </Fragment>
           );
         })}

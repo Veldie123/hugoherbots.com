@@ -1,0 +1,10 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hh. handwritten signature favicon — Hugo Herbots branding -->
+  <!-- H: two vertical stems + crossbar -->
+  <path d="M15 18 L15 78 M15 48 L40 48 M40 18 L40 78" stroke="#0F1826" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- h: stem + curved bowl -->
+  <path d="M56 22 L56 78" stroke="#0F1826" stroke-width="4" stroke-linecap="round"/>
+  <path d="M56 44 C56 34, 80 34, 80 46 L80 78" stroke="#0F1826" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <!-- Dot -->
+  <circle cx="90" cy="30" r="3.5" fill="#0F1826"/>
+</svg>

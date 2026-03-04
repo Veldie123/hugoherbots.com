@@ -363,12 +363,14 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
 
       try {
         let result: any;
+        const authHeaders = await getAuthHeaders();
+        const { 'Content-Type': _, ...formDataAuth } = authHeaders;
 
         if (bf.file.size > CHUNK_SIZE) {
           const totalChunks = Math.ceil(bf.file.size / CHUNK_SIZE);
           const initRes = await fetch('/api/v2/analysis/upload/init', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders,
             body: JSON.stringify({
               fileName: bf.file.name,
               fileSize: bf.file.size,
@@ -376,7 +378,10 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
               mimetype: bf.file.type,
             }),
           });
-          if (!initRes.ok) throw new Error('Upload init mislukt');
+          if (!initRes.ok) {
+            const errBody = await initRes.json().catch(() => ({}));
+            throw new Error(errBody.error || `Upload init mislukt (${initRes.status})`);
+          }
           const { uploadId } = await initRes.json();
 
           for (let c = 0; c < totalChunks; c++) {
@@ -387,13 +392,13 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
             fd.append('chunk', chunk, `chunk_${c}`);
             fd.append('uploadId', uploadId);
             fd.append('chunkIndex', String(c));
-            const chunkRes = await fetch('/api/v2/analysis/upload/chunk', { method: 'POST', body: fd });
+            const chunkRes = await fetch('/api/v2/analysis/upload/chunk', { method: 'POST', headers: formDataAuth, body: fd });
             if (!chunkRes.ok) throw new Error(`Chunk ${c + 1} mislukt`);
           }
 
           const completeRes = await fetch('/api/v2/analysis/upload/complete', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders,
             body: JSON.stringify({
               uploadId,
               title: bf.title,
@@ -414,6 +419,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
 
           const response = await fetch('/api/v2/analysis/upload', {
             method: 'POST',
+            headers: formDataAuth,
             body: formData,
           });
           result = await response.json();

@@ -14,22 +14,31 @@ export function Logo({ variant = "horizontal", className }: LogoProps) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* HH signature icon - simplified handwritten style */}
+        {/* Hh. handwritten signature — branding PDF */}
+        {/* H: two vertical stems + crossbar */}
         <path
-          d="M20 30 L20 70 M20 50 L45 50 M45 30 L45 70 M55 30 L55 70 M55 50 L80 50 M80 30 L80 70"
+          d="M15 18 L15 78 M15 48 L40 48 M40 18 L40 78"
           stroke="currentColor"
-          strokeWidth="4"
+          strokeWidth="3.2"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {/* Signature underline */}
+        {/* h: stem + curved bowl */}
         <path
-          d="M15 80 Q50 75 85 80"
+          d="M56 22 L56 78"
           stroke="currentColor"
-          strokeWidth="2.5"
+          strokeWidth="3.2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M56 44 C56 34, 80 34, 80 46 L80 78"
+          stroke="currentColor"
+          strokeWidth="3.2"
           strokeLinecap="round"
           fill="none"
         />
+        {/* Dot */}
+        <circle cx="90" cy="30" r="3" fill="currentColor" />
       </svg>
     );
   }
