@@ -1,7 +1,7 @@
 import { supabase } from '@/utils/supabase/client';
 import type { ActivityType, ActivityMetadata } from '@/types/crossPlatform';
 
-const HUGO_AI_API_URL = import.meta.env.VITE_HUGO_AI_API_URL || 'https://hugoherbots-ai-chat.replit.app';
+const HUGO_AI_API_URL = import.meta.env.VITE_HUGO_AI_API_URL || window.location.origin;
 
 async function notifyAiPlatform(
   userId: string,

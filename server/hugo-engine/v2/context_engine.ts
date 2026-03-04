@@ -1333,6 +1333,11 @@ export async function generateQuestionForSlot(
   const theme = getThemeForSlot(slotId);
   const technique = getTechnique(techniqueId);
   
+  // Detect brand-new user: first slot (sector), no gathered context, no conversation history
+  const isFirstSlotForNewUser = slotId === 'sector'
+    && Object.values(gatheredContext).filter(v => v && v.trim()).length === 0
+    && (!conversationHistory || conversationHistory.length === 0);
+
   const situation = `Je bent bezig met context verzamelen voor techniek "${technique?.naam || techniqueId}".
 Wat je al weet:
 ${formatGatheredContext(gatheredContext)}
@@ -1341,9 +1346,15 @@ Nu wil je meer weten over: ${theme.theme}
 ${theme.examples_of_info_needed ? `Voorbeelden van info die je zoekt: ${theme.examples_of_info_needed.join(', ')}` : ''}`;
 
   // Gebruik theme.theme in plaats van slotId om interne IDs te vermijden in de output
-  const task = `Stel een natuurlijke vraag om meer te weten te komen over "${theme.theme}". 
-Bouw voort op wat je al weet. Stel maximaal 1 vraag. 
+  let task: string;
+  if (isFirstSlotForNewUser) {
+    task = `Dit is een gloednieuwe gebruiker die voor het eerst met je praat. Begin heel warm en enthousiast. Stel jezelf kort voor als Hugo, hun persoonlijke sales coach. Vertel in 1 zin wat je voor hen kunt doen (oefenen, rollenspel, feedback op gesprekken). Vraag dan natuurlijk en vriendelijk naar hun ${theme.theme}.
 BELANGRIJK: Noem NOOIT interne termen zoals "lens_reverse_engineering" of andere technische slot-IDs in je antwoord.`;
+  } else {
+    task = `Stel een natuurlijke vraag om meer te weten te komen over "${theme.theme}".
+Bouw voort op wat je al weet. Stel maximaal 1 vraag.
+BELANGRIJK: Noem NOOIT interne termen zoals "lens_reverse_engineering" of andere technische slot-IDs in je antwoord.`;
+  }
 
   return generateHugoResponse(situation, task, { conversationHistory });
 }

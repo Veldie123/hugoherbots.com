@@ -208,7 +208,6 @@ const ALLOWED_ORIGINS = [
   'https://www.hugoherbots.com',
   'https://hugoherbots.ai',
   'https://www.hugoherbots.ai',
-  'https://hugoherbots-ai-chat.replit.app',
 ];
 if (process.env.NODE_ENV !== 'production') {
   ALLOWED_ORIGINS.push('http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:5000');
@@ -5450,8 +5449,8 @@ app.post("/api/sso/generate-token", async (req, res) => {
     console.log(`[SSO] Token generated successfully (expires in ${ttlSeconds}s)`);
 
     // Build the redirect URL
-    const targetBaseUrl = targetPlatform === 'ai' 
-      ? 'https://hugoherbots-ai-chat.replit.app'
+    const targetBaseUrl = targetPlatform === 'ai'
+      ? (process.env.HUGO_AI_URL || 'https://hugoherbots.ai')
       : 'https://hugoherbots.com';
     
     const redirectUrl = `${targetBaseUrl}/sso/validate?token=${token}`;

@@ -12,7 +12,7 @@ import { auth } from "../../utils/supabase/client";
 import { projectId, publicAnonKey } from "../../utils/supabase/info";
 const hugoImage = "/images/Hugo-Herbots-WEB-0444.JPG";
 
-type Page = "landing" | "pricing" | "about" | "login" | "signup" | "onboarding" | "dashboard" | "roleplay" | "library" | "builder" | "sessions" | "analytics" | "settings";
+type Page = "landing" | "pricing" | "about" | "login" | "signup" | "onboarding" | "dashboard" | "roleplay" | "library" | "builder" | "sessions" | "analytics" | "settings" | "talk-to-hugo" | "admin-dashboard";
 
 interface SignupProps {
   onLoginClick?: () => void;
@@ -104,8 +104,8 @@ export function Signup({ onLoginClick, onSignupSuccess, navigate }: SignupProps)
         console.log('🎉 Signup complete! Admin user - navigating to admin-dashboard...');
         navigate('admin-dashboard');
       } else {
-        console.log('🎉 Signup complete! Navigating to onboarding...');
-        navigate('onboarding');
+        console.log('🎉 Signup complete! Navigating to talk-to-hugo...');
+        navigate('talk-to-hugo');
       }
 
     } catch (err: any) {

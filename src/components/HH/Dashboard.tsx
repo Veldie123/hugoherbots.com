@@ -297,11 +297,14 @@ const HugoTrainingCard = ({
   );
 };
 
-export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview = false, onboardingMode }: DashboardProps) {
+export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isPreview = false, onboardingMode }: DashboardProps) {
   const { videos: realVideos, featuredVideo, loading: videosLoading } = useDashboardVideos();
   const { firstName, loginStreak, phaseProgress, totalCompleted, totalVideos } = useDashboardUserData();
   const { upcomingWebinars, completedWebinars, loading: webinarsLoading } = useDashboardWebinars();
   const displayName = isPreview ? "" : firstName;
+
+  // hasData: default true since dashboard always has shared content (videos, webinars)
+  const hasData = hasDataProp ?? true;
 
   const getCompletedVideoIds = (): Set<string> => {
     try {
@@ -322,9 +325,9 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
     return completedVideoIds.has(realVideos[idx - 1].id);
   };
 
-  const continueWatching = realVideos.slice(0, 5).map((v, i) => ({
+  const continueWatching = realVideos.slice(0, 5).map((v) => ({
     ...v,
-    progress: i === 0 ? 68 : i === 1 ? 45 : i === 2 ? 12 : 0
+    progress: completedVideoIds.has(v.id) ? 100 : 0,
   }));
 
   const hugoTrainings = [
@@ -340,16 +343,16 @@ export function Dashboard({ hasData = true, navigate, isAdmin = false, isPreview
       <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} isPreview={isPreview}>
         <div className="p-8">
           <EmptyState
-            icon={Play}
+            icon={MessageSquare}
             title="Klaar om te beginnen?"
-            body="Je eerste role-play duurt 2 minuten. Daarna weet je direct waar je staat — en wat je volgende stap is."
+            body="Praat met Hugo, je persoonlijke sales coach. Hij leert je kennen en helpt je direct op weg."
             primaryCta={{
-              label: "Begin role-play",
-              onClick: () => navigate?.("roleplay"),
+              label: "Praat met Hugo",
+              onClick: () => navigate?.("talk-to-hugo"),
             }}
             secondaryCta={{
-              label: "Bekijk bibliotheek",
-              onClick: () => navigate?.("library"),
+              label: "Bekijk video's",
+              onClick: () => navigate?.("videos"),
             }}
           />
         </div>

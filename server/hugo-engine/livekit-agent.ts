@@ -47,8 +47,8 @@ const DEBOUNCE_MS = 800; // Wait 800ms after last speech before processing — r
 const MIN_TRANSCRIPT_LENGTH = 3; // Minimum characters to process
 
 async function getBaseUrl(): Promise<string> {
-  if (process.env.REPLIT_DEV_DOMAIN) {
-    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+    return `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
   }
   return 'http://localhost:5000';
 }

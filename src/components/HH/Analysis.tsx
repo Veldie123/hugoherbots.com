@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { toast } from "sonner";
 import { getAuthHeaders } from "../../services/hugoApi";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
@@ -90,7 +91,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
       });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || 'Opnieuw proberen mislukt');
+        toast.error(data.error || 'Opnieuw proberen mislukt');
         return;
       }
       const listRes = await fetch('/api/v2/analysis/list?source=upload', {
@@ -116,7 +117,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
         setConversations(mapped);
       }
     } catch (err) {
-      alert('Opnieuw proberen mislukt');
+      toast.error('Opnieuw proberen mislukt');
     }
   };
 

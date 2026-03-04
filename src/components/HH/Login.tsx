@@ -8,6 +8,7 @@ import { Logo } from "./Logo";
 import { StickyHeader } from "./StickyHeader";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { auth } from "../../utils/supabase/client";
+import { toast } from "sonner";
 const hugoImage = "/images/Hugo-Herbots-WEB-0444.JPG";
 
 type Page = "landing" | "pricing" | "about" | "login" | "signup" | "onboarding" | "dashboard" | "roleplay" | "library" | "builder" | "sessions" | "analytics" | "settings" | "admin-dashboard";
@@ -24,6 +25,27 @@ export function Login({ onSignupClick, onLoginSuccess, navigate }: LoginProps) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resetLoading, setResetLoading] = useState(false);
+
+  const handlePasswordReset = async () => {
+    if (!email.trim()) {
+      toast.info("Vul eerst je emailadres in, dan sturen we je een reset link.");
+      return;
+    }
+    setResetLoading(true);
+    try {
+      const { error: resetError } = await auth.resetPassword(email.trim());
+      if (resetError) {
+        toast.error(resetError.message || "Kon geen reset link versturen.");
+      } else {
+        toast.success(`Reset link verstuurd naar ${email.trim()}`);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Er ging iets mis. Probeer het opnieuw.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,9 +152,11 @@ export function Login({ onSignupClick, onLoginSuccess, navigate }: LoginProps) {
                   <Label htmlFor="password">Wachtwoord</Label>
                   <button
                     type="button"
-                    className="text-[14px] leading-[20px] text-hh-primary hover:underline"
+                    onClick={handlePasswordReset}
+                    disabled={resetLoading}
+                    className="text-[14px] leading-[20px] text-hh-primary hover:underline disabled:opacity-50"
                   >
-                    Vergeten?
+                    {resetLoading ? "Versturen..." : "Vergeten?"}
                   </button>
                 </div>
                 <div className="relative">

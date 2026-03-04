@@ -65,14 +65,13 @@ export default function App() {
   // Development screenshot bypass: check URL path immediately (synchronously)
   const getDevPreviewPage = (): Page | null => {
     if (typeof window === 'undefined') return null;
-    // SEC-003: Only allow dev preview routes in development or on Replit
-    const isDev = import.meta.env.DEV || window.location.hostname.includes('replit');
+    // SEC-003: Only allow dev preview routes in development
+    const isDev = import.meta.env.DEV;
     const path = window.location.pathname;
     if (path.startsWith('/_dark/') && isDev) {
       localStorage.setItem('hh-theme', 'dark');
       document.documentElement.classList.add('dark');
       const pageName = path.replace('/_dark/', '');
-      console.log('🌙 Dark mode dev preview:', pageName);
       return pageName as Page;
     }
     if (path.startsWith('/_dev/') && isDev) {
@@ -91,21 +90,18 @@ export default function App() {
       if (detailParam) {
         localStorage.setItem('selectedTechniqueNumber', detailParam);
       }
-      console.log('🔧 Dev preview mode activated via path:', pageName);
       return pageName as Page;
     }
     // Check for Hugo onboarding paths: /_hugo/dashboard, /_hugo/videos, etc.
     if (path.startsWith('/_hugo/') && isDev) {
       const pageName = path.replace('/_hugo/', '');
-      console.log('👋 Hugo onboarding preview activated via path:', pageName);
       localStorage.setItem('hugo_onboarding_mode', 'true');
       return pageName as Page;
     }
     // Also check query params as fallback
     const urlParams = new URLSearchParams(window.location.search);
     const devPreview = urlParams.get('dev_preview');
-    if (devPreview && (import.meta.env.DEV || window.location.hostname.includes('replit'))) {
-      console.log('🔧 Dev preview mode activated via param:', devPreview);
+    if (devPreview && import.meta.env.DEV) {
       return devPreview as Page;
     }
     return null;
@@ -132,19 +128,14 @@ export default function App() {
   const [onboardingMode, setOnboardingMode] = useState(isHugoDevPath); // Simplified UI for Hugo's onboarding
   const [viewMode, setViewMode] = useState<'admin' | 'user'>(devPage && String(devPage).startsWith('admin-') ? 'admin' : 'user'); // Tracks admin/user view for Talk to Hugo
 
-  console.log('📍 App.tsx rendered, currentPage:', currentPage);
-
   // Check auth state on mount - determine initial route
   useEffect(() => {
     // Skip if dev preview mode is active
     if (devPage) {
-      console.log('🔧 Skipping auth check - dev preview mode');
       return;
     }
     
     const checkAuthAndRoute = async () => {
-      console.log('🔐 Checking initial auth state...');
-      
       try {
         const { session } = await auth.getSession();
         
@@ -160,17 +151,14 @@ export default function App() {
           setOnboardingMode(isHugoOnboarding);
           
           if (isHugoOnboarding) {
-            console.log('👋 Hugo onboarding mode activated - content admin, user view');
             localStorage.setItem('hugo_onboarding_mode', 'true');
             setCurrentPage("dashboard");
           } else {
             localStorage.removeItem('hugo_onboarding_mode');
             if (userIsAdmin) {
-              console.log('✅ Admin user logged in, route to admin-dashboard');
               setViewMode('admin');
               setCurrentPage("admin-dashboard");
             } else {
-              console.log('✅ User is logged in, route to dashboard');
               setCurrentPage("dashboard");
             }
           }
@@ -179,10 +167,8 @@ export default function App() {
           const publicPages: Page[] = ["pricing", "about", "login", "signup", "privacy-policy"];
           const pathPage = window.location.pathname.replace('/', '') as Page;
           if (publicPages.includes(pathPage)) {
-            console.log('🌐 No session, route to public page:', pathPage);
             setCurrentPage(pathPage);
           } else {
-            console.log('❌ No session, route to landing');
             setCurrentPage("landing");
           }
         }
@@ -200,7 +186,6 @@ export default function App() {
 
   // Navigation context - doorgeven aan alle pages
   const navigate = (page: Page | string, data?: Record<string, any>) => {
-    console.log('🧭 Navigate called with:', page, data);
     if (page === "landing" || page === "logout") {
       setIsAdmin(false);
       setIsSuperAdmin(false);

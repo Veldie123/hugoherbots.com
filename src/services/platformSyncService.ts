@@ -185,7 +185,6 @@ export async function syncApiSpecToAiPlatform() {
     ],
     cors: {
       allowedOrigins: [
-        'https://hugoherbots-com.replit.app',
         'https://hugoherbots.com',
       ],
     },

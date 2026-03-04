@@ -23,9 +23,7 @@ interface OnboardingProps {
 
 export function Onboarding({ navigate }: OnboardingProps) {
   const [step, setStep] = useState<OnboardingStep>(1);
-  
-  console.log('🎯 Onboarding component rendered, step:', step);
-  
+
   // Step 1: Sales profiel
   const [salesType, setSalesType] = useState(""); // B2B of B2C
   const [experience, setExperience] = useState("");
@@ -57,8 +55,6 @@ export function Onboarding({ navigate }: OnboardingProps) {
 
   const requestMicPermission = async () => {
     try {
-      console.log("🎤 Vraag microfoon toegang aan...");
-      
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
@@ -67,15 +63,11 @@ export function Onboarding({ navigate }: OnboardingProps) {
         } 
       });
       
-      console.log("✅ Microfoon toegang verkregen");
       setMicPermission("granted");
       
       stream.getTracks().forEach(track => track.stop());
       
     } catch (error: any) {
-      console.warn("⚠️ Microfoon toegang geweigerd door gebruiker");
-      console.log("Details:", error.name, "-", error.message);
-      
       setMicPermission("denied");
     }
   };
@@ -83,7 +75,6 @@ export function Onboarding({ navigate }: OnboardingProps) {
   useEffect(() => {
     if (step === 4) {
       setMicPermission("pending");
-      console.log("🎤 Stap 4 bereikt - wacht op gebruiker actie voor microfoon");
     }
   }, [step]);
 

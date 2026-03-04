@@ -73,6 +73,7 @@ import type { EpicSlideContent, VideoEmbed, WebinarLink, AnalysisResultEmbed, Ri
 import { hugoApi, getAuthHeaders, type AssistanceConfig } from "../../services/hugoApi";
 import { lastActivityService } from "../../services/lastActivityService";
 import { supabase } from "../../utils/supabase/client";
+import { toast } from "sonner";
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession();
@@ -253,7 +254,6 @@ export function TalkToHugoAI({
         const levelData = await hugoApi.getUserLevel();
         setDifficultyLevel(levelData.levelName);
         setAssistanceConfig(levelData.assistance);
-        console.log("[Performance] Loaded user level:", levelData.level, levelData.levelName);
       } catch (error) {
         console.error("[Performance] Failed to load user level:", error);
       }
@@ -336,7 +336,6 @@ export function TalkToHugoAI({
               setIsLoading(false);
             }
           })();
-          console.log("[Hugo] Practice context loaded from analysis:", ctx.practiceLabel, "turns:", turns.length);
           return;
         }
       } catch (e) {
@@ -378,7 +377,6 @@ export function TalkToHugoAI({
         text: welcomeText,
         timestamp: new Date(),
       }]);
-      console.log("[Hugo] Analysis discussion loaded for:", title);
       return;
     }
 
@@ -423,9 +421,7 @@ export function TalkToHugoAI({
             }
           );
           setHasActiveSession(true);
-          console.log("[Hugo] Admin streaming session started");
         } catch (e) {
-          console.warn("[Hugo] Failed to start admin session:", e);
           setMessages([{
             id: `welcome-${Date.now()}`,
             sender: "ai",
@@ -449,11 +445,10 @@ export function TalkToHugoAI({
             text: data.welcomeMessage,
             timestamp: new Date(),
           }]);
-          console.log("[Hugo] User welcome loaded, userId:", user?.id);
           return;
         }
       } catch (e) {
-        console.warn("[Hugo] Failed to load user welcome, falling back:", e);
+        // Fall back to lastActivityService welcome
       }
       const { message, summary } = await lastActivityService.getPersonalizedWelcome(user?.id || null);
       setMessages([{
@@ -502,8 +497,6 @@ export function TalkToHugoAI({
       const { token, avatarId } = await tokenResponse.json();
       setHeygenToken(token);
       
-      console.log("[HeyGen] Token received, avatarId:", avatarId || "not configured");
-      
       // Create avatar instance
       const avatar = new StreamingAvatar({ token });
       
@@ -517,31 +510,23 @@ export function TalkToHugoAI({
       });
       
       avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
-        console.log("[HeyGen] Stream disconnected");
         setAvatarSession(null);
       });
       
       avatar.on(StreamingEvents.STREAM_READY, (event: any) => {
-        console.log("[HeyGen] Stream ready, event:", event);
         // Try multiple ways to get the stream
         const stream = event.detail?.stream || event.detail || (avatar as any).mediaStream;
-        console.log("[HeyGen] Stream object:", stream, "typeof:", typeof stream);
-        console.log("[HeyGen] Avatar properties:", Object.keys(avatar));
-        
+
         if (videoRef.current && stream instanceof MediaStream) {
-          console.log("[HeyGen] Attaching MediaStream to video element");
           videoRef.current.srcObject = stream;
           videoRef.current.onloadedmetadata = () => {
             videoRef.current?.play().catch(e => console.error("[HeyGen] Play error:", e));
           };
-        } else {
-          console.warn("[HeyGen] MediaStream not found in event, will try from avatar instance after start");
         }
       });
       
       // Start avatar session - use custom avatar from backend or fallback to public avatar
       const avatarName = avatarId || "Shawn_Therapist_public";
-      console.log("[HeyGen] Starting avatar session with:", avatarName);
       
       const sessionData = await avatar.createStartAvatar({
         quality: AvatarQuality.Medium,
@@ -549,19 +534,12 @@ export function TalkToHugoAI({
         language: "nl",
       });
       
-      console.log("[HeyGen] Session data:", sessionData);
-      console.log("[HeyGen] Avatar after start:", Object.keys(avatar));
-      
       // Get mediaStream from avatar instance - this is how HeyGen SDK exposes the stream
       const avatarStream = (avatar as any).mediaStream;
-      console.log("[HeyGen] Avatar mediaStream:", avatarStream);
-      console.log("[HeyGen] Is MediaStream?", avatarStream instanceof MediaStream);
       
       if (videoRef.current && avatarStream) {
-        console.log("[HeyGen] Attaching mediaStream to video element");
         videoRef.current.srcObject = avatarStream;
         videoRef.current.onloadedmetadata = () => {
-          console.log("[HeyGen] Video metadata loaded, calling play()");
           videoRef.current?.play().catch(e => console.error("[HeyGen] Play error:", e));
         };
       } else {
@@ -573,7 +551,6 @@ export function TalkToHugoAI({
       }
       
       setAvatarSession(avatar);
-      console.log("[HeyGen] Avatar session started successfully");
     } catch (error: any) {
       console.error("[HeyGen] Error:", error);
       setAvatarError(error.message || "Kon video avatar niet starten");
@@ -651,7 +628,6 @@ export function TalkToHugoAI({
       
       // Setup event listeners
       room.on(RoomEvent.ConnectionStateChanged, (state) => {
-        console.log("[LiveKit] Connection state:", state);
         setAudioConnectionState(state);
         if (state === ConnectionState.Connected) {
           setIsAudioConnecting(false);
@@ -659,7 +635,6 @@ export function TalkToHugoAI({
       });
       
       room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
-        console.log("[LiveKit] Track subscribed:", track.kind);
         if (track.kind === Track.Kind.Audio) {
           // Attach audio track
           const audioElement = track.attach();
@@ -682,17 +657,14 @@ export function TalkToHugoAI({
       });
       
       room.on(RoomEvent.Disconnected, () => {
-        console.log("[LiveKit] Disconnected");
         setAudioConnectionState(ConnectionState.Disconnected);
       });
       
       // Connect to room
       await room.connect(url, token);
-      console.log("[LiveKit] Connected to room");
-      
+
       // Enable microphone
       await room.localParticipant.setMicrophoneEnabled(true);
-      console.log("[LiveKit] Microphone enabled");
       
       setLiveKitRoom(room);
       
@@ -930,7 +902,6 @@ export function TalkToHugoAI({
       }
 
       const { conversationId } = await response.json();
-      console.log('[Hugo] Inline analysis started:', conversationId);
 
       setMessages(prev => prev.map(m => {
         if (m.id !== analysisMessageId) return m;
@@ -1086,7 +1057,6 @@ export function TalkToHugoAI({
           viewMode: 'user',
         });
         setHasActiveSession(true);
-        console.log("[Hugo] Auto-started coach session");
       } catch (error: any) {
         console.error("[Hugo] Failed to start session:", error);
         setMessages(prev => [...prev, {
@@ -1273,7 +1243,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
-      alert("Je browser ondersteunt spraakherkenning niet. Gebruik Chrome of Edge.");
+      toast.error("Je browser ondersteunt spraakherkenning niet. Gebruik Chrome of Edge.");
       return;
     }
 
