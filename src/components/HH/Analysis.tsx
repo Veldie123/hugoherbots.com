@@ -38,6 +38,8 @@ import {
   BarChart2,
   Trash2,
   RotateCcw,
+  CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 
 import { getCodeBadgeColors } from "../../utils/phaseColors";
@@ -123,7 +125,11 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
 
   const openTranscript = (conv: ConversationRecord) => {
     if (conv.status === 'completed') {
-      navigate?.(isAdmin ? 'admin-analysis-results' : 'analysis-results', { conversationId: conv.id, ...(isAdmin ? { fromAdmin: true } : {}) });
+      if (isAdmin) {
+        navigate?.('admin-analysis-results', { conversationId: conv.id, fromAdmin: true });
+      } else {
+        navigate?.('talk-to-hugo', { loadAnalysisId: conv.id });
+      }
     }
   };
 
@@ -320,59 +326,89 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
 
   return (
     <Layout {...layoutProps}>
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-        {/* Header */}
-        <div className="space-y-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h1 className="text-[24px] sm:text-[32px] leading-[32px] sm:leading-[40px] text-hh-text mb-1">
-                Gespreksanalyse
-              </h1>
-              <p className="text-[14px] sm:text-[16px] leading-[20px] sm:leading-[24px] text-hh-muted">
-                Upload gesprekken voor AI-analyse en feedback
-              </p>
-            </div>
-            <Button
-              className="gap-2 text-white shrink-0 hidden sm:flex"
-              style={{ backgroundColor: '#059669' }}
-              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#047857')}
-              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#059669')}
-              onClick={() => navigate?.("upload-analysis")}
-            >
-              <Upload className="w-4 h-4 text-white" />
-              Analyseer gesprek
-            </Button>
+      <div className="p-3 sm:p-4 lg:p-6 space-y-6">
+        {/* Header with compact KPI pills */}
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+          <div>
+            <h1 className="text-[24px] sm:text-[28px] lg:text-[32px] leading-[40px] text-hh-text mb-2">
+              Gespreksanalyse
+            </h1>
+            <p className="text-[16px] leading-[24px] text-hh-muted">
+              Upload gesprekken voor AI-analyse en feedback
+            </p>
           </div>
-          <Button
-            className="gap-2 text-white w-full sm:hidden"
-            style={{ backgroundColor: '#059669' }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#047857')}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#059669')}
-            onClick={() => navigate?.("upload-analysis")}
-          >
-            <Upload className="w-4 h-4 text-white" />
-            Analyseer gesprek
-          </Button>
+          <div className="grid grid-cols-2 sm:flex gap-2 sm:flex-wrap lg:flex-nowrap">
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-hh-ink/10 flex items-center justify-center">
+                <FileAudio className="w-3 h-3 text-hh-ink" />
+              </div>
+              <div>
+                <p className="text-[10px] text-hh-muted leading-none">Totaal</p>
+                <p className="text-[14px] font-semibold text-hh-ink leading-tight">{conversations.length}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-hh-success/10 flex items-center justify-center">
+                <CheckCircle2 className="w-3 h-3 text-hh-success" />
+              </div>
+              <div>
+                <p className="text-[10px] text-hh-muted leading-none">Geanalyseerd</p>
+                <p className="text-[14px] font-semibold text-hh-ink leading-tight">{analyzedCount}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                <Clock className="w-3 h-3 text-hh-primary" />
+              </div>
+              <div>
+                <p className="text-[10px] text-hh-muted leading-none">Totale Duur</p>
+                <p className="text-[14px] font-semibold text-hh-ink leading-tight">{`${Math.floor(totalDuration / 60)}u ${totalDuration % 60}m`}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-hh-warning/10 flex items-center justify-center">
+                <TrendingUp className="w-3 h-3 text-hh-warning" />
+              </div>
+              <div>
+                <p className="text-[10px] text-hh-muted leading-none">Gem. Score</p>
+                <p className="text-[14px] font-semibold text-hh-ink leading-tight">{`${avgScore}%`}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {[
-            { name: 'Totaal Analyses', value: conversations.length, icon: FileAudio, bgColor: 'rgba(37, 99, 235, 0.12)', color: '#2563eb' },
-            { name: 'Geanalyseerd', value: analyzedCount, icon: BarChart2, bgColor: 'rgba(5, 150, 105, 0.12)', color: '#059669' },
-            { name: 'Totale Duur', value: `${Math.floor(totalDuration / 60)}u ${totalDuration % 60}m`, icon: Clock, bgColor: 'rgba(234, 88, 12, 0.12)', color: '#ea580c' },
-            { name: 'Gem. Score', value: `${avgScore}%`, icon: TrendingUp, bgColor: 'rgba(2, 132, 199, 0.12)', color: '#0284c7' },
-          ].map(stat => (
-            <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-              <div className="flex items-start justify-between mb-2 sm:mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColor, color: stat.color }}>
-                  <stat.icon className="w-5 h-5" />
-                </div>
-              </div>
-              <p className="text-[13px] leading-[18px] text-hh-muted">{stat.name}</p>
-              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-text">{stat.value}</p>
-            </Card>
-          ))}
+        {/* Hero Banner */}
+        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px]">
+          <img
+            src="/images/Hugo-Herbots-WEB-0116.JPG"
+            alt="Hugo Herbots Gespreksanalyse"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: '50% 30%' }}
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+          <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+          <div className="relative h-full flex items-center p-6 sm:p-8">
+            <div className="text-white space-y-3 max-w-lg">
+              <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: '#4F7396' }}>
+                <Sparkles className="w-3 h-3 mr-1" />
+                Gespreksanalyse
+              </Badge>
+              <h2 className="text-[20px] sm:text-[24px] font-bold leading-tight">
+                Analyseer je verkoopgesprekken
+              </h2>
+              <p className="text-white/70 text-[13px] sm:text-[14px] leading-relaxed line-clamp-2">
+                Upload een rollenspel of echt klantgesprek en ontvang gedetailleerde E.P.I.C. feedback van Hugo.
+              </p>
+              <Button
+                className="gap-2 text-white border-0 bg-hh-success hover:bg-hh-success/90"
+                onClick={() => navigate?.("upload-analysis")}
+              >
+                <Upload className="w-4 h-4" />
+                Analyseer gesprek
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Filters & Search */}
@@ -387,7 +423,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full sm:w-[180px]">
@@ -400,14 +436,13 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                   <SelectItem value="failed">Mislukt</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <div className="hidden md:flex gap-1 shrink-0">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode("list")}
-                  style={viewMode === "list" ? { backgroundColor: '#059669', color: 'white' } : {}}
-                  className={`hidden md:flex ${viewMode !== "list" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}`}
+                  className={`hidden md:flex ${viewMode === "list" ? "bg-hh-success text-white hover:bg-hh-success/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
                 >
                   <List className="w-4 h-4 text-current" />
                 </Button>
@@ -415,8 +450,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode("grid")}
-                  style={viewMode === "grid" ? { backgroundColor: '#059669', color: 'white' } : {}}
-                  className={`hidden md:flex ${viewMode !== "grid" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}`}
+                  className={`hidden md:flex ${viewMode === "grid" ? "bg-hh-success text-white hover:bg-hh-success/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
                 >
                   <LayoutGrid className="w-4 h-4 text-current" />
                 </Button>
@@ -452,14 +486,11 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
               <FileAudio className="w-12 h-12 text-hh-muted mx-auto mb-4" />
               <p className="text-[16px] leading-[24px] text-hh-text mb-2">Nog geen analyses</p>
               <p className="text-[14px] text-hh-muted mb-4">Upload een gesprek om je eerste analyse te starten</p>
-              <Button 
-                className="gap-2 text-white"
-                style={{ backgroundColor: '#059669' }}
-                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#047857')}
-                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#059669')}
+              <Button
+                className="gap-2 text-white bg-hh-success hover:bg-hh-success/90"
                 onClick={() => navigate?.("upload-analysis")}
               >
-                <Upload className="w-4 h-4 text-white" />
+                <Upload className="w-4 h-4" />
                 Analyseer gesprek
               </Button>
             </div>
@@ -537,9 +568,8 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                       className="border-b border-hh-border last:border-0 hover:bg-hh-ui-50/50 transition-colors cursor-pointer"
                     >
                       <td className="py-3 px-4">
-                        <span 
-                          style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}
-                          className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold">
+                        <span
+                          className="bg-hh-success/10 text-hh-success inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold">
                           {conv.techniquesUsed[0] || "—"}
                         </span>
                       </td>
@@ -555,8 +585,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                               {conv.techniquesUsed.slice(0, 4).map((tech, idx) => (
                                 <span
                                   key={idx}
-                                  style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}
-                                  className="inline-flex items-center justify-center min-w-[32px] h-7 px-1.5 rounded-full text-[10px] font-mono font-semibold"
+                                  className="bg-hh-success/10 text-hh-success inline-flex items-center justify-center min-w-[32px] h-7 px-1.5 rounded-full text-[10px] font-mono font-semibold"
                                 >
                                   {tech}
                                 </span>
@@ -578,7 +607,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                       <td className="py-3 px-4">
                         {conv.score !== null ? (
                           <span className={`text-[14px] leading-[20px] font-medium ${
-                            conv.score >= 70 ? "text-hh-success" : conv.score >= 50 ? "text-blue-600" : "text-hh-warn"
+                            conv.score >= 70 ? "text-hh-success" : conv.score >= 50 ? "text-hh-primary" : "text-hh-warning"
                           }`}>
                             {Math.round(conv.score)}%
                           </span>
@@ -606,7 +635,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                             </DropdownMenuItem>
                             {conv.status === 'failed' && (
                               <DropdownMenuItem onClick={() => retryAnalysis(conv.id)}>
-                                <RotateCcw className="w-4 h-4 mr-2" style={{ color: '#059669' }} />
+                                <RotateCcw className="w-4 h-4 mr-2 text-hh-success" />
                                 Opnieuw proberen
                               </DropdownMenuItem>
                             )}
@@ -660,7 +689,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                         </DropdownMenuItem>
                         {conv.status === 'failed' && (
                           <DropdownMenuItem onClick={() => retryAnalysis(conv.id)}>
-                            <RotateCcw className="w-4 h-4 mr-2" style={{ color: '#059669' }} />
+                            <RotateCcw className="w-4 h-4 mr-2 text-hh-success" />
                             Opnieuw proberen
                           </DropdownMenuItem>
                         )}
@@ -678,7 +707,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                     {conv.duration}
                   </div>
                   {conv.score !== null ? (
-                    <span className={`font-semibold ${conv.score >= 70 ? "text-hh-success" : conv.score >= 50 ? "text-blue-600" : "text-hh-warn"}`}>
+                    <span className={`font-semibold ${conv.score >= 70 ? "text-hh-success" : conv.score >= 50 ? "text-hh-primary" : "text-hh-warning"}`}>
                       {Math.round(conv.score)}%
                     </span>
                   ) : (
@@ -686,7 +715,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                   )}
                   <span>{conv.date}</span>
                   {conv.techniquesUsed.length > 0 && (
-                    <span className="text-emerald-600 font-mono text-[11px]">{conv.techniquesUsed.length} technieken</span>
+                    <span className="text-hh-success font-mono text-[11px]">{conv.techniquesUsed.length} technieken</span>
                   )}
                 </div>
               </Card>
@@ -723,7 +752,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                         </DropdownMenuItem>
                         {conv.status === 'failed' && (
                           <DropdownMenuItem onClick={() => retryAnalysis(conv.id)}>
-                            <RotateCcw className="w-4 h-4 mr-2" style={{ color: '#059669' }} />
+                            <RotateCcw className="w-4 h-4 mr-2 text-hh-success" />
                             Opnieuw proberen
                           </DropdownMenuItem>
                         )}
@@ -747,8 +776,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                       {conv.techniquesUsed.slice(0, 3).map((tech, idx) => (
                         <span
                           key={idx}
-                          style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}
-                          className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold"
+                          className="bg-hh-success/10 text-hh-success inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold"
                         >
                           {tech}
                         </span>
@@ -771,8 +799,8 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                         conv.score >= 70
                           ? "text-hh-success"
                           : conv.score >= 50
-                          ? "text-blue-600"
-                          : "text-hh-warn"
+                          ? "text-hh-primary"
+                          : "text-hh-warning"
                       }`}
                     >
                       {Math.round(conv.score)}%

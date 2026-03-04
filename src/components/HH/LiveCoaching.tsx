@@ -1373,7 +1373,8 @@ export function LiveCoaching({
                 return (
                   <Card
                     key={session.id}
-                    className="rounded-[16px] shadow-hh-sm border-hh-border hover:shadow-hh-md transition-all flex flex-col overflow-hidden"
+                    className="rounded-[16px] shadow-hh-sm border-hh-border hover:shadow-hh-md transition-all flex flex-col overflow-hidden cursor-pointer"
+                    onClick={() => setCalendarDetailSession(session)}
                   >
                     <div className="relative aspect-video">
                       <img 
@@ -1386,7 +1387,7 @@ export function LiveCoaching({
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 flex-shrink-0 bg-card/90 hover:bg-card shadow-sm"
-                          onClick={() => toggleReminder(session.id)}
+                          onClick={(e) => { e.stopPropagation(); toggleReminder(session.id); }}
                         >
                           {reminderSessionIds.has(session.id) ? (
                             <BellOff className="w-4 h-4 text-hh-primary" />
@@ -1452,7 +1453,7 @@ export function LiveCoaching({
                         <Button
                           size="sm"
                           className={`w-full gap-2 ${registeredSessionIds.has(session.id) ? 'bg-hh-ui-100 text-hh-text hover:bg-hh-ui-200' : 'bg-hh-primary hover:bg-hh-primary/90 text-white'}`}
-                          onClick={() => handleRegisterSession(session)}
+                          onClick={(e) => { e.stopPropagation(); handleRegisterSession(session); }}
                         >
                           {registeredSessionIds.has(session.id) ? (
                             <>
@@ -1470,7 +1471,7 @@ export function LiveCoaching({
                           variant="outline"
                           size="sm"
                           className="w-full"
-                          onClick={() => downloadIcsFile(session)}
+                          onClick={(e) => { e.stopPropagation(); downloadIcsFile(session); }}
                         >
                           <CalendarIcon className="w-4 h-4 mr-2" />
                           Voeg toe aan agenda
@@ -1521,7 +1522,7 @@ export function LiveCoaching({
                     </thead>
                     <tbody>
                       {upcomingSessions.map((session, sessionIndex) => (
-                        <tr key={session.id} className="border-t border-hh-border hover:bg-hh-ui-50 transition-colors">
+                        <tr key={session.id} className="border-t border-hh-border hover:bg-hh-ui-50 transition-colors cursor-pointer" onClick={() => setCalendarDetailSession(session)}>
                           <td className="py-3 px-4">
                             <img 
                               src={SESSION_IMAGES[sessionIndex % SESSION_IMAGES.length]} 
@@ -1549,7 +1550,7 @@ export function LiveCoaching({
                               Gepland
                             </Badge>
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
                             <div className="flex items-center justify-end gap-2">
                               <Button
                                 variant="ghost"

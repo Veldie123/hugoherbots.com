@@ -46,7 +46,7 @@ import { hideItem, getHiddenIds } from "../../utils/hiddenItems";
 import { getCodeBadgeColors } from "../../utils/phaseColors";
 
 interface HugoAIOverviewProps {
-  navigate?: (page: string) => void;
+  navigate?: (page: string, data?: Record<string, any>) => void;
   isAdmin?: boolean;
 }
 
@@ -503,7 +503,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
             src="/images/Hugo-Herbots-WEB-0461.JPG"
             alt="Hugo Herbots AI Coach"
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: '50% 25%' }}
+            style={{ objectPosition: '50% 15%' }}
             loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
@@ -658,7 +658,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                     <tr
                       key={session.id}
                       className="border-b border-hh-border last:border-0 hover:bg-hh-ui-50/50 transition-colors cursor-pointer"
-                      onClick={() => openSessionAnalysis(session)}
+                      onClick={() => navigate?.('talk-to-hugo', { loadSessionId: String(session.id) })}
                     >
                       {/* Technique Number Badge - emerald circles */}
                       <td className="py-3 px-4">
@@ -726,7 +726,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openSessionAnalysis(session)}>
+                            <DropdownMenuItem onClick={() => navigate?.('talk-to-hugo', { loadSessionId: String(session.id) })}>
                               <Eye className="w-4 h-4 mr-2" />
                               Bekijk details
                             </DropdownMenuItem>
@@ -756,7 +756,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
               <Card
                 key={session.id}
                 className="p-5 rounded-[16px] shadow-hh-sm border-hh-border hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => openSessionAnalysis(session)}
+                onClick={() => navigate?.('talk-to-hugo', { loadSessionId: String(session.id) })}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -776,7 +776,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={(e: Event) => { e.stopPropagation(); openSessionAnalysis(session); }}>
+                      <DropdownMenuItem onClick={(e: Event) => { e.stopPropagation(); navigate?.('talk-to-hugo', { loadSessionId: String(session.id) }); }}>
                         <Eye className="w-4 h-4 mr-2" />
                         Bekijk details
                       </DropdownMenuItem>
