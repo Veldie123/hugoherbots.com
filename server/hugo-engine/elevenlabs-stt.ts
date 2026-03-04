@@ -19,12 +19,14 @@ interface ScribeConnection {
 }
 
 const MAX_WS_CONNECTIONS = 50; // SEC-055: limit concurrent WebSocket connections
+const MAX_WS_MESSAGE_SIZE = 256 * 1024; // SEC-060: 256KB max (audio chunks are base64-encoded)
 const connections = new Map<string, ScribeConnection>();
 
 export function setupScribeWebSocket(server: Server) {
   const wss = new WebSocketServer({
     server,
-    path: "/ws/scribe"
+    path: "/ws/scribe",
+    maxPayload: MAX_WS_MESSAGE_SIZE,
   });
 
   wss.on("connection", async (clientWs, req) => {

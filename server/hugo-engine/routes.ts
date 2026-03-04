@@ -7,6 +7,12 @@ import { storage } from "./storage";
 import { requireAuth, requireAdmin } from "./auth-middleware";
 import { getAllowedTechniques, loadFases, loadTechniquesCatalog, loadAiPrompt, getContextSlotsForPhase, getTechniqueFromCatalog } from "./config-loader";
 
+// SEC-016: Sanitize error messages — hide internal details in production
+function safeErrorMessage(err: any, fallback = 'Er ging iets mis'): string {
+  if (process.env.NODE_ENV !== 'production') return err?.message || fallback;
+  return fallback;
+}
+
 function applyTemplate(template: string, vars: Record<string, string>): string {
   let result = template;
   for (const [key, value] of Object.entries(vars)) {
@@ -60,7 +66,7 @@ async function getSupabaseSession(sessionId: string): Promise<any | null> {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
-  const url = `${SUPABASE_URL}/rest/v1/live_sessions?id=eq.${sessionId}&select=*&limit=1`;
+  const url = `${SUPABASE_URL}/rest/v1/live_sessions?id=eq.${encodeURIComponent(sessionId)}&select=*&limit=1`;
   const r = await fetch(url, {
     headers: {
       'apikey': SUPABASE_SERVICE_ROLE_KEY,
@@ -113,7 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fases = loadFases();
       res.json(fases);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -123,7 +129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const technieken = loadTechniquesCatalog();
       res.json(technieken);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -152,7 +158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(techniquesByPhase);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   };
   app.get("/api/techniques", techniquesHandler);
@@ -179,7 +185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(techniquesByPhase);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -190,7 +196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const context = await storage.getUserContext(userId);
       res.json(context || null);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -210,7 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(context);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -412,7 +418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         practiceConfig,
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -531,7 +537,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ sessionId: session.id });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -546,7 +552,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(sessionState);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -556,7 +562,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const turns = await storage.getSessionTurns(req.params.id);
       res.json(turns);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -587,7 +593,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ success: true, message: "Context reset, ready for new context gathering" });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -645,7 +651,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Error starting roleplay:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -1330,7 +1336,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(response);
     } catch (error: any) {
       console.error("Error processing message:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -1603,7 +1609,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Error evaluating session:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2320,7 +2326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error: any) {
       console.error("Error in streaming endpoint:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2356,7 +2362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(report);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2377,7 +2383,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(videosWithThumbnails);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2395,7 +2401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(videosWithThumbnails);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2420,7 +2426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(videoWithDetails);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2442,7 +2448,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(uploadData);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2505,7 +2511,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(progress);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2523,7 +2529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completed: 0 
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2580,7 +2586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentVideo,
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2645,7 +2651,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await response.json();
       res.json(result);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2682,7 +2688,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rows = await r.json();
       res.json({ success: true, session: rows[0] });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2703,7 +2709,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(safeSessions);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -2736,7 +2742,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }));
       res.json(recordings);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -2752,7 +2758,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { muxStreamKey, muxLiveStreamId, ...safeSession } = session;
       res.json(safeSession);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -2783,7 +2789,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(session);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -2818,7 +2824,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         participantToken,
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -2831,7 +2837,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.leaveLiveSession(sessionId, userId);
       res.json({ success: true });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -2844,7 +2850,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.setReminder(sessionId, userId);
       res.json({ success: true });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -2915,7 +2921,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         recordingError,
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -2997,7 +3003,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(updated);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -3040,7 +3046,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({ success: true, recordingReady: false, message: "No recording found" });
       }
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -3050,7 +3056,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const messages = await storage.getSessionChatMessages(req.params.id);
       res.json(messages);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -3075,7 +3081,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(chatMessage);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -3102,7 +3108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(enrichedPolls);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -3133,7 +3139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ ...poll, options: createdOptions, totalVotes: 0 });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -3178,7 +3184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ ...poll, options: updatedOptions, totalVotes, userVoted: true, userVotedOptionId: optionId });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -3213,7 +3219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader('Content-Disposition', `attachment; filename="${session.title.replace(/[^a-z0-9]/gi, '-')}.ics"`);
       res.send(ics);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3268,7 +3274,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sessions: createdSessions 
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3300,7 +3306,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ received: true });
     } catch (error: any) {
       console.error("Mux webhook error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3356,7 +3362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } : null,
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3367,7 +3373,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const masteries = await storage.getUserTechniqueMasteries(userId);
       res.json(masteries);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3379,7 +3385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const activities = await storage.getUserActivityLog(userId, limit);
       res.json(activities);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3416,7 +3422,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(activity);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3440,7 +3446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(mastery);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3464,7 +3470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         improvementRate: Math.round(improvementRate * 100) / 100,
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3569,7 +3575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[LiveAvatar] Unexpected error:", error.message, error.stack);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3631,7 +3637,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ token, avatarId });
     } catch (error: any) {
       console.error("[HeyGen] Unexpected error:", error.message, error.stack);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3734,7 +3740,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(Buffer.from(arrayBuffer));
     } catch (error: any) {
       console.error("ElevenLabs speak error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -3917,7 +3923,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[V2] Session start error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -3983,7 +3989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[V2] Message error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -4105,7 +4111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[V2] Session end error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
   
@@ -4128,7 +4134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         score: state.totalScore
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4186,7 +4192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[V2] Session reset error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4235,7 +4241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[V2] Save reference error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4290,7 +4296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[V2] Flag customer response error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4372,7 +4378,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[V2] Flag evaluation error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4394,7 +4400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[RAG] Index error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4414,7 +4420,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           : "OPENAI_API_KEY required for RAG"
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4432,7 +4438,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(result);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4443,7 +4449,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const report = generateMethodologyReport();
       res.json(report);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4454,7 +4460,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const markdown = generateEpicFlowMarkdown();
       res.type('text/markdown').send(markdown);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4475,7 +4481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json(answers);
       }
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4490,7 +4496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(404).json({ error: "Reference answer not found" });
       }
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4517,7 +4523,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "Config conflicts tonen waar de config files aangepast moeten worden (voortschrijdend inzicht)."
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4532,7 +4538,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ conflicts, stats });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4569,7 +4575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, conflict });
     } catch (error: any) {
       console.error('[config-conflicts] Error adding conflict:', error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4586,7 +4592,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(404).json({ error: 'Conflict not found' });
       }
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4602,7 +4608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(404).json({ error: 'Conflict not found or no patch available' });
       }
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4618,7 +4624,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(400).json({ error: result.message });
       }
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4634,7 +4640,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(404).json({ error: 'Conflict not found' });
       }
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4770,7 +4776,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[golden-standard/start] Error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4848,7 +4854,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[golden-standard/message] Error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4904,7 +4910,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[golden-standard/save-reference] Error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4925,7 +4931,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: session.createdAt
       });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 
@@ -4979,7 +4985,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[LiveKit] Token generation error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: safeErrorMessage(error) });
     }
   });
 

@@ -286,7 +286,7 @@ app.use((req, res, next) => {
 // JWT Authentication — applied to all /api/ routes with exemptions
 app.use('/api', (req: Request, res: Response, next: NextFunction) => {
   // Skip auth for health checks, Stripe webhooks, platform sync, and V3 status
-  const publicPaths = ['/health', '/stripe/webhook', '/platform-sync/', '/v3/status'];
+  const publicPaths = ['/health', '/stripe/webhook', '/v3/status'];
   if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
     return next();
   }

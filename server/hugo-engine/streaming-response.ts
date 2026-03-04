@@ -91,10 +91,13 @@ function v2StateToDb(state: v2Engine.V2SessionState, options?: { isActive?: numb
   };
 }
 
+const MAX_WS_MESSAGE_SIZE = 64 * 1024; // SEC-060: 64KB max message size
+
 export function setupStreamingResponseWebSocket(server: Server) {
   const wss = new WebSocketServer({
     server,
-    path: "/ws/stream-response"
+    path: "/ws/stream-response",
+    maxPayload: MAX_WS_MESSAGE_SIZE,
   });
 
   wss.on("connection", async (clientWs, req) => {
