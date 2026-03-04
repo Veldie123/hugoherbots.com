@@ -29,13 +29,10 @@ export function AppPreview({ navigate }: AppPreviewProps) {
   const [modalVariant, setModalVariant] = useState<"first" | "reminder">("first");
   const [hasSeenFirstModal, setHasSeenFirstModal] = useState(false);
 
-  console.log("AppPreview render - showSignupModal:", showSignupModal);
-
   // Timer logic
   useEffect(() => {
     // First modal after 10 minutes
     const firstTimer = setTimeout(() => {
-      console.log("🎯 First signup modal triggered");
       setShowSignupModal(true);
       setModalVariant("first");
       setHasSeenFirstModal(true);
@@ -48,7 +45,6 @@ export function AppPreview({ navigate }: AppPreviewProps) {
   useEffect(() => {
     if (hasSeenFirstModal && !showSignupModal) {
       const reminderTimer = setTimeout(() => {
-        console.log("🔔 Reminder modal triggered");
         setShowSignupModal(true);
         setModalVariant("reminder");
       }, 20000); // 20 seconds for testing (change to 120000 for 2 more minutes)

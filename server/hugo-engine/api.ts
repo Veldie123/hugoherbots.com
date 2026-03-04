@@ -121,8 +121,16 @@ import {
 import { runFullAnalysisV3 } from "./v3/analysis-service";
 import { isV3Available } from "./v3/anthropic-client";
 import multer from "multer";
+import { getAdminStats } from "./admin-stats";
 
 const SUPERADMIN_EMAIL = "stephane@hugoherbots.com";
+
+/** Sanitize 500 errors: show details only in dev, generic message in production */
+function sendError(res: Response, err: any, fallback = 'Er ging iets mis') {
+  console.error('[API Error]', err?.message || err);
+  const isDev = process.env.NODE_ENV !== 'production';
+  res.status(500).json({ error: isDev ? (err?.message || fallback) : fallback });
+}
 
 /** Route analysis through V3 (Claude) for superadmin, V2 (GPT) for others */
 function runAnalysisForUser(
@@ -174,7 +182,7 @@ setInterval(() => {
   const now = Date.now();
   for (const [id, upload] of activeChunkedUploads) {
     if (now - upload.createdAt > 30 * 60 * 1000) {
-      try { fs.rmSync(upload.tmpDir, { recursive: true, force: true }); } catch {}
+      try { fs.rmSync(upload.tmpDir, { recursive: true, force: true }); } catch { /* cleanup best-effort */ }
       activeChunkedUploads.delete(id);
     }
   }
@@ -208,7 +216,6 @@ const ALLOWED_ORIGINS = [
   'https://www.hugoherbots.com',
   'https://hugoherbots.ai',
   'https://www.hugoherbots.ai',
-  'https://hugoherbots-ai-chat.replit.app',
 ];
 if (process.env.NODE_ENV !== 'production') {
   ALLOWED_ORIGINS.push('http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:5000');
@@ -445,7 +452,7 @@ app.get("/api/technieken", async (req, res) => {
     res.json(techniques);
   } catch (error: any) {
     console.error("[API] Error loading technieken:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -599,7 +606,7 @@ app.post("/api/v2/sessions", async (req, res) => {
     
   } catch (error: any) {
     console.error("[API] Error creating session:", error.message, error.stack);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -726,7 +733,7 @@ app.post("/api/v2/sessions/stream", async (req, res) => {
   } catch (error: any) {
     console.error("[API] Streaming session setup error:", error.message, error.stack);
     if (!res.headersSent) {
-      res.status(500).json({ error: error.message });
+      sendError(res, error);
     } else {
       res.write(`data: ${JSON.stringify({ type: "error", error: error.message })}\n\n`);
       res.end();
@@ -993,7 +1000,7 @@ app.post("/api/v2/message", async (req, res) => {
     
   } catch (error: any) {
     console.error("[API] Error processing message:", error.message, error.stack);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1328,7 +1335,7 @@ app.post("/api/v2/session/message", async (req, res) => {
     
   } catch (error: any) {
     console.error("[API] Error in session/message:", error.message, error.stack);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1360,7 +1367,7 @@ app.get("/api/v2/sessions/:sessionId", async (req, res) => {
       createdAt: session.createdAt
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1373,7 +1380,7 @@ app.delete("/api/v2/sessions/:sessionId", async (req, res) => {
     }
     res.json({ success: true });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1389,7 +1396,7 @@ app.get("/api/sessions/stats", async (req, res) => {
       needsImprovement: 0
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1417,7 +1424,7 @@ app.get("/api/sessions", async (req, res) => {
     
     if (error) {
       console.error("[API] Supabase error fetching sessions:", error.message);
-      return res.status(500).json({ error: error.message });
+      return sendError(res, error);
     }
     
     const result = { rows: rows || [] };
@@ -1519,7 +1526,7 @@ app.get("/api/sessions", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[API] Error fetching sessions:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1538,7 +1545,7 @@ app.get("/api/user/sessions", async (req, res) => {
     
     if (error) {
       console.error("[API] Supabase error fetching user sessions:", error.message);
-      return res.status(500).json({ error: error.message });
+      return sendError(res, error);
     }
     
     const sessionList = (rows || []).map(row => {
@@ -1592,7 +1599,7 @@ app.get("/api/user/sessions", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[API] Error fetching user sessions:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1637,7 +1644,7 @@ app.post("/api/admin/sessions/process-recording", async (req, res) => {
     res.json(result);
   } catch (error: any) {
     console.error("[API] process-recording error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1679,7 +1686,7 @@ app.get("/api/live-sessions/recordings", async (req, res) => {
     res.json(recordings);
   } catch (error: any) {
     console.error("[API] Error fetching live session recordings:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1714,7 +1721,7 @@ app.get("/api/user/context", async (req, res) => {
     res.json({ success: true, context });
   } catch (error: any) {
     console.error("[API] Error loading user context:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1742,8 +1749,7 @@ app.post("/api/user/context", async (req, res) => {
       }, { onConflict: 'user_id' });
     
     if (upsertError) {
-      console.error("[API] Supabase error saving user context:", upsertError.message);
-      return res.status(500).json({ error: upsertError.message });
+      return sendError(res, upsertError);
     }
     
     // Fetch updated context
@@ -1765,7 +1771,7 @@ app.post("/api/user/context", async (req, res) => {
     res.json({ success: true, context: updatedContext });
   } catch (error: any) {
     console.error("[API] Error saving user context:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1798,7 +1804,7 @@ app.post("/api/session/:sessionId/start-roleplay", async (req, res) => {
       message: roleplayOpening
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1844,7 +1850,7 @@ Wil je doorgaan met oefenen of heb je een specifieke vraag?
       }
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1888,7 +1894,7 @@ app.post("/api/session/:sessionId/evaluate", async (req, res) => {
       evaluation
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1935,7 +1941,7 @@ app.post("/api/session/:sessionId/reset-context", async (req, res) => {
       message: openingMessage
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -1960,7 +1966,7 @@ app.get("/api/session/:sessionId/turns", async (req, res) => {
       total: turns.length
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2048,7 +2054,7 @@ app.post("/api/session/:sessionId/message/stream", async (req, res) => {
   } catch (error: any) {
     console.error("[API] Streaming setup error:", error.message);
     if (!res.headersSent) {
-      res.status(500).json({ error: error.message });
+      sendError(res, error);
     } else {
       res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
       res.end();
@@ -2068,7 +2074,7 @@ app.post("/api/heygen/token", async (req, res) => {
     // Fallback to generic HEYGEN_API_KEY if streaming key not available
     const apiKey = streamingApiKey || process.env.HEYGEN_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: "HEYGEN_API_KEY not configured" });
+      return sendError(res, new Error('HEYGEN_API_KEY not configured'), 'Video service niet beschikbaar');
     }
 
     const response = await fetch("https://api.heygen.com/v1/streaming.create_token", {
@@ -2096,7 +2102,7 @@ app.post("/api/heygen/token", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[API] HeyGen token error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2112,10 +2118,7 @@ app.post("/api/livekit/token", async (req, res) => {
     const apiSecret = process.env.LIVEKIT_API_SECRET;
     
     if (!livekitUrl || !apiKey || !apiSecret) {
-      return res.status(500).json({ 
-        error: "LiveKit not configured",
-        message: "Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET"
-      });
+      return sendError(res, new Error('LiveKit not configured: Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET'), 'Audio service niet beschikbaar');
     }
     
     const roomName = `hugo-${techniqueId || 'general'}-${Date.now()}`;
@@ -2144,7 +2147,7 @@ app.post("/api/livekit/token", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[API] LiveKit token error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2224,7 +2227,7 @@ app.post("/api/v2/roleplay/start", async (req, res) => {
     
   } catch (error: any) {
     console.error("[API] Error starting roleplay:", error.message, error.stack);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2273,7 +2276,7 @@ app.post("/api/v2/roleplay/message", async (req, res) => {
     
   } catch (error: any) {
     console.error("[API] Error processing roleplay message:", error.message, error.stack);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2314,7 +2317,7 @@ app.post("/api/v2/roleplay/end", async (req, res) => {
     
   } catch (error: any) {
     console.error("[API] Error ending roleplay:", error.message, error.stack);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2392,7 +2395,7 @@ app.post("/api/v2/session/save-reference", async (req, res) => {
     
   } catch (error: any) {
     console.error("[save-reference] Error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2426,7 +2429,7 @@ app.post("/api/v2/session/flag-customer-response", async (req, res) => {
     
   } catch (error: any) {
     console.error("[flag-response] Error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2446,7 +2449,7 @@ app.get("/api/v2/golden-standard/examples/:techniqueId", (req, res) => {
     
   } catch (error: any) {
     console.error("[golden-standard/examples] Error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2457,7 +2460,7 @@ app.get("/api/v2/golden-standard/report", (req, res) => {
     res.json(report);
   } catch (error: any) {
     console.error("[golden-standard/report] Error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2473,7 +2476,7 @@ app.get("/api/v2/golden-standard/all", (req, res) => {
     });
   } catch (error: any) {
     console.error("[golden-standard/all] Error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2506,7 +2509,7 @@ app.post("/api/v2/artifacts", async (req, res) => {
     
   } catch (error: any) {
     console.error("[artifacts] Save error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2531,7 +2534,7 @@ app.get("/api/v2/artifacts/:sessionId/check", async (req, res) => {
     
   } catch (error: any) {
     console.error("[artifacts] Check error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2548,7 +2551,7 @@ app.get("/api/v2/artifacts/:sessionId/map", async (req, res) => {
     
   } catch (error: any) {
     console.error("[artifacts] Map error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2566,7 +2569,7 @@ app.get("/api/v2/artifacts/:sessionId", async (req, res) => {
     
   } catch (error: any) {
     console.error("[artifacts] Get error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2587,7 +2590,7 @@ app.get("/api/v2/artifacts/:sessionId/:artifactType", async (req, res) => {
     
   } catch (error: any) {
     console.error("[artifacts] Get specific error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2617,7 +2620,7 @@ app.post("/api/v2/briefs/discovery", async (req, res) => {
     
   } catch (error: any) {
     console.error("[briefs] Discovery brief error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2644,7 +2647,7 @@ app.post("/api/v2/briefs/offer", async (req, res) => {
     
   } catch (error: any) {
     console.error("[briefs] Offer brief error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2675,7 +2678,7 @@ app.post("/api/v2/context/build", async (req, res) => {
     
   } catch (error: any) {
     console.error("[context] Build error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2709,7 +2712,7 @@ app.post("/api/v2/roleplay/unlock-check", async (req, res) => {
     
   } catch (error: any) {
     console.error("[roleplay] Unlock check error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2723,7 +2726,7 @@ app.get("/api/v2/context/flow-rules", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[context] Flow rules error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2744,7 +2747,7 @@ app.post("/api/v2/context/snapshot", async (req, res) => {
     
   } catch (error: any) {
     console.error("[context] Snapshot error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2757,7 +2760,7 @@ app.post("/api/v2/rag/index", async (req, res) => {
     res.json(result);
   } catch (error: any) {
     console.error("[RAG] Index error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2771,7 +2774,7 @@ app.get("/api/v2/rag/status", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[RAG] Status error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2793,7 +2796,7 @@ app.post("/api/v2/rag/tag-bulk", async (req, res) => {
     res.json(result);
   } catch (error: any) {
     console.error("[RAG-TAGGER] Bulk tag error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2804,7 +2807,7 @@ app.get("/api/v2/rag/tag-stats", async (req, res) => {
     res.json(stats);
   } catch (error: any) {
     console.error("[RAG-TAGGER] Stats error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2838,7 +2841,7 @@ app.get("/api/v2/technieken/names", async (req, res) => {
     res.json(nameMap);
   } catch (error: any) {
     console.error("[TECHNIEKEN] Names error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2850,7 +2853,7 @@ app.get("/api/v2/rag/untagged", async (req, res) => {
     res.json({ chunks, count: chunks.length });
   } catch (error: any) {
     console.error("[RAG-TAGGER] Untagged error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2865,7 +2868,7 @@ app.post("/api/v2/rag/tag-video", async (req, res) => {
     res.json({ success: true, updated });
   } catch (error: any) {
     console.error("[RAG-TAGGER] Tag video error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2898,7 +2901,7 @@ app.post("/api/v2/rag/suggest-bulk", async (req, res) => {
     res.json(result);
   } catch (error: any) {
     console.error("[HEURISTIC-V2] Suggest error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2910,7 +2913,7 @@ app.get("/api/v2/rag/review", async (req, res) => {
     res.json({ chunks, count: chunks.length });
   } catch (error: any) {
     console.error("[HEURISTIC] Review list error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2921,7 +2924,7 @@ app.get("/api/v2/rag/review-stats", async (req, res) => {
     res.json(stats);
   } catch (error: any) {
     console.error("[HEURISTIC] Stats error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2933,7 +2936,7 @@ app.post("/api/v2/rag/approve/:id", async (req, res) => {
     res.json({ success });
   } catch (error: any) {
     console.error("[HEURISTIC] Approve error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2946,7 +2949,7 @@ app.post("/api/v2/rag/reject/:id", async (req, res) => {
     res.json({ success });
   } catch (error: any) {
     console.error("[HEURISTIC] Reject error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2961,7 +2964,7 @@ app.post("/api/v2/rag/approve-bulk", async (req, res) => {
     res.json({ success: true, approved: count });
   } catch (error: any) {
     console.error("[HEURISTIC] Bulk approve error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -2973,7 +2976,7 @@ app.post("/api/v2/rag/reset-suggestions", async (req, res) => {
     res.json({ success: true, ...result });
   } catch (error: any) {
     console.error("[HEURISTIC-V2] Reset error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -3028,7 +3031,7 @@ app.get("/api/v2/rag/export", async (req, res) => {
     }
   } catch (error: any) {
     console.error("[RAG] Export error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -3053,7 +3056,7 @@ app.get("/api/v2/user/level", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[Performance] Get level error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -3095,7 +3098,7 @@ app.post("/api/v2/user/performance", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[Performance] Record error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -3114,7 +3117,7 @@ app.get("/api/v2/user/mastery", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[Performance] Get mastery error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -3202,7 +3205,7 @@ app.get("/api/v2/user/activity-summary", async (req, res) => {
         });
       }
       console.error("[Activity] Supabase error:", error);
-      return res.status(500).json({ error: error.message });
+      return sendError(res, error);
     }
     
     const recentVideos = activities?.filter(a => a.activity_type === "video_view").slice(0, 5) || [];
@@ -3263,8 +3266,7 @@ app.get("/api/v2/user/activity-summary", async (req, res) => {
       source: lastActivity?.source_app || null
     });
   } catch (err) {
-    console.error("[Activity] Error:", err);
-    res.status(500).json({ error: "Failed to fetch activity summary" });
+    sendError(res, err, 'Failed to fetch activity summary');
   }
 });
 
@@ -3317,14 +3319,13 @@ app.post("/api/v2/user/activity", async (req, res) => {
         });
       }
       console.error("[Activity] Insert error:", error);
-      return res.status(500).json({ error: error.message });
+      return sendError(res, error);
     }
     
     console.log(`[Activity] Logged: ${activityType} for user ${userId} (source: ai)`);
     res.json({ success: true, activity: data });
   } catch (err) {
-    console.error("[Activity] Error:", err);
-    res.status(500).json({ error: "Failed to log activity" });
+    sendError(res, err, 'Failed to log activity');
   }
 });
 
@@ -3407,8 +3408,7 @@ app.get("/api/v2/user/hugo-context", async (req, res) => {
     
     res.json(contextForHugo);
   } catch (err) {
-    console.error("[Hugo Context] Error:", err);
-    res.status(500).json({ error: "Failed to build Hugo context" });
+    sendError(res, err, 'Failed to build Hugo context');
   }
 });
 
@@ -3462,7 +3462,7 @@ app.post("/api/v2/analysis/upload", upload.single('file'), async (req: Request, 
     });
   } catch (err: any) {
     console.error("[Analysis] Upload error:", err);
-    res.status(500).json({ error: err.message || 'Upload mislukt' });
+    sendError(res, err, 'Upload mislukt');
   }
 });
 
@@ -3500,7 +3500,7 @@ app.post("/api/v2/analysis/inline", upload.single('file'), async (req: Request, 
     });
   } catch (err: any) {
     console.error("[Analysis:Inline] Upload error:", err);
-    res.status(500).json({ error: err.message || 'Inline analyse mislukt' });
+    sendError(res, err, 'Inline analyse mislukt');
   }
 });
 
@@ -3541,7 +3541,7 @@ app.post("/api/v2/analysis/upload/init", express.json(), (req: Request, res: Res
     res.json({ uploadId, totalChunks });
   } catch (err: any) {
     console.error("[ChunkedUpload] Init error:", err);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -3574,7 +3574,7 @@ app.post("/api/v2/analysis/upload/chunk", chunkUpload.single('chunk'), (req: Req
     });
   } catch (err: any) {
     console.error("[ChunkedUpload] Chunk error:", err);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -3634,7 +3634,7 @@ app.post("/api/v2/analysis/upload/complete", express.json(), async (req: Request
     const conversationId = crypto.randomUUID();
     runAnalysisForUser(conversationId, storageKey, effectiveUserId, req.userEmail, title);
 
-    try { fs.rmSync(uploadInfo.tmpDir, { recursive: true, force: true }); } catch {}
+    try { fs.rmSync(uploadInfo.tmpDir, { recursive: true, force: true }); } catch { /* cleanup best-effort */ }
     activeChunkedUploads.delete(uploadId);
 
     res.json({
@@ -3648,7 +3648,7 @@ app.post("/api/v2/analysis/upload/complete", express.json(), async (req: Request
     });
   } catch (err: any) {
     console.error("[ChunkedUpload] Complete error:", err);
-    res.status(500).json({ error: err.message || 'Upload afronden mislukt' });
+    sendError(res, err, 'Upload afronden mislukt');
   }
 });
 
@@ -3664,7 +3664,7 @@ app.get("/api/v2/analysis/status/:conversationId", async (req: Request, res: Res
     res.json(status);
   } catch (err: any) {
     console.error("[Analysis] Status error:", err);
-    res.status(500).json({ error: err.message || 'Status ophalen mislukt' });
+    sendError(res, err, 'Status ophalen mislukt');
   }
 });
 
@@ -3687,7 +3687,7 @@ app.get("/api/v2/analysis/results/:conversationId", async (req: Request, res: Re
     res.json(results);
   } catch (err: any) {
     console.error("[Analysis] Results error:", err);
-    res.status(500).json({ error: err.message || 'Resultaten ophalen mislukt' });
+    sendError(res, err, 'Resultaten ophalen mislukt');
   }
 });
 
@@ -3741,7 +3741,7 @@ app.get("/api/v2/analysis/percentile/:conversationId", async (req: Request, res:
     });
   } catch (err: any) {
     console.error("[Analysis] Percentile error:", err);
-    res.status(500).json({ error: err.message || 'Percentiel ophalen mislukt' });
+    sendError(res, err, 'Percentiel ophalen mislukt');
   }
 });
 
@@ -3788,7 +3788,7 @@ app.post("/api/v2/analysis/retry/:conversationId", express.json(), async (req: R
     });
   } catch (err: any) {
     console.error("[Analysis] Retry error:", err);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -3848,7 +3848,7 @@ app.post("/api/v2/analysis/regenerate-coach/:conversationId", express.json(), as
     });
   } catch (err: any) {
     console.error("[Analysis] Regenerate coach error:", err);
-    res.status(500).json({ error: err.message || 'Coach artifacts regenereren mislukt' });
+    sendError(res, err, 'Coach artifacts regenereren mislukt');
   }
 });
 
@@ -3912,7 +3912,7 @@ app.post("/api/v2/analysis/chat-session", express.json(), async (req: Request, r
 
   } catch (err: any) {
     console.error("[API] Chat session analysis error:", err);
-    res.status(500).json({ error: err.message || 'Analyse starten mislukt' });
+    sendError(res, err, 'Analyse starten mislukt');
   }
 });
 
@@ -4001,7 +4001,7 @@ app.get("/api/v2/analysis/list", async (req: Request, res: Response) => {
     res.json({ analyses, totalCount: analyses.length });
   } catch (err: any) {
     console.error("[Analysis] List error:", err);
-    res.status(500).json({ error: err.message || 'Analyses ophalen mislukt' });
+    sendError(res, err, 'Analyses ophalen mislukt');
   }
 });
 
@@ -4102,7 +4102,7 @@ Output als JSON: {"instruction": "...", "example": "..."}`
       const content = response.choices[0]?.message?.content?.trim() || '{}';
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       let drill = { instruction: '', example: '' };
-      try { drill = jsonMatch ? JSON.parse(jsonMatch[0]) : drill; } catch {}
+      try { drill = jsonMatch ? JSON.parse(jsonMatch[0]) : drill; } catch { /* JSON parse fallback to default */ }
 
       res.json({ type: 'micro_drill', drill });
       return;
@@ -4135,7 +4135,7 @@ Output als JSON: {"response": "...", "reasoning": "..."}`
       const content = response.choices[0]?.message?.content?.trim() || '{}';
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       let demo = { response: '', reasoning: '' };
-      try { demo = jsonMatch ? JSON.parse(jsonMatch[0]) : demo; } catch {}
+      try { demo = jsonMatch ? JSON.parse(jsonMatch[0]) : demo; } catch { /* JSON parse fallback to default */ }
 
       res.json({ type: 'hugo_demo', demo });
       return;
@@ -4143,8 +4143,7 @@ Output als JSON: {"response": "...", "reasoning": "..."}`
 
     res.status(400).json({ error: 'Onbekend actionType' });
   } catch (err: any) {
-    console.error("[CoachAction] Error:", err);
-    res.status(500).json({ error: 'Coach actie kon niet worden uitgevoerd. Probeer opnieuw.' });
+    sendError(res, err, 'Coach actie kon niet worden uitgevoerd. Probeer opnieuw.');
   }
 });
 
@@ -4186,7 +4185,7 @@ app.post("/api/v2/chat/feedback", express.json(), async (req: Request, res: Resp
     res.json({ success: true, feedback });
   } catch (err: any) {
     console.error('[Feedback] Error:', err);
-    res.status(500).json({ error: err.message || 'Feedback opslaan mislukt' });
+    sendError(res, err, 'Feedback opslaan mislukt');
   }
 });
 
@@ -4197,7 +4196,7 @@ app.get("/api/v2/admin/feedback", async (req: Request, res: Response) => {
     );
     res.json({ feedback: rows });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4261,7 +4260,7 @@ app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
     res.json({ correction, message: 'Correctie ingediend voor review' });
   } catch (err: any) {
     console.error('[Admin] Correction submit error:', err);
-    res.status(500).json({ error: err.message || 'Correctie opslaan mislukt' });
+    sendError(res, err, 'Correctie opslaan mislukt');
   }
 });
 
@@ -4278,7 +4277,7 @@ app.get("/api/v2/admin/corrections", async (req: Request, res: Response) => {
     const { rows } = await pool.query(queryText, params);
     res.json({ corrections: rows || [] });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4392,7 +4391,7 @@ app.patch("/api/v2/admin/corrections/:id", async (req: Request, res: Response) =
 
     res.json({ correction, ragGenerated, ssotUpdated });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4415,7 +4414,7 @@ app.get("/api/v2/admin/notifications", async (req: Request, res: Response) => {
     res.json({ notifications: rows || [] });
   } catch (err: any) {
     console.error('[Admin] Notifications list error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4425,7 +4424,7 @@ app.get("/api/v2/admin/notifications/count", async (req: Request, res: Response)
     res.json({ unread: parseInt(rows[0]?.count || '0') });
   } catch (err: any) {
     console.error('[Admin] Notifications count error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4439,7 +4438,7 @@ app.patch("/api/v2/admin/notifications/read-all", async (req: Request, res: Resp
     res.json({ updated, message: 'Alle notificaties als gelezen gemarkeerd' });
   } catch (err: any) {
     console.error('[Admin] Notifications read-all error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4457,7 +4456,7 @@ app.patch("/api/v2/admin/notifications/:id", async (req: Request, res: Response)
     res.json({ notification });
   } catch (err: any) {
     console.error('[Admin] Notification update error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4472,7 +4471,7 @@ app.delete("/api/v2/admin/notifications/:id", async (req: Request, res: Response
     res.json({ deleted: true, id: parseInt(id as string) });
   } catch (err: any) {
     console.error('[Admin] Notification delete error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4558,7 +4557,7 @@ app.get("/api/v2/admin/onboarding/status", async (req: Request, res: Response) =
     });
   } catch (err: any) {
     console.error('[Onboarding] Status error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4583,7 +4582,7 @@ app.post("/api/v2/admin/onboarding/approve", async (req: Request, res: Response)
     res.json({ success: true, item: result.rows[0] });
   } catch (err: any) {
     console.error('[Onboarding] Approve error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4608,7 +4607,7 @@ app.post("/api/v2/admin/onboarding/skip", async (req: Request, res: Response) =>
     res.json({ success: true, item: result.rows[0] });
   } catch (err: any) {
     console.error('[Onboarding] Skip error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4723,7 +4722,7 @@ app.post("/api/v2/admin/onboarding/feedback", async (req: Request, res: Response
     });
   } catch (err: any) {
     console.error('[Onboarding] Feedback error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4748,7 +4747,7 @@ app.get("/api/v2/admin/onboarding/item/:module/:key", async (req: Request, res: 
     }
   } catch (err: any) {
     console.error('[Onboarding] Item fetch error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4757,120 +4756,11 @@ app.get("/api/v2/admin/onboarding/item/:module/:key", async (req: Request, res: 
 // ===========================================
 app.get("/api/v2/admin/stats", async (req: Request, res: Response) => {
   try {
-    const { data: allUsers } = await supabase.auth.admin.listUsers({ perPage: 1000 });
-    const users = (allUsers as any)?.users || [];
-    const totalUsers = users.length || 0;
-
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
-    const activeUsers = users.filter((u: any) => 
-      u.last_sign_in_at && new Date(u.last_sign_in_at) > new Date(thirtyDaysAgo)
-    ).length || 0;
-
-    const newUsersThisWeek = users.filter((u: any) => 
-      u.created_at && new Date(u.created_at) > new Date(sevenDaysAgo)
-    ).length || 0;
-
-    const { data: allSessions } = await supabase
-      .from('v2_sessions')
-      .select('id, total_score, technique_id, created_at, user_id, conversation_history')
-      .eq('is_active', 1)
-      .order('created_at', { ascending: false })
-      .limit(500);
-
-    const totalSessions = allSessions?.length || 0;
-    const recentSessions = allSessions?.filter(s => 
-      s.created_at && new Date(s.created_at) > new Date(sevenDaysAgo)
-    ).length || 0;
-
-    let totalAnalyses = 0;
-    let completedAnalyses = 0;
-    let avgAnalysisScore = 0;
-    let pendingReviews = 0;
-    try {
-      const uploadResult = await pool.query(
-        "SELECT COUNT(*) as total, COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed FROM conversation_analyses WHERE id NOT LIKE 'session-%'"
-      );
-      totalAnalyses = parseInt(uploadResult.rows[0]?.total || '0');
-      completedAnalyses = parseInt(uploadResult.rows[0]?.completed || '0');
-      
-      const scoreResult = await pool.query(
-        "SELECT AVG(COALESCE((result->'insights'->>'overallScore')::numeric, (result->>'overallScore')::numeric)) as avg_score FROM conversation_analyses WHERE id NOT LIKE 'session-%' AND status = 'completed' AND (result->'insights'->>'overallScore' IS NOT NULL OR result->>'overallScore' IS NOT NULL)"
-      );
-      avgAnalysisScore = Math.round(parseFloat(scoreResult.rows[0]?.avg_score || '0'));
-
-      const pendingResult = await pool.query("SELECT COUNT(*) as count FROM admin_corrections WHERE status = 'pending'");
-      pendingReviews = parseInt(pendingResult.rows[0]?.count || '0');
-    } catch (e) {
-      console.log('[Admin Stats] DB query error:', (e as any)?.message);
-    }
-
-    const topAnalyses: Array<{id: string; title: string; score: number | null; userName: string}> = [];
-    try {
-      const { rows } = await pool.query(
-        `SELECT id, title, user_id, COALESCE((result->'insights'->>'overallScore')::numeric, (result->>'overallScore')::numeric) as score 
-         FROM conversation_analyses 
-         WHERE status = 'completed' AND id NOT LIKE 'session-%'
-         ORDER BY created_at DESC LIMIT 3`
-      );
-      const userIds = [...new Set(rows.map(r => r.user_id).filter(Boolean))];
-      let userMap: Record<string, string> = {};
-      if (userIds.length > 0 && allUsers?.users) {
-        for (const u of allUsers.users) {
-          const name = [u.user_metadata?.first_name, u.user_metadata?.last_name].filter(Boolean).join(' ') || u.email?.split('@')[0] || 'Onbekend';
-          userMap[u.id] = name;
-        }
-      }
-      for (const row of rows) {
-        topAnalyses.push({
-          id: row.id,
-          title: row.title || 'Untitled',
-          score: row.score !== null && row.score !== undefined ? Math.round(row.score) : null,
-          userName: userMap[row.user_id] || 'Anoniem',
-        });
-      }
-    } catch (e) {
-      console.log('[Admin Stats] Top analyses query error:', (e as any)?.message);
-    }
-
-    const topChatSessions: Array<{id: string; technique: string; userName: string; score: number}> = [];
-    if (allSessions && allSessions.length > 0) {
-      for (const s of allSessions.slice(0, 3)) {
-        const technique = getTechnique(s.technique_id);
-        const userName = users.find((u: any) => u.id === s.user_id);
-        const name = userName ? [userName.user_metadata?.first_name, userName.user_metadata?.last_name].filter(Boolean).join(' ') || userName.email?.split('@')[0] || 'Anoniem' : 'Anoniem';
-        topChatSessions.push({
-          id: s.id,
-          technique: technique?.naam || s.technique_id || 'general',
-          userName: name,
-          score: Math.min(100, Math.round(50 + (s.conversation_history?.length || 0) * 2.5)),
-        });
-      }
-    }
-
-    res.json({
-      platform: {
-        totalUsers,
-        activeUsers,
-        newUsersThisWeek,
-      },
-      sessions: {
-        total: totalSessions,
-        recentWeek: recentSessions,
-      },
-      analyses: {
-        total: totalAnalyses,
-        completed: completedAnalyses,
-        avgScore: avgAnalysisScore,
-      },
-      pendingReviews,
-      topAnalyses,
-      topChatSessions,
-    });
+    const stats = await getAdminStats();
+    res.json(stats);
   } catch (err: any) {
     console.error('[Admin Stats] Error:', err.message);
-    res.status(500).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
@@ -4879,8 +4769,7 @@ app.get("/api/v2/admin/stats", async (req: Request, res: Response) => {
 // ===========================================
 app.get("/api/v2/admin/welcome", async (req: Request, res: Response) => {
   try {
-    const statsRes = await fetch(`http://localhost:3002/api/v2/admin/stats`);
-    const stats = await statsRes.json();
+    const stats = await getAdminStats();
     
     const lines: string[] = [];
     lines.push(`Dag Hugo! Hier is je overzicht van vandaag:\n`);
@@ -4953,7 +4842,7 @@ app.get("/api/v2/user/welcome", async (req: Request, res: Response) => {
           const fn = userData.user.user_metadata?.first_name;
           if (fn) userName = fn;
         }
-      } catch (e) {}
+      } catch (e) { console.error('[Welcome] Error fetching user name:', e); }
 
       const { data: sessions } = await supabase
         .from('v2_sessions')
@@ -4986,7 +4875,7 @@ app.get("/api/v2/user/welcome", async (req: Request, res: Response) => {
           [userId]
         );
         analysesCount = parseInt(analysisResult.rows[0]?.total || '0');
-      } catch (e) {}
+      } catch (e) { console.error('[Welcome] Error counting analyses:', e); }
     }
 
     const lines: string[] = [];
@@ -5061,8 +4950,7 @@ app.use("/api/v3", v3Routes);
 
 // Error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error("[API] Error:", err);
-  res.status(err.status || 500).json({ message: err.message || "Internal Server Error" });
+  sendError(res, err);
 });
 
 // Start server on port 3001 (backend API)
@@ -5328,7 +5216,7 @@ app.get("/api/platform-sync/pending", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[SYNC] Error fetching pending messages:", error);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -5360,7 +5248,7 @@ app.post("/api/platform-sync/acknowledge", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[SYNC] Error acknowledging message:", error);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -5395,7 +5283,7 @@ app.post("/api/platform-sync/send", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[SYNC] Error sending message:", error);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -5421,7 +5309,7 @@ app.get("/api/platform-sync/status", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[SYNC] Error fetching status:", error);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -5458,15 +5346,15 @@ app.post("/api/sso/generate-token", async (req, res) => {
 
     if (error) {
       console.error("[SSO] Error generating token:", error);
-      return res.status(500).json({ error: error.message });
+      return sendError(res, error);
     }
 
     const token = data;
     console.log(`[SSO] Token generated successfully (expires in ${ttlSeconds}s)`);
 
     // Build the redirect URL
-    const targetBaseUrl = targetPlatform === 'ai' 
-      ? 'https://hugoherbots-ai-chat.replit.app'
+    const targetBaseUrl = targetPlatform === 'ai'
+      ? (process.env.HUGO_AI_URL || 'https://hugoherbots.ai')
       : 'https://hugoherbots.com';
     
     const redirectUrl = `${targetBaseUrl}/sso/validate?token=${token}`;
@@ -5479,7 +5367,7 @@ app.post("/api/sso/generate-token", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[SSO] Error generating token:", error);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -5501,7 +5389,7 @@ app.get("/api/sso/validate", async (req, res) => {
 
     if (error) {
       console.error("[SSO] Error validating token:", error);
-      return res.status(500).json({ error: error.message });
+      return sendError(res, error);
     }
 
     // RPC returns a table row
@@ -5549,7 +5437,7 @@ app.get("/api/sso/validate", async (req, res) => {
     });
   } catch (error: any) {
     console.error("[SSO] Error validating token:", error);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -5562,14 +5450,14 @@ app.post("/api/sso/cleanup", async (req, res) => {
     
     if (error) {
       console.error("[SSO] Cleanup error:", error);
-      return res.status(500).json({ error: error.message });
+      return sendError(res, error);
     }
 
     console.log("[SSO] Cleanup completed successfully");
     res.json({ success: true, message: "Expired tokens cleaned up" });
   } catch (error: any) {
     console.error("[SSO] Cleanup error:", error);
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 });
 
@@ -5596,8 +5484,7 @@ async function startServer() {
       
       res.json({ success: true, profile });
     } catch (error: any) {
-      console.error("[API] Company analyze error:", error.message);
-      res.status(500).json({ error: "Website analysis failed" });
+      sendError(res, error, 'Website analysis failed');
     }
   });
 
@@ -5608,8 +5495,7 @@ async function startServer() {
       const slides = getSlidesForTechnique(techniqueId);
       res.json({ slides });
     } catch (error: any) {
-      console.error("[API] Slides error:", error.message);
-      res.status(500).json({ error: "Failed to load slides" });
+      sendError(res, error, 'Failed to load slides');
     }
   });
 
@@ -5619,8 +5505,7 @@ async function startServer() {
       const slides = getAllSlides();
       res.json({ slides });
     } catch (error: any) {
-      console.error("[API] Slides error:", error.message);
-      res.status(500).json({ error: "Failed to load slides" });
+      sendError(res, error, 'Failed to load slides');
     }
   });
 

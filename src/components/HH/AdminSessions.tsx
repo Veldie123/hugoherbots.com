@@ -352,7 +352,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
 
   const handleBulkDelete = () => {
     if (window.confirm(`Weet je zeker dat je ${selectedIds.length} sessies wilt verwijderen?`)) {
-      console.log("Delete sessions:", selectedIds);
+      // TODO: implement bulk delete API call
       setSelectedIds([]);
     }
   };
@@ -463,7 +463,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
   const handleSubmitFeedback = (lineId: string) => {
     const feedback = feedbackText[lineId];
     if (feedback?.trim()) {
-      console.log(`Feedback for line ${lineId}:`, feedback);
+      // TODO: implement feedback save API call
       setShowFeedbackInput((prev) => ({ ...prev, [lineId]: false }));
     }
   };

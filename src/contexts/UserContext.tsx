@@ -41,8 +41,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const loadUserData = async () => {
-    console.log('👤 [START] Loading user data from session...');
-    
     try {
       // 1. Get session from Supabase - NO destructuring yet
       let sessionResult = null;
@@ -71,7 +69,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const sessionError = sessionResult.error ?? null;
       
       if (sessionError) {
-        console.log('❌ Session error:', sessionError);
         setUser(null);
         setWorkspace(null);
         setSession(null);
@@ -80,7 +77,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
       }
 
       if (!currentSession) {
-        console.log('❌ No active session (session is null)');
         setUser(null);
         setWorkspace(null);
         setSession(null);
@@ -88,7 +84,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      console.log('✅ Session found:', currentSession.user?.email);
       setSession(currentSession);
 
       // 2. Extract user from session
@@ -102,17 +97,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
       };
       
       setUser(userData);
-      console.log('✅ User data loaded:', userData.full_name);
 
       // 3. Get workspace from localStorage (set during signup/login)
       const storedWorkspace = localStorage.getItem('hh_workspace');
       if (storedWorkspace) {
         const workspaceData = JSON.parse(storedWorkspace);
         setWorkspace(workspaceData);
-        console.log('✅ Workspace loaded from localStorage:', workspaceData.name);
       } else {
         // Fetch from backend if not in localStorage
-        console.log('📁 Fetching workspace from backend...');
         const workspacesResponse = await fetch(
           `https://${projectId}.supabase.co/functions/v1/make-server-b9a572ea/workspaces`,
           {
@@ -128,7 +120,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
             const firstWorkspace = workspacesData.workspaces[0];
             setWorkspace(firstWorkspace);
             localStorage.setItem('hh_workspace', JSON.stringify(firstWorkspace));
-            console.log('✅ Workspace fetched and stored:', firstWorkspace.name);
           }
         }
       }
@@ -146,13 +137,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      console.log('🚪 Logging out...');
       await auth.signOut();
       localStorage.removeItem('hh_workspace');
       setUser(null);
       setWorkspace(null);
       setSession(null);
-      console.log('✅ Logged out');
     } catch (error) {
       console.error('❌ Logout error:', error);
     }
@@ -163,7 +152,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     // Listen for auth state changes
     const subscription = auth.onAuthStateChange((event, newSession) => {
-      console.log('🔄 Auth state changed:', event);
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         loadUserData();
       } else if (event === 'SIGNED_OUT') {

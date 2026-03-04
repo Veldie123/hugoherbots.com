@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { toast } from "sonner";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { getAuthHeaders } from "../../services/hugoApi";
 import { AppLayout } from "./AppLayout";
@@ -151,7 +152,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
     const sessionId = String(session.id);
 
     if (/^\d+$/.test(sessionId)) {
-      alert('Dit is een demo-sessie en kan niet worden geanalyseerd.');
+      toast.info('Dit is een demo-sessie en kan niet worden geanalyseerd.');
       return;
     }
 
@@ -183,7 +184,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
           next.delete(sessionId);
           return next;
         });
-        alert(`Analyse niet mogelijk: ${data.error}`);
+        toast.error(`Analyse niet mogelijk: ${data.error}`);
         return;
       }
 
@@ -209,7 +210,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
               next.delete(sessionId);
               return next;
             });
-            alert(`Analyse mislukt: ${statusData.error || 'Onbekende fout'}`);
+            toast.error(`Analyse mislukt: ${statusData.error || 'Onbekende fout'}`);
           }
         } catch {
           clearInterval(pollInterval);
@@ -226,7 +227,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
         next.delete(sessionId);
         return next;
       });
-      alert(`Fout bij starten analyse: ${err.message}`);
+      toast.error(`Fout bij starten analyse: ${err.message}`);
     }
   };
   
@@ -293,7 +294,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
     const sessionId = String(session.id);
 
     if (/^\d+$/.test(sessionId)) {
-      alert('Dit is een demo-sessie. Start een echte sessie via "Talk to Hugo" om analyses te bekijken.');
+      toast.info('Dit is een demo-sessie. Start een echte sessie via "Talk to Hugo" om analyses te bekijken.');
       return;
     }
 
@@ -327,7 +328,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
             } else if (data.status === 'failed') {
               clearInterval(pollInterval);
               setAnalyzingSessionIds(prev => { const n = new Set(prev); n.delete(sessionId); return n; });
-              alert(`Analyse mislukt: ${data.error || 'Onbekende fout'}`);
+              toast.error(`Analyse mislukt: ${data.error || 'Onbekende fout'}`);
             }
           } catch {
             clearInterval(pollInterval);

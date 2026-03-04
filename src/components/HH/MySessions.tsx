@@ -242,7 +242,7 @@ export function MySessions({ navigate }: MySessionsProps) {
                 <TableRow
                   key={session.id}
                   className="cursor-pointer hover:bg-hh-ui-50"
-                  onClick={() => console.log("View session", session.id)}
+                  onClick={() => { /* TODO: implement session detail view */ }}
                 >
                   <TableCell>
                     <div>

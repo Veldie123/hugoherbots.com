@@ -1,7 +1,7 @@
 import { supabase } from '@/utils/supabase/client';
 import type { ActivityType, ActivityMetadata } from '@/types/crossPlatform';
 
-const HUGO_AI_API_URL = import.meta.env.VITE_HUGO_AI_API_URL || 'https://hugoherbots-ai-chat.replit.app';
+const HUGO_AI_API_URL = import.meta.env.VITE_HUGO_AI_API_URL || window.location.origin;
 
 async function notifyAiPlatform(
   userId: string,
@@ -50,9 +50,8 @@ async function notifyAiPlatform(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    console.log(`[Activity] Notified .ai platform: ${activityType}`);
-  } catch (err) {
-    console.warn('[Activity] Failed to notify .ai platform (non-blocking):', err);
+  } catch {
+    // non-blocking: .ai platform notification is best-effort
   }
 }
 
@@ -70,7 +69,6 @@ export const activityService = {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.log('[Activity] No authenticated user, skipping activity log');
         return;
       }
 
@@ -92,15 +90,13 @@ export const activityService = {
         const { error } = supabaseResult.value as any;
         if (error) {
           console.error('[Activity] Supabase insert failed:', error.message);
-        } else {
-          console.log(`[Activity] Logged: ${activityType}`);
         }
       } else {
         console.error('[Activity] Supabase insert rejected:', supabaseResult.reason);
       }
 
       if (aiResult.status === 'rejected') {
-        console.warn('[Activity] AI platform notify rejected:', aiResult.reason);
+        console.error('[Activity] AI platform notify rejected:', aiResult.reason);
       }
     } catch (err) {
       console.error('[Activity] Error logging activity:', err);

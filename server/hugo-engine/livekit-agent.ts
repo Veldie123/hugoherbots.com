@@ -47,8 +47,8 @@ const DEBOUNCE_MS = 800; // Wait 800ms after last speech before processing — r
 const MIN_TRANSCRIPT_LENGTH = 3; // Minimum characters to process
 
 async function getBaseUrl(): Promise<string> {
-  if (process.env.REPLIT_DEV_DOMAIN) {
-    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+    return `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
   }
   return 'http://localhost:5000';
 }
@@ -302,7 +302,7 @@ export default defineAgent({
       console.error('[LiveKit Agent] Failed to start V2 session:', error);
       try {
         await session.say('Sorry, er ging iets mis.');
-      } catch (_) {}
+      } catch (_) { /* TTS fallback - session may already be disconnected */ }
     }
     
     console.log('[LiveKit Agent] Ready');

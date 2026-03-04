@@ -142,7 +142,7 @@ export function CustomDailyCall({
       try {
         callObjectRef.current.destroy();
       } catch (e) {
-        console.warn("[Daily] Error destroying call:", e);
+        // intentionally ignored - frame may already be destroyed
       }
       callObjectRef.current = null;
     }
@@ -257,7 +257,6 @@ export function CustomDailyCall({
 
       call.on("joined-meeting", async () => {
         if (!isMountedRef.current) return;
-        console.log("[Daily] Joined meeting");
         setConnectionState("connected");
         updateParticipants(call);
         if (!hasLoggedWebinarAttend.current) {
@@ -278,19 +277,16 @@ export function CustomDailyCall({
 
       call.on("left-meeting", () => {
         if (!isMountedRef.current) return;
-        console.log("[Daily] Left meeting");
         setConnectionState("left");
       });
 
       call.on("participant-joined", (event) => {
         if (!isMountedRef.current) return;
-        console.log("[Daily] Participant joined:", event?.participant?.user_name);
         updateParticipants(call);
       });
 
       call.on("participant-left", (event) => {
         if (!isMountedRef.current) return;
-        console.log("[Daily] Participant left:", event?.participant?.user_name);
         updateParticipants(call);
         if (event?.participant?.session_id) {
           setRaisedHands(prev => prev.filter(h => h.sessionId !== event.participant.session_id));
@@ -400,8 +396,7 @@ export function CustomDailyCall({
     try {
       const status = await liveCoachingApi.recording.getStatus(sessionId);
       setIsRecording(status.isRecording);
-    } catch (err) {
-      console.warn("[Recording] Could not fetch status:", err);
+    } catch {
       setIsRecording(false);
     }
   }, [sessionId]);
@@ -449,8 +444,8 @@ export function CustomDailyCall({
     if (callObjectRef.current) {
       try {
         await callObjectRef.current.leave();
-      } catch (e) {
-        console.warn("[Daily] Error leaving:", e);
+      } catch {
+        // intentionally ignored - call may already be left
       }
     }
     destroyCallObject();
@@ -461,8 +456,8 @@ export function CustomDailyCall({
     if (callObjectRef.current) {
       try {
         await callObjectRef.current.leave();
-      } catch (e) {
-        console.warn("[Daily] Error ending session:", e);
+      } catch {
+        // intentionally ignored - call may already be ended
       }
     }
     destroyCallObject();
@@ -492,14 +487,6 @@ export function CustomDailyCall({
   const participantList = Array.from(participants.values());
   const localParticipant = participantList.find(p => p.isLocal);
   const remoteParticipants = participantList.filter(p => !p.isLocal);
-
-  console.log("[CustomDailyCall] participantList:", participantList.length, participantList.map(p => ({ 
-    sessionId: p.sessionId.slice(0,8), 
-    userName: p.userName, 
-    isLocal: p.isLocal,
-    videoOn: p.videoOn,
-    hasVideoTrack: !!p.videoTrack
-  })));
 
   if (connectionState === "error") {
     return (
@@ -940,7 +927,7 @@ function VideoTile({ participant, isLarge = false, hasHandRaised = false, isSpea
       video.srcObject = stream;
       video.play()
         .then(() => setVideoReady(true))
-        .catch((e) => console.warn("[VideoTile] Play failed:", e));
+        .catch(() => { /* intentionally ignored - autoplay may be blocked */ });
     } else {
       video.srcObject = null;
       setVideoReady(false);

@@ -25,8 +25,6 @@ export function AuthCallback({ navigate }: AuthCallbackProps) {
 
   const handleCallback = async () => {
     try {
-      console.log("🔐 Processing OAuth callback...");
-
       // Get session from URL hash - DEFENSIVE CODE
       let sessionResult;
       try {
@@ -62,7 +60,6 @@ export function AuthCallback({ navigate }: AuthCallbackProps) {
         return;
       }
 
-      console.log("✅ OAuth login successful:", session.user.email);
       setStatus("success");
 
       // Check if this is a new user (created_at is recent)
@@ -73,10 +70,8 @@ export function AuthCallback({ navigate }: AuthCallbackProps) {
       // Navigate to onboarding for new users, dashboard for existing
       setTimeout(() => {
         if (isNewUser) {
-          console.log("🆕 New user - redirecting to onboarding");
-          navigate?.("onboarding");
+          navigate?.("talk-to-hugo");
         } else {
-          console.log("👤 Existing user - redirecting to dashboard");
           navigate?.("dashboard");
         }
       }, 1000);

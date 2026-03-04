@@ -72,8 +72,6 @@ export async function uploadRoleplay(
     const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const storagePath = `${user.id}/${timestamp}_${safeName}`;
 
-    console.log('📤 Uploading to Supabase Storage:', storagePath);
-
     // Upload to Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from(BUCKET_NAME)
@@ -86,8 +84,6 @@ export async function uploadRoleplay(
       console.error('❌ Storage upload failed:', uploadError);
       return { data: null, error: `Upload mislukt: ${uploadError.message}` };
     }
-
-    console.log('✅ File uploaded, creating database record...');
 
     // Create database record
     const { data: upload, error: dbError } = await supabase
@@ -114,7 +110,6 @@ export async function uploadRoleplay(
       return { data: null, error: `Database fout: ${dbError.message}` };
     }
 
-    console.log('✅ Upload complete:', upload);
     return { data: upload, error: null };
 
   } catch (err: any) {

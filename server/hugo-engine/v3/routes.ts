@@ -8,6 +8,7 @@ import { Router, type Request, type Response } from "express";
 import { requireAuth } from "../auth-middleware";
 import { chat, createSession, type V3SessionState } from "./agent";
 import { isV3Available } from "./anthropic-client";
+import { buildUserBriefing } from "./user-briefing";
 import { randomUUID } from "crypto";
 
 const router = Router();
@@ -54,14 +55,29 @@ router.post(
     const { techniqueId, userProfile } = req.body;
     const sessionId = `v3_${randomUUID()}`;
 
-    const session = createSession(sessionId, req.userId!, userProfile);
+    // Fetch rich user context for personalized opening
+    let briefing;
+    try {
+      briefing = await buildUserBriefing(req.userId!);
+      console.log(`[V3] Briefing loaded for ${briefing.name}: ${briefing.isNewUser ? 'new user' : `${briefing.sessionsPlayed} sessions`}`);
+    } catch (err) {
+      console.warn("[V3] Briefing fetch failed, continuing without:", err);
+    }
+
+    const session = createSession(sessionId, req.userId!, userProfile, briefing);
     sessions.set(sessionId, session);
 
-    // Auto-send opening message if no explicit first message
+    // Auto-send opening message with context-aware prompt
     try {
-      const openingPrompt = techniqueId
-        ? `De seller wil werken aan techniek ${techniqueId}. Begroet hem kort en natuurlijk als Hugo.`
-        : `Een seller start een nieuwe sessie. Begroet hem kort en natuurlijk als Hugo. Vraag wat hij wil oefenen of bespreken.`;
+      let openingPrompt: string;
+      const hasSpecificTechnique = techniqueId && techniqueId !== "general";
+      if (hasSpecificTechnique) {
+        openingPrompt = `De seller wil werken aan techniek ${techniqueId}. Begroet hem kort en natuurlijk als Hugo. Verwijs naar wat je weet over deze seller uit je briefing.`;
+      } else if (briefing && !briefing.isNewUser) {
+        openingPrompt = `Je hebt zojuist de briefing van deze seller gelezen in je system prompt. Begroet hem kort en natuurlijk als Hugo. Verwijs naar iets concreets uit zijn geschiedenis en stel een logische volgende stap voor. Eindig met "of zit je ergens anders mee?" zodat hij ook vrij kan kiezen.`;
+      } else {
+        openingPrompt = `Dit is een nieuwe seller${briefing?.sector ? ` in de sector ${briefing.sector}` : ''}. Begroet hem warm als Hugo. Vertel kort wat je voor hem kunt doen (oefenen met technieken, rollenspel, feedback op gesprekken, analyse van echte verkoopgesprekken) en vraag wat hij verkoopt en waar hij tegenaan loopt, zodat je hem gericht kunt helpen.`;
+      }
 
       const response = await chat(session, openingPrompt);
 

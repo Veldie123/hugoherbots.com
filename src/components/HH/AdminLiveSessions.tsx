@@ -146,7 +146,6 @@ ${platformUrl}`;
     try {
       setLoading(true);
       const { sessions } = await liveCoachingApi.sessions.list();
-      console.log("📋 Loaded sessions:", JSON.stringify(sessions.map(s => ({ id: s.id.slice(0,8), title: s.title, status: s.status, statusLower: s.status?.toLowerCase() }))));
       setSessions(sessions);
     } catch (error: any) {
       toast.error("Kon sessies niet laden: " + error.message);
@@ -226,7 +225,6 @@ ${platformUrl}`;
   };
 
   const handleCreatePoll = async () => {
-    console.log("[Poll] Creating poll, activeCall:", activeCall?.sessionId, "question:", pollQuestion);
     if (!activeCall) {
       toast.error("Geen actieve sessie gevonden");
       return;
@@ -242,9 +240,7 @@ ${platformUrl}`;
     }
     try {
       setCreatingPoll(true);
-      console.log("[Poll] Calling API with sessionId:", activeCall.sessionId);
       const newPoll = await liveCoachingApi.polls.create(activeCall.sessionId, { question: pollQuestion.trim(), options: validOptions });
-      console.log("[Poll] Created:", newPoll);
       setPolls((prev) => [...prev, newPoll]);
       setPollQuestion("");
       setPollOptions(["", ""]);
@@ -336,15 +332,11 @@ ${platformUrl}`;
         phaseId: formData.phase_id ? parseInt(formData.phase_id, 10) : undefined,
       };
       
-      console.log("📤 Submitting session:", editingSession ? "UPDATE" : "CREATE", updateData);
-
       if (editingSession) {
-        const result = await liveCoachingApi.sessions.update(editingSession.id, updateData);
-        console.log("✅ Session updated:", result);
+        await liveCoachingApi.sessions.update(editingSession.id, updateData);
         toast.success("Sessie bijgewerkt");
       } else {
-        const result = await liveCoachingApi.sessions.create(updateData);
-        console.log("✅ Session created:", result);
+        await liveCoachingApi.sessions.create(updateData);
         toast.success("Sessie aangemaakt");
       }
 

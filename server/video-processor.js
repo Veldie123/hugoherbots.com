@@ -718,11 +718,10 @@ async function initStripe() {
 
     const stripeSync = await getStripeSync();
 
-    const domains = process.env.REPLIT_DOMAINS || '';
-    const firstDomain = domains.split(',')[0];
-    if (firstDomain) {
+    const publicDomain = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.PUBLIC_URL || 'hugoherbots.com';
+    if (publicDomain) {
       try {
-        const webhookBaseUrl = `https://${firstDomain}`;
+        const webhookBaseUrl = publicDomain.startsWith('http') ? publicDomain : `https://${publicDomain}`;
         const result = await stripeSync.findOrCreateManagedWebhook(
           `${webhookBaseUrl}/api/stripe/webhook`
         );
@@ -735,7 +734,7 @@ async function initStripe() {
         console.log(`[Stripe] Webhook setup skipped: ${webhookErr.message}`);
       }
     } else {
-      console.log('[Stripe] REPLIT_DOMAINS not available, skipping webhook setup (dev mode)');
+      console.log('[Stripe] No public domain available, skipping webhook setup (dev mode)');
     }
 
     stripeSync.syncBackfill()
@@ -1677,7 +1676,7 @@ const server = http.createServer((req, res) => {
         res.writeHead(202, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, message: 'Sync gestart op de achtergrond. Video\'s worden bijgewerkt, herlaad de pagina over ~35 seconden.' }));
         
-        // Spawn as completely separate process (inherits env vars including REPLIT_CONNECTORS_HOSTNAME)
+        // Spawn as completely separate process (inherits env vars)
         const { spawn } = require('child_process');
         const child = spawn('node', ['scripts/sync_drive_order_standalone.js', ...folderIds], {
           detached: true,
@@ -1700,6 +1699,11 @@ const server = http.createServer((req, res) => {
   
   // PATCH /api/admin/sessions/:id — update webinar title, date, description
   if (pathname.match(/^\/api\/admin\/sessions\/[^/]+$/) && req.method === 'PATCH') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     const sessionId = pathname.replace('/api/admin/sessions/', '');
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -1740,6 +1744,11 @@ const server = http.createServer((req, res) => {
 
   // POST /api/admin/sessions — create new webinar
   if (pathname === '/api/admin/sessions' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
@@ -1778,8 +1787,13 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname.startsWith('/api/admin/sessions/') && req.method === 'DELETE') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     const sessionId = pathname.replace('/api/admin/sessions/', '');
-    
+
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
@@ -1813,8 +1827,13 @@ const server = http.createServer((req, res) => {
   
   // Start session endpoint - uses service role to bypass RLS
   if (pathname.match(/^\/api\/admin\/sessions\/[^/]+\/start$/) && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     const sessionId = pathname.split('/')[4];
-    
+
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
@@ -1917,8 +1936,13 @@ const server = http.createServer((req, res) => {
   
   // Get meeting token endpoint - generates Daily meeting token
   if (pathname.match(/^\/api\/admin\/sessions\/[^/]+\/token$/) && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     const sessionId = pathname.split('/')[4];
-    
+
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
@@ -1990,8 +2014,13 @@ const server = http.createServer((req, res) => {
   // End session endpoint - uses service role to bypass RLS
   // Also fetches Daily.co recording and schedules pipeline processing
   if (pathname.match(/^\/api\/admin\/sessions\/[^/]+\/end$/) && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     const sessionId = pathname.split('/')[4];
-    
+
     if (!supabaseAdmin) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, message: 'Server niet correct geconfigureerd' }));
@@ -2179,6 +2208,11 @@ const server = http.createServer((req, res) => {
   
   // Playback Order endpoint - returns ready videos sorted by playback_order
   if (pathname === '/api/videos/playback-order' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -2292,6 +2326,11 @@ const server = http.createServer((req, res) => {
 
   // Reorder videos - update playback_order for multiple videos
   if (pathname === '/api/videos/reorder' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -2653,6 +2692,11 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // Unified Video Library endpoint - uses Supabase for correct database
   if (pathname === '/api/videos/library' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -2894,6 +2938,11 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Delete videos by criteria (for cleanup)
   if (pathname === '/api/videos/cleanup' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -2946,6 +2995,11 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Delete video (admin only - uses service role, soft delete by setting status to 'deleted')
   if (pathname === '/api/videos/delete' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -2992,6 +3046,11 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Toggle video hidden status (admin only - uses service role)
   if (pathname === '/api/videos/toggle-hidden' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -3030,6 +3089,11 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Update video title (admin)
   if (pathname === '/api/videos/update-title' && req.method === 'POST') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -3285,6 +3349,11 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Admin Dashboard Stats - KPIs, recent activity, notifications, top content
   if (pathname === '/api/admin/dashboard-stats' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -3621,6 +3690,11 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // Platform Analytics - Aggregated metrics (bypasses RLS with service role)
   if (pathname === '/api/analytics/platform' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -3728,6 +3802,11 @@ Format: ["id1", "id2", "id3", ...]`;
   }
 
   if (pathname === '/api/analytics/user' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -3847,6 +3926,11 @@ Format: ["id1", "id2", "id3", ...]`;
   }
 
   if (pathname === '/api/analytics/users' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -3938,6 +4022,11 @@ Format: ["id1", "id2", "id3", ...]`;
   }
 
   if (pathname === '/api/analytics/content-performance' && req.method === 'GET') {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -4242,12 +4331,13 @@ Format: ["id1", "id2", "id3", ...]`;
         // Get fresh Google access token
         const accessToken = await getGoogleDriveAccessToken();
         
-        // Get callback URL - MUST use public Replit domain, not localhost
-        const replitDomain = process.env.REPLIT_DOMAINS?.split(',')[0];
-        if (!replitDomain) {
-          throw new Error('REPLIT_DOMAINS niet beschikbaar - kan geen callback URL maken');
+        // Get callback URL - MUST use public domain, not localhost
+        const publicDomain = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.PUBLIC_URL || 'hugoherbots.com';
+        if (!publicDomain) {
+          throw new Error('Geen publiek domein beschikbaar - kan geen callback URL maken');
         }
-        const callbackUrl = `https://${replitDomain}/api/worker-callback`;
+        const callbackBaseUrl = publicDomain.startsWith('http') ? publicDomain : `https://${publicDomain}`;
+        const callbackUrl = `${callbackBaseUrl}/api/worker-callback`;
         console.log(`[External] Callback URL: ${callbackUrl}`);
         
         console.log(`[External] Sending job ${job_id} to Cloud Run: ${CLOUD_RUN_URL}`);
@@ -5959,7 +6049,6 @@ ANTWOORD FORMAT:
           ],
           cors: {
             requiredOrigins: [
-              'https://hugoherbots-com.replit.app',
               'https://hugoherbots.com',
             ],
           },
@@ -6034,7 +6123,7 @@ ANTWOORD FORMAT:
         
         if (error) throw error;
         
-        const aiPlatformUrl = process.env.HUGO_AI_URL || 'https://hugoherbots-ai-chat.replit.app';
+        const aiPlatformUrl = process.env.HUGO_AI_URL || 'https://hugoherbots.ai';
         const handoffUrl = `${aiPlatformUrl}/auth/handoff?token=${token}${targetPath ? '&redirect=' + encodeURIComponent(targetPath) : ''}`;
         
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -6192,8 +6281,8 @@ ANTWOORD FORMAT:
           payment_method_types: ['card'],
           line_items: [{ price: priceId, quantity: 1 }],
           mode: 'subscription',
-          success_url: successUrl || `https://${(process.env.REPLIT_DOMAINS || '').split(',')[0]}/pricing?success=true`,
-          cancel_url: cancelUrl || `https://${(process.env.REPLIT_DOMAINS || '').split(',')[0]}/pricing?canceled=true`,
+          success_url: successUrl || `https://${process.env.RAILWAY_PUBLIC_DOMAIN || process.env.PUBLIC_URL || 'hugoherbots.com'}/pricing?success=true`,
+          cancel_url: cancelUrl || `https://${process.env.RAILWAY_PUBLIC_DOMAIN || process.env.PUBLIC_URL || 'hugoherbots.com'}/pricing?canceled=true`,
         };
 
         if (customerEmail) {
@@ -6226,7 +6315,7 @@ ANTWOORD FORMAT:
         const stripe = await getUncachableStripeClient();
         const session = await stripe.billingPortal.sessions.create({
           customer: customerId,
-          return_url: returnUrl || `https://${(process.env.REPLIT_DOMAINS || '').split(',')[0]}/pricing`,
+          return_url: returnUrl || `https://${process.env.RAILWAY_PUBLIC_DOMAIN || process.env.PUBLIC_URL || 'hugoherbots.com'}/pricing`,
         });
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ url: session.url }));

@@ -179,13 +179,11 @@ export function UploadAnalysis({
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
-    console.log('🎯 Drag over detected');
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    console.log('🚫 Drag leave');
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -193,56 +191,40 @@ export function UploadAnalysis({
     setIsDragging(false);
     
     const file = e.dataTransfer.files[0];
-    console.log('📥 File dropped:', { 
-      name: file?.name, 
-      type: file?.type, 
-      size: file?.size 
-    });
-    
+
     if (file) {
       // Check for iCloud placeholder files
       if (file.name.endsWith('.icloud')) {
         setUploadError('Dit is een iCloud placeholder bestand. Download eerst het echte bestand van iCloud naar je Mac (rechtsklik → Download Now).');
-        console.log('❌ iCloud placeholder detected');
         return;
       }
-      
+
       const isValidType = isValidFileType(file);
       const isValidSize = isValidFileSize(file);
-      console.log('🔍 Validation results:', { isValidType, isValidSize });
-      
+
       if (isValidType && isValidSize) {
         setSelectedFile(file);
         setUploadError(null);
-        console.log('✅ File accepted:', file.name);
       }
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log('📂 File selected from input:', { 
-      name: file?.name, 
-      type: file?.type, 
-      size: file?.size 
-    });
-    
+
     if (file) {
       // Check for iCloud placeholder files
       if (file.name.endsWith('.icloud')) {
         setUploadError('Dit is een iCloud placeholder bestand. Download eerst het echte bestand van iCloud naar je Mac (rechtsklik → Download Now).');
-        console.log('❌ iCloud placeholder detected');
         return;
       }
-      
+
       const isValidType = isValidFileType(file);
       const isValidSize = isValidFileSize(file);
-      console.log('🔍 Validation results:', { isValidType, isValidSize });
-      
+
       if (isValidType && isValidSize) {
         setSelectedFile(file);
         setUploadError(null);
-        console.log('✅ File accepted:', file.name);
       }
     }
   };
@@ -267,9 +249,6 @@ export function UploadAnalysis({
     
     if (!isValid) {
       setUploadError('Alleen audio (MP3, WAV, M4A) en video (MP4, MOV) bestanden zijn toegestaan');
-      console.log('❌ Invalid file:', { type: file.type, name: file.name });
-    } else {
-      console.log('✅ Valid file type:', { type: file.type, name: file.name, mimeMatch: hasValidMimeType, extMatch: !!hasValidExtension });
     }
     
     return isValid;

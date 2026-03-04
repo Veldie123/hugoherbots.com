@@ -211,7 +211,7 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
   };
 
   const handleCreate = () => {
-    console.log("Create article:", formData);
+    // TODO: implement article create API call
     setCreateDialogOpen(false);
     setFormData({
       title: "",

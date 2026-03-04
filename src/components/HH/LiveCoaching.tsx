@@ -692,8 +692,8 @@ export function LiveCoaching({
     }
   };
 
-  const handleReaction = (emoji: string) => {
-    console.log("Reaction:", emoji);
+  const handleReaction = (_emoji: string) => {
+    // TODO: implement reaction broadcasting
   };
 
   const handleRaiseHand = () => {
@@ -1974,12 +1974,6 @@ export function LiveCoaching({
                           }
                           setSubmittingFeedback(true);
                           await new Promise((resolve) => setTimeout(resolve, 500));
-                          console.log("Feedback submitted:", {
-                            sessionId: selectedRecording.id,
-                            sessionTitle: selectedRecording.title,
-                            rating: feedback.rating,
-                            text: feedback.text,
-                          });
                           saveFeedbackToStorage(selectedRecording.id, feedback.rating, feedback.text || "");
                           setRecordingFeedback((prev) => ({
                             ...prev,

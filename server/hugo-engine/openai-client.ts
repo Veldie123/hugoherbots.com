@@ -1,4 +1,4 @@
-// OpenAI client using Replit AI Integrations
+// OpenAI client configuration
 // SIMPLIFIED for V2 engine - V1 functions archived to server/_archive/openai-v1.ts
 import OpenAI from "openai";
 

@@ -142,7 +142,6 @@ class HugoApiService {
 
   setV3Mode(enabled: boolean): void {
     this.useV3 = enabled;
-    console.log(`[HugoApi] V3 mode ${enabled ? 'enabled' : 'disabled'}`);
   }
 
   async startSession(request: StartSessionRequest): Promise<StartSessionResponse> {
@@ -176,7 +175,8 @@ class HugoApiService {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to start V3 session: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.details || errorData.error || `Failed to start V3 session: ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -298,7 +298,8 @@ class HugoApiService {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to send V3 message: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.details || errorData.error || `Failed to send V3 message: ${response.statusText}`);
     }
 
     const data = await response.json();

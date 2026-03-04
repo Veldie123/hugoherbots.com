@@ -30,8 +30,6 @@ export async function uploadConversationViaAPI(
   file: File
 ): Promise<{ path: string; signedUrl: string } | { error: string }> {
   try {
-    console.log('📤 [API] Uploading conversation via backend:', { name: file.name, size: file.size, type: file.type })
-    
     // Get auth header
     const authHeader = await getAuthHeader()
     
@@ -53,7 +51,6 @@ export async function uploadConversationViaAPI(
       return { error: result.message || result.error || 'Upload failed' }
     }
     
-    console.log('✅ [API] Upload successful:', result)
     return { path: result.path, signedUrl: result.signedUrl }
     
   } catch (error: any) {

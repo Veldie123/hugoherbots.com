@@ -188,7 +188,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
   };
 
   const handleCreate = () => {
-    console.log("Create resource:", formData);
+    // TODO: implement resource create API call
     setCreateDialogOpen(false);
     setFormData({
       title: "",
@@ -202,7 +202,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
   };
 
   const handleEdit = () => {
-    console.log("Edit resource:", selectedResource);
+    // TODO: implement resource edit API call
     setEditDialogOpen(false);
   };
 

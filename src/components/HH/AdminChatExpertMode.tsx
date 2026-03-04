@@ -270,7 +270,6 @@ export function AdminChatExpertMode({
         const levelData = await hugoApi.getUserLevel();
         setDifficultyLevel(levelData.levelName);
         setAssistanceConfig(levelData.assistance);
-        console.log("[Performance] Loaded user level:", levelData.level, levelData.levelName);
       } catch (error) {
         console.error("[Performance] Failed to load user level:", error);
         // Keep defaults on error
@@ -357,7 +356,6 @@ export function AdminChatExpertMode({
               if (!cancelled) setIsLoading(false);
             }
           })();
-          console.log("[Admin] Practice context loaded from analysis:", ctx.practiceLabel, "turns:", turns.length);
         }
       } catch (err) {
         console.error("[Admin] Failed to parse practice context:", err);
@@ -405,9 +403,8 @@ export function AdminChatExpertMode({
             }
           );
           setHasActiveSession(true);
-          console.log("[Admin] Streaming session started");
         } catch (e) {
-          console.warn("[Admin] Failed to start admin session:", e);
+          console.error("[Admin] Failed to start admin session:", e);
           try {
             const res = await fetch('/api/v2/admin/welcome');
             if (res.ok) {
@@ -421,7 +418,7 @@ export function AdminChatExpertMode({
               return;
             }
           } catch (e2) {
-            console.warn("[Admin] Fallback welcome also failed:", e2);
+            console.error("[Admin] Fallback welcome also failed:", e2);
           }
           setMessages([{
             id: `welcome-${Date.now()}`,
@@ -491,7 +488,6 @@ export function AdminChatExpertMode({
       }
       
       const result = await response.json();
-      console.log('[Golden Standard] Saved:', result.message, isCorrection ? '(CORRECTION)' : '');
       toast.success(isCorrection ? 'Correctie opgeslagen als Golden Standard' : 'Opgeslagen als Golden Standard');
       return true;
     } catch (error) {
@@ -538,7 +534,6 @@ export function AdminChatExpertMode({
       }
       
       const result = await response.json();
-      console.log('[Golden Standard] Flagged:', result.message);
       toast.success(`Feedback opgeslagen (${result.conflictsFound || 0} conflicts)`);
       return true;
     } catch (error) {
@@ -571,18 +566,11 @@ export function AdminChatExpertMode({
       const room = new Room();
       
       room.on(RoomEvent.ConnectionStateChanged, (state: ConnectionState) => {
-        console.log('[LiveKit] Connection state:', state);
         setAudioConnectionState(state);
-        if (state === ConnectionState.Connected) {
-          console.log('[LiveKit] Connected to room');
-        } else if (state === ConnectionState.Disconnected) {
-          console.log('[LiveKit] Disconnected');
-        }
       });
       
-      room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant) => {
+      room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack, _publication: RemoteTrackPublication, _participant: RemoteParticipant) => {
         if (track.kind === Track.Kind.Audio) {
-          console.log('[LiveKit] Track subscribed:', track.kind);
           const audioElement = track.attach();
           audioElementRef.current = audioElement;
           document.body.appendChild(audioElement);
@@ -602,8 +590,7 @@ export function AdminChatExpertMode({
       
       await room.connect(url, token);
       await room.localParticipant.setMicrophoneEnabled(true);
-      console.log('[LiveKit] Microphone enabled');
-      
+
       setLiveKitRoom(room);
     } catch (error) {
       console.error('[LiveKit] Error:', error);
@@ -932,7 +919,6 @@ export function AdminChatExpertMode({
           viewMode: 'admin',
         });
         setHasActiveSession(true);
-        console.log("[Admin] Auto-started expert session");
       } catch (error) {
         console.error("[Admin] Failed to auto-start session:", error);
         setIsLoading(false);
@@ -1112,7 +1098,7 @@ export function AdminChatExpertMode({
             }),
           });
         } catch (e) {
-          console.warn("[Admin] Onboarding feedback failed:", e);
+          console.error("[Admin] Onboarding feedback failed:", e);
         }
 
         // Stuur AI door naar volgende techniek
@@ -1138,7 +1124,7 @@ export function AdminChatExpertMode({
             if (status.nextItem) setOnboardingCurrentItem(status.nextItem);
           }
         } catch (e) {
-          console.warn("[Admin] Next onboarding item failed:", e);
+          console.error("[Admin] Next onboarding item failed:", e);
         } finally {
           setIsLoading(false);
         }
@@ -2501,8 +2487,7 @@ export function AdminChatExpertMode({
         technique={selectedTechniqueDetails}
         isEditable={true}
         isAdmin={true}
-        onSave={(updatedTechnique) => {
-          console.log("Technique updated:", updatedTechnique);
+        onSave={(_updatedTechnique) => {
           // TODO: Save to backend
         }}
       />

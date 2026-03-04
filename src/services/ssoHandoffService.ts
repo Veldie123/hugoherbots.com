@@ -3,7 +3,7 @@ import type { HandoffResult } from '@/types/crossPlatform';
 
 export type { HandoffResult };
 
-const AI_PLATFORM_URL = import.meta.env.VITE_HUGO_AI_URL || 'https://hugoherbots-ai-chat.replit.app';
+const AI_PLATFORM_URL = import.meta.env.VITE_HUGO_AI_URL || window.location.origin;
 
 export const ssoHandoffService = {
   /**

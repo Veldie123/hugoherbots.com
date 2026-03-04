@@ -12,6 +12,7 @@ import {
   COACHING_MODEL,
 } from "./anthropic-client";
 import { buildV3SystemPrompt } from "./system-prompt";
+import { type UserBriefing } from "./user-briefing";
 import {
   knowledgeToolDefinitions,
   executeKnowledgeTool,
@@ -47,6 +48,7 @@ export interface V3SessionState {
     ervaring?: string;
     bedrijfsnaam?: string;
   };
+  briefing?: UserBriefing;
   engineVersion: "v3";
   roleplay?: RoleplayState;
 }
@@ -114,7 +116,7 @@ export async function chat(
 ): Promise<V3Response> {
   const client = getAnthropicClient();
   const tools = getAllToolDefinitions();
-  const systemPrompt = buildV3SystemPrompt(session.userProfile);
+  const systemPrompt = buildV3SystemPrompt(session.userProfile, session.briefing);
 
   // Build message history for Claude
   const messages: Anthropic.MessageParam[] = session.messages.map((m) => ({
@@ -209,13 +211,15 @@ export async function chat(
 export function createSession(
   sessionId: string,
   userId: string,
-  userProfile?: V3SessionState["userProfile"]
+  userProfile?: V3SessionState["userProfile"],
+  briefing?: UserBriefing
 ): V3SessionState {
   return {
     sessionId,
     userId,
     messages: [],
     userProfile,
+    briefing,
     engineVersion: "v3",
   };
 }

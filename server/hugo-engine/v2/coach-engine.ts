@@ -44,6 +44,7 @@ import { getVideoLibraryStats, buildVideoStatsPrompt } from './content-assets';
 import { storage } from '../storage';
 import { buildCoachingPrompt, buildFeedbackPrompt, getHugoIdentity, getHugoRole } from '../hugo-persona-loader';
 import { pool } from '../db';
+import { getAdminStats } from '../admin-stats';
 import { getHistoricalContext, type HistoricalContext } from './historical-context-service';
 import type { CustomerSignal, Persona, EpicPhase } from "./customer_engine";
 import type { CustomerDynamics } from "../houding-selector";
@@ -831,7 +832,7 @@ Fase: ${faseNamen[fase] || `Fase ${fase}`}`;
           enhancedSystemPrompt += `\nVoorbeeld: "${techData.voorbeeld[0]}"`;
         }
       }
-    } catch (e) {}
+    } catch (e) { console.error('[CoachEngine] Error loading technique SSOT data:', e); }
     enhancedSystemPrompt += `\nAntwoord inhoudelijk over deze techniek. Noem het nummer (${context.detectedTechniqueId}) en de naam. Leg kort uit wat het is en wanneer je het gebruikt.`;
     if (context.userWantsVideo) {
       enhancedSystemPrompt += `\nDe gebruiker vraagt ook om een VIDEO. Zeg: "Hier is een video over ${context.detectedTechniqueName}" — het systeem voegt de video automatisch toe aan je antwoord.`;
@@ -1104,12 +1105,7 @@ export async function generateCoachOpening(context: CoachContext): Promise<Coach
       })(),
       (async () => {
         try {
-          const statsController = new AbortController();
-          const statsTimeout = setTimeout(() => statsController.abort(), 1500);
-          const statsRes = await fetch('http://localhost:3002/api/v2/admin/stats', { signal: statsController.signal });
-          clearTimeout(statsTimeout);
-          if (statsRes.ok) return await statsRes.json();
-          return null;
+          return await getAdminStats();
         } catch (err: any) {
           console.log('[COACH] Platform stats fetch failed (non-critical):', err.message);
           return null;
@@ -1386,12 +1382,7 @@ export async function generateCoachOpeningStream(
       })(),
       (async () => {
         try {
-          const statsController = new AbortController();
-          const statsTimeout = setTimeout(() => statsController.abort(), 1500);
-          const statsRes = await fetch('http://localhost:3002/api/v2/admin/stats', { signal: statsController.signal });
-          clearTimeout(statsTimeout);
-          if (statsRes.ok) return await statsRes.json();
-          return null;
+          return await getAdminStats();
         } catch (err: any) {
           console.log('[COACH] Platform stats fetch failed (non-critical):', err.message);
           return null;
