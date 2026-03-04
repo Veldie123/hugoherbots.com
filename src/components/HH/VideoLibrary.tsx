@@ -663,10 +663,10 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
         {/* Hero Banner - matching Dashboard style */}
         <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px] dark:ring-1 dark:ring-white/10">
           <img
-            src="/images/Hugo-Herbots-WEB-0350.JPG"
+            src="/images/Hugo-Herbots-WEB-0726.JPG"
             alt="Hugo Herbots Video Bibliotheek"
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: '50% 30%' }}
+            style={{ objectPosition: '50% 30%', transform: 'scaleX(-1)' }}
             loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
