@@ -214,7 +214,7 @@ export function ConversationAnalysis({
     switch (status) {
       case "completed":
         return (
-          <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-0 font-medium gap-1.5">
+          <Badge className="bg-hh-success/15 text-hh-success border-0 font-medium gap-1.5">
             <CheckCircle2 className="w-3 h-3" />
             Geanalyseerd
           </Badge>
@@ -223,21 +223,21 @@ export function ConversationAnalysis({
       case "transcribing":
       case "analyzing":
         return (
-          <Badge className="bg-blue-500/15 text-blue-600 dark:text-blue-400 border-0 font-medium gap-1.5">
+          <Badge className="bg-hh-primary/15 text-hh-primary border-0 font-medium gap-1.5">
             <Loader2 className="w-3 h-3 animate-spin" />
             Verwerken
           </Badge>
         );
       case "pending":
         return (
-          <Badge className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border-0 font-medium gap-1.5">
+          <Badge className="bg-hh-warning/15 text-hh-warning border-0 font-medium gap-1.5">
             <Clock className="w-3 h-3" />
             Wachtrij
           </Badge>
         );
       case "failed":
         return (
-          <Badge className="bg-red-500/15 text-red-600 dark:text-red-400 border-0 font-medium gap-1.5">
+          <Badge className="bg-hh-error/15 text-hh-error border-0 font-medium gap-1.5">
             <AlertCircle className="w-3 h-3" />
             Mislukt
           </Badge>
@@ -286,73 +286,89 @@ export function ConversationAnalysis({
   if (!showUploadView) {
     return (
       <AppLayout currentPage="analysis" navigate={navigate} isAdmin={isAdmin}>
-        <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="p-3 sm:p-4 lg:p-6 space-y-6">
+          {/* Header with compact KPI pills */}
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div>
-              <h1 className="mb-1 text-[24px] leading-[32px] sm:text-[28px] sm:leading-[36px] font-semibold text-hh-text">
-                Rollenspel Uploads
+              <h1 className="text-[24px] sm:text-[28px] lg:text-[32px] leading-[40px] text-hh-text mb-2">
+                Gespreksanalyse
               </h1>
-              <p className="text-[14px] leading-[22px] text-hh-muted">
+              <p className="text-[16px] leading-[24px] text-hh-muted">
                 {isAdmin ? 'Beheer alle geüploade rollenspellen' : 'Jouw geüploade rollenspellen en analyses'}
               </p>
             </div>
-            <Button
-              onClick={() => setShowUploadView(true)}
-              className="gap-2 bg-hh-primary hover:bg-hh-primary/90"
-            >
-              <Upload className="w-4 h-4" />
-              Upload nieuw
-            </Button>
+            <div className="grid grid-cols-2 sm:flex gap-2 sm:flex-wrap lg:flex-nowrap">
+              <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+                <div className="w-6 h-6 rounded-full bg-hh-ink/10 flex items-center justify-center">
+                  <FileText className="w-3 h-3 text-hh-ink" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-hh-muted leading-none">Totaal</p>
+                  <p className="text-[14px] font-semibold text-hh-ink leading-tight">{isLoading ? '-' : kpiStats.totaal}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+                <div className="w-6 h-6 rounded-full bg-hh-success/10 flex items-center justify-center">
+                  <CheckCircle2 className="w-3 h-3 text-hh-success" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-hh-muted leading-none">Geanalyseerd</p>
+                  <p className="text-[14px] font-semibold text-hh-ink leading-tight">{isLoading ? '-' : kpiStats.geanalyseerd}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+                <div className="w-6 h-6 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                  <Timer className="w-3 h-3 text-hh-primary" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-hh-muted leading-none">Verwerken</p>
+                  <p className="text-[14px] font-semibold text-hh-ink leading-tight">{isLoading ? '-' : kpiStats.verwerken}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
+                <div className="w-6 h-6 rounded-full bg-hh-warning/10 flex items-center justify-center">
+                  <ListTodo className="w-3 h-3 text-hh-warning" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-hh-muted leading-none">Wachtrij</p>
+                  <p className="text-[14px] font-semibold text-hh-ink leading-tight">{isLoading ? '-' : kpiStats.wachtrij}</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="p-4 rounded-[16px] border-hh-border shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-full bg-hh-ui-100 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-hh-muted" />
-                </div>
+          {/* Hero Banner */}
+          <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px]">
+            <img
+              src="/images/Hugo-Herbots-WEB-0116.JPG"
+              alt="Hugo Herbots Gespreksanalyse"
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: '50% 30%' }}
+              loading="eager"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+            <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+            <div className="relative h-full flex items-center p-6 sm:p-8">
+              <div className="text-white space-y-3 max-w-lg">
+                <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: '#4F7396' }}>
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Gespreksanalyse
+                </Badge>
+                <h2 className="text-[20px] sm:text-[24px] font-bold leading-tight">
+                  Analyseer je verkoopgesprekken
+                </h2>
+                <p className="text-white/70 text-[13px] sm:text-[14px] leading-relaxed line-clamp-2">
+                  Upload een rollenspel of echt klantgesprek en ontvang gedetailleerde E.P.I.C. feedback van Hugo.
+                </p>
+                <Button
+                  className="gap-2 text-white border-0 bg-hh-success hover:bg-hh-success/90"
+                  onClick={() => setShowUploadView(true)}
+                >
+                  <Upload className="w-4 h-4" />
+                  Upload nieuw
+                </Button>
               </div>
-              <div className="text-[28px] leading-[34px] font-semibold text-hh-text">
-                {isLoading ? '-' : kpiStats.totaal}
-              </div>
-              <div className="text-[13px] leading-[18px] text-hh-muted">Totaal</div>
-            </Card>
-
-            <Card className="p-4 rounded-[16px] border-hh-border shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-500/15 flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                </div>
-              </div>
-              <div className="text-[28px] leading-[34px] font-semibold text-hh-text">
-                {isLoading ? '-' : kpiStats.geanalyseerd}
-              </div>
-              <div className="text-[13px] leading-[18px] text-hh-muted">Geanalyseerd</div>
-            </Card>
-
-            <Card className="p-4 rounded-[16px] border-hh-border shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-full bg-blue-500/15 flex items-center justify-center">
-                  <Timer className="w-5 h-5 text-blue-600" />
-                </div>
-              </div>
-              <div className="text-[28px] leading-[34px] font-semibold text-hh-text">
-                {isLoading ? '-' : kpiStats.verwerken}
-              </div>
-              <div className="text-[13px] leading-[18px] text-hh-muted">Verwerken</div>
-            </Card>
-
-            <Card className="p-4 rounded-[16px] border-hh-border shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-full bg-amber-500/15 flex items-center justify-center">
-                  <ListTodo className="w-5 h-5 text-amber-600" />
-                </div>
-              </div>
-              <div className="text-[28px] leading-[34px] font-semibold text-hh-text">
-                {isLoading ? '-' : kpiStats.wachtrij}
-              </div>
-              <div className="text-[13px] leading-[18px] text-hh-muted">Wachtrij</div>
-            </Card>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
@@ -457,7 +473,7 @@ export function ConversationAnalysis({
 
   return (
     <AppLayout currentPage="analysis" navigate={navigate} isAdmin={isAdmin}>
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
+      <div className="p-3 sm:p-4 lg:p-6 space-y-6">
         <div>
           <button
             onClick={() => setShowUploadView(false)}

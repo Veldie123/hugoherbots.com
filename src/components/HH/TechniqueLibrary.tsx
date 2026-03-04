@@ -182,7 +182,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
 
   return (
     <AppLayout currentPage="techniques" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
-      <div className="p-3 sm:p-4 lg:p-6 space-y-4">
+      <div className="p-3 sm:p-4 lg:p-6 space-y-6">
         {/* Header with compact KPI cards on the right */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-2">
           <div>

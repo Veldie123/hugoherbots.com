@@ -809,7 +809,7 @@ export function LiveCoaching({
       isAdmin={isAdmin}
       onboardingMode={onboardingMode}
     >
-      <div className="p-3 sm:p-4 lg:p-6 space-y-6 sm:space-y-8">
+      <div className="p-3 sm:p-4 lg:p-6 space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="mb-2 text-[24px] leading-[32px] sm:text-[32px] sm:leading-[40px] lg:text-[40px] lg:leading-[48px] font-normal">
