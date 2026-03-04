@@ -340,7 +340,7 @@ export function ConversationAnalysis({
           {/* Hero Banner */}
           <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px]">
             <img
-              src="/images/Hugo-Herbots-WEB-0116.JPG"
+              src="/images/Hugo-Herbots-WEB-0309.JPG"
               alt="Hugo Herbots Gespreksanalyse"
               className="absolute inset-0 w-full h-full object-cover"
               style={{ objectPosition: '50% 30%' }}
