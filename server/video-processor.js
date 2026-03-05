@@ -655,25 +655,10 @@ ${transcriptSnippet ? `Transcript fragment: ${transcriptSnippet}` : ''}`
   }
 }
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
-
 const stripePool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 3,
 });
-
-async function query(text, params) {
-  const client = await pool.connect();
-  try {
-    const result = await client.query(text, params);
-    return result;
-  } finally {
-    client.release();
-  }
-}
 
 async function stripeQuery(text, params) {
   const client = await stripePool.connect();
@@ -1523,13 +1508,21 @@ const server = http.createServer((req, res) => {
       try {
         const data = JSON.parse(body || '{}');
         const folderIds = data.folderIds || [];
-        
+
         if (!folderIds.length) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ success: false, message: 'folderIds is vereist' }));
           return;
         }
-        
+
+        // SEC-023: Validate folderIds to prevent injection
+        const VALID_FOLDER_ID = /^[a-zA-Z0-9_-]+$/;
+        if (folderIds.some(id => !VALID_FOLDER_ID.test(id))) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: 'Ongeldige folderId(s)' }));
+          return;
+        }
+
         console.log('[VideoProcessor] Preview sync for folders:', folderIds);
         
         const accessToken = await getGoogleDriveAccessToken();
@@ -1665,13 +1658,21 @@ const server = http.createServer((req, res) => {
       try {
         const data = JSON.parse(body || '{}');
         const folderIds = data.folderIds || (data.folderId ? [data.folderId] : []);
-        
+
         if (!folderIds.length) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ success: false, message: 'folderId of folderIds is vereist' }));
           return;
         }
-        
+
+        // SEC-023: Validate folderIds to prevent command injection via spawn()
+        const VALID_FOLDER_ID = /^[a-zA-Z0-9_-]+$/;
+        if (folderIds.some(id => !VALID_FOLDER_ID.test(id))) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: 'Ongeldige folderId(s)' }));
+          return;
+        }
+
         // Return 202 immediately — sync runs as a separate spawned process to avoid memory issues
         console.log('[VideoProcessor] Spawning standalone sync for folders:', folderIds);
         res.writeHead(202, { 'Content-Type': 'application/json' });
@@ -3352,11 +3353,17 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // GET /api/admin/settings — Read all platform settings
   if (pathname === '/api/admin/settings' && req.method === 'GET') {
+    if (!supabaseAdmin) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Supabase niet geconfigureerd' }));
+      return;
+    }
     (async () => {
       try {
-        const result = await query('SELECT key, value FROM platform_settings');
+        const { data, error } = await supabaseAdmin.from('platform_settings').select('key, value');
+        if (error) throw error;
         const settings = {};
-        for (const row of result.rows) {
+        for (const row of data) {
           settings[row.key] = row.value;
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -3372,6 +3379,11 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // PUT /api/admin/settings — Save platform settings
   if (pathname === '/api/admin/settings' && req.method === 'PUT') {
+    if (!supabaseAdmin) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Supabase niet geconfigureerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -3383,11 +3395,11 @@ Format: ["id1", "id2", "id3", ...]`;
           return;
         }
         for (const [key, value] of Object.entries(settings)) {
-          await query(
-            `INSERT INTO platform_settings (key, value, updated_at) VALUES ($1, $2, NOW())
-             ON CONFLICT (key) DO UPDATE SET value = $2, updated_at = NOW()`,
-            [key, JSON.stringify(value)]
+          const { error } = await supabaseAdmin.from('platform_settings').upsert(
+            { key, value, updated_at: new Date().toISOString() },
+            { onConflict: 'key' }
           );
+          if (error) throw error;
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
@@ -3402,14 +3414,21 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // GET /api/admin/admins — List admin users
   if (pathname === '/api/admin/admins' && req.method === 'GET') {
+    if (!supabaseAdmin) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Supabase niet geconfigureerd' }));
+      return;
+    }
     (async () => {
       try {
-        const result = await query(
-          `SELECT id, email, first_name, last_name, admin_role, avatar_url, created_at
-           FROM profiles WHERE admin_role IS NOT NULL ORDER BY created_at ASC`
-        );
+        const { data, error } = await supabaseAdmin
+          .from('profiles')
+          .select('id, email, first_name, last_name, admin_role, avatar_url, created_at')
+          .not('admin_role', 'is', null)
+          .order('created_at', { ascending: true });
+        if (error) throw error;
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, admins: result.rows }));
+        res.end(JSON.stringify({ success: true, admins: data }));
       } catch (err) {
         console.error('[Admin] List admins error:', err.message);
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -3421,6 +3440,11 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // POST /api/admin/admins — Add admin user
   if (pathname === '/api/admin/admins' && req.method === 'POST') {
+    if (!supabaseAdmin) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Supabase niet geconfigureerd' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -3437,17 +3461,19 @@ Format: ["id1", "id2", "id3", ...]`;
           res.end(JSON.stringify({ success: false, error: 'Ongeldige role' }));
           return;
         }
-        const result = await query(
-          'UPDATE profiles SET admin_role = $1 WHERE email = $2 RETURNING id, email, admin_role',
-          [role, email]
-        );
-        if (result.rowCount === 0) {
+        const { data, error } = await supabaseAdmin
+          .from('profiles')
+          .update({ admin_role: role })
+          .eq('email', email)
+          .select('id, email, admin_role');
+        if (error) throw error;
+        if (!data || data.length === 0) {
           res.writeHead(404, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ success: false, error: 'Gebruiker niet gevonden' }));
           return;
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, admin: result.rows[0] }));
+        res.end(JSON.stringify({ success: true, admin: data[0] }));
       } catch (err) {
         console.error('[Admin] Add admin error:', err.message);
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -3459,10 +3485,16 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // DELETE /api/admin/admins/:id — Remove admin role
   if (pathname.match(/^\/api\/admin\/admins\/[^/]+$/) && req.method === 'DELETE') {
+    if (!supabaseAdmin) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Supabase niet geconfigureerd' }));
+      return;
+    }
     const adminId = pathname.split('/').pop();
     (async () => {
       try {
-        await query('UPDATE profiles SET admin_role = NULL WHERE id = $1', [adminId]);
+        const { error } = await supabaseAdmin.from('profiles').update({ admin_role: null }).eq('id', adminId);
+        if (error) throw error;
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
       } catch (err) {
@@ -3478,10 +3510,16 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // POST /api/admin/users/:id/suspend — Suspend user
   if (pathname.match(/^\/api\/admin\/users\/[^/]+\/suspend$/) && req.method === 'POST') {
+    if (!supabaseAdmin) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Supabase niet geconfigureerd' }));
+      return;
+    }
     const userId = pathname.split('/')[4];
     (async () => {
       try {
-        await query('UPDATE profiles SET status = $1 WHERE id = $2', ['suspended', userId]);
+        const { error } = await supabaseAdmin.from('profiles').update({ status: 'suspended' }).eq('id', userId);
+        if (error) throw error;
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
       } catch (err) {
@@ -3495,10 +3533,16 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // POST /api/admin/users/:id/activate — Reactivate user
   if (pathname.match(/^\/api\/admin\/users\/[^/]+\/activate$/) && req.method === 'POST') {
+    if (!supabaseAdmin) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Supabase niet geconfigureerd' }));
+      return;
+    }
     const userId = pathname.split('/')[4];
     (async () => {
       try {
-        await query('UPDATE profiles SET status = $1 WHERE id = $2', ['active', userId]);
+        const { error } = await supabaseAdmin.from('profiles').update({ status: 'active' }).eq('id', userId);
+        if (error) throw error;
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
       } catch (err) {
@@ -3512,11 +3556,16 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // DELETE /api/admin/users/:id — Delete user
   if (pathname.match(/^\/api\/admin\/users\/[^/]+$/) && req.method === 'DELETE') {
+    if (!supabaseAdmin) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Supabase niet geconfigureerd' }));
+      return;
+    }
     const userId = pathname.split('/').pop();
     (async () => {
       try {
-        // Delete from profiles (cascades through foreign keys)
-        await query('DELETE FROM profiles WHERE id = $1', [userId]);
+        const { error } = await supabaseAdmin.from('profiles').delete().eq('id', userId);
+        if (error) throw error;
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
       } catch (err) {
@@ -3770,12 +3819,13 @@ Format: ["id1", "id2", "id3", ...]`;
         // --- NOTIFICATIONS (from local DB) ---
         let notifications = [];
         try {
-          const notifResult = await pool.query(
-            `SELECT id, type, title, message, category, severity, related_page, read, created_at
-             FROM admin_notifications
-             ORDER BY created_at DESC
-             LIMIT 10`
-          );
+          const { data: notifRows, error: notifError } = await supabaseAdmin
+            .from('admin_notifications')
+            .select('id, type, title, message, category, severity, related_page, read, created_at')
+            .order('created_at', { ascending: false })
+            .limit(10);
+          if (notifError) throw notifError;
+          const notifResult = { rows: notifRows || [] };
           const formatTimeAgo = (dateStr) => {
             const diff = now - new Date(dateStr);
             const mins = Math.floor(diff / 60000);
