@@ -84,7 +84,7 @@ const VideoCard = ({
   locked?: boolean;
 }) => (
   <div 
-    className={`flex-shrink-0 w-[140px] sm:w-[200px] group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+    className={`flex-shrink-0 w-[45vw] sm:w-[200px] group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
     onClick={locked ? undefined : onClick}
   >
     <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
@@ -169,7 +169,7 @@ const WebinarCard = ({
   onRegister?: () => void;
 }) => (
   <div 
-    className="flex-shrink-0 w-[140px] sm:w-[200px] group cursor-pointer"
+    className="flex-shrink-0 w-[45vw] sm:w-[200px] group cursor-pointer"
     onClick={onClick}
   >
     <div className="relative rounded-lg overflow-hidden aspect-video mb-2">
@@ -264,7 +264,7 @@ const HugoTrainingCard = ({
   
   return (
     <div 
-      className="flex-shrink-0 w-[140px] sm:w-[200px] group cursor-pointer"
+      className="flex-shrink-0 w-[45vw] sm:w-[200px] group cursor-pointer"
       onClick={onClick}
     >
       <div className={`relative rounded-lg overflow-hidden aspect-video mb-2`}>
@@ -518,7 +518,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         >
           {webinarsLoading ? (
             <>{[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[140px] sm:w-[200px] p-3 bg-hh-card rounded-lg border border-hh-border space-y-2">
+              <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[200px] p-3 bg-hh-card rounded-lg border border-hh-border space-y-2">
                 <div className="h-4 w-32 bg-hh-border/30 rounded animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-20 bg-hh-border/20 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 40}ms` }} />
               </div>

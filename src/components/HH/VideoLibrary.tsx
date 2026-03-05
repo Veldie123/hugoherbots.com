@@ -796,7 +796,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
           {!showAllVideos && isLoading && (
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex-shrink-0 w-[140px] sm:w-[200px]">
+                <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
                   <div className="rounded-lg overflow-hidden bg-hh-ui-100 aspect-video mb-2 animate-pulse" />
                   <div className="h-4 w-3/4 bg-hh-ui-100 rounded animate-pulse mb-1.5" />
                   <div className="h-3 w-1/2 bg-hh-ui-100 rounded animate-pulse" />
@@ -813,7 +813,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
               return (
                 <div 
                   key={video.id}
-                  className={`flex-shrink-0 w-[140px] sm:w-[200px] group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex-shrink-0 w-[45vw] sm:w-[200px] group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={() => !locked && handlePlayVideo(video)}
                 >
                   <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
@@ -1105,7 +1105,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
               { title: "Klant zegt 'te duur' - wat nu?", duration: "1:30" },
               { title: "Eerste indruk optimaliseren", duration: "0:52" },
             ].map((short, idx) => (
-              <div key={idx} className="flex-shrink-0 w-[140px] sm:w-[200px] opacity-60">
+              <div key={idx} className="flex-shrink-0 w-[45vw] sm:w-[200px] opacity-60">
                 <div className="relative rounded-lg overflow-hidden bg-hh-ui-100 aspect-video mb-2 flex items-center justify-center">
                   <div className="text-center space-y-1">
                     <Zap className="w-6 h-6 text-hh-muted/40 mx-auto" />
@@ -1153,7 +1153,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
             ].map((webinar, idx) => (
               <div 
                 key={idx} 
-                className="flex-shrink-0 w-[140px] sm:w-[200px] cursor-pointer group"
+                className="flex-shrink-0 w-[45vw] sm:w-[200px] cursor-pointer group"
                 onClick={() => navigate?.("live")}
               >
                 <div className="relative aspect-video rounded-lg overflow-hidden bg-hh-ui-100 mb-2">
@@ -1214,7 +1214,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
               return (
                 <div 
                   key={video.id}
-                  className={`flex-shrink-0 w-[140px] sm:w-[200px] group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex-shrink-0 w-[45vw] sm:w-[200px] group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={() => !locked && handlePlayVideo(video)}
                 >
                   <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
