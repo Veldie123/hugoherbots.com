@@ -839,11 +839,6 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                         <CheckCircle2 className="w-4 h-4 text-white" />
                       </div>
                     )}
-                    {video.techniqueNumber && (
-                      <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
-                        {video.techniqueNumber}
-                      </Badge>
-                    )}
                     {recentlyAdded && !completed && (
                       <Badge className="absolute bottom-2 left-2 text-white border-0 text-[9px] px-1.5 py-0.5 font-medium" style={{ backgroundColor: '#3C9A6E' }}>
                         Nieuw
@@ -958,11 +953,6 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[#3d9a6e] flex items-center justify-center">
                         <CheckCircle2 className="w-4 h-4 text-white" />
                       </div>
-                    )}
-                    {video.techniqueNumber && (
-                      <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
-                        {video.techniqueNumber}
-                      </Badge>
                     )}
                     {recentlyAdded && !completed && (
                       <Badge className="absolute bottom-2 left-2 text-white border-0 text-[9px] px-1.5 py-0.5 font-medium" style={{ backgroundColor: '#3C9A6E' }}>
@@ -1239,11 +1229,6 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[#3d9a6e] flex items-center justify-center">
                         <CheckCircle2 className="w-4 h-4 text-white" />
                       </div>
-                    )}
-                    {video.techniqueNumber && (
-                      <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
-                        {video.techniqueNumber}
-                      </Badge>
                     )}
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
                       <div className="h-full bg-[#3d9a6e]" style={{ width: completed ? '100%' : '0%' }} />

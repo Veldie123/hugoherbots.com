@@ -85,8 +85,11 @@ export function useDashboardVideos() {
               progress: 0,
               thumbnail: getMuxThumbnail(v.mux_playback_id),
               muxPlaybackId: v.mux_playback_id,
+              _playbackOrder: v.playback_order ?? Infinity,
             };
-          });
+          })
+          .sort((a, b) => (a as any)._playbackOrder - (b as any)._playbackOrder)
+          .map(({ _playbackOrder, ...rest }) => rest as DashboardVideo);
 
         setVideos(mappedVideos);
         
