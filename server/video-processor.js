@@ -1405,19 +1405,24 @@ function checkAuth(req) {
 // Accept either VIDEO_PROCESSOR_SECRET (server-to-server) or Supabase JWT (frontend)
 async function checkAdminAuth(req) {
   if (checkAuth(req)) return true;
-  if (!supabaseAdmin) return false;
+  if (!supabaseAdmin) { console.log('[AdminAuth] supabaseAdmin is null'); return false; }
   const authHeader = req.headers['authorization'] || '';
   const token = authHeader.replace('Bearer ', '');
-  if (!token) return false;
+  if (!token) { console.log('[AdminAuth] No token in request'); return false; }
   try {
     const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-    if (error || !user) return false;
+    if (error || !user) { console.log('[AdminAuth] getUser failed:', error?.message); return false; }
+    // Email domain check (mirrors auth-middleware.ts)
+    if (user.email?.endsWith('@hugoherbots.com')) return true;
+    // Fallback: check admin_role in profiles
     const { data: profile } = await supabaseAdmin.from('profiles')
-      .select('role')
+      .select('admin_role')
       .eq('id', user.id)
       .single();
-    return profile?.role === 'admin' || profile?.role === 'super_admin';
-  } catch {
+    console.log('[AdminAuth] email:', user.email, 'admin_role:', profile?.admin_role);
+    return !!profile?.admin_role;
+  } catch (e) {
+    console.log('[AdminAuth] Exception:', e.message);
     return false;
   }
 }
@@ -2256,12 +2261,8 @@ const server = http.createServer((req, res) => {
   }
   
   // Playback Order endpoint - returns ready videos sorted by playback_order
+  // Public read-only endpoint — no auth required
   if (pathname === '/api/videos/playback-order' && req.method === 'GET') {
-    if (!checkAuth(req)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
-      return;
-    }
     (async () => {
       try {
         if (!supabaseAdmin) {
@@ -2740,12 +2741,8 @@ Format: ["id1", "id2", "id3", ...]`;
   }
 
   // Unified Video Library endpoint - uses Supabase for correct database
+  // Public read-only endpoint — no auth required (used by both admin and user views)
   if (pathname === '/api/videos/library' && req.method === 'GET') {
-    if (!checkAuth(req)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
-      return;
-    }
     (async () => {
       try {
         if (!supabaseAdmin) {
