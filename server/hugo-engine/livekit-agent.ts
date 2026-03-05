@@ -134,8 +134,9 @@ export default defineAgent({
     // eleven_multilingual_v2: highest quality for Dutch — best intonation, question marks, natural pacing
     // voiceSettings tuned for consistent volume, natural speed, and voice clone fidelity
     const TTS_MODEL = 'eleven_multilingual_v2';
+    const HUGO_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || process.env.Elevenlabs_Hugo_voice_clone || 'sOsTzBXVBqNYMd5L4sCU';
     const hugoTTS = new elevenlabsPlugin.TTS({
-      voiceId: 'sOsTzBXVBqNYMd5L4sCU',
+      voiceId: HUGO_VOICE_ID,
       model: TTS_MODEL,
       apiKey: process.env.ELEVENLABS_API_KEY,
       voiceSettings: {
@@ -146,7 +147,7 @@ export default defineAgent({
         use_speaker_boost: true,
       },
     });
-    console.log(`[LiveKit Agent] Using Hugo voice (${TTS_MODEL}) - voiceId: sOsTzBXVBqNYMd5L4sCU`);
+    console.log(`[LiveKit Agent] Using Hugo voice (${TTS_MODEL}) - voiceId: ${HUGO_VOICE_ID}`);
     
     const session = new voice.AgentSession({
       stt: new inference.STT({

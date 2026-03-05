@@ -1446,7 +1446,18 @@ const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
   
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // SEC-006: Restrict CORS to known origins
+  const ALLOWED_ORIGINS = [
+    'https://hugoherbots.com', 'https://www.hugoherbots.com',
+    'https://hugoherbots.ai', 'https://www.hugoherbots.ai',
+  ];
+  if (process.env.NODE_ENV !== 'production') {
+    ALLOWED_ORIGINS.push('http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:5000');
+  }
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Auth-Token');
   
@@ -4382,6 +4393,15 @@ Format: ["id1", "id2", "id3", ...]`;
   
   // Cloud Run worker callback - receives status updates from external processor
   if (pathname === '/api/worker-callback' && req.method === 'POST') {
+    // SEC-018: Verify callback comes from our Cloud Run worker
+    const callbackSecret = process.env.CLOUD_RUN_WORKER_SECRET;
+    const authHeader = req.headers['authorization'] || '';
+    if (!callbackSecret || authHeader !== `Bearer ${callbackSecret}`) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Unauthorized' }));
+      return;
+    }
+
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', async () => {
@@ -6567,6 +6587,12 @@ ANTWOORD FORMAT:
   }
 
   if (pathname === '/api/stripe/subscription' && req.method === 'GET') {
+    // SEC-014: Require auth to prevent email enumeration / PII disclosure
+    if (!checkAuth(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Niet geautoriseerd' }));
+      return;
+    }
     (async () => {
       try {
         const queryParams = new URL(req.url, `http://localhost`).searchParams;
