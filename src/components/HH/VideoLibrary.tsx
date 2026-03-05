@@ -820,7 +820,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                     <img
                       src={video.thumbnail}
                       alt={video.displayTitle || "Video"}
-                      className={`w-full h-full object-cover ${locked ? 'grayscale' : ''}`}
+                      className={`absolute inset-0 w-full h-full object-cover ${locked ? 'grayscale' : ''}`}
                       loading="lazy"
                     />
                     {locked ? (
@@ -840,7 +840,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       </div>
                     )}
                     {video.techniqueNumber && (
-                      <Badge className="absolute top-2 left-2 bg-emerald-100 text-emerald-600 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
+                      <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
                         {video.techniqueNumber}
                       </Badge>
                     )}
@@ -940,7 +940,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                     <img
                       src={video.thumbnail}
                       alt={video.displayTitle || "Video"}
-                      className={`w-full h-full object-cover ${locked ? 'grayscale' : ''}`}
+                      className={`absolute inset-0 w-full h-full object-cover ${locked ? 'grayscale' : ''}`}
                       loading="lazy"
                     />
                     {locked ? (
@@ -960,7 +960,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       </div>
                     )}
                     {video.techniqueNumber && (
-                      <Badge className="absolute top-2 left-2 bg-emerald-100 text-emerald-600 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
+                      <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
                         {video.techniqueNumber}
                       </Badge>
                     )}
@@ -1062,7 +1062,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                         <tr key={video.id} className={`group border-b border-hh-border last:border-0 transition-colors ${locked ? 'opacity-40 cursor-not-allowed' : 'hover:bg-hh-ui-50/50 cursor-pointer'}`} onClick={() => !locked && handlePlayVideo(video)}>
                           <td className="py-2 px-4">
                             <div className="relative w-16 h-10 rounded-md overflow-hidden bg-hh-ui-100">
-                              <img src={video.thumbnail} alt={video.displayTitle || "Video"} className={`w-full h-full object-cover ${locked ? 'grayscale' : ''}`} />
+                              <img src={video.thumbnail} alt={video.displayTitle || "Video"} className={`absolute inset-0 w-full h-full object-cover ${locked ? 'grayscale' : ''}`} />
                             </div>
                           </td>
                           <td className="py-3 px-4">
@@ -1160,7 +1160,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                   <img
                     src={`https://image.mux.com/${sortedVideos[idx]?.muxPlaybackId || 'placeholder'}/thumbnail.jpg?time=5&width=400`}
                     alt={webinar.title}
-                    className="w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).src = '/images/Hugo-Herbots-WEB-0350.JPG'; }}
                   />
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -1168,7 +1168,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       <Play className="w-5 h-5 text-hh-ink ml-0.5" />
                     </div>
                   </div>
-                  <Badge className="absolute top-2 left-2 bg-teal-100/90 text-teal-600 border-0 text-[10px] font-mono font-semibold rounded-full px-1.5">
+                  <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary border-0 text-[10px] font-mono font-semibold rounded-full px-1.5">
                     {webinar.techniek}
                   </Badge>
                   <Badge className="absolute top-2 right-2 border-0 text-[10px] text-white" style={{ backgroundColor: '#3d9a6e' }}>
@@ -1221,7 +1221,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                     <img
                       src={video.thumbnail}
                       alt={video.displayTitle || "Video"}
-                      className={`w-full h-full object-cover ${locked ? 'grayscale' : ''}`}
+                      className={`absolute inset-0 w-full h-full object-cover ${locked ? 'grayscale' : ''}`}
                       loading="lazy"
                     />
                     {locked ? (
@@ -1241,7 +1241,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       </div>
                     )}
                     {video.techniqueNumber && (
-                      <Badge className="absolute top-2 left-2 bg-emerald-100 text-emerald-600 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
+                      <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
                         {video.techniqueNumber}
                       </Badge>
                     )}

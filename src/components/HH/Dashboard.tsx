@@ -114,7 +114,7 @@ const VideoCard = ({
           </div>
         </div>
       )}
-      <Badge className="absolute top-2 left-2 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
+      <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
         {techniqueNumber}
       </Badge>
     </div>
@@ -179,7 +179,7 @@ const WebinarCard = ({
         className="absolute inset-0 w-full h-full object-cover object-top"
       />
       {techniqueNumber && (
-        <Badge className="absolute top-2 left-2 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
+        <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
           {techniqueNumber}
         </Badge>
       )}
@@ -274,7 +274,7 @@ const HugoTrainingCard = ({
           className="absolute inset-0 w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-black/20" />
-        <Badge className="absolute top-2 left-2 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
+        <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
           {techniqueNumber}
         </Badge>
         <Badge className={`absolute top-2 right-2 ${faseColors.bg} ${faseColors.text} text-[10px] px-1.5 py-0.5`}>
@@ -361,7 +361,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
 
   return (
     <AppLayout currentPage="dashboard" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} isPreview={isPreview}>
-      <div className="p-3 sm:p-4 lg:p-6 space-y-6">
+      <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
         {/* Header with streak + E.P.I.C. progress */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div className="min-w-0 flex-1">
