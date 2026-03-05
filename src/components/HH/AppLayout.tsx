@@ -34,6 +34,7 @@ import { useNotifications } from "../../contexts/NotificationContext";
 import { getHiddenIds } from "../../utils/hiddenItems";
 import { useTheme } from "./ThemeProvider";
 import { getAuthHeaders } from "../../services/hugoApi";
+import { PageFooter } from "./PageFooter";
 
 interface HistoryItem {
   id: string;
@@ -681,6 +682,7 @@ export function AppLayout({
 
         <div className={contentClassName || "flex-1 overflow-y-auto min-h-0 pb-24 lg:pb-8"}>
           {children}
+          <PageFooter />
         </div>
       </div>
     </div>

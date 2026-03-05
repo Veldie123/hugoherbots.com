@@ -12,7 +12,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../ui/collapsible";
-import { PageFooter } from "./PageFooter";
 import { CustomDailyCall } from "./CustomDailyCall";
 import { PreJoinCheck } from "./PreJoinCheck";
 import {
@@ -2247,7 +2246,6 @@ export function LiveCoaching({
           })()}
         </DialogContent>
       </Dialog>
-      <PageFooter />
     </AppLayout>
   );
 }

@@ -45,6 +45,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { useTheme } from "./ThemeProvider";
+import { PageFooter } from "./PageFooter";
 
 interface HistoryItem {
   id: string;
@@ -495,7 +496,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                   onClick={() => handleNavigate(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                     isActive
-                      ? "bg-hh-primary/10 border-l-2 border-hh-primary text-hh-primary"
+                      ? "bg-[var(--hh-primary-50)] border border-hh-primary text-hh-primary"
                       : "text-hh-text hover:bg-hh-ui-100"
                   } ${collapsed ? "justify-center" : ""}`}
                 >
@@ -510,7 +511,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 </button>
 
                 {!collapsed && isActive && history.length > 0 && (
-                  <div className="ml-2 pl-4 border-l-2 border-hh-primary/30 space-y-0.5 -mt-0.5">
+                  <div className="ml-2 pl-4 border-l-2 border-[var(--hh-primary-200)] space-y-0.5 -mt-0.5">
                     {history.slice(0, 3).map((histItem) => (
                       <button
                         key={histItem.id}
@@ -535,7 +536,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                     ))}
                     <button
                       onClick={() => navigate?.((item as any).overviewPage)}
-                      className="w-full flex items-center gap-1 px-2 py-1.5 text-[12px] text-hh-primary hover:text-hh-primary transition-colors"
+                      className="w-full flex items-center gap-1 px-2 py-1.5 text-[12px] text-hh-primary hover:text-[var(--hh-primary-dark,var(--hh-primary))] transition-colors"
                     >
                       <span>Bekijk alle{history.length > 0 ? ` (${history.length})` : ""}</span>
                       <ChevronRight className="w-3 h-3" />
@@ -559,7 +560,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 onClick={() => handleNavigate(item.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                   isActive
-                    ? "bg-hh-primary/10 border-l-2 border-hh-primary text-hh-primary"
+                    ? "bg-[var(--hh-primary-50)] border border-hh-primary text-hh-primary"
                     : "text-hh-text hover:bg-hh-ui-100"
                 } ${collapsed ? "justify-center" : ""}`}
               >
@@ -624,9 +625,9 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
             <button
               onClick={() => navigate?.("admin-chat-expert")}
               className="flex items-center gap-2 text-white h-10 px-3 sm:px-4 rounded-lg transition-colors"
-              style={{ backgroundColor: '#7e22ce' }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6b21a8')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7e22ce')}
+              style={{ backgroundColor: 'var(--hh-primary)' }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--hh-primary-hover)')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--hh-primary)')}
             >
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline text-[14px]">
@@ -789,6 +790,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden">
           {children}
+          <PageFooter />
         </main>
       </div>
     </div>
