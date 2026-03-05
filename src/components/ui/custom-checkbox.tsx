@@ -28,8 +28,8 @@ export function CustomCheckbox({ checked, onChange, onClick }: CustomCheckboxPro
       <div
         className={`w-4 h-4 rounded border-2 transition-all flex items-center justify-center ${
           checked
-            ? 'border-purple-600 bg-purple-600'
-            : 'border-hh-border bg-hh-bg hover:border-purple-400'
+            ? 'border-hh-primary bg-hh-primary'
+            : 'border-hh-border bg-hh-bg hover:border-hh-primary'
         }`}
       >
         {checked && (

@@ -51,10 +51,9 @@ export function ChatBubble({
           <div
             className={`${padding} rounded-2xl ${
               isSeller
-                ? adminColors ? "bg-purple-600 text-white rounded-br-md" : "text-white rounded-br-md"
-                : adminColors ? "bg-purple-500/10 text-hh-text rounded-bl-md" : "bg-hh-ui-50 text-hh-text rounded-bl-md"
+                ? adminColors ? "bg-hh-primary text-white rounded-br-md" : `bg-hh-primary text-white rounded-br-md`
+                : adminColors ? "bg-hh-primary/10 text-hh-text rounded-bl-md" : "bg-hh-ui-50 text-hh-text rounded-bl-md"
             } ${opacityClass}`}
-            style={isSeller && !adminColors ? { backgroundColor: '#4F7396' } : undefined}
           >
             <p className={`${textSize} whitespace-pre-wrap`}>
               {text}

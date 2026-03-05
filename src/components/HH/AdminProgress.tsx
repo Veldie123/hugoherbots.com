@@ -97,7 +97,7 @@ export function AdminProgress({ navigate, isSuperAdmin }: AdminProgressProps) {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-hh-muted">Voltooide Video's</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              <CheckCircle2 className="h-4 w-4 text-hh-success" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-hh-ink">{totalCompleted}</div>
@@ -121,12 +121,12 @@ export function AdminProgress({ navigate, isSuperAdmin }: AdminProgressProps) {
           <CardContent>
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#9333ea' }} />
+                <Loader2 className="h-8 w-8 animate-spin text-hh-primary" />
                 <span className="ml-3 text-hh-muted">Voortgang wordt geladen...</span>
               </div>
             ) : error ? (
               <div className="text-center py-12">
-                <p className="text-red-600 text-lg">{error}</p>
+                <p className="text-hh-error text-lg">{error}</p>
                 <p className="text-hh-muted mt-2">
                   Probeer de pagina te vernieuwen. Neem contact op met ondersteuning als het probleem aanhoudt.
                 </p>
@@ -162,7 +162,7 @@ export function AdminProgress({ navigate, isSuperAdmin }: AdminProgressProps) {
                           <span className="inline-flex items-center gap-1">
                             {user.completedVideos}
                             {user.completedVideos > 0 && (
-                              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                              <CheckCircle2 className="h-4 w-4 text-hh-success" />
                             )}
                           </span>
                         </TableCell>

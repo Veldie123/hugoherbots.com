@@ -70,17 +70,17 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
   if (isCoach) {
     // Debug info voor AI Coach (klant) berichten
     return (
-      <Card className="mt-2 p-3 bg-slate-50 border-slate-200 text-[12px] leading-[16px] space-y-2">
+      <Card className="mt-2 p-3 bg-hh-ui-50 border-hh-border text-[12px] leading-[16px] space-y-2">
         {debugData.customerSignal && (
           <div>
-            <span className="font-medium text-slate-700">Klant Signaal:</span>{" "}
+            <span className="font-medium text-hh-text">Klant Signaal:</span>{" "}
             <Badge
               className={`ml-1 ${
                 debugData.customerSignal === "positief"
-                  ? "bg-green-100 text-green-700"
+                  ? "bg-hh-success/10 text-hh-success"
                   : debugData.customerSignal === "negatief"
-                  ? "bg-red-100 text-red-700"
-                  : "bg-slate-100 text-slate-700"
+                  ? "bg-hh-error/10 text-hh-error"
+                  : "bg-hh-ui-50 text-hh-text"
               }`}
             >
               {debugData.customerSignal}
@@ -90,15 +90,15 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
 
         {debugData.expectedTechnique && (
           <div>
-            <span className="font-medium text-slate-700">Verwachte techniek:</span>{" "}
-            <span className="text-slate-600">{debugData.expectedTechnique}</span>
+            <span className="font-medium text-hh-text">Verwachte techniek:</span>{" "}
+            <span className="text-hh-muted">{debugData.expectedTechnique}</span>
           </div>
         )}
 
         {debugData.persona && (
-          <div className="pt-2 border-t border-slate-200">
-            <p className="font-medium text-slate-700 mb-1">Persona</p>
-            <div className="pl-2 space-y-1 text-slate-600">
+          <div className="pt-2 border-t border-hh-border">
+            <p className="font-medium text-hh-text mb-1">Persona</p>
+            <div className="pl-2 space-y-1 text-hh-muted">
               <div>
                 <span className="font-medium">Gedragsstijl:</span> {debugData.persona.gedragsstijl}
               </div>
@@ -113,9 +113,9 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
         )}
 
         {debugData.context && (
-          <div className="pt-2 border-t border-slate-200">
-            <p className="font-medium text-slate-700 mb-1">Context</p>
-            <div className="pl-2 text-slate-600">
+          <div className="pt-2 border-t border-hh-border">
+            <p className="font-medium text-hh-text mb-1">Context</p>
+            <div className="pl-2 text-hh-muted">
               <div>
                 <span className="font-medium">Fase:</span> {debugData.context.fase}
               </div>
@@ -124,9 +124,9 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
         )}
 
         {debugData.customerDynamics && (
-          <div className="pt-2 border-t border-slate-200">
-            <p className="font-medium text-slate-700 mb-1">Customer Dynamics</p>
-            <div className="pl-2 space-y-1 text-slate-600">
+          <div className="pt-2 border-t border-hh-border">
+            <p className="font-medium text-hh-text mb-1">Customer Dynamics</p>
+            <div className="pl-2 space-y-1 text-hh-muted">
               <div>
                 <span className="font-medium">Rapport:</span> {debugData.customerDynamics.rapport}
               </div>
@@ -141,9 +141,9 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
         )}
 
         {debugData.aiDecisions && (
-          <div className="pt-2 border-t border-slate-200">
-            <p className="font-medium text-slate-700 mb-1">AI Beslissingen</p>
-            <div className="pl-2 space-y-1 text-slate-600">
+          <div className="pt-2 border-t border-hh-border">
+            <p className="font-medium text-hh-text mb-1">AI Beslissingen</p>
+            <div className="pl-2 space-y-1 text-hh-muted">
               <div>
                 <span className="font-medium">E.P.I.C. TECHNIQUE Fase:</span> {debugData.aiDecisions.epicFase}
               </div>
@@ -158,17 +158,17 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
   } else {
     // Debug info voor Verkoper berichten
     return (
-      <Card className="mt-2 p-3 bg-blue-50 border-blue-200 text-[12px] leading-[16px] space-y-2">
+      <Card className="mt-2 p-3 bg-hh-primary/5 border-hh-primary/20 text-[12px] leading-[16px] space-y-2">
         {debugData.sellerSignal && (
           <div>
-            <span className="font-medium text-blue-700">Signaal:</span>{" "}
+            <span className="font-medium text-hh-primary">Signaal:</span>{" "}
             <Badge
               className={`ml-1 ${
                 debugData.sellerSignal === "positief"
-                  ? "bg-green-100 text-green-700"
+                  ? "bg-hh-success/10 text-hh-success"
                   : debugData.sellerSignal === "negatief"
-                  ? "bg-red-100 text-red-700"
-                  : "bg-slate-100 text-slate-700"
+                  ? "bg-hh-error/10 text-hh-error"
+                  : "bg-hh-ui-50 text-hh-text"
               }`}
             >
               {debugData.sellerSignal}
@@ -179,15 +179,15 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
         {debugData.expectedTechniqueForSeller && (
           <div className="flex items-center justify-between">
             <div>
-              <span className="font-medium text-blue-700">Verwachte techniek:</span>{" "}
-              <span className="text-blue-600">{debugData.expectedTechniqueForSeller}</span>
+              <span className="font-medium text-hh-primary">Verwachte techniek:</span>{" "}
+              <span className="text-hh-primary">{debugData.expectedTechniqueForSeller}</span>
             </div>
             <div className="flex items-center gap-1">
               <Button
                 size="icon"
                 variant="ghost"
                 className={`h-6 w-6 ${
-                  validation === true ? "bg-green-500 text-white hover:bg-green-600" : ""
+                  validation === true ? "bg-hh-success text-white hover:bg-hh-success/90" : ""
                 }`}
                 onClick={() => handleValidate(true)}
               >
@@ -197,7 +197,7 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
                 size="icon"
                 variant="ghost"
                 className={`h-6 w-6 ${
-                  validation === false ? "bg-red-500 text-white hover:bg-red-600" : ""
+                  validation === false ? "bg-hh-error text-white hover:bg-hh-error/90" : ""
                 }`}
                 onClick={() => handleValidate(false)}
               >
@@ -209,10 +209,10 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
 
         {debugData.detectedTechnique && (
           <div>
-            <span className="font-medium text-blue-700">Gedetecteerde techniek:</span>{" "}
-            <span className="text-blue-600">{debugData.detectedTechnique}</span>
+            <span className="font-medium text-hh-primary">Gedetecteerde techniek:</span>{" "}
+            <span className="text-hh-primary">{debugData.detectedTechnique}</span>
             {debugData.score !== undefined && (
-              <span className="ml-2 text-green-600 font-medium">(+{debugData.score})</span>
+              <span className="ml-2 text-hh-success font-medium">(+{debugData.score})</span>
             )}
           </div>
         )}
@@ -227,7 +227,7 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
             />
             <Button
               size="sm"
-              className="w-full h-7 text-[11px] bg-red-600 hover:bg-red-700"
+              className="w-full h-7 text-[11px] bg-hh-error hover:bg-hh-error/90"
               onClick={handleSubmitFeedback}
             >
               Submit Feedback

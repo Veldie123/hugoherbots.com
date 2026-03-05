@@ -229,7 +229,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
     switch (severity) {
       case "HIGH":
         return (
-          <Badge className="bg-red-600 text-white border-0 text-[10px] px-2 py-0.5">
+          <Badge className="bg-hh-error text-white border-0 text-[10px] px-2 py-0.5">
             HIGH
           </Badge>
         );
@@ -241,13 +241,13 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
         );
       case "ACTION":
         return (
-          <Badge className="bg-purple-600 text-white border-0 text-[10px] px-2 py-0.5">
+          <Badge className="bg-hh-primary text-white border-0 text-[10px] px-2 py-0.5">
             ACTIE
           </Badge>
         );
       case "LOW":
         return (
-          <Badge className="bg-blue-500 text-white border-0 text-[10px] px-2 py-0.5">
+          <Badge className="bg-hh-primary text-white border-0 text-[10px] px-2 py-0.5">
             LOW
           </Badge>
         );
@@ -260,19 +260,19 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
     switch (status) {
       case "pending":
         return (
-          <Badge variant="outline" className="text-[11px] bg-amber-500/10 text-amber-600 border-amber-500/20">
+          <Badge variant="outline" className="text-[11px] bg-hh-warning/10 text-hh-warning border-hh-warning/20">
             pending
           </Badge>
         );
       case "approved":
         return (
-          <Badge variant="outline" className="text-[11px] bg-green-500/10 text-green-600 border-green-500/20">
+          <Badge variant="outline" className="text-[11px] bg-hh-success/10 text-hh-success border-hh-success/20">
             approved
           </Badge>
         );
       case "rejected":
         return (
-          <Badge variant="outline" className="text-[11px] bg-red-500/10 text-red-600 border-red-500/20">
+          <Badge variant="outline" className="text-[11px] bg-hh-error/10 text-hh-error border-hh-error/20">
             rejected
           </Badge>
         );
@@ -303,32 +303,32 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center mb-3">
-              <Clock className="w-5 h-5 text-amber-600" />
+            <div className="w-10 h-10 rounded-full bg-hh-warning/10 flex items-center justify-center mb-3">
+              <Clock className="w-5 h-5 text-hh-warning" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Pending</p>
             <p className="text-[28px] font-semibold text-hh-ink">{pendingCount}</p>
           </Card>
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mb-3">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 rounded-full bg-hh-success/10 flex items-center justify-center mb-3">
+              <CheckCircle2 className="w-5 h-5 text-hh-success" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Approved</p>
             <p className="text-[28px] font-semibold text-hh-ink">{approvedCount}</p>
           </Card>
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center mb-3">
-              <XCircle className="w-5 h-5 text-red-600" />
+            <div className="w-10 h-10 rounded-full bg-hh-error/10 flex items-center justify-center mb-3">
+              <XCircle className="w-5 h-5 text-hh-error" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Rejected</p>
             <p className="text-[28px] font-semibold text-hh-ink">{rejectedCount}</p>
           </Card>
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center mb-3">
-              <LayoutGrid className="w-5 h-5 text-purple-600" />
+            <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center mb-3">
+              <LayoutGrid className="w-5 h-5 text-hh-primary" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Totaal</p>
             <p className="text-[28px] font-semibold text-hh-ink">{conflicts.length}</p>
@@ -392,7 +392,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
         <div className="space-y-3 md:hidden">
           {loading && (
             <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border text-center">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto text-purple-600 mb-2" />
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-hh-primary mb-2" />
               <p className="text-[13px] text-hh-muted">Correcties laden...</p>
             </Card>
           )}
@@ -444,8 +444,8 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                   <div>
                     {conflict.severity === 'ACTION' && conflict.status === 'pending' && (
                       <div className="flex items-center gap-1.5 mb-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-                        <span className="text-[11px] font-medium text-purple-600">
+                        <span className="w-1.5 h-1.5 rounded-full bg-hh-primary animate-pulse" />
+                        <span className="text-[11px] font-medium text-hh-primary">
                           Actie vereist — vrije feedback
                         </span>
                       </div>
@@ -475,7 +475,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600"
+                            className="h-8 w-8 p-0 hover:bg-hh-success/10 hover:text-hh-success"
                             onClick={() => handleApprove(conflict.id)}
                           >
                             <Check className="w-4 h-4" />
@@ -483,7 +483,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 hover:bg-red-500/10 hover:text-red-600"
+                            className="h-8 w-8 p-0 hover:bg-hh-error/10 hover:text-hh-error"
                             onClick={() => handleReject(conflict.id)}
                           >
                             <X className="w-4 h-4" />
@@ -511,14 +511,14 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                 {isExpanded && conflict.originalJson && conflict.newJson && (
                   <div className="p-4 bg-hh-ui-50 border-t border-hh-border space-y-3">
                     <div>
-                      <p className="text-[12px] font-medium text-red-600 mb-2">Origineel</p>
-                      <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 space-y-1 text-[13px]">
+                      <p className="text-[12px] font-medium text-hh-error mb-2">Origineel</p>
+                      <div className="bg-hh-error/5 dark:bg-hh-error/20 rounded-lg p-3 space-y-1 text-[13px]">
                         {Object.keys(conflict.newJson).filter(key =>
                           JSON.stringify(conflict.originalJson![key]) !== JSON.stringify(conflict.newJson![key])
                         ).map(key => (
                           <div key={key}>
                             <span className="font-medium text-hh-muted">{key}:</span>
-                            <span className="ml-2 text-red-700 dark:text-red-400 break-all">
+                            <span className="ml-2 text-hh-error dark:text-hh-error break-all">
                               {typeof conflict.originalJson![key] === 'object'
                                 ? JSON.stringify(conflict.originalJson![key], null, 2)
                                 : String(conflict.originalJson![key] || '—')}
@@ -528,14 +528,14 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                       </div>
                     </div>
                     <div>
-                      <p className="text-[12px] font-medium text-green-600 mb-2">Voorgesteld</p>
-                      <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 space-y-1 text-[13px]">
+                      <p className="text-[12px] font-medium text-hh-success mb-2">Voorgesteld</p>
+                      <div className="bg-hh-success/5 dark:bg-hh-success/20 rounded-lg p-3 space-y-1 text-[13px]">
                         {Object.keys(conflict.newJson).filter(key =>
                           JSON.stringify(conflict.originalJson![key]) !== JSON.stringify(conflict.newJson![key])
                         ).map(key => (
                           <div key={key}>
                             <span className="font-medium text-hh-muted">{key}:</span>
-                            <span className="ml-2 text-green-700 dark:text-green-400 break-all">
+                            <span className="ml-2 text-hh-success dark:text-hh-success break-all">
                               {typeof conflict.newJson![key] === 'object'
                                 ? JSON.stringify(conflict.newJson![key], null, 2)
                                 : String(conflict.newJson![key] || '—')}
@@ -588,7 +588,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
               <tbody>
                 {loading && (
                   <tr><td colSpan={8} className="p-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-purple-600 mb-2" />
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-hh-primary mb-2" />
                     <p className="text-[13px] text-hh-muted">Correcties laden...</p>
                   </td></tr>
                 )}
@@ -632,8 +632,8 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                           <div className="max-w-[300px]">
                             {conflict.severity === 'ACTION' && conflict.status === 'pending' && (
                               <div className="flex items-center gap-1.5 mb-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-                                <span className="text-[11px] font-medium text-purple-600">
+                                <span className="w-1.5 h-1.5 rounded-full bg-hh-primary animate-pulse" />
+                                <span className="text-[11px] font-medium text-hh-primary">
                                   Actie vereist — vrije feedback, geen automatische verwerking
                                 </span>
                               </div>
@@ -669,7 +669,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600"
+                                className="h-8 w-8 p-0 hover:bg-hh-success/10 hover:text-hh-success"
                                 onClick={() => handleApprove(conflict.id)}
                               >
                                 <Check className="w-4 h-4" />
@@ -677,7 +677,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-500/10 hover:text-red-600"
+                                className="h-8 w-8 p-0 hover:bg-hh-error/10 hover:text-hh-error"
                                 onClick={() => handleReject(conflict.id)}
                               >
                                 <X className="w-4 h-4" />
@@ -707,14 +707,14 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                           <td colSpan={8} className="p-4 bg-hh-ui-50">
                             <div className="grid grid-cols-2 gap-4 max-w-4xl">
                               <div>
-                                <p className="text-[12px] font-medium text-red-600 mb-2">Origineel</p>
-                                <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 space-y-1 text-[13px]">
+                                <p className="text-[12px] font-medium text-hh-error mb-2">Origineel</p>
+                                <div className="bg-hh-error/5 dark:bg-hh-error/20 rounded-lg p-3 space-y-1 text-[13px]">
                                   {Object.keys(conflict.newJson).filter(key =>
                                     JSON.stringify(conflict.originalJson[key]) !== JSON.stringify(conflict.newJson[key])
                                   ).map(key => (
                                     <div key={key}>
                                       <span className="font-medium text-hh-muted">{key}:</span>
-                                      <span className="ml-2 text-red-700 dark:text-red-400">
+                                      <span className="ml-2 text-hh-error dark:text-hh-error">
                                         {typeof conflict.originalJson[key] === 'object'
                                           ? JSON.stringify(conflict.originalJson[key], null, 2)
                                           : String(conflict.originalJson[key] || '—')}
@@ -724,14 +724,14 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                                 </div>
                               </div>
                               <div>
-                                <p className="text-[12px] font-medium text-green-600 mb-2">Voorgesteld</p>
-                                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 space-y-1 text-[13px]">
+                                <p className="text-[12px] font-medium text-hh-success mb-2">Voorgesteld</p>
+                                <div className="bg-hh-success/5 dark:bg-hh-success/20 rounded-lg p-3 space-y-1 text-[13px]">
                                   {Object.keys(conflict.newJson).filter(key =>
                                     JSON.stringify(conflict.originalJson[key]) !== JSON.stringify(conflict.newJson[key])
                                   ).map(key => (
                                     <div key={key}>
                                       <span className="font-medium text-hh-muted">{key}:</span>
-                                      <span className="ml-2 text-green-700 dark:text-green-400">
+                                      <span className="ml-2 text-hh-success dark:text-hh-success">
                                         {typeof conflict.newJson[key] === 'object'
                                           ? JSON.stringify(conflict.newJson[key], null, 2)
                                           : String(conflict.newJson[key] || '—')}

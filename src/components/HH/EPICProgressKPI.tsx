@@ -55,9 +55,9 @@ export function EPICProgressKPI({ phases, className = "" }: EPICProgressKPIProps
                 <div key={phase.phaseNumber} className="flex-1 group relative">
                   <div
                     className={`h-2 rounded-full transition-all ${
-                      isCompleted ? "bg-green-500" : ""
-                    } ${isCurrent ? "bg-[#9333ea]" : ""} ${
-                      isUpcoming ? "bg-hh-slate-200" : ""
+                      isCompleted ? "bg-hh-success" : ""
+                    } ${isCurrent ? "bg-hh-primary" : ""} ${
+                      isUpcoming ? "bg-hh-ui-200" : ""
                     }`}
                   />
                   {/* Tooltip on hover */}

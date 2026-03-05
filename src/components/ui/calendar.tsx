@@ -21,7 +21,7 @@ function Calendar({
   classNames,
   showOutsideDays = true,
   sessionDates = [],
-  sessionIndicatorColor = "bg-purple-600",
+  sessionIndicatorColor = "bg-hh-primary",
   selectedDayColor = "bg-primary",
   weekStartsOn = 1,
   selected,
@@ -49,7 +49,7 @@ function Calendar({
         width: '6px',
         height: '6px',
         borderRadius: '50%',
-        backgroundColor: isSelected ? '#ffffff' : (sessionIndicatorColor === 'bg-hh-primary' ? '#1e3a5f' : '#9333ea'),
+        backgroundColor: isSelected ? '#ffffff' : 'var(--hh-primary)',
         marginTop: '2px'
       };
 

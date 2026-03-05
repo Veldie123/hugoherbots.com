@@ -206,19 +206,19 @@ export function EPICSalesFlow(props: EPICSalesFlowProps) {
                   <div
                     className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                      progress === 100 && "bg-green-500/10",
+                      progress === 100 && "bg-hh-success/10",
                       progress < 100 && phase.id === currentPhaseId && "bg-cyan-600/10",
-                      progress < 100 && phase.id !== currentPhaseId && "bg-gray-300/30"
+                      progress < 100 && phase.id !== currentPhaseId && "bg-hh-ui-200/30"
                     )}
                   >
                     {progress === 100 ? (
-                      <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      <CheckCircle2 className="w-4 h-4 text-hh-success" />
                     ) : phase.id === currentPhaseId ? (
                       <span className="text-[14px] text-cyan-600 font-medium">
                         {phase.id}
                       </span>
                     ) : (
-                      <span className="text-[14px] text-gray-400">
+                      <span className="text-[14px] text-hh-muted">
                         {phase.id}
                       </span>
                     )}
@@ -238,13 +238,13 @@ export function EPICSalesFlow(props: EPICSalesFlowProps) {
                       <span>
                         {completedInPhase}/{phase.steps.length}
                       </span>
-                      <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="flex-1 h-1 bg-hh-ui-200 rounded-full overflow-hidden">
                         <div
                           className={cn(
                             "h-full",
-                            progress === 100 && "bg-green-500",
+                            progress === 100 && "bg-hh-success",
                             progress > 0 && progress < 100 && phase.id === currentPhaseId && "bg-cyan-600",
-                            progress > 0 && progress < 100 && phase.id !== currentPhaseId && "bg-gray-300"
+                            progress > 0 && progress < 100 && phase.id !== currentPhaseId && "bg-hh-ui-200"
                           )}
                           style={{ width: `${progress}%` }}
                         />
@@ -275,7 +275,7 @@ export function EPICSalesFlow(props: EPICSalesFlowProps) {
                       >
                         <div className="flex items-start gap-2">
                           <div className="flex-shrink-0 mt-0.5">
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            <CheckCircle2 className="w-4 h-4 text-hh-success" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
@@ -335,13 +335,13 @@ export function EPICSalesFlow(props: EPICSalesFlowProps) {
                             <div className="flex items-start gap-2">
                               <div className="flex-shrink-0 mt-0.5">
                                 {step.status === "completed" ? (
-                                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                  <CheckCircle2 className="w-4 h-4 text-hh-success" />
                                 ) : step.status === "current" ? (
                                   <Circle className="w-4 h-4 text-cyan-600 fill-cyan-600" />
                                 ) : step.status === "locked" ? (
-                                  <Lock className="w-4 h-4 text-gray-400" />
+                                  <Lock className="w-4 h-4 text-hh-muted" />
                                 ) : (
-                                  <Circle className="w-4 h-4 text-gray-400" />
+                                  <Circle className="w-4 h-4 text-hh-muted" />
                                 )}
                               </div>
 

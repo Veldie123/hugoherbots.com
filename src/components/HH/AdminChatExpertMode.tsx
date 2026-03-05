@@ -775,7 +775,7 @@ export function AdminChatExpertMode({
 
   const getFaseBadgeColor = (phase: number) => {
     // Admin view uses purple palette for all phases
-    return "bg-purple-100 text-purple-700 border-purple-300";
+    return "bg-hh-primary/15 text-hh-primary border-hh-primary/30";
   };
 
   // Get top-level techniques (those without parent or whose parent is the phase itself)
@@ -1307,7 +1307,7 @@ export function AdminChatExpertMode({
             <div className="flex items-center gap-2 lg:gap-3 min-w-0">
               <span className="text-[13px] text-hh-muted font-medium whitespace-nowrap flex items-center gap-1">
                 {sessionTitle}
-                <span className="px-2 py-0.5 text-[10px] font-medium bg-purple-100 text-purple-700 rounded-full ml-1">
+                <span className="px-2 py-0.5 text-[10px] font-medium bg-hh-primary/15 text-hh-primary rounded-full ml-1">
                   Lvl {difficultyLevel === "onbewuste_onkunde" ? "1" : 
                        difficultyLevel === "bewuste_onkunde" ? "2" : 
                        difficultyLevel === "bewuste_kunde" ? "3" : "4"}
@@ -1398,7 +1398,7 @@ export function AdminChatExpertMode({
 
           {/* Level transition notification banner */}
           {levelTransitionMessage && (
-            <div className="px-6 py-3 bg-gradient-to-r from-purple-500/10 to-purple-500/5 border-b border-purple-500/20">
+            <div className="px-6 py-3 bg-gradient-to-r from-hh-primary/10 to-hh-primary/5 border-b border-hh-primary/20">
               <div className="flex items-center justify-between">
                 <span className="text-[14px] text-hh-ink font-medium">{levelTransitionMessage}</span>
                 <button 
@@ -1566,7 +1566,7 @@ export function AdminChatExpertMode({
                             : "rounded-bl-md"
                           : message.sender === "hugo"
                             ? "rounded-br-md"
-                            : "bg-purple-600/10 text-hh-ink rounded-bl-md border border-purple-600/20"
+                            : "bg-hh-primary/10 text-hh-ink rounded-bl-md border border-hh-primary/20"
                       }`}
                       style={
                         message.isTranscriptReplay
@@ -1706,8 +1706,8 @@ export function AdminChatExpertMode({
                               }
                               className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-colors ml-1 ${
                                 expandedDebug === message.id
-                                  ? "bg-purple-100 text-purple-700"
-                                  : "bg-hh-ui-100 text-hh-muted hover:bg-purple-600/10 hover:text-purple-600"
+                                  ? "bg-hh-primary/15 text-hh-primary"
+                                  : "bg-hh-ui-100 text-hh-muted hover:bg-hh-primary/10 hover:text-hh-primary"
                               }`}
                               title="Toggle debug info"
                             >
@@ -1731,7 +1731,7 @@ export function AdminChatExpertMode({
 
                         {/* Show saved correction badge */}
                         {message.correctionData && !correctionMessageId && (
-                          <div className="mt-1 flex items-center gap-1.5 text-[11px] text-purple-600">
+                          <div className="mt-1 flex items-center gap-1.5 text-[11px] text-hh-primary">
                             <Check className="w-3 h-3" />
                             <span>Correctie opgeslagen{message.correctionData.selectedTechniqueName ? `: ${message.correctionData.selectedTechniqueName}` : ''}</span>
                           </div>
@@ -1744,7 +1744,7 @@ export function AdminChatExpertMode({
                 {/* Debug Info (collapsible) - Purple admin styling — hidden during onboarding */}
                 {message.debugInfo && expandedDebug === message.id && !(onboardingStatus && !onboardingStatus.isComplete) && (
                   <div className={`${message.sender === "hugo" ? "flex justify-end" : ""}`}>
-                    <div className="bg-purple-600/10 border border-purple-600/20 rounded-lg p-3 max-w-[300px] text-hh-ink">
+                    <div className="bg-hh-primary/10 border border-hh-primary/20 rounded-lg p-3 max-w-[300px] text-hh-ink">
                         <div className="space-y-3 text-[13px] leading-[18px]">
                           {/* For Hugo/Seller messages */}
                           {message.sender === "hugo" && (
@@ -1780,8 +1780,8 @@ export function AdminChatExpertMode({
                                         variant="ghost"
                                         className={`h-7 w-7 transition-all ${
                                           techniqueValidation[message.id] === true
-                                            ? "bg-green-500 text-white hover:bg-green-600"
-                                            : "hover:bg-green-100 hover:text-green-700 border border-green-300"
+                                            ? "bg-hh-success text-white hover:bg-hh-success/90"
+                                            : "hover:bg-hh-success/15 hover:text-hh-success border border-hh-success/30"
                                         }`}
                                         onClick={async () => {
                                           const success = await saveAsGoldenStandard(message, true);
@@ -1798,8 +1798,8 @@ export function AdminChatExpertMode({
                                         variant="ghost"
                                         className={`h-7 w-7 transition-all ${
                                           techniqueValidation[message.id] === false
-                                            ? "bg-red-500 text-white hover:bg-red-600"
-                                            : "hover:bg-red-100 hover:text-red-700 border border-red-300"
+                                            ? "bg-hh-error text-white hover:bg-hh-error/90"
+                                            : "hover:bg-hh-error/15 hover:text-hh-error border border-hh-error/30"
                                         }`}
                                         onClick={() => {
                                           setTechniqueValidation((prev) => ({ ...prev, [message.id]: false }));
@@ -1862,7 +1862,7 @@ export function AdminChatExpertMode({
                                     <p className="text-hh-ink text-[12px]">
                                       {message.debugInfo.detectedTechnique || "N/A"}
                                       {message.debugInfo.score && (
-                                        <span className="ml-2 text-green-600 font-semibold">
+                                        <span className="ml-2 text-hh-success font-semibold">
                                           (+{message.debugInfo.score})
                                         </span>
                                       )}
@@ -1876,8 +1876,8 @@ export function AdminChatExpertMode({
                                         variant="ghost"
                                         className={`h-7 w-7 transition-all ${
                                           techniqueValidation[message.id + "_detected"] === true
-                                            ? "bg-green-500 text-white hover:bg-green-600"
-                                            : "hover:bg-green-100 hover:text-green-700 border border-green-300"
+                                            ? "bg-hh-success text-white hover:bg-hh-success/90"
+                                            : "hover:bg-hh-success/15 hover:text-hh-success border border-hh-success/30"
                                         }`}
                                         onClick={async () => {
                                           const success = await saveAsGoldenStandard(message, true);
@@ -1894,8 +1894,8 @@ export function AdminChatExpertMode({
                                         variant="ghost"
                                         className={`h-7 w-7 transition-all ${
                                           techniqueValidation[message.id + "_detected"] === false
-                                            ? "bg-red-500 text-white hover:bg-red-600"
-                                            : "hover:bg-red-100 hover:text-red-700 border border-red-300"
+                                            ? "bg-hh-error text-white hover:bg-hh-error/90"
+                                            : "hover:bg-hh-error/15 hover:text-hh-error border border-hh-error/30"
                                         }`}
                                         onClick={() => {
                                           setTechniqueValidation((prev) => ({ ...prev, [message.id + "_detected"]: false }));
@@ -1955,7 +1955,7 @@ export function AdminChatExpertMode({
                               <div className="pt-4 border-t border-hh-border/50">
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "persona")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-hh-primary w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "persona") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -1980,7 +1980,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "context")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-hh-primary w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "context") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -2028,7 +2028,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "dynamics")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-hh-primary w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "dynamics") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -2075,9 +2075,9 @@ export function AdminChatExpertMode({
                                   <span className="text-hh-muted font-medium">Klant Signaal:</span>
                                   <Badge className={`text-[11px] ${
                                     message.debugInfo.klantSignaal === "positief" 
-                                      ? "bg-green-100 text-green-700 border-green-300"
+                                      ? "bg-hh-success/15 text-hh-success border-hh-success/30"
                                       : message.debugInfo.klantSignaal === "negatief"
-                                      ? "bg-red-100 text-red-700 border-red-300"
+                                      ? "bg-hh-error/15 text-hh-error border-hh-error/30"
                                       : "bg-hh-ui-100 text-hh-ink border-hh-border"
                                   }`}>
                                     {message.debugInfo.klantSignaal || "neutraal"}
@@ -2093,9 +2093,9 @@ export function AdminChatExpertMode({
                                   <span className="text-hh-muted font-medium">Evaluatie:</span>
                                   <Badge variant="outline" className={`text-[11px] ${
                                     (message.debugInfo.aiDecision?.evaluatie as string) === "positief" || (message.debugInfo.aiDecision?.evaluatie as string) === "perfect"
-                                      ? "bg-green-100 text-green-700 border-green-300"
+                                      ? "bg-hh-success/15 text-hh-success border-hh-success/30"
                                       : message.debugInfo.aiDecision?.evaluatie === "gemist"
-                                      ? "bg-red-100 text-red-700 border-red-300"
+                                      ? "bg-hh-error/15 text-hh-error border-hh-error/30"
                                       : "bg-hh-ui-100 text-hh-ink border-hh-border"
                                   }`}>
                                     {message.debugInfo.aiDecision?.evaluatie || "neutraal"}
@@ -2107,7 +2107,7 @@ export function AdminChatExpertMode({
                               {message.debugInfo.expectedTechnique && (
                                 <div>
                                   <div className="flex items-start justify-between gap-3">
-                                    <div className="flex-1 pb-3 border-b border-purple-200">
+                                    <div className="flex-1 pb-3 border-b border-hh-primary/20">
                                       <p className="text-[12px] text-hh-muted font-medium mb-1">Verwachte techniek:</p>
                                       <p className="text-hh-ink text-[12px]">
                                         {message.debugInfo.expectedTechnique}
@@ -2121,8 +2121,8 @@ export function AdminChatExpertMode({
                                           variant="ghost"
                                           className={`h-7 w-7 transition-all ${
                                             techniqueValidation[message.id] === true
-                                              ? "bg-green-500 text-white hover:bg-green-600"
-                                              : "hover:bg-green-100 hover:text-green-700 border border-green-300"
+                                              ? "bg-hh-success text-white hover:bg-hh-success/90"
+                                              : "hover:bg-hh-success/15 hover:text-hh-success border border-hh-success/30"
                                           }`}
                                           onClick={async () => {
                                             const success = await saveAsGoldenStandard(message, false);
@@ -2139,8 +2139,8 @@ export function AdminChatExpertMode({
                                           variant="ghost"
                                           className={`h-7 w-7 transition-all ${
                                             techniqueValidation[message.id] === false
-                                              ? "bg-red-500 text-white hover:bg-red-600"
-                                              : "hover:bg-red-100 hover:text-red-700 border border-red-300"
+                                              ? "bg-hh-error text-white hover:bg-hh-error/90"
+                                              : "hover:bg-hh-error/15 hover:text-hh-error border border-hh-error/30"
                                           }`}
                                           onClick={() => {
                                             setTechniqueValidation((prev) => ({ ...prev, [message.id]: false }));
@@ -2202,7 +2202,7 @@ export function AdminChatExpertMode({
                                   <span className="text-hh-muted font-medium">Gedetecteerde techniek:</span>
                                   <span className="text-hh-ink">
                                     {message.debugInfo.expectedTechnique}
-                                    <span className="ml-2 text-green-600 font-semibold">
+                                    <span className="ml-2 text-hh-success font-semibold">
                                       (+10)
                                     </span>
                                   </span>
@@ -2214,7 +2214,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "persona")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-hh-primary w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "persona") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -2239,7 +2239,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "context")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-hh-primary w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "context") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -2287,7 +2287,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "dynamics")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-hh-primary w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "dynamics") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -2327,7 +2327,7 @@ export function AdminChatExpertMode({
                               <div>
                                 <button
                                   onClick={() => toggleDebugSection(message.id, "aiPrompt")}
-                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-purple-600 w-full"
+                                  className="flex items-center gap-2 text-[13px] font-bold text-hh-ink hover:text-hh-primary w-full"
                                 >
                                   {isDebugSectionExpanded(message.id, "aiPrompt") ? (
                                     <ChevronDown className="w-4 h-4" />
@@ -2360,9 +2360,9 @@ export function AdminChatExpertMode({
                                             <p className="text-hh-muted font-medium mb-1">RAG Documents ({message.debugInfo.ragDocuments.length}):</p>
                                             <div className="space-y-1">
                                               {message.debugInfo.ragDocuments.map((doc, idx) => (
-                                                <div key={idx} className="bg-blue-600/10 p-2 rounded border border-blue-600/20">
-                                                  <p className="font-medium text-blue-800 text-[11px]">{doc.title || `Document ${idx + 1}`}</p>
-                                                  <p className="text-blue-600 text-[10px]">{doc.content?.slice(0, 200)}...</p>
+                                                <div key={idx} className="bg-hh-primary/10 p-2 rounded border border-hh-primary/20">
+                                                  <p className="font-medium text-hh-primary text-[11px]">{doc.title || `Document ${idx + 1}`}</p>
+                                                  <p className="text-hh-primary text-[10px]">{doc.content?.slice(0, 200)}...</p>
                                                 </div>
                                               ))}
                                             </div>
@@ -2402,7 +2402,7 @@ export function AdminChatExpertMode({
                     )}
                     <span className="text-hh-muted max-w-[120px] truncate">{file.name}</span>
                     <span className="text-hh-muted">{formatFileSize(file.size)}</span>
-                    <button onClick={() => removeAttachedFile(file.id)} className="text-hh-muted hover:text-red-500 ml-0.5">
+                    <button onClick={() => removeAttachedFile(file.id)} className="text-hh-muted hover:text-hh-error ml-0.5">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
@@ -2413,7 +2413,7 @@ export function AdminChatExpertMode({
               {/* Paperclip - file upload */}
               <button
                 onClick={() => handleFileSelect("*/*")}
-                className="p-2 rounded-md text-hh-muted hover:text-purple-600 hover:bg-purple-600/10 transition-colors flex-shrink-0"
+                className="p-2 rounded-md text-hh-muted hover:text-hh-primary hover:bg-hh-primary/10 transition-colors flex-shrink-0"
                 title="Bestand bijvoegen"
               >
                 <Paperclip className="w-4 h-4" />

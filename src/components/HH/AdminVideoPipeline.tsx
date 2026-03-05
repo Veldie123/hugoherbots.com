@@ -70,13 +70,13 @@ interface VideoIngestJob {
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
   pending: { label: "Wachtend", color: "bg-yellow-500/10 text-yellow-600", icon: Clock },
-  downloading: { label: "Downloaden", color: "bg-blue-500/10 text-blue-600", icon: HardDrive },
+  downloading: { label: "Downloaden", color: "bg-hh-primary/10 text-hh-primary", icon: HardDrive },
   processing: { label: "Verwerken", color: "bg-hh-ui-100 text-hh-ink", icon: FileVideo },
   extracting_audio: { label: "Audio extractie", color: "bg-indigo-500/10 text-indigo-600", icon: Mic },
   transcribing: { label: "Transcriberen", color: "bg-cyan-500/10 text-cyan-600", icon: FileText },
   embedding: { label: "RAG embeddings", color: "bg-teal-500/10 text-teal-600", icon: FileText },
-  completed: { label: "Voltooid", color: "bg-emerald-500/10 text-emerald-500", icon: CheckCircle2 },
-  failed: { label: "Mislukt", color: "bg-red-500/10 text-red-600", icon: XCircle },
+  completed: { label: "Voltooid", color: "bg-hh-success/10 text-hh-success", icon: CheckCircle2 },
+  failed: { label: "Mislukt", color: "bg-hh-error/10 text-hh-error", icon: XCircle },
   deleted: { label: "Verwijderd", color: "bg-hh-ui-100 text-hh-muted", icon: Trash2 },
 };
 
@@ -361,13 +361,10 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
               )}
               Sync Drive
             </Button>
-            <Button 
-              onClick={handleProcessVideos} 
+            <Button
+              onClick={handleProcessVideos}
               disabled={processing || stats.pending === 0}
-              style={{ backgroundColor: '#9333ea' }}
-              className=""
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3d6080'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#9333ea'}
+              className="bg-hh-primary hover:bg-hh-primary/90 text-white"
             >
               {processing ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -393,24 +390,24 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
           </Card>
           <Card className="p-4 rounded-[12px] shadow-hh-sm border-hh-border">
             <div className="text-[14px] text-hh-muted mb-1 flex items-center gap-1">
-              <Loader2 className="w-3.5 h-3.5" style={{ color: '#9333ea' }} />
+              <Loader2 className="w-3.5 h-3.5 text-hh-primary" />
               Bezig
             </div>
-            <div className="text-[28px] font-semibold" style={{ color: '#9333ea' }}>{stats.processing}</div>
+            <div className="text-[28px] font-semibold text-hh-primary">{stats.processing}</div>
           </Card>
           <Card className="p-4 rounded-[12px] shadow-hh-sm border-hh-border">
             <div className="text-[14px] text-hh-muted mb-1 flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-hh-success" />
               Voltooid
             </div>
-            <div className="text-[28px] font-semibold text-emerald-500">{stats.completed}</div>
+            <div className="text-[28px] font-semibold text-hh-success">{stats.completed}</div>
           </Card>
           <Card className="p-4 rounded-[12px] shadow-hh-sm border-hh-border">
             <div className="text-[14px] text-hh-muted mb-1 flex items-center gap-1">
-              <XCircle className="w-3.5 h-3.5 text-red-600" />
+              <XCircle className="w-3.5 h-3.5 text-hh-error" />
               Mislukt
             </div>
-            <div className="text-[28px] font-semibold text-red-600">{stats.failed}</div>
+            <div className="text-[28px] font-semibold text-hh-error">{stats.failed}</div>
           </Card>
         </div>
 
@@ -423,7 +420,7 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
 
           {loading ? (
             <div className="p-12 text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#9333ea' }} />
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-hh-primary" />
               <p className="text-hh-muted">Laden...</p>
             </div>
           ) : jobs.length === 0 ? (
@@ -485,15 +482,15 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
                       <tr key={job.id} className="hover:bg-hh-ui-50/50">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.05)' }}>
-                              <FileVideo className="w-5 h-5" style={{ color: '#9333ea' }} />
+                            <div className="w-10 h-10 rounded-lg bg-hh-primary/5 flex items-center justify-center">
+                              <FileVideo className="w-5 h-5 text-hh-primary" />
                             </div>
                             <div>
                               <div className="text-[14px] font-medium text-hh-text truncate max-w-[300px]">
                                 {job.video_title || job.drive_file_name}
                               </div>
                               {job.error_message && (
-                                <div className="text-[12px] text-red-600 flex items-center gap-1 mt-0.5">
+                                <div className="text-[12px] text-hh-error flex items-center gap-1 mt-0.5">
                                   <AlertTriangle className="w-3 h-3" />
                                   {job.error_message.substring(0, 50)}...
                                 </div>
@@ -547,7 +544,7 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
                               )}
                               <DropdownMenuItem
                                 onClick={() => handleDelete(job.id)}
-                                className="text-red-600"
+                                className="text-hh-error"
                               >
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Verwijderen

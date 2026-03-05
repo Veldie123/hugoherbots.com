@@ -571,33 +571,33 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.12)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 12%, transparent)' }}>
                 <MessageSquare className="w-5 h-5 text-hh-primary" />
               </div>
-              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>+15%</span>
+              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-success) 10%, transparent)', color: 'var(--hh-success)', borderColor: 'color-mix(in srgb, var(--hh-success) 20%, transparent)' }}>+15%</span>
             </div>
             <p className="text-[13px] leading-[18px] text-hh-muted">Totaal Sessies</p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stats.totalSessions}</p>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: 'var(--hh-primary)' }}>{stats.totalSessions}</p>
           </Card>
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.12)' }}>
                 <CheckCircle2 className="w-5 h-5" style={{ color: '#059669' }} />
               </div>
-              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>+8%</span>
+              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-success) 10%, transparent)', color: 'var(--hh-success)', borderColor: 'color-mix(in srgb, var(--hh-success) 20%, transparent)' }}>+8%</span>
             </div>
             <p className="text-[13px] leading-[18px] text-hh-muted">Uitstekend</p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stats.excellentCount}</p>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: 'var(--hh-primary)' }}>{stats.excellentCount}</p>
           </Card>
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(2, 132, 199, 0.12)' }}>
                 <BarChart3 className="w-5 h-5" style={{ color: '#0284c7' }} />
               </div>
-              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>+2.3%</span>
+              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-success) 10%, transparent)', color: 'var(--hh-success)', borderColor: 'color-mix(in srgb, var(--hh-success) 20%, transparent)' }}>+2.3%</span>
             </div>
             <p className="text-[13px] leading-[18px] text-hh-muted">Gem. Score</p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stats.avgScore}%</p>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: 'var(--hh-primary)' }}>{stats.avgScore}%</p>
           </Card>
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
@@ -607,7 +607,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}>-5%</span>
             </div>
             <p className="text-[13px] leading-[18px] text-hh-muted">Verbetering Nodig</p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stats.needsWorkCount}</p>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: 'var(--hh-primary)' }}>{stats.needsWorkCount}</p>
           </Card>
         </div>
 

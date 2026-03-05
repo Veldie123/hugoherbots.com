@@ -221,12 +221,12 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                   <div 
                   className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${stat.color === "steelblue" ? "" : bgColor}`}
                   style={stat.color === "steelblue" ? { 
-                    backgroundColor: "rgba(147, 51, 234, 0.1)"
+                    backgroundColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)"
                   } : undefined}
                 >
-                    <Icon 
+                    <Icon
                       className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.color === "steelblue" ? "" : iconColor}`}
-                      style={stat.color === "steelblue" ? { 
+                      style={stat.color === "steelblue" ? {
                         color: "var(--hh-primary)"
                       } : undefined}
                     />
@@ -319,7 +319,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                         <div 
                           className={`w-10 h-10 rounded-xl flex items-center justify-center ${content.type === "video" ? "" : getTypeColor(content.type)}`}
                           style={content.type === "video" ? {
-                            backgroundColor: "rgba(147, 51, 234, 0.1)"
+                            backgroundColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)"
                           } : undefined}
                         >
                           <Icon className="w-5 h-5" style={content.type === "video" ? { color: "var(--hh-primary)" } : undefined} />
@@ -475,7 +475,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                       <td className="px-4 py-3">
                         {content.techniqueNumber && (
                           <div className="w-10 h-10 rounded-lg flex items-center justify-center text-[13px] font-semibold" style={{
-                            backgroundColor: "rgba(147, 51, 234, 0.15)",
+                            backgroundColor: "color-mix(in srgb, var(--hh-primary) 15%, transparent)",
                             color: "var(--hh-primary)"
                           }}>
                             {content.techniqueNumber}
@@ -495,7 +495,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                           <div 
                             className={`w-8 h-8 rounded-lg flex items-center justify-center ${content.type === "video" ? "" : getTypeColor(content.type)}`}
                             style={content.type === "video" ? {
-                              backgroundColor: "rgba(147, 51, 234, 0.1)"
+                              backgroundColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)"
                             } : undefined}
                           >
                             <Icon className="w-4 h-4" style={content.type === "video" ? { color: "var(--hh-primary)" } : undefined} />

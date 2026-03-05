@@ -891,7 +891,7 @@ ${platformUrl}`;
         {/* KPI Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColor: 'rgba(147, 51, 234, 0.12)', color: 'var(--hh-primary)', badge: `+${Math.round(sessions.length * 0.12)}%`, badgeTrend: 'up' as const },
+            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColor: 'color-mix(in srgb, var(--hh-primary) 12%, transparent)', color: 'var(--hh-primary)', badge: `+${Math.round(sessions.length * 0.12)}%`, badgeTrend: 'up' as const },
             { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgColor: 'rgba(79, 70, 229, 0.12)', color: 'var(--hh-primary)', badge: `+${upcomingSessionsAll.length}`, badgeTrend: 'up' as const },
             { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgColor: 'rgba(219, 39, 119, 0.12)', color: 'var(--hh-primary)', badge: '+8%', badgeTrend: 'up' as const },
             { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--hh-success)', badge: '100%', badgeTrend: 'up' as const },

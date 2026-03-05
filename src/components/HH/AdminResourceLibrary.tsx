@@ -162,7 +162,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
 
   const getCategoryBadge = (category: string) => {
     return (
-      <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[11px]">
+      <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
         {category}
       </Badge>
     );
@@ -228,8 +228,8 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)' }}>
-                <FileText className="w-5 h-5" style={{ color: '#9333ea' }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)' }}>
+                <FileText className="w-5 h-5" style={{ color: 'var(--hh-primary)' }} />
               </div>
               <Badge
                 variant="outline"
@@ -560,7 +560,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
                     onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
                     className="w-4 h-4 rounded border-2 border-hh-border/40 cursor-pointer bg-transparent focus:ring-2 focus:ring-offset-0"
                     style={{
-                      accentColor: '#9333ea'
+                      accentColor: 'var(--hh-primary)'
                     }}
                   />
                   <Star className="w-4 h-4 text-hh-warn" />

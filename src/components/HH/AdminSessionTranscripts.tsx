@@ -220,14 +220,14 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
     switch (quality) {
       case "excellent":
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px]">
+          <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px]">
             <CheckCircle2 className="w-3 h-3 mr-1" />
             Excellent
           </Badge>
         );
       case "good":
         return (
-          <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[11px]">
+          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
             <ThumbsUp className="w-3 h-3 mr-1" />
             Good
           </Badge>
@@ -301,12 +301,12 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)' }}>
-                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#9333ea' }} />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)' }}>
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: 'var(--hh-primary)' }} />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +15%
               </Badge>
@@ -321,12 +321,12 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-success/10 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-hh-success" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +8%
               </Badge>
@@ -341,12 +341,12 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600/10 flex items-center justify-center">
-                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-hh-primary" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +2.3%
               </Badge>
@@ -503,7 +503,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="w-8 h-8">
-                          <AvatarFallback className="text-[11px]" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea' }}>
+                          <AvatarFallback className="text-[11px]" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)' }}>
                             {session.user
                               .split(" ")
                               .map((n: string) => n[0])
@@ -514,7 +514,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
                           <p className="text-[14px] leading-[20px] text-hh-text font-medium flex items-center gap-2">
                             {session.user}
                             {session.flagged && (
-                              <Flag className="w-3.5 h-3.5 text-red-600" />
+                              <Flag className="w-3.5 h-3.5 text-hh-error" />
                             )}
                           </p>
                           <p className="text-[12px] leading-[16px] text-hh-muted">
@@ -541,9 +541,9 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
                       <span
                         className={`text-[14px] leading-[20px] font-medium ${
                           session.score >= 80
-                            ? "text-emerald-500"
+                            ? "text-hh-success"
                             : session.score >= 70
-                            ? "text-blue-600"
+                            ? "text-hh-primary"
                             : "text-hh-warn"
                         }`}
                       >
@@ -573,7 +573,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
                             Download
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            className={session.flagged ? "text-emerald-500" : "text-red-600"}
+                            className={session.flagged ? "text-hh-success" : "text-hh-error"}
                           >
                             <Flag className="w-4 h-4 mr-2" />
                             {session.flagged ? "Unflag" : "Flag for Review"}
@@ -592,9 +592,9 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredSessions.map((session) => {
               const scoreColor = session.quality === "excellent"
-                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                ? "bg-hh-success/10 text-hh-success border-hh-success/20"
                 : session.quality === "good"
-                ? "bg-blue-600/10 text-blue-600 border-blue-600/20"
+                ? "bg-hh-primary/10 text-hh-primary border-hh-primary/20"
                 : "bg-hh-warn/10 text-hh-warn border-hh-warn/20";
 
               return (
@@ -606,7 +606,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
                   {/* Header */}
                   <div className="flex items-center gap-3 mb-4">
                     <Avatar className="w-10 h-10">
-                      <AvatarFallback className="text-[12px] font-semibold" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea' }}>
+                      <AvatarFallback className="text-[12px] font-semibold" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)' }}>
                         {session.user.split(" ").map((n) => n[0]).join("")}
                       </AvatarFallback>
                     </Avatar>
@@ -625,7 +625,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
                     <p className="text-[13px] font-medium text-hh-text mb-1">
                       {session.techniek}
                     </p>
-                    <Badge className="text-[11px]" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
+                    <Badge className="text-[11px]" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}>
                       {session.fase}
                     </Badge>
                   </div>

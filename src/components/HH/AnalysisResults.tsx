@@ -232,9 +232,9 @@ interface FullAnalysisResult {
 }
 
 const PHASE_LABELS: Record<number, { name: string; description: string; color: string; bgColor: string }> = {
-  1: { name: 'Fase 1: Opening', description: 'Koopklimaat, Gentleman\'s Agreement, Instapvraag', color: 'text-blue-700 dark:text-blue-400', bgColor: 'bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800' },
-  2: { name: 'Fase 2: EPIC', description: 'Explore, Probe, Impact, Commitment', color: 'text-emerald-700 dark:text-emerald-400', bgColor: 'bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800' },
-  3: { name: 'Fase 3: Aanbeveling', description: 'O.V.B., USP\'s, Mening vragen', color: 'text-purple-700 dark:text-purple-400', bgColor: 'bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-800' },
+  1: { name: 'Fase 1: Opening', description: 'Koopklimaat, Gentleman\'s Agreement, Instapvraag', color: 'text-hh-primary', bgColor: 'bg-hh-primary/5 border-hh-primary/20' },
+  2: { name: 'Fase 2: EPIC', description: 'Explore, Probe, Impact, Commitment', color: 'text-hh-success', bgColor: 'bg-hh-success/5 border-hh-success/20' },
+  3: { name: 'Fase 3: Aanbeveling', description: 'O.V.B., USP\'s, Mening vragen', color: 'text-hh-primary', bgColor: 'bg-hh-primary/5 border-hh-primary/20' },
   4: { name: 'Fase 4: Beslissing', description: 'Bezwaarbehandeling, Closing', color: 'text-amber-700 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800' },
 };
 
@@ -244,7 +244,7 @@ function VideoRecommendationCard({ video, adminColors }: { video: any; adminColo
 
   if (isPlaying && hasMux) {
     return (
-      <div className="rounded-xl overflow-hidden border" style={{ borderColor: adminColors ? '#9910FA20' : '#4F739620' }}>
+      <div className="rounded-xl overflow-hidden border" style={{ borderColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 12%, transparent)' : 'color-mix(in srgb, var(--hh-primary) 12%, transparent)' }}>
         <div className="relative">
           <button
             onClick={() => setIsPlaying(false)}
@@ -257,11 +257,11 @@ function VideoRecommendationCard({ video, adminColors }: { video: any; adminColo
             autoPlay
             style={{ width: '100%', aspectRatio: '16/9' }}
             streamType="on-demand"
-            primaryColor="#3C9A6E"
-            accentColor={adminColors ? '#9910FA' : '#3C9A6E'}
+            primaryColor="var(--hh-success)"
+            accentColor={adminColors ? 'var(--hh-primary)' : 'var(--hh-success)'}
           />
         </div>
-        <div className="px-3 py-2" style={{ backgroundColor: adminColors ? '#9910FA05' : '#4F739605' }}>
+        <div className="px-3 py-2" style={{ backgroundColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 2%, transparent)' : 'color-mix(in srgb, var(--hh-primary) 2%, transparent)' }}>
           <p className="text-[12px] font-medium text-hh-text truncate">{video.title}</p>
           <p className="text-[10px] text-hh-muted">{video.techniqueName}{video.durationSeconds ? ` · ${Math.round(video.durationSeconds / 60)} min` : ''}</p>
         </div>
@@ -274,8 +274,8 @@ function VideoRecommendationCard({ video, adminColors }: { video: any; adminColo
       onClick={() => hasMux && setIsPlaying(true)}
       className="w-full flex items-center gap-3 p-2.5 rounded-lg border text-left transition-all"
       style={{
-        borderColor: adminColors ? '#9910FA15' : '#4F739615',
-        backgroundColor: adminColors ? '#9910FA05' : '#4F739605',
+        borderColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 8%, transparent)' : 'color-mix(in srgb, var(--hh-primary) 8%, transparent)',
+        backgroundColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 2%, transparent)' : 'color-mix(in srgb, var(--hh-primary) 2%, transparent)',
         cursor: hasMux ? 'pointer' : 'default',
       }}
     >
@@ -283,16 +283,16 @@ function VideoRecommendationCard({ video, adminColors }: { video: any; adminColo
         className="rounded-lg flex items-center justify-center flex-shrink-0 transition-transform"
         style={{
           width: 36, height: 36,
-          backgroundColor: adminColors ? '#9910FA15' : '#3C9A6E15',
+          backgroundColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 8%, transparent)' : 'color-mix(in srgb, var(--hh-success) 8%, transparent)',
         }}
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill={adminColors ? '#9910FA' : '#3C9A6E'} stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill={adminColors ? 'var(--hh-primary)' : 'var(--hh-success)'} stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-[12px] font-medium text-hh-text truncate">{video.title}</p>
         <p className="text-[10px] text-hh-muted">{video.techniqueName}{video.durationSeconds ? ` · ${Math.round(video.durationSeconds / 60)} min` : ''}</p>
       </div>
-      {hasMux && <span className="text-[10px] font-medium flex-shrink-0" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }}>Afspelen</span>}
+      {hasMux && <span className="text-[10px] font-medium flex-shrink-0" style={{ color: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }}>Afspelen</span>}
     </button>
   );
 }
@@ -711,7 +711,7 @@ export function AnalysisResults({
       case 'goed': return { label: 'Goed', color: '', style: { backgroundColor: isDark ? '#064E3B' : '#DCFCE7', color: isDark ? '#86EFAC' : '#166534', borderColor: isDark ? '#065F46' : '#BBF7D0' } };
       case 'bijna': return { label: 'Bijna', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FFF7ED', color: isDark ? '#FBBF24' : '#9A3412', borderColor: isDark ? '#92400E' : '#FED7AA' } };
       case 'gemist': return { label: 'Gemist', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FFF7ED', color: isDark ? '#FBBF24' : '#9A3412', borderColor: isDark ? '#92400E' : '#FED7AA' } };
-      default: return { label: quality, color: '', style: { backgroundColor: isDark ? '#3B0764' : '#EDE9FE', color: isDark ? '#C4B5FD' : '#5B21B6', borderColor: isDark ? '#581C87' : '#DDD6FE' } };
+      default: return { label: quality, color: '', style: { backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' } };
     }
   };
 
@@ -789,13 +789,13 @@ export function AnalysisResults({
 
   const epicGetFaseBadgeColor = (fase: number) => {
     const colors: Record<number, string> = {
-      0: isDark ? "bg-slate-800 text-slate-300 border-slate-700" : "bg-slate-100 text-slate-600 border-slate-200",
-      1: isDark ? "bg-emerald-900 text-emerald-300 border-emerald-800" : "bg-emerald-100 text-emerald-700 border-emerald-200",
-      2: isDark ? "bg-blue-900 text-blue-300 border-blue-800" : "bg-blue-100 text-blue-700 border-blue-200",
-      3: isDark ? "bg-amber-900 text-amber-300 border-amber-800" : "bg-amber-100 text-amber-700 border-amber-200",
-      4: isDark ? "bg-purple-900 text-purple-300 border-purple-800" : "bg-purple-100 text-purple-700 border-purple-200",
+      0: "bg-hh-ui-100 text-hh-muted border-hh-border",
+      1: "bg-hh-success/10 text-hh-success border-hh-success/20",
+      2: "bg-hh-primary/10 text-hh-primary border-hh-primary/20",
+      3: "bg-hh-warning/10 text-hh-warning border-hh-warning/20",
+      4: "bg-hh-primary/10 text-hh-primary border-hh-primary/20",
     };
-    return colors[fase] || (isDark ? "bg-gray-800 text-gray-300 border-gray-700" : "bg-gray-100 text-gray-700 border-gray-200");
+    return colors[fase] || "bg-hh-ui-100 text-hh-muted border-hh-border";
   };
 
   const epicGetTopLevelTechniques = (phase: number) => {
@@ -946,7 +946,7 @@ export function AnalysisResults({
     return wrapLayout(
       <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 5rem)' }}>
         <div className="text-center space-y-4">
-          <Loader2 className={`w-8 h-8 ${adminColors ? 'text-purple-600 dark:text-purple-400' : 'text-hh-primary'} animate-spin mx-auto`} />
+          <Loader2 className={`w-8 h-8 ${adminColors ? 'text-hh-primary' : 'text-hh-primary'} animate-spin mx-auto`} />
           <p className="text-hh-text font-medium">{processingStep || 'Resultaten laden...'}</p>
           {processingStep && (
             <p className="text-[14px] leading-[20px] text-hh-muted">
@@ -978,7 +978,7 @@ export function AnalysisResults({
   const { conversation, transcript, evaluations, signals, insights } = result;
 
   if ((result as any).insufficientTurns) {
-    const accentColor = adminColors ? '#9910FA' : '#3C9A6E';
+    const accentColor = adminColors ? 'var(--hh-primary)' : 'var(--hh-success)';
     const accentBg = adminColors ? 'rgba(153,16,250,0.15)' : 'rgba(60,154,110,0.15)';
     const accentBgLight = adminColors ? 'rgba(153,16,250,0.08)' : 'rgba(60,154,110,0.08)';
     const accentBorder = adminColors ? 'rgba(153,16,250,0.2)' : 'rgba(60,154,110,0.2)';
@@ -1156,7 +1156,7 @@ export function AnalysisResults({
                       }
                     }}
                     className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-lg font-medium transition-colors border"
-                    style={{ borderColor: adminColors ? (isDark ? '#581C87' : '#E9D5FF') : 'var(--hh-border)', color: adminColors ? (isDark ? '#C4B5FD' : '#9910FA') : (isDark ? '#93C5FD' : '#4F7396'), backgroundColor: adminColors ? (isDark ? '#3B0764' : '#FAF5FF') : 'var(--hh-ui-50)' }}
+                    style={{ borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)', color: 'var(--hh-primary)', backgroundColor: 'color-mix(in srgb, var(--hh-primary) 5%, transparent)' }}
                     title="Opnieuw analyseren"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -1192,7 +1192,7 @@ export function AnalysisResults({
                   <circle
                     cx="50" cy="50" r="42"
                     fill="none"
-                    stroke={adminColors ? '#9910FA' : '#3C9A6E'}
+                    stroke={adminColors ? 'var(--hh-primary)' : 'var(--hh-success)'}
                     strokeWidth="6"
                     strokeLinecap="round"
                     strokeDasharray={`${2 * Math.PI * 42}`}
@@ -1207,7 +1207,7 @@ export function AnalysisResults({
               {percentileData && percentileData.totalAnalyses >= 3 && (
                 <div className="flex flex-col items-center gap-1.5">
                   <span className="text-hh-muted" style={{ fontSize: '12px' }}>
-                    Top <span className="font-bold" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }}>{100 - percentileData.percentile > 0 ? 100 - percentileData.percentile : 1}%</span>
+                    Top <span className="font-bold" style={{ color: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }}>{100 - percentileData.percentile > 0 ? 100 - percentileData.percentile : 1}%</span>
                   </span>
                   <div className="flex items-center rounded-lg overflow-hidden border" style={{ borderColor: 'var(--hh-border)' }}>
                     {(['week', 'month', 'year', 'all'] as const).map((p, idx) => (
@@ -1218,7 +1218,7 @@ export function AnalysisResults({
                         style={{
                           fontSize: '11px',
                           padding: '4px 10px',
-                          backgroundColor: percentilePeriod === p ? (adminColors ? '#9910FA' : '#3C9A6E') : 'var(--card)',
+                          backgroundColor: percentilePeriod === p ? (adminColors ? 'var(--hh-primary)' : 'var(--hh-success)') : 'var(--card)',
                           color: percentilePeriod === p ? '#FFFFFF' : 'var(--hh-muted)',
                           fontWeight: percentilePeriod === p ? 600 : 500,
                           borderRight: idx < 3 ? '1px solid var(--hh-border)' : 'none',
@@ -1246,7 +1246,7 @@ export function AnalysisResults({
                 activeTab !== tab.value ? 'hover:bg-hh-ui-100' : ''
               }`}
               style={activeTab === tab.value
-                ? { backgroundColor: adminColors ? '#9910FA' : '#3C9A6E', color: 'white' }
+                ? { backgroundColor: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)', color: 'white' }
                 : { color: isDark ? '#9CA3AF' : '#4B5563' }
               }
             >
@@ -1260,7 +1260,7 @@ export function AnalysisResults({
 
           {regeneratingCoach && (
             <div className="flex items-center gap-3 p-4 rounded-xl mb-4" style={{ backgroundColor: 'var(--hh-ui-50)', border: '1px solid var(--hh-border)' }}>
-              <Loader2 className="w-5 h-5 animate-spin" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }} />
+              <Loader2 className="w-5 h-5 animate-spin" style={{ color: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }} />
               <span className="text-[14px] text-hh-text">AI coaching momenten genereren...</span>
             </div>
           )}
@@ -1302,11 +1302,11 @@ export function AnalysisResults({
                           value={editedOneliner}
                           onChange={(e) => setEditedOneliner(e.target.value)}
                           className="w-full px-3 py-2 text-[13px] leading-[18px] border rounded-lg focus:outline-none focus:ring-2 resize-none"
-                          style={{ borderColor: '#9910FA40', outlineColor: '#9910FA' }}
+                          style={{ borderColor: 'color-mix(in srgb, var(--hh-primary) 25%, transparent)', outlineColor: 'var(--hh-primary)' }}
                           rows={3}
                         />
                         <div className="flex gap-2">
-                          <Button size="sm" className="gap-1.5 text-[12px] text-white" style={{ backgroundColor: '#9910FA' }} disabled={submittingCorrection}
+                          <Button size="sm" className="gap-1.5 text-[12px] text-white" style={{ backgroundColor: 'var(--hh-primary)' }} disabled={submittingCorrection}
                             onClick={() => {
                               submitCorrection('coach_debrief', 'oneliner', insights.coachDebrief?.oneliner || '', editedOneliner, 'Coach oneliner correctie');
                               if (editedEpicMomentum !== (insights.coachDebrief?.epicMomentum || '')) {
@@ -1322,10 +1322,10 @@ export function AnalysisResults({
                     ) : (
                       <>
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: adminColors ? '#9910FA15' : '#3C9A6E15' }}>
-                            <Sparkles className="w-3.5 h-3.5" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }} />
+                          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 8%, transparent)' : 'color-mix(in srgb, var(--hh-success) 8%, transparent)' }}>
+                            <Sparkles className="w-3.5 h-3.5" style={{ color: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }} />
                           </div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }}>Coach Samenvatting</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }}>Coach Samenvatting</span>
                         </div>
                         <p className="text-[14px] sm:text-[15px] leading-[22px] sm:leading-[24px] text-hh-text font-medium" style={{ overflowWrap: 'break-word' }}>
                           {insights.coachDebrief?.oneliner || `Laten we je gesprek samen doornemen.`}
@@ -1338,7 +1338,7 @@ export function AnalysisResults({
                               setEditingDebrief(true);
                             }}
                             className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg"
-                            style={{ backgroundColor: '#9910FA15', color: '#9910FA' }}
+                            style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 8%, transparent)', color: 'var(--hh-primary)' }}
                             title="Correctie indienen"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -1392,7 +1392,7 @@ export function AnalysisResults({
                                     <div className="flex justify-start">
                                       <div style={{ maxWidth: '80%' }}>
                                         <p className="text-[10px] font-medium text-hh-muted mb-0.5 px-1">Klant</p>
-                                        <div className={`px-3 py-2 rounded-2xl rounded-bl-md text-[12px] leading-[17px] ${adminColors ? 'bg-purple-50 dark:bg-purple-950 text-hh-text' : 'bg-hh-ui-50 text-hh-text'}`}>
+                                        <div className={`px-3 py-2 rounded-2xl rounded-bl-md text-[12px] leading-[17px] ${adminColors ? 'bg-hh-primary/5 text-hh-text' : 'bg-hh-ui-50 text-hh-text'}`}>
                                           {moment.customerText.length > 200 ? moment.customerText.substring(0, 200) + '...' : moment.customerText}
                                         </div>
                                       </div>
@@ -1402,7 +1402,7 @@ export function AnalysisResults({
                                     <div className="flex justify-end">
                                       <div style={{ maxWidth: '80%' }}>
                                         <p className="text-[10px] font-medium text-hh-text mb-0.5 px-1 text-right">Jij</p>
-                                        <div className={`px-3 py-2 rounded-2xl rounded-br-md text-[12px] leading-[17px] text-white ${adminColors ? 'bg-purple-600' : ''}`} style={!adminColors ? { backgroundColor: '#4F7396' } : undefined}>
+                                        <div className={`px-3 py-2 rounded-2xl rounded-br-md text-[12px] leading-[17px] text-white ${adminColors ? 'bg-hh-primary' : ''}`} style={!adminColors ? { backgroundColor: 'var(--hh-primary)' } : undefined}>
                                           {moment.sellerText.length > 200 ? moment.sellerText.substring(0, 200) + '...' : moment.sellerText}
                                         </div>
                                       </div>
@@ -1412,11 +1412,11 @@ export function AnalysisResults({
                               )}
 
                               {moment.betterAlternative && moment.type !== 'big_win' && (
-                                <div className="p-3 rounded-xl border" style={{ backgroundColor: adminColors ? '#9910FA08' : '#3C9A6E08', borderColor: adminColors ? '#9910FA15' : '#3C9A6E15' }}>
+                                <div className="p-3 rounded-xl border" style={{ backgroundColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 3%, transparent)' : 'color-mix(in srgb, var(--hh-success) 3%, transparent)', borderColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 8%, transparent)' : 'color-mix(in srgb, var(--hh-success) 8%, transparent)' }}>
                                   <div className="flex gap-2 items-start">
-                                    <Lightbulb className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }} />
+                                    <Lightbulb className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }} />
                                     <div>
-                                      <p className="text-[11px] font-medium mb-0.5" style={{ color: adminColors ? '#9910FA' : '#3C9A6E' }}>Wat had je kunnen zeggen?</p>
+                                      <p className="text-[11px] font-medium mb-0.5" style={{ color: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }}>Wat had je kunnen zeggen?</p>
                                       <p className="text-[13px] leading-[19px] text-hh-text">"{moment.betterAlternative}"</p>
                                     </div>
                                   </div>
@@ -1427,7 +1427,7 @@ export function AnalysisResults({
                                 <div className="flex gap-1.5 flex-wrap">
                                   {moment.recommendedTechniques.map((t, i) => (
                                     <span key={i} className="text-[10px] px-2 py-0.5 rounded-full border font-medium"
-                                      style={{ color: adminColors ? '#9910FA' : '#4F7396', borderColor: adminColors ? '#9910FA20' : '#4F739620', backgroundColor: adminColors ? '#9910FA08' : '#4F739608' }}
+                                      style={{ color: adminColors ? 'var(--hh-primary)' : 'var(--hh-primary)', borderColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 12%, transparent)' : 'color-mix(in srgb, var(--hh-primary) 12%, transparent)', backgroundColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 3%, transparent)' : 'color-mix(in srgb, var(--hh-primary) 3%, transparent)' }}
                                       title={t}
                                     >
                                       {getTechniekByNummer(t)?.naam || t}
@@ -1438,7 +1438,7 @@ export function AnalysisResults({
 
                               {(moment as any).videoRecommendations?.length > 0 && (
                                 <div className="space-y-2">
-                                  <p className="text-[11px] font-medium" style={{ color: adminColors ? '#9910FA' : '#4F7396' }}>
+                                  <p className="text-[11px] font-medium" style={{ color: adminColors ? 'var(--hh-primary)' : 'var(--hh-primary)' }}>
                                     Aanbevolen trainingsmateriaal:
                                   </p>
                                   {(moment as any).videoRecommendations.map((video: any, vi: number) => (
@@ -1451,9 +1451,9 @@ export function AnalysisResults({
                                 {moment.type !== 'big_win' && (
                                   <button
                                     className="inline-flex items-center gap-1.5 text-[12px] h-8 px-4 text-white rounded-lg font-medium transition-all"
-                                    style={{ backgroundColor: adminColors ? '#9910FA' : '#3C9A6E' }}
+                                    style={{ backgroundColor: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }}
                                     onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? '#7C3AED' : '#2D7F57')}
-                                    onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? '#9910FA' : '#3C9A6E')}
+                                    onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? 'var(--hh-primary)' : 'var(--hh-success)')}
                                     onClick={() => navigateToHugoForPractice(moment.recommendedTechniques || [], moment.label, moment.turnIndex)}
                                   >
                                     <Sparkles className="w-3.5 h-3.5" /> Oefen met Hugo
@@ -1466,21 +1466,21 @@ export function AnalysisResults({
                                   {editingMomentId === moment.id ? (
                                     <div className="space-y-2">
                                       <div>
-                                        <label className="text-[11px] font-medium mb-1 block" style={{ color: '#9910FA' }}>Moment label</label>
-                                        <input value={editedMomentLabel} onChange={(e) => setEditedMomentLabel(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2" style={{ borderColor: '#9910FA40' }} />
+                                        <label className="text-[11px] font-medium mb-1 block" style={{ color: 'var(--hh-primary)' }}>Moment label</label>
+                                        <input value={editedMomentLabel} onChange={(e) => setEditedMomentLabel(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2" style={{ borderColor: 'color-mix(in srgb, var(--hh-primary) 25%, transparent)' }} />
                                       </div>
                                       <div>
-                                        <label className="text-[11px] font-medium mb-1 block" style={{ color: '#9910FA' }}>Waarom belangrijk</label>
-                                        <textarea value={editedMomentWhy} onChange={(e) => setEditedMomentWhy(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2 resize-none" style={{ borderColor: '#9910FA40' }} rows={2} />
+                                        <label className="text-[11px] font-medium mb-1 block" style={{ color: 'var(--hh-primary)' }}>Waarom belangrijk</label>
+                                        <textarea value={editedMomentWhy} onChange={(e) => setEditedMomentWhy(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2 resize-none" style={{ borderColor: 'color-mix(in srgb, var(--hh-primary) 25%, transparent)' }} rows={2} />
                                       </div>
                                       {moment.betterAlternative && (
                                         <div>
-                                          <label className="text-[11px] font-medium mb-1 block" style={{ color: '#9910FA' }}>Beter alternatief</label>
-                                          <textarea value={editedMomentAlt} onChange={(e) => setEditedMomentAlt(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2 resize-none" style={{ borderColor: '#9910FA40' }} rows={2} />
+                                          <label className="text-[11px] font-medium mb-1 block" style={{ color: 'var(--hh-primary)' }}>Beter alternatief</label>
+                                          <textarea value={editedMomentAlt} onChange={(e) => setEditedMomentAlt(e.target.value)} className="w-full px-3 py-1.5 text-[13px] border rounded-lg focus:outline-none focus:ring-2 resize-none" style={{ borderColor: 'color-mix(in srgb, var(--hh-primary) 25%, transparent)' }} rows={2} />
                                         </div>
                                       )}
                                       <div className="flex gap-2">
-                                        <Button size="sm" className="gap-1.5 text-[12px] text-white" style={{ backgroundColor: '#9910FA' }} disabled={submittingCorrection}
+                                        <Button size="sm" className="gap-1.5 text-[12px] text-white" style={{ backgroundColor: 'var(--hh-primary)' }} disabled={submittingCorrection}
                                           onClick={() => {
                                             if (editedMomentLabel !== moment.label) submitCorrection('moment', 'label', moment.label, editedMomentLabel, `Moment: ${moment.id}`);
                                             if (editedMomentWhy !== moment.whyItMatters) submitCorrection('moment', 'whyItMatters', moment.whyItMatters, editedMomentWhy, `Moment: ${moment.id}`);
@@ -1495,7 +1495,7 @@ export function AnalysisResults({
                                   ) : (
                                     <button onClick={() => { setEditingMomentId(moment.id); setEditedMomentLabel(moment.label); setEditedMomentWhy(moment.whyItMatters); setEditedMomentAlt(moment.betterAlternative || ''); }}
                                       className="flex items-center gap-1.5 text-[12px] font-medium"
-                                      style={{ color: '#9910FA' }}
+                                      style={{ color: 'var(--hh-primary)' }}
                                     >
                                       <Pencil className="w-3 h-3" /> Correctie indienen
                                     </button>
@@ -1517,9 +1517,9 @@ export function AnalysisResults({
             const dm = insights.detailedMetrics;
             if (!dm?.structure || !dm?.impact || !dm?.houdingen || !dm?.balance) return null;
 
-            const accentColor = adminColors ? '#9910FA' : '#3C9A6E';
-            const accentColorLight = adminColors ? '#9910FA15' : '#3C9A6E15';
-            const accentColorBg = adminColors ? '#9910FA08' : '#3C9A6E08';
+            const accentColor = adminColors ? 'var(--hh-primary)' : 'var(--hh-success)';
+            const accentColorLight = adminColors ? 'color-mix(in srgb, var(--hh-primary) 8%, transparent)' : 'color-mix(in srgb, var(--hh-success) 8%, transparent)';
+            const accentColorBg = adminColors ? 'color-mix(in srgb, var(--hh-primary) 3%, transparent)' : 'color-mix(in srgb, var(--hh-success) 3%, transparent)';
 
             const PHASE_COLORS: Record<number, string> = {
               1: '#3B82F6',
@@ -1943,7 +1943,7 @@ export function AnalysisResults({
                                           borderRadius: isSeller ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
                                           backgroundColor: isHighlighted
                                             ? (statusOk ? (isDark ? '#064E3B' : '#DCFCE7') : (isDark ? '#450A0A' : '#FEE2E2'))
-                                            : (isSeller ? (adminColors ? (isDark ? '#3B0764' : '#F3E8FF') : 'var(--hh-ui-100)') : 'var(--card)'),
+                                            : (isSeller ? (adminColors ? 'color-mix(in srgb, var(--hh-primary) 5%, transparent)' : 'var(--hh-ui-100)') : 'var(--card)'),
                                           border: isHighlighted
                                             ? `1.5px solid ${statusOk ? (isDark ? '#065F46' : '#86EFAC') : (isDark ? '#7F1D1D' : '#FCA5A5')}`
                                             : '1px solid var(--hh-border)',
@@ -2122,9 +2122,9 @@ export function AnalysisResults({
           <div className="text-center">
             <button
               className="inline-flex items-center justify-center gap-2 text-[14px] h-11 px-6 text-white rounded-xl font-medium transition-all shadow-sm"
-              style={{ backgroundColor: adminColors ? '#9910FA' : '#3C9A6E' }}
+              style={{ backgroundColor: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }}
               onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? '#7C3AED' : '#2D7F57')}
-              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? '#9910FA' : '#3C9A6E')}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? 'var(--hh-primary)' : 'var(--hh-success)')}
               onClick={() => {
                 const analysisContext = {
                   analysisDiscussion: true,
@@ -2323,7 +2323,7 @@ export function AnalysisResults({
                                       setFeedbackText('');
                                     }}
                                     className="flex-shrink-0 w-7 h-7 rounded flex items-center justify-center"
-                                    style={{ backgroundColor: '#9910FA', color: 'white' }}
+                                    style={{ backgroundColor: 'var(--hh-primary)', color: 'white' }}
                                     title="Correctie indienen"
                                   >
                                     <CheckCircle className="w-3.5 h-3.5" />
@@ -2356,7 +2356,7 @@ export function AnalysisResults({
                                   onClick={() => handleGoldenStandard(turn)}
                                   className={`p-1.5 rounded-md transition-all ${
                                     feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx)
-                                      ? 'bg-emerald-50 dark:bg-emerald-950 scale-110'
+                                      ? 'bg-hh-success/5 scale-110'
                                       : 'text-hh-muted hover:text-hh-text hover:bg-hh-ui-100'
                                   }`}
                                   style={feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx) ? { color: '#22C55E', fill: '#22C55E' } : undefined}
@@ -2374,9 +2374,9 @@ export function AnalysisResults({
                                   }}
                                   className={`p-1.5 rounded-md transition-all ${
                                     feedbackGiven[turn.idx] === 'negative'
-                                      ? 'bg-red-50 dark:bg-red-950 scale-110'
+                                      ? 'bg-hh-error/5 scale-110'
                                       : correctionPanelTurn === turn.idx
-                                        ? 'bg-red-50 dark:bg-red-950'
+                                        ? 'bg-hh-error/5'
                                         : 'text-hh-muted hover:text-hh-text hover:bg-hh-ui-100'
                                   }`}
                                   style={feedbackGiven[turn.idx] === 'negative' ? { color: '#EF4444', fill: '#EF4444' } : correctionPanelTurn === turn.idx ? { color: '#EF4444' } : undefined}
@@ -2424,8 +2424,8 @@ export function AnalysisResults({
                                       setEpicSidebarOpen(true);
                                     }
                                   }}
-                                  className="p-1.5 rounded-md transition-colors hover:bg-purple-50 dark:hover:bg-purple-950"
-                                  style={{ color: '#9910FA' }}
+                                  className="p-1.5 rounded-md transition-colors hover:bg-hh-primary/5"
+                                  style={{ color: 'var(--hh-primary)' }}
                                   title="Bekijk EPIC techniek"
                                 >
                                   <Lightbulb className="w-3.5 h-3.5" />
@@ -2433,8 +2433,8 @@ export function AnalysisResults({
                               </div>
                             )}
                             {useAdminLayout && correctionPanelTurn === turn.idx && (
-                              <div className="rounded-xl border p-3 mt-2" style={{ backgroundColor: isDark ? '#2E1065' : '#FAF5FF', borderColor: isDark ? '#6D28D9' : '#E9D5FF' }}>
-                                <p className="text-[11px] font-semibold mb-2" style={{ color: isDark ? '#C4B5FD' : '#7C3AED' }}>
+                              <div className="rounded-xl border p-3 mt-2" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 5%, transparent)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}>
+                                <p className="text-[11px] font-semibold mb-2" style={{ color: 'var(--hh-primary)' }}>
                                   Welk type wil je corrigeren?
                                 </p>
                                 <div className="flex gap-2 mb-3">
@@ -2442,7 +2442,7 @@ export function AnalysisResults({
                                     onClick={() => setCorrectionType('technique')}
                                     className="text-[11px] px-3 py-1.5 rounded-lg font-medium transition-colors"
                                     style={{
-                                      backgroundColor: correctionType === 'technique' ? '#9910FA' : 'var(--hh-ui-100)',
+                                      backgroundColor: correctionType === 'technique' ? 'var(--hh-primary)' : 'var(--hh-ui-100)',
                                       color: correctionType === 'technique' ? 'white' : 'var(--hh-muted)',
                                     }}
                                   >
@@ -2452,7 +2452,7 @@ export function AnalysisResults({
                                     onClick={() => setCorrectionType('houding')}
                                     className="text-[11px] px-3 py-1.5 rounded-lg font-medium transition-colors"
                                     style={{
-                                      backgroundColor: correctionType === 'houding' ? '#9910FA' : 'var(--hh-ui-100)',
+                                      backgroundColor: correctionType === 'houding' ? 'var(--hh-primary)' : 'var(--hh-ui-100)',
                                       color: correctionType === 'houding' ? 'white' : 'var(--hh-muted)',
                                     }}
                                   >
@@ -2469,19 +2469,19 @@ export function AnalysisResults({
                                         setEpicSidebarOpen(true);
                                       }}
                                       className="w-full text-left text-[12px] px-2.5 py-2 rounded-lg border bg-card flex items-center justify-between"
-                                      style={{ borderColor: isDark ? '#6D28D9' : '#E9D5FF' }}
+                                      style={{ borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}
                                     >
                                       <span style={{ color: correctionValue ? 'var(--hh-text)' : 'var(--hh-muted)' }}>
                                         {correctionValue ? `${correctionValue} — ${getTechniekByNummer(correctionValue)?.naam || correctionValue}` : 'Selecteer juiste techniek...'}
                                       </span>
-                                      <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" style={{ color: isDark ? '#C4B5FD' : '#9910FA' }} />
+                                      <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--hh-primary)' }} />
                                     </button>
                                   ) : (
                                     <select
                                       value={correctionValue}
                                       onChange={(e) => setCorrectionValue(e.target.value)}
                                       className="w-full text-[12px] px-2.5 py-2 rounded-lg border bg-card"
-                                      style={{ borderColor: isDark ? '#6D28D9' : '#E9D5FF' }}
+                                      style={{ borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}
                                     >
                                       <option value="">Selecteer juiste houding...</option>
                                       {KLANT_HOUDINGEN.map(h => (
@@ -2496,14 +2496,14 @@ export function AnalysisResults({
                                   onChange={(e) => setCorrectionNote(e.target.value)}
                                   placeholder="Optionele toelichting..."
                                   className="w-full text-[11px] px-2.5 py-1.5 rounded-lg border bg-card mb-2"
-                                  style={{ borderColor: isDark ? '#6D28D9' : '#E9D5FF' }}
+                                  style={{ borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}
                                 />
                                 <div className="flex gap-2">
                                   <button
                                     onClick={() => handleCorrectionSubmit(turn)}
                                     disabled={!correctionValue || correctionSubmitting}
                                     className="text-[11px] px-3 py-1.5 rounded-lg font-medium text-white transition-colors disabled:opacity-50"
-                                    style={{ backgroundColor: '#9910FA' }}
+                                    style={{ backgroundColor: 'var(--hh-primary)' }}
                                   >
                                     {correctionSubmitting ? 'Bezig...' : 'Indienen'}
                                   </button>

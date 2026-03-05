@@ -428,8 +428,8 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-hh-ink via-hh-ink/90 to-hh-ink/70">
             {permissionState === "error" || permissionState === "denied" ? (
               <div className="text-center px-6 max-w-md">
-                <div className="w-20 h-20 rounded-full bg-red-500/15 flex items-center justify-center mx-auto mb-4">
-                  <XCircle className="w-9 h-9 text-red-400" />
+                <div className="w-20 h-20 rounded-full bg-hh-error/15 flex items-center justify-center mx-auto mb-4">
+                  <XCircle className="w-9 h-9 text-hh-error" />
                 </div>
                 <p className="text-white/80 text-sm mb-4 leading-relaxed">{errorMessage}</p>
                 <Button

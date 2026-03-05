@@ -132,7 +132,7 @@ export function AdminHugoAgent({ navigate }: Props) {
             width: 44,
             height: 44,
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
+            background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary))",
             display: "flex",
             alignItems: "center",
             justifyContent: "center"
@@ -153,7 +153,7 @@ export function AdminHugoAgent({ navigate }: Props) {
               width: 56,
               height: 56,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
+              background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary))",
               display: "flex",
               alignItems: "center",
               justifyContent: "center"
@@ -187,7 +187,7 @@ export function AdminHugoAgent({ navigate }: Props) {
                 flexShrink: 0,
                 background: message.role === "user"
                   ? "linear-gradient(135deg, #3b82f6, #2563eb)"
-                  : "linear-gradient(135deg, #7c3aed, #5b21b6)",
+                  : "linear-gradient(135deg, var(--hh-primary), var(--hh-primary))",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center"
@@ -266,7 +266,7 @@ export function AdminHugoAgent({ navigate }: Props) {
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
             <div style={{
               width: 36, height: 36, borderRadius: "50%",
-              background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
+              background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary))",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
             }}>
               <Loader2 size={18} color="white" style={{ animation: "spin 1s linear infinite" }} />
@@ -318,7 +318,7 @@ export function AdminHugoAgent({ navigate }: Props) {
               backgroundColor: isLoading ? "#f9fafb" : "white",
               color: "#111827"
             }}
-            onFocus={e => { e.target.style.borderColor = "#7c3aed"; }}
+            onFocus={e => { e.target.style.borderColor = "var(--hh-primary)"; }}
             onBlur={e => { e.target.style.borderColor = "#e5e7eb"; }}
           />
           <button
@@ -330,7 +330,7 @@ export function AdminHugoAgent({ navigate }: Props) {
               border: "none",
               background: isLoading || !inputValue.trim()
                 ? "#e5e7eb"
-                : "linear-gradient(135deg, #7c3aed, #5b21b6)",
+                : "linear-gradient(135deg, var(--hh-primary), var(--hh-primary))",
               color: isLoading || !inputValue.trim() ? "#9ca3af" : "white",
               fontSize: 16,
               fontWeight: 600,
@@ -490,8 +490,8 @@ function WebinarListCard({ data }: { data: any[] }) {
                       onChange={e => handleEdit(session.id, "title", e.target.value)}
                       style={{
                         width: "100%", padding: "6px 10px", fontSize: 16,
-                        border: ed.title !== undefined ? "1.5px solid #7c3aed" : "1px solid transparent",
-                        borderRadius: 8, outline: "none", backgroundColor: ed.title !== undefined ? "#faf5ff" : "transparent",
+                        border: ed.title !== undefined ? "1.5px solid var(--hh-primary)" : "1px solid transparent",
+                        borderRadius: 8, outline: "none", backgroundColor: ed.title !== undefined ? "color-mix(in srgb, var(--hh-primary) 5%, transparent)" : "transparent",
                         color: "#111827", fontFamily: "inherit"
                       }}
                     />
@@ -503,8 +503,8 @@ function WebinarListCard({ data }: { data: any[] }) {
                       onChange={e => handleEdit(session.id, "scheduled_date", e.target.value + ":00Z")}
                       style={{
                         padding: "6px 10px", fontSize: 15,
-                        border: ed.scheduled_date !== undefined ? "1.5px solid #7c3aed" : "1px solid transparent",
-                        borderRadius: 8, outline: "none", backgroundColor: ed.scheduled_date !== undefined ? "#faf5ff" : "transparent",
+                        border: ed.scheduled_date !== undefined ? "1.5px solid var(--hh-primary)" : "1px solid transparent",
+                        borderRadius: 8, outline: "none", backgroundColor: ed.scheduled_date !== undefined ? "color-mix(in srgb, var(--hh-primary) 5%, transparent)" : "transparent",
                         color: "#111827", fontFamily: "inherit"
                       }}
                     />
@@ -525,7 +525,7 @@ function WebinarListCard({ data }: { data: any[] }) {
                         disabled={isSaving}
                         style={{
                           padding: "6px 14px", borderRadius: 8, border: "none",
-                          backgroundColor: isSaved ? "#16a34a" : "#7c3aed", color: "white",
+                          backgroundColor: isSaved ? "var(--hh-success)" : "var(--hh-primary)", color: "white",
                           fontSize: 14, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6
                         }}
                       >
@@ -590,7 +590,7 @@ function VideoOrderCard({ data }: { data: any[] }) {
             disabled={saving}
             style={{
               padding: "8px 18px", borderRadius: 10, border: "none",
-              backgroundColor: saved ? "#16a34a" : "#7c3aed", color: "white",
+              backgroundColor: saved ? "var(--hh-success)" : "var(--hh-primary)", color: "white",
               fontSize: 15, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6
             }}
           >
@@ -607,7 +607,7 @@ function VideoOrderCard({ data }: { data: any[] }) {
             borderBottom: i < videos.length - 1 ? "1px solid #f3f4f6" : "none",
             backgroundColor: "white"
           }}>
-            <span style={{ width: 28, textAlign: "center", fontSize: 16, fontWeight: 700, color: "#7c3aed" }}>{i + 1}</span>
+            <span style={{ width: 28, textAlign: "center", fontSize: 16, fontWeight: 700, color: "var(--hh-primary)" }}>{i + 1}</span>
             {video.thumbnail_url && (
               <img src={video.thumbnail_url} alt="" style={{ width: 48, height: 32, objectFit: "cover", borderRadius: 6 }} />
             )}
@@ -674,7 +674,7 @@ function AnalyticsCard({ data, tool }: { data: any; tool: string }) {
   return (
     <div style={{ backgroundColor: "white", borderRadius: 16, border: "1px solid #e5e7eb", padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
       <div style={{ fontWeight: 700, fontSize: 17, color: "#111827", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-        <BarChart3 size={20} color="#7c3aed" /> Platform Analytics
+        <BarChart3 size={20} color="var(--hh-primary)" /> Platform Analytics
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
         {kpis.map(([key, value]) => (
@@ -711,7 +711,7 @@ function StartWebinarCard({ data, navigate }: { data: any; navigate?: (page: str
 
   return (
     <div style={{
-      backgroundColor: started ? "#f0fdf4" : "#faf5ff",
+      backgroundColor: started ? "color-mix(in srgb, var(--hh-success) 5%, white)" : "color-mix(in srgb, var(--hh-primary) 5%, white)",
       borderRadius: 16, border: `2px solid ${started ? "#86efac" : "#c4b5fd"}`,
       padding: "24px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16,
       boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
@@ -906,8 +906,8 @@ function UserListCard({ data }: { data: any[] }) {
         }}>
           <div style={{
             width: 36, height: 36, borderRadius: "50%",
-            backgroundColor: "#ede9fe", display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 16, fontWeight: 700, color: "#7c3aed", flexShrink: 0
+            backgroundColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)", display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 16, fontWeight: 700, color: "var(--hh-primary)", flexShrink: 0
           }}>
             {(user.full_name || user.email || "?")[0].toUpperCase()}
           </div>

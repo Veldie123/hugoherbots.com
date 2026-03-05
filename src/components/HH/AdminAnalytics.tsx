@@ -100,8 +100,8 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
       change: "",
       trend: "up" as const,
       icon: Users,
-      color: "#9333ea",
-      bgColor: "rgba(147, 51, 234, 0.1)",
+      color: "var(--hh-primary)",
+      bgColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)",
     },
     {
       label: "MAU (Monthly Active)",
@@ -217,8 +217,8 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                     <Badge
                       className={`${
                         metric.trend === "up"
-                          ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                          : "bg-red-500/10 text-red-600 border-red-500/20"
+                          ? "bg-hh-success/10 text-hh-success border-hh-success/20"
+                          : "bg-hh-error/10 text-hh-error border-hh-error/20"
                       } text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5`}
                     >
                       {metric.change}
@@ -228,7 +228,7 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                 <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1">
                   {metric.label}
                 </p>
-                <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px]" style={{ color: '#7c3aed' }}>
+                <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-primary">
                   {metric.value}
                 </p>
               </Card>
@@ -254,7 +254,7 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                     <span className="text-[12px] text-hh-muted font-medium">{week.sessions}</span>
                     <div className="w-full flex justify-center" style={{ height: '140px', alignItems: 'flex-end', display: 'flex' }}>
                       <div
-                        className="w-full max-w-[60px] rounded-t-lg transition-all bg-red-600"
+                        className="w-full max-w-[60px] rounded-t-lg transition-all bg-hh-error"
                         style={{ height: `${barHeight}%` }}
                       />
                     </div>
@@ -287,17 +287,17 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`} style={{
                       backgroundColor: content.type === "Video"
-                        ? "rgba(147, 51, 234, 0.1)"
+                        ? "color-mix(in srgb, var(--hh-primary) 10%, transparent)"
                         : content.type === "Live"
                         ? "rgba(239, 68, 68, 0.1)"
                         : "rgba(37, 99, 235, 0.1)"
                     }}>
                       {content.type === "Video" ? (
                         <Video className={`w-5 h-5`} style={{
-                          color: "#9333ea"
+                          color: "var(--hh-primary)"
                         }} />
                       ) : content.type === "Live" ? (
-                        <Play className="w-5 h-5" style={{ color: "#EF4444" }} />
+                        <Play className="w-5 h-5 text-hh-error" />
                       ) : (
                         <Play className="w-5 h-5" style={{ color: "#2563EB" }} />
                       )}
@@ -353,7 +353,7 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                     </div>
                     <div className="relative h-2 bg-hh-ui-200 rounded-full overflow-hidden">
                       <div
-                        className="absolute inset-y-0 left-0 bg-red-600 rounded-full transition-all"
+                        className="absolute inset-y-0 left-0 bg-hh-error rounded-full transition-all"
                         style={{ width: `${(week.sessions / (maxSessions * 1.1)) * 100}%` }}
                       />
                     </div>
@@ -376,7 +376,7 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                   <p className="text-[12px] leading-[16px] text-hh-muted mb-1">
                     Gem Score Trend
                   </p>
-                  <p className={`text-[20px] leading-[28px] font-semibold flex items-center gap-1 ${scoreTrend >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                  <p className={`text-[20px] leading-[28px] font-semibold flex items-center gap-1 ${scoreTrend >= 0 ? "text-hh-success" : "text-hh-error"}`}>
                     {scoreTrend >= 0 ? "+" : ""}{scoreTrend}%
                     {scoreTrend >= 0 ? (
                       <TrendingUp className="w-4 h-4" />

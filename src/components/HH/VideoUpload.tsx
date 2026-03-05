@@ -219,13 +219,13 @@ export function VideoUpload({ onUploadComplete, className = "" }: VideoUploadPro
                 isDragging 
                   ? "border-primary bg-primary/10" 
                   : selectedFile 
-                    ? "border-green-500 bg-green-50" 
-                    : "border-gray-300 hover:border-primary"
+                    ? "border-hh-success bg-hh-success/5"
+                    : "border-hh-border hover:border-hh-primary"
               }`}
             >
               {selectedFile ? (
                 <div className="flex flex-col items-center gap-3">
-                  <FileVideo className="w-12 h-12 text-green-500" />
+                  <FileVideo className="w-12 h-12 text-hh-success" />
                   <div>
                     <p className="font-medium">{selectedFile.name}</p>
                     <p className="text-sm text-muted-foreground">{formatFileSize(selectedFile.size)}</p>
@@ -234,11 +234,11 @@ export function VideoUpload({ onUploadComplete, className = "" }: VideoUploadPro
                 </div>
               ) : (
                 <>
-                  <Upload className={`w-10 h-10 mx-auto mb-4 ${isDragging ? "text-primary" : "text-gray-400"}`} />
-                  <p className="text-sm text-gray-600 mb-2">
+                  <Upload className={`w-10 h-10 mx-auto mb-4 ${isDragging ? "text-hh-primary" : "text-hh-muted"}`} />
+                  <p className="text-sm text-hh-muted mb-2">
                     {isDragging ? "Laat los om te uploaden" : "Sleep een video hierheen"}
                   </p>
-                  <p className="text-xs text-gray-400 mb-4">of</p>
+                  <p className="text-xs text-hh-muted mb-4">of</p>
                   <Button variant="outline" type="button">
                     Bladeren
                   </Button>
@@ -258,7 +258,7 @@ export function VideoUpload({ onUploadComplete, className = "" }: VideoUploadPro
             )}
 
             {errorMessage && (
-              <div className="flex items-center gap-2 p-3 bg-red-50 rounded-lg text-red-700 text-sm">
+              <div className="flex items-center gap-2 p-3 bg-hh-error/5 rounded-lg text-hh-error text-sm">
                 <AlertCircle className="w-4 h-4" />
                 {errorMessage}
               </div>
@@ -288,9 +288,9 @@ export function VideoUpload({ onUploadComplete, className = "" }: VideoUploadPro
 
         {uploadStatus === "complete" && (
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-              <span className="text-sm text-green-800">Video succesvol geupload!</span>
+            <div className="flex items-center gap-3 p-4 bg-hh-success/5 rounded-lg">
+              <CheckCircle2 className="w-5 h-5 text-hh-success" />
+              <span className="text-sm text-hh-success">Video succesvol geupload!</span>
             </div>
             <Button onClick={resetForm} className="w-full">
               Nog een video uploaden
@@ -300,9 +300,9 @@ export function VideoUpload({ onUploadComplete, className = "" }: VideoUploadPro
 
         {uploadStatus === "error" && (
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-4 bg-red-50 rounded-lg">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              <span className="text-sm text-red-800">{errorMessage || "Er is een fout opgetreden"}</span>
+            <div className="flex items-center gap-3 p-4 bg-hh-error/5 rounded-lg">
+              <AlertCircle className="w-5 h-5 text-hh-error" />
+              <span className="text-sm text-hh-error">{errorMessage || "Er is een fout opgetreden"}</span>
             </div>
             <Button onClick={resetForm} variant="outline" className="w-full">
               Opnieuw proberen

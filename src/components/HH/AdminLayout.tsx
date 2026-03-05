@@ -327,7 +327,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
   }, [isSuperAdminProp]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="flex h-screen bg-hh-bg">
+    <div className="admin-session flex h-screen bg-hh-bg">
       {/* Mobile Menu Sheet - Full screen */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-full p-0 flex flex-col bg-hh-bg">
@@ -337,7 +337,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HUGO</span>
                 <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HERBOTS</span>
               </div>
-              <Badge className="bg-purple-600 text-white border-0 text-[10px] px-2 py-0.5 self-start mt-0.5">
+              <Badge className="bg-hh-primary text-white border-0 text-[10px] px-2 py-0.5 self-start mt-0.5">
                 ADMIN
               </Badge>
             </SheetTitle>
@@ -359,7 +359,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                       onClick={() => handleNavigate(item.id)}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                         isActive
-                          ? "bg-purple-600 text-white"
+                          ? "bg-hh-primary text-white"
                           : "text-hh-text hover:bg-hh-ui-50"
                       }`}
                     >
@@ -372,7 +372,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                     </button>
 
                     {isActive && history.length > 0 && (
-                      <div className="ml-3 pl-4 border-l-2 border-purple-600/30 space-y-0.5 -mt-0.5">
+                      <div className="ml-3 pl-4 border-l-2 border-hh-primary/30 space-y-0.5 -mt-0.5">
                         {history.slice(0, 3).map((histItem) => (
                           <button
                             key={histItem.id}
@@ -388,7 +388,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                               }
                               setMobileMenuOpen(false);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-left hover:bg-purple-600/10 transition-colors cursor-pointer"
+                            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-left hover:bg-hh-primary/10 transition-colors cursor-pointer"
                           >
                             <div className="flex-1 min-w-0">
                               <p className="text-[14px] text-hh-text truncate">{histItem.title}</p>
@@ -401,7 +401,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                             navigate?.((item as any).overviewPage);
                             setMobileMenuOpen(false);
                           }}
-                          className="w-full flex items-center gap-1 px-3 py-2 text-[13px] text-purple-600 hover:text-purple-700 transition-colors"
+                          className="w-full flex items-center gap-1 px-3 py-2 text-[13px] text-hh-primary hover:text-hh-primary transition-colors"
                         >
                           <span>Bekijk alle{history.length > 0 ? ` (${history.length})` : ""}</span>
                           <ChevronRight className="w-3 h-3" />
@@ -427,7 +427,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                       onClick={() => handleNavigate(item.id)}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                         isActive
-                          ? "bg-purple-600 text-white"
+                          ? "bg-hh-primary text-white"
                           : "text-hh-text hover:bg-hh-ui-50"
                       }`}
                     >
@@ -473,7 +473,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HUGO</span>
                 <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HERBOTS</span>
               </div>
-              <Badge className="bg-purple-600 text-white border-0 text-[10px] px-2 py-0.5 self-start mt-0.5">
+              <Badge className="bg-hh-primary text-white border-0 text-[10px] px-2 py-0.5 self-start mt-0.5">
                 ADMIN
               </Badge>
             </div>
@@ -495,7 +495,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                   onClick={() => handleNavigate(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                     isActive
-                      ? "bg-purple-600/10 border-l-2 border-purple-600 text-purple-600"
+                      ? "bg-hh-primary/10 border-l-2 border-hh-primary text-hh-primary"
                       : "text-hh-text hover:bg-hh-ui-100"
                   } ${collapsed ? "justify-center" : ""}`}
                 >
@@ -510,7 +510,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 </button>
 
                 {!collapsed && isActive && history.length > 0 && (
-                  <div className="ml-2 pl-4 border-l-2 border-purple-600/30 space-y-0.5 -mt-0.5">
+                  <div className="ml-2 pl-4 border-l-2 border-hh-primary/30 space-y-0.5 -mt-0.5">
                     {history.slice(0, 3).map((histItem) => (
                       <button
                         key={histItem.id}
@@ -525,17 +525,17 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                             navigate?.('admin-analysis-results', { conversationId: histItem.id, fromAdmin: true });
                           }
                         }}
-                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left hover:bg-purple-600/10 transition-colors group cursor-pointer"
+                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left hover:bg-hh-primary/10 transition-colors group cursor-pointer"
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="text-[13px] text-hh-text truncate group-hover:text-purple-400">{histItem.title}</p>
+                          <p className="text-[13px] text-hh-text truncate group-hover:text-hh-primary">{histItem.title}</p>
                           <p className="text-[11px] text-hh-muted">{histItem.date}</p>
                         </div>
                       </button>
                     ))}
                     <button
                       onClick={() => navigate?.((item as any).overviewPage)}
-                      className="w-full flex items-center gap-1 px-2 py-1.5 text-[12px] text-purple-600 hover:text-purple-700 transition-colors"
+                      className="w-full flex items-center gap-1 px-2 py-1.5 text-[12px] text-hh-primary hover:text-hh-primary transition-colors"
                     >
                       <span>Bekijk alle{history.length > 0 ? ` (${history.length})` : ""}</span>
                       <ChevronRight className="w-3 h-3" />
@@ -559,7 +559,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 onClick={() => handleNavigate(item.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                   isActive
-                    ? "bg-purple-600/10 border-l-2 border-purple-600 text-purple-600"
+                    ? "bg-hh-primary/10 border-l-2 border-hh-primary text-hh-primary"
                     : "text-hh-text hover:bg-hh-ui-100"
                 } ${collapsed ? "justify-center" : ""}`}
               >
@@ -699,7 +699,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                                   {notif.title}
                                 </p>
                                 {notif.severity === "high" && (
-                                  <Badge className="bg-red-600 text-white border-0 text-[9px] px-1.5 py-0 flex-shrink-0">
+                                  <Badge className="bg-hh-error text-white border-0 text-[9px] px-1.5 py-0 flex-shrink-0">
                                     HIGH
                                   </Badge>
                                 )}
@@ -717,16 +717,16 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                               </p>
                             </div>
                             {notif.type === "video" && (
-                              <Video className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                              <Video className="w-4 h-4 text-hh-primary flex-shrink-0" />
                             )}
                             {notif.type === "user" && (
-                              <UserPlus className="w-4 h-4 text-green-600 flex-shrink-0" />
+                              <UserPlus className="w-4 h-4 text-hh-success flex-shrink-0" />
                             )}
                             {notif.type === "config" && (
-                              <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+                              <AlertCircle className="w-4 h-4 text-hh-error flex-shrink-0" />
                             )}
                             {notif.type === "rag" && (
-                              <Zap className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                              <Zap className="w-4 h-4 text-hh-primary flex-shrink-0" />
                             )}
                           </div>
                         </div>
@@ -752,7 +752,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 px-2">
                   <Avatar className="w-8 h-8">
-                    <AvatarFallback className="bg-purple-600 text-white text-[12px]">
+                    <AvatarFallback className="bg-hh-primary text-white text-[12px]">
                       {adminUserInitials}
                     </AvatarFallback>
                   </Avatar>
@@ -775,7 +775,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
-                  className="text-red-600"
+                  className="text-hh-error"
                   onClick={() => navigate?.("landing")}
                 >
                   <LogOut className="w-4 h-4 mr-2" />

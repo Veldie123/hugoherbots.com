@@ -4,7 +4,7 @@
 
 // TODO[PLAY-ICON-COLOR]: Play icoon bij video thumbnails is Steel Blue - moet dit anders?
 // Status: Done
-// Oplossing: Play button veranderd naar paars (bg-purple-600) in card view
+// Oplossing: Play button veranderd naar paars (bg-hh-primary) in card view
 
 import {
   Search,
@@ -312,8 +312,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
   const SortIcon = ({ column }: { column: typeof sortColumn }) => {
     if (sortColumn !== column) return <ArrowUpDown className="w-3 h-3 ml-1 opacity-50" />;
     return sortDirection === 'asc' 
-      ? <ArrowUp className="w-3 h-3 ml-1" style={{ color: '#9333ea' }} />
-      : <ArrowDown className="w-3 h-3 ml-1" style={{ color: '#9333ea' }} />;
+      ? <ArrowUp className="w-3 h-3 ml-1" style={{ color: 'var(--hh-primary)' }} />
+      : <ArrowDown className="w-3 h-3 ml-1" style={{ color: 'var(--hh-primary)' }} />;
   };
 
   // Preview, Details, Delete state
@@ -1551,7 +1551,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                   {batchQueueStatus?.isStalled ? (
                     <Button 
                       variant="outline"
-                      className="border-orange-400 bg-orange-500/10 text-orange-700 hover:bg-orange-500/20"
+                      className="border-hh-warning bg-hh-warning/10 text-hh-warning hover:bg-hh-warning/20"
                       onClick={() => handleStartBatchQueue(true)}
                       disabled={isStartingBatch}
                     >
@@ -1561,30 +1561,30 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         <AlertTriangle className="w-4 h-4 mr-2" />
                       )}
                       Worker vastgelopen
-                      <span className="ml-1 w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                      <span className="ml-1 w-2 h-2 rounded-full bg-hh-warning animate-pulse" />
                     </Button>
                   ) : (
                     <Button 
                       variant="outline"
                       className={`${
                         batchQueueStatus?.active 
-                          ? 'border-purple-300 text-purple-700 hover:bg-purple-500/10'
+                          ? 'border-hh-primary/30 text-hh-primary hover:bg-hh-primary/10'
                           : 'border-hh-border text-hh-muted hover:bg-hh-ui-50'
                       }`}
                       disabled
                     >
                       <span className={`w-2 h-2 rounded-full mr-2 ${
-                        batchQueueStatus?.active ? 'bg-purple-500 animate-pulse' : 'bg-hh-ui-300'
+                        batchQueueStatus?.active ? 'bg-hh-primary animate-pulse' : 'bg-hh-ui-300'
                       }`} />
                       Worker {batchQueueStatus?.active ? 'actief' : 'idle'}
                       {batchQueueStatus?.active && (batchQueueStatus?.counters?.pending ?? 0) > 0 && (
-                        <span className="ml-1 text-purple-600">({batchQueueStatus?.counters?.pending})</span>
+                        <span className="ml-1 text-hh-primary">({batchQueueStatus?.counters?.pending})</span>
                       )}
                     </Button>
                   )}
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className={`max-w-[280px] ${
-                  batchQueueStatus?.active ? 'border-purple-200 bg-purple-500/10 text-purple-800' : ''
+                  batchQueueStatus?.active ? 'border-hh-primary/20 bg-hh-primary/10 text-hh-primary' : ''
                 }`}>
                   <p className="text-xs">
                     {batchQueueStatus?.isStalled 
@@ -1601,7 +1601,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
             {isSuperAdmin && errorCount > 0 && (
               <Button 
                 variant="outline"
-                className="border-orange-300 text-orange-700 hover:bg-orange-500/10"
+                className="border-hh-warning/60 text-hh-warning hover:bg-hh-warning/10"
                 onClick={handleResetErrors} 
                 disabled={resettingErrors}
               >
@@ -1623,7 +1623,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               { name: driveTotalCount ? `${pipelineStats.drive.done} / ${driveTotalCount}` : 'Drive', key: 'drive', stats: pipelineStats.drive, icon: FolderSync, bgColorStyle: 'rgba(37, 99, 235, 0.1)', colorStyle: '#2563eb', isClickable: false, link: undefined as string | undefined },
               { name: 'Greenscreen', key: 'greenscreen', stats: pipelineStats.greenscreen, icon: Video, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: '#10b981', isClickable: false, link: undefined as string | undefined },
               { name: 'Audio', key: 'audio', stats: pipelineStats.audio, icon: Volume2, bgColorStyle: 'rgba(234, 88, 12, 0.1)', colorStyle: '#ea580c', isClickable: false, link: undefined as string | undefined },
-              { name: 'Transcript', key: 'transcript', stats: pipelineStats.transcript, icon: FileText, bgColorStyle: 'rgba(79, 115, 150, 0.1)', colorStyle: '#9333ea', isClickable: false, link: undefined as string | undefined },
+              { name: 'Transcript', key: 'transcript', stats: pipelineStats.transcript, icon: FileText, bgColorStyle: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', colorStyle: 'var(--hh-primary)', isClickable: false, link: undefined as string | undefined },
               { name: 'RAG', key: 'rag', stats: pipelineStats.rag, icon: Database, bgColorStyle: 'rgba(79, 70, 229, 0.1)', colorStyle: '#4f46e5', isClickable: false, link: undefined as string | undefined },
               { name: 'Mux', key: 'mux', stats: pipelineStats.mux, icon: Tv, bgColorStyle: 'rgba(219, 39, 119, 0.1)', colorStyle: '#db2777', isClickable: false, link: undefined as string | undefined },
             ].map(step => {
@@ -1648,7 +1648,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 badgeStyleObj = { backgroundColor: 'rgba(249, 115, 22, 0.1)', color: '#ea580c', borderColor: 'rgba(249, 115, 22, 0.2)' };
               } else if (isProcessing) {
                 badgeText = `${step.stats.processing} bezig`;
-                badgeStyleObj = { backgroundColor: 'rgba(79, 115, 150, 0.1)', color: '#9333ea', borderColor: 'rgba(79, 115, 150, 0.2)' };
+                badgeStyleObj = { backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' };
               } else {
                 badgeText = `${percentage}%`;
                 badgeStyleObj = { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' };
@@ -1681,7 +1681,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 <Card 
                   key={step.name} 
                   className={`p-3 rounded-[12px] shadow-hh-sm transition-all cursor-pointer hover:shadow-hh-md
-                    ${isActive ? 'ring-2 ring-[#9333ea] border-[#9333ea]' : 'border-hh-border'}`}
+                    ${isActive ? 'ring-2 ring-hh-primary border-hh-primary' : 'border-hh-border'}`}
                   onClick={handleCardClick}
                 >
                   <div className="flex items-start justify-between mb-2">
@@ -1693,10 +1693,10 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button className="p-0.5 rounded hover:bg-hh-ui-100" onClick={(e) => e.stopPropagation()}>
-                              <Info className="w-3 h-3 text-red-500" />
+                              <Info className="w-3 h-3 text-hh-error" />
                             </button>
                           </TooltipTrigger>
-                          <TooltipContent side="top" className="bg-gray-900 text-white p-2">
+                          <TooltipContent side="top" className="bg-hh-text text-white p-2">
                             {errorTooltipContent}
                           </TooltipContent>
                         </Tooltip>
@@ -1716,7 +1716,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
-                              className="p-1.5 rounded-full hover:bg-hh-ui-100 text-orange-600"
+                              className="p-1.5 rounded-full hover:bg-hh-ui-100 text-hh-warning"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleResetKpiStage(step.name, step.key);
@@ -1732,8 +1732,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                       )}
                       {step.stats.pending > 0 && (
                         <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                          step.stats.pending >= 100 ? 'bg-red-500/10 text-red-700' :
-                          step.stats.pending >= 50 ? 'bg-orange-500/10 text-orange-700' :
+                          step.stats.pending >= 100 ? 'bg-hh-error/10 text-hh-error' :
+                          step.stats.pending >= 50 ? 'bg-hh-warning/10 text-hh-warning' :
                           'bg-hh-ui-100 text-hh-muted'
                         }`}>
                           ⏳ {step.stats.pending}
@@ -1767,7 +1767,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     </div>
                     <span className="text-[10px] px-1.5 py-0.5 rounded-full border" style={
                       isProcessing
-                        ? { backgroundColor: 'rgba(79, 115, 150, 0.1)', color: '#9333ea', borderColor: 'rgba(79, 115, 150, 0.2)' }
+                        ? { backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }
                         : { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }
                     }>
                       {isProcessing ? `${step.stats.processing} bezig` : `${percentage}%`}
@@ -1783,12 +1783,12 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         
         {/* Active KPI Filter indicator */}
         {isSuperAdmin && activeKpiFilter && (
-          <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ color: '#3d6080', backgroundColor: 'rgba(147, 51, 234, 0.05)' }}>
+          <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ color: 'var(--hh-primary)', backgroundColor: 'color-mix(in srgb, var(--hh-primary) 5%, transparent)' }}>
             <span>Gefilterd op: <strong>{activeKpiFilter}</strong></span>
             <button 
               onClick={() => setActiveKpiFilter(null)}
               className="ml-2 underline"
-              style={{ color: '#9333ea' }}
+              style={{ color: 'var(--hh-primary)' }}
             >
               Wis filter
             </button>
@@ -1840,7 +1840,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"
                 className={`rounded-r-none ${viewMode === 'grid' ? 'text-white' : ''}`}
-                style={viewMode === 'grid' ? { backgroundColor: '#9333ea' } : undefined}
+                style={viewMode === 'grid' ? { backgroundColor: 'var(--hh-primary)' } : undefined}
                 onClick={() => setViewMode('grid')}
               >
                 <LayoutGrid className="w-4 h-4" />
@@ -1849,7 +1849,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 variant={viewMode === 'list' ? 'default' : 'ghost'}
                 size="sm"
                 className={`${viewMode === 'list' ? 'text-white' : ''}`}
-                style={viewMode === 'list' ? { backgroundColor: '#9333ea' } : undefined}
+                style={viewMode === 'list' ? { backgroundColor: 'var(--hh-primary)' } : undefined}
                 onClick={() => setViewMode('list')}
               >
                 <List className="w-4 h-4" />
@@ -1858,7 +1858,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 variant={viewMode === 'reorder' ? 'default' : 'ghost'}
                 size="sm"
                 className={`rounded-l-none ${viewMode === 'reorder' ? 'text-white' : ''}`}
-                style={viewMode === 'reorder' ? { backgroundColor: '#9333ea' } : undefined}
+                style={viewMode === 'reorder' ? { backgroundColor: 'var(--hh-primary)' } : undefined}
                 onClick={() => setViewMode('reorder')}
                 title="Afspeelvolgorde aanpassen"
               >
@@ -1870,7 +1870,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               onClick={handleSync}
               disabled={syncing}
               className="text-white hover:opacity-90 flex-shrink-0"
-              style={{ backgroundColor: '#9333ea' }}
+              style={{ backgroundColor: 'var(--hh-primary)' }}
               title="Synchroniseer Google Drive — voegt nieuwe video's toe en detecteert verwijderde"
             >
               {syncing
@@ -1878,7 +1878,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 : <FolderSync className="w-4 h-4 mr-1.5" />}
               {syncing ? 'Bezig...' : 'Sync Drive'}
               {syncResult && (
-                <span className={`ml-1.5 text-xs font-bold ${syncResult.success ? 'text-green-200' : 'text-red-200'}`}>
+                <span className={`ml-1.5 text-xs font-bold ${syncResult.success ? 'text-hh-success/80' : 'text-hh-error/80'}`}>
                   {syncResult.message}
                 </span>
               )}
@@ -1891,7 +1891,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         {/* Video Grid/List */}
         {loadingVideos ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#9333ea' }} />
+            <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--hh-primary)' }} />
           </div>
         ) : videos.length === 0 ? (
           <Card className="p-12 text-center rounded-[16px] shadow-hh-sm border-hh-border">
@@ -1900,7 +1900,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
             <p className="text-[14px] text-hh-muted mb-4">
               Klik op "Sync Drive" om video's te synchroniseren van Google Drive
             </p>
-            <Button className="text-white hover:opacity-90" style={{ backgroundColor: '#9333ea' }} onClick={handleSync}>
+            <Button className="text-white hover:opacity-90" style={{ backgroundColor: 'var(--hh-primary)' }} onClick={handleSync}>
               <FolderSync className="w-4 h-4 mr-2" />
               Sync Drive
             </Button>
@@ -1911,7 +1911,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
             <div className="p-4 border-b border-hh-border bg-hh-ui-50">
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
-                  <ArrowUpDown className="w-5 h-5" style={{ color: '#9333ea' }} />
+                  <ArrowUpDown className="w-5 h-5" style={{ color: 'var(--hh-primary)' }} />
                   <h3 className="text-[16px] font-semibold text-hh-text">Afspeelvolgorde</h3>
                   <Badge variant="secondary" className="text-xs">{searchQuery ? reorderVideos.filter(v => matchesSearch(v, searchQuery)).length : reorderVideos.length} video's</Badge>
                 </div>
@@ -1921,7 +1921,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     size="sm"
                     onClick={handleAiOrder}
                     disabled={isAiOrdering || isSavingOrder}
-                    className="border-purple-300 text-purple-700 hover:bg-purple-500/10"
+                    className="border-hh-primary/30 text-hh-primary hover:bg-hh-primary/10"
                   >
                     {isAiOrdering ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
                     AI Volgorde
@@ -1930,7 +1930,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     <Button
                       size="sm"
                       className="text-white"
-                      style={{ backgroundColor: '#9333ea' }}
+                      style={{ backgroundColor: 'var(--hh-primary)' }}
                       onClick={handleSavePlaybackOrder}
                       disabled={isSavingOrder}
                     >
@@ -1953,7 +1953,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 <div className="py-12 text-center">
                   <Search className="w-8 h-8 text-hh-muted/30 mx-auto mb-3" />
                   <p className="text-sm text-hh-muted">Geen video's gevonden voor "{searchQuery}"</p>
-                  <button onClick={() => setSearchQuery('')} className="text-xs mt-2 underline" style={{ color: '#9333ea' }}>Wis zoekopdracht</button>
+                  <button onClick={() => setSearchQuery('')} className="text-xs mt-2 underline" style={{ color: 'var(--hh-primary)' }}>Wis zoekopdracht</button>
                 </div>
               )}
               {reorderVideos.filter(v => matchesSearch(v, searchQuery)).map((video, index) => {
@@ -1973,11 +1973,11 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     onDragEnd={() => { setDraggedIndex(null); setDragOverIndex(null); }}
                     onDrop={() => handleDrop(index)}
                     className={`flex items-center gap-3 p-3 cursor-grab active:cursor-grabbing transition-all ${
-                      isDragging ? 'opacity-40 bg-purple-500/10' : ''
-                    } ${isDragOver ? 'border-t-2 border-purple-500' : ''} hover:bg-hh-ui-50`}
+                      isDragging ? 'opacity-40 bg-hh-primary/10' : ''
+                    } ${isDragOver ? 'border-t-2 border-hh-primary' : ''} hover:bg-hh-ui-50`}
                   >
                     <GripVertical className="w-5 h-5 text-hh-muted flex-shrink-0" />
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0" style={{ backgroundColor: '#9333ea' }}>
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0" style={{ backgroundColor: 'var(--hh-primary)' }}>
                       {index + 1}
                     </div>
                     {thumbnailUrl ? (
@@ -2081,7 +2081,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                             )}
                             {video.source === 'pipeline' && (
                               <DropdownMenuItem
-                                className="text-orange-600"
+                                className="text-hh-warning"
                                 onSelect={(e: Event) => {
                                   e.preventDefault();
                                   handleReprocess(video);
@@ -2118,7 +2118,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-hh-error"
                               onSelect={(e: Event) => {
                                 e.preventDefault();
                                 setDeleteVideo(video);
@@ -2188,7 +2188,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     <tr><td colSpan={6} className="py-12 text-center">
                       <Search className="w-8 h-8 text-hh-muted/30 mx-auto mb-3" />
                       <p className="text-sm text-hh-muted">{searchQuery ? `Geen video's gevonden voor "${searchQuery}"` : 'Geen video\'s met deze filters'}</p>
-                      {searchQuery && <button onClick={() => setSearchQuery('')} className="text-xs mt-2 underline" style={{ color: '#9333ea' }}>Wis zoekopdracht</button>}
+                      {searchQuery && <button onClick={() => setSearchQuery('')} className="text-xs mt-2 underline" style={{ color: 'var(--hh-primary)' }}>Wis zoekopdracht</button>}
                     </td></tr>
                   )}
                   {videos
@@ -2251,13 +2251,13 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                       const getStatusColor = (status: string) => {
                         const label = getStatusLabel(status);
                         switch (label) {
-                          case 'Gepubliceerd': return 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
-                          case 'Concept': return 'bg-orange-500/10 text-orange-600 border border-orange-500/20';
+                          case 'Gepubliceerd': return 'bg-hh-success/10 text-hh-success border border-hh-success/20';
+                          case 'Concept': return 'bg-hh-warning/10 text-hh-warning border border-hh-warning/20';
                           case 'Verwerken': case 'Cloud verwerking': return 'bg-blue-500/10 text-blue-600 border border-blue-500/20';
                           case 'Transcriberen': return 'border';
                           case 'Wachtend': return 'bg-hh-ui-50 text-hh-muted border border-hh-border';
-                          case 'Fout': return 'bg-red-500/10 text-red-600 border border-red-500/20';
-                          case 'Te groot': return 'bg-orange-500/10 text-orange-600 border border-orange-500/20';
+                          case 'Fout': return 'bg-hh-error/10 text-hh-error border border-hh-error/20';
+                          case 'Te groot': return 'bg-hh-warning/10 text-hh-warning border border-hh-warning/20';
                           default: return 'bg-hh-ui-50 text-hh-muted border border-hh-border';
                         }
                       };
@@ -2266,8 +2266,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           case '0': return { label: 'Voorbereiding', color: 'bg-sky-500/10 text-sky-700' };
                           case '1': return { label: 'Voorbereiding', color: 'bg-sky-500/10 text-sky-700' };
                           case '2': return { label: 'Ontdekkingsfase', color: 'bg-teal-500/10 text-teal-700' };
-                          case '3': return { label: 'Aanbevelingsfase', color: 'bg-orange-500/10 text-orange-700' };
-                          case '4': return { label: 'Beslissingsfase', color: 'bg-emerald-500/10 text-emerald-500' };
+                          case '3': return { label: 'Aanbevelingsfase', color: 'bg-hh-warning/10 text-hh-warning' };
+                          case '4': return { label: 'Beslissingsfase', color: 'bg-hh-success/10 text-hh-success' };
                           default: return { label: '-', color: 'bg-hh-ui-100 text-hh-muted' };
                         }
                       };
@@ -2301,7 +2301,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           onClick={() => isPlayable && setPreviewVideo(video)}
                         >
                           <td className="py-3 px-4">
-                            <Badge variant="outline" className="text-[11px] font-mono" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
+                            <Badge variant="outline" className="text-[11px] font-mono" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}>
                               {techNummer}
                             </Badge>
                           </td>
@@ -2310,7 +2310,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                               {video.ai_attractive_title || video.title}
                               {video.is_hidden && <EyeOff className="w-3 h-3 text-hh-muted inline ml-1" />}
                               {linkedTech?.confidence && (
-                                <Badge variant="outline" className="text-[9px] px-1 py-0 ml-2" style={{ backgroundColor: 'rgba(147, 51, 234, 0.05)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
+                                <Badge variant="outline" className="text-[9px] px-1 py-0 ml-2" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 5%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}>
                                   AI {Math.round(linkedTech.confidence * 100)}%
                                 </Badge>
                               )}
@@ -2326,7 +2326,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           </td>
                           <td className="py-3 px-4 text-right">
                             <div className="flex items-center justify-end gap-1 text-[14px] leading-[20px] text-hh-text">
-                              <Video className="w-3.5 h-3.5" style={{ color: '#9333ea' }} />
+                              <Video className="w-3.5 h-3.5" style={{ color: 'var(--hh-primary)' }} />
                               {formatDuration(video.duration)}
                             </div>
                           </td>
@@ -2334,12 +2334,12 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                             {views}
                           </td>
                           <td className="py-3 px-4 text-right">
-                            <span className={`text-[14px] leading-[20px] font-medium ${completion >= 85 ? 'text-emerald-500' : completion >= 70 ? 'text-[#9333ea]' : 'text-orange-600'}`}>
+                            <span className={`text-[14px] leading-[20px] font-medium ${completion >= 85 ? 'text-hh-success' : completion >= 70 ? 'text-hh-primary' : 'text-hh-warning'}`}>
                               {completion}%
                             </span>
                           </td>
                           <td className="py-3 px-4">
-                            <Badge variant="outline" className={`text-[11px] ${video.status === 'ready' || video.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : video.status === 'error' ? 'bg-red-500/10 text-red-600 border-red-500/20' : 'bg-hh-ui-50 text-hh-muted border-hh-border'}`}>
+                            <Badge variant="outline" className={`text-[11px] ${video.status === 'ready' || video.status === 'completed' ? 'bg-hh-success/10 text-hh-success border-hh-success/20' : video.status === 'error' ? 'bg-hh-error/10 text-hh-error border-hh-error/20' : 'bg-hh-ui-50 text-hh-muted border-hh-border'}`}>
                               {getStatusLabel(video.status)}
                             </Badge>
                           </td>
@@ -2394,7 +2394,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                                 )}
                                 {video.source === 'pipeline' && (
                                   <DropdownMenuItem
-                                    className="text-orange-600"
+                                    className="text-hh-warning"
                                     onSelect={(e: Event) => {
                                       e.preventDefault();
                                       handleReprocess(video);
@@ -2431,7 +2431,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem
-                                  className="text-red-600"
+                                  className="text-hh-error"
                                   onSelect={(e: Event) => {
                                     e.preventDefault();
                                     setDeleteVideo(video);
@@ -2457,7 +2457,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               <div className="col-span-full py-12 text-center">
                 <Search className="w-8 h-8 text-hh-muted/30 mx-auto mb-3" />
                 <p className="text-sm text-hh-muted">{searchQuery ? `Geen video's gevonden voor "${searchQuery}"` : 'Geen video\'s met deze filters'}</p>
-                {searchQuery && <button onClick={() => setSearchQuery('')} className="text-xs mt-2 underline" style={{ color: '#9333ea' }}>Wis zoekopdracht</button>}
+                {searchQuery && <button onClick={() => setSearchQuery('')} className="text-xs mt-2 underline" style={{ color: 'var(--hh-primary)' }}>Wis zoekopdracht</button>}
               </div>
             )}
             {videos
@@ -2490,14 +2490,14 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               };
               const getStatusColor = (status: string) => {
                 switch (status) {
-                  case 'ready': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+                  case 'ready': return 'bg-hh-success/10 text-hh-success border-hh-success/20';
                   case 'transcript_only': return 'bg-blue-500/10 text-blue-700 border-blue-500/20';
                   case 'processing': return 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20';
                   case 'transcribing': return 'bg-blue-500/10 text-blue-700 border-blue-500/20';
                   case 'pending': return 'bg-hh-ui-100 text-hh-muted border-hh-border';
-                  case 'error': return 'bg-red-500/10 text-red-700 border-red-500/20';
+                  case 'error': return 'bg-hh-error/10 text-hh-error border-hh-error/20';
                   case 'external_processing': return 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20';
-                  case 'disk_quota': return 'bg-orange-500/10 text-orange-700 border-orange-500/20';
+                  case 'disk_quota': return 'bg-hh-warning/10 text-hh-warning border-hh-warning/20';
                   default: return 'bg-hh-ui-100 text-hh-muted border-hh-border';
                 }
               };
@@ -2542,7 +2542,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
                         onClick={() => setPreviewVideo(video)}
                       >
-                        <Button size="icon" className="rounded-full w-12 h-12 bg-purple-600 hover:bg-purple-700">
+                        <Button size="icon" className="rounded-full w-12 h-12 bg-hh-primary hover:bg-hh-primary/90">
                           <Play className="w-6 h-6 text-white" />
                         </Button>
                       </div>
@@ -2560,9 +2560,9 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         variant="outline"
                         className={`text-[11px] ${
                           video.status === "ready"
-                            ? "border-emerald-500/20 text-emerald-500"
+                            ? "border-hh-success/20 text-hh-success"
                             : video.status === "error"
-                            ? "border-red-500/20 text-red-500"
+                            ? "border-hh-error/20 text-hh-error"
                             : "border-hh-warn/20 text-hh-warn"
                         }`}
                       >
@@ -2618,7 +2618,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           )}
                           {video.source === 'pipeline' && (
                             <DropdownMenuItem
-                              className="text-orange-600"
+                              className="text-hh-warning"
                               onSelect={(e: Event) => {
                                 e.preventDefault();
                                 handleReprocess(video);
@@ -2655,7 +2655,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
-                            className="text-red-600"
+                            className="text-hh-error"
                             onSelect={(e: Event) => {
                               e.preventDefault();
                               setDeleteVideo(video);
@@ -2687,7 +2687,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         </Badge>
                       )}
                       {video.has_transcript && (
-                        <Badge variant="outline" className="text-[10px] px-2 py-0 border-emerald-500/20 text-emerald-500 gap-1">
+                        <Badge variant="outline" className="text-[10px] px-2 py-0 border-hh-success/20 text-hh-success gap-1">
                           <FileText className="w-3 h-3" />
                           Transcript
                         </Badge>
@@ -2734,7 +2734,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         badges={
           <>
             {selectedTechniqueId && (
-              <Badge className="text-[12px] px-2.5 py-0.5 rounded-full font-mono" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea' }}>
+              <Badge className="text-[12px] px-2.5 py-0.5 rounded-full font-mono" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)' }}>
                 {selectedTechniqueId}
               </Badge>
             )}
@@ -2742,7 +2742,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               {detailsVideo?.status}
             </Badge>
             {detailsVideo?.ai_confidence && (
-              <Badge variant="outline" className="text-[11px]" style={{ backgroundColor: 'rgba(147, 51, 234, 0.05)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
+              <Badge variant="outline" className="text-[11px]" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 5%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}>
                 AI {Math.round(detailsVideo.ai_confidence * 100)}%
               </Badge>
             )}
@@ -3043,7 +3043,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                   }
                 }}
                 className="text-white gap-2 hover:opacity-90"
-                style={{ backgroundColor: '#9333ea' }}
+                style={{ backgroundColor: 'var(--hh-primary)' }}
               >
                 <Save className="w-4 h-4" />
                 {isSuperAdmin ? 'Opslaan' : 'Indienen ter review'}
@@ -3108,9 +3108,9 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                   </div>
 
                   {/* Samenvatting Section - with steel blue background like Doel */}
-                  <div className="p-4 rounded-lg border" style={{ backgroundColor: 'rgba(147, 51, 234, 0.05)', borderColor: 'rgba(147, 51, 234, 0.15)' }}>
+                  <div className="p-4 rounded-lg border" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 5%, transparent)', borderColor: 'color-mix(in srgb, var(--hh-primary) 15%, transparent)' }}>
                     <div className="flex items-start gap-2 mb-2">
-                      <Target className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#9333ea' }} />
+                      <Target className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--hh-primary)' }} />
                       <h3 className="text-[13px] font-semibold text-hh-text">Samenvatting</h3>
                     </div>
                     {(() => {
@@ -3147,8 +3147,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                                 }
                               }}
                               disabled={generatingSummary}
-                              className="text-[12px] font-medium px-3 py-1.5 rounded-md border flex items-center gap-1.5 hover:bg-purple-500/10 transition-colors"
-                              style={{ color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.3)' }}
+                              className="text-[12px] font-medium px-3 py-1.5 rounded-md border flex items-center gap-1.5 hover:bg-hh-primary/10 transition-colors"
+                              style={{ color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 30%, transparent)' }}
                             >
                               {generatingSummary ? (
                                 <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Genereren...</>
@@ -3171,7 +3171,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                               <button 
                                 onClick={() => setSummaryExpanded(!summaryExpanded)}
                                 className="text-[13px] font-medium flex items-center gap-1"
-                                style={{ color: '#9333ea' }}
+                                style={{ color: 'var(--hh-primary)' }}
                               >
                                 {summaryExpanded ? (
                                   <>Minder tonen <ChevronUp className="w-4 h-4" /></>
@@ -3206,8 +3206,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                                 }
                               }}
                               disabled={generatingSummary}
-                              className="text-[11px] font-medium px-2 py-1 rounded border flex items-center gap-1 hover:bg-purple-500/10 transition-colors"
-                              style={{ color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.3)' }}
+                              className="text-[11px] font-medium px-2 py-1 rounded border flex items-center gap-1 hover:bg-hh-primary/10 transition-colors"
+                              style={{ color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 30%, transparent)' }}
                             >
                               {generatingSummary ? (
                                 <><Loader2 className="w-3 h-3 animate-spin" /> Hergenereren...</>
@@ -3305,7 +3305,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <AutoResizeTextarea
                             value={editedVideoData.techniqueDoel}
                             onChange={(e) => setEditedVideoData({...editedVideoData, techniqueDoel: e.target.value})}
-                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                             placeholder="Doel van de techniek..."
                             minHeight={60}
                             maxHeight={300}
@@ -3322,7 +3322,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <AutoResizeTextarea
                             value={editedVideoData.techniqueWat}
                             onChange={(e) => setEditedVideoData({...editedVideoData, techniqueWat: e.target.value})}
-                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                             placeholder="Wat is de techniek..."
                             minHeight={60}
                             maxHeight={300}
@@ -3339,7 +3339,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <AutoResizeTextarea
                             value={editedVideoData.techniqueWaarom}
                             onChange={(e) => setEditedVideoData({...editedVideoData, techniqueWaarom: e.target.value})}
-                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                             placeholder="Waarom deze techniek gebruiken..."
                             minHeight={60}
                             maxHeight={300}
@@ -3356,7 +3356,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <AutoResizeTextarea
                             value={editedVideoData.techniqueWanneer}
                             onChange={(e) => setEditedVideoData({...editedVideoData, techniqueWanneer: e.target.value})}
-                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                             placeholder="Wanneer de techniek toepassen..."
                             minHeight={60}
                             maxHeight={300}
@@ -3373,7 +3373,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <AutoResizeTextarea
                             value={editedVideoData.techniqueHoe}
                             onChange={(e) => setEditedVideoData({...editedVideoData, techniqueHoe: e.target.value})}
-                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                             placeholder="Hoe de techniek toepassen..."
                             minHeight={60}
                             maxHeight={300}
@@ -3393,7 +3393,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <AutoResizeTextarea
                             value={editedVideoData.techniqueStappenplan}
                             onChange={(e) => setEditedVideoData({...editedVideoData, techniqueStappenplan: e.target.value})}
-                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                             placeholder="Stap 1&#10;Stap 2&#10;Stap 3..."
                             minHeight={80}
                             maxHeight={400}
@@ -3419,7 +3419,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <AutoResizeTextarea
                             value={editedVideoData.techniqueVoorbeeld}
                             onChange={(e) => setEditedVideoData({...editedVideoData, techniqueVoorbeeld: e.target.value})}
-                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                             placeholder="Voorbeeld 1&#10;Voorbeeld 2..."
                             minHeight={80}
                             maxHeight={400}
@@ -3445,7 +3445,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <AutoResizeTextarea
                             value={editedVideoData.techniqueTags}
                             onChange={(e) => setEditedVideoData({...editedVideoData, techniqueTags: e.target.value})}
-                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                             placeholder="tag1&#10;tag2&#10;tag3..."
                             minHeight={60}
                             maxHeight={300}
@@ -3473,7 +3473,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <AutoResizeTextarea
                             value={editedVideoData.techniqueThemas}
                             onChange={(e) => setEditedVideoData({...editedVideoData, techniqueThemas: e.target.value})}
-                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                             placeholder="thema1&#10;thema2..."
                             minHeight={60}
                             maxHeight={300}
@@ -3481,7 +3481,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         ) : currentTechnique.themas && currentTechnique.themas.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
                             {currentTechnique.themas.map((thema: string) => (
-                              <Badge key={thema} variant="outline" className="text-[11px]" style={{ borderColor: 'rgba(147, 51, 234, 0.2)', color: '#3d6080' }}>
+                              <Badge key={thema} variant="outline" className="text-[11px]" style={{ borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)', color: 'var(--hh-muted)' }}>
                                 {thema}
                               </Badge>
                             ))}
@@ -3501,7 +3501,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <AutoResizeTextarea
                             value={editedVideoData.techniqueContextRequirements}
                             onChange={(e) => setEditedVideoData({...editedVideoData, techniqueContextRequirements: e.target.value})}
-                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                            className="w-full text-[13px] leading-[20px] p-2 border border-hh-border focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                             placeholder="requirement1&#10;requirement2..."
                             minHeight={60}
                             maxHeight={300}
@@ -3538,7 +3538,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Annuleren</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-hh-error hover:bg-hh-error/90"
               onClick={handleDelete}
               disabled={isDeleting}
             >

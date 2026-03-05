@@ -222,13 +222,13 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px]">
+          <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px]">
             Actief
           </Badge>
         );
       case "trial":
         return (
-          <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[11px]">
+          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
             Trial
           </Badge>
         );
@@ -665,7 +665,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                     <div className="flex items-center gap-2">
                       <p className="text-[15px] text-hh-text font-semibold">{user.avgScore}%</p>
                       {user.scoreDelta > 0 && (
-                        <Badge className="text-[10px] bg-emerald-500/10 text-emerald-500 border-0">
+                        <Badge className="text-[10px] bg-hh-success/10 text-hh-success border-0">
                           +{user.scoreDelta}%
                         </Badge>
                       )}
@@ -775,7 +775,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                   <p className="text-[12px] leading-[16px] text-hh-muted">Sessies</p>
                 </Card>
                 <Card className="p-4 rounded-[12px] shadow-hh-sm border-hh-border text-center">
-                  <TrendingUp className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
+                  <TrendingUp className="w-5 h-5 text-hh-success mx-auto mb-2" />
                   <p className="text-[24px] leading-[32px] text-hh-ink">
                     {selectedUser.avgScore}%
                   </p>

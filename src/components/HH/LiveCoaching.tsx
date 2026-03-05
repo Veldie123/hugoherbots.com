@@ -232,7 +232,7 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
       <div className="relative h-full flex items-center p-6 sm:p-8">
         <div className="text-white space-y-3 max-w-lg">
           {/* Green accent badge - dynamic date */}
-          <Badge className="text-white border-0" style={{ backgroundColor: '#4F7396' }}>
+          <Badge className="text-white border-0 bg-hh-primary">
             <CalendarIcon className="w-3 h-3 mr-1" />
             {nextSession?.scheduledDate 
               ? formatNextSessionDate(new Date(nextSession.scheduledDate))
@@ -260,11 +260,8 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
           
           <div className="flex flex-wrap gap-3 pt-1">
             {nextSession && (
-              <Button 
-                className={`gap-2 border-0 transition-colors ${isRegistered ? 'bg-white/20 text-white hover:bg-white/30' : 'text-white'}`}
-                style={isRegistered ? {} : { backgroundColor: '#3d9a6e' }}
-                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { if (!isRegistered) e.currentTarget.style.backgroundColor = '#4daa7e'; }}
-                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { if (!isRegistered) e.currentTarget.style.backgroundColor = '#3d9a6e'; }}
+              <Button
+                className={`gap-2 border-0 transition-colors ${isRegistered ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-hh-success hover:bg-hh-success/90 text-white'}`}
                 onClick={onRegister}
               >
                 {isRegistered ? <CheckCircle className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
@@ -1207,8 +1204,7 @@ export function LiveCoaching({
                     variant="ghost"
                     size="sm"
                     onClick={() => setViewMode("list")}
-                    style={viewMode === "list" ? { backgroundColor: '#059669', color: 'white' } : {}}
-                    className={`${viewMode !== "list" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}`}
+                    className={`${viewMode === "list" ? "bg-hh-success text-white hover:opacity-90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
                   >
                     <List className="w-4 h-4" />
                   </Button>
@@ -1216,8 +1212,7 @@ export function LiveCoaching({
                     variant="ghost"
                     size="sm"
                     onClick={() => setViewMode("grid")}
-                    style={viewMode === "grid" ? { backgroundColor: '#059669', color: 'white' } : {}}
-                    className={`${viewMode !== "grid" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}`}
+                    className={`${viewMode === "grid" ? "bg-hh-success text-white hover:opacity-90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
                   >
                     <LayoutGrid className="w-4 h-4" />
                   </Button>

@@ -87,11 +87,11 @@ const getActivityIcon = (type: string) => {
 
 const getActivityColor = (type: string) => {
   switch (type) {
-    case "video": return "#9333ea";
+    case "video": return "var(--hh-primary)";
     case "session": return "#12B981";
     case "live": return "rgb(239, 68, 68)";
     case "signup": return "rgb(37, 99, 235)";
-    default: return "#9333ea";
+    default: return "var(--hh-primary)";
   }
 };
 
@@ -106,10 +106,10 @@ const getNotificationIcon = (type: string, category: string) => {
 
 const getNotificationColors = (type: string) => {
   switch (type) {
-    case "success": return { iconColor: "text-emerald-500", iconBg: "bg-emerald-500/10" };
-    case "warning": return { iconColor: "text-orange-600", iconBg: "bg-orange-100 dark:bg-orange-500/10" };
-    case "error": return { iconColor: "text-red-500", iconBg: "bg-red-500/10" };
-    default: return { iconColor: "text-blue-600", iconBg: "bg-blue-100 dark:bg-blue-500/10" };
+    case "success": return { iconColor: "text-hh-success", iconBg: "bg-hh-success/10" };
+    case "warning": return { iconColor: "text-hh-warning", iconBg: "bg-hh-warning/10" };
+    case "error": return { iconColor: "text-hh-error", iconBg: "bg-hh-error/10" };
+    default: return { iconColor: "text-hh-primary", iconBg: "bg-hh-primary/10" };
   }
 };
 
@@ -150,8 +150,8 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
       change: data.kpis.activeUsers.change,
       trend: data.kpis.activeUsers.change.startsWith("+") ? "up" : "down",
       icon: Users,
-      color: "#9333ea",
-      bgColor: "rgba(147, 51, 234, 0.1)",
+      color: "var(--hh-primary)",
+      bgColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)",
     },
     {
       label: "Sessies Vandaag",
@@ -159,8 +159,8 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
       change: data.kpis.sessionsToday.change,
       trend: data.kpis.sessionsToday.change.startsWith("+") ? "up" : "down",
       icon: Play,
-      color: "#12B981",
-      bgColor: "rgba(18, 185, 129, 0.1)",
+      color: "var(--hh-success)",
+      bgColor: "color-mix(in srgb, var(--hh-success) 10%, transparent)",
     },
     {
       label: "Nieuwe Signups",
@@ -194,7 +194,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
               Vandaag &bull; {dateStr}
             </p>
           </div>
-          <Button variant="outline" className="gap-2 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20">
+          <Button variant="outline" className="gap-2 border-hh-primary/20 text-hh-primary hover:bg-hh-primary/5">
             <Clock className="w-4 h-4" />
             Laatste 30 dagen
           </Button>
@@ -202,12 +202,12 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
 
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+            <Loader2 className="w-8 h-8 animate-spin text-hh-primary" />
             <span className="ml-3 text-hh-muted">Dashboard laden...</span>
           </div>
         ) : error ? (
           <Card className="p-6 rounded-[16px] border-hh-border">
-            <div className="flex items-center gap-3 text-red-500">
+            <div className="flex items-center gap-3 text-hh-error">
               <AlertCircle className="w-5 h-5" />
               <p>Kon dashboard data niet laden: {error}</p>
             </div>
@@ -239,7 +239,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                       <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1 sm:mb-2">
                         {kpi.label}
                       </p>
-                      <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px]" style={{ color: '#7c3aed' }}>
+                      <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px]" style={{ color: 'var(--hh-primary)' }}>
                         {kpi.value}
                       </p>
                     </Card>
@@ -249,7 +249,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {[
-                  { label: "Actieve Video's", icon: Video, color: "#9333ea", bgColor: "rgba(147, 51, 234, 0.1)", note: "Beheer via Video's" },
+                  { label: "Actieve Video's", icon: Video, color: "var(--hh-primary)", bgColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)", note: "Beheer via Video's" },
                   { label: "Live Webinars", icon: Radio, color: "#2563eb", bgColor: "rgba(37, 99, 235, 0.1)", note: "Beheer via Webinars" },
                   { label: "Coaching Sessies", icon: MessageSquare, color: "#ea580c", bgColor: "rgba(234, 88, 12, 0.1)", note: "Talk to Hugo AI" },
                   { label: "Platform Users", icon: Users, color: "#059669", bgColor: "rgba(5, 150, 105, 0.1)", note: "Ingeschreven gebruikers" },
@@ -315,7 +315,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                   <h3 className="text-[18px] leading-[24px] text-hh-text">
                     Notificaties
                   </h3>
-                  <Badge variant="outline" className="bg-orange-500/10 text-orange-600 border-orange-500/20">
+                  <Badge variant="outline" className="bg-hh-warning/10 text-hh-warning border-hh-warning/20">
                     {data?.unreadNotifications || 0} nieuw
                   </Badge>
                 </div>
@@ -368,7 +368,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 <Button
-                  className="flex-1 justify-start gap-2 h-auto py-3 px-4 bg-red-600 hover:bg-red-700 rounded-xl"
+                  className="flex-1 justify-start gap-2 h-auto py-3 px-4 bg-hh-primary hover:bg-hh-primary/90 rounded-xl"
                   onClick={() => navigate?.("admin-videos")}
                 >
                   <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
@@ -385,8 +385,8 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                   className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
                   onClick={() => navigate?.("admin-live")}
                 >
-                  <div className="w-8 h-8 rounded-full bg-red-600/10 flex items-center justify-center">
-                    <Radio className="w-4 h-4 text-red-600" />
+                  <div className="w-8 h-8 rounded-full bg-hh-error/10 flex items-center justify-center">
+                    <Radio className="w-4 h-4 text-hh-error" />
                   </div>
                   <div className="text-left">
                     <p className="text-[14px] leading-[18px] font-medium text-hh-text">Plan Sessie</p>
@@ -399,8 +399,8 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                   className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
                   onClick={() => navigate?.("admin-analytics")}
                 >
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                    <BarChart3 className="w-4 h-4 text-emerald-500" />
+                  <div className="w-8 h-8 rounded-full bg-hh-success/10 flex items-center justify-center">
+                    <BarChart3 className="w-4 h-4 text-hh-success" />
                   </div>
                   <div className="text-left">
                     <p className="text-[14px] leading-[18px] font-medium text-hh-text">Analytics</p>
@@ -413,8 +413,8 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                   className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
                   onClick={() => navigate?.("admin-users")}
                 >
-                  <div className="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center">
-                    <Users className="w-4 h-4 text-blue-600" />
+                  <div className="w-8 h-8 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                    <Users className="w-4 h-4 text-hh-primary" />
                   </div>
                   <div className="text-left">
                     <p className="text-[14px] leading-[18px] font-medium text-hh-text">Gebruikers</p>

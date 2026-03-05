@@ -245,7 +245,7 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
               size="sm"
               onClick={runVideoTagging}
               disabled={bulkLoading}
-              className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
+              className="border-hh-primary/30 text-hh-primary hover:bg-hh-primary/10"
             >
               <FileText className="w-4 h-4 mr-2" />
               Video Tagging
@@ -254,12 +254,12 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
               size="sm"
               onClick={runHeuristics}
               disabled={bulkLoading}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="bg-hh-primary hover:bg-hh-primary/90 text-white"
             >
               <Zap className="w-4 h-4 mr-2" />
               Run Heuristics
             </Button>
-            <Button variant="outline" size="sm" onClick={loadData} className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10">
+            <Button variant="outline" size="sm" onClick={loadData} className="border-hh-primary/30 text-hh-primary hover:bg-hh-primary/10">
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               Ververs
             </Button>
@@ -267,7 +267,7 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
               variant="outline" 
               size="sm" 
               onClick={() => window.open('/api/v2/rag/export?format=csv', '_blank')}
-              className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
+              className="border-hh-primary/30 text-hh-primary hover:bg-hh-primary/10"
             >
               <Download className="w-4 h-4 mr-2" />
               Export CSV
@@ -286,9 +286,9 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-hh-muted">Getagd</span>
-              <CheckCircle2 className="w-4 h-4 text-green-500" />
+              <CheckCircle2 className="w-4 h-4 text-hh-success" />
             </div>
-            <p className="text-2xl font-semibold mt-2 text-green-600">
+            <p className="text-2xl font-semibold mt-2 text-hh-success">
               {tagStats?.tagged || 0}
               <span className="text-sm font-normal text-hh-muted ml-2">
                 ({tagStats ? Math.round((tagStats.tagged / tagStats.total) * 100) : 0}%)
@@ -307,9 +307,9 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-hh-muted">Goedgekeurd</span>
-              <Check className="w-4 h-4 text-purple-500" />
+              <Check className="w-4 h-4 text-hh-primary" />
             </div>
-            <p className="text-2xl font-semibold mt-2 text-purple-600">
+            <p className="text-2xl font-semibold mt-2 text-hh-primary">
               {reviewStats?.approved || 0}
             </p>
           </Card>
@@ -326,10 +326,10 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
                   size="sm"
                   onClick={() => bulkApprove(t.technique)}
                   disabled={bulkLoading}
-                  className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10 hover:border-purple-500/40"
+                  className="border-hh-primary/30 text-hh-primary hover:bg-hh-primary/10 hover:border-hh-primary/40"
                   title={getTechniqueName(t.technique)}
                 >
-                  <Check className="w-3 h-3 mr-1 text-purple-600" />
+                  <Check className="w-3 h-3 mr-1 text-hh-primary" />
                   {getTechniqueName(t.technique)} ({t.count})
                 </Button>
               ))}
@@ -393,7 +393,7 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
                         </p>
                         {chunk.content && chunk.content.length > 200 && (
                           <button
-                            className="text-xs text-purple-600 hover:text-purple-800 mt-1 flex items-center gap-1"
+                            className="text-xs text-hh-primary hover:text-hh-primary mt-1 flex items-center gap-1"
                             onClick={() => setExpandedChunkId(isExpanded ? null : chunk.id)}
                           >
                             {isExpanded ? (
@@ -408,7 +408,7 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-8 w-8 p-0 text-purple-600 hover:bg-purple-500/10"
+                          className="h-8 w-8 p-0 text-hh-primary hover:bg-hh-primary/10"
                           onClick={() => approveChunk(chunk.id)}
                           title="Goedkeuren"
                         >
@@ -417,7 +417,7 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-8 w-8 p-0 text-red-600 hover:bg-red-500/10"
+                          className="h-8 w-8 p-0 text-hh-error hover:bg-hh-error/10"
                           onClick={() => openRejectDialog(chunk.id)}
                           title="Afwijzen of corrigeren"
                         >
@@ -468,7 +468,7 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
               <Button
                 onClick={() => rejectChunk(true)}
                 disabled={!correctTechniqueId}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
+                className="bg-hh-primary hover:bg-hh-primary/90 text-white"
               >
                 Corrigeren naar {correctTechniqueId || "..."}
               </Button>

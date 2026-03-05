@@ -698,32 +698,32 @@ export function UploadAnalysis({
                         key={idx}
                         className={`p-3 rounded-lg border-l-4 ${
                           tip.type === "wedervraag"
-                            ? "bg-blue-500/10 border-blue-500"
+                            ? "bg-hh-primary/10 border-hh-primary"
                             : tip.type === "lock"
-                            ? "bg-purple-500/10 border-purple-500"
+                            ? "bg-hh-primary/10 border-hh-primary"
                             : tip.type === "waarschuwing"
-                            ? "bg-red-500/10 border-red-500"
+                            ? "bg-hh-error/10 border-hh-error"
                             : tip.type === "open"
-                            ? "bg-teal-500/10 border-teal-500"
-                            : "bg-green-500/10 border-green-500"
+                            ? "bg-hh-primary/10 border-hh-primary"
+                            : "bg-hh-success/10 border-hh-success"
                         }`}
                       >
                         <div className="flex items-start gap-2">
                           <div className="flex-shrink-0 mt-0.5">
                             {tip.type === "wedervraag" && (
-                              <MessageSquare className="w-4 h-4 text-blue-600" />
+                              <MessageSquare className="w-4 h-4 text-hh-primary" />
                             )}
                             {tip.type === "lock" && (
-                              <Lock className="w-4 h-4 text-purple-600" />
+                              <Lock className="w-4 h-4 text-hh-primary" />
                             )}
                             {tip.type === "waarschuwing" && (
-                              <Target className="w-4 h-4 text-red-600" />
+                              <Target className="w-4 h-4 text-hh-error" />
                             )}
                             {tip.type === "open" && (
-                              <Lightbulb className="w-4 h-4 text-teal-600" />
+                              <Lightbulb className="w-4 h-4 text-hh-primary" />
                             )}
                             {tip.type === "positief" && (
-                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                              <CheckCircle2 className="w-4 h-4 text-hh-success" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">

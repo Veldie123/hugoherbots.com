@@ -20,18 +20,18 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
   if (!video.muxPlaybackId) {
     return (
       <div
-        className="rounded-xl border border-slate-200 bg-slate-50 p-4 flex items-center gap-3"
+        className="rounded-xl border border-hh-border bg-hh-ui-50 p-4 flex items-center gap-3"
         style={{ maxWidth: 480 }}
       >
         <div
           className="rounded-lg flex items-center justify-center flex-shrink-0"
           style={{ width: 48, height: 48, backgroundColor: "#e2e8f0" }}
         >
-          <Play className="w-5 h-5 text-slate-400" />
+          <Play className="w-5 h-5 text-hh-muted" />
         </div>
         <div className="min-w-0">
-          <p className="font-medium text-sm text-slate-700 truncate">{video.title}</p>
-          <p className="text-xs text-slate-400">Video niet beschikbaar</p>
+          <p className="font-medium text-sm text-hh-text truncate">{video.title}</p>
+          <p className="text-xs text-hh-muted">Video niet beschikbaar</p>
         </div>
       </div>
     );
@@ -39,7 +39,7 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
 
   if (isPlaying) {
     return (
-      <div className="rounded-xl overflow-hidden border border-slate-200" style={{ maxWidth: 520 }}>
+      <div className="rounded-xl overflow-hidden border border-hh-border" style={{ maxWidth: 520 }}>
         <div className="relative">
           <button
             onClick={() => setIsPlaying(false)}
@@ -56,9 +56,9 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
           />
         </div>
         <div className="px-3 py-2 bg-white">
-          <p className="font-medium text-sm text-slate-700">{video.title}</p>
+          <p className="font-medium text-sm text-hh-text">{video.title}</p>
           {video.techniqueId && (
-            <p className="text-xs text-slate-400">Techniek {video.techniqueId}</p>
+            <p className="text-xs text-hh-muted">Techniek {video.techniqueId}</p>
           )}
         </div>
       </div>
@@ -68,7 +68,7 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
   return (
     <button
       onClick={() => setIsPlaying(true)}
-      className="rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors p-3 flex items-center gap-3 text-left w-full group"
+      className="rounded-xl border border-hh-border bg-white hover:bg-hh-ui-50 transition-colors p-3 flex items-center gap-3 text-left w-full group"
       style={{ maxWidth: 480 }}
     >
       <div
@@ -78,16 +78,16 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
         <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="font-medium text-sm text-slate-800 truncate">{video.title}</p>
+        <p className="font-medium text-sm text-hh-text truncate">{video.title}</p>
         <div className="flex items-center gap-2 mt-0.5">
           {video.duration && (
-            <span className="text-xs text-slate-400 flex items-center gap-1">
+            <span className="text-xs text-hh-muted flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {formatDuration(video.duration)}
             </span>
           )}
           {video.techniqueId && (
-            <span className="text-xs text-slate-400">Techniek {video.techniqueId}</span>
+            <span className="text-xs text-hh-muted">Techniek {video.techniqueId}</span>
           )}
         </div>
       </div>

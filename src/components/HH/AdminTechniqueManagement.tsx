@@ -436,7 +436,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               <div 
                 key={techniek.code}
                 className="group bg-hh-bg rounded-xl border border-hh-border shadow-sm hover:shadow-lg transition-all cursor-pointer relative overflow-hidden"
-                style={{ '--hover-border-color': 'rgba(147, 51, 234, 0.3)' } as React.CSSProperties}
+                style={{ '--hover-border-color': 'color-mix(in srgb, var(--hh-primary) 30%, transparent)' } as React.CSSProperties}
               >
                 <div className="p-4" onClick={() => setDetailsTechnique(techniek.code)}>
                   <div className="flex items-center gap-3 mb-3">

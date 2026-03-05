@@ -546,9 +546,9 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Analyses', value: isLoading ? "-" : stats.total, icon: Upload, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: 'var(--hh-primary)', badge: '+24%', badgeTrend: 'up' as const },
+            { name: 'Totaal Analyses', value: isLoading ? "-" : stats.total, icon: Upload, bgColorStyle: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', colorStyle: 'var(--hh-primary)', badge: '+24%', badgeTrend: 'up' as const },
             { name: 'Uitstekend', value: isLoading ? "-" : stats.excellent, icon: CheckCircle2, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: 'var(--hh-success)', badge: '+43%', badgeTrend: 'up' as const },
-            { name: 'Gem. Score', value: isLoading ? "-" : `${stats.avgScore}%`, icon: BarChart3, bgColorStyle: 'rgba(147, 51, 234, 0.1)', colorStyle: 'var(--hh-primary)', badge: '+5%', badgeTrend: 'up' as const },
+            { name: 'Gem. Score', value: isLoading ? "-" : `${stats.avgScore}%`, icon: BarChart3, bgColorStyle: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', colorStyle: 'var(--hh-primary)', badge: '+5%', badgeTrend: 'up' as const },
             { name: 'Verbetering Nodig', value: isLoading ? "-" : stats.needsImprovement, icon: AlertTriangle, bgColorStyle: 'rgba(239, 68, 68, 0.1)', colorStyle: 'var(--hh-error)', badge: '15%', badgeTrend: 'down' as const },
           ].map(stat => {
             const badgeStyles = stat.badgeTrend === 'up'
@@ -606,11 +606,11 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                 <Card key={pa.id} className="p-4 rounded-xl border-hh-border shadow-sm bg-hh-ui-50">
                   <div className="flex items-center gap-3 mb-3">
                     {isDone ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                      <CheckCircle2 className="w-5 h-5 text-hh-success" />
                     ) : isFailed ? (
-                      <XCircle className="w-5 h-5 text-red-500" />
+                      <XCircle className="w-5 h-5 text-hh-error" />
                     ) : (
-                      <Loader2 className="w-5 h-5 text-purple-600 animate-spin" />
+                      <Loader2 className="w-5 h-5 text-hh-primary animate-spin" />
                     )}
                     <div className="flex-1 min-w-0">
                       <span className="text-[14px] font-semibold text-hh-text">{statusText}</span>
@@ -622,7 +622,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                       <div
                         key={step}
                         className="h-2 flex-1 rounded-full transition-all duration-500"
-                        style={{ backgroundColor: isFailed ? '#ef4444' : currentIndex >= i ? '#7e22ce' : 'var(--hh-ui-200, #e5e7eb)' }}
+                        style={{ backgroundColor: isFailed ? 'var(--hh-error)' : currentIndex >= i ? 'var(--hh-primary)' : 'var(--hh-ui-200, #e5e7eb)' }}
                       />
                     ))}
                   </div>
@@ -672,7 +672,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
           {isLoading ? (
             <div className="p-12 flex items-center justify-center">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hh-primary mx-auto mb-4"></div>
                 <p className="text-hh-muted">Analyses laden...</p>
               </div>
             </div>
@@ -956,10 +956,10 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
             )}
 
             {bulkSkippedErrors.length > 0 && (
-              <div className="rounded-lg border border-orange-300 bg-orange-50/50 px-3 py-2">
-                <p className="text-[12px] font-medium text-orange-700 mb-1">Overgeslagen bestanden:</p>
+              <div className="rounded-lg border border-hh-warning/30 bg-hh-warning/5 px-3 py-2">
+                <p className="text-[12px] font-medium text-hh-warning mb-1">Overgeslagen bestanden:</p>
                 {bulkSkippedErrors.map((err, i) => (
-                  <p key={i} className="text-[11px] text-orange-600">{err}</p>
+                  <p key={i} className="text-[11px] text-hh-warning">{err}</p>
                 ))}
               </div>
             )}

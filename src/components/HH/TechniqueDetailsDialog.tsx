@@ -129,7 +129,7 @@ export function TechniqueDetailsDialog({
   const displayData = isEditing ? editedData : technique;
   const phaseColor = PHASE_COLORS[String(technique.fase)] || "#64748b";
 
-  const accentBtnBg = isAdmin ? "bg-purple-600 hover:bg-purple-700" : "bg-[#4F7396] hover:bg-[#3d6280]";
+  const accentBtnBg = isAdmin ? "bg-hh-primary hover:bg-hh-primary/90" : "bg-hh-primary hover:bg-hh-primary/90";
 
   const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
 
@@ -216,7 +216,7 @@ export function TechniqueDetailsDialog({
                       {isEditing && (
                         <button
                           onClick={() => handleRemoveTag(tag)}
-                          className="ml-1.5 hover:text-red-600"
+                          className="ml-1.5 hover:text-hh-error"
                         >
                           <X className="w-3 h-3" />
                         </button>

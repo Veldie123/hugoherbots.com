@@ -49,10 +49,10 @@ const PHASE_CIRCLE_COLORS: Record<number, string> = {
   1: '#475569',
   2: '#3B82F6',
   3: '#D97706',
-  4: '#10B981',
+  4: 'var(--hh-success)',
 };
 
-const STEEL_BLUE = '#4F7396';
+const STEEL_BLUE = 'var(--hh-primary)';
 const STEEL_BLUE_BG = 'rgba(79, 115, 150, 0.08)';
 const STEEL_BLUE_BORDER = 'rgba(79, 115, 150, 0.18)';
 
@@ -89,7 +89,7 @@ export function EPICSidebar({
   hideHeader = false,
   onSelectTechnique,
 }: EPICSidebarProps) {
-  const ACCENT = isAdminView ? '#9910FA' : '#10B981';
+  const ACCENT = isAdminView ? 'var(--hh-primary)' : 'var(--hh-success)';
   const ACCENT_BG = isAdminView ? 'rgba(153, 16, 250, 0.1)' : undefined;
   
   const isTechniqueLocked = (techniqueNumber: string) => {
@@ -484,9 +484,9 @@ export function EPICSidebar({
               
               if (isCompleted || (item.phase < currentUnlockedPhase && !isLocked)) {
                 barBgStyle = { backgroundColor: 'rgba(79, 115, 150, 0.2)' };
-                barFillStyle = { backgroundColor: '#4F7396' };
+                barFillStyle = { backgroundColor: 'var(--hh-primary)' };
                 barWidth = "100%";
-                numberStyle = { color: '#4F7396' };
+                numberStyle = { color: 'var(--hh-primary)' };
                 labelStyle = { color: '#475569' };
               } else if (isCurrent) {
                 barBgStyle = { backgroundColor: ACCENT };
@@ -496,7 +496,7 @@ export function EPICSidebar({
                 labelStyle = { color: '#475569' };
               } else if (hasProgress && !isLocked) {
                 barBgStyle = { backgroundColor: '#e2e8f0' };
-                barFillStyle = { backgroundColor: '#4F7396' };
+                barFillStyle = { backgroundColor: 'var(--hh-primary)' };
                 barWidth = progress.total > 0 ? `${(progress.completed / progress.total) * 100}%` : "0%";
                 numberStyle = { color: '#64748b' };
                 labelStyle = { color: '#64748b' };
@@ -545,7 +545,7 @@ export function EPICSidebar({
                 Fases & bijhorende technieken
               </h4>
             </div>
-            <Badge className="bg-purple-100 text-purple-700 border-purple-300">
+            <Badge className="bg-hh-primary/15 text-hh-primary border-hh-primary/30">
               5 fases
             </Badge>
           </button>
@@ -582,12 +582,12 @@ export function EPICSidebar({
                         <div
                           className={cn(
                             "flex items-center justify-center text-[11px] font-bold text-white",
-                            !isAdminView && (isPhaseCompleted ? "bg-emerald-500" :
-                            phase === 0 ? "bg-slate-500" :
-                            phase === 1 ? "bg-emerald-500" :
-                            phase === 2 ? "bg-blue-500" :
-                            phase === 3 ? "bg-amber-500" :
-                            "bg-purple-500")
+                            !isAdminView && (isPhaseCompleted ? "bg-hh-success" :
+                            phase === 0 ? "bg-hh-muted" :
+                            phase === 1 ? "bg-hh-success" :
+                            phase === 2 ? "bg-hh-primary" :
+                            phase === 3 ? "bg-hh-warning" :
+                            "bg-hh-primary")
                           )}
                           style={{
                             width: '24px',
@@ -611,7 +611,7 @@ export function EPICSidebar({
                       </div>
                       <Badge className={
                         isPhaseCompleted
-                          ? (isAdminView ? "bg-purple-100 text-purple-700 border-purple-200" : "bg-emerald-100 text-emerald-700 border-emerald-200")
+                          ? (isAdminView ? "bg-hh-primary/15 text-hh-primary border-hh-primary/20" : "bg-hh-success/15 text-hh-success border-hh-success/20")
                           : getFaseBadgeColor(phase)
                       }>
                         {phaseProgress.completed}/{phaseProgress.total}
@@ -651,9 +651,9 @@ export function EPICSidebar({
                                 className={cn(
                                   "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-pointer",
                                   selectedTechnique === technique.naam
-                                    ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
+                                    ? "bg-hh-primary/10 text-hh-primary border border-hh-primary/20"
                                     : isRecommended
-                                    ? "bg-purple-600/5 border border-purple-600/20"
+                                    ? "bg-hh-primary/5 border border-hh-primary/20"
                                     : "bg-card text-hh-text hover:bg-hh-ui-50"
                                 )}
                               >
@@ -721,9 +721,9 @@ export function EPICSidebar({
                                           className={cn(
                                             "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-pointer",
                                             selectedTechnique === child.naam
-                                              ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
+                                              ? "bg-hh-primary/10 text-hh-primary border border-hh-primary/20"
                                               : isChildRecommended
-                                              ? "bg-purple-600/5 border border-purple-600/20"
+                                              ? "bg-hh-primary/5 border border-hh-primary/20"
                                               : "bg-card text-hh-text hover:bg-hh-ui-50"
                                           )}
                                         >
@@ -778,9 +778,9 @@ export function EPICSidebar({
                                                   className={cn(
                                                     "w-full text-left px-3 py-1.5 rounded-lg text-[11px] leading-[15px] transition-all cursor-pointer",
                                                     selectedTechnique === grandchild.naam
-                                                      ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
+                                                      ? "bg-hh-primary/10 text-hh-primary border border-hh-primary/20"
                                                       : isGrandchildRecommended
-                                                      ? "bg-purple-600/5 border border-purple-600/20"
+                                                      ? "bg-hh-primary/5 border border-hh-primary/20"
                                                       : "bg-hh-ui-50/50 text-hh-text hover:bg-hh-ui-100"
                                                   )}
                                                 >
@@ -845,7 +845,7 @@ export function EPICSidebar({
                 Houdingen van de klant & bijhorende technieken
               </h4>
             </div>
-            <Badge className="bg-purple-100 text-purple-700 border-purple-300">
+            <Badge className="bg-hh-primary/15 text-hh-primary border-hh-primary/30">
               {klantHoudingen.length}
             </Badge>
           </button>
@@ -867,7 +867,7 @@ export function EPICSidebar({
                       className={cn(
                         "w-full flex items-center justify-between p-3 rounded-lg border transition-all",
                         isActive
-                          ? "border-orange-400 bg-orange-600/10 shadow-sm"
+                          ? "border-hh-warning bg-hh-warning/10 shadow-sm"
                           : "border-hh-border bg-card hover:bg-hh-ui-50"
                       )}
                     >
@@ -881,20 +881,20 @@ export function EPICSidebar({
                           className={cn(
                             "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold",
                             isActive
-                              ? "bg-orange-500 text-white border-2 border-orange-600"
-                              : "bg-orange-100 text-orange-700 border border-orange-300"
+                              ? "bg-hh-warning text-white border-2 border-hh-warning"
+                              : "bg-hh-warning/10 text-hh-warning border border-hh-warning/30"
                           )}
                         >
                           {houding.id}
                         </div>
                         <span className={cn(
                           "text-[13px] leading-[18px] font-medium",
-                          isActive ? "text-orange-900 font-semibold" : "text-hh-text"
+                          isActive ? "text-hh-warning font-semibold" : "text-hh-text"
                         )}>
                           {houding.naam}
                         </span>
                       </div>
-                      <Badge className={isActive ? "bg-orange-500 text-white border-orange-600" : "bg-orange-100 text-orange-700 border-orange-300"}>
+                      <Badge className={isActive ? "bg-hh-warning text-white border-hh-warning" : "bg-hh-warning/10 text-hh-warning border-hh-warning/30"}>
                         {houding.recommended_technique_ids?.length || 0}
                       </Badge>
                     </button>
@@ -924,9 +924,9 @@ export function EPICSidebar({
                                   className={cn(
                                     "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-pointer",
                                     selectedTechnique === technique.naam
-                                      ? "bg-purple-600/10 text-purple-800 border border-purple-600/20"
+                                      ? "bg-hh-primary/10 text-hh-primary border border-hh-primary/20"
                                       : isRecommended
-                                      ? "bg-purple-600/5 border border-purple-600/20 hover:bg-purple-600/10"
+                                      ? "bg-hh-primary/5 border border-hh-primary/20 hover:bg-hh-primary/10"
                                       : "bg-card text-hh-text hover:bg-hh-ui-50"
                                   )}
                                 >

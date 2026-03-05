@@ -134,7 +134,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
     switch (status) {
       case "paid":
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px] gap-1">
+          <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px] gap-1">
             <CheckCircle2 className="w-3 h-3" />
             Betaald
           </Badge>
@@ -155,7 +155,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
         );
       case "failed":
         return (
-          <Badge className="bg-red-600/10 text-red-600 border-red-600/20 text-[11px] gap-1">
+          <Badge className="bg-hh-error/10 text-hh-error border-hh-error/20 text-[11px] gap-1">
             <XCircle className="w-3 h-3" />
             Mislukt
           </Badge>
@@ -200,12 +200,12 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-success/10 flex items-center justify-center">
+                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-hh-success" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +18%
               </Badge>
@@ -260,12 +260,12 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(147, 51, 234, 0.1)" }}>
-                <FileText className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: "#9333ea" }} />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-hh-primary" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +5%
               </Badge>
@@ -454,7 +454,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
                   {invoice.status === "paid" && invoice.paidDate && (
                     <div className="flex items-center justify-between text-[13px] leading-[18px]">
                       <span className="text-hh-muted">Betaald:</span>
-                      <span className="text-emerald-500">{invoice.paidDate}</span>
+                      <span className="text-hh-success">{invoice.paidDate}</span>
                     </div>
                   )}
                 </div>

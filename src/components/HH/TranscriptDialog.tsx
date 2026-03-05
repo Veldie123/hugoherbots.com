@@ -390,15 +390,15 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                           ? "bg-cyan-50 border border-cyan-200" 
                           : isAdmin 
                             ? "bg-fuchsia-50 border border-fuchsia-200"
-                            : "bg-slate-50 border border-slate-200"
-                      } ${isAdmin && validatedLines.has(lineId) ? "ring-2 ring-green-400" : ""} ${isAdmin && flaggedLines.has(lineId) ? "ring-2 ring-red-400" : ""}`}
+                            : "bg-hh-ui-50 border border-hh-border"
+                      } ${isAdmin && validatedLines.has(lineId) ? "ring-2 ring-hh-success" : ""} ${isAdmin && flaggedLines.has(lineId) ? "ring-2 ring-hh-error" : ""}`}
                     >
                       <div className="flex-shrink-0">
                         <Badge
                           className={`text-[10px] font-mono ${
                             isAdmin
-                              ? "bg-purple-600 text-white border-purple-600"
-                              : "bg-[#4F7396] text-white border-[#4F7396]"
+                              ? "bg-hh-primary text-white border-hh-primary"
+                              : "bg-hh-primary text-white border-hh-primary"
                           }`}
                         >
                           {line.time}
@@ -419,7 +419,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className={`h-7 w-7 p-0 ${validatedLines.has(lineId) ? "bg-green-100 text-green-700" : "hover:bg-green-100 hover:text-green-700"}`}
+                                className={`h-7 w-7 p-0 ${validatedLines.has(lineId) ? "bg-hh-success/15 text-hh-success" : "hover:bg-hh-success/15 hover:text-hh-success"}`}
                                 onClick={() => saveAsGoldenStandard(line, index)}
                                 disabled={validatedLines.has(lineId)}
                                 title="Markeer als correct (Golden Standard)"
@@ -429,7 +429,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className={`h-7 w-7 p-0 ${flaggedLines.has(lineId) ? "bg-red-100 text-red-700" : "hover:bg-red-100 hover:text-red-700"}`}
+                                className={`h-7 w-7 p-0 ${flaggedLines.has(lineId) ? "bg-hh-error/15 text-hh-error" : "hover:bg-hh-error/15 hover:text-hh-error"}`}
                                 onClick={() => setShowFeedbackInput(showFeedbackInput === lineId ? null : lineId)}
                                 disabled={flaggedLines.has(lineId)}
                                 title="Markeer als incorrect (+ feedback)"
@@ -439,7 +439,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-7 w-7 p-0 hover:bg-purple-100 hover:text-purple-700"
+                                className="h-7 w-7 p-0 hover:bg-hh-primary/15 hover:text-hh-primary"
                                 onClick={() => startEdit(lineId, index, line)}
                                 title="Bewerk debug info"
                               >
@@ -453,18 +453,18 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                     
                     {/* Feedback input for flagging - admin only */}
                     {isAdmin && showFeedbackInput === lineId && (
-                      <div className="ml-11 mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-[12px] text-red-700 mb-2 font-medium">Wat is er mis met dit antwoord?</p>
+                      <div className="ml-11 mt-2 p-3 bg-hh-error/5 border border-hh-error/20 rounded-lg">
+                        <p className="text-[12px] text-hh-error mb-2 font-medium">Wat is er mis met dit antwoord?</p>
                         <Textarea
                           value={feedbackText}
                           onChange={(e) => setFeedbackText(e.target.value)}
                           placeholder="Beschrijf de fout of verbeterpunt..."
-                          className="text-[13px] bg-hh-bg border-red-200 focus:border-red-400 min-h-[60px]"
+                          className="text-[13px] bg-hh-bg border-hh-error/20 focus:border-hh-error min-h-[60px]"
                         />
                         <div className="flex gap-2 mt-2">
                           <Button
                             size="sm"
-                            className="bg-red-600 hover:bg-red-700 text-white"
+                            className="bg-hh-error hover:bg-hh-error/90 text-white"
                             onClick={() => flagAsIncorrect(line, index, feedbackText)}
                             disabled={!feedbackText.trim()}
                           >
@@ -503,11 +503,11 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                             <div className="flex items-center gap-2">
                               <span className="text-hh-muted">Signaal:</span>
                               <Badge className={`${
-                                line.debugInfo?.signal === "positief" 
-                                  ? "bg-green-100 text-green-700 border-green-300"
+                                line.debugInfo?.signal === "positief"
+                                  ? "bg-hh-success/15 text-hh-success border-hh-success/30"
                                   : line.debugInfo?.signal === "negatief"
-                                  ? "bg-red-100 text-red-700 border-red-300"
-                                  : "bg-gray-100 text-gray-700 border-gray-300"
+                                  ? "bg-hh-error/15 text-hh-error border-hh-error/30"
+                                  : "bg-hh-ui-100 text-hh-text border-hh-border"
                               }`}>
                                 {line.debugInfo?.signal || "neutraal"}
                               </Badge>
@@ -593,10 +593,10 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                       <span className="text-hh-muted">Evaluatie:</span>
                                       <Badge className={`ml-1 text-[10px] ${
                                         line.debugInfo.aiDecision.evaluatie === "positief" || line.debugInfo.aiDecision.evaluatie === "perfect"
-                                          ? "bg-green-100 text-green-700 border-green-300"
+                                          ? "bg-hh-success/15 text-hh-success border-hh-success/30"
                                           : line.debugInfo.aiDecision.evaluatie === "gemist"
-                                          ? "bg-red-100 text-red-700 border-red-300"
-                                          : "bg-gray-100 text-gray-700 border-gray-300"
+                                          ? "bg-hh-error/15 text-hh-error border-hh-error/30"
+                                          : "bg-hh-ui-100 text-hh-text border-hh-border"
                                       }`}>
                                         {line.debugInfo.aiDecision.evaluatie}
                                       </Badge>
@@ -617,7 +617,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-400"
+                                  className="w-full border-hh-primary/30 text-hh-primary hover:bg-hh-primary/5 hover:border-hh-primary"
                                   onClick={() => startEdit(lineId, index, line)}
                                 >
                                   <Pencil className="w-3 h-3 mr-2" />
@@ -628,8 +628,8 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                             
                             {/* Edit Mode */}
                             {isAdmin && editState?.lineId === lineId && (
-                              <div className="pt-3 mt-3 border-t-2 border-purple-300">
-                                <p className="text-[11px] text-purple-700 mb-3 font-semibold">Bewerk Debug Info</p>
+                              <div className="pt-3 mt-3 border-t-2 border-hh-primary/30">
+                                <p className="text-[11px] text-hh-primary mb-3 font-semibold">Bewerk Debug Info</p>
                                 <div className="space-y-3">
                                   <div>
                                     <label className="text-[11px] text-hh-muted block mb-1">Signaal</label>
@@ -639,7 +639,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                         setEditState({...editState, signal: value})
                                       }
                                     >
-                                      <SelectTrigger className="h-8 text-[12px] bg-hh-bg border-hh-border text-hh-text cursor-pointer hover:border-purple-400">
+                                      <SelectTrigger className="h-8 text-[12px] bg-hh-bg border-hh-border text-hh-text cursor-pointer hover:border-hh-primary">
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent className="bg-hh-bg border-hh-border">
@@ -656,7 +656,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                       value={editState.expectedTechnique}
                                       onValueChange={(value: string) => setEditState({...editState, expectedTechnique: value})}
                                     >
-                                      <SelectTrigger className="h-8 text-[12px] bg-hh-bg border-hh-border text-hh-text cursor-pointer hover:border-purple-400">
+                                      <SelectTrigger className="h-8 text-[12px] bg-hh-bg border-hh-border text-hh-text cursor-pointer hover:border-hh-primary">
                                         <SelectValue placeholder="Selecteer techniek" />
                                       </SelectTrigger>
                                       <SelectContent className="bg-hh-bg border-hh-border max-h-[300px]">
@@ -675,7 +675,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                       value={editState.detectedTechnique || "none"}
                                       onValueChange={(value: string) => setEditState({...editState, detectedTechnique: value === "none" ? "" : value})}
                                     >
-                                      <SelectTrigger className="h-8 text-[12px] bg-hh-bg border-hh-border text-hh-text cursor-pointer hover:border-purple-400">
+                                      <SelectTrigger className="h-8 text-[12px] bg-hh-bg border-hh-border text-hh-text cursor-pointer hover:border-hh-primary">
                                         <SelectValue placeholder="Geen / Onbekend" />
                                       </SelectTrigger>
                                       <SelectContent className="bg-hh-bg border-hh-border max-h-[300px]">
@@ -692,7 +692,7 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                   <div className="flex gap-2 pt-2">
                                     <Button
                                       size="sm"
-                                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                                      className="bg-hh-primary hover:bg-hh-primary/90 text-white"
                                       onClick={saveEdit}
                                     >
                                       <Check className="w-3 h-3 mr-1" />

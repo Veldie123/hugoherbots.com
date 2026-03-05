@@ -973,13 +973,13 @@ export function TalkToHugoAI({
 
   const getFaseBadgeColor = (fase: number) => {
     const colors: Record<number, string> = {
-      0: "bg-slate-100 text-slate-600 border-slate-200",
-      1: "bg-emerald-100 text-emerald-700 border-emerald-200",
-      2: "bg-blue-100 text-blue-700 border-blue-200",
-      3: "bg-amber-100 text-amber-700 border-amber-200",
-      4: "bg-purple-100 text-purple-700 border-purple-200",
+      0: "bg-hh-ui-100 text-hh-muted border-hh-border",
+      1: "bg-hh-success/15 text-hh-success border-hh-success/30",
+      2: "bg-hh-primary/15 text-hh-primary border-hh-primary/30",
+      3: "bg-hh-warning/15 text-hh-warning border-hh-warning/30",
+      4: "bg-hh-primary/15 text-hh-primary border-hh-primary/30",
     };
-    return colors[fase] || "bg-gray-100 text-gray-700 border-gray-200";
+    return colors[fase] || "bg-hh-ui-100 text-hh-text border-hh-border";
   };
 
   const getTopLevelTechniques = (phase: number) => {
@@ -1920,16 +1920,16 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
   const renderChatInterface = () => (
     <div
-      className={`flex-1 min-h-0 flex flex-col bg-hh-bg relative ${isDraggingOver ? "ring-2 ring-[#4F7396] ring-inset" : ""}`}
+      className={`flex-1 min-h-0 flex flex-col bg-hh-bg relative ${isDraggingOver ? "ring-2 ring-hh-primary ring-inset" : ""}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {isDraggingOver && (
-        <div className="absolute inset-0 bg-[#4F7396]/5 z-10 flex items-center justify-center pointer-events-none">
-          <div className="bg-hh-bg border-2 border-dashed border-[#4F7396] rounded-2xl px-8 py-6 shadow-lg">
+        <div className="absolute inset-0 bg-hh-primary/5 z-10 flex items-center justify-center pointer-events-none">
+          <div className="bg-hh-bg border-2 border-dashed border-hh-primary rounded-2xl px-8 py-6 shadow-lg">
             <div className="flex flex-col items-center gap-2">
-              <Paperclip className="w-8 h-8 text-[#4F7396]" />
+              <Paperclip className="w-8 h-8 text-hh-primary" />
               <p className="text-[15px] font-medium text-hh-text">Sleep bestanden hier</p>
               <p className="text-[12px] text-hh-muted">Audio, documenten, afbeeldingen</p>
             </div>
@@ -1939,15 +1939,14 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
       {isAdmin && adminViewMode && onboardingStatus && !onboardingStatus.isComplete && (
         <div className="flex items-center justify-center gap-3 py-2 px-4 border-b border-hh-border bg-hh-ui-50/50">
           <div className="flex items-center gap-2">
-            <span className="text-[12px] font-medium" style={{ color: '#7c3aed' }}>
+            <span className="text-[12px] font-medium text-hh-primary">
               Technieken {onboardingStatus.technieken.reviewed}/{onboardingStatus.technieken.total}
             </span>
             <div className="w-16 h-1.5 rounded-full bg-hh-ui-100 overflow-hidden">
               <div
-                className="h-full rounded-full transition-all"
+                className="h-full rounded-full transition-all bg-hh-primary"
                 style={{
                   width: `${onboardingStatus.technieken.total > 0 ? (onboardingStatus.technieken.reviewed / onboardingStatus.technieken.total) * 100 : 0}%`,
-                  backgroundColor: '#7c3aed'
                 }}
               />
             </div>
@@ -2000,7 +1999,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             1: 'Fase 1: Opening', 2: 'Fase 2: EPIC', 3: 'Fase 3: Aanbeveling', 4: 'Fase 4: Beslissing',
           };
           const phaseColors: Record<number, string> = {
-            1: '#2563eb', 2: '#059669', 3: '#9333ea', 4: '#d97706',
+            1: 'var(--hh-primary)', 2: 'var(--hh-success)', 3: 'var(--hh-primary)', 4: 'var(--hh-warning)',
           };
           let phaseDivider = null;
           if (analysisResult?.signals) {
@@ -2014,7 +2013,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     <div className="h-px flex-1 bg-hh-border" />
                     <span
                       className="text-[11px] font-semibold px-3 py-1 rounded-full"
-                      style={{ backgroundColor: `${phaseColors[phase] || '#6b7280'}10`, color: phaseColors[phase] || '#6b7280' }}
+                      style={{ backgroundColor: `color-mix(in srgb, ${phaseColors[phase] || 'var(--hh-muted)'} 10%, transparent)`, color: phaseColors[phase] || 'var(--hh-muted)' }}
                     >
                       {phaseLabels[phase] || `Fase ${phase}`}
                     </span>
@@ -2031,7 +2030,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           <div id={`msg-turn-${msgIdx}`} className={`group flex ${message.sender === "hugo" ? "justify-end" : "justify-start"} transition-all rounded-xl`}>
             <div className={`flex flex-col ${message.sender === "hugo" ? "items-end" : "items-start"}`} style={{ maxWidth: '75%' }}>
               {message.isTranscriptReplay && message.transcriptRole && (
-                <span className="text-[11px] font-medium mb-0.5 px-1" style={{ color: message.transcriptRole === 'Klant' ? '#4F7396' : '#3C9A6E' }}>
+                <span className="text-[11px] font-medium mb-0.5 px-1" style={{ color: message.transcriptRole === 'Klant' ? 'var(--hh-primary)' : 'var(--hh-success)' }}>
                   {message.transcriptRole}
                 </span>
               )}
@@ -2046,10 +2045,10 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               }`} style={message.isTranscriptReplay
                 ? {
                     opacity: 0.85,
-                    backgroundColor: message.sender === 'hugo' ? '#4F7396' : 'var(--hh-ui-100)',
+                    backgroundColor: message.sender === 'hugo' ? 'var(--hh-primary)' : 'var(--hh-ui-100)',
                   }
                 : message.sender === 'hugo'
-                  ? { backgroundColor: '#4F7396' }
+                  ? { backgroundColor: 'var(--hh-primary)' }
                   : undefined
               }>
                 {message.attachments && message.attachments.length > 0 && (
@@ -2067,7 +2066,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                           <img src={att.preview} alt={att.name} className="w-8 h-8 rounded object-cover" />
                         ) : (
                           <div className={`w-6 h-6 rounded flex items-center justify-center ${
-                            message.sender === "hugo" ? "text-white/80" : "text-[#4F7396]"
+                            message.sender === "hugo" ? "text-white/80" : "text-hh-primary"
                           }`}>
                             {att.type.startsWith("audio/") ? <FileAudio className="w-4 h-4" /> :
                              att.type.startsWith("image/") ? <Image className="w-4 h-4" /> :
@@ -2120,12 +2119,12 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                         const d = rc.data as Record<string, any>;
                         const isTech = d.module === 'technieken';
                         const faseColors: Record<string, string> = {
-                          '0': '#64748b', '1': '#059669', '2': '#2563eb', '3': '#d97706', '4': '#7c3aed'
+                          '0': 'var(--hh-muted)', '1': 'var(--hh-success)', '2': 'var(--hh-primary)', '3': 'var(--hh-warning)', '4': 'var(--hh-primary)'
                         };
-                        const faseColor = faseColors[String(d.fase || '0').charAt(0)] || '#64748b';
+                        const faseColor = faseColors[String(d.fase || '0').charAt(0)] || 'var(--hh-muted)';
                         return (
                           <div key={idx} className="rounded-xl border border-hh-border bg-hh-bg shadow-sm overflow-hidden" style={{ maxWidth: '100%' }}>
-                            <div className="px-4 py-3 border-b border-hh-border" style={{ backgroundColor: `${faseColor}08` }}>
+                            <div className="px-4 py-3 border-b border-hh-border" style={{ backgroundColor: `color-mix(in srgb, ${faseColor} 5%, transparent)` }}>
                               <div className="flex items-center gap-2 mb-1">
                                 {isTech && d.nummer && (
                                   <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md text-white" style={{ backgroundColor: faseColor }}>
@@ -2140,7 +2139,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                                 <h3 className="text-[15px] font-semibold text-hh-text">{d.naam}</h3>
                               </div>
                               {isTech && d.fase && (
-                                <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ backgroundColor: `${faseColor}15`, color: faseColor }}>
+                                <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ backgroundColor: `color-mix(in srgb, ${faseColor} 10%, transparent)`, color: faseColor }}>
                                   Fase {d.fase}
                                 </span>
                               )}
@@ -2218,16 +2217,14 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                             <div className="px-4 py-3 border-t border-hh-border flex items-center gap-2">
                               <button
                                 onClick={handleOnboardingApprove}
-                                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-white transition-colors"
-                                style={{ backgroundColor: '#059669' }}
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-white transition-colors bg-hh-success"
                               >
                                 <ThumbsUp className="w-3.5 h-3.5" />
                                 Goedkeuren
                               </button>
                               <button
                                 onClick={() => setOnboardingFeedbackInput("")}
-                                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-white transition-colors"
-                                style={{ backgroundColor: '#d97706' }}
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-white transition-colors bg-hh-warning"
                               >
                                 <ThumbsDown className="w-3.5 h-3.5" />
                                 Feedback geven
@@ -2253,15 +2250,13 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                                       }
                                     }}
                                     placeholder="Bijv. 'Het doel moet korter' of 'Voeg een voorbeeld toe over...'"
-                                    className="flex-1 px-3 py-2 text-[13px] rounded-lg border border-hh-border bg-hh-bg text-hh-text placeholder:text-hh-muted focus:outline-none focus:ring-1"
-                                    style={{ focusRingColor: '#7c3aed' }}
+                                    className="flex-1 px-3 py-2 text-[13px] rounded-lg border border-hh-border bg-hh-bg text-hh-text placeholder:text-hh-muted focus:outline-none focus:ring-1 focus:ring-hh-primary"
                                     autoFocus
                                   />
                                   <button
                                     onClick={() => onboardingFeedbackInput?.trim() && handleOnboardingFeedback(onboardingFeedbackInput)}
                                     disabled={!onboardingFeedbackInput?.trim()}
-                                    className="px-4 py-2 rounded-lg text-[13px] font-medium text-white disabled:opacity-50 transition-colors"
-                                    style={{ backgroundColor: '#7c3aed' }}
+                                    className="px-4 py-2 rounded-lg text-[13px] font-medium text-white disabled:opacity-50 transition-colors bg-hh-primary"
                                   >
                                     Verstuur
                                   </button>
@@ -2309,10 +2304,10 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                   <div className="flex flex-wrap gap-1 mt-1 px-1">
                     {evalForTurn?.techniques?.map((tech: any, ti: number) => {
                       const qualityColors: Record<string, { bg: string; text: string }> = {
-                        'perfect': { bg: '#ECFDF5', text: '#047857' },
-                        'goed': { bg: '#ECFDF5', text: '#059669' },
-                        'bijna': { bg: '#FFFBEB', text: '#B45309' },
-                        'gemist': { bg: '#FFF1F2', text: '#BE123C' },
+                        'perfect': { bg: 'var(--hh-success-bg, #ECFDF5)', text: 'var(--hh-success)' },
+                        'goed': { bg: 'var(--hh-success-bg, #ECFDF5)', text: 'var(--hh-success)' },
+                        'bijna': { bg: 'var(--hh-warning-bg, #FFFBEB)', text: 'var(--hh-warning)' },
+                        'gemist': { bg: 'var(--hh-error-bg, #FFF1F2)', text: 'var(--hh-error)' },
                       };
                       const colors = qualityColors[tech.quality] || qualityColors['bijna'];
                       const qualityIcon = tech.quality === 'perfect' || tech.quality === 'goed' ? '✓' : tech.quality === 'gemist' ? '✗' : '~';
@@ -2346,7 +2341,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     title="Kopieer"
                   >
                     {copiedMessageId === message.id ? (
-                      <Check className="w-3.5 h-3.5 text-green-500" />
+                      <Check className="w-3.5 h-3.5 text-hh-success" />
                     ) : (
                       <Copy className="w-3.5 h-3.5" />
                     )}
@@ -2355,7 +2350,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     onClick={() => handleMessageFeedback(message.id, "up")}
                     className={`p-1.5 rounded-md transition-colors ${
                       message.feedback === "up"
-                        ? "text-green-600 bg-green-600/15"
+                        ? "text-hh-success bg-hh-success/15"
                         : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-100"
                     }`}
                     title="Goed antwoord"
@@ -2366,7 +2361,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     onClick={() => handleMessageFeedback(message.id, "down")}
                     className={`p-1.5 rounded-md transition-colors ${
                       message.feedback === "down"
-                        ? "text-red-500 bg-red-500/15"
+                        ? "text-hh-error bg-hh-error/15"
                         : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-100"
                     }`}
                     title="Slecht antwoord"
@@ -2397,12 +2392,11 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                               setMobileSidebarOpen(!mobileSidebarOpen);
                             }
                           }}
-                          className={`p-1.5 rounded-md transition-colors ${
+                          className={`p-1.5 rounded-md transition-colors text-hh-success ${
                             (desktopSidebarOpen || mobileSidebarOpen)
-                              ? "bg-[#3C9A6E]/10"
-                              : "hover:bg-[#3C9A6E]/10"
+                              ? "bg-hh-success/10"
+                              : "hover:bg-hh-success/10"
                           }`}
-                          style={{ color: '#3C9A6E' }}
                         >
                           <Lightbulb className="w-3.5 h-3.5" />
                         </button>
@@ -2560,7 +2554,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 {file.preview ? (
                   <img src={file.preview} alt={file.name} className="w-8 h-8 rounded object-cover flex-shrink-0" />
                 ) : (
-                  <div className="w-8 h-8 rounded bg-[#4F7396]/10 flex items-center justify-center flex-shrink-0 text-[#4F7396]">
+                  <div className="w-8 h-8 rounded bg-hh-primary/10 flex items-center justify-center flex-shrink-0 text-hh-primary">
                     {getFileIcon(file.type)}
                   </div>
                 )}
@@ -2584,7 +2578,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             variant="outline"
             size="icon"
             disabled={isStreaming}
-            className="flex-shrink-0 rounded-full w-9 h-9 border-hh-border hover:bg-hh-ui-50 text-[#4F7396]"
+            className="flex-shrink-0 rounded-full w-9 h-9 border-hh-border hover:bg-hh-ui-50 text-hh-primary"
             title="Bestand toevoegen"
             onClick={() => handleFileSelect("*")}
           >
@@ -2595,7 +2589,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
             placeholder={isRecording ? "Luistert... spreek nu" : "Typ je bericht..."}
-            className={`flex-1 ${isRecording ? "border-red-300 bg-red-50/30" : ""}`}
+            className={`flex-1 ${isRecording ? "border-hh-error/30 bg-hh-error/5" : ""}`}
             disabled={isStreaming}
           />
           {messages.length > 2 && (
@@ -2605,7 +2599,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               className="flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-full border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors disabled:opacity-40"
               title="Vraag Hugo om feedback"
             >
-              <Award className="w-3.5 h-3.5 text-[#4F7396]" />
+              <Award className="w-3.5 h-3.5 text-hh-primary" />
               <span className="text-[11px] font-medium text-hh-muted hidden sm:inline">Feedback</span>
             </button>
           )}
@@ -2614,18 +2608,15 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             size="icon"
             onClick={handleDictation}
             disabled={isStreaming}
-            className={`flex-shrink-0 transition-all ${isRecording ? "bg-red-500 border-red-500 text-white shadow-lg shadow-red-200 animate-pulse" : "hover:bg-hh-ui-50"}`}
+            className={`flex-shrink-0 transition-all ${isRecording ? "bg-hh-error border-hh-error text-white shadow-lg shadow-hh-error/30 animate-pulse" : "hover:bg-hh-ui-50"}`}
           >
-            {isRecording ? <MicOff className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-[#4F7396]" />}
+            {isRecording ? <MicOff className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-hh-primary" />}
           </Button>
           <Button
             onClick={handleSendMessage}
             disabled={(!inputText.trim() && attachedFiles.length === 0) || isLoading || isStreaming}
             variant="ghost"
-            className="gap-2 px-3 sm:px-4 text-white rounded-md hover:text-white"
-            style={{ backgroundColor: '#3C9A6E' }}
-            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#2D7F57')}
-            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#3C9A6E')}
+            className="gap-2 px-3 sm:px-4 text-white rounded-md hover:text-white bg-hh-success hover:bg-hh-success/90"
           >
             {isLoading || isStreaming ? (
               <Loader2 className="w-4 h-4 text-white animate-spin" />
@@ -2640,10 +2631,10 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
   );
 
   const renderAudioInterface = () => (
-    <div className="h-full w-full flex flex-col" style={{ background: 'linear-gradient(180deg, #059669 0%, #0d9488 50%, #0f766e 100%)' }}>
+    <div className="h-full w-full flex flex-col" style={{ background: 'linear-gradient(180deg, var(--hh-success) 0%, #0d9488 50%, #0f766e 100%)' }}>
       {/* Error message */}
       {audioError && (
-        <div className="absolute top-4 left-4 right-4 bg-red-500/90 text-white p-3 rounded-lg flex items-center gap-2 z-10">
+        <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-10">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span className="text-[14px]">{audioError}</span>
           <button onClick={() => setAudioError(null)} className="ml-auto">
@@ -2757,7 +2748,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     <div className="h-full w-full relative" style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%)' }}>
       {/* Error message */}
       {avatarError && (
-        <div className="absolute top-4 left-4 right-4 bg-red-500/90 text-white p-3 rounded-lg flex items-center gap-2 z-20">
+        <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-20">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span className="text-[14px]">{avatarError}</span>
           <button onClick={() => setAvatarError(null)} className="ml-auto">
@@ -2795,7 +2786,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         <div className="flex items-center gap-2">
           <h3 className="text-white text-[18px] font-semibold">Hugo Herbots</h3>
           {isAvatarSpeaking && (
-            <span className="bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full">Spreekt</span>
+            <span className="bg-hh-success text-white text-[10px] px-2 py-0.5 rounded-full">Spreekt</span>
           )}
         </div>
         <p className="text-white/70 text-[14px]">{formatTime(sessionTimer)}</p>
@@ -2813,7 +2804,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           className="flex items-center justify-center"
           style={{ width: '50px', height: '50px', borderRadius: '50%', backgroundColor: 'var(--hh-ui-100)' }}
         >
-          <span className="text-slate-700 text-[12px] font-medium">JIJ</span>
+          <span className="text-hh-text text-[12px] font-medium">JIJ</span>
         </div>
       </div>
 
@@ -2831,7 +2822,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 backgroundColor: isMuted ? 'white' : 'rgba(255,255,255,0.2)' 
               }}
             >
-              {isMuted ? <MicOff className="w-5 h-5 text-slate-800" /> : <Mic className="w-5 h-5 text-white" />}
+              {isMuted ? <MicOff className="w-5 h-5 text-hh-text" /> : <Mic className="w-5 h-5 text-white" />}
             </button>
             <span className="text-white/70 text-[11px]">{isMuted ? "Unmute" : "Mute"}</span>
           </div>
@@ -2917,21 +2908,21 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               <div className="flex items-center bg-hh-ui-50 rounded-full p-0.5">
                 <button
                   onClick={() => setChatMode("chat")}
-                  className={`p-2 rounded-full transition-all ${chatMode === "chat" ? "bg-card shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
+                  className={`p-2 rounded-full transition-all ${chatMode === "chat" ? "bg-card shadow-sm text-hh-ink" : "text-hh-primary/60 hover:text-hh-primary"}`}
                   title="Chat"
                 >
                   <MessageSquare className="w-4 h-4" strokeWidth={1.5} />
                 </button>
                 <button
                   onClick={() => setChatMode("audio")}
-                  className={`p-2 rounded-full transition-all ${chatMode === "audio" ? "bg-card shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
+                  className={`p-2 rounded-full transition-all ${chatMode === "audio" ? "bg-card shadow-sm text-hh-ink" : "text-hh-primary/60 hover:text-hh-primary"}`}
                   title="Bellen"
                 >
                   <Phone className="w-4 h-4" strokeWidth={1.5} />
                 </button>
                 <button
                   onClick={() => setChatMode("video")}
-                  className={`p-2 rounded-full transition-all ${chatMode === "video" ? "bg-card shadow-sm text-hh-ink" : "text-[#4F7396]/60 hover:text-[#4F7396]"}`}
+                  className={`p-2 rounded-full transition-all ${chatMode === "video" ? "bg-card shadow-sm text-hh-ink" : "text-hh-primary/60 hover:text-hh-primary"}`}
                   title="Video"
                 >
                   <Video className="w-4 h-4" strokeWidth={1.5} />
@@ -2992,7 +2983,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           <div className={`${assistanceConfig.blindPlay || !desktopSidebarOpen ? 'w-full' : 'flex-1'} flex flex-col bg-hh-bg overflow-hidden min-h-0`}>
             {/* Level transition notification banner */}
             {levelTransitionMessage && (
-              <div className="px-6 py-3 bg-gradient-to-r from-[#4F7396]/10 to-[#4F7396]/5 border-b border-[#4F7396]/20">
+              <div className="px-6 py-3 bg-gradient-to-r from-hh-primary/10 to-hh-primary/5 border-b border-hh-primary/20">
                 <div className="flex items-center justify-between">
                   <span className="text-[14px] text-hh-ink font-medium">{levelTransitionMessage}</span>
                   <button 

@@ -178,11 +178,11 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
       case "critical":
-        return <Badge className="bg-red-600 text-white border-0 text-[10px] px-2 py-0.5">Kritiek</Badge>;
+        return <Badge className="bg-hh-error text-white border-0 text-[10px] px-2 py-0.5">Kritiek</Badge>;
       case "warning":
         return <Badge className="bg-orange-500 text-white border-0 text-[10px] px-2 py-0.5">Waarschuwing</Badge>;
       default:
-        return <Badge className="bg-blue-500 text-white border-0 text-[10px] px-2 py-0.5">Info</Badge>;
+        return <Badge className="bg-hh-primary text-white border-0 text-[10px] px-2 py-0.5">Info</Badge>;
     }
   };
 
@@ -207,7 +207,7 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
                 <Check className="w-3.5 h-3.5" />
                 Gelezen
               </Button>
-              <Button variant="outline" size="sm" className="gap-1.5 text-red-600 hover:text-red-700" onClick={handleBulkDelete}>
+              <Button variant="outline" size="sm" className="gap-1.5 text-hh-error hover:text-hh-error" onClick={handleBulkDelete}>
                 <X className="w-3.5 h-3.5" />
                 Verwijder
               </Button>
@@ -217,32 +217,32 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center mb-3">
-              <Bell className="w-5 h-5 text-purple-600" />
+            <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center mb-3">
+              <Bell className="w-5 h-5 text-hh-primary" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Totaal</p>
             <p className="text-[28px] font-semibold text-hh-ink">{notifications.length}</p>
           </Card>
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center mb-3">
-              <Clock className="w-5 h-5 text-amber-600" />
+            <div className="w-10 h-10 rounded-full bg-hh-warning/10 flex items-center justify-center mb-3">
+              <Clock className="w-5 h-5 text-hh-warning" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Ongelezen</p>
             <p className="text-[28px] font-semibold text-hh-ink">{unreadCount}</p>
           </Card>
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mb-3">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 rounded-full bg-hh-success/10 flex items-center justify-center mb-3">
+              <CheckCircle2 className="w-5 h-5 text-hh-success" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Gelezen</p>
             <p className="text-[28px] font-semibold text-hh-ink">{readCount}</p>
           </Card>
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-3">
-              <AlertCircle className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center mb-3">
+              <AlertCircle className="w-5 h-5 text-hh-primary" />
             </div>
             <p className="text-[13px] text-hh-muted mb-1">Correcties</p>
             <p className="text-[28px] font-semibold text-hh-ink">
@@ -305,8 +305,8 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
                       }}
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                         selectedNotifications.length === filteredNotifications.length && filteredNotifications.length > 0
-                          ? "bg-purple-600 border-purple-600"
-                          : "border-hh-border hover:border-purple-400"
+                          ? "bg-hh-primary border-hh-primary"
+                          : "border-hh-border hover:border-hh-primary"
                       }`}
                     >
                       {selectedNotifications.length === filteredNotifications.length && filteredNotifications.length > 0 && (
@@ -337,7 +337,7 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
               <tbody>
                 {loading && (
                   <tr><td colSpan={7} className="p-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-purple-600 mb-2" />
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-hh-primary mb-2" />
                     <p className="text-[13px] text-hh-muted">Notificaties laden...</p>
                   </td></tr>
                 )}
@@ -355,7 +355,7 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
                       key={notification.id}
                       className={`border-b border-hh-border last:border-0 transition-colors ${
                         notification.relatedPage ? 'cursor-pointer hover:bg-hh-ui-50' : 'hover:bg-hh-ui-50'
-                      } ${!notification.read ? 'bg-purple-500/5' : ''}`}
+                      } ${!notification.read ? 'bg-hh-primary/5' : ''}`}
                       onClick={() => {
                         if (notification.relatedPage && navigate) {
                           handleMarkRead(notification.id);
@@ -369,8 +369,8 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
                           onClick={() => toggleSelection(notification.id)}
                           className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                             isSelected
-                              ? "bg-purple-600 border-purple-600"
-                              : "border-hh-border hover:border-purple-400"
+                              ? "bg-hh-primary border-hh-primary"
+                              : "border-hh-border hover:border-hh-primary"
                           }`}
                         >
                           {isSelected && <Check className="w-3 h-3 text-white" />}
@@ -380,7 +380,7 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
                         <div className="max-w-[400px]">
                           <div className="flex items-center gap-2">
                             {!notification.read && (
-                              <span className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0" />
+                              <span className="w-2 h-2 rounded-full bg-hh-primary flex-shrink-0" />
                             )}
                             <p className={`text-[14px] leading-[20px] ${!notification.read ? 'font-semibold text-hh-ink' : 'text-hh-text'}`}>
                               {notification.title}
@@ -391,8 +391,8 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
                           </p>
                           {notification.relatedPage && (
                             <div className="flex items-center gap-1 mt-1">
-                              <ExternalLink className="w-3 h-3 text-purple-500" />
-                              <span className="text-[11px] text-purple-600">Bekijk in Config Review</span>
+                              <ExternalLink className="w-3 h-3 text-hh-primary" />
+                              <span className="text-[11px] text-hh-primary">Bekijk in Config Review</span>
                             </div>
                           )}
                         </div>
@@ -405,11 +405,11 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
                       <td className="p-4">{getSeverityBadge(notification.severity)}</td>
                       <td className="p-4">
                         {notification.read ? (
-                          <Badge variant="outline" className="text-[11px] bg-green-500/10 text-green-600 border-green-500/20">
+                          <Badge variant="outline" className="text-[11px] bg-hh-success/10 text-hh-success border-hh-success/20">
                             Gelezen
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-[11px] bg-amber-500/10 text-amber-600 border-amber-500/20">
+                          <Badge variant="outline" className="text-[11px] bg-hh-warning/10 text-hh-warning border-hh-warning/20">
                             Nieuw
                           </Badge>
                         )}
@@ -425,7 +425,7 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600"
+                              className="h-8 w-8 p-0 hover:bg-hh-success/10 hover:text-hh-success"
                               onClick={() => handleMarkRead(notification.id)}
                               title="Markeer als gelezen"
                             >
@@ -435,7 +435,7 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 hover:bg-red-500/10 hover:text-red-600"
+                            className="h-8 w-8 p-0 hover:bg-hh-error/10 hover:text-hh-error"
                             onClick={() => handleDelete(notification.id)}
                             title="Verwijder"
                           >

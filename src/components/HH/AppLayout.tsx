@@ -279,7 +279,7 @@ export function AppLayout({
       <div
         data-sidebar-collapsed={collapsed ? 'true' : 'false'}
         className={`hidden lg:flex ${
-          collapsed ? "w-[60px]" : "w-56"
+          collapsed ? "w-16" : "w-56"
         } bg-hh-bg border-r border-hh-border flex-col transition-all duration-300 flex-shrink-0`}
       >
         <button

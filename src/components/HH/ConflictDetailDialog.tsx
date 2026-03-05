@@ -56,11 +56,11 @@ export function ConflictDetailDialog({
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case "high":
-        return "text-red-600 bg-red-50 border-red-200";
+        return "text-hh-error bg-hh-error/5 border-hh-error/20";
       case "medium":
         return "text-orange-600 bg-orange-50 border-orange-200";
       case "low":
-        return "text-slate-600 bg-slate-50 border-slate-200";
+        return "text-hh-muted bg-hh-ui-50 border-hh-border";
       default:
         return "";
     }
@@ -104,14 +104,14 @@ export function ConflictDetailDialog({
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="text-[11px] bg-slate-50 border-slate-200"
+                  className="text-[11px] bg-hh-ui-50 border-hh-border"
                 >
                   {conflict.type}
                 </Badge>
                 {conflict.techniqueNumber && (
                   <Badge
                     variant="outline"
-                    className="text-[11px] bg-purple-100 text-purple-600 border-purple-200"
+                    className="text-[11px] bg-hh-primary/15 text-hh-primary border-hh-primary/20"
                   >
                     Techniek {conflict.techniqueNumber}
                   </Badge>
@@ -139,9 +139,9 @@ export function ConflictDetailDialog({
 
         <div className="space-y-6 py-4">
           {/* Expert Comment Section */}
-          <Card className="p-5 bg-blue-50 border-blue-200">
+          <Card className="p-5 bg-hh-primary/5 border-hh-primary/20">
             <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-hh-primary shrink-0 mt-0.5" />
               <div className="flex-1">
                 <h4 className="text-[14px] font-semibold text-hh-ink mb-2">
                   Hugo's AI Expert Comment
@@ -158,9 +158,9 @@ export function ConflictDetailDialog({
             <h4 className="text-[16px] font-semibold text-hh-ink mb-3">
               Voorgestelde aanpassing
             </h4>
-            <div className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden">
-              <div className="bg-slate-100 border-b border-slate-200 px-4 py-2 flex items-center justify-between">
-                <span className="text-[12px] font-mono text-slate-600">
+            <div className="bg-hh-ui-50 border border-hh-border rounded-xl overflow-hidden">
+              <div className="bg-hh-ui-100 border-b border-hh-border px-4 py-2 flex items-center justify-between">
+                <span className="text-[12px] font-mono text-hh-muted">
                   {conflict.affectedFile}
                 </span>
                 <Badge
@@ -170,7 +170,7 @@ export function ConflictDetailDialog({
                   {conflict.suggestedFix.type}
                 </Badge>
               </div>
-              <pre className="p-4 text-[13px] text-slate-800 overflow-x-auto">
+              <pre className="p-4 text-[13px] text-hh-text overflow-x-auto">
                 <code>{conflict.suggestedFix.content}</code>
               </pre>
             </div>
@@ -183,12 +183,12 @@ export function ConflictDetailDialog({
                 <MessageSquare className="w-5 h-5" />
                 Rollenspel Transcript
               </h4>
-              <Card className="p-4 bg-amber-50 border-amber-200">
+              <Card className="p-4 bg-hh-warning/5 border-hh-warning/20">
                 <div className="space-y-2">
-                  <div className="text-[12px] text-amber-800 font-medium">
+                  <div className="text-[12px] text-hh-warning font-medium">
                     Relevant fragment uit sessie {conflict.sessionId}:
                   </div>
-                  <p className="text-[14px] leading-[22px] text-slate-700">
+                  <p className="text-[14px] leading-[22px] text-hh-text">
                     {conflict.transcriptExcerpt}
                   </p>
                 </div>
@@ -197,21 +197,21 @@ export function ConflictDetailDialog({
           )}
 
           {/* Impact Analysis */}
-          <Card className="p-4 bg-purple-50 border-purple-200">
+          <Card className="p-4 bg-hh-primary/5 border-hh-primary/20">
             <h4 className="text-[14px] font-semibold text-hh-ink mb-2">
               Impact van deze wijziging
             </h4>
             <ul className="space-y-1 text-[13px] text-hh-text">
               <li className="flex items-start gap-2">
-                <span className="text-purple-600 shrink-0">•</span>
+                <span className="text-hh-primary shrink-0">•</span>
                 <span>Config file wordt automatisch geüpdatet</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-purple-600 shrink-0">•</span>
+                <span className="text-hh-primary shrink-0">•</span>
                 <span>Nieuwe detectie patterns worden actief bij volgende sessie</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-purple-600 shrink-0">•</span>
+                <span className="text-hh-primary shrink-0">•</span>
                 <span>Rollback mogelijk via Config History</span>
               </li>
             </ul>
@@ -229,14 +229,14 @@ export function ConflictDetailDialog({
           <Button
             variant="outline"
             onClick={handleRejectClick}
-            className="flex-1 sm:flex-none gap-2 text-red-600 border-red-600/30 hover:bg-red-50"
+            className="flex-1 sm:flex-none gap-2 text-hh-error border-hh-error/30 hover:bg-hh-error/5"
           >
             <X className="w-4 h-4" />
             Wijs af
           </Button>
           <Button
             onClick={handleAcceptClick}
-            className="flex-1 sm:flex-none gap-2 bg-green-600 hover:bg-green-700"
+            className="flex-1 sm:flex-none gap-2 bg-hh-success hover:bg-hh-success/90"
           >
             <Check className="w-4 h-4" />
             Accepteer & Pas toe

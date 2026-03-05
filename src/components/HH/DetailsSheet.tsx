@@ -33,10 +33,10 @@ export function DetailsSheet({
 }: DetailsSheetProps) {
   const isAdmin = variant === 'admin';
   
-  const accentColor = isAdmin ? '#9333ea' : '#3d9a6e';
-  const secondaryColor = isAdmin ? '#9333ea' : '#1e3a5f';
-  const accentBg = isAdmin ? 'rgba(147, 51, 234, 0.05)' : 'rgba(61, 154, 110, 0.08)';
-  const accentBorder = isAdmin ? 'rgba(147, 51, 234, 0.2)' : 'rgba(61, 154, 110, 0.25)';
+  const accentColor = isAdmin ? 'var(--hh-primary)' : 'var(--hh-success)';
+  const secondaryColor = isAdmin ? 'var(--hh-primary)' : '#1e3a5f';
+  const accentBg = isAdmin ? 'color-mix(in srgb, var(--hh-primary) 5%, transparent)' : 'rgba(61, 154, 110, 0.08)';
+  const accentBorder = isAdmin ? 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' : 'rgba(61, 154, 110, 0.25)';
   const headerBg = isAdmin ? 'var(--card)' : 'rgba(61, 154, 110, 0.03)';
 
   return (
@@ -103,8 +103,8 @@ interface TechniqueContentProps {
 
 export function TechniqueContent({ technique, variant = 'user' }: TechniqueContentProps) {
   const isAdmin = variant === 'admin';
-  const accentColor = isAdmin ? '#9333ea' : '#3d9a6e';
-  const accentBg = isAdmin ? 'rgba(147, 51, 234, 0.05)' : 'rgba(61, 154, 110, 0.08)';
+  const accentColor = isAdmin ? 'var(--hh-primary)' : 'var(--hh-success)';
+  const accentBg = isAdmin ? 'color-mix(in srgb, var(--hh-primary) 5%, transparent)' : 'rgba(61, 154, 110, 0.08)';
   
   if (!technique) {
     return <p className="text-hh-muted py-4">Techniek niet gevonden</p>;
