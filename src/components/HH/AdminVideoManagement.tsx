@@ -386,9 +386,22 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     }
   };
   
+  // Pipeline health state - checks service configuration
+  const [pipelineHealth, setPipelineHealth] = useState<{
+    checks: Record<string, { configured: boolean; [k: string]: any }>;
+    worker: { active: boolean; stalled: boolean; pending_jobs: number; minutes_since_last: number | null };
+  } | null>(null);
+
   // Poll batch status - reduced to every 2 minutes to avoid overload
   useEffect(() => {
     fetchBatchStatus();
+    // Fetch pipeline health once on mount
+    (async () => {
+      try {
+        const resp = await fetch('/api/admin-video/video-processor/pipeline-health');
+        if (resp.ok) setPipelineHealth(await resp.json());
+      } catch {}
+    })();
     const interval = setInterval(fetchBatchStatus, 120000); // elke 2 min
     return () => clearInterval(interval);
   }, []);
@@ -795,6 +808,80 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
   useEffect(() => {
     calculatePipelineStats(videos);
   }, [videos]);
+
+  // Compute per-stage diagnostics from pipeline stats + health checks
+  type Diagnostic = { severity: 'error' | 'warning' | 'info'; message: string; action: string };
+  const computeDiagnostics = (): Record<string, Diagnostic[]> => {
+    const d: Record<string, Diagnostic[]> = { drive: [], greenscreen: [], audio: [], transcript: [], rag: [], mux: [] };
+    const stats = pipelineStats;
+    const health = pipelineHealth;
+    const worker = batchQueueStatus;
+
+    // Drive diagnostics
+    if (stats.total === 0 && videos.length === 0) {
+      d.drive.push({ severity: 'error', message: 'Geen video\'s geladen', action: 'Controleer database verbinding' });
+    }
+    if (stats.drive.pending > 0) {
+      if (health && !health.checks.cloud_run?.configured) {
+        d.drive.push({ severity: 'error', message: `${stats.drive.pending} wachtend — Cloud Run niet geconfigureerd`, action: 'Stel CLOUD_RUN_WORKER_URL en SECRET in' });
+      } else if (worker?.isStalled) {
+        d.drive.push({ severity: 'error', message: `${stats.drive.pending} wachtend — worker vastgelopen`, action: 'Herstart batch verwerking' });
+      } else if (worker?.active) {
+        d.drive.push({ severity: 'info', message: `${stats.drive.pending} wordt verwerkt...`, action: '' });
+      } else {
+        d.drive.push({ severity: 'warning', message: `${stats.drive.pending} wachtend — worker idle`, action: 'Start batch verwerking' });
+      }
+    }
+    if (stats.drive.failed > 0) {
+      const hasDiskQuota = stats.drive.errorMessages.some(m => m.toLowerCase().includes('disk quota') || m.toLowerCase().includes('errno 122'));
+      d.drive.push({ severity: 'error', message: hasDiskQuota ? 'Disk quota vol' : `${stats.drive.failed} downloads mislukt`, action: hasDiskQuota ? 'Ruim disk op' : 'Reset en herverwerk' });
+    }
+
+    // Greenscreen
+    if (stats.greenscreen.stuck > 0) d.greenscreen.push({ severity: 'warning', message: `${stats.greenscreen.stuck} vastgelopen >15 min`, action: 'Reset of herstart worker' });
+    if (stats.greenscreen.failed > 0) d.greenscreen.push({ severity: 'error', message: `${stats.greenscreen.failed} chromakey mislukt`, action: 'Reset video\'s' });
+
+    // Audio
+    if (stats.audio.stuck > 0) d.audio.push({ severity: 'warning', message: `${stats.audio.stuck} vastgelopen >15 min`, action: 'Reset of herstart worker' });
+    if (stats.audio.failed > 0) d.audio.push({ severity: 'error', message: `${stats.audio.failed} audio extractie mislukt`, action: 'Reset en herverwerk' });
+
+    // Transcript
+    if (stats.transcript.stuck > 0) d.transcript.push({ severity: 'warning', message: `${stats.transcript.stuck} vastgelopen >15 min`, action: 'Reset of herstart worker' });
+    if (stats.transcript.failed > 0) {
+      const hasApiError = health && !health.checks.elevenlabs?.configured;
+      d.transcript.push({ severity: 'error', message: hasApiError ? 'ElevenLabs API key ontbreekt' : `${stats.transcript.failed} transcripties mislukt`, action: hasApiError ? 'Stel Elevenlabs_api_key in' : 'Reset en herverwerk' });
+    }
+
+    // RAG
+    const completedWithoutRag = videos.filter(v => v.source === 'pipeline' && v.has_transcript && !v.has_rag && ((v as any).raw_status === 'completed' || v.status === 'completed')).length;
+    if (completedWithoutRag > 0) {
+      d.rag.push({ severity: 'warning', message: `${completedWithoutRag} missen embeddings`, action: 'Herverwerk RAG stap' });
+    }
+    if (stats.rag.done === 0 && stats.transcript.done > 0) {
+      if (health && !health.checks.openai?.configured) {
+        d.rag.push({ severity: 'error', message: 'OpenAI API key ontbreekt', action: 'Stel OPENAI_API_KEY in' });
+      }
+    }
+    if (stats.rag.stuck > 0) d.rag.push({ severity: 'warning', message: `${stats.rag.stuck} vastgelopen >15 min`, action: 'Reset of herstart worker' });
+    if (stats.rag.failed > 0) d.rag.push({ severity: 'error', message: `${stats.rag.failed} embeddings mislukt`, action: 'Reset en herverwerk' });
+
+    // Mux
+    if (stats.mux.stuck > 0) d.mux.push({ severity: 'warning', message: `${stats.mux.stuck} uploads vastgelopen`, action: 'Check Mux dashboard' });
+    if (stats.mux.failed > 0) {
+      const hasMuxCreds = health?.checks.mux?.configured !== false;
+      d.mux.push({ severity: 'error', message: hasMuxCreds ? `${stats.mux.failed} Mux uploads mislukt` : 'Mux credentials ontbreken', action: hasMuxCreds ? 'Reset en herverwerk' : 'Stel MUX_TOKEN_ID en SECRET in' });
+    }
+
+    // Sort each stage by severity: error > warning > info
+    const severityOrder = { error: 0, warning: 1, info: 2 };
+    for (const key of Object.keys(d)) {
+      d[key].sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
+    }
+
+    return d;
+  };
+
+  const diagnostics = computeDiagnostics();
 
   // Fetch videos from API
   const fetchVideos = async (isBackgroundRefresh = false) => {
@@ -1623,7 +1710,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               { name: driveTotalCount ? `${pipelineStats.drive.done} / ${driveTotalCount}` : 'Drive', key: 'drive', stats: pipelineStats.drive, icon: FolderSync, bgColorStyle: 'rgba(37, 99, 235, 0.1)', colorStyle: '#2563eb', isClickable: false, link: undefined as string | undefined },
               { name: 'Greenscreen', key: 'greenscreen', stats: pipelineStats.greenscreen, icon: Video, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: '#10b981', isClickable: false, link: undefined as string | undefined },
               { name: 'Audio', key: 'audio', stats: pipelineStats.audio, icon: Volume2, bgColorStyle: 'rgba(234, 88, 12, 0.1)', colorStyle: '#ea580c', isClickable: false, link: undefined as string | undefined },
-              { name: 'Transcript', key: 'transcript', stats: pipelineStats.transcript, icon: FileText, bgColorStyle: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', colorStyle: 'var(--hh-primary)', isClickable: false, link: undefined as string | undefined },
+              { name: 'Transcript', key: 'transcript', stats: pipelineStats.transcript, icon: FileText, bgColorStyle: 'var(--hh-primary-100)', colorStyle: 'var(--hh-primary)', isClickable: false, link: undefined as string | undefined },
               { name: 'RAG', key: 'rag', stats: pipelineStats.rag, icon: Database, bgColorStyle: 'rgba(79, 70, 229, 0.1)', colorStyle: '#4f46e5', isClickable: false, link: undefined as string | undefined },
               { name: 'Mux', key: 'mux', stats: pipelineStats.mux, icon: Tv, bgColorStyle: 'rgba(219, 39, 119, 0.1)', colorStyle: '#db2777', isClickable: false, link: undefined as string | undefined },
             ].map(step => {
@@ -1648,7 +1735,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 badgeStyleObj = { backgroundColor: 'rgba(249, 115, 22, 0.1)', color: '#ea580c', borderColor: 'rgba(249, 115, 22, 0.2)' };
               } else if (isProcessing) {
                 badgeText = `${step.stats.processing} bezig`;
-                badgeStyleObj = { backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' };
+                badgeStyleObj = { backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' };
               } else {
                 badgeText = `${percentage}%`;
                 badgeStyleObj = { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' };
@@ -1741,6 +1828,35 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                       )}
                     </div>
                   </div>
+                  {diagnostics[step.key]?.length > 0 && (() => {
+                    const topDiag = diagnostics[step.key][0];
+                    const DiagIcon = topDiag.severity === 'error' ? AlertCircle : topDiag.severity === 'warning' ? AlertTriangle : Info;
+                    const diagColor = topDiag.severity === 'error' ? 'text-hh-error' : topDiag.severity === 'warning' ? 'text-hh-warning' : 'text-hh-muted';
+                    const allDiags = diagnostics[step.key];
+                    return allDiags.length > 1 ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className={`mt-1.5 flex items-center gap-1 cursor-help ${diagColor}`} onClick={e => e.stopPropagation()}>
+                            <DiagIcon className="w-3 h-3 shrink-0" />
+                            <span className="text-[10px] leading-[14px] truncate">{topDiag.message}</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-[280px] bg-hh-text text-white p-2">
+                          {allDiags.map((diag, i) => (
+                            <div key={i} className="text-[11px] mb-1 last:mb-0">
+                              <p className="font-medium">{diag.message}</p>
+                              {diag.action && <p className="text-hh-muted">{diag.action}</p>}
+                            </div>
+                          ))}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <div className={`mt-1.5 flex items-center gap-1 ${diagColor}`}>
+                        <DiagIcon className="w-3 h-3 shrink-0" />
+                        <span className="text-[10px] leading-[14px] truncate">{topDiag.message}</span>
+                      </div>
+                    );
+                  })()}
                 </Card>
               );
             })}
@@ -1767,7 +1883,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     </div>
                     <span className="text-[10px] px-1.5 py-0.5 rounded-full border" style={
                       isProcessing
-                        ? { backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }
+                        ? { backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' }
                         : { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }
                     }>
                       {isProcessing ? `${step.stats.processing} bezig` : `${percentage}%`}
@@ -1783,7 +1899,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         
         {/* Active KPI Filter indicator */}
         {isSuperAdmin && activeKpiFilter && (
-          <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ color: 'var(--hh-primary)', backgroundColor: 'color-mix(in srgb, var(--hh-primary) 5%, transparent)' }}>
+          <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ color: 'var(--hh-primary)', backgroundColor: 'var(--hh-primary-50)' }}>
             <span>Gefilterd op: <strong>{activeKpiFilter}</strong></span>
             <button 
               onClick={() => setActiveKpiFilter(null)}
@@ -2301,7 +2417,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           onClick={() => isPlayable && setPreviewVideo(video)}
                         >
                           <td className="py-3 px-4">
-                            <Badge variant="outline" className="text-[11px] font-mono" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}>
+                            <Badge variant="outline" className="text-[11px] font-mono" style={{ backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' }}>
                               {techNummer}
                             </Badge>
                           </td>
@@ -2310,7 +2426,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                               {video.ai_attractive_title || video.title}
                               {video.is_hidden && <EyeOff className="w-3 h-3 text-hh-muted inline ml-1" />}
                               {linkedTech?.confidence && (
-                                <Badge variant="outline" className="text-[9px] px-1 py-0 ml-2" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 5%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}>
+                                <Badge variant="outline" className="text-[9px] px-1 py-0 ml-2" style={{ backgroundColor: 'var(--hh-primary-50)', color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' }}>
                                   AI {Math.round(linkedTech.confidence * 100)}%
                                 </Badge>
                               )}
@@ -2734,7 +2850,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         badges={
           <>
             {selectedTechniqueId && (
-              <Badge className="text-[12px] px-2.5 py-0.5 rounded-full font-mono" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)' }}>
+              <Badge className="text-[12px] px-2.5 py-0.5 rounded-full font-mono" style={{ backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)' }}>
                 {selectedTechniqueId}
               </Badge>
             )}
@@ -2742,7 +2858,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               {detailsVideo?.status}
             </Badge>
             {detailsVideo?.ai_confidence && (
-              <Badge variant="outline" className="text-[11px]" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 5%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' }}>
+              <Badge variant="outline" className="text-[11px]" style={{ backgroundColor: 'var(--hh-primary-50)', color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' }}>
                 AI {Math.round(detailsVideo.ai_confidence * 100)}%
               </Badge>
             )}
@@ -3108,7 +3224,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                   </div>
 
                   {/* Samenvatting Section - with steel blue background like Doel */}
-                  <div className="p-4 rounded-lg border" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 5%, transparent)', borderColor: 'color-mix(in srgb, var(--hh-primary) 15%, transparent)' }}>
+                  <div className="p-4 rounded-lg border" style={{ backgroundColor: 'var(--hh-primary-50)', borderColor: 'var(--hh-primary-100)' }}>
                     <div className="flex items-start gap-2 mb-2">
                       <Target className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--hh-primary)' }} />
                       <h3 className="text-[13px] font-semibold text-hh-text">Samenvatting</h3>
@@ -3148,7 +3264,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                               }}
                               disabled={generatingSummary}
                               className="text-[12px] font-medium px-3 py-1.5 rounded-md border flex items-center gap-1.5 hover:bg-hh-primary/10 transition-colors"
-                              style={{ color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 30%, transparent)' }}
+                              style={{ color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' }}
                             >
                               {generatingSummary ? (
                                 <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Genereren...</>
@@ -3207,7 +3323,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                               }}
                               disabled={generatingSummary}
                               className="text-[11px] font-medium px-2 py-1 rounded border flex items-center gap-1 hover:bg-hh-primary/10 transition-colors"
-                              style={{ color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 30%, transparent)' }}
+                              style={{ color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' }}
                             >
                               {generatingSummary ? (
                                 <><Loader2 className="w-3 h-3 animate-spin" /> Hergenereren...</>
@@ -3481,7 +3597,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         ) : currentTechnique.themas && currentTechnique.themas.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
                             {currentTechnique.themas.map((thema: string) => (
-                              <Badge key={thema} variant="outline" className="text-[11px]" style={{ borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)', color: 'var(--hh-muted)' }}>
+                              <Badge key={thema} variant="outline" className="text-[11px]" style={{ borderColor: 'var(--hh-primary-200)', color: 'var(--hh-muted)' }}>
                                 {thema}
                               </Badge>
                             ))}

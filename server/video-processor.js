@@ -1506,6 +1506,43 @@ const server = http.createServer((req, res) => {
     res.end(JSON.stringify({ status: 'ok', processing: processingActive }));
     return;
   }
+
+  if (pathname === '/api/video-processor/pipeline-health') {
+    (async () => {
+      try {
+        const checks = {
+          google_drive: { configured: !!process.env.GOOGLE_CLOUD_SECRET },
+          cloud_run: {
+            configured: !!(process.env.CLOUD_RUN_WORKER_URL && process.env.CLOUD_RUN_WORKER_SECRET),
+            url_set: !!process.env.CLOUD_RUN_WORKER_URL,
+            secret_set: !!process.env.CLOUD_RUN_WORKER_SECRET,
+          },
+          mux: { configured: !!(process.env.MUX_TOKEN_ID && process.env.MUX_TOKEN_SECRET) },
+          openai: { configured: !!process.env.OPENAI_API_KEY },
+          elevenlabs: { configured: !!(process.env.Elevenlabs_api_key || process.env.ELEVENLABS_API_KEY) },
+          supabase: { configured: !!(supabaseAdmin) },
+        };
+
+        let worker = { active: false, stalled: false, pending_jobs: 0 };
+        try {
+          const batchStatus = await getBatchStatus();
+          worker = {
+            active: batchStatus.active || false,
+            stalled: batchStatus.isStalled || false,
+            pending_jobs: batchStatus.counters?.pending || 0,
+            minutes_since_last: batchStatus.minutesSinceLastCompletion || null,
+          };
+        } catch {}
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'ok', checks, worker }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'error', message: err.message }));
+      }
+    })();
+    return;
+  }
   
   if (pathname === '/api/video-processor/start' && req.method === 'POST') {
     if (!checkAuth(req)) {
