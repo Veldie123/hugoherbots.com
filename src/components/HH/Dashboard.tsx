@@ -1,3 +1,4 @@
+import { useState, useRef, useCallback } from 'react';
 import { AppLayout } from "./AppLayout";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
@@ -5,6 +6,7 @@ import { Button } from "../ui/button";
 import { EmptyState } from "./EmptyState";
 import {
   Play,
+  ChevronLeft,
   ChevronRight,
   Clock,
   Calendar,
@@ -14,6 +16,8 @@ import {
   CheckCircle,
   UserPlus,
   Lock,
+  BarChart3,
+  Upload,
 } from "lucide-react";
 import { getDailyQuote } from "../../data/hugoQuotes";
 import { getTechniekByNummer } from "../../data/technieken-service";
@@ -21,6 +25,8 @@ import { useDashboardWebinars } from "../../hooks/useDashboardWebinars";
 import { getFaseBadgeColors } from "../../utils/phaseColors";
 import { useDashboardVideos } from "../../hooks/useDashboardVideos";
 import { useDashboardUserData } from "../../hooks/useDashboardUserData";
+import { useDashboardAnalyses } from "../../hooks/useDashboardAnalyses";
+import { useDashboardSessions } from "../../hooks/useDashboardSessions";
 
 interface DashboardProps {
   hasData?: boolean;
@@ -30,39 +36,82 @@ interface DashboardProps {
   isPreview?: boolean;
 }
 
-const ContentRow = ({ 
-  title, 
+const ContentRow = ({
+  title,
   icon: Icon,
   children,
   onSeeAll
-}: { 
-  title: string; 
+}: {
+  title: string;
   icon?: React.ElementType;
   children: React.ReactNode;
   onSeeAll?: () => void;
-}) => (
-  <div className="space-y-3 min-w-0">
-    <div className="flex items-center justify-between gap-2 px-1">
-      <div className="flex items-center gap-2 min-w-0">
-        {Icon && <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-hh-muted flex-shrink-0" />}
-        <h2 className="text-[16px] sm:text-[18px] font-semibold text-hh-text truncate">{title}</h2>
+}) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+  }, []);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const scrollAmount = el.clientWidth * 0.8;
+    el.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="space-y-3 min-w-0 group/row">
+      <div className="flex items-center justify-between gap-2 px-1">
+        <div className="flex items-center gap-2 min-w-0">
+          {Icon && <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-hh-muted flex-shrink-0" />}
+          <h2 className="text-[16px] sm:text-[18px] font-semibold text-hh-text truncate">{title}</h2>
+        </div>
+        {onSeeAll && (
+          <button
+            onClick={onSeeAll}
+            className="flex items-center gap-1 text-[12px] sm:text-[13px] text-hh-primary hover:text-hh-ink transition-colors flex-shrink-0 whitespace-nowrap"
+          >
+            <span className="hidden sm:inline">Alles bekijken</span>
+            <span className="sm:hidden">Alle</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
       </div>
-      {onSeeAll && (
-        <button 
-          onClick={onSeeAll}
-          className="flex items-center gap-1 text-[12px] sm:text-[13px] text-hh-primary hover:text-hh-ink transition-colors flex-shrink-0 whitespace-nowrap"
+      <div className="relative">
+        {canScrollLeft && (
+          <button
+            onClick={() => scroll('left')}
+            className="hidden sm:flex absolute left-0 top-0 bottom-2 z-10 w-10 items-center justify-center bg-gradient-to-r from-white via-white/90 to-transparent opacity-0 group-hover/row:opacity-100 transition-opacity"
+          >
+            <ChevronLeft className="w-5 h-5 text-hh-text" />
+          </button>
+        )}
+        <div
+          ref={scrollRef}
+          onScroll={checkScroll}
+          onMouseEnter={checkScroll}
+          className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
         >
-          <span className="hidden sm:inline">Alles bekijken</span>
-          <span className="sm:hidden">Alle</span>
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      )}
+          {children}
+        </div>
+        {canScrollRight && (
+          <button
+            onClick={() => scroll('right')}
+            className="hidden sm:flex absolute right-0 top-0 bottom-2 z-10 w-10 items-center justify-center bg-gradient-to-l from-white via-white/90 to-transparent opacity-0 group-hover/row:opacity-100 transition-opacity"
+          >
+            <ChevronRight className="w-5 h-5 text-hh-text" />
+          </button>
+        )}
+      </div>
     </div>
-    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-      {children}
-    </div>
-  </div>
-);
+  );
+};
 
 const VideoCard = ({ 
   title, 
@@ -84,7 +133,7 @@ const VideoCard = ({
   locked?: boolean;
 }) => (
   <div 
-    className={`flex-shrink-0 w-[45vw] sm:w-[200px] group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+    className={`flex-shrink-0 w-[45vw] sm:w-[260px] group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
     onClick={locked ? undefined : onClick}
   >
     <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
@@ -166,7 +215,7 @@ const WebinarCard = ({
   onRegister?: () => void;
 }) => (
   <div 
-    className="flex-shrink-0 w-[45vw] sm:w-[200px] group cursor-pointer"
+    className="flex-shrink-0 w-[45vw] sm:w-[260px] group cursor-pointer"
     onClick={onClick}
   >
     <div className="relative rounded-lg overflow-hidden aspect-video mb-2">
@@ -256,7 +305,7 @@ const HugoTrainingCard = ({
   
   return (
     <div 
-      className="flex-shrink-0 w-[45vw] sm:w-[200px] group cursor-pointer"
+      className="flex-shrink-0 w-[45vw] sm:w-[260px] group cursor-pointer"
       onClick={onClick}
     >
       <div className={`relative rounded-lg overflow-hidden aspect-video mb-2`}>
@@ -285,10 +334,121 @@ const HugoTrainingCard = ({
   );
 };
 
+const AnalysisCard = ({
+  title,
+  date,
+  score,
+  status,
+  duration,
+  onClick
+}: {
+  title: string;
+  date: string;
+  score: number | null;
+  status: string;
+  duration: string;
+  onClick?: () => void;
+}) => {
+  const isProcessing = status !== 'completed' && status !== 'failed';
+  const scoreColor = score !== null
+    ? score >= 80 ? 'text-hh-success' : score >= 50 ? 'text-amber-500' : 'text-hh-error'
+    : 'text-hh-muted';
+
+  return (
+    <div
+      className="flex-shrink-0 w-[45vw] sm:w-[260px] group cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-ink to-hh-primary/60 aspect-video mb-2 flex items-center justify-center">
+        {isProcessing ? (
+          <Loader2 className="w-8 h-8 text-white/60 animate-spin" />
+        ) : status === 'failed' ? (
+          <span className="text-hh-error text-[11px] font-medium">Mislukt</span>
+        ) : (
+          <div className="text-center">
+            {score !== null && (
+              <div className={`text-[32px] font-bold ${scoreColor}`}>{score}%</div>
+            )}
+            <BarChart3 className="w-6 h-6 text-white/40 mx-auto mt-1" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+          <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+            <BarChart3 className="w-6 h-6 text-hh-ink" />
+          </div>
+        </div>
+      </div>
+      <h3 className="text-[12px] font-medium text-hh-text leading-tight line-clamp-2 group-hover:text-hh-primary transition-colors">
+        {title}
+      </h3>
+      <div className="flex items-center gap-2 mt-1">
+        <span className="text-[11px] text-hh-muted">{date}</span>
+        {duration && (
+          <>
+            <span className="text-[11px] text-hh-muted">•</span>
+            <span className="text-[11px] text-hh-muted flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {duration}
+            </span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const SessionCard = ({
+  title,
+  date,
+  score,
+  type,
+  onClick
+}: {
+  title: string;
+  date: string;
+  score: number | null;
+  type: string;
+  onClick?: () => void;
+}) => {
+  const typeLabel = type === 'ai-audio' ? 'Audio' : type === 'ai-video' ? 'Video' : 'Chat';
+
+  return (
+    <div
+      className="flex-shrink-0 w-[45vw] sm:w-[260px] group cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-primary/80 to-hh-primary/40 aspect-video mb-2 flex items-center justify-center">
+        <MessageSquare className="w-10 h-10 text-white/40" />
+        {score !== null && (
+          <Badge className="absolute top-2 right-2 bg-white/90 text-hh-ink text-[10px] px-1.5 py-0.5">
+            {score}%
+          </Badge>
+        )}
+        <Badge className="absolute top-2 left-2 bg-hh-ink/60 text-white text-[10px] px-1.5 py-0.5">
+          {typeLabel}
+        </Badge>
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+          <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+            <MessageSquare className="w-6 h-6 text-hh-ink" />
+          </div>
+        </div>
+      </div>
+      <h3 className="text-[12px] font-medium text-hh-text leading-tight line-clamp-2 group-hover:text-hh-primary transition-colors">
+        {title}
+      </h3>
+      <div className="flex items-center gap-2 mt-1">
+        <span className="text-[11px] text-hh-muted">{date}</span>
+      </div>
+    </div>
+  );
+};
+
 export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isPreview = false, onboardingMode }: DashboardProps) {
   const { videos: realVideos, featuredVideo, loading: videosLoading } = useDashboardVideos();
   const { firstName, loginStreak, phaseProgress, totalCompleted, totalVideos } = useDashboardUserData();
   const { upcomingWebinars, completedWebinars, loading: webinarsLoading } = useDashboardWebinars();
+  const { analyses, loading: analysesLoading } = useDashboardAnalyses();
+  const { sessions: hugoSessions, loading: sessionsLoading } = useDashboardSessions();
   const displayName = isPreview ? "" : firstName;
 
   // hasData: default true since dashboard always has shared content (videos, webinars)
@@ -313,7 +473,10 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
     return completedVideoIds.has(realVideos[idx - 1].id);
   };
 
-  const continueWatching = realVideos.slice(0, 5).map((v) => ({
+  // Find where the user left off: first unwatched video, then show from there
+  const firstUnwatchedIdx = realVideos.findIndex(v => !completedVideoIds.has(v.id));
+  const startIdx = firstUnwatchedIdx > 0 ? firstUnwatchedIdx - 1 : 0; // include last watched
+  const continueWatching = realVideos.slice(startIdx, startIdx + 12).map((v) => ({
     ...v,
     progress: completedVideoIds.has(v.id) ? 100 : 0,
   }));
@@ -465,9 +628,9 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
           }}
         >
           {videosLoading ? (
-            <>{[...Array(4)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[180px] space-y-2">
-                <div className="h-[100px] bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
+            <>{[...Array(5)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[260px] space-y-2">
+                <div className="aspect-video bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-24 bg-hh-border/30 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 40}ms` }} />
                 <div className="h-3 w-16 bg-hh-border/20 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 80}ms` }} />
               </div>
@@ -507,7 +670,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         >
           {webinarsLoading ? (
             <>{[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[200px] p-3 bg-hh-card rounded-lg border border-hh-border space-y-2">
+              <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[260px] p-3 bg-hh-card rounded-lg border border-hh-border space-y-2">
                 <div className="h-4 w-32 bg-hh-border/30 rounded animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-20 bg-hh-border/20 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 40}ms` }} />
               </div>
@@ -552,23 +715,86 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
           </ContentRow>
         )}
 
-        {/* Train met Hugo AI */}
-        <ContentRow 
-          title="Train met Hugo AI" 
+        {/* Train met Hugo AI — real sessions or fallback to suggestions */}
+        <ContentRow
+          title="Train met Hugo AI"
           icon={MessageSquare}
           onSeeAll={() => navigate?.("hugo-overview")}
         >
-          {hugoTrainings.map((training, index) => (
-            <HugoTrainingCard
-              key={index}
-              title={training.naam}
-              techniqueNumber={training.nummer}
-              fase={training.fase}
-              sessions={training.sessions}
-              imageIndex={index}
-              onClick={() => navigate?.("talk-to-hugo")}
-            />
-          ))}
+          {sessionsLoading ? (
+            <>{[...Array(3)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[260px] space-y-2">
+                <div className="aspect-video bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
+                <div className="h-3 w-24 bg-hh-border/30 rounded animate-pulse" />
+              </div>
+            ))}</>
+          ) : hugoSessions.length > 0 ? (
+            hugoSessions.map((session, index) => (
+              <SessionCard
+                key={session.id || index}
+                title={session.title}
+                date={session.date}
+                score={session.score}
+                type={session.type}
+                onClick={() => navigate?.("hugo-overview")}
+              />
+            ))
+          ) : (
+            hugoTrainings.map((training, index) => (
+              <HugoTrainingCard
+                key={index}
+                title={training.naam}
+                techniqueNumber={training.nummer}
+                fase={training.fase}
+                sessions={training.sessions}
+                imageIndex={index}
+                onClick={() => navigate?.("talk-to-hugo")}
+              />
+            ))
+          )}
+        </ContentRow>
+
+        {/* Gespreksanalyses */}
+        <ContentRow
+          title="Gespreksanalyses"
+          icon={BarChart3}
+          onSeeAll={() => navigate?.("analysis")}
+        >
+          {analysesLoading ? (
+            <>{[...Array(3)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[260px] space-y-2">
+                <div className="aspect-video bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
+                <div className="h-3 w-24 bg-hh-border/30 rounded animate-pulse" />
+              </div>
+            ))}</>
+          ) : analyses.length > 0 ? (
+            analyses.map((analysis, index) => (
+              <AnalysisCard
+                key={analysis.id || index}
+                title={analysis.title}
+                date={analysis.date}
+                score={analysis.score}
+                status={analysis.status}
+                duration={analysis.duration}
+                onClick={() => navigate?.("analysis")}
+              />
+            ))
+          ) : (
+            <div
+              className="flex-shrink-0 w-[45vw] sm:w-[260px] cursor-pointer group"
+              onClick={() => navigate?.("analysis")}
+            >
+              <div className="rounded-lg border-2 border-dashed border-hh-border group-hover:border-hh-primary/50 aspect-video mb-2 flex flex-col items-center justify-center gap-2 transition-colors">
+                <Upload className="w-8 h-8 text-hh-muted group-hover:text-hh-primary transition-colors" />
+                <span className="text-[12px] text-hh-muted group-hover:text-hh-primary transition-colors font-medium">
+                  Upload je eerste gesprek
+                </span>
+              </div>
+              <h3 className="text-[12px] font-medium text-hh-muted leading-tight">
+                Analyseer je verkoopgesprekken met AI
+              </h3>
+            </div>
+          )}
         </ContentRow>
 
         {/* Compact Progress Footer */}
@@ -583,8 +809,8 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
                 <div key={index} className="flex-1 h-2 rounded-full bg-hh-ui-200 overflow-hidden">
                   <div 
                     className={`h-full rounded-full ${
-                      p.percentage >= 100 ? "bg-emerald-500" : 
-                      p.percentage > 0 ? "bg-blue-400" : "bg-hh-ui-200"
+                      p.percentage >= 100 ? "bg-hh-success" :
+                      p.percentage > 0 ? "bg-hh-primary" : "bg-hh-ui-200"
                     }`}
                     style={{ width: `${p.percentage}%` }}
                   />
