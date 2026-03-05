@@ -12,8 +12,6 @@ import {
   BookOpen,
   Star,
   Search,
-  List,
-  LayoutGrid,
   FolderOpen,
   TrendingUp,
   ArrowUpDown,
@@ -57,7 +55,7 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterType, setFilterType] = useState("all");
-  const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
+  const [viewMode] = useMobileViewMode("grid", "list");
   const [sortBy, setSortBy] = useState<"title" | "downloads" | "size">("title");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
@@ -348,32 +346,6 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
               </SelectContent>
             </Select>
             
-            <div className="hidden sm:flex gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`${
-                  viewMode === "list" 
-                    ? "bg-hh-primary text-white hover:bg-hh-primary/90" 
-                    : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }`}
-                onClick={() => setViewMode("list")}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`${
-                  viewMode === "grid" 
-                    ? "bg-hh-primary text-white hover:bg-hh-primary/90" 
-                    : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }`}
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </Card>
 

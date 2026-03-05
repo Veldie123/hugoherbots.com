@@ -22,8 +22,6 @@ import {
 } from "../ui/dropdown-menu";
 import {
   Search,
-  List,
-  LayoutGrid,
   Upload,
   FileAudio,
   Video,
@@ -69,7 +67,7 @@ interface ConversationRecord {
 }
 
 export function Analysis({ navigate, isAdmin }: AnalysisProps) {
-  const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
+  const [viewMode] = useMobileViewMode("grid", "list");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortField, setSortField] = useState<string | null>("date");
@@ -437,24 +435,6 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                 </SelectContent>
               </Select>
 
-              <div className="hidden md:flex gap-1 shrink-0">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className={`hidden md:flex ${viewMode === "list" ? "bg-hh-success text-white hover:bg-hh-success/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
-                >
-                  <List className="w-4 h-4 text-current" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className={`hidden md:flex ${viewMode === "grid" ? "bg-hh-success text-white hover:bg-hh-success/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
-                >
-                  <LayoutGrid className="w-4 h-4 text-current" />
-                </Button>
-              </div>
             </div>
           </div>
         </Card>

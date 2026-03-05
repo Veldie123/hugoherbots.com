@@ -9,8 +9,6 @@ import {
   CheckCircle,
   AlertTriangle,
   BarChart3,
-  Grid3X3,
-  List,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -65,7 +63,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFase, setActiveFase] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [viewMode, setViewMode] = useMobileViewMode('grid', 'list');
+  const [viewMode] = useMobileViewMode('grid', 'list');
   const [sortField, setSortField] = useState<SortField>('code');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [detailsTechnique, setDetailsTechnique] = useState<string | null>(null);
@@ -325,68 +323,68 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)' }}>
-                <Award className="w-5 h-5" style={{ color: '#9333ea' }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-primary/10">
+                <Award className="w-5 h-5 text-hh-primary" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">
                 +5%
               </Badge>
             </div>
             <p className="text-[13px] leading-[18px] text-hh-muted">
               Totaal Technieken
             </p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-primary">
               {totalTechnieken}
             </p>
           </Card>
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
-                <CheckCircle className="w-5 h-5" style={{ color: '#10b981' }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success/10">
+                <CheckCircle className="w-5 h-5 text-hh-success" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">
                 +12%
               </Badge>
             </div>
             <p className="text-[13px] leading-[18px] text-hh-muted">
               Actieve Technieken
             </p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-primary">
               {activeTechnieken}
             </p>
           </Card>
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)' }}>
-                <BarChart3 className="w-5 h-5" style={{ color: '#9333ea' }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-primary/10">
+                <BarChart3 className="w-5 h-5 text-hh-primary" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">
                 +8%
               </Badge>
             </div>
             <p className="text-[13px] leading-[18px] text-hh-muted">
               Gem. Score
             </p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-primary">
               {avgScore}%
             </p>
           </Card>
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
-                <TrendingUp className="w-5 h-5" style={{ color: '#10b981' }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success/10">
+                <TrendingUp className="w-5 h-5 text-hh-success" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">
                 +4.2%
               </Badge>
             </div>
             <p className="text-[13px] leading-[18px] text-hh-muted">
               Trend Score
             </p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>
+            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-primary">
               {needsImprovement}
             </p>
           </Card>
@@ -428,35 +426,6 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               </SelectContent>
             </Select>
             
-            {/* View Toggle */}
-            <div className="hidden sm:flex gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`${
-                  viewMode === "list" 
-                    ? "text-white" 
-                    : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }`}
-                style={viewMode === "list" ? { backgroundColor: '#9333ea' } : undefined}
-                onClick={() => setViewMode("list")}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`${
-                  viewMode === "grid" 
-                    ? "text-white" 
-                    : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }`}
-                style={viewMode === "grid" ? { backgroundColor: '#9333ea' } : undefined}
-                onClick={() => setViewMode("grid")}
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </Card>
 
@@ -471,10 +440,10 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               >
                 <div className="p-4" onClick={() => setDetailsTechnique(techniek.code)}>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[12px] font-mono font-semibold" style={{ backgroundColor: 'rgba(147, 51, 234, 0.15)', color: '#3d6080' }}>
+                    <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[12px] font-mono font-semibold bg-hh-primary/15" style={{ color: '#3d6080' }}>
                       {techniek.code}
                     </span>
-                    <Badge variant="outline" className="text-[10px]" style={techniek.status === 'Actief' ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' } : { backgroundColor: 'rgba(139, 149, 165, 0.1)', color: '#8B95A5' }}>
+                    <Badge variant="outline" className="text-[10px]" style={techniek.status === 'Actief' ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--hh-success)', borderColor: 'rgba(16, 185, 129, 0.2)' } : { backgroundColor: 'rgba(139, 149, 165, 0.1)', color: '#8B95A5' }}>
                       {techniek.status}
                     </Badge>
                   </div>
@@ -483,16 +452,16 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                   </h3>
                   <div className="flex items-center gap-4 text-[12px] text-hh-muted mb-3">
                     <span className="flex items-center gap-1">
-                      <Video className="w-3.5 h-3.5" style={{ color: '#9333ea' }} />
+                      <Video className="w-3.5 h-3.5 text-hh-primary" />
                       {techniek.videos} video's
                     </span>
                     <span className="flex items-center gap-1">
-                      <Play className="w-3.5 h-3.5 text-blue-500" />
+                      <Play className="w-3.5 h-3.5 text-hh-primary" />
                       {techniek.roleplays} role-plays
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-[12px]">
-                    <span className="text-hh-muted">Score: <span className="font-medium" style={{ color: '#10b981' }}>{techniek.avgScore}%</span></span>
+                    <span className="text-hh-muted">Score: <span className="font-medium text-hh-success">{techniek.avgScore}%</span></span>
                     <span className="text-hh-muted">Compl: {techniek.completion}%</span>
                   </div>
                 </div>
@@ -500,8 +469,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex-1 h-8 text-[11px]"
-                    style={{ color: '#9333ea' }}
+                    className="flex-1 h-8 text-[11px] text-hh-primary"
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       localStorage.setItem('filterTechniek', techniek.code);
@@ -514,7 +482,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex-1 h-8 text-[11px] text-blue-600 hover:bg-hh-ui-50 hover:text-blue-500"
+                    className="flex-1 h-8 text-[11px] text-hh-primary hover:bg-hh-ui-50 hover:text-hh-primary"
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       setDetailsTechnique(techniek.code);
@@ -614,8 +582,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                         <td className="py-3 px-4">
                           <Badge
                             variant="outline"
-                            className="text-[11px] font-mono"
-                            style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}
+                            className="text-[11px] font-mono bg-hh-primary/10 text-hh-primary border-hh-primary/20"
                           >
                             {techniek.code}
                           </Badge>
@@ -627,18 +594,18 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                         </td>
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1 text-[14px] leading-[20px] text-hh-text">
-                            <Video className="w-3.5 h-3.5" style={{ color: '#9333ea' }} />
+                            <Video className="w-3.5 h-3.5 text-hh-primary" />
                             {techniek.videos}
                           </div>
                         </td>
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1 text-[14px] leading-[20px] text-hh-text">
-                            <Play className="w-3.5 h-3.5 text-blue-600" />
+                            <Play className="w-3.5 h-3.5 text-hh-primary" />
                             {techniek.roleplays}
                           </div>
                         </td>
                         <td className="py-3 px-4 text-right">
-                          <span className="text-[14px] leading-[20px] font-medium" style={{ color: '#10b981' }}>
+                          <span className="text-[14px] leading-[20px] font-medium text-hh-success">
                             {techniek.avgScore}%
                           </span>
                         </td>
@@ -648,7 +615,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <Badge className="text-[11px]" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+                          <Badge className="text-[11px] bg-hh-success/10 text-hh-success border-hh-success/20">
                             {techniek.status}
                           </Badge>
                         </td>
@@ -698,9 +665,8 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
             variant="admin"
             badges={
               tech?.nummer && (
-                <Badge 
-                  className="font-mono text-sm px-3 py-1" 
-                  style={{ backgroundColor: 'rgba(147, 51, 234, 0.15)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.3)' }}
+                <Badge
+                  className="font-mono text-sm px-3 py-1 bg-hh-primary/15 text-hh-primary border-hh-primary/30"
                 >
                   {tech.nummer}
                 </Badge>
@@ -726,9 +692,8 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                 <Button variant="outline" onClick={() => setDetailsTechnique(null)}>
                   Sluiten
                 </Button>
-                <Button 
-                  className="text-white hover:opacity-90"
-                  style={{ backgroundColor: '#9333ea' }}
+                <Button
+                  className="text-white hover:opacity-90 bg-hh-primary"
                   onClick={() => {
                     if (detailsTechnique) {
                       startEditing(detailsTechnique);
@@ -759,9 +724,8 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
         variant="admin"
         badges={
           editingTechnique && (
-            <Badge 
-              className="font-mono text-sm px-3 py-1" 
-              style={{ backgroundColor: 'rgba(147, 51, 234, 0.15)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.3)' }}
+            <Badge
+              className="font-mono text-sm px-3 py-1 bg-hh-primary/15 text-hh-primary border-hh-primary/30"
             >
               {editingTechnique}
             </Badge>
@@ -772,7 +736,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
             <Input
               value={editedTechniqueData.naam}
               onChange={(e) => setEditedTechniqueData({...editedTechniqueData, naam: e.target.value})}
-              className="text-xl font-semibold border-2 focus-visible:ring-[#9333ea] focus-visible:border-[#9333ea]"
+              className="text-xl font-semibold border-2 focus-visible:ring-hh-primary focus-visible:border-hh-primary"
               placeholder="Techniek naam"
             />
           ) : 'Techniek Bewerken'
@@ -791,9 +755,8 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
             }}>
               Annuleren
             </Button>
-            <Button 
-              className="text-white hover:opacity-90 gap-2"
-              style={{ backgroundColor: '#9333ea' }}
+            <Button
+              className="text-white hover:opacity-90 gap-2 bg-hh-primary"
               onClick={handleSaveTechnique}
             >
               <Save className="w-4 h-4" />
@@ -805,15 +768,15 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
         {editedTechniqueData && (
           <div className="space-y-6">
             {/* Doel Section - Main purple card like video Samenvatting */}
-            <div className="p-4 rounded-lg border" style={{ backgroundColor: 'rgba(147, 51, 234, 0.05)', borderColor: 'rgba(147, 51, 234, 0.15)' }}>
+            <div className="p-4 rounded-lg border bg-hh-primary/5 border-hh-primary/15">
               <div className="flex items-start gap-2 mb-2">
-                <Target className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#9333ea' }} />
+                <Target className="w-4 h-4 mt-0.5 flex-shrink-0 text-hh-primary" />
                 <h3 className="text-[13px] font-semibold text-hh-text">Doel</h3>
               </div>
               <AutoResizeTextarea
                 value={editedTechniqueData.doel}
                 onChange={(e) => setEditedTechniqueData({...editedTechniqueData, doel: e.target.value})}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="Doel van de techniek..."
                 minHeight={60}
                 maxHeight={200}
@@ -829,7 +792,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               <AutoResizeTextarea
                 value={editedTechniqueData.wat}
                 onChange={(e) => setEditedTechniqueData({...editedTechniqueData, wat: e.target.value})}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="Wat is de techniek..."
                 minHeight={60}
                 maxHeight={200}
@@ -845,7 +808,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               <AutoResizeTextarea
                 value={editedTechniqueData.waarom}
                 onChange={(e) => setEditedTechniqueData({...editedTechniqueData, waarom: e.target.value})}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="Waarom deze techniek gebruiken..."
                 minHeight={60}
                 maxHeight={200}
@@ -861,7 +824,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               <AutoResizeTextarea
                 value={editedTechniqueData.wanneer}
                 onChange={(e) => setEditedTechniqueData({...editedTechniqueData, wanneer: e.target.value})}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="Wanneer de techniek toepassen..."
                 minHeight={60}
                 maxHeight={200}
@@ -877,7 +840,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               <AutoResizeTextarea
                 value={editedTechniqueData.hoe}
                 onChange={(e) => setEditedTechniqueData({...editedTechniqueData, hoe: e.target.value})}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="Hoe de techniek toepassen..."
                 minHeight={80}
                 maxHeight={300}
@@ -897,7 +860,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                   ...editedTechniqueData, 
                   stappenplan: e.target.value.split('\n').filter((s: string) => s.trim())
                 })}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="Stap 1&#10;Stap 2&#10;Stap 3..."
                 minHeight={80}
                 maxHeight={300}
@@ -917,7 +880,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                   ...editedTechniqueData, 
                   voorbeeld: e.target.value.split('\n').filter((s: string) => s.trim())
                 })}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="Voorbeeld 1&#10;Voorbeeld 2..."
                 minHeight={80}
                 maxHeight={300}
@@ -937,7 +900,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                   ...editedTechniqueData, 
                   tags: e.target.value.split('\n').filter((s: string) => s.trim())
                 })}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="tag1&#10;tag2&#10;tag3..."
                 minHeight={60}
                 maxHeight={200}
@@ -957,7 +920,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                   ...editedTechniqueData, 
                   themas: e.target.value.split('\n').filter((s: string) => s.trim())
                 })}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="thema1&#10;thema2..."
                 minHeight={60}
                 maxHeight={200}
@@ -977,7 +940,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                   ...editedTechniqueData, 
                   context_requirements: e.target.value.split('\n').filter((s: string) => s.trim())
                 })}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="vereiste1&#10;vereiste2..."
                 minHeight={60}
                 maxHeight={200}
@@ -997,7 +960,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                   ...editedTechniqueData, 
                   verkoper_intentie: e.target.value.split('\n').filter((s: string) => s.trim())
                 })}
-                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea]"
+                className="w-full text-[13px] leading-[20px] p-3 border rounded-md bg-hh-bg focus:ring-2 focus:ring-hh-primary focus:border-hh-primary"
                 placeholder="intentie1&#10;intentie2..."
                 minHeight={60}
                 maxHeight={300}

@@ -11,8 +11,6 @@ import {
   Calendar,
   Download,
   Plus,
-  List,
-  LayoutGrid,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -56,7 +54,7 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPlan, setFilterPlan] = useState("all");
-  const [viewMode, setViewMode] = useMobileViewMode("card", "list");
+  const [viewMode] = useMobileViewMode("card", "list");
   const [sortBy, setSortBy] = useState<string>("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedOrg, setSelectedOrg] = useState<any>(null);
@@ -172,13 +170,13 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px]">
+          <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px]">
             Actief
           </Badge>
         );
       case "trial":
         return (
-          <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[11px]">
+          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
             Trial
           </Badge>
         );
@@ -229,12 +227,12 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)' }}>
-                <Building2 className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#9333ea' }} />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-hh-primary" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +8%
               </Badge>
@@ -249,12 +247,12 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-success/10 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-hh-success" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +5%
               </Badge>
@@ -269,12 +267,12 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600/10 flex items-center justify-center">
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-hh-primary" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +12%
               </Badge>
@@ -289,12 +287,12 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-success/10 flex items-center justify-center">
+                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-hh-success" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +15%
               </Badge>
@@ -321,34 +319,6 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-              </div>
-              <div className="hidden sm:flex gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  style={viewMode === "list" ? { backgroundColor: '#9333ea', color: 'white' } : {}}
-                  className={`${
-                    viewMode === "list" 
-                      ? "" 
-                      : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                  }`}
-                  onClick={() => setViewMode("list")}
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  style={viewMode === "card" ? { backgroundColor: '#9333ea', color: 'white' } : {}}
-                  className={`${
-                    viewMode === "card" 
-                      ? "" 
-                      : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                  }`}
-                  onClick={() => setViewMode("card")}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                </Button>
               </div>
             </div>
 
@@ -421,7 +391,7 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <Avatar className="w-10 h-10">
-                            <AvatarFallback style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea' }} className="text-[13px]">
+                            <AvatarFallback className="text-[13px] bg-hh-primary/10 text-hh-primary">
                               {org.name.substring(0, 2).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
@@ -461,7 +431,7 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
                       <td className="py-3 px-4 text-right text-[14px] leading-[20px] text-hh-text">
                         {org.totalSessions}
                       </td>
-                      <td className="py-3 px-4 text-right text-[14px] leading-[20px] text-emerald-500 font-medium">
+                      <td className="py-3 px-4 text-right text-[14px] leading-[20px] text-hh-success font-medium">
                         €{org.mrr}
                       </td>
                       <td className="py-3 px-4">{getStatusBadge(org.status)}</td>
@@ -481,7 +451,7 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
                               <Edit className="w-4 h-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
+                            <DropdownMenuItem className="text-hh-error">
                               <Trash2 className="w-4 h-4 mr-2" />
                               Delete
                             </DropdownMenuItem>
@@ -504,7 +474,7 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <Avatar className="w-12 h-12">
-                      <AvatarFallback style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea' }} className="text-[16px]">
+                      <AvatarFallback className="text-[16px] bg-hh-primary/10 text-hh-primary">
                         {org.name.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -538,7 +508,7 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
                   </div>
                   <div className="flex items-center justify-between text-[13px] leading-[18px]">
                     <span className="text-hh-muted">MRR:</span>
-                    <span className="text-emerald-500 font-medium">€{org.mrr}/mnd</span>
+                    <span className="text-hh-success font-medium">€{org.mrr}/mnd</span>
                   </div>
                 </div>
 
@@ -569,7 +539,7 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
               <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
                 <div className="flex items-start gap-4">
                   <Avatar className="w-16 h-16">
-                    <AvatarFallback style={{ backgroundColor: '#9333ea', color: 'white' }} className="text-[20px]">
+                    <AvatarFallback className="text-[20px] bg-hh-primary text-white">
                       {selectedOrg.name.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -586,7 +556,7 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
                       <span>{selectedOrg.adminEmail}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-3">
-                      <Badge style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
+                      <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20">
                         {selectedOrg.plan} - {selectedOrg.planPrice}
                       </Badge>
                       {getStatusBadge(selectedOrg.status)}
@@ -598,28 +568,28 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
               {/* Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <Card className="p-4 rounded-[12px] shadow-hh-sm border-hh-border text-center">
-                  <Users className="w-5 h-5 text-blue-600 mx-auto mb-2" />
+                  <Users className="w-5 h-5 text-hh-primary mx-auto mb-2" />
                   <p className="text-[24px] leading-[32px] text-hh-ink">
                     {selectedOrg.users}
                   </p>
                   <p className="text-[12px] leading-[16px] text-hh-muted">Gebruikers</p>
                 </Card>
                 <Card className="p-4 rounded-[12px] shadow-hh-sm border-hh-border text-center">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
+                  <CheckCircle2 className="w-5 h-5 text-hh-success mx-auto mb-2" />
                   <p className="text-[24px] leading-[32px] text-hh-ink">
                     {selectedOrg.activeUsers}
                   </p>
                   <p className="text-[12px] leading-[16px] text-hh-muted">Actief</p>
                 </Card>
                 <Card className="p-4 rounded-[12px] shadow-hh-sm border-hh-border text-center">
-                  <TrendingUp className="w-5 h-5" style={{ color: '#9333ea' }} />
+                  <TrendingUp className="w-5 h-5 text-hh-primary" />
                   <p className="text-[24px] leading-[32px] text-hh-ink">
                     {selectedOrg.totalSessions}
                   </p>
                   <p className="text-[12px] leading-[16px] text-hh-muted">Sessies</p>
                 </Card>
                 <Card className="p-4 rounded-[12px] shadow-hh-sm border-hh-border text-center">
-                  <DollarSign className="w-5 h-5 text-emerald-500 mx-auto mb-2" />
+                  <DollarSign className="w-5 h-5 text-hh-success mx-auto mb-2" />
                   <p className="text-[24px] leading-[32px] text-hh-ink">
                     €{selectedOrg.mrr}
                   </p>

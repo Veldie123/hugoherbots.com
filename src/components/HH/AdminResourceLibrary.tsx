@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -32,8 +31,6 @@ import {
   Edit2,
   Trash2,
   MoreVertical,
-  List,
-  LayoutGrid,
   TrendingUp,
   Calendar,
   Star,
@@ -56,7 +53,6 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterType, setFilterType] = useState("all");
-  const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<any>(null);
@@ -344,26 +340,6 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
                 <SelectItem value="Spreadsheet">Spreadsheet</SelectItem>
               </SelectContent>
             </Select>
-            <div className="hidden sm:flex gap-2">
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("list")}
-                style={viewMode === "list" ? { backgroundColor: '#9333ea' } : {}}
-                className={viewMode === "list" ? "hover:opacity-90 text-white" : ""}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("grid")}
-                style={viewMode === "grid" ? { backgroundColor: '#9333ea' } : {}}
-                className={viewMode === "grid" ? "hover:opacity-90 text-white" : ""}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </Card>
 

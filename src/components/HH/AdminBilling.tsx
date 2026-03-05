@@ -9,8 +9,6 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  List,
-  LayoutGrid,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -41,7 +39,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPeriod, setFilterPeriod] = useState("all");
-  const [viewMode, setViewMode] = useMobileViewMode("card", "list");
+  const [viewMode] = useMobileViewMode("card", "list");
   const [sortBy, setSortBy] = useState<string>("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -294,24 +292,6 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-              </div>
-              <div className="hidden sm:flex rounded-lg border border-hh-border overflow-hidden">
-                <Button
-                  variant={viewMode === "list" ? "secondary" : "ghost"}
-                  size="sm"
-                  className="rounded-none border-r border-hh-border"
-                  onClick={() => setViewMode("list")}
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "card" ? "secondary" : "ghost"}
-                  size="sm"
-                  className="rounded-none"
-                  onClick={() => setViewMode("card")}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                </Button>
               </div>
             </div>
 

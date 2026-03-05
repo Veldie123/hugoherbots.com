@@ -15,8 +15,6 @@ import {
   Image as ImageIcon,
   Play,
   TrendingUp,
-  List,
-  LayoutGrid,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -56,7 +54,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterFase, setFilterFase] = useState("all");
-  const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
+  const [viewMode] = useMobileViewMode("grid", "list");
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -90,11 +88,11 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
       case "video":
         return "steelblue-bg";
       case "scenario":
-        return "bg-blue-600/10 text-blue-600";
+        return "bg-hh-primary/10 text-hh-primary";
       case "live":
-        return "bg-red-600/10 text-red-600";
+        return "bg-hh-error/10 text-hh-error";
       case "document":
-        return "bg-emerald-500/10 text-emerald-500";
+        return "bg-hh-success/10 text-hh-success";
       default:
         return "bg-hh-muted/10 text-hh-muted";
     }
@@ -169,9 +167,9 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
       return <ArrowUpDown className="w-3 h-3 text-hh-muted" />;
     }
     return sortDirection === "asc" ? (
-      <ArrowUp className="w-3 h-3" style={{ color: "#9333ea" }} />
+      <ArrowUp className="w-3 h-3" style={{ color: "var(--hh-primary)" }} />
     ) : (
-      <ArrowDown className="w-3 h-3" style={{ color: "#9333ea" }} />
+      <ArrowDown className="w-3 h-3" style={{ color: "var(--hh-primary)" }} />
     );
   };
 
@@ -193,7 +191,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
               <Download className="w-4 h-4" />
               <span className="hidden lg:inline">Export</span>
             </Button>
-            <Button size="sm" className="gap-2 bg-red-600 hover:bg-red-700">
+            <Button size="sm" className="gap-2 bg-hh-error hover:bg-hh-error/90">
               <Upload className="w-4 h-4" />
               <span className="hidden lg:inline">Upload Content</span>
               <span className="lg:hidden">Upload</span>
@@ -206,12 +204,12 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
           {stats.map((stat) => {
             const Icon = stat.icon;
             const bgColor = stat.color === "steelblue" ? "steelblue-bg" : 
-                           stat.color === "blue" ? "bg-blue-600/10" :
-                           stat.color === "red" ? "bg-red-600/10" : "bg-emerald-500/10";
+                           stat.color === "blue" ? "bg-hh-primary/10" :
+                           stat.color === "red" ? "bg-hh-error/10" : "bg-hh-success/10";
             const iconColor = stat.color === "steelblue" ? "steelblue-text" : 
-                             stat.color === "blue" ? "text-blue-600" :
-                             stat.color === "red" ? "text-red-600" : "text-emerald-500";
-            const trendColor = stat.trend === "up" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                             stat.color === "blue" ? "text-hh-primary" :
+                             stat.color === "red" ? "text-hh-error" : "text-hh-success";
+            const trendColor = stat.trend === "up" ? "bg-hh-success/10 text-hh-success border-hh-success/20" :
                               stat.trend === "down" ? "bg-hh-error/10 text-hh-error border-hh-error/20" :
                               "bg-hh-muted/10 text-hh-muted border-hh-muted/20";
             return (
@@ -229,7 +227,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                     <Icon 
                       className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.color === "steelblue" ? "" : iconColor}`}
                       style={stat.color === "steelblue" ? { 
-                        color: "#9333ea"
+                        color: "var(--hh-primary)"
                       } : undefined}
                     />
                   </div>
@@ -294,39 +292,6 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
               </SelectContent>
             </Select>
             
-            {/* View Toggle - Right Side */}
-            <div className="hidden sm:flex gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`${
-                  viewMode === "list" 
-                    ? "text-white" 
-                    : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }`}
-                style={viewMode === "list" ? {
-                  backgroundColor: "#9333ea"
-                } : undefined}
-                onClick={() => setViewMode("list")}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`${
-                  viewMode === "grid" 
-                    ? "text-white" 
-                    : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }`}
-                style={viewMode === "grid" ? {
-                  backgroundColor: "#9333ea"
-                } : undefined}
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </Card>
 
@@ -357,7 +322,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                             backgroundColor: "rgba(147, 51, 234, 0.1)"
                           } : undefined}
                         >
-                          <Icon className="w-5 h-5" style={content.type === "video" ? { color: "#9333ea" } : undefined} />
+                          <Icon className="w-5 h-5" style={content.type === "video" ? { color: "var(--hh-primary)" } : undefined} />
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -378,7 +343,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                               <Play className="w-4 h-4 mr-2" />
                               Preview
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
+                            <DropdownMenuItem className="text-hh-error">
                               <Trash2 className="w-4 h-4 mr-2" />
                               Verwijder
                             </DropdownMenuItem>
@@ -395,7 +360,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                           <Badge variant="outline" className="text-[11px]">
                             {getTypeLabel(content.type)}
                           </Badge>
-                          <Badge variant="outline" className="text-[11px] bg-blue-500/10 text-blue-600 border-blue-500/20">
+                          <Badge variant="outline" className="text-[11px] bg-hh-primary/10 text-hh-primary border-hh-primary/20">
                             {content.fase}
                           </Badge>
                         </div>
@@ -407,7 +372,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                           <Eye className="w-4 h-4" />
                           <span>{content.views} views</span>
                         </div>
-                        <div className="flex items-center gap-1 text-emerald-500">
+                        <div className="flex items-center gap-1 text-hh-success">
                           <TrendingUp className="w-4 h-4" />
                           <span>{content.engagement}%</span>
                         </div>
@@ -419,7 +384,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                         <Badge
                           className={`text-[11px] ${
                             content.status === "Gepubliceerd"
-                              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                              ? "bg-hh-success/10 text-hh-success border-hh-success/20"
                               : "bg-hh-muted/10 text-hh-muted border-hh-muted/20"
                           }`}
                         >
@@ -511,7 +476,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                         {content.techniqueNumber && (
                           <div className="w-10 h-10 rounded-lg flex items-center justify-center text-[13px] font-semibold" style={{
                             backgroundColor: "rgba(147, 51, 234, 0.15)",
-                            color: "#9333ea"
+                            color: "var(--hh-primary)"
                           }}>
                             {content.techniqueNumber}
                           </div>
@@ -533,7 +498,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                               backgroundColor: "rgba(147, 51, 234, 0.1)"
                             } : undefined}
                           >
-                            <Icon className="w-4 h-4" style={content.type === "video" ? { color: "#9333ea" } : undefined} />
+                            <Icon className="w-4 h-4" style={content.type === "video" ? { color: "var(--hh-primary)" } : undefined} />
                           </div>
                           <Badge variant="outline" className="text-[11px] bg-hh-ui-100 text-hh-muted border-hh-border">
                             {getTypeLabel(content.type)}
@@ -543,16 +508,16 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                       <td className="px-4 py-3">
                         <Badge
                           variant="outline"
-                          className="text-[11px] bg-blue-600/10 text-blue-600 border-blue-600/20"
+                          className="text-[11px] bg-hh-primary/10 text-hh-primary border-hh-primary/20"
                         >
                           {content.fase}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-right text-[14px] text-emerald-500 font-medium">
+                      <td className="px-4 py-3 text-right text-[14px] text-hh-success font-medium">
                         {content.views}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className="text-[14px] text-emerald-500 flex items-center justify-end gap-1">
+                        <span className="text-[14px] text-hh-success flex items-center justify-end gap-1">
                           {content.engagement}%
                           <TrendingUp className="w-3.5 h-3.5" />
                         </span>
@@ -561,7 +526,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                         <Badge
                           className={`text-[11px] ${
                             content.status === "Gepubliceerd"
-                              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                              ? "bg-hh-success/10 text-hh-success border-hh-success/20"
                               : "bg-hh-muted/10 text-hh-muted border-hh-muted/20"
                           }`}
                         >
@@ -588,7 +553,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                               <Play className="w-4 h-4 mr-2" />
                               Preview
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
+                            <DropdownMenuItem className="text-hh-error">
                               <Trash2 className="w-4 h-4 mr-2" />
                               Verwijder
                             </DropdownMenuItem>

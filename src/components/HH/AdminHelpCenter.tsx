@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -29,8 +28,6 @@ import {
   Edit2,
   Trash2,
   MoreVertical,
-  List,
-  LayoutGrid,
   Calendar,
   CheckCircle2,
   XCircle,
@@ -57,7 +54,6 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
@@ -361,24 +357,6 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
                 <SelectItem value="Gearchiveerd">Gearchiveerd</SelectItem>
               </SelectContent>
             </Select>
-            <div className="hidden sm:flex gap-2">
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("list")}
-                style={viewMode === "list" ? { backgroundColor: '#9333ea' } : {}}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("grid")}
-                style={viewMode === "grid" ? { backgroundColor: '#9333ea' } : {}}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </Card>
 

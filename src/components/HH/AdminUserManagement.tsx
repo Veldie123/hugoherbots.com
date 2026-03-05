@@ -17,8 +17,6 @@ import {
   Trash2,
   Users,
   CheckCircle,
-  List,
-  LayoutGrid,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -67,7 +65,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
   const [filterPlan, setFilterPlan] = useState("all");
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [showUserDetail, setShowUserDetail] = useState(false);
-  const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
+  const [viewMode] = useMobileViewMode("grid", "list");
   const [sortField, setSortField] = useState<"name" | "sessions" | "score" | "joined" | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -434,33 +432,6 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               </SelectContent>
             </Select>
             
-            {/* View Toggle - Right Side */}
-            <div className="hidden sm:flex gap-1 sm:ml-auto">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={
-                  viewMode === "list"
-                    ? "bg-hh-primary text-white"
-                    : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }
-                onClick={() => setViewMode("list")}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={
-                  viewMode === "grid"
-                    ? "bg-hh-primary text-white"
-                    : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </Card>
 

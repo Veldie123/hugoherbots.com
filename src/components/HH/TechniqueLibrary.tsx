@@ -23,8 +23,6 @@ import {
 } from "../ui/dropdown-menu";
 import {
   Search,
-  List,
-  LayoutGrid,
   Video,
   Play,
   Award,
@@ -53,7 +51,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFase, setActiveFase] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
+  const [viewMode] = useMobileViewMode("grid", "list");
   const [sortBy, setSortBy] = useState<"code" | "name" | "videos" | "roleplays" | "score">("code");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [selectedTechnique, setSelectedTechnique] = useState<any>(null);
@@ -215,8 +213,8 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
               </div>
             </div>
             <div className="flex items-center gap-2 px-3 py-2 bg-hh-bg rounded-lg border border-hh-border shadow-sm">
-              <div className="w-6 h-6 rounded-full bg-[#3d9a6e]/10 flex items-center justify-center">
-                <TrendingUp className="w-3 h-3" style={{ color: '#3d9a6e' }} />
+              <div className="w-6 h-6 rounded-full bg-hh-success/10 flex items-center justify-center">
+                <TrendingUp className="w-3 h-3 text-hh-success" />
               </div>
               <div>
                 <p className="text-[10px] text-hh-muted leading-none">Voortgang</p>
@@ -243,7 +241,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
           <div className="relative h-full flex items-center p-6 sm:p-8">
             <div className="text-white space-y-3 max-w-lg">
               {/* Green accent badge */}
-              <Badge className="text-white border-0" style={{ backgroundColor: '#3d9a6e' }}>
+              <Badge className="text-white border-0 bg-hh-success">
                 <Award className="w-3 h-3 mr-1" />
                 54 E.P.I.C. TECHNIQUE
               </Badge>
@@ -269,11 +267,8 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                   <Play className="w-4 h-4" />
                   Bekijk Video's
                 </button>
-                <Button 
-                  className="gap-2 border-0"
-                  style={{ backgroundColor: '#3d9a6e' }}
-                  onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#4daa7e'}
-                  onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#3d9a6e'}
+                <Button
+                  className="gap-2 border-0 bg-hh-success hover:bg-hh-success/90"
                   onClick={() => navigate?.("talk-to-hugo")}
                 >
                   <MessageCircle className="w-4 h-4" />
@@ -321,32 +316,6 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                   <SelectItem value="archief">Archief</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="hidden sm:flex gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`${
-                    viewMode === "list" 
-                      ? "bg-hh-primary text-white hover:bg-hh-primary/90" 
-                      : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                  }`}
-                  onClick={() => setViewMode("list")}
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`${
-                    viewMode === "grid" 
-                      ? "bg-hh-primary text-white hover:bg-hh-primary/90" 
-                      : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                  }`}
-                  onClick={() => setViewMode("grid")}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                </Button>
-              </div>
             </div>
           </div>
         </Card>
@@ -394,7 +363,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                     <span className="text-[11px] text-hh-success font-medium">{techniek.avgScore}%</span>
                   </div>
                 </div>
-                <Badge className={`text-[9px] px-1.5 py-0 flex-shrink-0 ${techniek.status === 'Actief' ? 'bg-green-500/10 text-green-700 dark:text-green-400' : techniek.status === 'Concept' ? 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400' : 'bg-hh-ui-50 text-hh-muted'} border-0`}>
+                <Badge className={`text-[9px] px-1.5 py-0 flex-shrink-0 ${techniek.status === 'Actief' ? 'bg-hh-success/10 text-hh-success dark:text-hh-success' : techniek.status === 'Concept' ? 'bg-hh-warning/10 text-hh-warning dark:text-hh-warning' : 'bg-hh-ui-50 text-hh-muted'} border-0`}>
                   {techniek.status}
                 </Badge>
               </div>
@@ -515,7 +484,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                       </td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-1 text-[14px] leading-[20px] text-hh-text">
-                          <Play className="w-3.5 h-3.5 text-blue-600" />
+                          <Play className="w-3.5 h-3.5 text-hh-primary" />
                           {techniek.roleplays}
                         </div>
                       </td>

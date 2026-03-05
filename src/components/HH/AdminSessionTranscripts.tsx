@@ -12,8 +12,6 @@ import {
   MoreVertical,
   ThumbsUp,
   BarChart3,
-  List,
-  LayoutGrid,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -77,7 +75,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
   };
   const [sortField, setSortField] = useState<"user" | "score" | "date" | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
+  const [viewMode] = useMobileViewMode("grid", "list");
 
   const handleSort = (field: "user" | "score" | "date") => {
     if (sortField === field) {
@@ -419,27 +417,6 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
               </SelectContent>
             </Select>
             
-            {/* View Toggle - Right Side */}
-            <div className="hidden sm:flex gap-1 sm:ml-auto shrink-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                style={viewMode === "list" ? { backgroundColor: '#9333ea', color: 'white' } : {}}
-                className={viewMode === "list" ? "hover:opacity-90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}
-                onClick={() => setViewMode("list")}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                style={viewMode === "grid" ? { backgroundColor: '#9333ea', color: 'white' } : {}}
-                className={viewMode === "grid" ? "hover:opacity-90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </Card>
 

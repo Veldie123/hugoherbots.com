@@ -51,8 +51,6 @@ import {
   Code,
   ChevronRight,
   ChevronDown,
-  List,
-  LayoutGrid,
   Settings,
 } from "lucide-react";
 import { CustomCheckbox } from "../ui/custom-checkbox";
@@ -109,7 +107,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterQuality, setFilterQuality] = useState<string>("all");
-  const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
+  const [viewMode] = useMobileViewMode("grid", "list");
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [transcriptDialogOpen, setTranscriptDialogOpen] = useState(false);
   const [sortField, setSortField] = useState<string | null>(null);
@@ -368,15 +366,15 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
   const getTypeIcon = (type: SessionType) => {
     switch (type) {
       case "ai-audio":
-        return <Mic className="w-4 h-4 text-purple-600" />;
+        return <Mic className="w-4 h-4 text-hh-primary" />;
       case "ai-video":
-        return <Video className="w-4 h-4 text-purple-600" />;
+        return <Video className="w-4 h-4 text-hh-primary" />;
       case "ai-chat":
-        return <MessageSquare className="w-4 h-4 text-purple-600" />;
+        return <MessageSquare className="w-4 h-4 text-hh-primary" />;
       case "upload-audio":
-        return <FileAudio className="w-4 h-4 text-blue-600" />;
+        return <FileAudio className="w-4 h-4 text-hh-primary" />;
       case "upload-video":
-        return <Video className="w-4 h-4 text-blue-600" />;
+        return <Video className="w-4 h-4 text-hh-primary" />;
       case "live-analysis":
         return <Sparkles className="w-4 h-4 text-hh-ocean-blue animate-pulse" />;
       default:
@@ -414,7 +412,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
         );
       case "good":
         return (
-          <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[11px]">
+          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
             <ThumbsUp className="w-3 h-3 mr-1" />
             Good
           </Badge>
@@ -511,7 +509,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
       <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-sessions" navigate={navigate}>
         <div className="p-6 flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hh-primary mx-auto mb-4"></div>
             <p className="text-hh-muted">Sessies laden...</p>
           </div>
         </div>
@@ -543,7 +541,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               Talk to Hugo <sup className="text-[14px] sm:text-[18px]">AI</sup>
             </h1>
             <div className="hidden sm:flex items-center gap-2">
-              <Button variant="outline" className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50" size="sm" onClick={() => navigate?.("admin-config-review")}>
+              <Button variant="outline" className="gap-2 border-hh-primary/20 text-hh-primary hover:bg-hh-primary/5" size="sm" onClick={() => navigate?.("admin-config-review")}>
                 <Settings className="w-4 h-4" />
                 Config Review
               </Button>
@@ -555,7 +553,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
           </div>
           {/* Mobile: buttons row below title */}
           <div className="flex sm:hidden items-center gap-2 mt-2">
-            <Button variant="outline" size="sm" className="gap-1.5 text-[12px] flex-1 border-purple-200 text-purple-700 hover:bg-purple-50" onClick={() => navigate?.("admin-config-review")}>
+            <Button variant="outline" size="sm" className="gap-1.5 text-[12px] flex-1 border-hh-primary/20 text-hh-primary hover:bg-hh-primary/5" onClick={() => navigate?.("admin-config-review")}>
               <Settings className="w-3.5 h-3.5" />
               Config
             </Button>
@@ -574,7 +572,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(147, 51, 234, 0.12)' }}>
-                <MessageSquare className="w-5 h-5" style={{ color: '#9333ea' }} />
+                <MessageSquare className="w-5 h-5 text-hh-primary" />
               </div>
               <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>+15%</span>
             </div>
@@ -651,38 +649,12 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               </SelectContent>
             </Select>
             
-            <div className="hidden md:flex gap-1 flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`${
-                  viewMode === "list" 
-                    ? "bg-purple-600 text-white hover:bg-purple-700" 
-                    : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }`}
-                onClick={() => setViewMode("list")}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`${
-                  viewMode === "grid" 
-                    ? "bg-purple-600 text-white hover:bg-purple-700" 
-                    : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"
-                }`}
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </Card>
 
         {/* Bulk Actions */}
         {selectionMode && selectedIds.length > 0 && (
-          <Card className="p-4 rounded-[16px] shadow-hh-sm border-hh-border bg-purple-600/10 border-purple-600/20">
+          <Card className="p-4 rounded-[16px] shadow-hh-sm border-hh-border bg-hh-primary/10 border-hh-primary/20">
             <div className="flex items-center justify-between">
               <p className="text-[14px] text-hh-text">
                 <span className="font-semibold">{selectedIds.length}</span> sessies geselecteerd
@@ -712,7 +684,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
         {/* Mobile Card Fallback (always shows on mobile regardless of viewMode) */}
         <div className="md:hidden space-y-3">
           {filteredSessions.map((session) => {
-            const scoreColor = session.score >= 80 ? "text-hh-success" : session.score >= 70 ? "text-blue-600" : "text-hh-warn";
+            const scoreColor = session.score >= 80 ? "text-hh-success" : session.score >= 70 ? "text-hh-primary" : "text-hh-warn";
             return (
               <Card
                 key={session.id}
@@ -722,7 +694,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <Avatar className="w-7 h-7 flex-shrink-0">
-                      <AvatarFallback className="bg-purple-600/10 text-purple-600 text-[10px] font-semibold">
+                      <AvatarFallback className="bg-hh-primary/10 text-hh-primary text-[10px] font-semibold">
                         {session.user.split(" ").map((n) => n[0]).join("")}
                       </AvatarFallback>
                     </Avatar>
@@ -742,7 +714,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                     {getTypeIcon(session.type)}
                     <span>{getTypeLabel(session.type)}</span>
                   </div>
-                  {session.flagged && <Flag className="w-3 h-3 text-red-600" />}
+                  {session.flagged && <Flag className="w-3 h-3 text-hh-error" />}
                 </div>
               </Card>
             );
@@ -858,7 +830,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                       ) : <div className="w-4 h-4" />}
                     </td>
                     <td className="py-3 px-4">
-                      <Badge className="bg-purple-600/10 text-purple-600 border-purple-600/20 text-[11px] font-mono">
+                      <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px] font-mono">
                         {session.techniek.split(' - ')[0]}
                       </Badge>
                     </td>
@@ -873,7 +845,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="w-8 h-8">
-                          <AvatarFallback className="bg-purple-600/10 text-purple-600 text-[11px]">
+                          <AvatarFallback className="bg-hh-primary/10 text-hh-primary text-[11px]">
                             {session.user
                               .split(" ")
                               .map((n) => n[0])
@@ -884,7 +856,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                           <p className="text-[14px] leading-[20px] text-hh-text font-medium flex items-center gap-2">
                             {session.title || session.user}
                             {session.flagged && (
-                              <Flag className="w-3.5 h-3.5 text-red-600" />
+                              <Flag className="w-3.5 h-3.5 text-hh-error" />
                             )}
                           </p>
                           <p className="text-[12px] leading-[16px] text-hh-muted">
@@ -905,7 +877,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                           session.score >= 80
                             ? "text-hh-success"
                             : session.score >= 70
-                            ? "text-blue-600"
+                            ? "text-hh-primary"
                             : "text-hh-warn"
                         }`}
                       >
@@ -935,12 +907,12 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                             Download
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            className={session.flagged ? "text-hh-success" : "text-red-600"}
+                            className={session.flagged ? "text-hh-success" : "text-hh-error"}
                           >
                             <Flag className="w-4 h-4 mr-2" />
                             {session.flagged ? "Unflag" : "Flag for Review"}
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDeleteSession(session.id)} className="text-red-600 focus:text-red-600">
+                          <DropdownMenuItem onClick={() => handleDeleteSession(session.id)} className="text-hh-error focus:text-hh-error">
                             <Trash2 className="w-4 h-4 mr-2" />
                             Verwijderen
                           </DropdownMenuItem>
@@ -969,7 +941,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               const scoreColor = session.score >= 80
                 ? "bg-hh-success/10 text-hh-success border-hh-success/20"
                 : session.score >= 70
-                ? "bg-blue-600/10 text-blue-600 border-blue-600/20"
+                ? "bg-hh-primary/10 text-hh-primary border-hh-primary/20"
                 : "bg-hh-warn/10 text-hh-warn border-hh-warn/20";
 
               return (
@@ -982,14 +954,14 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <Avatar className="w-10 h-10 flex-shrink-0">
-                        <AvatarFallback className="bg-purple-600/10 text-purple-600 font-semibold text-[12px]">
+                        <AvatarFallback className="bg-hh-primary/10 text-hh-primary font-semibold text-[12px]">
                           {session.user.split(" ").map((n) => n[0]).join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <p className="text-[14px] font-semibold text-hh-text truncate flex items-center gap-2">
                           {session.title || session.user}
-                          {session.flagged && <Flag className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />}
+                          {session.flagged && <Flag className="w-3.5 h-3.5 text-hh-error flex-shrink-0" />}
                         </p>
                         <p className="text-[12px] text-hh-muted truncate">
                           {session.workspace}
@@ -1048,14 +1020,14 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                          className={session.flagged ? "text-hh-success" : "text-red-600"}
+                          className={session.flagged ? "text-hh-success" : "text-hh-error"}
                         >
                           <Flag className="w-4 h-4 mr-2" />
                           {session.flagged ? "Unflag" : "Flag for Review"}
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleDeleteSession(session.id); }}
-                          className="text-red-600 focus:text-red-600"
+                          className="text-hh-error focus:text-hh-error"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
                           Verwijderen

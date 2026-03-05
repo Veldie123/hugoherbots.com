@@ -20,8 +20,6 @@ import {
   TrendingUp,
   CheckCircle2,
   Search,
-  List,
-  Grid3X3,
   Monitor,
   ChevronLeft,
   ChevronRight,
@@ -72,7 +70,7 @@ interface AdminLiveSessionsProps {
 export function AdminLiveSessions({ navigate, isSuperAdmin }: AdminLiveSessionsProps) {
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [editingSession, setEditingSession] = useState<LiveSession | null>(null);
-  const [view, setView] = useMobileViewMode("upcoming", "list") as [string, (v: string) => void];
+  const [view] = useMobileViewMode("upcoming", "list");
   const [showAdminCalendar, setShowAdminCalendar] = useState(false);
   const [adminCalendarMonth, setAdminCalendarMonth] = useState(() => new Date());
   const [adminSelectedDate, setAdminSelectedDate] = useState<Date | null>(null);
@@ -470,7 +468,7 @@ ${platformUrl}`;
     if (session.muxPlaybackId) {
       if (session.recordingApproved) {
         return (
-          <Badge className="bg-green-500/10 text-green-600 border-green-500/20 gap-1">
+          <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 gap-1">
             <CheckCircle2 className="w-3 h-3" />
             Goedgekeurd
           </Badge>
@@ -478,13 +476,13 @@ ${platformUrl}`;
       }
       return (
         <div className="flex items-center gap-2">
-          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 gap-1">
+          <Badge className="bg-hh-warning/10 text-hh-warning border-hh-warning/20 gap-1">
             Wacht op goedkeuring
           </Badge>
           <Button
             size="sm"
             variant="outline"
-            className="h-7 px-2 text-[11px] gap-1 border-green-300 text-green-700 hover:bg-green-500/10"
+            className="h-7 px-2 text-[11px] gap-1 border-hh-success/30 text-hh-success hover:bg-hh-success/10"
             onClick={(e) => handleApproveRecording(e, session.id, true)}
           >
             <CheckCircle2 className="w-3 h-3" />
@@ -493,7 +491,7 @@ ${platformUrl}`;
           <Button
             size="sm"
             variant="outline"
-            className="h-7 px-2 text-[11px] gap-1 border-red-300 text-red-700 hover:bg-red-500/10"
+            className="h-7 px-2 text-[11px] gap-1 border-hh-error/30 text-hh-error hover:bg-hh-error/10"
             onClick={(e) => handleApproveRecording(e, session.id, false)}
           >
             <X className="w-3 h-3" />
@@ -505,7 +503,7 @@ ${platformUrl}`;
     
     if (processingId === session.id || session.recordingReady === 0 && session.dailyRecordingId) {
       return (
-        <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 gap-1 animate-pulse">
+        <Badge className="bg-hh-warning/10 text-hh-warning border-hh-warning/20 gap-1 animate-pulse">
           <Loader2 className="w-3 h-3 animate-spin" />
           In verwerking...
         </Badge>
@@ -515,13 +513,13 @@ ${platformUrl}`;
     if (session.dailyRecordingUrl || session.recordingReady === 1) {
       return (
         <div className="flex items-center gap-2">
-          <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20">
+          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20">
             Niet verwerkt
           </Badge>
           <Button 
             size="sm" 
             variant="outline" 
-            className="h-7 px-2 text-[11px] gap-1 border-purple-300 text-purple-700 hover:bg-purple-500/10"
+            className="h-7 px-2 text-[11px] gap-1 border-hh-primary/30 text-hh-primary hover:bg-hh-primary/10"
             onClick={(e) => handleTriggerProcess(e, session.id)}
             disabled={!!processingId}
           >
@@ -534,7 +532,7 @@ ${platformUrl}`;
 
     if (session.status?.toLowerCase() === 'ended' || session.status?.toLowerCase() === 'completed') {
       return (
-        <Badge variant="outline" className="text-purple-400 border-purple-200 opacity-70">
+        <Badge variant="outline" className="text-hh-primary border-hh-primary/20 opacity-70">
           Geen opname
         </Badge>
       );
@@ -547,7 +545,7 @@ ${platformUrl}`;
     switch (status?.toLowerCase()) {
       case "live":
         return (
-          <Badge className="bg-red-600 text-white border-0 text-[11px]">
+          <Badge className="bg-hh-error text-white border-0 text-[11px]">
             <Radio className="w-3 h-3 mr-1 animate-pulse" />
             LIVE
           </Badge>
@@ -560,7 +558,7 @@ ${platformUrl}`;
         );
       case "ended":
         return (
-          <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20 text-[11px]">
+          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
             Afgelopen
           </Badge>
         );
@@ -649,18 +647,18 @@ ${platformUrl}`;
                             <div key={msg.id} className="flex gap-3">
                               <Avatar className="flex-shrink-0 w-8 h-8">
                                 <AvatarFallback
-                                  className={msg.isHost ? "bg-purple-600 text-white text-[12px]" : "bg-hh-ui-200 text-hh-ink text-[12px]"}
+                                  className={msg.isHost ? "bg-hh-primary text-white text-[12px]" : "bg-hh-ui-200 text-hh-ink text-[12px]"}
                                 >
                                   {getInitials(msg.userName)}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-baseline gap-2 mb-1">
-                                  <span className={`text-sm ${msg.isHost ? "font-medium text-purple-600" : "text-hh-ink"}`}>
+                                  <span className={`text-sm ${msg.isHost ? "font-medium text-hh-primary" : "text-hh-ink"}`}>
                                     {msg.userName}
                                   </span>
                                   {msg.isHost && (
-                                    <Badge className="bg-purple-500/15 text-purple-600 border-purple-500/30 text-[10px] px-1.5 py-0">
+                                    <Badge className="bg-hh-primary/15 text-hh-primary border-hh-primary/30 text-[10px] px-1.5 py-0">
                                       HOST
                                     </Badge>
                                   )}
@@ -699,7 +697,7 @@ ${platformUrl}`;
                           onClick={handleSendMessage}
                           disabled={!chatMessage.trim() || sendingMessage}
                           size="icon"
-                          className="bg-purple-600 hover:bg-purple-700 text-white"
+                          className="bg-hh-primary hover:bg-hh-primary/90 text-white"
                         >
                           {sendingMessage ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -716,13 +714,13 @@ ${platformUrl}`;
                       {!showCreatePoll ? (
                         <Button
                           onClick={() => setShowCreatePoll(true)}
-                          className="w-full gap-2 bg-purple-600 hover:bg-purple-700 text-white"
+                          className="w-full gap-2 bg-hh-primary hover:bg-hh-primary/90 text-white"
                         >
                           <Plus className="w-4 h-4" />
                           Nieuwe Poll
                         </Button>
                       ) : (
-                        <Card className="p-4 space-y-3 border-purple-500/30 bg-purple-500/5">
+                        <Card className="p-4 space-y-3 border-hh-primary/30 bg-hh-primary/5">
                           <div className="flex items-center justify-between">
                             <h4 className="font-medium text-hh-text">Nieuwe Poll</h4>
                             <Button
@@ -784,7 +782,7 @@ ${platformUrl}`;
                           <Button
                             onClick={handleCreatePoll}
                             disabled={creatingPoll || !pollQuestion.trim()}
-                            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                            className="w-full bg-hh-primary hover:bg-hh-primary/90 text-white"
                           >
                             {creatingPoll ? (
                               <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -805,7 +803,7 @@ ${platformUrl}`;
                         {polls.map((poll) => (
                           <Card key={poll.id} className="p-4">
                             <div className="flex items-center justify-between mb-2">
-                              <Badge className={poll.isActive ? "bg-purple-500/10 text-purple-500" : "bg-hh-ui-100 text-hh-muted"}>
+                              <Badge className={poll.isActive ? "bg-hh-primary/10 text-hh-primary" : "bg-hh-ui-100 text-hh-muted"}>
                                 {poll.isActive ? "Actief" : "Gesloten"}
                               </Badge>
                               {poll.isActive && (
@@ -827,7 +825,7 @@ ${platformUrl}`;
                                 return (
                                   <div key={option.id} className="relative">
                                     <div
-                                      className="absolute inset-0 rounded bg-purple-500/15"
+                                      className="absolute inset-0 rounded bg-hh-primary/15"
                                       style={{ width: `${percentage}%` }}
                                     />
                                     <div className="relative p-2 flex justify-between text-sm">
@@ -870,7 +868,7 @@ ${platformUrl}`;
           <div className="flex gap-2">
             <Button
               variant="outline"
-              className={`gap-2 ${showAdminCalendar ? 'bg-purple-600 text-white hover:bg-purple-700 border-purple-600' : ''}`}
+              className={`gap-2 ${showAdminCalendar ? 'bg-hh-primary text-white hover:bg-hh-primary/90 border-hh-primary' : ''}`}
               onClick={() => {
                 setShowAdminCalendar(!showAdminCalendar);
                 if (showAdminCalendar) setAdminSelectedDate(null);
@@ -880,7 +878,7 @@ ${platformUrl}`;
               <span className="hidden sm:inline">Kalender</span>
             </Button>
             <Button
-              className="gap-2 bg-purple-600 hover:bg-purple-700 text-white"
+              className="gap-2 bg-hh-primary hover:bg-hh-primary/90 text-white"
               onClick={openCreateModal}
             >
               <Plus className="w-4 h-4" />
@@ -893,16 +891,16 @@ ${platformUrl}`;
         {/* KPI Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColor: 'rgba(147, 51, 234, 0.12)', color: '#9333ea', badge: `+${Math.round(sessions.length * 0.12)}%`, badgeTrend: 'up' as const },
-            { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgColor: 'rgba(79, 70, 229, 0.12)', color: '#4f46e5', badge: `+${upcomingSessionsAll.length}`, badgeTrend: 'up' as const },
-            { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgColor: 'rgba(219, 39, 119, 0.12)', color: '#db2777', badge: '+8%', badgeTrend: 'up' as const },
-            { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgColor: 'rgba(16, 185, 129, 0.12)', color: '#10b981', badge: '100%', badgeTrend: 'up' as const },
+            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColor: 'rgba(147, 51, 234, 0.12)', color: 'var(--hh-primary)', badge: `+${Math.round(sessions.length * 0.12)}%`, badgeTrend: 'up' as const },
+            { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgColor: 'rgba(79, 70, 229, 0.12)', color: 'var(--hh-primary)', badge: `+${upcomingSessionsAll.length}`, badgeTrend: 'up' as const },
+            { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgColor: 'rgba(219, 39, 119, 0.12)', color: 'var(--hh-primary)', badge: '+8%', badgeTrend: 'up' as const },
+            { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--hh-success)', badge: '100%', badgeTrend: 'up' as const },
           ].map(stat => {
             const badgeStyles = stat.badgeTrend === 'up'
-              ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }
+              ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--hh-success)', borderColor: 'rgba(16, 185, 129, 0.2)' }
               : stat.badgeTrend === 'neutral'
-              ? { backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.2)' }
-              : { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' };
+              ? { backgroundColor: 'rgba(245, 158, 11, 0.1)', color: 'var(--hh-warning)', borderColor: 'rgba(245, 158, 11, 0.2)' }
+              : { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--hh-error)', borderColor: 'rgba(239, 68, 68, 0.2)' };
             return (
             <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
               <div className="flex items-start justify-between mb-2 sm:mb-3">
@@ -914,7 +912,7 @@ ${platformUrl}`;
                 </span>
               </div>
               <p className="text-[13px] leading-[18px] text-hh-muted">{stat.name}</p>
-              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: '#7c3aed' }}>{stat.value}</p>
+              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-primary">{stat.value}</p>
             </Card>
           );})}
         </div>
@@ -955,24 +953,6 @@ ${platformUrl}`;
                 <SelectItem value="live">Live</SelectItem>
               </SelectContent>
             </Select>
-            <div className="hidden sm:flex border rounded-md">
-              <Button
-                variant={view === "list" ? "default" : "ghost"}
-                size="sm"
-                className={`rounded-r-none ${view === "list" ? "bg-purple-600 text-white hover:bg-purple-700" : ""}`}
-                onClick={() => setView("list")}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={view === "upcoming" ? "default" : "ghost"}
-                size="sm"
-                className={`rounded-l-none ${view === "upcoming" ? "bg-purple-600 text-white hover:bg-purple-700" : ""}`}
-                onClick={() => setView("upcoming")}
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
         </Card>
 
@@ -1049,24 +1029,24 @@ ${platformUrl}`;
                       className={`
                         relative flex flex-col items-center justify-center rounded-lg text-[13px] transition-colors min-h-[44px]
                         ${!day ? 'invisible' : 'cursor-pointer'}
-                        ${selected ? 'bg-purple-600 text-white rounded-lg py-1 px-0.5' : ''}
-                        ${sessionDay && !selected ? 'bg-purple-500/10 py-1 px-0.5 hover:opacity-80' : ''}
+                        ${selected ? 'bg-hh-primary text-white rounded-lg py-1 px-0.5' : ''}
+                        ${sessionDay && !selected ? 'bg-hh-primary/10 py-1 px-0.5 hover:opacity-80' : ''}
                         ${!sessionDay && !selected ? 'py-1.5 px-0.5 hover:bg-hh-ui-50' : ''}
-                        ${todayDay && !selected && !sessionDay ? 'bg-hh-ui-50 font-bold ring-1 ring-purple-300' : ''}
+                        ${todayDay && !selected && !sessionDay ? 'bg-hh-ui-50 font-bold ring-1 ring-hh-primary/30' : ''}
                         ${!selected && !sessionDay && !todayDay ? 'text-hh-text' : ''}
                       `}
                     >
-                      <span className={`${sessionDay && !selected ? 'font-semibold text-purple-700' : ''} ${sessionDay && !selected && todayDay ? 'underline underline-offset-2' : ''}`}>
+                      <span className={`${sessionDay && !selected ? 'font-semibold text-hh-primary' : ''} ${sessionDay && !selected && todayDay ? 'underline underline-offset-2' : ''}`}>
                         {day}
                       </span>
                       {sessionDay && (
-                        <span className={`text-[9px] leading-none mt-0.5 font-medium ${selected ? 'text-white/80' : 'text-purple-600'}`}>
+                        <span className={`text-[9px] leading-none mt-0.5 font-medium ${selected ? 'text-white/80' : 'text-hh-primary'}`}>
                           {daySessions[0].time}
                         </span>
                       )}
                       {sessionDay && !selected && (
                         <span
-                          className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-600 ring-2 ring-purple-500/25"
+                          className="absolute top-1 right-1 w-2 h-2 rounded-full bg-hh-primary ring-2 ring-hh-primary/25"
                         />
                       )}
                     </button>
@@ -1098,7 +1078,7 @@ ${platformUrl}`;
                 <Video className="w-12 h-12 text-hh-muted mx-auto mb-4" />
                 <h3 className="text-[18px] text-hh-text mb-2">Geen sessies gepland</h3>
                 <p className="text-hh-muted mb-4">Plan je eerste live coaching sessie</p>
-                <Button onClick={openCreateModal} className="bg-purple-600 hover:bg-purple-700 text-white">
+                <Button onClick={openCreateModal} className="bg-hh-primary hover:bg-hh-primary/90 text-white">
                   <Plus className="w-4 h-4 mr-2" />
                   Plan Sessie
                 </Button>
@@ -1146,7 +1126,7 @@ ${platformUrl}`;
                             Kopieer Link
                           </DropdownMenuItem>
                           <DropdownMenuItem 
-                            className="text-red-600"
+                            className="text-hh-error"
                             onClick={() => handleDelete(session)}
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
@@ -1196,7 +1176,7 @@ ${platformUrl}`;
                         {session.status?.toLowerCase() === "upcoming" && (
                           <Button 
                             size="sm" 
-                            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+                            className="flex-1 bg-hh-primary hover:bg-hh-primary/90 text-white"
                             onClick={() => handleStartSession(session)}
                           >
                             <Play className="w-4 h-4 mr-2" />
@@ -1207,7 +1187,7 @@ ${platformUrl}`;
                           <Button 
                             size="sm" 
                             onClick={() => handleJoinLiveSession(session)}
-                            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+                            className="flex-1 bg-hh-primary hover:bg-hh-primary/90 text-white"
                           >
                             <Radio className="w-4 h-4 mr-2 animate-pulse" />
                             Join Live Sessie
@@ -1367,7 +1347,7 @@ ${platformUrl}`;
                           onClick={handleRowClick}
                         >
                           <td className="py-3 px-4">
-                            <Badge variant="outline" className="text-[11px] font-mono" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', borderColor: 'rgba(147, 51, 234, 0.2)' }}>
+                            <Badge variant="outline" className="text-[11px] font-mono bg-hh-primary/10 text-hh-primary border-hh-primary/20">
                               {techniqueNumber}
                             </Badge>
                           </td>
@@ -1389,7 +1369,7 @@ ${platformUrl}`;
                             </p>
                           </td>
                           <td className="py-3 px-4">
-                            <span className="text-[14px] leading-[20px] text-purple-600">
+                            <span className="text-[14px] leading-[20px] text-hh-primary">
                               {phaseName}
                             </span>
                           </td>
@@ -1400,13 +1380,13 @@ ${platformUrl}`;
                                 <span className="text-hh-muted"> / 50</span>
                               </div>
                               {!isCompleted && (
-                                <span className="text-[11px] text-purple-500">ingeschreven</span>
+                                <span className="text-[11px] text-hh-primary">ingeschreven</span>
                               )}
                             </div>
                           </td>
                           <td className="py-3 px-4">
                             <span 
-                              className={`text-[14px] leading-[20px] ${isCompleted ? 'text-purple-500' : 'text-purple-600'}`}
+                              className={`text-[14px] leading-[20px] ${isCompleted ? 'text-hh-primary' : 'text-hh-primary'}`}
                             >
                               {isCompleted ? 'Afgelopen' : 'Gepland'}
                             </span>
@@ -1445,7 +1425,7 @@ ${platformUrl}`;
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem 
-                                  className="text-red-600"
+                                  className="text-hh-error"
                                   onClick={() => handleDelete(session)}
                                 >
                                   <Trash2 className="w-4 h-4 mr-2" />
@@ -1582,7 +1562,7 @@ ${platformUrl}`;
               Annuleren
             </Button>
             <Button
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="bg-hh-primary hover:bg-hh-primary/90 text-white"
               onClick={handleSubmit}
               disabled={submitting}
             >

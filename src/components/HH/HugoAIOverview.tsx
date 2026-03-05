@@ -22,8 +22,6 @@ import {
 } from "../ui/dropdown-menu";
 import {
   Search,
-  List,
-  LayoutGrid,
   Mic,
   Video,
   MessageSquare,
@@ -123,7 +121,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterQuality, setFilterQuality] = useState<string>("all");
-  const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
+  const [viewMode] = useMobileViewMode("grid", "list");
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   
@@ -566,26 +564,6 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                 <SelectItem value="needs-improvement">Needs Improvement</SelectItem>
               </SelectContent>
             </Select>
-            <div className="hidden sm:flex gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setViewMode("list")}
-                style={viewMode === "list" ? { backgroundColor: '#3C9A6E', color: 'white' } : {}}
-                className={viewMode !== "list" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}
-              >
-                <List className="w-4 h-4 text-current" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                style={viewMode === "grid" ? { backgroundColor: '#3C9A6E', color: 'white' } : {}}
-                className={viewMode !== "grid" ? "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50" : "hover:opacity-90"}
-              >
-                <LayoutGrid className="w-4 h-4 text-current" />
-              </Button>
-            </div>
           </div>
         </Card>
 
