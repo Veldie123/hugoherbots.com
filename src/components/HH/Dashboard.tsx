@@ -114,9 +114,6 @@ const VideoCard = ({
           </div>
         </div>
       )}
-      <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
-        {techniqueNumber}
-      </Badge>
     </div>
     <h3 className="text-[12px] font-medium text-hh-text leading-tight line-clamp-2 group-hover:text-hh-primary transition-colors">
       {title}
@@ -178,11 +175,6 @@ const WebinarCard = ({
         alt={title} 
         className="absolute inset-0 w-full h-full object-cover object-top"
       />
-      {techniqueNumber && (
-        <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
-          {techniqueNumber}
-        </Badge>
-      )}
       {isLive && (
         <Badge className="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-2 py-0.5 animate-pulse">
           LIVE
@@ -274,9 +266,6 @@ const HugoTrainingCard = ({
           className="absolute inset-0 w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-black/20" />
-        <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary rounded-full px-2 py-0.5 text-[10px] font-mono font-medium">
-          {techniqueNumber}
-        </Badge>
         <Badge className={`absolute top-2 right-2 ${faseColors.bg} ${faseColors.text} text-[10px] px-1.5 py-0.5`}>
           Fase {fase}
         </Badge>
