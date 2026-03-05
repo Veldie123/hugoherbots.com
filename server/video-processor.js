@@ -6799,7 +6799,14 @@ async function regenerateVideoMapping() {
 async function autoBatchPendingJobs() {
   const CLOUD_RUN_URL = process.env.CLOUD_RUN_WORKER_URL;
   const WORKER_SECRET = process.env.CLOUD_RUN_WORKER_SECRET;
-  if (!CLOUD_RUN_URL || !WORKER_SECRET || !supabaseAdmin) return;
+  if (!CLOUD_RUN_URL || !WORKER_SECRET) {
+    console.warn('[AutoBatch] SKIPPED — CLOUD_RUN_WORKER_URL or CLOUD_RUN_WORKER_SECRET not configured');
+    return;
+  }
+  if (!supabaseAdmin) {
+    console.warn('[AutoBatch] SKIPPED — Supabase not configured');
+    return;
+  }
 
   try {
     const { data: batchRows } = await supabaseAdmin
@@ -7091,11 +7098,23 @@ server.listen(PORT, '0.0.0.0', () => {
   // Run once after 60s on startup
   setTimeout(pollWebinarRecordings, 60 * 1000);
 
-  // Server-side auto-sync: DISABLED until Google Drive credentials work in production
-  // Re-enable by uncommenting the setTimeout/setInterval below
-  // const SYNC_FOLDER_IDS = ['1Oaww3IMBcFZ1teFvSoqAUART2B6Q6VrT', '1iaRAByySJPXpcJ6I3aoXwlb0SR3q3wKZ'];
-  // const SYNC_INTERVAL_MINUTES = parseInt(process.env.SYNC_INTERVAL_MINUTES || '60', 10);
-  // setTimeout(runAutoSync, 45 * 1000);
-  // setInterval(runAutoSync, SYNC_INTERVAL_MINUTES * 60 * 1000);
-  console.log('[AutoSync] DISABLED — Google Drive credentials need to be configured first');
+  // Server-side auto-sync: only enable if Google Drive credentials are available
+  if (process.env.GOOGLE_CLOUD_SECRET) {
+    const SYNC_FOLDER_IDS = ['1Oaww3IMBcFZ1teFvSoqAUART2B6Q6VrT', '1iaRAByySJPXpcJ6I3aoXwlb0SR3q3wKZ'];
+    const SYNC_INTERVAL_MINUTES = parseInt(process.env.SYNC_INTERVAL_MINUTES || '60', 10);
+    const runAutoSync = async () => {
+      try {
+        console.log('[AutoSync] Starting scheduled Drive sync...');
+        await syncVideosFromDrive(SYNC_FOLDER_IDS);
+        console.log('[AutoSync] Drive sync completed');
+      } catch (err) {
+        console.error('[AutoSync] Drive sync failed:', err.message);
+      }
+    };
+    setTimeout(runAutoSync, 45 * 1000);
+    setInterval(runAutoSync, SYNC_INTERVAL_MINUTES * 60 * 1000);
+    console.log(`[AutoSync] Enabled — syncing every ${SYNC_INTERVAL_MINUTES} minutes`);
+  } else {
+    console.log('[AutoSync] DISABLED — GOOGLE_CLOUD_SECRET not configured');
+  }
 });
