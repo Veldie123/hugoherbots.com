@@ -156,9 +156,9 @@
 
 /* Admin/host webinar session — purple accent instead of steel blue */
 .admin-session {
-  --hh-primary: #8B5CF6;
-  --hh-primary-hover: #7C3AED;
-  --hh-primary-rgb: 139, 92, 246;
+  --hh-primary: #7e22ce;
+  --hh-primary-hover: #6b21a8;
+  --hh-primary-rgb: 126, 34, 206;
 }
 
 /* Force light mode on specific elements (e.g. landing page) */
