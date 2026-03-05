@@ -2193,7 +2193,14 @@ const server = http.createServer((req, res) => {
           res.end(JSON.stringify({ success: false, message: 'folderId is vereist' }));
           return;
         }
-        
+
+        // SEC-023: Validate folderId to prevent injection
+        if (!/^[a-zA-Z0-9_-]+$/.test(folderId)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: 'Ongeldige folderId' }));
+          return;
+        }
+
         const accessToken = await getGoogleDriveAccessToken();
         const result = await listAllDriveFiles(folderId, accessToken);
         
