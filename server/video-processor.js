@@ -1402,6 +1402,26 @@ function checkAuth(req) {
   return token === AUTH_SECRET;
 }
 
+// Accept either VIDEO_PROCESSOR_SECRET (server-to-server) or Supabase JWT (frontend)
+async function checkAdminAuth(req) {
+  if (checkAuth(req)) return true;
+  if (!supabaseAdmin) return false;
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.replace('Bearer ', '');
+  if (!token) return false;
+  try {
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+    if (error || !user) return false;
+    const { data: profile } = await supabaseAdmin.from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    return profile?.role === 'admin' || profile?.role === 'super_admin';
+  } catch {
+    return false;
+  }
+}
+
 function runProcessing(jobId = null) {
   if (processingActive) {
     return { success: false, message: 'Verwerking is al bezig' };
@@ -3606,12 +3626,12 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // Admin Dashboard Stats - KPIs, recent activity, notifications, top content
   if (pathname === '/api/admin/dashboard-stats' && req.method === 'GET') {
-    if (!checkAuth(req)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
-      return;
-    }
     (async () => {
+      if (!await checkAdminAuth(req)) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+        return;
+      }
       try {
         if (!supabaseAdmin) {
           throw new Error('Supabase niet geconfigureerd');
@@ -7074,25 +7094,11 @@ server.listen(PORT, '0.0.0.0', () => {
   // Run once after 60s on startup
   setTimeout(pollWebinarRecordings, 60 * 1000);
 
-  // Server-side auto-sync: sync Google Drive → database every SYNC_INTERVAL_MINUTES (default: 60)
-  const SYNC_FOLDER_IDS = ['1Oaww3IMBcFZ1teFvSoqAUART2B6Q6VrT', '1iaRAByySJPXpcJ6I3aoXwlb0SR3q3wKZ'];
-  const SYNC_INTERVAL_MINUTES = parseInt(process.env.SYNC_INTERVAL_MINUTES || '60', 10);
-
-  const runAutoSync = () => {
-    console.log('[AutoSync] Starting scheduled Google Drive sync...');
-    const { spawn } = require('child_process');
-    const child = spawn('node', ['scripts/sync_drive_order_standalone.js', ...SYNC_FOLDER_IDS], {
-      detached: true,
-      stdio: ['ignore', 'pipe', 'pipe'],
-      env: process.env
-    });
-    child.stdout.on('data', d => process.stdout.write('[AutoSync] ' + d));
-    child.stderr.on('data', d => process.stderr.write('[AutoSync] ' + d));
-    child.on('close', code => console.log(`[AutoSync] Drive sync completed (exit code ${code})`));
-    child.unref();
-  };
-
-  setTimeout(runAutoSync, 45 * 1000);
-  setInterval(runAutoSync, SYNC_INTERVAL_MINUTES * 60 * 1000);
-  console.log(`[AutoSync] Drive sync scheduled every ${SYNC_INTERVAL_MINUTES} minutes`);
+  // Server-side auto-sync: DISABLED until Google Drive credentials work in production
+  // Re-enable by uncommenting the setTimeout/setInterval below
+  // const SYNC_FOLDER_IDS = ['1Oaww3IMBcFZ1teFvSoqAUART2B6Q6VrT', '1iaRAByySJPXpcJ6I3aoXwlb0SR3q3wKZ'];
+  // const SYNC_INTERVAL_MINUTES = parseInt(process.env.SYNC_INTERVAL_MINUTES || '60', 10);
+  // setTimeout(runAutoSync, 45 * 1000);
+  // setInterval(runAutoSync, SYNC_INTERVAL_MINUTES * 60 * 1000);
+  console.log('[AutoSync] DISABLED — Google Drive credentials need to be configured first');
 });
