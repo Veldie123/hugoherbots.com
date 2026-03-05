@@ -1356,28 +1356,37 @@ async function syncVideosFromDrive(folderIdOrIds) {
   result.ordersUpdated = orderUpdates.length;
   
   // DELETION LOGIC: Mark videos as deleted if they're NOT in Drive AT ALL (not active, not archief)
-  // This means: if Hugo deletes a video from Drive completely, it gets deleted here + from RAG
-  for (const [driveFileId, job] of existingMap) {
-    // Only delete if video is NOT in active Drive AND not is_hidden (archief videos stay in DB even if not re-scanned)
-    if (!allDriveFileIds.has(driveFileId) && job.status !== 'deleted' && !job.is_hidden) {
-      try {
-        // Mark job as deleted
-        await supabaseAdmin
-          .from('video_ingest_jobs')
-          .update({ status: 'deleted', updated_at: new Date().toISOString() })
-          .eq('id', job.id);
-        
-        // Remove from RAG documents (since video is completely gone)
-        const sourceId = `video_${job.id}`;
-        await supabaseAdmin
-          .from('rag_documents')
-          .delete()
-          .eq('source_id', sourceId);
-        
-        result.deleted.push({ id: job.id, driveFileId, title: job.video_title });
-        console.log(`[Sync] Deleted: ${job.video_title || driveFileId} (removed from Drive completely)`);
-      } catch (err) {
-        result.errors.push(`Fout bij verwijderen ${driveFileId}: ${err.message}`);
+  // SAFETY: Skip deletion if Drive returned 0 videos (likely auth failure) or would delete >50%
+  const nonHiddenExisting = [...existingMap.values()].filter(j => j.status !== 'deleted' && !j.is_hidden);
+  const wouldDelete = nonHiddenExisting.filter(j => !allDriveFileIds.has(j.drive_file_id));
+
+  if (allActiveVideos.length === 0 && allArchiefVideos.length === 0) {
+    console.error('[Sync] SAFETY: Drive returned 0 videos — skipping deletion to prevent mass-delete');
+  } else if (nonHiddenExisting.length > 5 && wouldDelete.length > nonHiddenExisting.length * 0.5) {
+    console.error(`[Sync] SAFETY: Would delete ${wouldDelete.length}/${nonHiddenExisting.length} videos (>50%) — skipping deletion`);
+  } else {
+    for (const [driveFileId, job] of existingMap) {
+      // Only delete if video is NOT in active Drive AND not is_hidden (archief videos stay in DB even if not re-scanned)
+      if (!allDriveFileIds.has(driveFileId) && job.status !== 'deleted' && !job.is_hidden) {
+        try {
+          // Mark job as deleted
+          await supabaseAdmin
+            .from('video_ingest_jobs')
+            .update({ status: 'deleted', updated_at: new Date().toISOString() })
+            .eq('id', job.id);
+
+          // Remove from RAG documents (since video is completely gone)
+          const sourceId = `video_${job.id}`;
+          await supabaseAdmin
+            .from('rag_documents')
+            .delete()
+            .eq('source_id', sourceId);
+
+          result.deleted.push({ id: job.id, driveFileId, title: job.video_title });
+          console.log(`[Sync] Deleted: ${job.video_title || driveFileId} (removed from Drive completely)`);
+        } catch (err) {
+          result.errors.push(`Fout bij verwijderen ${driveFileId}: ${err.message}`);
+        }
       }
     }
   }

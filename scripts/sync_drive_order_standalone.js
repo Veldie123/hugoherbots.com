@@ -196,18 +196,28 @@ async function main() {
   }
 
   // Handle deletions: mark videos not in Drive as deleted (only non-hidden active videos)
+  // SAFETY: Skip deletion entirely if Drive returned 0 videos (likely auth failure)
   const activeDriveIds = new Set(allActiveVideos.map(v => v.id));
   let deleted = 0;
-  for (const [driveFileId, job] of existingMap) {
-    if (!activeDriveIds.has(driveFileId) && !job.is_hidden) {
-      const { error: delError } = await supabase.from('video_ingest_jobs')
-        .update({ status: 'deleted', updated_at: new Date().toISOString() })
-        .eq('id', job.id);
-      if (!delError) {
-        deleted++;
-        console.log(`[StandaloneSync] Marked deleted: ${job.video_title || driveFileId}`);
-        // Also remove from RAG
-        await supabase.from('rag_documents').delete().eq('source_id', `video_${job.id}`);
+  const nonHiddenExisting = [...existingMap.values()].filter(j => !j.is_hidden);
+  const wouldDelete = nonHiddenExisting.filter(j => !activeDriveIds.has(j.drive_file_id));
+
+  if (allActiveVideos.length === 0) {
+    console.error('[StandaloneSync] SAFETY: Drive returned 0 videos — skipping deletion to prevent mass-delete');
+  } else if (nonHiddenExisting.length > 5 && wouldDelete.length > nonHiddenExisting.length * 0.5) {
+    console.error(`[StandaloneSync] SAFETY: Would delete ${wouldDelete.length}/${nonHiddenExisting.length} videos (>50%) — skipping deletion`);
+  } else {
+    for (const [driveFileId, job] of existingMap) {
+      if (!activeDriveIds.has(driveFileId) && !job.is_hidden) {
+        const { error: delError } = await supabase.from('video_ingest_jobs')
+          .update({ status: 'deleted', updated_at: new Date().toISOString() })
+          .eq('id', job.id);
+        if (!delError) {
+          deleted++;
+          console.log(`[StandaloneSync] Marked deleted: ${job.video_title || driveFileId}`);
+          // Also remove from RAG
+          await supabase.from('rag_documents').delete().eq('source_id', `video_${job.id}`);
+        }
       }
     }
   }
