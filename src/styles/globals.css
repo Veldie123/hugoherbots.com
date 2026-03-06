@@ -173,16 +173,16 @@
   --sidebar-ring: var(--hh-primary);
 }
 
-/* Admin/host webinar session — purple accent instead of steel blue */
+/* Admin/host webinar session — fuchsia purple accent instead of steel blue */
 .admin-session {
-  --hh-primary: #7e22ce;           /* purple-700 — diep paars */
-  --hh-primary-hover: #6b21a8;     /* purple-800 */
-  --hh-primary-dark: #581c87;      /* purple-900 — gradient endpoint */
-  --hh-primary-light: #9333ea;     /* purple-600 — lighter accent */
-  --hh-primary-50: #FAF5FF;        /* purple-50 — light bg */
-  --hh-primary-100: #F3E8FF;       /* purple-100 — badge bg */
-  --hh-primary-200: #E9D5FF;       /* purple-200 — light borders */
-  --hh-primary-rgb: 126, 34, 206;
+  --hh-primary: #9910FA;           /* fuchsia — admin accent */
+  --hh-primary-hover: #7B0DD4;     /* darker fuchsia — hover */
+  --hh-primary-dark: #5C09A0;      /* deep fuchsia — gradient endpoint */
+  --hh-primary-light: #B44DFF;     /* lighter fuchsia */
+  --hh-primary-50: #FBF5FF;        /* ultra-light fuchsia bg */
+  --hh-primary-100: #F3E5FF;       /* light fuchsia — badge bg */
+  --hh-primary-200: #E2C6FF;       /* medium-light fuchsia — borders */
+  --hh-primary-rgb: 153, 16, 250;
 }
 
 /* Dashboard card sizing — bypasses Tailwind v4 JIT not generating base w-[160px] */
@@ -198,9 +198,10 @@
 
 /* Radix portals (Dialog, AlertDialog, Select) inherit admin purple theme */
 body:has(.admin-session) [data-radix-portal] {
-  --hh-primary: #7e22ce;
-  --hh-primary-hover: #6b21a8;
-  --hh-primary-dark: #581c87;
+  --hh-primary: #9910FA;
+  --hh-primary-hover: #7B0DD4;
+  --hh-primary-dark: #5C09A0;
+  --hh-primary-rgb: 153, 16, 250;
 }
 
 /* Force light mode on specific elements (e.g. landing page) */
@@ -236,7 +237,27 @@ body:has(.admin-session) [data-radix-portal] {
 @theme inline {
   --color-hh-ink: var(--hh-ink);
   --color-hh-primary: var(--hh-primary);
+  --color-hh-primary-hover: var(--hh-primary-hover);
+  --color-hh-primary-dark: var(--hh-primary-dark);
+  --color-hh-primary-light: var(--hh-primary-light);
+  --color-hh-primary-50: var(--hh-primary-50);
+  --color-hh-primary-100: var(--hh-primary-100);
+  --color-hh-primary-200: var(--hh-primary-200);
   --color-hh-success: var(--hh-success);
+  --color-hh-success-50: var(--hh-success-50);
+  --color-hh-success-100: var(--hh-success-100);
+  --color-hh-success-200: var(--hh-success-200);
+  --color-hh-success-700: var(--hh-success-700);
+  --color-hh-error: var(--hh-error);
+  --color-hh-error-50: var(--hh-error-50);
+  --color-hh-error-100: var(--hh-error-100);
+  --color-hh-error-200: var(--hh-error-200);
+  --color-hh-error-700: var(--hh-error-700);
+  --color-hh-warning: var(--hh-warning);
+  --color-hh-warning-50: var(--hh-warning-50);
+  --color-hh-warning-100: var(--hh-warning-100);
+  --color-hh-warning-200: var(--hh-warning-200);
+  --color-hh-warning-700: var(--hh-warning-700);
   --color-hh-warn: var(--hh-warn);
   --color-hh-ui-50: var(--hh-ui-50);
   --color-hh-ui-100: var(--hh-ui-100);
@@ -248,6 +269,7 @@ body:has(.admin-session) [data-radix-portal] {
   --color-hh-text: var(--hh-text);
   --color-hh-muted: var(--hh-muted);
   --color-hh-border: var(--hh-border);
+  --color-hh-slate-gray: var(--hh-slate-gray);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

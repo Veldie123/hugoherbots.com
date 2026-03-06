@@ -58,9 +58,10 @@ interface AdminLayoutProps {
   currentPage: string;
   navigate?: (page: string, data?: Record<string, any>) => void;
   isSuperAdmin?: boolean;
+  contentClassName?: string;
 }
 
-export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isSuperAdminProp }: AdminLayoutProps) {
+export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isSuperAdminProp, contentClassName }: AdminLayoutProps) {
   const { theme, toggleTheme } = useTheme();
 
   // Module mapping: admin view → user view equivalent
@@ -763,7 +764,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden">
+        <main className={contentClassName || "flex-1 overflow-y-auto overflow-x-hidden"}>
           {children}
           <PageFooter />
         </main>

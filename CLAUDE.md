@@ -9,10 +9,17 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 
 ## Design System
 
-### Kleuren — ALLEEN hh-* tokens
+### Kleuren — ALLEEN hh-* tokens (STRIKT)
 
-**NOOIT** hardcoded Tailwind kleuren gebruiken (`purple-500`, `blue-600`, `emerald-500`, etc.).
-**ALTIJD** de `hh-*` design tokens uit `src/styles/globals.css`:
+**NOOIT** gebruiken:
+- Hardcoded Tailwind kleuren (`purple-500`, `blue-600`, `emerald-500`, `bg-white`, `bg-black`)
+- Hex kleuren in inline styles (`style={{ color: '#xxx' }}`, `style={{ backgroundColor: '#xxx' }}`)
+- `rgb()`/`rgba()` waarden in component code
+- Enige kleur die niet via een `hh-*` token loopt
+
+**ALTIJD** de `hh-*` design tokens uit `src/styles/globals.css`.
+**Ontbreekt een kleur?** Voeg een token toe aan `globals.css`, gebruik dan die token.
+**Check:** Run `bash scripts/check-design-tokens.sh` om violations op te sporen.
 
 | Token | Hex | Gebruik |
 |-------|-----|---------|
@@ -102,9 +109,10 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 ## Database & Migrations
 
 - **NOOIT de gebruiker vragen om SQL handmatig te draaien.** Voer migrations zelf uit via de credentials in `.env`.
-- **Neon (primaire server storage):** Connectie via `PGHOST`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` env vars. Gebruik `pg` (node-postgres) Client.
-- **Supabase (frontend + admin):** Connectie via `postgresql://postgres:{SUPABASE_YOUR_PASSWORD}@db.{project-ref}.supabase.co:5432/postgres`. Password staat in `SUPABASE_YOUR_PASSWORD`.
-- **Beide databases moeten gesynchroniseerd worden** — `live_sessions` tabel bestaat in Neon én Supabase. Run migrations altijd op beide.
+- **Eén database: Supabase PostgreSQL.** Connectie via `PostgreSQL_connection_string_supabase` + `SUPABASE_YOUR_PASSWORD` env vars. `db.ts` verbindt via Supabase session pooler.
+- **Twee access patterns, zelfde database:**
+  - `pool` / `db` (Drizzle ORM + raw SQL via `pg`) — voor server-side queries
+  - `supabase` client (REST API) — voor live_sessions, profiles, auth, storage
 - Migration bestanden opslaan in `src/supabase/migrations/` voor documentatie.
 
 ## Key Files
@@ -116,4 +124,4 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 | `src/components/ui/` | shadcn UI componenten (Badge, Button, Dialog, etc.) |
 | `src/components/HH/` | Alle app-specifieke componenten |
 | `server/hugo-engine/api.ts` | Express.js API routes |
-| `server/hugo-engine/db.ts` | Database queries (Supabase/Neon) |
+| `server/hugo-engine/db.ts` | Database connectie (Supabase PostgreSQL via session pooler) |
