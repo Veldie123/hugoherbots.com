@@ -75,6 +75,7 @@ import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
 import { supabase } from "../../utils/supabase/client";
 import { Loader2 } from "lucide-react";
 import { LiveAvatarComponent } from "./LiveAvatarComponent";
+import { ModelSelector, type EngineModel } from "./ModelSelector";
 
 interface AnalysisCard {
   id: string;
@@ -247,6 +248,25 @@ export function AdminChatExpertMode({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   
+  // Engine model selection (V2 default, V3 for superadmin)
+  const [engineModel, setEngineModel] = useState<EngineModel>(isSuperAdmin ? "v3" : "v2");
+  const [sessionRestartKey, setSessionRestartKey] = useState(0);
+
+  // Sync engine model to hugoApi
+  useEffect(() => {
+    hugoApi.setV3Mode(engineModel === "v3");
+    return () => { hugoApi.setV3Mode(false); };
+  }, [engineModel]);
+
+  // Handle engine model switch — reset session and restart
+  const handleEngineModelChange = useCallback((newModel: EngineModel) => {
+    setEngineModel(newModel);
+    setMessages([]);
+    setHasActiveSession(false);
+    hugoApi.setCurrentSessionId(null);
+    setSessionRestartKey(prev => prev + 1);
+  }, []);
+
   // LiveKit Audio State
   const [liveKitRoom, setLiveKitRoom] = useState<Room | null>(null);
   const [audioConnectionState, setAudioConnectionState] = useState<ConnectionState>(ConnectionState.Disconnected);
@@ -433,7 +453,7 @@ export function AdminChatExpertMode({
     }
 
     return () => { cancelled = true; };
-  }, []);
+  }, [sessionRestartKey]);
 
   // Session timer effect
   useEffect(() => {
@@ -1305,14 +1325,12 @@ export function AdminChatExpertMode({
           )}
           <div className={`${!desktopSidebarOpen ? 'w-full' : 'flex-1'} flex items-center justify-between px-3 lg:px-6 py-3 lg:py-4 bg-hh-bg`}>
             <div className="flex items-center gap-2 lg:gap-3 min-w-0">
-              <span className="text-[13px] text-hh-muted font-medium whitespace-nowrap flex items-center gap-1">
-                {sessionTitle}
-                <span className="px-2 py-0.5 text-[10px] font-medium bg-hh-primary/15 text-hh-primary rounded-full ml-1">
-                  Lvl {difficultyLevel === "onbewuste_onkunde" ? "1" : 
-                       difficultyLevel === "bewuste_onkunde" ? "2" : 
-                       difficultyLevel === "bewuste_kunde" ? "3" : "4"}
-                </span>
-              </span>
+              <ModelSelector
+                currentModel={engineModel}
+                onModelChange={handleEngineModelChange}
+                isSuperAdmin={!!isSuperAdmin}
+                disabled={isLoading}
+              />
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center bg-hh-ui-50 rounded-full p-0.5">

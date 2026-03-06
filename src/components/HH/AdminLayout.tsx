@@ -73,6 +73,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
     'admin-analysis-results': 'analysis-results',
     'admin-sessions': 'hugo-overview',
     'admin-chat-expert': 'talk-to-hugo',
+    'admin-v3-chat': 'talk-to-hugo',
     'admin-settings': 'settings',
     'admin-help': 'help',
     'admin-resources': 'resources',
