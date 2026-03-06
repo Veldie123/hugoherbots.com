@@ -3703,12 +3703,17 @@ Format: ["id1", "id2", "id3", ...]`;
           }
         } catch (e) { /* ignore */ }
 
-        const [viewsThisWeek, viewsPrevWeek, viewsToday, viewsYesterday] = await Promise.all([
-          supabaseAdmin.from('video_views').select('user_id, created_at').gte('created_at', sevenDaysAgo.toISOString()),
-          supabaseAdmin.from('video_views').select('user_id, created_at').gte('created_at', fourteenDaysAgo.toISOString()).lt('created_at', sevenDaysAgo.toISOString()),
-          supabaseAdmin.from('video_views').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),
-          supabaseAdmin.from('video_views').select('id', { count: 'exact', head: true }).gte('created_at', new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toISOString()).lt('created_at', todayStart),
-        ]);
+        let viewsThisWeek = { data: [] }, viewsPrevWeek = { data: [] }, viewsToday = { count: 0 }, viewsYesterday = { count: 0 };
+        try {
+          [viewsThisWeek, viewsPrevWeek, viewsToday, viewsYesterday] = await Promise.all([
+            supabaseAdmin.from('video_views').select('user_id, created_at').gte('created_at', sevenDaysAgo.toISOString()),
+            supabaseAdmin.from('video_views').select('user_id, created_at').gte('created_at', fourteenDaysAgo.toISOString()).lt('created_at', sevenDaysAgo.toISOString()),
+            supabaseAdmin.from('video_views').select('id', { count: 'exact', head: true }).gte('created_at', todayStart),
+            supabaseAdmin.from('video_views').select('id', { count: 'exact', head: true }).gte('created_at', new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toISOString()).lt('created_at', todayStart),
+          ]);
+        } catch (e) {
+          console.log('[Dashboard] video_views query failed:', e.message);
+        }
 
         const activeViewUsersThisWeek = new Set((viewsThisWeek.data || []).map(v => v.user_id).filter(Boolean));
         const activeViewUsersPrevWeek = new Set((viewsPrevWeek.data || []).map(v => v.user_id).filter(Boolean));
@@ -3994,7 +3999,7 @@ Format: ["id1", "id2", "id3", ...]`;
       } catch (err) {
         console.error('[Dashboard] Stats error:', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err.message }));
+        res.end(JSON.stringify({ message: err.message, error: err.message }));
       }
     })();
     return;

@@ -175,7 +175,7 @@ function proxyRequest(req, res, targetPort) {
   proxyReq.on('error', (err) => {
     if (!res.headersSent) {
       res.writeHead(502, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: `Service on port ${targetPort} starting up` }));
+      res.end(JSON.stringify({ message: `Service on port ${targetPort} starting up`, error: `Service on port ${targetPort} starting up` }));
     }
   });
 
