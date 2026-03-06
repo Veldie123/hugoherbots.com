@@ -350,7 +350,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
 
   const handleBulkDelete = () => {
     if (window.confirm(`Weet je zeker dat je ${selectedIds.length} sessies wilt verwijderen?`)) {
-      // TODO: implement bulk delete API call
+      selectedIds.forEach(id => handleDeleteSession(id));
       setSelectedIds([]);
     }
   };
