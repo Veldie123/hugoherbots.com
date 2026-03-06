@@ -179,6 +179,7 @@ class HugoApiService {
       body: JSON.stringify({
         techniqueId: request.techniqueId,
         userProfile: {},
+        mode: request.viewMode === "admin" ? "admin" : "coaching",
       }),
     });
 

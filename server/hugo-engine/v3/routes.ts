@@ -9,6 +9,7 @@ import { requireAuth } from "../auth-middleware";
 import { chat, createSession, type V3SessionState } from "./agent";
 import { isV3Available } from "./anthropic-client";
 import { buildUserBriefing } from "./user-briefing";
+import { saveMemory } from "./memory-service";
 import { randomUUID } from "crypto";
 
 const router = Router();
@@ -52,31 +53,42 @@ router.post(
       });
     }
 
-    const { techniqueId, userProfile } = req.body;
+    const { techniqueId, userProfile, mode } = req.body;
+    const sessionMode = mode === "admin" ? "admin" as const : "coaching" as const;
     const sessionId = `v3_${randomUUID()}`;
 
-    // Fetch rich user context for personalized opening
+    // Fetch rich user context for personalized opening (coaching only)
     let briefing;
-    try {
-      briefing = await buildUserBriefing(req.userId!);
-      console.log(`[V3] Briefing loaded for ${briefing.name}: ${briefing.isNewUser ? 'new user' : `${briefing.sessionsPlayed} sessions`}`);
-    } catch (err) {
-      console.warn("[V3] Briefing fetch failed, continuing without:", err);
+    if (sessionMode === "coaching") {
+      try {
+        briefing = await buildUserBriefing(req.userId!);
+        console.log(`[V3] Briefing loaded for ${briefing.name}: ${briefing.isNewUser ? 'new user' : `${briefing.sessionsPlayed} sessions`}`);
+      } catch (err) {
+        console.warn("[V3] Briefing fetch failed, continuing without:", err);
+      }
     }
 
-    const session = createSession(sessionId, req.userId!, userProfile, briefing);
+    const session = createSession(sessionId, req.userId!, sessionMode, userProfile, briefing);
     sessions.set(sessionId, session);
+    console.log(`[V3] Session created: ${sessionId} (mode: ${sessionMode})`);
 
     // Auto-send opening message with context-aware prompt
     try {
       let openingPrompt: string;
-      const hasSpecificTechnique = techniqueId && techniqueId !== "general";
-      if (hasSpecificTechnique) {
-        openingPrompt = `De seller wil werken aan techniek ${techniqueId}. Begroet hem kort en natuurlijk als Hugo. Verwijs naar wat je weet over deze seller uit je briefing.`;
-      } else if (briefing && !briefing.isNewUser) {
-        openingPrompt = `Je hebt zojuist de briefing van deze seller gelezen in je system prompt. Begroet hem kort en natuurlijk als Hugo. Verwijs naar iets concreets uit zijn geschiedenis en stel een logische volgende stap voor. Eindig met "of zit je ergens anders mee?" zodat hij ook vrij kan kiezen.`;
+
+      if (sessionMode === "admin") {
+        // Admin mode: daily briefing for Hugo
+        openingPrompt = `Geef me een dagelijkse briefing. Check: hoeveel webinars er gepland staan, de platform analytics van de afgelopen week, en of er iets urgents is (vastgelopen gebruikers, lage scores, lege pipeline). Eindig met 3 concrete suggesties voor wat ik vandaag kan doen.`;
       } else {
-        openingPrompt = `Dit is een nieuwe seller${briefing?.sector ? ` in de sector ${briefing.sector}` : ''}. Begroet hem warm als Hugo. Vertel kort wat je voor hem kunt doen (oefenen met technieken, rollenspel, feedback op gesprekken, analyse van echte verkoopgesprekken) en vraag wat hij verkoopt en waar hij tegenaan loopt, zodat je hem gericht kunt helpen.`;
+        // Coaching mode: personalized opening
+        const hasSpecificTechnique = techniqueId && techniqueId !== "general";
+        if (hasSpecificTechnique) {
+          openingPrompt = `De seller wil werken aan techniek ${techniqueId}. Begroet hem kort en natuurlijk als Hugo. Verwijs naar wat je weet over deze seller uit je briefing.`;
+        } else if (briefing && !briefing.isNewUser) {
+          openingPrompt = `Je hebt zojuist de briefing van deze seller gelezen in je system prompt. Begroet hem kort en natuurlijk als Hugo. Verwijs naar iets concreets uit zijn geschiedenis en stel een logische volgende stap voor. Eindig met "of zit je ergens anders mee?" zodat hij ook vrij kan kiezen.`;
+        } else {
+          openingPrompt = `Dit is een nieuwe seller${briefing?.sector ? ` in de sector ${briefing.sector}` : ''}. Begroet hem warm als Hugo. Vertel kort wat je voor hem kunt doen (oefenen met technieken, rollenspel, feedback op gesprekken, analyse van echte verkoopgesprekken) en vraag wat hij verkoopt en waar hij tegenaan loopt, zodat je hem gericht kunt helpen.`;
+        }
       }
 
       const response = await chat(session, openingPrompt);
@@ -84,6 +96,7 @@ router.post(
       res.json({
         sessionId,
         engineVersion: "v3",
+        mode: sessionMode,
         opening: {
           text: response.text,
           toolsUsed: response.toolsUsed,
@@ -165,9 +178,44 @@ router.get(
     res.json({
       sessionId: session.sessionId,
       engineVersion: session.engineVersion,
+      mode: session.mode,
       messageCount: session.messages.length,
       messages: session.messages,
     });
+  }
+);
+
+/** Save an admin correction as agent memory */
+router.post(
+  "/memory/save",
+  requireAuth,
+  requireSuperAdmin,
+  async (req: Request, res: Response) => {
+    const { content, memoryType, techniqueId, metadata } = req.body;
+
+    if (!content || typeof content !== "string") {
+      return res.status(400).json({ error: "Content is verplicht." });
+    }
+
+    try {
+      const result = await saveMemory({
+        userId: "hugo-admin",
+        content,
+        memoryType: memoryType || "admin_correction",
+        source: "admin_correction",
+        techniqueId,
+        metadata,
+      });
+
+      if (result.success) {
+        res.json({ success: true, memoryId: result.memoryId });
+      } else {
+        res.status(500).json({ error: result.error });
+      }
+    } catch (err: any) {
+      console.error("[V3] Memory save error:", err);
+      res.status(500).json({ error: "Fout bij opslaan herinnering." });
+    }
   }
 );
 

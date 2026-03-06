@@ -282,19 +282,27 @@ async function fetchActivityStats(
   try {
     const { data, error } = await supabase
       .from("user_activity")
-      .select("activity_type")
+      .select("activity_type, video_id, webinar_id")
       .eq("user_id", userId)
       .in("activity_type", ["video_view", "video_complete", "webinar_attend", "webinar_complete"]);
 
     if (error || !data) return { videosWatched: 0, webinarsAttended: 0 };
 
+    // Count DISTINCT content items, not total activity rows
+    const uniqueVideos = new Set(
+      data
+        .filter((a: any) => (a.activity_type === "video_view" || a.activity_type === "video_complete") && a.video_id)
+        .map((a: any) => a.video_id)
+    );
+    const uniqueWebinars = new Set(
+      data
+        .filter((a: any) => (a.activity_type === "webinar_attend" || a.activity_type === "webinar_complete") && a.webinar_id)
+        .map((a: any) => a.webinar_id)
+    );
+
     return {
-      videosWatched: data.filter((a) =>
-        a.activity_type === "video_view" || a.activity_type === "video_complete"
-      ).length,
-      webinarsAttended: data.filter((a) =>
-        a.activity_type === "webinar_attend" || a.activity_type === "webinar_complete"
-      ).length,
+      videosWatched: uniqueVideos.size,
+      webinarsAttended: uniqueWebinars.size,
     };
   } catch {
     return { videosWatched: 0, webinarsAttended: 0 };

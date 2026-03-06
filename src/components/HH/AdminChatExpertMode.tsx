@@ -1103,6 +1103,31 @@ export function AdminChatExpertMode({
         toast.error("Fout bij opslaan correctie");
       }
 
+      // Save correction as V3 agent memory for future recall
+      try {
+        const memoryContent = correctionTechnique
+          ? `CORRECTIE (${correctionTechniqueName}): Hugo corrigeerde het AI-antwoord "${message.text.slice(0, 100)}..." met: "${finalCorrectionText}"`
+          : `CORRECTIE: Hugo corrigeerde het AI-antwoord "${message.text.slice(0, 100)}..." met: "${finalCorrectionText}"`;
+
+        await fetch('/api/v3/memory/save', {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({
+            content: memoryContent,
+            memoryType: 'admin_correction',
+            techniqueId: correctionTechnique || undefined,
+            metadata: {
+              originalMessage: message.text.slice(0, 200),
+              correction: finalCorrectionText,
+              technique: correctionTechnique || null,
+            },
+          }),
+        });
+      } catch (memErr) {
+        // Non-blocking — memory save is best-effort
+        console.warn("[Admin] Memory save failed:", memErr);
+      }
+
       // Fix 4: Na correctie → doorgaan naar volgende techniek als onboarding actief
       if (onboardingStatus && !onboardingStatus.isComplete && onboardingCurrentItem) {
         // Meld feedback aan onboarding backend

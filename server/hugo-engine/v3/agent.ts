@@ -1,10 +1,11 @@
 /**
- * Hugo V3 Agent — Claude-powered sales coaching agent
+ * Hugo V3 Agent — Claude-powered intelligent agent
  *
- * Single intelligent agent that replaces the V2 multi-engine system.
- * Uses tools for knowledge lookup and methodology enforcement.
- * No rigid modes — the agent naturally shifts between coaching,
- * roleplay, feedback, and context gathering.
+ * Supports two modes:
+ * - "coaching": Sales coaching agent (replaces V2 multi-engine system)
+ * - "admin": Platform management agent (Hugo's personal assistant)
+ *
+ * The agentic loop is shared — only tools and system prompt differ per mode.
  */
 import Anthropic from "@anthropic-ai/sdk";
 import {
@@ -12,6 +13,7 @@ import {
   COACHING_MODEL,
 } from "./anthropic-client";
 import { buildV3SystemPrompt } from "./system-prompt";
+import { buildAdminSystemPrompt } from "./system-prompt-admin";
 import { type UserBriefing } from "./user-briefing";
 import {
   knowledgeToolDefinitions,
@@ -28,8 +30,15 @@ import {
   ROLEPLAY_TOOLS,
   type RoleplayState,
 } from "./tools/roleplay";
+import {
+  adminToolDefinitions,
+  executeAdminTool,
+  ADMIN_TOOLS,
+} from "./tools/admin";
 
 // ── Types ───────────────────────────────────────────────────────────────────
+
+export type V3Mode = "coaching" | "admin";
 
 export interface V3Message {
   role: "user" | "assistant";
@@ -39,6 +48,7 @@ export interface V3Message {
 export interface V3SessionState {
   sessionId: string;
   userId: string;
+  mode: V3Mode;
   messages: V3Message[];
   userProfile?: {
     name?: string;
@@ -61,9 +71,12 @@ export interface V3Response {
   outputTokens: number;
 }
 
-// ── All available tools ─────────────────────────────────────────────────────
+// ── Tool Definitions (mode-specific) ────────────────────────────────────────
 
-function getAllToolDefinitions(): Anthropic.Tool[] {
+function getAllToolDefinitions(mode: V3Mode): Anthropic.Tool[] {
+  if (mode === "admin") {
+    return adminToolDefinitions;
+  }
   return [
     ...knowledgeToolDefinitions,
     ...methodologyToolDefinitions,
@@ -87,6 +100,11 @@ async function executeTool(
   input: Record<string, any>,
   session: V3SessionState
 ): Promise<string> {
+  // Admin mode: route to admin tools
+  if (session.mode === "admin" && ADMIN_TOOLS.has(name)) {
+    return executeAdminTool(name, input);
+  }
+  // Coaching mode: route to coaching tools
   if (KNOWLEDGE_TOOLS.has(name)) {
     return executeKnowledgeTool(name, input);
   }
@@ -99,6 +117,15 @@ async function executeTool(
   return JSON.stringify({ error: `Unknown tool: ${name}` });
 }
 
+// ── System Prompt (mode-specific) ───────────────────────────────────────────
+
+function getSystemPrompt(session: V3SessionState): string {
+  if (session.mode === "admin") {
+    return buildAdminSystemPrompt();
+  }
+  return buildV3SystemPrompt(session.userProfile, session.briefing);
+}
+
 // ── Agent Core ──────────────────────────────────────────────────────────────
 
 const MAX_TOOL_ROUNDS = 5;
@@ -106,17 +133,19 @@ const MAX_TOOL_ROUNDS = 5;
 /**
  * Send a message to the Hugo V3 agent and get a response.
  *
- * The agent will use tools as needed to look up methodology,
- * training materials, user profiles, etc. Tool calls happen
+ * The agent will use tools as needed. Tool calls happen
  * transparently — the caller just gets the final text response.
+ *
+ * In admin mode, extended thinking is enabled for deeper reasoning.
  */
 export async function chat(
   session: V3SessionState,
   userMessage: string
 ): Promise<V3Response> {
   const client = getAnthropicClient();
-  const tools = getAllToolDefinitions();
-  const systemPrompt = buildV3SystemPrompt(session.userProfile, session.briefing);
+  const tools = getAllToolDefinitions(session.mode);
+  const systemPrompt = getSystemPrompt(session);
+  const model = COACHING_MODEL;
 
   // Build message history for Claude
   const messages: Anthropic.MessageParam[] = session.messages.map((m) => ({
@@ -134,13 +163,15 @@ export async function chat(
   // Agentic loop: keep going until Claude produces a final text response
   let currentMessages = [...messages];
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-    const response = await client.messages.create({
-      model: COACHING_MODEL,
-      max_tokens: 1024,
+    const requestParams: Anthropic.MessageCreateParams = {
+      model,
+      max_tokens: session.mode === "admin" ? 4096 : 1024,
       system: systemPrompt,
       tools,
       messages: currentMessages,
-    });
+    };
+
+    const response = await client.messages.create(requestParams);
 
     totalInputTokens += response.usage.input_tokens;
     totalOutputTokens += response.usage.output_tokens;
@@ -164,7 +195,7 @@ export async function chat(
       return {
         text,
         toolsUsed,
-        model: COACHING_MODEL,
+        model,
         inputTokens: totalInputTokens,
         outputTokens: totalOutputTokens,
       };
@@ -177,7 +208,6 @@ export async function chat(
     // Then add tool results
     const toolResults: Anthropic.ToolResultBlockParam[] = [];
     for (const toolUse of toolUseBlocks) {
-      console.log(`[V3 Agent] Tool call: ${toolUse.name}`, toolUse.input);
       toolsUsed.push(toolUse.name);
 
       const result = await executeTool(
@@ -197,9 +227,11 @@ export async function chat(
 
   // Fallback if we hit max rounds
   return {
-    text: "Ik heb even te veel informatie opgezocht. Kun je je vraag herhalen?",
+    text: session.mode === "admin"
+      ? "Ik heb even te veel opgezocht. Kun je je vraag herhalen?"
+      : "Ik heb even te veel informatie opgezocht. Kun je je vraag herhalen?",
     toolsUsed,
-    model: COACHING_MODEL,
+    model,
     inputTokens: totalInputTokens,
     outputTokens: totalOutputTokens,
   };
@@ -211,12 +243,14 @@ export async function chat(
 export function createSession(
   sessionId: string,
   userId: string,
+  mode: V3Mode = "coaching",
   userProfile?: V3SessionState["userProfile"],
   briefing?: UserBriefing
 ): V3SessionState {
   return {
     sessionId,
     userId,
+    mode,
     messages: [],
     userProfile,
     briefing,
