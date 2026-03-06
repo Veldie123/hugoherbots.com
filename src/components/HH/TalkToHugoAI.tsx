@@ -2559,7 +2559,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
       
 
-      <div className="border-t border-hh-border bg-hh-bg">
+      <div className="border-t border-hh-border bg-hh-bg flex-shrink-0">
         <input
           ref={fileInputRef}
           type="file"
@@ -2923,7 +2923,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               <ModelSelector
                 currentModel={engineModel}
                 onModelChange={handleEngineModelChange}
-                isSuperAdmin={!!isSuperAdmin}
+                viewMode="coaching"
                 disabled={isLoading || isStreaming}
               />
             </div>

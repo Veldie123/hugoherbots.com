@@ -107,6 +107,14 @@ export interface SendMessageResponse {
   };
 }
 
+interface V3StreamEvent {
+  type: "thinking" | "tool_start" | "tool_result" | "token" | "done" | "error";
+  content?: string;
+  name?: string;
+  usage?: { inputTokens: number; outputTokens: number };
+  toolsUsed?: string[];
+}
+
 export interface Technique {
   nummer: string;
   naam: string;
@@ -329,10 +337,49 @@ class HugoApiService {
     }
 
     if (this.useV3) {
-      // V3 doesn't have streaming yet — simulate with non-streaming call
-      const result = await this.sendMessageV3(content);
-      if (result.response) onToken(result.response);
-      if (onDone) onDone();
+      const response = await fetch(`${API_BASE}/v3/session/${this.currentSessionId}/stream`, {
+        method: "POST",
+        headers: await getAuthHeaders(),
+        body: JSON.stringify({ message: content }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to stream V3 message: ${response.statusText}`);
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("No response body");
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            try {
+              const event: V3StreamEvent = JSON.parse(line.slice(6));
+              if (event.type === "token" && event.content) {
+                onToken(event.content);
+              } else if (event.type === "tool_start" && event.name) {
+                onToken(`\n⚡ ${event.name}...\n`);
+              } else if (event.type === "done") {
+                if (onDone) onDone(event);
+              } else if (event.type === "error") {
+                throw new Error(event.content || "Stream error");
+              }
+            } catch (e: any) {
+              if (e.message && !e.message.includes("JSON")) throw e;
+            }
+          }
+        }
+      }
       return;
     }
 
@@ -490,6 +537,18 @@ class HugoApiService {
       throw new Error(`Failed to get turns: ${response.statusText}`);
     }
     return response.json();
+  }
+
+  async checkV3Access(): Promise<{ admin_v3: boolean; coaching_v3: boolean }> {
+    try {
+      const response = await fetch(`${API_BASE}/v3/access`, {
+        headers: await getAuthHeaders(),
+      });
+      if (!response.ok) return { admin_v3: false, coaching_v3: false };
+      return response.json();
+    } catch {
+      return { admin_v3: false, coaching_v3: false };
+    }
   }
 
   getSessionId(): string | null {

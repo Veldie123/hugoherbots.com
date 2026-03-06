@@ -252,10 +252,6 @@ export function AdminChatExpertMode({
   const [engineModel, setEngineModel] = useState<EngineModel>(isSuperAdmin ? "v3" : "v2");
   const [sessionRestartKey, setSessionRestartKey] = useState(0);
 
-  // V3 session persistence keys
-  const V3_SESSION_KEY = "v3_admin_sessionId";
-  const V3_MESSAGES_KEY = "v3_admin_messages";
-
   // Sync engine model to hugoApi
   useEffect(() => {
     hugoApi.setV3Mode(engineModel === "v3");
@@ -268,8 +264,6 @@ export function AdminChatExpertMode({
     setMessages([]);
     setHasActiveSession(false);
     hugoApi.setCurrentSessionId(null);
-    localStorage.removeItem(V3_SESSION_KEY);
-    localStorage.removeItem(V3_MESSAGES_KEY);
     setSessionRestartKey(prev => prev + 1);
   }, []);
 
@@ -288,18 +282,6 @@ export function AdminChatExpertMode({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  // V3 session persistence: save messages to localStorage
-  useEffect(() => {
-    if (engineModel !== "v3" || messages.length === 0) return;
-    const sessionId = hugoApi.getCurrentSessionId();
-    if (sessionId) {
-      localStorage.setItem(V3_SESSION_KEY, sessionId);
-      localStorage.setItem(V3_MESSAGES_KEY, JSON.stringify(
-        messages.map(m => ({ id: m.id, sender: m.sender, text: m.text, timestamp: m.timestamp }))
-      ));
-    }
-  }, [messages, engineModel]);
 
   // Load user's current competence level on mount (auto-adaptive system)
   useEffect(() => {
@@ -401,37 +383,6 @@ export function AdminChatExpertMode({
     }
 
     if (!practiceRaw) {
-      // V3 session restore from localStorage
-      if (engineModel === "v3") {
-        const savedSessionId = localStorage.getItem(V3_SESSION_KEY);
-        const savedMessages = localStorage.getItem(V3_MESSAGES_KEY);
-        if (savedSessionId && savedMessages) {
-          (async () => {
-            try {
-              const { data: sessionData } = await supabase.auth.getSession();
-              const authToken = sessionData?.session?.access_token;
-              const headers: Record<string, string> = { "Content-Type": "application/json" };
-              if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
-
-              const res = await fetch(`/api/v3/session/${savedSessionId}`, { headers });
-              if (res.ok) {
-                const parsed = JSON.parse(savedMessages);
-                setMessages(parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) })));
-                setHasActiveSession(true);
-                hugoApi.setCurrentSessionId(savedSessionId);
-                hugoApi.setV3Mode(true);
-                return;
-              }
-            } catch {
-              // Session expired or server restarted — start fresh
-            }
-            localStorage.removeItem(V3_SESSION_KEY);
-            localStorage.removeItem(V3_MESSAGES_KEY);
-          })();
-          return () => { cancelled = true; };
-        }
-      }
-
       (async () => {
         try {
           setIsLoading(true);
@@ -1381,7 +1332,7 @@ export function AdminChatExpertMode({
   };
 
   return (
-    <AdminLayout currentPage={sessionId === "hugo-agent" ? "admin-hugo-agent" : "admin-chat-expert"} navigate={navigate} isSuperAdmin={isSuperAdmin}>
+    <AdminLayout currentPage={sessionId === "hugo-agent" ? "admin-hugo-agent" : "admin-chat-expert"} navigate={navigate} isSuperAdmin={isSuperAdmin} contentClassName="flex-1 overflow-hidden min-h-0 flex flex-col">
       <div className="flex flex-col h-full">
         {/* Unified header row — matching user view */}
         <div className="flex items-stretch border-b border-hh-border flex-shrink-0">
@@ -1404,7 +1355,7 @@ export function AdminChatExpertMode({
               <ModelSelector
                 currentModel={engineModel}
                 onModelChange={handleEngineModelChange}
-                isSuperAdmin={!!isSuperAdmin}
+                viewMode="admin"
                 disabled={isLoading}
               />
             </div>
@@ -1647,7 +1598,7 @@ export function AdminChatExpertMode({
                 <div className={`flex ${message.sender === "hugo" ? "justify-end" : "justify-start"}`}>
                   <div className="flex flex-col gap-1 max-w-[80%]">
                     {message.isTranscriptReplay && message.transcriptRole && (
-                      <span className="text-[11px] font-medium mb-0.5 px-1" style={{ color: message.transcriptRole === 'Klant' ? '#9910FA' : '#7e22ce' }}>
+                      <span className="text-[11px] font-medium mb-0.5 px-1" style={{ color: 'var(--hh-primary)' }}>
                         {message.transcriptRole}
                       </span>
                     )}
@@ -1666,12 +1617,12 @@ export function AdminChatExpertMode({
                         message.isTranscriptReplay
                           ? {
                               opacity: 0.85,
-                              backgroundColor: message.sender === 'hugo' ? '#7e22ce' : 'var(--hh-ui-100)',
+                              backgroundColor: message.sender === 'hugo' ? 'var(--hh-primary)' : 'var(--hh-ui-100)',
                               color: message.sender === 'hugo' ? '#ffffff' : 'var(--hh-ink)',
                             }
                           : message.sender === "hugo"
                             ? {
-                                backgroundColor: '#7e22ce',
+                                backgroundColor: 'var(--hh-primary)',
                                 color: '#ffffff',
                               }
                             : undefined
@@ -1741,7 +1692,7 @@ export function AdminChatExpertMode({
                             title="Kopieer"
                           >
                             {copiedMessageId === message.id ? (
-                              <Check className="w-3.5 h-3.5" style={{ color: '#9910FA' }} />
+                              <Check className="w-3.5 h-3.5" style={{ color: 'var(--hh-primary)' }} />
                             ) : (
                               <Copy className="w-3.5 h-3.5" />
                             )}
@@ -1749,7 +1700,7 @@ export function AdminChatExpertMode({
                           <button
                             onClick={() => handleMessageFeedback(message.id, "up")}
                             className="p-1.5 rounded-md transition-colors"
-                            style={message.feedback === "up" ? { color: '#9910FA', backgroundColor: 'rgba(153,16,250,0.08)' } : undefined}
+                            style={message.feedback === "up" ? { color: 'var(--hh-primary)', backgroundColor: 'rgba(var(--hh-primary-rgb), 0.08)' } : undefined}
                             title="Goed antwoord"
                           >
                             <ThumbsUp className={`w-3.5 h-3.5 ${message.feedback !== "up" ? "text-hh-muted hover:text-hh-muted" : ""}`} />
@@ -1781,8 +1732,8 @@ export function AdminChatExpertMode({
                                 onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
                                 className="p-1.5 rounded-md transition-colors"
                                 style={{
-                                  color: '#9910FA',
-                                  backgroundColor: desktopSidebarOpen ? 'rgba(153,16,250,0.1)' : undefined,
+                                  color: 'var(--hh-primary)',
+                                  backgroundColor: desktopSidebarOpen ? 'rgba(var(--hh-primary-rgb), 0.1)' : undefined,
                                 }}
                               >
                                 <Lightbulb className="w-3.5 h-3.5" />
@@ -1818,7 +1769,7 @@ export function AdminChatExpertMode({
 
                         {/* Correction active indicator — shown inline when admin clicks thumbs down */}
                         {correctionMessageId === message.id && (
-                          <div className="mt-1 flex items-center gap-1.5 text-[11px]" style={{ color: '#9910FA' }}>
+                          <div className="mt-1 flex items-center gap-1.5 text-[11px]" style={{ color: 'var(--hh-primary)' }}>
                             <span>Correctie modus actief — typ je opmerking onderaan</span>
                           </div>
                         )}
@@ -2483,7 +2434,7 @@ export function AdminChatExpertMode({
 
           {/* Input - only show in chat mode */}
           {chatMode === "chat" && (
-          <div className="p-4 border-t border-hh-border">
+          <div className="p-4 border-t border-hh-border flex-shrink-0">
             {/* Attached files preview */}
             {attachedFiles.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
@@ -2526,7 +2477,7 @@ export function AdminChatExpertMode({
                 onKeyDown={(e) => { if (e.key === 'Escape' && correctionMessageId) { handleCancelCorrection(); } }}
                 placeholder={isLoading ? "Hugo denkt na..." : correctionMessageId ? "Typ je correctie..." : "Typ je bericht..."}
                 className="flex-1 min-w-0 text-hh-ink bg-hh-bg"
-                style={correctionMessageId ? { borderColor: '#9910FA', boxShadow: '0 0 0 1px rgba(153,16,250,0.3)' } : undefined}
+                style={correctionMessageId ? { borderColor: 'var(--hh-primary)', boxShadow: '0 0 0 1px rgba(var(--hh-primary-rgb), 0.3)' } : undefined}
                 disabled={isLoading}
               />
               {/* Microphone - dictation */}
@@ -2545,9 +2496,9 @@ export function AdminChatExpertMode({
               <Button 
                 onClick={handleSendMessage} 
                 className="flex-shrink-0 text-white gap-1.5 px-4"
-                style={{ backgroundColor: '#9910FA' }}
-                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#7B0DD4')}
-                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#9910FA')}
+                style={{ backgroundColor: 'var(--hh-primary)' }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = 'var(--hh-primary-dark)')}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = 'var(--hh-primary)')}
                 disabled={!inputText.trim() || isLoading}
                 title="Verzend"
               >

@@ -1,33 +1,125 @@
 /**
  * Hugo V3 Agent Routes
  *
- * API routes for the V3 agent. Only accessible to superadmin (stephane@hugoherbots.com).
- * All other users continue to use V2.
+ * API routes for the V3 agent. Access controlled via v3_access table
+ * (superadmin always has full access). Sessions persisted to Supabase.
  */
 import { Router, type Request, type Response } from "express";
 import { requireAuth } from "../auth-middleware";
-import { chat, createSession, type V3SessionState } from "./agent";
+import { chat, chatStream, createSession, type V3SessionState, type V3StreamEvent } from "./agent";
 import { isV3Available } from "./anthropic-client";
 import { buildUserBriefing } from "./user-briefing";
 import { saveMemory } from "./memory-service";
+import { supabase } from "../supabase-client";
 import { pool } from "../db";
 import { randomUUID } from "crypto";
 
 const router = Router();
 
-// In-memory session store (will be replaced with DB persistence in later phase)
+// In-memory session store with Supabase write-through
 const sessions = new Map<string, V3SessionState>();
 
 const SUPERADMIN_EMAIL = "stephane@hugoherbots.com";
 
-/** Only allow superadmin access to V3 */
-function requireSuperAdmin(req: Request, res: Response, next: Function) {
-  if (req.userEmail?.toLowerCase() !== SUPERADMIN_EMAIL) {
-    return res.status(403).json({
-      error: "V3 agent is alleen beschikbaar voor superadmin.",
-    });
+/** Save session to Supabase (async, non-blocking) */
+async function persistSession(session: V3SessionState): Promise<void> {
+  try {
+    await supabase.from("v3_sessions").upsert({
+      id: session.sessionId,
+      user_id: session.userId,
+      mode: session.mode,
+      messages: session.messages,
+      user_profile: session.userProfile || null,
+      metadata: { engineVersion: session.engineVersion },
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "id" });
+  } catch (err: any) {
+    console.error("[V3] Session persist failed:", err.message);
   }
-  next();
+}
+
+/** Load session from Supabase if not in memory */
+async function loadSession(sessionId: string): Promise<V3SessionState | null> {
+  // Check memory first
+  const cached = sessions.get(sessionId);
+  if (cached) return cached;
+
+  // Try Supabase
+  try {
+    const { data, error } = await supabase
+      .from("v3_sessions")
+      .select("*")
+      .eq("id", sessionId)
+      .single();
+
+    if (error || !data) return null;
+
+    const session: V3SessionState = {
+      sessionId: data.id,
+      userId: data.user_id,
+      mode: data.mode as "coaching" | "admin",
+      messages: data.messages || [],
+      userProfile: data.user_profile,
+      engineVersion: "v3",
+    };
+
+    sessions.set(sessionId, session);
+    return session;
+  } catch {
+    return null;
+  }
+}
+
+/** V3 access control — check v3_access table with in-memory cache */
+const accessCache = new Map<string, { admin_v3: boolean; coaching_v3: boolean; ts: number }>();
+const ACCESS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function getV3Access(email: string): Promise<{ admin_v3: boolean; coaching_v3: boolean }> {
+  // Superadmin always has access
+  if (email.toLowerCase() === SUPERADMIN_EMAIL) {
+    return { admin_v3: true, coaching_v3: true };
+  }
+
+  // Check cache
+  const cached = accessCache.get(email);
+  if (cached && Date.now() - cached.ts < ACCESS_CACHE_TTL) {
+    return { admin_v3: cached.admin_v3, coaching_v3: cached.coaching_v3 };
+  }
+
+  // Check Supabase
+  try {
+    const { data } = await supabase
+      .from("v3_access")
+      .select("admin_v3, coaching_v3")
+      .eq("user_email", email.toLowerCase())
+      .single();
+
+    const access = {
+      admin_v3: data?.admin_v3 || false,
+      coaching_v3: data?.coaching_v3 || false,
+    };
+    accessCache.set(email, { ...access, ts: Date.now() });
+    return access;
+  } catch {
+    return { admin_v3: false, coaching_v3: false };
+  }
+}
+
+function requireV3Access(mode: "admin" | "coaching") {
+  return async (req: Request, res: Response, next: Function) => {
+    const email = req.userEmail;
+    if (!email) {
+      return res.status(401).json({ error: "Niet ingelogd." });
+    }
+
+    const access = await getV3Access(email);
+    const hasAccess = mode === "admin" ? access.admin_v3 : access.coaching_v3;
+
+    if (!hasAccess) {
+      return res.status(403).json({ error: "V3 is niet beschikbaar voor dit account." });
+    }
+    next();
+  };
 }
 
 /** Health check — is V3 available? */
@@ -46,7 +138,6 @@ router.get("/status", (_req: Request, res: Response) => {
 router.post(
   "/session",
   requireAuth,
-  requireSuperAdmin,
   async (req: Request, res: Response) => {
     if (!isV3Available()) {
       return res.status(503).json({
@@ -56,6 +147,14 @@ router.post(
 
     const { techniqueId, userProfile, mode } = req.body;
     const sessionMode = mode === "admin" ? "admin" as const : "coaching" as const;
+
+    // Access check based on requested mode
+    const access = await getV3Access(req.userEmail!);
+    const hasAccess = sessionMode === "admin" ? access.admin_v3 : access.coaching_v3;
+    if (!hasAccess) {
+      return res.status(403).json({ error: "V3 is niet beschikbaar voor dit account." });
+    }
+
     const sessionId = `v3_${randomUUID()}`;
 
     // Fetch rich user context for personalized opening (coaching only)
@@ -71,6 +170,7 @@ router.post(
 
     const session = createSession(sessionId, req.userId!, sessionMode, userProfile, briefing);
     sessions.set(sessionId, session);
+    persistSession(session);
     console.log(`[V3] Session created: ${sessionId} (mode: ${sessionMode})`);
 
     // Auto-send opening message with context-aware prompt
@@ -118,6 +218,7 @@ router.post(
       }
 
       const response = await chat(session, openingPrompt);
+      persistSession(session);
 
       res.json({
         sessionId,
@@ -148,7 +249,6 @@ router.post(
 router.post(
   "/session/:sessionId/message",
   requireAuth,
-  requireSuperAdmin,
   async (req: Request, res: Response) => {
     const sessionId = req.params.sessionId as string;
     const { message } = req.body;
@@ -157,7 +257,7 @@ router.post(
       return res.status(400).json({ error: "Message is verplicht." });
     }
 
-    const session = sessions.get(sessionId);
+    const session = await loadSession(sessionId);
     if (!session) {
       return res.status(404).json({
         error: "Sessie niet gevonden. Start een nieuwe sessie.",
@@ -166,6 +266,7 @@ router.post(
 
     try {
       const response = await chat(session, message.trim());
+      persistSession(session);
 
       res.json({
         sessionId,
@@ -190,14 +291,57 @@ router.post(
   }
 );
 
+/** Stream a message response via SSE */
+router.post(
+  "/session/:sessionId/stream",
+  requireAuth,
+  requireV3Access("admin"),
+  async (req: Request, res: Response) => {
+    const sessionId = req.params.sessionId as string;
+    const { message } = req.body;
+
+    if (!message || typeof message !== "string" || message.trim().length === 0) {
+      return res.status(400).json({ error: "Message is verplicht." });
+    }
+
+    const session = await loadSession(sessionId);
+    if (!session) {
+      return res.status(404).json({ error: "Sessie niet gevonden. Start een nieuwe sessie." });
+    }
+
+    // SSE headers
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+
+    let clientDisconnected = false;
+    req.on("close", () => { clientDisconnected = true; });
+
+    try {
+      for await (const event of chatStream(session, message.trim())) {
+        if (clientDisconnected) break;
+        res.write(`data: ${JSON.stringify(event)}\n\n`);
+      }
+      persistSession(session); // async, non-blocking
+    } catch (err: any) {
+      console.error("[V3] Stream error:", err.message);
+      if (!clientDisconnected) {
+        res.write(`data: ${JSON.stringify({ type: "error", content: err.message })}\n\n`);
+      }
+    }
+
+    res.end();
+  }
+);
+
 /** Get session history */
 router.get(
   "/session/:sessionId",
   requireAuth,
-  requireSuperAdmin,
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     const sessionId = req.params.sessionId as string;
-    const session = sessions.get(sessionId);
+    const session = await loadSession(sessionId);
     if (!session) {
       return res.status(404).json({ error: "Sessie niet gevonden." });
     }
@@ -216,7 +360,7 @@ router.get(
 router.post(
   "/memory/save",
   requireAuth,
-  requireSuperAdmin,
+  requireV3Access("admin"),
   async (req: Request, res: Response) => {
     const { content, memoryType, techniqueId, metadata } = req.body;
 
@@ -245,5 +389,14 @@ router.post(
     }
   }
 );
+
+/** Check V3 access for current user */
+router.get("/access", requireAuth, async (req: Request, res: Response) => {
+  const email = req.userEmail;
+  if (!email) return res.json({ admin_v3: false, coaching_v3: false });
+
+  const access = await getV3Access(email);
+  res.json(access);
+});
 
 export { router as v3Routes };

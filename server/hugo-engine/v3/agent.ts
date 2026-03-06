@@ -71,6 +71,14 @@ export interface V3Response {
   outputTokens: number;
 }
 
+export interface V3StreamEvent {
+  type: "thinking" | "tool_start" | "tool_result" | "token" | "done" | "error";
+  content?: string;
+  name?: string;        // tool name
+  usage?: { inputTokens: number; outputTokens: number };
+  toolsUsed?: string[];
+}
+
 // ── Tool Definitions (mode-specific) ────────────────────────────────────────
 
 function getAllToolDefinitions(mode: V3Mode): Anthropic.Tool[] {
@@ -241,6 +249,115 @@ export async function chat(
     inputTokens: totalInputTokens,
     outputTokens: totalOutputTokens,
   };
+}
+
+/**
+ * Stream a message to the Hugo V3 agent, yielding events as they happen.
+ *
+ * Uses client.messages.stream() for streaming responses. Tool calls are
+ * executed between rounds, and the final text is yielded as token events.
+ */
+export async function* chatStream(
+  session: V3SessionState,
+  userMessage: string
+): AsyncGenerator<V3StreamEvent> {
+  const client = getAnthropicClient();
+  const tools = getAllToolDefinitions(session.mode);
+  const systemPrompt = getSystemPrompt(session);
+  const model = COACHING_MODEL;
+
+  const messages: Anthropic.MessageParam[] = session.messages.map((m) => ({
+    role: m.role,
+    content: m.content,
+  }));
+  messages.push({ role: "user", content: userMessage });
+
+  const toolsUsed: string[] = [];
+  let totalInputTokens = 0;
+  let totalOutputTokens = 0;
+
+  let currentMessages = [...messages];
+  for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+    yield { type: "thinking" };
+
+    const stream = client.messages.stream({
+      model,
+      max_tokens: session.mode === "admin" ? 4096 : 1024,
+      system: systemPrompt,
+      tools,
+      messages: currentMessages,
+    });
+
+    // Collect full response for tool handling
+    let currentText = "";
+
+    stream.on("text", (text) => {
+      currentText += text;
+    });
+
+    const finalMessage = await stream.finalMessage();
+    totalInputTokens += finalMessage.usage.input_tokens;
+    totalOutputTokens += finalMessage.usage.output_tokens;
+    const stopReason = finalMessage.stop_reason;
+
+    // Process content blocks
+    const toolUseBlocks = finalMessage.content.filter(
+      (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
+    );
+
+    if (toolUseBlocks.length === 0 || stopReason === "end_turn") {
+      // Stream text tokens from the final text
+      const textBlocks = finalMessage.content.filter(
+        (block): block is Anthropic.TextBlock => block.type === "text"
+      );
+      const text = textBlocks.map((b) => b.text).join("");
+
+      // Yield token by token (split into small chunks for smooth rendering)
+      const chunkSize = 4; // characters per token event
+      for (let i = 0; i < text.length; i += chunkSize) {
+        yield { type: "token", content: text.slice(i, i + chunkSize) };
+      }
+
+      session.messages.push({ role: "user", content: userMessage });
+      session.messages.push({ role: "assistant", content: text });
+
+      yield {
+        type: "done",
+        usage: { inputTokens: totalInputTokens, outputTokens: totalOutputTokens },
+        toolsUsed,
+      };
+      return;
+    }
+
+    // Tool execution round
+    currentMessages.push({ role: "assistant", content: finalMessage.content });
+
+    const toolResults: Anthropic.ToolResultBlockParam[] = [];
+    for (const toolUse of toolUseBlocks) {
+      toolsUsed.push(toolUse.name);
+      yield { type: "tool_start", name: toolUse.name };
+
+      let result: string;
+      try {
+        result = await executeTool(toolUse.name, toolUse.input as Record<string, any>, session);
+      } catch (err: any) {
+        console.error(`[V3 Agent] Tool ${toolUse.name} threw:`, err.message);
+        result = JSON.stringify({ error: `Tool ${toolUse.name} failed: ${err.message}` });
+      }
+
+      toolResults.push({ type: "tool_result", tool_use_id: toolUse.id, content: result });
+      yield { type: "tool_result", name: toolUse.name };
+    }
+
+    currentMessages.push({ role: "user", content: toolResults });
+  }
+
+  // Max rounds fallback
+  const fallback = session.mode === "admin"
+    ? "Ik heb even te veel opgezocht. Kun je je vraag herhalen?"
+    : "Ik heb even te veel informatie opgezocht. Kun je je vraag herhalen?";
+  yield { type: "token", content: fallback };
+  yield { type: "done", usage: { inputTokens: totalInputTokens, outputTokens: totalOutputTokens }, toolsUsed };
 }
 
 /**

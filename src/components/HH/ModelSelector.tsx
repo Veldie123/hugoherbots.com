@@ -1,9 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, Check, Sparkles, Cpu } from "lucide-react";
+import { hugoApi } from "../../services/hugoApi";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export type EngineModel = "v2" | "v3";
+
+type ViewMode = "admin" | "coaching";
 
 interface ModelOption {
   id: EngineModel;
@@ -16,7 +19,7 @@ interface ModelOption {
 interface Props {
   currentModel: EngineModel;
   onModelChange: (model: EngineModel) => void;
-  isSuperAdmin: boolean;
+  viewMode?: ViewMode;
   disabled?: boolean;
 }
 
@@ -41,11 +44,20 @@ const MODELS: ModelOption[] = [
 
 // ── Component ───────────────────────────────────────────────────────────────
 
-export function ModelSelector({ currentModel, onModelChange, isSuperAdmin, disabled }: Props) {
+export function ModelSelector({ currentModel, onModelChange, viewMode = "coaching", disabled }: Props) {
   const [open, setOpen] = useState(false);
+  const [hasV3Access, setHasV3Access] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   const current = MODELS.find(m => m.id === currentModel) || MODELS[0];
+
+  // Check V3 access on mount
+  useEffect(() => {
+    hugoApi.checkV3Access().then((access) => {
+      const hasAccess = viewMode === "admin" ? access.admin_v3 : access.coaching_v3;
+      setHasV3Access(hasAccess);
+    });
+  }, [viewMode]);
 
   // Close on click outside
   useEffect(() => {
@@ -60,8 +72,8 @@ export function ModelSelector({ currentModel, onModelChange, isSuperAdmin, disab
     }
   }, [open]);
 
-  // Non-superadmin: static label only
-  if (!isSuperAdmin) {
+  // No V3 access: static label only
+  if (!hasV3Access) {
     return (
       <span className="text-[13px] text-hh-muted font-medium whitespace-nowrap flex items-center gap-1">
         {current.name} <span className="text-[11px] text-hh-muted/60 font-normal">{current.version}</span>
@@ -69,7 +81,7 @@ export function ModelSelector({ currentModel, onModelChange, isSuperAdmin, disab
     );
   }
 
-  // Superadmin: interactive model selector
+  // V3 access: interactive model selector
   return (
     <div ref={ref} className="relative">
       <button
