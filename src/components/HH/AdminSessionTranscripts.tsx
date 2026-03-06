@@ -534,7 +534,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         {(selectionMode || hoveredRow === session.id) ? (
-                          <div className="w-8 h-8 flex items-center justify-center cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleSelection(session.id); }}>
+                          <div className="w-8 h-8 flex items-center justify-center cursor-pointer" onClick={(e) => e.stopPropagation()}>
                             <CustomCheckbox checked={selectedIds.includes(session.id)} onChange={() => toggleSelection(session.id)} />
                           </div>
                         ) : (

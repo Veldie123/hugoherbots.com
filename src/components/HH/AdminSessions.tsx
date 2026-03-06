@@ -808,7 +808,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                   >
                     <td className="py-3 px-4" onClick={(e) => { if (selectionMode || hoveredRow === session.id) e.stopPropagation(); }}>
                       {(selectionMode || hoveredRow === session.id) ? (
-                        <div onClick={() => toggleSelection(session.id)} className="cursor-pointer w-fit">
+                        <div onClick={(e) => e.stopPropagation()} className="cursor-pointer w-fit">
                           <CustomCheckbox
                             checked={selectedIds.includes(session.id)}
                             onChange={() => toggleSelection(session.id)}
