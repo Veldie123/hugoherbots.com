@@ -74,6 +74,7 @@ import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
 import { CoachViewSummary } from "./CoachViewSummary";
 import { ModelSelector, type EngineModel } from "./ModelSelector";
 import { lastActivityService } from "../../services/lastActivityService";
+import { SessionRating } from "./SessionRating";
 import { supabase } from "../../utils/supabase/client";
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
@@ -170,6 +171,8 @@ export function TalkToHugoAI({
   });
   const [levelTransitionMessage, setLevelTransitionMessage] = useState<string | null>(null);
   const [stopRoleplayDialogOpen, setStopRoleplayDialogOpen] = useState(false);
+  const [showSessionRating, setShowSessionRating] = useState(false);
+  const [ratingSessionId, setRatingSessionId] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpenRaw] = useState(
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('epic') === '1'
@@ -526,7 +529,7 @@ export function TalkToHugoAI({
               mode: 'COACH_CHAT',
               isExpert: false,
               modality: 'chat',
-              viewMode: 'admin',
+              viewMode: engineModel === "v3" ? 'user' : 'admin',
             },
             (token) => {
               setMessages(prev => {
@@ -1505,6 +1508,13 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
       } catch (e) {
         // Analysis trigger failed — just clear silently
       }
+    }
+
+    // Show session rating before clearing
+    const sid = hugoApi.getSessionId();
+    if (sid && messages.length >= 3) {
+      setRatingSessionId(sid);
+      setShowSessionRating(true);
     }
 
     setInputText("");
@@ -3025,6 +3035,18 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         onOpenChange={setStopRoleplayDialogOpen}
         onConfirm={confirmStopRoleplay}
       />
+
+      {showSessionRating && ratingSessionId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <SessionRating
+            sessionId={ratingSessionId}
+            onClose={() => {
+              setShowSessionRating(false);
+              setRatingSessionId(null);
+            }}
+          />
+        </div>
+      )}
 
       <TechniqueDetailsDialog
         open={techniqueDetailsPanelOpen}

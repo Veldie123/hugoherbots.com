@@ -108,7 +108,8 @@ router.post(
         },
       });
     } catch (err: any) {
-      console.error("[V3] Session start error:", err);
+      console.error("[V3] Session start error:", err.message);
+      console.error("[V3] Stack:", err.stack);
       res.status(500).json({
         error: "Kon V3 sessie niet starten.",
         details: err.message,

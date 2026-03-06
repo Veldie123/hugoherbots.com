@@ -205,16 +205,22 @@ export async function chat(
     // First, add the assistant message with tool use blocks
     currentMessages.push({ role: "assistant", content: response.content });
 
-    // Then add tool results
+    // Then add tool results (each tool wrapped in try/catch so one failure doesn't crash the loop)
     const toolResults: Anthropic.ToolResultBlockParam[] = [];
     for (const toolUse of toolUseBlocks) {
       toolsUsed.push(toolUse.name);
 
-      const result = await executeTool(
-        toolUse.name,
-        toolUse.input as Record<string, any>,
-        session
-      );
+      let result: string;
+      try {
+        result = await executeTool(
+          toolUse.name,
+          toolUse.input as Record<string, any>,
+          session
+        );
+      } catch (err: any) {
+        console.error(`[V3 Agent] Tool ${toolUse.name} threw:`, err.message);
+        result = JSON.stringify({ error: `Tool ${toolUse.name} failed: ${err.message}` });
+      }
       toolResults.push({
         type: "tool_result",
         tool_use_id: toolUse.id,

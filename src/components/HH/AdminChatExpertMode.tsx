@@ -443,7 +443,9 @@ export function AdminChatExpertMode({
           setMessages([{
             id: `welcome-${Date.now()}`,
             sender: "ai",
-            text: "Dag Hugo! Waar kan ik je vandaag mee helpen? Je kunt direct beginnen met chatten, of selecteer een techniek via het E.P.I.C. TECHNIQUE menu.",
+            text: engineModel === "v3"
+              ? "V3 sessie kon niet gestart worden. Controleer de server logs of schakel terug naar HugoGPT v1.0."
+              : "Dag Hugo! Waar kan ik je vandaag mee helpen? Je kunt direct beginnen met chatten, of selecteer een techniek via het E.P.I.C. TECHNIQUE menu.",
             timestamp: new Date(),
           }]);
         } finally {
