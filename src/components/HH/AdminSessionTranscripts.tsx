@@ -40,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { getTechniekByNummer } from "../../data/technieken-service";
+import { hideItem, getHiddenIds } from "../../utils/hiddenItems";
 import { CustomCheckbox } from "../ui/custom-checkbox";
 
 interface Session {
@@ -81,12 +82,18 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
   const selectionMode = selectedIds.length > 0;
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => getHiddenIds('admin', 'analysis'));
 
   const toggleSelection = (id: number) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
+  const handleDeleteSession = (id: number) => {
+    hideItem('admin', 'analysis', String(id));
+    setHiddenIds(new Set(getHiddenIds('admin', 'analysis')));
+  };
   const handleBulkDelete = () => {
     if (window.confirm(`Weet je zeker dat je ${selectedIds.length} sessies wilt verwijderen?`)) {
+      selectedIds.forEach(id => handleDeleteSession(id));
       setSelectedIds([]);
     }
   };
@@ -265,6 +272,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
   };
 
   const filteredSessions = sessions.filter((session) => {
+    if (hiddenIds.has(String(session.id))) return false;
     const matchesSearch =
       session.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
       session.userEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
