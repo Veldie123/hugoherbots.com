@@ -295,7 +295,6 @@ router.post(
 router.post(
   "/session/:sessionId/stream",
   requireAuth,
-  requireV3Access("admin"),
   async (req: Request, res: Response) => {
     const sessionId = req.params.sessionId as string;
     const { message } = req.body;

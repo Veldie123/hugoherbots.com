@@ -72,8 +72,8 @@ export function ModelSelector({ currentModel, onModelChange, viewMode = "coachin
     }
   }, [open]);
 
-  // No V3 access: static label only
-  if (!hasV3Access) {
+  // No V3 access AND not currently on V3: static label only
+  if (!hasV3Access && currentModel !== "v3") {
     return (
       <span className="text-[13px] text-hh-muted font-medium whitespace-nowrap flex items-center gap-1">
         {current.name} <span className="text-[11px] text-hh-muted/60 font-normal">{current.version}</span>
