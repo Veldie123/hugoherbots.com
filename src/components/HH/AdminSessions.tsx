@@ -652,33 +652,19 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
           </div>
         </Card>
 
-        {/* Bulk Actions */}
-        {selectionMode && selectedIds.length > 0 && (
-          <Card className="p-4 rounded-[16px] shadow-hh-sm border-hh-border bg-hh-primary-100 border-hh-primary-200">
-            <div className="flex items-center justify-between">
-              <p className="text-[14px] text-hh-text">
-                <span className="font-semibold">{selectedIds.length}</span> sessies geselecteerd
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedIds([])}
-                >
-                  Annuleer
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleBulkDelete}
-                  className="gap-2"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Verwijder
-                </Button>
-              </div>
-            </div>
-          </Card>
+        {/* Bulk Actions — Google Drive style */}
+        {selectionMode && (
+          <div className="flex items-center gap-4 px-4 py-2 bg-hh-primary/5 border border-hh-primary/20 rounded-lg">
+            <button onClick={() => setSelectedIds([])} className="text-hh-muted hover:text-hh-text transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+            <span className="text-[13px] text-hh-text font-medium">
+              {selectedIds.length} geselecteerd
+            </span>
+            <button onClick={handleBulkDelete} className="text-hh-muted hover:text-hh-error transition-colors" title="Verwijderen">
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
         )}
 
         {/* Mobile Card Fallback (always shows on mobile regardless of viewMode) */}
@@ -734,22 +720,21 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               <table className="w-full">
               <thead className="bg-hh-ui-50 border-b border-hh-border">
                 <tr>
-                  <th className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted w-[40px]">
-                    {selectionMode && (
+                  <th
+                    className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted w-[80px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
+                    onClick={() => selectionMode ? toggleSelectAll() : handleSort("techniek")}
+                  >
+                    {selectionMode ? (
                       <CustomCheckbox
                         checked={selectedIds.length === filteredSessions.length && filteredSessions.length > 0}
                         onChange={toggleSelectAll}
                       />
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        #
+                        <SortIcon column="techniek" />
+                      </div>
                     )}
-                  </th>
-                  <th 
-                    className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted w-[80px] cursor-pointer hover:bg-hh-ui-100 transition-colors"
-                    onClick={() => handleSort("techniek")}
-                  >
-                    <div className="flex items-center gap-2">
-                      #
-                      <SortIcon column="techniek" />
-                    </div>
                   </th>
                   <th 
                     className="text-left px-4 py-3 text-[13px] leading-[18px] font-medium text-hh-muted cursor-pointer hover:bg-hh-ui-100 transition-colors"
@@ -821,18 +806,19 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                       index % 2 === 0 ? "bg-hh-bg" : "bg-hh-ui-50/30"
                     }`}
                   >
-                    <td className="py-3 px-4 w-[40px]" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-3 px-4" onClick={(e) => { if (selectionMode || hoveredRow === session.id) e.stopPropagation(); }}>
                       {(selectionMode || hoveredRow === session.id) ? (
-                        <CustomCheckbox
-                          checked={selectedIds.includes(session.id)}
-                          onChange={() => toggleSelection(session.id)}
-                        />
-                      ) : <div className="w-4 h-4" />}
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px] font-mono">
-                        {session.techniek.split(' - ')[0]}
-                      </Badge>
+                        <div onClick={() => toggleSelection(session.id)} className="cursor-pointer w-fit">
+                          <CustomCheckbox
+                            checked={selectedIds.includes(session.id)}
+                            onChange={() => toggleSelection(session.id)}
+                          />
+                        </div>
+                      ) : (
+                        <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px] font-mono">
+                          {session.techniek.split(' - ')[0]}
+                        </Badge>
+                      )}
                     </td>
                     <td className="py-3 px-4">
                       <p className="text-[14px] leading-[20px] text-hh-text font-medium">

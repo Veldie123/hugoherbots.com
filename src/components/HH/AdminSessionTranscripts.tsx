@@ -16,6 +16,7 @@ import {
   ArrowUp,
   ArrowDown,
   Trash2,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
@@ -39,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { getTechniekByNummer } from "../../data/technieken-service";
+import { CustomCheckbox } from "../ui/custom-checkbox";
 
 interface Session {
   id: number;
@@ -76,6 +78,18 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
   const [sortField, setSortField] = useState<"user" | "score" | "date" | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [viewMode] = useMobileViewMode("grid", "list");
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const selectionMode = selectedIds.length > 0;
+
+  const toggleSelection = (id: number) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+  const handleBulkDelete = () => {
+    if (window.confirm(`Weet je zeker dat je ${selectedIds.length} sessies wilt verwijderen?`)) {
+      setSelectedIds([]);
+    }
+  };
 
   const handleSort = (field: "user" | "score" | "date") => {
     if (sortField === field) {
@@ -420,6 +434,21 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
           </div>
         </Card>
 
+        {/* Bulk Actions — Google Drive style */}
+        {selectionMode && (
+          <div className="flex items-center gap-4 px-4 py-2 bg-hh-primary/5 border border-hh-primary/20 rounded-lg">
+            <button onClick={() => setSelectedIds([])} className="text-hh-muted hover:text-hh-text transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+            <span className="text-[13px] text-hh-text font-medium">
+              {selectedIds.length} geselecteerd
+            </span>
+            <button onClick={handleBulkDelete} className="text-hh-muted hover:text-hh-error transition-colors" title="Verwijderen">
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         {/* Sessions List/Grid */}
         {viewMode === "list" ? (
           <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
@@ -496,20 +525,28 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
                 {filteredSessions.map((session, index) => (
                   <tr
                     key={session.id}
+                    onMouseEnter={() => setHoveredRow(session.id)}
+                    onMouseLeave={() => setHoveredRow(null)}
                     className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50 transition-colors ${
                       index % 2 === 0 ? "bg-card" : "bg-hh-ui-50/30"
                     }`}
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <Avatar className="w-8 h-8">
-                          <AvatarFallback className="text-[11px]" style={{ backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)' }}>
-                            {session.user
-                              .split(" ")
-                              .map((n: string) => n[0])
-                              .join("")}
-                          </AvatarFallback>
-                        </Avatar>
+                        {(selectionMode || hoveredRow === session.id) ? (
+                          <div className="w-8 h-8 flex items-center justify-center cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleSelection(session.id); }}>
+                            <CustomCheckbox checked={selectedIds.includes(session.id)} onChange={() => toggleSelection(session.id)} />
+                          </div>
+                        ) : (
+                          <Avatar className="w-8 h-8">
+                            <AvatarFallback className="text-[11px]" style={{ backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)' }}>
+                              {session.user
+                                .split(" ")
+                                .map((n: string) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
                         <div>
                           <p className="text-[14px] leading-[20px] text-hh-text font-medium flex items-center gap-2">
                             {session.user}
