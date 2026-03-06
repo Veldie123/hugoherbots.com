@@ -77,9 +77,9 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
             <Badge
               className={`ml-1 ${
                 debugData.customerSignal === "positief"
-                  ? "bg-hh-success/10 text-hh-success"
+                  ? "bg-[var(--hh-success-100)] text-[var(--hh-success-700)]"
                   : debugData.customerSignal === "negatief"
-                  ? "bg-hh-error/10 text-hh-error"
+                  ? "bg-[var(--hh-error-100)] text-[var(--hh-error-700)]"
                   : "bg-hh-ui-50 text-hh-text"
               }`}
             >
@@ -158,16 +158,16 @@ export function SessionDebugPanel({ lineIndex, speaker, debugData, onValidate }:
   } else {
     // Debug info voor Verkoper berichten
     return (
-      <Card className="mt-2 p-3 bg-hh-primary/5 border-hh-primary/20 text-[12px] leading-[16px] space-y-2">
+      <Card className="mt-2 p-3 bg-[var(--hh-primary-50)] border-[var(--hh-primary-200)] text-[12px] leading-[16px] space-y-2">
         {debugData.sellerSignal && (
           <div>
             <span className="font-medium text-hh-primary">Signaal:</span>{" "}
             <Badge
               className={`ml-1 ${
                 debugData.sellerSignal === "positief"
-                  ? "bg-hh-success/10 text-hh-success"
+                  ? "bg-[var(--hh-success-100)] text-[var(--hh-success-700)]"
                   : debugData.sellerSignal === "negatief"
-                  ? "bg-hh-error/10 text-hh-error"
+                  ? "bg-[var(--hh-error-100)] text-[var(--hh-error-700)]"
                   : "bg-hh-ui-50 text-hh-text"
               }`}
             >

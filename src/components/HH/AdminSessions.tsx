@@ -405,14 +405,14 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
     switch (quality) {
       case "excellent":
         return (
-          <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px]">
+          <Badge className="bg-hh-success-100 text-hh-success-700 border-hh-success-200 text-[11px]">
             <CheckCircle2 className="w-3 h-3 mr-1" />
             Excellent
           </Badge>
         );
       case "good":
         return (
-          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
+          <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px]">
             <ThumbsUp className="w-3 h-3 mr-1" />
             Good
           </Badge>
@@ -541,7 +541,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               Talk to Hugo <sup className="text-[14px] sm:text-[18px]">AI</sup>
             </h1>
             <div className="hidden sm:flex items-center gap-2">
-              <Button variant="outline" className="gap-2 border-hh-primary/20 text-hh-primary hover:bg-hh-primary/5" size="sm" onClick={() => navigate?.("admin-config-review")}>
+              <Button variant="outline" className="gap-2 border-hh-primary-200 text-hh-primary hover:bg-hh-primary/5" size="sm" onClick={() => navigate?.("admin-config-review")}>
                 <Settings className="w-4 h-4" />
                 Config Review
               </Button>
@@ -553,7 +553,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
           </div>
           {/* Mobile: buttons row below title */}
           <div className="flex sm:hidden items-center gap-2 mt-2">
-            <Button variant="outline" size="sm" className="gap-1.5 text-[12px] flex-1 border-hh-primary/20 text-hh-primary hover:bg-hh-primary/5" onClick={() => navigate?.("admin-config-review")}>
+            <Button variant="outline" size="sm" className="gap-1.5 text-[12px] flex-1 border-hh-primary-200 text-hh-primary hover:bg-hh-primary/5" onClick={() => navigate?.("admin-config-review")}>
               <Settings className="w-3.5 h-3.5" />
               Config
             </Button>
@@ -571,7 +571,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 12%, transparent)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--hh-primary-100)' }}>
                 <MessageSquare className="w-5 h-5 text-hh-primary" />
               </div>
               <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-success) 10%, transparent)', color: 'var(--hh-success)', borderColor: 'color-mix(in srgb, var(--hh-success) 20%, transparent)' }}>+15%</span>
@@ -654,7 +654,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
 
         {/* Bulk Actions */}
         {selectionMode && selectedIds.length > 0 && (
-          <Card className="p-4 rounded-[16px] shadow-hh-sm border-hh-border bg-hh-primary/10 border-hh-primary/20">
+          <Card className="p-4 rounded-[16px] shadow-hh-sm border-hh-border bg-hh-primary-100 border-hh-primary-200">
             <div className="flex items-center justify-between">
               <p className="text-[14px] text-hh-text">
                 <span className="font-semibold">{selectedIds.length}</span> sessies geselecteerd
@@ -694,7 +694,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <Avatar className="w-7 h-7 flex-shrink-0">
-                      <AvatarFallback className="bg-hh-primary/10 text-hh-primary text-[10px] font-semibold">
+                      <AvatarFallback className="bg-hh-primary-100 text-hh-primary text-[10px] font-semibold">
                         {session.user.split(" ").map((n) => n[0]).join("")}
                       </AvatarFallback>
                     </Avatar>
@@ -830,7 +830,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                       ) : <div className="w-4 h-4" />}
                     </td>
                     <td className="py-3 px-4">
-                      <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px] font-mono">
+                      <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px] font-mono">
                         {session.techniek.split(' - ')[0]}
                       </Badge>
                     </td>
@@ -845,7 +845,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="w-8 h-8">
-                          <AvatarFallback className="bg-hh-primary/10 text-hh-primary text-[11px]">
+                          <AvatarFallback className="bg-hh-primary-100 text-hh-primary text-[11px]">
                             {session.user
                               .split(" ")
                               .map((n) => n[0])
@@ -939,9 +939,9 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
           <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredSessions.map((session) => {
               const scoreColor = session.score >= 80
-                ? "bg-hh-success/10 text-hh-success border-hh-success/20"
+                ? "bg-hh-success-100 text-hh-success-700 border-hh-success-200"
                 : session.score >= 70
-                ? "bg-hh-primary/10 text-hh-primary border-hh-primary/20"
+                ? "bg-hh-primary-100 text-hh-primary border-hh-primary-200"
                 : "bg-hh-warn/10 text-hh-warn border-hh-warn/20";
 
               return (
@@ -954,7 +954,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <Avatar className="w-10 h-10 flex-shrink-0">
-                        <AvatarFallback className="bg-hh-primary/10 text-hh-primary font-semibold text-[12px]">
+                        <AvatarFallback className="bg-hh-primary-100 text-hh-primary font-semibold text-[12px]">
                           {session.user.split(" ").map((n) => n[0]).join("")}
                         </AvatarFallback>
                       </Avatar>

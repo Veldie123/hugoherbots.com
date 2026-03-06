@@ -286,7 +286,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
                     )}
                     {isSpecial && <div className="w-4" />}
                     <Badge className={`text-[10px] flex-shrink-0 rounded-full px-2 border-0 ${
-                      isSpecial ? "bg-hh-primary text-white" : "bg-teal-100 text-teal-600"
+                      isSpecial ? "bg-hh-primary text-white" : "bg-hh-primary-100 text-hh-primary"
                     }`}>
                       {phase.nummer}
                     </Badge>
@@ -321,7 +321,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
                           onClick={() => openDetails(child)}
                           className="flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-hh-ui-50 transition-colors"
                         >
-                          <Badge className="bg-teal-100 text-teal-600 border-0 text-[10px] flex-shrink-0 rounded-full px-2">
+                          <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] flex-shrink-0 rounded-full px-2">
                             {child.nummer}
                           </Badge>
                           <span className="text-[12px] text-hh-muted truncate flex-1">

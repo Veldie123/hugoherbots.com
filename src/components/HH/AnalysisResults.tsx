@@ -232,9 +232,9 @@ interface FullAnalysisResult {
 }
 
 const PHASE_LABELS: Record<number, { name: string; description: string; color: string; bgColor: string }> = {
-  1: { name: 'Fase 1: Opening', description: 'Koopklimaat, Gentleman\'s Agreement, Instapvraag', color: 'text-hh-primary', bgColor: 'bg-hh-primary/5 border-hh-primary/20' },
-  2: { name: 'Fase 2: EPIC', description: 'Explore, Probe, Impact, Commitment', color: 'text-hh-success', bgColor: 'bg-hh-success/5 border-hh-success/20' },
-  3: { name: 'Fase 3: Aanbeveling', description: 'O.V.B., USP\'s, Mening vragen', color: 'text-hh-primary', bgColor: 'bg-hh-primary/5 border-hh-primary/20' },
+  1: { name: 'Fase 1: Opening', description: 'Koopklimaat, Gentleman\'s Agreement, Instapvraag', color: 'text-hh-primary', bgColor: 'bg-[var(--hh-primary-50)] border-[var(--hh-primary-200)]' },
+  2: { name: 'Fase 2: EPIC', description: 'Explore, Probe, Impact, Commitment', color: 'text-[var(--hh-success-700)]', bgColor: 'bg-[var(--hh-success-50)] border-[var(--hh-success-200)]' },
+  3: { name: 'Fase 3: Aanbeveling', description: 'O.V.B., USP\'s, Mening vragen', color: 'text-hh-primary', bgColor: 'bg-[var(--hh-primary-50)] border-[var(--hh-primary-200)]' },
   4: { name: 'Fase 4: Beslissing', description: 'Bezwaarbehandeling, Closing', color: 'text-amber-700 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800' },
 };
 
@@ -700,7 +700,7 @@ export function AnalysisResults({
   };
 
   const getScoreBgColor = (score: number) => {
-    if (score >= 80) return "bg-hh-success/10 border-hh-success/20";
+    if (score >= 80) return "bg-[var(--hh-success-100)] border-[var(--hh-success-200)]";
     if (score >= 60) return "bg-hh-warn/10 border-hh-warn/20";
     return "bg-hh-destructive/10 border-hh-destructive/20";
   };
@@ -790,10 +790,10 @@ export function AnalysisResults({
   const epicGetFaseBadgeColor = (fase: number) => {
     const colors: Record<number, string> = {
       0: "bg-hh-ui-100 text-hh-muted border-hh-border",
-      1: "bg-hh-success/10 text-hh-success border-hh-success/20",
-      2: "bg-hh-primary/10 text-hh-primary border-hh-primary/20",
-      3: "bg-hh-warning/10 text-hh-warning border-hh-warning/20",
-      4: "bg-hh-primary/10 text-hh-primary border-hh-primary/20",
+      1: "bg-[var(--hh-success-100)] text-[var(--hh-success-700)] border-[var(--hh-success-200)]",
+      2: "bg-[var(--hh-primary-100)] text-hh-primary border-[var(--hh-primary-200)]",
+      3: "bg-[var(--hh-warning-100)] text-[var(--hh-warning-700)] border-[var(--hh-warning-200)]",
+      4: "bg-[var(--hh-primary-100)] text-hh-primary border-[var(--hh-primary-200)]",
     };
     return colors[fase] || "bg-hh-ui-100 text-hh-muted border-hh-border";
   };

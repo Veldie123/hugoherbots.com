@@ -68,13 +68,13 @@ interface Session {
 const getTypeIcon = (type: SessionType) => {
   switch (type) {
     case "ai-audio":
-      return <Mic className="w-4 h-4 text-[#4F7396]" />;
+      return <Mic className="w-4 h-4 text-hh-primary" />;
     case "ai-video":
-      return <Video className="w-4 h-4 text-[#4F7396]" />;
+      return <Video className="w-4 h-4 text-hh-primary" />;
     case "ai-chat":
-      return <MessageSquare className="w-4 h-4 text-[#4F7396]" />;
+      return <MessageSquare className="w-4 h-4 text-hh-primary" />;
     case "upload-audio":
-      return <Upload className="w-4 h-4 text-[#4F7396]" />;
+      return <Upload className="w-4 h-4 text-hh-primary" />;
   }
 };
 
@@ -640,9 +640,8 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                     >
                       {/* Technique Number Badge - emerald circles */}
                       <td className="py-3 px-4">
-                        <span 
-                          style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}
-                          className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold"
+                        <span
+                          className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold bg-hh-primary-100 text-hh-primary"
                         >
                           {session.nummer}
                         </span>
@@ -677,8 +676,8 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                             session.score >= 80
                               ? "text-hh-success"
                               : session.score >= 70
-                              ? "text-blue-600"
-                              : "text-hh-warn"
+                              ? "text-hh-primary"
+                              : "text-hh-warning"
                           }`}
                         >
                           {session.score}%
@@ -739,7 +738,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <span 
-                      className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold border-2 bg-hh-success/10 text-hh-success border-hh-success"
+                      className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold border bg-hh-primary-100 text-hh-primary border-hh-primary-200"
                     >
                       {session.nummer}
                     </span>
@@ -789,7 +788,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
 
                 <div className="flex items-center justify-between text-[13px] text-hh-muted">
                   <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-[#4F7396]" />
+                    <Clock className="w-4 h-4 text-hh-primary" />
                     {session.duration}
                   </div>
                   <span
@@ -797,8 +796,8 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
                       session.score >= 80
                         ? "text-hh-success"
                         : session.score >= 70
-                        ? "text-blue-600"
-                        : "text-hh-warn"
+                        ? "text-hh-primary"
+                        : "text-hh-warning"
                     }`}
                   >
                     {session.score}%

@@ -725,7 +725,7 @@ export function ConversationAnalysis({
                               <Target className="w-4 h-4 text-red-600" />
                             )}
                             {tip.type === "open" && (
-                              <Lightbulb className="w-4 h-4 text-teal-600" />
+                              <Lightbulb className="w-4 h-4 text-hh-primary" />
                             )}
                             {tip.type === "positief" && (
                               <CheckCircle2 className="w-4 h-4 text-green-600" />

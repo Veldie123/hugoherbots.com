@@ -29,8 +29,8 @@ export function TechniqueCard({
     const colors: Record<string, string> = {
       "1": "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
       "2": "bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/20",
-      "3": "bg-hh-primary/10 text-hh-primary border-hh-primary/20",
-      "4": "bg-hh-success/10 text-hh-success border-hh-success/20",
+      "3": "bg-[var(--hh-primary-100)] text-hh-primary border-[var(--hh-primary-200)]",
+      "4": "bg-[var(--hh-success-100)] text-[var(--hh-success-700)] border-[var(--hh-success-200)]",
       "*": "bg-hh-ui-50 text-hh-muted border-hh-border",
     };
     return colors[phase] || colors["*"];

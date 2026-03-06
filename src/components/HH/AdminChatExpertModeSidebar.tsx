@@ -545,7 +545,7 @@ export function EPICSidebar({
                 Fases & bijhorende technieken
               </h4>
             </div>
-            <Badge className="bg-hh-primary/15 text-hh-primary border-hh-primary/30">
+            <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200">
               5 fases
             </Badge>
           </button>
@@ -611,7 +611,7 @@ export function EPICSidebar({
                       </div>
                       <Badge className={
                         isPhaseCompleted
-                          ? (isAdminView ? "bg-hh-primary/15 text-hh-primary border-hh-primary/20" : "bg-hh-success/15 text-hh-success border-hh-success/20")
+                          ? (isAdminView ? "bg-hh-primary-100 text-hh-primary border-hh-primary-200" : "bg-hh-success-100 text-hh-success-700 border-hh-success-200")
                           : getFaseBadgeColor(phase)
                       }>
                         {phaseProgress.completed}/{phaseProgress.total}
@@ -651,9 +651,9 @@ export function EPICSidebar({
                                 className={cn(
                                   "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-pointer",
                                   selectedTechnique === technique.naam
-                                    ? "bg-hh-primary/10 text-hh-primary border border-hh-primary/20"
+                                    ? "bg-hh-primary-100 text-hh-primary border border-hh-primary-200"
                                     : isRecommended
-                                    ? "bg-hh-primary/5 border border-hh-primary/20"
+                                    ? "bg-hh-primary-50 border border-hh-primary-200"
                                     : "bg-card text-hh-text hover:bg-hh-ui-50"
                                 )}
                               >
@@ -721,9 +721,9 @@ export function EPICSidebar({
                                           className={cn(
                                             "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-pointer",
                                             selectedTechnique === child.naam
-                                              ? "bg-hh-primary/10 text-hh-primary border border-hh-primary/20"
+                                              ? "bg-hh-primary-100 text-hh-primary border border-hh-primary-200"
                                               : isChildRecommended
-                                              ? "bg-hh-primary/5 border border-hh-primary/20"
+                                              ? "bg-hh-primary-50 border border-hh-primary-200"
                                               : "bg-card text-hh-text hover:bg-hh-ui-50"
                                           )}
                                         >
@@ -778,9 +778,9 @@ export function EPICSidebar({
                                                   className={cn(
                                                     "w-full text-left px-3 py-1.5 rounded-lg text-[11px] leading-[15px] transition-all cursor-pointer",
                                                     selectedTechnique === grandchild.naam
-                                                      ? "bg-hh-primary/10 text-hh-primary border border-hh-primary/20"
+                                                      ? "bg-hh-primary-100 text-hh-primary border border-hh-primary-200"
                                                       : isGrandchildRecommended
-                                                      ? "bg-hh-primary/5 border border-hh-primary/20"
+                                                      ? "bg-hh-primary-50 border border-hh-primary-200"
                                                       : "bg-hh-ui-50/50 text-hh-text hover:bg-hh-ui-100"
                                                   )}
                                                 >
@@ -845,7 +845,7 @@ export function EPICSidebar({
                 Houdingen van de klant & bijhorende technieken
               </h4>
             </div>
-            <Badge className="bg-hh-primary/15 text-hh-primary border-hh-primary/30">
+            <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200">
               {klantHoudingen.length}
             </Badge>
           </button>
@@ -867,7 +867,7 @@ export function EPICSidebar({
                       className={cn(
                         "w-full flex items-center justify-between p-3 rounded-lg border transition-all",
                         isActive
-                          ? "border-hh-warning bg-hh-warning/10 shadow-sm"
+                          ? "border-hh-warning bg-hh-warning-100 shadow-sm"
                           : "border-hh-border bg-card hover:bg-hh-ui-50"
                       )}
                     >
@@ -882,7 +882,7 @@ export function EPICSidebar({
                             "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold",
                             isActive
                               ? "bg-hh-warning text-white border-2 border-hh-warning"
-                              : "bg-hh-warning/10 text-hh-warning border border-hh-warning/30"
+                              : "bg-hh-warning-100 text-hh-warning-700 border border-hh-warning-200"
                           )}
                         >
                           {houding.id}
@@ -894,7 +894,7 @@ export function EPICSidebar({
                           {houding.naam}
                         </span>
                       </div>
-                      <Badge className={isActive ? "bg-hh-warning text-white border-hh-warning" : "bg-hh-warning/10 text-hh-warning border-hh-warning/30"}>
+                      <Badge className={isActive ? "bg-hh-warning text-white border-hh-warning" : "bg-hh-warning-100 text-hh-warning-700 border-hh-warning-200"}>
                         {houding.recommended_technique_ids?.length || 0}
                       </Badge>
                     </button>
@@ -924,9 +924,9 @@ export function EPICSidebar({
                                   className={cn(
                                     "w-full text-left px-3 py-2 rounded-lg text-[12px] leading-[16px] transition-all cursor-pointer",
                                     selectedTechnique === technique.naam
-                                      ? "bg-hh-primary/10 text-hh-primary border border-hh-primary/20"
+                                      ? "bg-hh-primary-100 text-hh-primary border border-hh-primary-200"
                                       : isRecommended
-                                      ? "bg-hh-primary/5 border border-hh-primary/20 hover:bg-hh-primary/10"
+                                      ? "bg-hh-primary-50 border border-hh-primary-200 hover:bg-hh-primary/10"
                                       : "bg-card text-hh-text hover:bg-hh-ui-50"
                                   )}
                                 >

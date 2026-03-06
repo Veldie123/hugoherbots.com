@@ -27,6 +27,8 @@ export interface LiveSession {
   transcript?: string | null;
   aiSummary?: string | null;
   recordingApproved?: boolean;
+  maxAttendees?: number | null;
+  attendeeCount?: number;
 }
 
 export interface LiveChatMessage {

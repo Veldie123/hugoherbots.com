@@ -60,88 +60,8 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
   const [selectedOrg, setSelectedOrg] = useState<any>(null);
   const [showOrgDetail, setShowOrgDetail] = useState(false);
 
-  const organizations = [
-    {
-      id: 1,
-      name: "TechCorp BV",
-      domain: "techcorp.nl",
-      plan: "Team",
-      planPrice: "€499",
-      users: 24,
-      activeUsers: 19,
-      totalSessions: 347,
-      avgScore: 82,
-      mrr: 499,
-      status: "active",
-      joined: "15 sept 2024",
-      admin: "Jan de Vries",
-      adminEmail: "jan@techcorp.nl",
-    },
-    {
-      id: 2,
-      name: "GrowCo",
-      domain: "growco.nl",
-      plan: "Pro",
-      planPrice: "€149",
-      users: 5,
-      activeUsers: 4,
-      totalSessions: 89,
-      avgScore: 76,
-      mrr: 149,
-      status: "active",
-      joined: "3 okt 2024",
-      admin: "Sarah van Dijk",
-      adminEmail: "sarah@growco.nl",
-    },
-    {
-      id: 3,
-      name: "StartUp.io",
-      domain: "startup.io",
-      plan: "Starter",
-      planPrice: "€49",
-      users: 2,
-      activeUsers: 1,
-      totalSessions: 23,
-      avgScore: 68,
-      mrr: 49,
-      status: "trial",
-      joined: "12 dec 2024",
-      admin: "Mark Peters",
-      adminEmail: "mark@startup.io",
-    },
-    {
-      id: 4,
-      name: "Salesforce EMEA",
-      domain: "salesforce.com",
-      plan: "Enterprise",
-      planPrice: "€2.499",
-      users: 127,
-      activeUsers: 98,
-      totalSessions: 1834,
-      avgScore: 88,
-      mrr: 2499,
-      status: "active",
-      joined: "20 sept 2024",
-      admin: "Lisa de Jong",
-      adminEmail: "lisa@salesforce.com",
-    },
-    {
-      id: 5,
-      name: "Example Inc",
-      domain: "example.com",
-      plan: "Pro",
-      planPrice: "€149",
-      users: 3,
-      activeUsers: 0,
-      totalSessions: 8,
-      avgScore: 62,
-      mrr: 149,
-      status: "inactive",
-      joined: "5 nov 2024",
-      admin: "Tom Bakker",
-      adminEmail: "tom@example.com",
-    },
-  ];
+  // TODO: fetch real organizations from API when org management is implemented
+  const organizations: any[] = [];
 
   const handleSort = (column: string) => {
     if (sortBy === column) {
@@ -176,7 +96,7 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
         );
       case "trial":
         return (
-          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
+          <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px]">
             Trial
           </Badge>
         );
@@ -382,6 +302,9 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
                   </tr>
                 </thead>
                 <tbody>
+                  {filteredOrgs.length === 0 && (
+                    <tr><td colSpan={8} className="py-12 text-center text-hh-muted text-[14px]">Nog geen organisaties</td></tr>
+                  )}
                   {filteredOrgs.map((org) => (
                     <tr
                       key={org.id}
@@ -556,7 +479,7 @@ export function AdminOrganizationManagement({ navigate }: AdminOrganizationManag
                       <span>{selectedOrg.adminEmail}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-3">
-                      <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20">
+                      <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200">
                         {selectedOrg.plan} - {selectedOrg.planPrice}
                       </Badge>
                       {getStatusBadge(selectedOrg.status)}

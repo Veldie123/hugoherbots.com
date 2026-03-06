@@ -328,7 +328,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
         <div className="p-3 sm:p-4 border-b border-hh-border bg-hh-bg">
           <div className="flex items-center justify-between mb-2 sm:mb-3">
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-              <Badge className="bg-teal-100 text-teal-600 border-0 text-[9px] sm:text-[10px] flex-shrink-0 rounded-full px-2">{activeTechnique.nummer}</Badge>
+              <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[9px] sm:text-[10px] flex-shrink-0 rounded-full px-2">{activeTechnique.nummer}</Badge>
               <h3 className="text-[14px] sm:text-[16px] leading-[20px] sm:leading-[24px] text-hh-text truncate">{activeTechnique.name}</h3>
             </div>
             
@@ -968,7 +968,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
                             {/* Title */}
                             <div className="mb-2">
                               <div className="flex items-center gap-2 mb-1">
-                                <Badge className="bg-teal-100 text-teal-600 border-0 text-[10px] flex-shrink-0 rounded-full px-2">
+                                <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] flex-shrink-0 rounded-full px-2">
                                   {technique.nummer}
                                 </Badge>
                                 <Badge
@@ -1125,7 +1125,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge className="bg-teal-100 text-teal-600 border-0 text-[10px] rounded-full px-2">
+                        <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] rounded-full px-2">
                           {selectedTechnique.nummer}
                         </Badge>
                         <Badge variant="secondary" className="text-[10px] bg-hh-ui-100">
@@ -1458,7 +1458,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
                     {getStatusIcon(technique.status)}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge className="bg-teal-100 text-teal-600 border-0 text-[9px] rounded-full px-2">
+                        <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[9px] rounded-full px-2">
                           {technique.nummer}
                         </Badge>
                         <h4 className="text-[14px] text-hh-text truncate">

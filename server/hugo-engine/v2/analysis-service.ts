@@ -191,6 +191,12 @@ export async function transcribeAudio(storageKey: string): Promise<WhisperSegmen
   }
 
   const buffer = fs.readFileSync(filePath);
+  const maxWhisperSize = 24 * 1024 * 1024; // 24MB safety margin (Whisper limit = 25MB)
+  if (buffer.length > maxWhisperSize) {
+    const sizeMB = (buffer.length / (1024 / 1024)).toFixed(1);
+    throw new Error(`Audiobestand te groot voor transcriptie (${sizeMB}MB, max 24MB). Compressie was onvoldoende.`);
+  }
+
   const ext = storageKey.split('.').pop() || 'wav';
   const file = new File([buffer], `audio.${ext}`, { type: `audio/${ext}` });
 
@@ -200,16 +206,40 @@ export async function transcribeAudio(storageKey: string): Promise<WhisperSegmen
     response_format: 'verbose_json',
     timestamp_granularities: ['segment'],
     language: 'nl',
+    prompt: 'Verkoopgesprek tussen verkoper en klant. Nederlandse taal.',
+    temperature: 0,
   });
 
-  const segments: WhisperSegment[] = ((response as any).segments || []).map((seg: any) => ({
+  const rawSegments: WhisperSegment[] = ((response as any).segments || []).map((seg: any) => ({
     id: seg.id,
     start: seg.start,
     end: seg.end,
     text: (seg.text || '').trim(),
   }));
 
+  // Deduplicate repeated segments (Whisper hallucination prevention)
+  const segments = deduplicateSegments(rawSegments);
+  if (segments.length < rawSegments.length) {
+    console.log(`[Transcription] Deduplication removed ${rawSegments.length - segments.length} repeated segments (${rawSegments.length} → ${segments.length})`);
+  }
+
   return segments;
+}
+
+function deduplicateSegments(segments: WhisperSegment[]): WhisperSegment[] {
+  if (segments.length < 2) return segments;
+  return segments.filter((seg, i) => {
+    if (i === 0) return true;
+    const prev = segments[i - 1];
+    if (seg.text === prev.text) return false;
+    const words = seg.text.split(/\s+/);
+    const prevWords = prev.text.split(/\s+/);
+    if (words.length > 3) {
+      const overlap = words.filter(w => prevWords.includes(w)).length;
+      if (overlap / words.length > 0.8) return false;
+    }
+    return true;
+  });
 }
 
 export async function buildTurns(segments: WhisperSegment[]): Promise<TranscriptTurn[]> {

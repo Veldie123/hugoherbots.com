@@ -15,7 +15,7 @@ export function getAnthropicClient(): Anthropic {
     );
   }
 
-  client = new Anthropic({ apiKey });
+  client = new Anthropic({ apiKey, maxRetries: 5 });
   return client;
 }
 

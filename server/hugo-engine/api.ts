@@ -152,7 +152,7 @@ import { v3Routes } from "./v3/routes";
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 24 * 1024 * 1024 },
+  limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const allowed = ['audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'video/mp4', 'video/quicktime', 'application/octet-stream'];
     if (allowed.includes(file.mimetype) || file.originalname.match(/\.(mp3|wav|m4a|mp4|mov)$/i)) {
@@ -165,7 +165,7 @@ const upload = multer({
 
 const chunkUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 24 * 1024 * 1024 },
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
 
@@ -266,7 +266,10 @@ const aiLimiter = rateLimit({
 app.use('/api/v2/chat', aiLimiter);
 app.use('/api/v2/sessions', aiLimiter);
 app.use('/api/v2/roleplay', aiLimiter);
-app.use('/api/v2/analysis', aiLimiter);
+app.use('/api/v2/analysis', (req, res, next) => {
+  if (req.path.startsWith('/upload') || req.path.startsWith('/inline')) return next();
+  return aiLimiter(req, res, next);
+});
 app.use('/api/chat', aiLimiter);
 app.use('/api/v2/briefs', aiLimiter);
 app.use('/api/livekit/token', aiLimiter);

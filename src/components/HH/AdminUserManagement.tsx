@@ -228,7 +228,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
         );
       case "trial":
         return (
-          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
+          <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px]">
             Trial
           </Badge>
         );
@@ -648,7 +648,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
                 {/* Plan & Status */}
                 <div className="flex items-center gap-2 mb-4">
-                  <Badge className="text-[11px] bg-hh-primary/10 text-hh-primary border border-hh-primary/20">
+                  <Badge className="text-[11px] bg-hh-primary-100 text-hh-primary border border-hh-primary-200">
                     {getPlanDisplayName(user.plan)}{user.planPrice ? ` - ${user.planPrice}` : ""}
                   </Badge>
                   {getStatusBadge(user.status)}
@@ -756,7 +756,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                       <span>Laatste login: {selectedUser.lastLogin}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-3">
-                      <Badge className="bg-hh-primary/10 text-hh-primary border border-hh-primary/20">
+                      <Badge className="bg-hh-primary-100 text-hh-primary border border-hh-primary-200">
                         {getPlanDisplayName(selectedUser.plan)}{selectedUser.planPrice ? ` - ${selectedUser.planPrice}` : ""}
                       </Badge>
                       {getStatusBadge(selectedUser.status)}

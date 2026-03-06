@@ -172,7 +172,7 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
 
   const getCategoryBadge = (category: string) => {
     return (
-      <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
+      <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px]">
         {category}
       </Badge>
     );
@@ -245,7 +245,7 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--hh-primary-100)' }}>
                 <FileText className="w-5 h-5" style={{ color: 'var(--hh-primary)' }} />
               </div>
               <Badge

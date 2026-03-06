@@ -88,7 +88,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
       case "video":
         return "steelblue-bg";
       case "scenario":
-        return "bg-hh-primary/10 text-hh-primary";
+        return "bg-hh-primary-100 text-hh-primary";
       case "live":
         return "bg-hh-error/10 text-hh-error";
       case "document":
@@ -204,7 +204,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
           {stats.map((stat) => {
             const Icon = stat.icon;
             const bgColor = stat.color === "steelblue" ? "steelblue-bg" : 
-                           stat.color === "blue" ? "bg-hh-primary/10" :
+                           stat.color === "blue" ? "bg-hh-primary-100" :
                            stat.color === "red" ? "bg-hh-error/10" : "bg-hh-success/10";
             const iconColor = stat.color === "steelblue" ? "steelblue-text" : 
                              stat.color === "blue" ? "text-hh-primary" :
@@ -220,8 +220,8 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                 <div className="flex items-start justify-between mb-2 sm:mb-3">
                   <div 
                   className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${stat.color === "steelblue" ? "" : bgColor}`}
-                  style={stat.color === "steelblue" ? { 
-                    backgroundColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)"
+                  style={stat.color === "steelblue" ? {
+                    backgroundColor: "var(--hh-primary-100)"
                   } : undefined}
                 >
                     <Icon
@@ -319,7 +319,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                         <div 
                           className={`w-10 h-10 rounded-xl flex items-center justify-center ${content.type === "video" ? "" : getTypeColor(content.type)}`}
                           style={content.type === "video" ? {
-                            backgroundColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)"
+                            backgroundColor: "var(--hh-primary-100)"
                           } : undefined}
                         >
                           <Icon className="w-5 h-5" style={content.type === "video" ? { color: "var(--hh-primary)" } : undefined} />
@@ -360,7 +360,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                           <Badge variant="outline" className="text-[11px]">
                             {getTypeLabel(content.type)}
                           </Badge>
-                          <Badge variant="outline" className="text-[11px] bg-hh-primary/10 text-hh-primary border-hh-primary/20">
+                          <Badge variant="outline" className="text-[11px] bg-hh-primary-100 text-hh-primary border-hh-primary-200">
                             {content.fase}
                           </Badge>
                         </div>
@@ -475,7 +475,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                       <td className="px-4 py-3">
                         {content.techniqueNumber && (
                           <div className="w-10 h-10 rounded-lg flex items-center justify-center text-[13px] font-semibold" style={{
-                            backgroundColor: "color-mix(in srgb, var(--hh-primary) 15%, transparent)",
+                            backgroundColor: "var(--hh-primary-100)",
                             color: "var(--hh-primary)"
                           }}>
                             {content.techniqueNumber}
@@ -495,7 +495,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                           <div 
                             className={`w-8 h-8 rounded-lg flex items-center justify-center ${content.type === "video" ? "" : getTypeColor(content.type)}`}
                             style={content.type === "video" ? {
-                              backgroundColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)"
+                              backgroundColor: "var(--hh-primary-100)"
                             } : undefined}
                           >
                             <Icon className="w-4 h-4" style={content.type === "video" ? { color: "var(--hh-primary)" } : undefined} />
@@ -508,7 +508,7 @@ export function AdminContentLibrary({ navigate, isSuperAdmin }: AdminContentLibr
                       <td className="px-4 py-3">
                         <Badge
                           variant="outline"
-                          className="text-[11px] bg-hh-primary/10 text-hh-primary border-hh-primary/20"
+                          className="text-[11px] bg-hh-primary-100 text-hh-primary border-hh-primary-200"
                         >
                           {content.fase}
                         </Badge>

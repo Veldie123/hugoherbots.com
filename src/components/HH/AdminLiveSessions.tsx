@@ -143,7 +143,7 @@ ${platformUrl}`;
   async function loadSessions() {
     try {
       setLoading(true);
-      const { sessions } = await liveCoachingApi.sessions.list();
+      const { sessions } = await liveCoachingApi.sessions.listWithAttendees();
       setSessions(sessions);
     } catch (error: any) {
       toast.error("Kon sessies niet laden: " + error.message);
@@ -513,7 +513,7 @@ ${platformUrl}`;
     if (session.dailyRecordingUrl || session.recordingReady === 1) {
       return (
         <div className="flex items-center gap-2">
-          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20">
+          <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200">
             Niet verwerkt
           </Badge>
           <Button 
@@ -532,7 +532,7 @@ ${platformUrl}`;
 
     if (session.status?.toLowerCase() === 'ended' || session.status?.toLowerCase() === 'completed') {
       return (
-        <Badge variant="outline" className="text-hh-primary border-hh-primary/20 opacity-70">
+        <Badge variant="outline" className="text-hh-primary border-hh-primary-200 opacity-70">
           Geen opname
         </Badge>
       );
@@ -558,7 +558,7 @@ ${platformUrl}`;
         );
       case "ended":
         return (
-          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
+          <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px]">
             Afgelopen
           </Badge>
         );
@@ -803,7 +803,7 @@ ${platformUrl}`;
                         {polls.map((poll) => (
                           <Card key={poll.id} className="p-4">
                             <div className="flex items-center justify-between mb-2">
-                              <Badge className={poll.isActive ? "bg-hh-primary/10 text-hh-primary" : "bg-hh-ui-100 text-hh-muted"}>
+                              <Badge className={poll.isActive ? "bg-hh-primary-100 text-hh-primary" : "bg-hh-ui-100 text-hh-muted"}>
                                 {poll.isActive ? "Actief" : "Gesloten"}
                               </Badge>
                               {poll.isActive && (
@@ -891,7 +891,7 @@ ${platformUrl}`;
         {/* KPI Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColor: 'color-mix(in srgb, var(--hh-primary) 12%, transparent)', color: 'var(--hh-primary)', badge: `+${Math.round(sessions.length * 0.12)}%`, badgeTrend: 'up' as const },
+            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)', badge: `+${Math.round(sessions.length * 0.12)}%`, badgeTrend: 'up' as const },
             { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgColor: 'rgba(79, 70, 229, 0.12)', color: 'var(--hh-primary)', badge: `+${upcomingSessionsAll.length}`, badgeTrend: 'up' as const },
             { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgColor: 'rgba(219, 39, 119, 0.12)', color: 'var(--hh-primary)', badge: '+8%', badgeTrend: 'up' as const },
             { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--hh-success)', badge: '100%', badgeTrend: 'up' as const },
@@ -1347,7 +1347,7 @@ ${platformUrl}`;
                           onClick={handleRowClick}
                         >
                           <td className="py-3 px-4">
-                            <Badge variant="outline" className="text-[11px] font-mono bg-hh-primary/10 text-hh-primary border-hh-primary/20">
+                            <Badge variant="outline" className="text-[11px] font-mono bg-hh-primary-100 text-hh-primary border-hh-primary-200">
                               {techniqueNumber}
                             </Badge>
                           </td>
@@ -1376,8 +1376,8 @@ ${platformUrl}`;
                           <td className="py-3 px-4 text-[14px] leading-[20px] text-hh-text">
                             <div className="flex flex-col">
                               <div>
-                                <span className="font-medium">{(session as any).registrationCount || Math.floor(Math.random() * 15) + 5}</span>
-                                <span className="text-hh-muted"> / 50</span>
+                                <span className="font-medium">{session.attendeeCount ?? 0}</span>
+                                {session.maxAttendees && <span className="text-hh-muted"> / {session.maxAttendees}</span>}
                               </div>
                               {!isCompleted && (
                                 <span className="text-[11px] text-hh-primary">ingeschreven</span>

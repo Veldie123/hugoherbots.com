@@ -795,7 +795,7 @@ export function AdminChatExpertMode({
 
   const getFaseBadgeColor = (phase: number) => {
     // Admin view uses purple palette for all phases
-    return "bg-hh-primary/15 text-hh-primary border-hh-primary/30";
+    return "bg-hh-primary-100 text-hh-primary border-hh-primary-200";
   };
 
   // Get top-level techniques (those without parent or whose parent is the phase itself)
@@ -1416,7 +1416,7 @@ export function AdminChatExpertMode({
 
           {/* Level transition notification banner */}
           {levelTransitionMessage && (
-            <div className="px-6 py-3 bg-gradient-to-r from-hh-primary/10 to-hh-primary/5 border-b border-hh-primary/20">
+            <div className="px-6 py-3 border-b border-hh-primary-200" style={{ background: 'linear-gradient(to right, var(--hh-primary-100), var(--hh-primary-50))' }}>
               <div className="flex items-center justify-between">
                 <span className="text-[14px] text-hh-ink font-medium">{levelTransitionMessage}</span>
                 <button 
@@ -1584,7 +1584,7 @@ export function AdminChatExpertMode({
                             : "rounded-bl-md"
                           : message.sender === "hugo"
                             ? "rounded-br-md"
-                            : "bg-hh-primary/10 text-hh-ink rounded-bl-md border border-hh-primary/20"
+                            : "bg-hh-primary-100 text-hh-ink rounded-bl-md border border-hh-primary-200"
                       }`}
                       style={
                         message.isTranscriptReplay
@@ -1724,7 +1724,7 @@ export function AdminChatExpertMode({
                               }
                               className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-colors ml-1 ${
                                 expandedDebug === message.id
-                                  ? "bg-hh-primary/15 text-hh-primary"
+                                  ? "bg-hh-primary-100 text-hh-primary"
                                   : "bg-hh-ui-100 text-hh-muted hover:bg-hh-primary/10 hover:text-hh-primary"
                               }`}
                               title="Toggle debug info"
@@ -1762,7 +1762,7 @@ export function AdminChatExpertMode({
                 {/* Debug Info (collapsible) - Purple admin styling — hidden during onboarding */}
                 {message.debugInfo && expandedDebug === message.id && !(onboardingStatus && !onboardingStatus.isComplete) && (
                   <div className={`${message.sender === "hugo" ? "flex justify-end" : ""}`}>
-                    <div className="bg-hh-primary/10 border border-hh-primary/20 rounded-lg p-3 max-w-[300px] text-hh-ink">
+                    <div className="bg-hh-primary-100 border border-hh-primary-200 rounded-lg p-3 max-w-[300px] text-hh-ink">
                         <div className="space-y-3 text-[13px] leading-[18px]">
                           {/* For Hugo/Seller messages */}
                           {message.sender === "hugo" && (
@@ -2092,10 +2092,10 @@ export function AdminChatExpertMode({
                                 <div className="flex items-center gap-2">
                                   <span className="text-hh-muted font-medium">Klant Signaal:</span>
                                   <Badge className={`text-[11px] ${
-                                    message.debugInfo.klantSignaal === "positief" 
-                                      ? "bg-hh-success/15 text-hh-success border-hh-success/30"
+                                    message.debugInfo.klantSignaal === "positief"
+                                      ? "bg-hh-success-100 text-hh-success-700 border-hh-success-200"
                                       : message.debugInfo.klantSignaal === "negatief"
-                                      ? "bg-hh-error/15 text-hh-error border-hh-error/30"
+                                      ? "bg-hh-error-100 text-hh-error-700 border-hh-error-200"
                                       : "bg-hh-ui-100 text-hh-ink border-hh-border"
                                   }`}>
                                     {message.debugInfo.klantSignaal || "neutraal"}
@@ -2111,9 +2111,9 @@ export function AdminChatExpertMode({
                                   <span className="text-hh-muted font-medium">Evaluatie:</span>
                                   <Badge variant="outline" className={`text-[11px] ${
                                     (message.debugInfo.aiDecision?.evaluatie as string) === "positief" || (message.debugInfo.aiDecision?.evaluatie as string) === "perfect"
-                                      ? "bg-hh-success/15 text-hh-success border-hh-success/30"
+                                      ? "bg-hh-success-100 text-hh-success-700 border-hh-success-200"
                                       : message.debugInfo.aiDecision?.evaluatie === "gemist"
-                                      ? "bg-hh-error/15 text-hh-error border-hh-error/30"
+                                      ? "bg-hh-error-100 text-hh-error-700 border-hh-error-200"
                                       : "bg-hh-ui-100 text-hh-ink border-hh-border"
                                   }`}>
                                     {message.debugInfo.aiDecision?.evaluatie || "neutraal"}
@@ -2125,7 +2125,7 @@ export function AdminChatExpertMode({
                               {message.debugInfo.expectedTechnique && (
                                 <div>
                                   <div className="flex items-start justify-between gap-3">
-                                    <div className="flex-1 pb-3 border-b border-hh-primary/20">
+                                    <div className="flex-1 pb-3 border-b border-hh-primary-200">
                                       <p className="text-[12px] text-hh-muted font-medium mb-1">Verwachte techniek:</p>
                                       <p className="text-hh-ink text-[12px]">
                                         {message.debugInfo.expectedTechnique}
@@ -2378,7 +2378,7 @@ export function AdminChatExpertMode({
                                             <p className="text-hh-muted font-medium mb-1">RAG Documents ({message.debugInfo.ragDocuments.length}):</p>
                                             <div className="space-y-1">
                                               {message.debugInfo.ragDocuments.map((doc, idx) => (
-                                                <div key={idx} className="bg-hh-primary/10 p-2 rounded border border-hh-primary/20">
+                                                <div key={idx} className="bg-hh-primary-100 p-2 rounded border border-hh-primary-200">
                                                   <p className="font-medium text-hh-primary text-[11px]">{doc.title || `Document ${idx + 1}`}</p>
                                                   <p className="text-hh-primary text-[10px]">{doc.content?.slice(0, 200)}...</p>
                                                 </div>

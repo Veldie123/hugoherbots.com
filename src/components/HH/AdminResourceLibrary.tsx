@@ -77,74 +77,14 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
     featured: false,
   });
 
-  const resources = [
-    {
-      id: "1",
-      title: "EPIC Sales Methodologie - Complete Guide",
-      description: "Volledige handleiding voor het EPIC sales framework met alle 25 technieken",
-      category: "Methodologie",
-      type: "PDF",
-      fileSize: "2,4 MB",
-      downloads: 156,
-      featured: true,
-      createdAt: "2025-01-10",
-      author: "Hugo Herbots",
-    },
-    {
-      id: "2",
-      title: "Ontdekkingsfase Templates",
-      description: "Ready-to-use templates voor discovery gesprekken en vragenlijsten",
-      category: "Templates",
-      type: "Document",
-      fileSize: "1,2 MB",
-      downloads: 98,
-      featured: false,
-      createdAt: "2025-01-08",
-      author: "Admin Team",
-    },
-    {
-      id: "3",
-      title: "Bezwaarhandeling Masterclass",
-      description: "Video training voor effectieve bezwaarhandeling in de afsluitingsfase",
-      category: "Video's",
-      type: "Video",
-      fileSize: "124,5 MB",
-      downloads: 234,
-      featured: true,
-      createdAt: "2025-01-05",
-      author: "Hugo Herbots",
-    },
-    {
-      id: "4",
-      title: "Sales Call Checklist",
-      description: "Pre-call en post-call checklists voor optimale voorbereiding",
-      category: "Tools",
-      type: "Spreadsheet",
-      fileSize: "0,8 MB",
-      downloads: 187,
-      featured: false,
-      createdAt: "2025-01-03",
-      author: "Admin Team",
-    },
-    {
-      id: "5",
-      title: "SPIN Questioning Guide",
-      description: "Praktische gids voor SPIN vragen in discovery fase",
-      category: "Technieken",
-      type: "PDF",
-      fileSize: "1,6 MB",
-      downloads: 142,
-      featured: false,
-      createdAt: "2024-12-28",
-      author: "Hugo Herbots",
-    },
-  ];
+  // TODO: fetch real resources from API when resource management is implemented
+  const resources: any[] = [];
 
   const stats = {
-    totalResources: 48,
-    totalDownloads: 1842,
-    featuredResources: 8,
-    newThisMonth: 6,
+    totalResources: resources.length,
+    totalDownloads: 0,
+    featuredResources: resources.filter((r: any) => r.featured).length,
+    newThisMonth: 0,
   };
 
   const filteredResources = resources.filter((resource) => {
@@ -162,7 +102,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
 
   const getCategoryBadge = (category: string) => {
     return (
-      <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
+      <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px]">
         {category}
       </Badge>
     );
@@ -228,7 +168,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--hh-primary-100)' }}>
                 <FileText className="w-5 h-5" style={{ color: 'var(--hh-primary)' }} />
               </div>
               <Badge
@@ -371,6 +311,9 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
                 </tr>
               </thead>
               <tbody>
+                {filteredResources.length === 0 && (
+                  <tr><td colSpan={7} className="py-12 text-center text-hh-muted text-[14px]">Nog geen resources</td></tr>
+                )}
                 {filteredResources.map((resource, index) => (
                   <tr
                     key={resource.id}

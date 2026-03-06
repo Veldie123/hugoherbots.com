@@ -47,80 +47,14 @@ interface MySessionsProps {
 }
 
 export function MySessions({ navigate }: MySessionsProps) {
-  const sessions: Session[] = [
-    {
-      id: "1",
-      title: "Discovery call - SaaS prospect",
-      scenario: "Tech industry discovery",
-      date: "Vandaag om 14:30",
-      duration: "12 min",
-      score: 87,
-      phase: "Fase 1 • Discovery",
-      technique: "E.P.I.C",
-      status: "completed",
-    },
-    {
-      id: "2",
-      title: "Objection handling - Budget bezwaar",
-      scenario: "Price objection handling",
-      date: "Vandaag om 11:15",
-      duration: "8 min",
-      score: 91,
-      phase: "Fase 2 • Objections",
-      technique: "Value Selling",
-      status: "completed",
-    },
-    {
-      id: "3",
-      title: "Cold call - Enterprise lead",
-      scenario: "Cold calling enterprise",
-      date: "Gisteren om 16:45",
-      duration: "15 min",
-      score: 68,
-      phase: "Fase 1 • Discovery",
-      technique: "SPIN",
-      status: "completed",
-    },
-    {
-      id: "4",
-      title: "Closing - High-value deal",
-      scenario: "Enterprise closing",
-      date: "Gisteren om 10:20",
-      duration: "18 min",
-      score: 84,
-      phase: "Fase 4 • Closing",
-      technique: "Urgency Creation",
-      status: "completed",
-    },
-    {
-      id: "5",
-      title: "Proposal presentation - ROI focus",
-      scenario: "B2B proposal practice",
-      date: "2 dagen geleden",
-      duration: "14 min",
-      score: 79,
-      phase: "Fase 3 • Proposal",
-      technique: "ROI Calculation",
-      status: "completed",
-    },
-    {
-      id: "6",
-      title: "Discovery call - Manufacturing sector",
-      scenario: "Industry-specific discovery",
-      date: "3 dagen geleden",
-      duration: "11 min",
-      score: 82,
-      phase: "Fase 1 • Discovery",
-      technique: "Active Listening",
-      status: "completed",
-    },
-  ];
+  // TODO: fetch real sessions from /api/v2/analysis/list
+  const sessions: Session[] = [];
 
   const weekStats = {
-    totalSessions: 12,
-    avgScore: 82,
-    totalTime: "2u 24min",
-    improvement: 8,
+    totalSessions: sessions.length,
+    avgScore: sessions.length > 0 ? Math.round(sessions.reduce((s, sess) => s + sess.score, 0) / sessions.length) : 0,
+    totalTime: "0 min",
+    improvement: 0,
   };
 
   const getScoreColor = (score: number) => {
@@ -238,6 +172,9 @@ export function MySessions({ navigate }: MySessionsProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {sessions.length === 0 && (
+                <TableRow><TableCell colSpan={6} className="py-12 text-center text-hh-muted text-[14px]">Nog geen sessies — start je eerste oefensessie via Talk to Hugo AI</TableCell></TableRow>
+              )}
               {sessions.map((session) => (
                 <TableRow
                   key={session.id}

@@ -3,10 +3,12 @@ import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import ffmpegPath from 'ffmpeg-static';
 
 const execFileAsync = promisify(execFile);
 
-const COMPRESSION_THRESHOLD = 24 * 1024 * 1024; // 24MB
+const COMPRESSION_THRESHOLD = 20 * 1024 * 1024; // 20MB — compress anything above this
+const WHISPER_MAX_SIZE = 24 * 1024 * 1024; // 24MB — hard ceiling for Whisper API (actual limit 25MB)
 
 export async function compressAudioIfNeeded(
   buffer: Buffer,
@@ -27,8 +29,8 @@ export async function compressAudioIfNeeded(
     const result = await compressAudioFile(inputPath, outputPath, originalName, buffer.length);
     return result;
   } catch (err: any) {
-    console.error('[Compressor] Compression failed, using original:', err.message);
-    return { buffer, mimetype, originalName, compressed: false };
+    console.error('[Compressor] Compression failed:', err.message);
+    throw new Error(`Audio compressie mislukt: ${err.message}`);
   } finally {
     try { await fs.promises.unlink(inputPath); } catch { /* cleanup best-effort */ }
     try { await fs.promises.unlink(outputPath); } catch { /* cleanup best-effort */ }
@@ -56,9 +58,8 @@ export async function compressAudioFileFromPath(
     const result = await compressAudioFile(inputPath, outputPath, originalName, fileSize);
     return result;
   } catch (err: any) {
-    console.error('[Compressor] Compression failed, reading original:', err.message);
-    const buffer = await fs.promises.readFile(inputPath);
-    return { buffer, mimetype: 'audio/mp4', originalName, compressed: false };
+    console.error('[Compressor] Compression failed:', err.message);
+    throw new Error(`Audio compressie mislukt: ${err.message}`);
   } finally {
     try { await fs.promises.unlink(outputPath); } catch { /* cleanup best-effort */ }
   }
@@ -71,25 +72,50 @@ async function compressAudioFile(
   fileSize: number
 ): Promise<{ buffer: Buffer; mimetype: string; originalName: string; compressed: boolean }> {
   const sizeMB = fileSize / (1024 * 1024);
+
+  // Aggressive bitrates to ensure result < 24MB
   let bitrate = '64k';
   if (sizeMB < 50) bitrate = '96k';
   if (sizeMB < 30) bitrate = '128k';
 
   console.log(`[Compressor] Compressing ${originalName} (${sizeMB.toFixed(1)}MB) to ${bitrate} MP3...`);
 
-  await execFileAsync('ffmpeg', [
+  const ffmpeg = ffmpegPath || 'ffmpeg';
+  await execFileAsync(ffmpeg, [
     '-i', inputPath,
-    '-vn', '-ac', '1', '-ar', '16000',
+    '-vn', '-ac', '1', '-ar', '22050',
     '-b:a', bitrate,
     '-y', outputPath
   ], { timeout: 300000 });
 
-  const compressedBuffer = await fs.promises.readFile(outputPath);
-  const compressedMB = compressedBuffer.length / (1024 * 1024);
-  console.log(`[Compressor] Done: ${sizeMB.toFixed(1)}MB → ${compressedMB.toFixed(1)}MB (${Math.round((1 - compressedMB / sizeMB) * 100)}% reduction)`);
+  let compressedBuffer = await fs.promises.readFile(outputPath);
+  let compressedMB = compressedBuffer.length / (1024 * 1024);
+  console.log(`[Compressor] First pass: ${sizeMB.toFixed(1)}MB → ${compressedMB.toFixed(1)}MB (${Math.round((1 - compressedMB / sizeMB) * 100)}% reduction)`);
+
+  // If still too large, re-compress with minimum quality
+  if (compressedBuffer.length > WHISPER_MAX_SIZE) {
+    console.log(`[Compressor] Still > 24MB, re-compressing with 48k bitrate...`);
+    const recompressPath = outputPath.replace('.mp3', '_v2.mp3');
+    try {
+      await execFileAsync(ffmpeg, [
+        '-i', outputPath,
+        '-vn', '-ac', '1', '-ar', '16000',
+        '-b:a', '48k',
+        '-y', recompressPath
+      ], { timeout: 300000 });
+      compressedBuffer = await fs.promises.readFile(recompressPath);
+      compressedMB = compressedBuffer.length / (1024 * 1024);
+      console.log(`[Compressor] Second pass: → ${compressedMB.toFixed(1)}MB`);
+    } finally {
+      try { await fs.promises.unlink(recompressPath); } catch { /* cleanup */ }
+    }
+  }
+
+  if (compressedBuffer.length > WHISPER_MAX_SIZE) {
+    throw new Error(`Bestand nog steeds te groot na compressie (${compressedMB.toFixed(1)}MB). Maximum: 24MB.`);
+  }
 
   const newName = originalName.replace(/\.[^.]+$/, '.mp3');
-
   return {
     buffer: compressedBuffer,
     mimetype: 'audio/mpeg',

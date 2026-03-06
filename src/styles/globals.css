@@ -59,6 +59,25 @@
   --hh-border: var(--hh-platinum);
   --hh-slate-gray-legacy: var(--hh-slate-gray);  /* Legacy compatibility */
 
+  /* Light shades for badges/backgrounds (match Tailwind 50/100/200/700 levels) */
+  --hh-primary-dark: var(--hh-steel-blue);       /* Darker accent (same as primary in user view) */
+  --hh-primary-light: #7BA3C4;                   /* Lighter steel blue */
+  --hh-primary-50: #EFF6FF;       /* blue-50 — very light bg */
+  --hh-primary-100: #DBEAFE;      /* blue-100 — badge bg */
+  --hh-primary-200: #BFDBFE;      /* blue-200 — light borders */
+  --hh-success-50: #ECFDF5;       /* emerald-50 — light bg */
+  --hh-success-100: #D1FAE5;      /* emerald-100 — badge bg */
+  --hh-success-200: #A7F3D0;      /* emerald-200 — light borders */
+  --hh-success-700: #047857;      /* emerald-700 — badge text */
+  --hh-warning-50: #FFFBEB;       /* amber-50 — light bg */
+  --hh-warning-100: #FEF3C7;      /* amber-100 — badge bg */
+  --hh-warning-200: #FDE68A;      /* amber-200 — light borders */
+  --hh-warning-700: #B45309;      /* amber-700 — badge text */
+  --hh-error-50: #FEF2F2;         /* red-50 — light bg */
+  --hh-error-100: #FEE2E2;        /* red-100 — badge bg */
+  --hh-error-200: #FECACA;        /* red-200 — light borders */
+  --hh-error-700: #B91C1C;        /* red-700 — badge text */
+
   /* Original Shadcn tokens */
   --font-size: 16px;
   --background: var(--hh-bg);
@@ -156,8 +175,13 @@
 
 /* Admin/host webinar session — purple accent instead of steel blue */
 .admin-session {
-  --hh-primary: #7e22ce;
-  --hh-primary-hover: #6b21a8;
+  --hh-primary: #7e22ce;           /* purple-700 — diep paars */
+  --hh-primary-hover: #6b21a8;     /* purple-800 */
+  --hh-primary-dark: #581c87;      /* purple-900 — gradient endpoint */
+  --hh-primary-light: #9333ea;     /* purple-600 — lighter accent */
+  --hh-primary-50: #FAF5FF;        /* purple-50 — light bg */
+  --hh-primary-100: #F3E8FF;       /* purple-100 — badge bg */
+  --hh-primary-200: #E9D5FF;       /* purple-200 — light borders */
   --hh-primary-rgb: 126, 34, 206;
 }
 

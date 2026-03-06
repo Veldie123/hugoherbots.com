@@ -6319,6 +6319,23 @@ body {
   --hh-muted: var(--hh-french-gray);
   --hh-border: var(--hh-platinum);
   --hh-slate-gray-legacy: var(--hh-slate-gray);
+  --hh-primary-dark: var(--hh-steel-blue);
+  --hh-primary-light: #7BA3C4;
+  --hh-primary-50: #EFF6FF;
+  --hh-primary-100: #DBEAFE;
+  --hh-primary-200: #BFDBFE;
+  --hh-success-50: #ECFDF5;
+  --hh-success-100: #D1FAE5;
+  --hh-success-200: #A7F3D0;
+  --hh-success-700: #047857;
+  --hh-warning-50: #FFFBEB;
+  --hh-warning-100: #FEF3C7;
+  --hh-warning-200: #FDE68A;
+  --hh-warning-700: #B45309;
+  --hh-error-50: #FEF2F2;
+  --hh-error-100: #FEE2E2;
+  --hh-error-200: #FECACA;
+  --hh-error-700: #B91C1C;
   --font-size: 16px;
   --background: var(--hh-bg);
   --foreground: var(--hh-ink);
@@ -6365,8 +6382,38 @@ body {
 .admin-session {
   --hh-primary: #7e22ce;
   --hh-primary-hover: #6b21a8;
+  --hh-primary-dark: #581c87;
+  --hh-primary-light: #9333ea;
+  --hh-primary-50: #FAF5FF;
+  --hh-primary-100: #F3E8FF;
+  --hh-primary-200: #E9D5FF;
   --hh-primary-rgb: 126, 34, 206;
 }
+
+/* HH Design Token Light Shades — custom utility classes */
+.bg-hh-primary-50 { background-color: var(--hh-primary-50); }
+.bg-hh-primary-100 { background-color: var(--hh-primary-100); }
+.text-hh-primary-dark { color: var(--hh-primary-dark); }
+.text-hh-primary-light { color: var(--hh-primary-light); }
+.border-hh-primary-200 { border-color: var(--hh-primary-200); }
+
+/* Success shades */
+.bg-hh-success-50 { background-color: var(--hh-success-50); }
+.bg-hh-success-100 { background-color: var(--hh-success-100); }
+.text-hh-success-700 { color: var(--hh-success-700); }
+.border-hh-success-200 { border-color: var(--hh-success-200); }
+
+/* Error shades */
+.bg-hh-error-50 { background-color: var(--hh-error-50); }
+.bg-hh-error-100 { background-color: var(--hh-error-100); }
+.text-hh-error-700 { color: var(--hh-error-700); }
+.border-hh-error-200 { border-color: var(--hh-error-200); }
+
+/* Warning shades */
+.bg-hh-warning-50 { background-color: var(--hh-warning-50); }
+.bg-hh-warning-100 { background-color: var(--hh-warning-100); }
+.text-hh-warning-700 { color: var(--hh-warning-700); }
+.border-hh-warning-200 { border-color: var(--hh-warning-200); }
 
 .dark {
   --hh-bg: #0b0f19;

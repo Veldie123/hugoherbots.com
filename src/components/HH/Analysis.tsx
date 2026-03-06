@@ -266,7 +266,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
   };
 
   const getTypeIcon = (type: string) => {
-    return <Mic className="w-4 h-4 text-[#4F7396]" />;
+    return <Mic className="w-4 h-4 text-hh-primary" />;
   };
 
   const getTypeLabel = (type: string) => {
@@ -549,7 +549,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                     >
                       <td className="py-3 px-4">
                         <span
-                          className="bg-hh-success/10 text-hh-success inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold">
+                          className="bg-hh-primary-100 text-hh-primary inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[12px] font-semibold">
                           {conv.techniquesUsed[0] || "—"}
                         </span>
                       </td>
@@ -565,7 +565,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                               {conv.techniquesUsed.slice(0, 4).map((tech, idx) => (
                                 <span
                                   key={idx}
-                                  className="bg-hh-success/10 text-hh-success inline-flex items-center justify-center min-w-[32px] h-7 px-1.5 rounded-full text-[10px] font-mono font-semibold"
+                                  className="bg-hh-primary-100 text-hh-primary inline-flex items-center justify-center min-w-[32px] h-7 px-1.5 rounded-full text-[10px] font-mono font-semibold"
                                 >
                                   {tech}
                                 </span>
@@ -649,12 +649,15 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
             {sortedConversations.map((conv) => (
               <Card
                 key={conv.id}
-                className="p-4 rounded-xl border-hh-border hover:shadow-md transition-shadow cursor-pointer"
+                className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => openTranscript(conv)}
               >
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-[15px] font-medium text-hh-text">{conv.title}</h3>
-                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                  <div className="flex items-center gap-2">
+                    {getTypeIcon(conv.type)}
+                    <span className="text-[12px] text-hh-muted">{getTypeLabel(conv.type)}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
                     {getStatusBadge(conv.status)}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -681,22 +684,40 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                     </DropdownMenu>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 text-[12px] text-hh-muted">
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
+
+                <h3 className="text-[15px] font-medium text-hh-text mb-2">{conv.title}</h3>
+
+                {conv.techniquesUsed.length > 0 && (
+                  <div className="flex items-center gap-1.5 mb-3">
+                    <div className="flex gap-1 flex-wrap">
+                      {conv.techniquesUsed.slice(0, 3).map((tech, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-hh-primary-100 text-hh-primary inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                      {conv.techniquesUsed.length > 3 && (
+                        <span className="text-[10px] text-hh-muted font-mono">+{conv.techniquesUsed.length - 3}</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between text-[13px] text-hh-muted pt-3 border-t border-hh-border">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-hh-primary" />
                     {conv.duration}
                   </div>
                   {conv.score !== null ? (
-                    <span className={`font-semibold ${conv.score >= 70 ? "text-hh-success" : conv.score >= 50 ? "text-hh-primary" : "text-hh-warning"}`}>
+                    <span className={`font-semibold text-[14px] ${conv.score >= 70 ? "text-hh-success" : conv.score >= 50 ? "text-hh-primary" : "text-hh-warning"}`}>
                       {Math.round(conv.score)}%
                     </span>
                   ) : (
-                    <span>—</span>
+                    <span className="text-hh-muted">—</span>
                   )}
                   <span>{conv.date}</span>
-                  {conv.techniquesUsed.length > 0 && (
-                    <span className="text-hh-success font-mono text-[11px]">{conv.techniquesUsed.length} technieken</span>
-                  )}
                 </div>
               </Card>
             ))}
@@ -756,7 +777,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
                       {conv.techniquesUsed.slice(0, 3).map((tech, idx) => (
                         <span
                           key={idx}
-                          className="bg-hh-success/10 text-hh-success inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold"
+                          className="bg-hh-primary-100 text-hh-primary inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold"
                         >
                           {tech}
                         </span>
@@ -770,7 +791,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
 
                 <div className="flex items-center justify-between text-[13px] text-hh-muted pt-3 border-t border-hh-border">
                   <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-[#4F7396]" />
+                    <Clock className="w-3.5 h-3.5 text-hh-primary" />
                     {conv.duration}
                   </div>
                   {conv.score !== null ? (

@@ -186,7 +186,7 @@ export function UploadAnalysis({
     return true;
   };
 
-  const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB chunks (under proxy limit)
+  const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks (safe under Railway 25MB proxy limit)
 
   const uploadChunked = async (file: File, userId: string): Promise<any> => {
     const totalChunks = Math.ceil(file.size / CHUNK_SIZE);

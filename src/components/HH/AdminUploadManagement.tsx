@@ -288,7 +288,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
         );
       case "Good":
         return (
-          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20">
+          <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200">
             <ThumbsUp className="w-3 h-3 mr-1" />
             Good
           </Badge>
@@ -494,7 +494,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                 <span>{upload.date}</span>
                 <span>{upload.duration}</span>
                 {upload.techniquesFound.length > 0 && (
-                  <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[10px] font-mono px-1.5 py-0">
+                  <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[10px] font-mono px-1.5 py-0">
                     {upload.techniquesFound[0]}
                   </Badge>
                 )}
@@ -623,7 +623,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                     </td>
                     <td className="px-4 py-3">
                       {upload.techniquesFound.length > 0 ? (
-                        <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px] font-mono">
+                        <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px] font-mono">
                           {upload.techniquesFound[0]}
                         </Badge>
                       ) : (

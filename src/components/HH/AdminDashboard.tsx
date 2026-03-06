@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getAuthHeaders } from "../../services/hugoApi";
 import {
   Users,
   TrendingUp,
@@ -106,10 +107,10 @@ const getNotificationIcon = (type: string, category: string) => {
 
 const getNotificationColors = (type: string) => {
   switch (type) {
-    case "success": return { iconColor: "text-hh-success", iconBg: "bg-hh-success/10" };
-    case "warning": return { iconColor: "text-hh-warning", iconBg: "bg-hh-warning/10" };
-    case "error": return { iconColor: "text-hh-error", iconBg: "bg-hh-error/10" };
-    default: return { iconColor: "text-hh-primary", iconBg: "bg-hh-primary/10" };
+    case "success": return { iconColor: "text-hh-success", iconBg: "bg-hh-success-100" };
+    case "warning": return { iconColor: "text-hh-warning", iconBg: "bg-hh-warning-100" };
+    case "error": return { iconColor: "text-hh-error", iconBg: "bg-hh-error-100" };
+    default: return { iconColor: "text-hh-primary", iconBg: "bg-hh-primary-100" };
   }
 };
 
@@ -122,8 +123,12 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
     const fetchDashboard = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/admin/dashboard-stats");
-        if (!response.ok) throw new Error("Failed to fetch dashboard data");
+        const headers = await getAuthHeaders();
+        const response = await fetch("/api/admin/dashboard-stats", { headers });
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => null);
+          throw new Error(errorBody?.message || `HTTP ${response.status}`);
+        }
         const result = await response.json();
         setData(result);
       } catch (err: any) {
@@ -151,7 +156,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
       trend: data.kpis.activeUsers.change.startsWith("+") ? "up" : "down",
       icon: Users,
       color: "var(--hh-primary)",
-      bgColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)",
+      bgColor: "var(--hh-primary-100)",
     },
     {
       label: "Sessies Vandaag",
@@ -194,7 +199,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
               Vandaag &bull; {dateStr}
             </p>
           </div>
-          <Button variant="outline" className="gap-2 border-hh-primary/20 text-hh-primary hover:bg-hh-primary/5">
+          <Button variant="outline" className="gap-2 border-hh-primary-200 text-hh-primary hover:bg-hh-primary/5">
             <Clock className="w-4 h-4" />
             Laatste 30 dagen
           </Button>
@@ -229,7 +234,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                           style={kpi.trend === "up" ? { backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' } : undefined}
                           className={`text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 ${
                             kpi.trend !== "up"
-                              ? "bg-hh-error/10 text-hh-error border-hh-error/20"
+                              ? "bg-hh-error-100 text-hh-error-700 border-hh-error-200"
                               : ""
                           }`}
                         >
@@ -249,7 +254,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {[
-                  { label: "Actieve Video's", icon: Video, color: "var(--hh-primary)", bgColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)", note: "Beheer via Video's" },
+                  { label: "Actieve Video's", icon: Video, color: "var(--hh-primary)", bgColor: "var(--hh-primary-100)", note: "Beheer via Video's" },
                   { label: "Live Webinars", icon: Radio, color: "#2563eb", bgColor: "rgba(37, 99, 235, 0.1)", note: "Beheer via Webinars" },
                   { label: "Coaching Sessies", icon: MessageSquare, color: "#ea580c", bgColor: "rgba(234, 88, 12, 0.1)", note: "Talk to Hugo AI" },
                   { label: "Platform Users", icon: Users, color: "#059669", bgColor: "rgba(5, 150, 105, 0.1)", note: "Ingeschreven gebruikers" },
@@ -315,7 +320,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                   <h3 className="text-[18px] leading-[24px] text-hh-text">
                     Notificaties
                   </h3>
-                  <Badge variant="outline" className="bg-hh-warning/10 text-hh-warning border-hh-warning/20">
+                  <Badge variant="outline" className="bg-hh-warning-100 text-hh-warning-700 border-hh-warning-200">
                     {data?.unreadNotifications || 0} nieuw
                   </Badge>
                 </div>
@@ -385,7 +390,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                   className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
                   onClick={() => navigate?.("admin-live")}
                 >
-                  <div className="w-8 h-8 rounded-full bg-hh-error/10 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-hh-error-100 flex items-center justify-center">
                     <Radio className="w-4 h-4 text-hh-error" />
                   </div>
                   <div className="text-left">
@@ -399,7 +404,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                   className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
                   onClick={() => navigate?.("admin-analytics")}
                 >
-                  <div className="w-8 h-8 rounded-full bg-hh-success/10 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-hh-success-100 flex items-center justify-center">
                     <BarChart3 className="w-4 h-4 text-hh-success" />
                   </div>
                   <div className="text-left">
@@ -413,7 +418,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                   className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
                   onClick={() => navigate?.("admin-users")}
                 >
-                  <div className="w-8 h-8 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-hh-primary-100 flex items-center justify-center">
                     <Users className="w-4 h-4 text-hh-primary" />
                   </div>
                   <div className="text-left">

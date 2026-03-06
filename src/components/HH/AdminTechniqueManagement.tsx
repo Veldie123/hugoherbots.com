@@ -70,17 +70,14 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
   const [editingTechnique, setEditingTechnique] = useState<string | null>(null);
   const [editedTechniqueData, setEditedTechniqueData] = useState<any>(null);
 
-  // Generate mock statistics for each technique
-  const generateMockStats = (techniqueNumber: string) => {
-    const hash = techniqueNumber.split('.').reduce((acc, num) => acc + parseInt(num || '0', 10), 0);
-    return {
-      videos: 2 + (hash % 4),
-      roleplays: 150 + (hash * 50),
-      avgScore: 74 + (hash % 15),
-      completion: 79 + (hash % 13),
-      status: "Actief" as const,
-    };
-  };
+  // TODO: fetch real stats from conversation_analyses + videos tables
+  const getStats = () => ({
+    videos: 0,
+    roleplays: 0,
+    avgScore: 0,
+    completion: 0,
+    status: "Actief" as const,
+  });
 
   // Convert EPIC techniques to admin format - all phases combined
   const allTechnieken = [
@@ -89,35 +86,35 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
       code: tech.nummer,
       name: tech.naam,
       fase: "0",
-      ...generateMockStats(tech.nummer),
+      ...getStats(),
     })),
     ...getTechniquesByPhase("1").map((tech, idx) => ({
       id: idx + 50,
       code: tech.nummer,
       name: tech.naam,
       fase: "1",
-      ...generateMockStats(tech.nummer),
+      ...getStats(),
     })),
     ...getTechniquesByPhase("2").map((tech, idx) => ({
       id: idx + 100,
       code: tech.nummer,
       name: tech.naam,
       fase: "2",
-      ...generateMockStats(tech.nummer),
+      ...getStats(),
     })),
     ...getTechniquesByPhase("3").map((tech, idx) => ({
       id: idx + 200,
       code: tech.nummer,
       name: tech.naam,
       fase: "3",
-      ...generateMockStats(tech.nummer),
+      ...getStats(),
     })),
     ...getTechniquesByPhase("4").map((tech, idx) => ({
       id: idx + 300,
       code: tech.nummer,
       name: tech.naam,
       fase: "4",
-      ...generateMockStats(tech.nummer),
+      ...getStats(),
     })),
   ];
 
@@ -582,7 +579,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                         <td className="py-3 px-4">
                           <Badge
                             variant="outline"
-                            className="text-[11px] font-mono bg-hh-primary/10 text-hh-primary border-hh-primary/20"
+                            className="text-[11px] font-mono bg-hh-primary-100 text-hh-primary border-hh-primary-200"
                           >
                             {techniek.code}
                           </Badge>

@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useMobileViewMode } from "@/hooks/useMobileViewMode";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { getAuthHeaders } from "../../services/hugoApi";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
@@ -125,6 +126,7 @@ const VALID_MIME_TYPES = [
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
 
 export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
+  const { addPendingAnalysis } = useNotifications();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [viewMode] = useMobileViewMode("grid", "list");
@@ -274,14 +276,14 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
     switch (quality) {
       case "Excellent":
         return (
-          <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20">
+          <Badge className="bg-hh-success-100 text-hh-success-700 border-hh-success-200">
             <CheckCircle2 className="w-3 h-3 mr-1" />
             Excellent
           </Badge>
         );
       case "Good":
         return (
-          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20">
+          <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200">
             <ThumbsUp className="w-3 h-3 mr-1" />
             Good
           </Badge>
@@ -307,14 +309,14 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
     switch (status) {
       case "completed":
         return (
-          <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px]">
+          <Badge className="bg-hh-success-100 text-hh-success-700 border-hh-success-200 text-[11px]">
             <CheckCircle2 className="w-3 h-3 mr-1" />
             Geanalyseerd
           </Badge>
         );
       case "failed":
         return (
-          <Badge className="bg-hh-error/10 text-hh-error border-hh-error/20 text-[11px]">
+          <Badge className="bg-hh-error-100 text-hh-error-700 border-hh-error-200 text-[11px]">
             <XCircle className="w-3 h-3 mr-1" />
             Mislukt
           </Badge>
@@ -323,7 +325,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
       case "transcribing":
       case "analyzing":
         return (
-          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px]">
+          <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px]">
             <Loader2 className="w-3 h-3 mr-1 animate-spin" />
             Verwerken
           </Badge>
@@ -382,7 +384,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
     bulkPausedRef.current = false;
     bulkAbortRef.current = false;
 
-    const CHUNK_SIZE = 20 * 1024 * 1024;
+    const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks (safe under Railway 25MB proxy limit)
 
     for (let i = 0; i < bulkFiles.length; i++) {
       const bf = bulkFiles[i];
@@ -468,6 +470,8 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
           conversationId: result.conversationId,
         } : f));
 
+        addPendingAnalysis(result.conversationId, bf.title);
+
       } catch (err: any) {
         setBulkFiles(prev => prev.map(f => f.id === bf.id ? {
           ...f,
@@ -546,9 +550,9 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Analyses', value: isLoading ? "-" : stats.total, icon: Upload, bgColorStyle: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', colorStyle: 'var(--hh-primary)', badge: '+24%', badgeTrend: 'up' as const },
+            { name: 'Totaal Analyses', value: isLoading ? "-" : stats.total, icon: Upload, bgColorStyle: 'var(--hh-primary-100)', colorStyle: 'var(--hh-primary)', badge: '+24%', badgeTrend: 'up' as const },
             { name: 'Uitstekend', value: isLoading ? "-" : stats.excellent, icon: CheckCircle2, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: 'var(--hh-success)', badge: '+43%', badgeTrend: 'up' as const },
-            { name: 'Gem. Score', value: isLoading ? "-" : `${stats.avgScore}%`, icon: BarChart3, bgColorStyle: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', colorStyle: 'var(--hh-primary)', badge: '+5%', badgeTrend: 'up' as const },
+            { name: 'Gem. Score', value: isLoading ? "-" : `${stats.avgScore}%`, icon: BarChart3, bgColorStyle: 'var(--hh-primary-100)', colorStyle: 'var(--hh-primary)', badge: '+5%', badgeTrend: 'up' as const },
             { name: 'Verbetering Nodig', value: isLoading ? "-" : stats.needsImprovement, icon: AlertTriangle, bgColorStyle: 'rgba(239, 68, 68, 0.1)', colorStyle: 'var(--hh-error)', badge: '15%', badgeTrend: 'down' as const },
           ].map(stat => {
             const badgeStyles = stat.badgeTrend === 'up'
@@ -573,7 +577,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
         </div>
 
         {error && (
-          <Card className="p-4 rounded-[16px] border-hh-error/30 bg-hh-error/10">
+          <Card className="p-4 rounded-[16px] border-hh-error-200 bg-hh-error-100">
             <div className="flex items-center gap-3 text-hh-error">
               <AlertTriangle className="w-5 h-5" />
               <p className="text-[14px]">{error}</p>
@@ -725,7 +729,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                     >
                       <td className="px-4 py-3">
                         {(analysis.techniquesFound || []).length > 0 ? (
-                          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[11px] font-mono">
+                          <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[11px] font-mono">
                             {analysis.techniquesFound[0]}
                           </Badge>
                         ) : (
@@ -744,7 +748,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-hh-primary/10 flex items-center justify-center text-[11px] font-semibold text-hh-primary shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-hh-primary-100 flex items-center justify-center text-[11px] font-semibold text-hh-primary shrink-0">
                             {getInitials(analysis.userName || analysis.userId)}
                           </div>
                           <div>
@@ -834,7 +838,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                 >
                   <div className="flex items-start justify-between mb-3">
                     {(analysis.techniquesFound || []).length > 0 ? (
-                      <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 text-[10px] font-mono px-1.5 py-0">
+                      <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[10px] font-mono px-1.5 py-0">
                         {analysis.techniquesFound[0]}
                       </Badge>
                     ) : (
@@ -870,7 +874,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                   </p>
                   <p className="text-[11px] text-hh-muted mb-3">{analysis.status === 'failed' && analysis.error ? analysis.error : analysis.status}</p>
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-full bg-hh-primary/10 flex items-center justify-center text-[10px] font-semibold text-hh-primary">
+                    <div className="w-6 h-6 rounded-full bg-hh-primary-100 flex items-center justify-center text-[10px] font-semibold text-hh-primary">
                       {getInitials(analysis.userName || analysis.userId)}
                     </div>
                     <span className="text-[12px] text-hh-muted truncate">
@@ -898,7 +902,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                         <Badge
                           key={i}
                           variant="outline"
-                          className="text-[9px] px-1 py-0 border-hh-primary/20 text-hh-primary bg-hh-primary/5"
+                          className="text-[9px] px-1 py-0 border-hh-primary-200 text-hh-primary bg-hh-primary-50"
                         >
                           {tech}
                         </Badge>
@@ -906,7 +910,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                       {(analysis.techniquesFound || []).length > 2 && (
                         <Badge
                           variant="outline"
-                          className="text-[9px] px-1 py-0 border-hh-primary/20 text-hh-primary bg-hh-primary/5"
+                          className="text-[9px] px-1 py-0 border-hh-primary-200 text-hh-primary bg-hh-primary-50"
                         >
                           +{analysis.techniquesFound.length - 2}
                         </Badge>
@@ -938,7 +942,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
           <div className="flex-1 overflow-hidden flex flex-col gap-4 mt-2">
             {!bulkRunning && (
               <div
-                className="border-2 border-dashed border-hh-primary/30 rounded-xl p-6 text-center cursor-pointer hover:border-hh-primary hover:bg-hh-primary/5 transition-all"
+                className="border-2 border-dashed border-hh-primary-200 rounded-xl p-6 text-center cursor-pointer hover:border-hh-primary hover:bg-hh-primary/5 transition-all"
                 onClick={() => bulkFileInputRef.current?.click()}
               >
                 <Upload className="w-8 h-8 text-hh-primary/60 mx-auto mb-2" />
@@ -956,7 +960,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
             )}
 
             {bulkSkippedErrors.length > 0 && (
-              <div className="rounded-lg border border-hh-warning/30 bg-hh-warning/5 px-3 py-2">
+              <div className="rounded-lg border border-hh-warning-200 bg-hh-warning-50 px-3 py-2">
                 <p className="text-[12px] font-medium text-hh-warning mb-1">Overgeslagen bestanden:</p>
                 {bulkSkippedErrors.map((err, i) => (
                   <p key={i} className="text-[11px] text-hh-warning">{err}</p>
@@ -987,10 +991,10 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                   </div>
                   {bulkRunning && (
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={toggleBulkPause} className="h-7 text-[12px] border-hh-primary/30 text-hh-primary">
+                      <Button variant="outline" size="sm" onClick={toggleBulkPause} className="h-7 text-[12px] border-hh-primary-200 text-hh-primary">
                         {bulkPaused ? <><Play className="w-3 h-3 mr-1" /> Hervat</> : <><Pause className="w-3 h-3 mr-1" /> Pauzeer</>}
                       </Button>
-                      <Button variant="outline" size="sm" onClick={cancelBulkUpload} className="h-7 text-[12px] border-hh-error/30 text-hh-error hover:bg-hh-error/5" title="Stopt na het huidige bestand">
+                      <Button variant="outline" size="sm" onClick={cancelBulkUpload} className="h-7 text-[12px] border-hh-error-200 text-hh-error hover:bg-hh-error/5" title="Stopt na het huidige bestand">
                         <X className="w-3 h-3 mr-1" /> Stop na huidig
                       </Button>
                     </div>
@@ -1002,9 +1006,9 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                     <div
                       key={bf.id}
                       className={`flex items-center gap-3 px-3 py-2 rounded-lg border transition-all text-[13px] ${
-                        bf.status === "completed" ? "bg-hh-success/5 border-hh-success/20" :
-                        bf.status === "failed" ? "bg-hh-error/5 border-hh-error/20" :
-                        bf.status === "uploading" ? "bg-hh-primary/5 border-hh-primary/30" :
+                        bf.status === "completed" ? "bg-hh-success-50 border-hh-success-200" :
+                        bf.status === "failed" ? "bg-hh-error-50 border-hh-error-200" :
+                        bf.status === "uploading" ? "bg-hh-primary-50 border-hh-primary-200" :
                         "bg-hh-bg border-hh-border"
                       }`}
                     >

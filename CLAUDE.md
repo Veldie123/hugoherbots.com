@@ -93,6 +93,12 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 - **Build check:** `npm run build` moet slagen voor elke commit
 - **Commit message stijl:** Korte imperatief ("Fix X", "Add Y", "Update Z")
 
+## Local Development Server
+
+- **Na elke build/commit:** Herstart de lokale server automatisch (kill poorten 5001/3001/3002, dan `PORT=5001 node --env-file=.env server/production-server.js`)
+- **Architectuur:** `production-server.js` (port 5001) spawnt `video-processor.js` (3001) en `standalone.js` (3002)
+- **Productie:** Railway auto-deployt bij push naar `main` — geen handmatige restart nodig
+
 ## Database & Migrations
 
 - **NOOIT de gebruiker vragen om SQL handmatig te draaien.** Voer migrations zelf uit via de credentials in `.env`.

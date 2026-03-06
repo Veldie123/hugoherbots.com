@@ -108,8 +108,8 @@ export function RolePlayOverview({ navigate, isAdmin }: RolePlayOverviewProps) {
         techniqueNumbers: [tech?.nummer || "2.1.1", allTechnieken[(techIdx + 1) % allTechnieken.length]?.nummer || "2.1.2"],
         tags: tagOptions[seed % tagOptions.length],
         duration: `${6 + (seed % 10)}-${10 + (seed % 8)} min`,
-        plays: 100 + (seed % 1200),
-        avgScore: 60 + (seed % 30),
+        plays: 0,
+        avgScore: 0,
         isFavorite: seed % 3 === 0,
         difficulty: difficulties[seed % difficulties.length],
       };

@@ -81,17 +81,14 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
       nummer: "-1.1",
       fase: "-1",
       faseNaam: "Voorbereiding",
-      status: "completed",
+      status: "current",
       duration: "8 min",
       description: "De juiste mindset is de basis van succesvolle sales — leer hoe je jezelf mentaal voorbereidt op elke deal.",
       doList: ["Start met positieve affirmaties", "Visualiseer succesvolle gesprekken", "Accepteer dat niet elke deal binnenkomt"],
       dontList: ["Begin aan een gesprek met negatieve gedachten", "Neem afwijzing persoonlijk", "Vergelijk jezelf met anderen"],
-      sessieHistory: [
-        { id: "s1", datum: "10 nov 2024", tijd: "09:15", type: "video", duration: "08:42", score: 95 },
-      ],
-      totalAttempts: 4,
-      avgScore: 92,
-      lastPlayed: "10 nov 2024",
+      sessieHistory: [],
+      totalAttempts: 0,
+      avgScore: 0,
     },
     {
       id: "-1.2",
@@ -99,17 +96,14 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
       nummer: "-1.2",
       fase: "-1",
       faseNaam: "Voorbereiding",
-      status: "completed",
+      status: "upcoming",
       duration: "12 min",
       description: "Goede voorbereiding is het halve werk — research, planning en strategie voor elk gesprek.",
       doList: ["Onderzoek het bedrijf grondig", "Bereid je vragen voor", "Ken je USP's uit je hoofd"],
       dontList: ["Ga onvoorbereid een gesprek in", "Vertrouw enkel op improvisatie", "Negeer de context van de klant"],
-      sessieHistory: [
-        { id: "s2", datum: "11 nov 2024", tijd: "14:20", type: "chat", duration: "12:15", score: 88 },
-      ],
-      totalAttempts: 3,
-      avgScore: 86,
-      lastPlayed: "11 nov 2024",
+      sessieHistory: [],
+      totalAttempts: 0,
+      avgScore: 0,
     },
     {
       id: "-1.3",
@@ -117,15 +111,14 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
       nummer: "-1.3",
       fase: "-1",
       faseNaam: "Voorbereiding",
-      status: "completed",
+      status: "upcoming",
       duration: "6 min",
       description: "De eerste indruk is cruciaal — leer hoe je direct vertrouwen en respect afdwingt.",
       doList: ["Maak oogcontact", "Gebruik een stevige handdruk", "Glimlach authentiek"],
       dontList: ["Kijk naar de grond", "Begin met excuses", "Wees te informeel"],
       sessieHistory: [],
-      totalAttempts: 1,
-      avgScore: 75,
-      lastPlayed: "09 nov 2024",
+      totalAttempts: 0,
+      avgScore: 0,
     },
 
     // Openingsfase (1)
@@ -135,19 +128,14 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
       nummer: "1.1",
       fase: "1",
       faseNaam: "Openingsfase",
-      status: "completed",
+      status: "upcoming",
       duration: "10 min",
       description: "Creëer een warme, professionele sfeer waarin de klant zich op zijn gemak voelt.",
       doList: ["Wees authentiek", "Toon interesse", "Gebruik small talk strategisch"],
       dontList: ["Forceer een gesprek", "Praat alleen over jezelf", "Negeer non-verbale signalen"],
-      sessieHistory: [
-        { id: "s3", datum: "14 nov 2024", tijd: "14:32", type: "video", duration: "12:45", score: 87 },
-        { id: "s4", datum: "12 nov 2024", tijd: "10:15", type: "chat", duration: "08:20", score: 92 },
-        { id: "s5", datum: "10 nov 2024", tijd: "16:00", type: "roleplay", duration: "10:10", score: 84 },
-      ],
-      totalAttempts: 12,
-      avgScore: 85,
-      lastPlayed: "14 nov 2024",
+      sessieHistory: [],
+      totalAttempts: 0,
+      avgScore: 0,
     },
     {
       id: "1.2",
@@ -155,18 +143,14 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
       nummer: "1.2",
       fase: "1",
       faseNaam: "Openingsfase",
-      status: "completed",
+      status: "upcoming",
       duration: "7 min",
       description: "Maak duidelijke afspraken over het verloop van het gesprek.",
       doList: ["Wees transparant", "Vraag toestemming", "Stel tijdverwachtingen"],
       dontList: ["Neem aan dat alles OK is", "Spring direct naar verkopen"],
-      sessieHistory: [
-        { id: "s6", datum: "13 nov 2024", tijd: "16:20", type: "roleplay", duration: "05:30", score: 78 },
-        { id: "s7", datum: "11 nov 2024", tijd: "11:45", type: "video", duration: "07:15", score: 82 },
-      ],
-      totalAttempts: 8,
-      avgScore: 81,
-      lastPlayed: "13 nov 2024",
+      sessieHistory: [],
+      totalAttempts: 0,
+      avgScore: 0,
     },
     {
       id: "1.3",
@@ -174,17 +158,14 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
       nummer: "1.3",
       fase: "1",
       faseNaam: "Openingsfase",
-      status: "completed",
+      status: "upcoming",
       duration: "14 min",
       description: "Introduceer je bedrijf met een krachtige reference story die aansluit bij de klant.",
       doList: ["Gebruik concrete resultaten", "Kies relevante case", "Houd het kort"],
       dontList: ["Vertel je hele geschiedenis", "Focus op features", "Maak het generiek"],
-      sessieHistory: [
-        { id: "s8", datum: "12 nov 2024", tijd: "09:30", type: "chat", duration: "14:50", score: 76 },
-      ],
-      totalAttempts: 3,
-      avgScore: 72,
-      lastPlayed: "12 nov 2024",
+      sessieHistory: [],
+      totalAttempts: 0,
+      avgScore: 0,
     },
     {
       id: "1.4",
@@ -192,17 +173,14 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
       nummer: "1.4",
       fase: "1",
       faseNaam: "Openingsfase",
-      status: "completed",
+      status: "upcoming",
       duration: "5 min",
       description: "Start de ontdekking met een sterke openingsvraag.",
       doList: ["Maak het open-ended", "Laat klant praten", "Toon nieuwsgierigheid"],
       dontList: ["Stel ja/nee vragen", "Onderbreek te snel"],
-      sessieHistory: [
-        { id: "s9", datum: "15 nov 2024", tijd: "09:45", type: "chat", duration: "06:15", score: 89 },
-      ],
-      totalAttempts: 6,
-      avgScore: 84,
-      lastPlayed: "15 nov 2024",
+      sessieHistory: [],
+      totalAttempts: 0,
+      avgScore: 0,
     },
 
     // Ontdekkingsfase (2)
@@ -212,18 +190,14 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
       nummer: "2.1.1",
       fase: "2",
       faseNaam: "Ontdekkingsfase",
-      status: "completed",
+      status: "upcoming",
       duration: "9 min",
       description: "Verzamel concrete feiten over de situatie van de klant.",
       doList: ["Vraag naar cijfers", "Noteer details", "Blijf objectief"],
       dontList: ["Interpreteer te snel", "Spring naar oplossingen"],
-      sessieHistory: [
-        { id: "s10", datum: "16 nov 2024", tijd: "11:00", type: "video", duration: "14:20", score: 91 },
-        { id: "s11", datum: "14 nov 2024", tijd: "15:30", type: "roleplay", duration: "09:45", score: 87 },
-      ],
-      totalAttempts: 9,
-      avgScore: 88,
-      lastPlayed: "16 nov 2024",
+      sessieHistory: [],
+      totalAttempts: 0,
+      avgScore: 0,
     },
     {
       id: "2.1.2",
@@ -231,17 +205,14 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
       nummer: "2.1.2",
       fase: "2",
       faseNaam: "Ontdekkingsfase",
-      status: "completed",
+      status: "upcoming",
       duration: "11 min",
       description: "Ontdek de meningen, zorgen en prioriteiten van de klant.",
       doList: ["Luister actief", "Stel waarom-vragen", "Laat stiltes bestaan"],
       dontList: ["Vul antwoorden in", "Ga in discussie"],
-      sessieHistory: [
-        { id: "s12", datum: "15 nov 2024", tijd: "14:30", type: "chat", duration: "11:45", score: 86 },
-      ],
-      totalAttempts: 11,
-      avgScore: 83,
-      lastPlayed: "15 nov 2024",
+      sessieHistory: [],
+      totalAttempts: 0,
+      avgScore: 0,
     },
     {
       id: "2.1.3",
@@ -249,18 +220,14 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
       nummer: "2.1.3",
       fase: "2",
       faseNaam: "Ontdekkingsfase",
-      status: "current",
+      status: "upcoming",
       duration: "8 min",
       description: "Krijg feitelijke info zonder direct confronterend te zijn.",
       doList: ["Wees creatief", "Gebruik indirecte routes", "Blijf vriendelijk"],
       dontList: ["Wees manipulatief", "Verlies het doel"],
-      sessieHistory: [
-        { id: "s13", datum: "17 nov 2024", tijd: "10:15", type: "roleplay", duration: "08:30", score: 79 },
-        { id: "s14", datum: "16 nov 2024", tijd: "13:20", type: "video", duration: "07:55", score: 74 },
-      ],
-      totalAttempts: 5,
-      avgScore: 76,
-      lastPlayed: "17 nov 2024",
+      sessieHistory: [],
+      totalAttempts: 0,
+      avgScore: 0,
     },
     {
       id: "2.1.4",
@@ -703,7 +670,7 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge className="bg-teal-100 text-teal-600 border-0 text-[10px] flex-shrink-0 rounded-full px-2">
+                        <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] flex-shrink-0 rounded-full px-2">
                           {technique.nummer}
                         </Badge>
                         <Badge
@@ -861,7 +828,7 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Badge className="bg-teal-100 text-teal-600 border-0 text-[10px] rounded-full px-2">
+                      <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] rounded-full px-2">
                         {selectedTechnique.nummer}
                       </Badge>
                       <Badge variant="secondary" className="text-[10px] bg-hh-ui-100">

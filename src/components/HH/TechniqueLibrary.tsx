@@ -99,16 +99,14 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
     );
   };
 
-  const generateMockStats = (techniqueNumber: string) => {
-    const hash = techniqueNumber.split('.').reduce((acc, num) => acc + parseInt(num || '0', 10), 0);
-    return {
-      videos: 2 + (hash % 4),
-      roleplays: 150 + (hash * 50),
-      avgScore: 74 + (hash % 15),
-      completion: 79 + (hash % 13),
-      status: "Actief" as const,
-    };
-  };
+  // TODO: fetch real stats from conversation_analyses + videos tables
+  const getStats = () => ({
+    videos: 0,
+    roleplays: 0,
+    avgScore: 0,
+    completion: 0,
+    status: "Actief" as const,
+  });
 
   const technieken = {
     "fase-0": getTechniekenByFase("0", true).map((tech, idx) => ({
@@ -116,35 +114,35 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
       code: tech.nummer,
       name: tech.naam,
       is_fase: tech.is_fase,
-      ...generateMockStats(tech.nummer),
+      ...getStats(),
     })),
     "fase-1": getTechniekenByFase("1", true).map((tech, idx) => ({
       id: idx + 10,
       code: tech.nummer,
       name: tech.naam,
       is_fase: tech.is_fase,
-      ...generateMockStats(tech.nummer),
+      ...getStats(),
     })),
     "fase-2": getTechniekenByFase("2", true).map((tech, idx) => ({
       id: idx + 20,
       code: tech.nummer,
       name: tech.naam,
       is_fase: tech.is_fase,
-      ...generateMockStats(tech.nummer),
+      ...getStats(),
     })),
     "fase-3": getTechniekenByFase("3", true).map((tech, idx) => ({
       id: idx + 40,
       code: tech.nummer,
       name: tech.naam,
       is_fase: tech.is_fase,
-      ...generateMockStats(tech.nummer),
+      ...getStats(),
     })),
     "fase-4": getTechniekenByFase("4", true).map((tech, idx) => ({
       id: idx + 50,
       code: tech.nummer,
       name: tech.naam,
       is_fase: tech.is_fase,
-      ...generateMockStats(tech.nummer),
+      ...getStats(),
     })),
   };
 
@@ -351,7 +349,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                   }
                 }}
               >
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[12px] font-mono font-semibold flex-shrink-0">
+                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-hh-primary-100 text-hh-primary text-[12px] font-mono font-semibold flex-shrink-0">
                   {techniek.code}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -466,7 +464,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                       }}
                     >
                       <td className="py-3 px-4">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[12px] font-mono font-semibold">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-hh-primary-100 text-hh-primary text-[12px] font-mono font-semibold">
                           {techniek.code}
                         </span>
                       </td>

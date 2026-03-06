@@ -117,7 +117,7 @@ const getQualityBadge = (quality: string) => {
   switch (lowerQuality) {
     case "excellent":
       return (
-        <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 hover:bg-hh-success/20">
+        <Badge className="bg-[var(--hh-success-100)] text-[var(--hh-success-700)] border-[var(--hh-success-200)] hover:bg-hh-success/20">
           <CheckCircle2 className="w-3 h-3 mr-1" />
           Excellent
         </Badge>
@@ -132,7 +132,7 @@ const getQualityBadge = (quality: string) => {
     case "needs-improvement":
     case "needs-work":
       return (
-        <Badge className="bg-hh-warning/10 text-hh-warning border-hh-warning/20 hover:bg-hh-warning/20">
+        <Badge className="bg-[var(--hh-warning-100)] text-[var(--hh-warning-700)] border-[var(--hh-warning-200)] hover:bg-hh-warning/20">
           <AlertTriangle className="w-3 h-3 mr-1" />
           Needs Improvement
         </Badge>
@@ -453,13 +453,13 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                     
                     {/* Feedback input for flagging - admin only */}
                     {isAdmin && showFeedbackInput === lineId && (
-                      <div className="ml-11 mt-2 p-3 bg-hh-error/5 border border-hh-error/20 rounded-lg">
-                        <p className="text-[12px] text-hh-error mb-2 font-medium">Wat is er mis met dit antwoord?</p>
+                      <div className="ml-11 mt-2 p-3 bg-[var(--hh-error-50)] border border-[var(--hh-error-200)] rounded-lg">
+                        <p className="text-[12px] text-[var(--hh-error-700)] mb-2 font-medium">Wat is er mis met dit antwoord?</p>
                         <Textarea
                           value={feedbackText}
                           onChange={(e) => setFeedbackText(e.target.value)}
                           placeholder="Beschrijf de fout of verbeterpunt..."
-                          className="text-[13px] bg-hh-bg border-hh-error/20 focus:border-hh-error min-h-[60px]"
+                          className="text-[13px] bg-hh-bg border-[var(--hh-error-200)] focus:border-hh-error min-h-[60px]"
                         />
                         <div className="flex gap-2 mt-2">
                           <Button
@@ -504,9 +504,9 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                               <span className="text-hh-muted">Signaal:</span>
                               <Badge className={`${
                                 line.debugInfo?.signal === "positief"
-                                  ? "bg-hh-success/15 text-hh-success border-hh-success/30"
+                                  ? "bg-[var(--hh-success-100)] text-[var(--hh-success-700)] border-[var(--hh-success-200)]"
                                   : line.debugInfo?.signal === "negatief"
-                                  ? "bg-hh-error/15 text-hh-error border-hh-error/30"
+                                  ? "bg-[var(--hh-error-100)] text-[var(--hh-error-700)] border-[var(--hh-error-200)]"
                                   : "bg-hh-ui-100 text-hh-text border-hh-border"
                               }`}>
                                 {line.debugInfo?.signal || "neutraal"}
@@ -593,9 +593,9 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
                                       <span className="text-hh-muted">Evaluatie:</span>
                                       <Badge className={`ml-1 text-[10px] ${
                                         line.debugInfo.aiDecision.evaluatie === "positief" || line.debugInfo.aiDecision.evaluatie === "perfect"
-                                          ? "bg-hh-success/15 text-hh-success border-hh-success/30"
+                                          ? "bg-[var(--hh-success-100)] text-[var(--hh-success-700)] border-[var(--hh-success-200)]"
                                           : line.debugInfo.aiDecision.evaluatie === "gemist"
-                                          ? "bg-hh-error/15 text-hh-error border-hh-error/30"
+                                          ? "bg-[var(--hh-error-100)] text-[var(--hh-error-700)] border-[var(--hh-error-200)]"
                                           : "bg-hh-ui-100 text-hh-text border-hh-border"
                                       }`}>
                                         {line.debugInfo.aiDecision.evaluatie}

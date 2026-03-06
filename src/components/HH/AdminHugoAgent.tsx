@@ -132,7 +132,7 @@ export function AdminHugoAgent({ navigate }: Props) {
             width: 44,
             height: 44,
             borderRadius: "50%",
-            background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary))",
+            background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary-dark, var(--hh-primary)))",
             display: "flex",
             alignItems: "center",
             justifyContent: "center"
@@ -153,7 +153,7 @@ export function AdminHugoAgent({ navigate }: Props) {
               width: 56,
               height: 56,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary))",
+              background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary-dark, var(--hh-primary)))",
               display: "flex",
               alignItems: "center",
               justifyContent: "center"
@@ -187,7 +187,7 @@ export function AdminHugoAgent({ navigate }: Props) {
                 flexShrink: 0,
                 background: message.role === "user"
                   ? "linear-gradient(135deg, #3b82f6, #2563eb)"
-                  : "linear-gradient(135deg, var(--hh-primary), var(--hh-primary))",
+                  : "linear-gradient(135deg, var(--hh-primary), var(--hh-primary-dark, var(--hh-primary)))",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center"
@@ -266,7 +266,7 @@ export function AdminHugoAgent({ navigate }: Props) {
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
             <div style={{
               width: 36, height: 36, borderRadius: "50%",
-              background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary))",
+              background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary-dark, var(--hh-primary)))",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
             }}>
               <Loader2 size={18} color="white" style={{ animation: "spin 1s linear infinite" }} />
@@ -330,7 +330,7 @@ export function AdminHugoAgent({ navigate }: Props) {
               border: "none",
               background: isLoading || !inputValue.trim()
                 ? "#e5e7eb"
-                : "linear-gradient(135deg, var(--hh-primary), var(--hh-primary))",
+                : "linear-gradient(135deg, var(--hh-primary), var(--hh-primary-dark, var(--hh-primary)))",
               color: isLoading || !inputValue.trim() ? "#9ca3af" : "white",
               fontSize: 16,
               fontWeight: 600,
@@ -491,7 +491,7 @@ function WebinarListCard({ data }: { data: any[] }) {
                       style={{
                         width: "100%", padding: "6px 10px", fontSize: 16,
                         border: ed.title !== undefined ? "1.5px solid var(--hh-primary)" : "1px solid transparent",
-                        borderRadius: 8, outline: "none", backgroundColor: ed.title !== undefined ? "color-mix(in srgb, var(--hh-primary) 5%, transparent)" : "transparent",
+                        borderRadius: 8, outline: "none", backgroundColor: ed.title !== undefined ? "var(--hh-primary-50)" : "transparent",
                         color: "#111827", fontFamily: "inherit"
                       }}
                     />
@@ -504,7 +504,7 @@ function WebinarListCard({ data }: { data: any[] }) {
                       style={{
                         padding: "6px 10px", fontSize: 15,
                         border: ed.scheduled_date !== undefined ? "1.5px solid var(--hh-primary)" : "1px solid transparent",
-                        borderRadius: 8, outline: "none", backgroundColor: ed.scheduled_date !== undefined ? "color-mix(in srgb, var(--hh-primary) 5%, transparent)" : "transparent",
+                        borderRadius: 8, outline: "none", backgroundColor: ed.scheduled_date !== undefined ? "var(--hh-primary-50)" : "transparent",
                         color: "#111827", fontFamily: "inherit"
                       }}
                     />
@@ -906,7 +906,7 @@ function UserListCard({ data }: { data: any[] }) {
         }}>
           <div style={{
             width: 36, height: 36, borderRadius: "50%",
-            backgroundColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)", display: "flex", alignItems: "center", justifyContent: "center",
+            backgroundColor: "var(--hh-primary-100)", display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 16, fontWeight: 700, color: "var(--hh-primary)", flexShrink: 0
           }}>
             {(user.full_name || user.email || "?")[0].toUpperCase()}

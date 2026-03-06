@@ -59,88 +59,8 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
   const [sortBy, setSortBy] = useState<"title" | "downloads" | "size">("title");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const resources: Resource[] = useMemo(() => [
-    {
-      id: 1,
-      type: "PDF",
-      title: "E.P.I.C. TECHNIQUE - Complete Gids",
-      description: "Volledige uitleg van de 4 fasen en 25 technieken van Hugo's E.P.I.C. TECHNIQUE",
-      size: "2.4 MB",
-      downloads: 1247,
-      featured: true,
-      category: "Methodologie",
-    },
-    {
-      id: 2,
-      type: "PDF",
-      title: "Techniek Referentie Kaarten",
-      description: "Printbare kaarten met alle 25 technieken — handig tijdens je gesprekken",
-      size: "1.8 MB",
-      downloads: 892,
-      featured: true,
-      category: "Technieken",
-    },
-    {
-      id: 3,
-      type: "Video",
-      title: "Hugo's Masterclass - Ontdekkingsfase",
-      description: "60 minuten diepgaande training over de kunst van het stellen van de juiste vragen",
-      size: "245 MB",
-      downloads: 634,
-      featured: false,
-      category: "Video cursus",
-    },
-    {
-      id: 4,
-      type: "PDF",
-      title: "Bezwaar Behandeling Framework",
-      description: "Complete handleiding voor het omgaan met de 5 meest voorkomende bezwaren",
-      size: "1.2 MB",
-      downloads: 1108,
-      featured: false,
-      category: "Technieken",
-    },
-    {
-      id: 5,
-      type: "PDF",
-      title: "Sales Gesprek Template",
-      description: "Gestructureerde template voor het voorbereiden van je sales gesprekken",
-      size: "0.8 MB",
-      downloads: 1456,
-      featured: false,
-      category: "Templates",
-    },
-    {
-      id: 6,
-      type: "Spreadsheet",
-      title: "KPI Tracking Dashboard",
-      description: "Excel template om je sales metrics en voortgang bij te houden",
-      size: "0.5 MB",
-      downloads: 723,
-      featured: false,
-      category: "Analytics",
-    },
-    {
-      id: 7,
-      type: "PDF",
-      title: "ICP Definitie Workbook",
-      description: "Werkboek om je Ideal Customer Profile scherp te krijgen",
-      size: "1.1 MB",
-      downloads: 589,
-      featured: false,
-      category: "Strategie",
-    },
-    {
-      id: 8,
-      type: "Video",
-      title: "Role-Play Best Practices",
-      description: "15 minuten training over hoe je het meeste uit je oefensessies haalt",
-      size: "78 MB",
-      downloads: 445,
-      featured: false,
-      category: "Training",
-    },
-  ], []);
+  // TODO: fetch real resources from API when resource library is implemented
+  const resources: Resource[] = useMemo(() => [], []);
 
   const handleSort = (column: "title" | "downloads" | "size") => {
     if (sortBy === column) {
@@ -394,6 +314,9 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
                   </tr>
                 </thead>
                 <tbody>
+                  {sortedResources.length === 0 && (
+                    <tr><td colSpan={5} className="py-12 text-center text-hh-muted text-[14px]">Nog geen resources beschikbaar</td></tr>
+                  )}
                   {sortedResources.map((resource, index) => (
                     <tr
                       key={resource.id}
@@ -472,6 +395,9 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
 
         {viewMode === "grid" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sortedResources.length === 0 && (
+              <div className="col-span-full py-12 text-center text-hh-muted text-[14px]">Nog geen resources beschikbaar</div>
+            )}
             {sortedResources.map((resource) => (
               <Card 
                 key={resource.id} 

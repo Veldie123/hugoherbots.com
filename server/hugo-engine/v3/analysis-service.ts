@@ -63,7 +63,7 @@ function parseJSON<T>(raw: string, fallback: T): T {
     const cleaned = jsonMatch ? jsonMatch[1].trim() : raw.trim();
     return JSON.parse(cleaned);
   } catch {
-    console.warn("[V3 Analysis] JSON parse failed, using fallback");
+    console.warn("[V3 Analysis] JSON parse failed. Raw (first 500 chars):", raw.substring(0, 500));
     return fallback;
   }
 }
@@ -83,7 +83,7 @@ async function evaluateSellerTurnsV3(
   const sellerTurns = turns.filter((t) => t.speaker === "seller");
   if (sellerTurns.length === 0) return [];
 
-  // Build transcript context
+  // Full transcript for context (read-only, passed to every chunk)
   const transcriptContext = turns
     .map(
       (t) =>
@@ -117,19 +117,40 @@ Antwoord als JSON array van evaluaties, één per seller-turn:
 
 Wees concreet en verwijs naar specifieke techniek-IDs.`;
 
-  const result = await callClaude(
-    systemPrompt,
-    `TRANSCRIPT:\n${transcriptContext}\n\nEvalueer alle seller-turns (${sellerTurns.map((t) => t.idx).join(", ")}).`,
-    3000
-  );
+  // Chunk evaluation to avoid output truncation on long conversations
+  const CHUNK_SIZE = 25;
+  const allEvaluations: TurnEvaluation[] = [];
 
-  const parsed = parseJSON<TurnEvaluation[]>(result, []);
+  console.log(`[V3 Analysis] Evaluating ${sellerTurns.length} seller turns in chunks of ${CHUNK_SIZE}`);
+
+  for (let i = 0; i < sellerTurns.length; i += CHUNK_SIZE) {
+    const chunk = sellerTurns.slice(i, i + CHUNK_SIZE);
+    const chunkIdxs = chunk.map((t) => t.idx);
+    const chunkNum = Math.floor(i / CHUNK_SIZE) + 1;
+    const totalChunks = Math.ceil(sellerTurns.length / CHUNK_SIZE);
+
+    console.log(`[V3 Analysis] Chunk ${chunkNum}/${totalChunks}: evaluating turns ${chunkIdxs[0]}-${chunkIdxs[chunkIdxs.length - 1]}`);
+
+    const result = await callClaude(
+      systemPrompt,
+      `TRANSCRIPT:\n${transcriptContext}\n\nEvalueer ALLEEN de volgende seller-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
+      4096
+    );
+
+    const parsed = parseJSON<TurnEvaluation[]>(result, []);
+    console.log(`[V3 Analysis] Chunk ${chunkNum}: ${parsed.length} evaluations returned`);
+    allEvaluations.push(...parsed);
+  }
 
   // Ensure all seller turns have evaluations
-  const evaluatedIdxs = new Set(parsed.map((e) => e.turnIdx));
+  const evaluatedIdxs = new Set(allEvaluations.map((e) => e.turnIdx));
+  const missingCount = sellerTurns.filter((t) => !evaluatedIdxs.has(t.idx)).length;
+  if (missingCount > 0) {
+    console.log(`[V3 Analysis] Adding fallback for ${missingCount} unevaluated turns`);
+  }
   for (const turn of sellerTurns) {
     if (!evaluatedIdxs.has(turn.idx)) {
-      parsed.push({
+      allEvaluations.push({
         turnIdx: turn.idx,
         techniques: [],
         overallQuality: "gemist",
@@ -138,7 +159,7 @@ Wees concreet en verwijs naar specifieke techniek-IDs.`;
     }
   }
 
-  return parsed.sort((a, b) => a.turnIdx - b.turnIdx);
+  return allEvaluations.sort((a, b) => a.turnIdx - b.turnIdx);
 }
 
 // ── V3 Detect Customer Signals ───────────────────────────────────────────────

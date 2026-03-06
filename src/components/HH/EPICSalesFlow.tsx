@@ -166,7 +166,7 @@ export function EPICSalesFlow(props: EPICSalesFlowProps) {
       {/* Header - Exact copy from RolePlayChat */}
       <div className="p-4 border-b border-hh-border bg-hh-bg">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-[var(--hh-primary-100)] flex items-center justify-center">
             <Circle className="w-5 h-5 text-hh-primary" />
           </div>
           <div>
@@ -206,7 +206,7 @@ export function EPICSalesFlow(props: EPICSalesFlowProps) {
                   <div
                     className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                      progress === 100 && "bg-hh-success/10",
+                      progress === 100 && "bg-[var(--hh-success-100)]",
                       progress < 100 && phase.id === currentPhaseId && "bg-cyan-600/10",
                       progress < 100 && phase.id !== currentPhaseId && "bg-hh-ui-200/30"
                     )}
@@ -355,7 +355,7 @@ export function EPICSalesFlow(props: EPICSalesFlowProps) {
                                     </p>
                                     <div className="flex items-center gap-2 mt-0.5">
                                       {step.nummer && (
-                                        <span className="inline-flex items-center justify-center bg-teal-100 text-teal-600 text-[10px] font-semibold rounded-full px-1.5 py-0.5">
+                                        <span className="inline-flex items-center justify-center bg-hh-primary-100 text-hh-primary text-[10px] font-semibold rounded-full px-1.5 py-0.5">
                                           {step.nummer}
                                         </span>
                                       )}

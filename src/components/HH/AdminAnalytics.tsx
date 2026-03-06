@@ -101,7 +101,7 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
       trend: "up" as const,
       icon: Users,
       color: "var(--hh-primary)",
-      bgColor: "color-mix(in srgb, var(--hh-primary) 10%, transparent)",
+      bgColor: "var(--hh-primary-100)",
     },
     {
       label: "MAU (Monthly Active)",
@@ -217,8 +217,8 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                     <Badge
                       className={`${
                         metric.trend === "up"
-                          ? "bg-hh-success/10 text-hh-success border-hh-success/20"
-                          : "bg-hh-error/10 text-hh-error border-hh-error/20"
+                          ? "bg-hh-success-100 text-hh-success-700 border-hh-success-200"
+                          : "bg-hh-error-100 text-hh-error-700 border-hh-error-200"
                       } text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5`}
                     >
                       {metric.change}
@@ -287,7 +287,7 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`} style={{
                       backgroundColor: content.type === "Video"
-                        ? "color-mix(in srgb, var(--hh-primary) 10%, transparent)"
+                        ? "var(--hh-primary-100)"
                         : content.type === "Live"
                         ? "rgba(239, 68, 68, 0.1)"
                         : "rgba(37, 99, 235, 0.1)"

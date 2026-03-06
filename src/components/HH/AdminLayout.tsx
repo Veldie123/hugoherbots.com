@@ -332,7 +332,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
     <div className="admin-session flex h-screen bg-hh-bg">
       {/* Mobile Menu Sheet - Full screen */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-full p-0 flex flex-col bg-hh-bg">
+        <SheetContent side="left" className="admin-session w-full p-0 flex flex-col bg-hh-bg">
           <SheetHeader className="px-6 py-4 border-b border-hh-border flex-shrink-0">
             <SheetTitle className="flex items-center gap-3">
               <div className="flex flex-col items-start gap-0">
@@ -497,7 +497,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                   onClick={() => handleNavigate(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                     isActive
-                      ? "bg-[var(--hh-primary-50)] border border-hh-primary text-hh-primary"
+                      ? "bg-hh-primary-100 text-hh-primary border-l-2 border-hh-primary"
                       : "text-hh-text hover:bg-hh-ui-100"
                   } ${collapsed ? "justify-center" : ""}`}
                 >
@@ -512,7 +512,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 </button>
 
                 {!collapsed && isActive && history.length > 0 && (
-                  <div className="ml-2 pl-4 border-l-2 border-[var(--hh-primary-200)] space-y-0.5 -mt-0.5">
+                  <div className="ml-2 pl-4 border-l-2 border-hh-primary-200 space-y-0.5 -mt-0.5">
                     {history.slice(0, 3).map((histItem) => (
                       <button
                         key={histItem.id}
@@ -537,7 +537,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                     ))}
                     <button
                       onClick={() => navigate?.((item as any).overviewPage)}
-                      className="w-full flex items-center gap-1 px-2 py-1.5 text-[12px] text-hh-primary hover:text-[var(--hh-primary-dark,var(--hh-primary))] transition-colors"
+                      className="w-full flex items-center gap-1 px-2 py-1.5 text-[12px] text-hh-primary hover:text-hh-primary-dark transition-colors"
                     >
                       <span>Bekijk alle{history.length > 0 ? ` (${history.length})` : ""}</span>
                       <ChevronRight className="w-3 h-3" />
@@ -561,7 +561,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 onClick={() => handleNavigate(item.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                   isActive
-                    ? "bg-[var(--hh-primary-50)] border border-hh-primary text-hh-primary"
+                    ? "bg-hh-primary-100 text-hh-primary border-l-2 border-hh-primary"
                     : "text-hh-text hover:bg-hh-ui-100"
                 } ${collapsed ? "justify-center" : ""}`}
               >

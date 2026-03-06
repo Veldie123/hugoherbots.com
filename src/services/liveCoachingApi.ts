@@ -33,6 +33,10 @@ function mapRowToSession(row: any): LiveSession {
     transcript: row.transcript,
     aiSummary: row.ai_summary,
     recordingApproved: row.recording_approved ?? false,
+    maxAttendees: row.max_attendees ?? null,
+    attendeeCount: Array.isArray(row.live_session_attendees)
+      ? row.live_session_attendees[0]?.count ?? 0
+      : 0,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -83,6 +87,26 @@ export const liveCoachingApi = {
         throw new Error('Kon sessies niet laden: ' + error.message);
       }
       
+      return { sessions: (sessions || []).map(mapRowToSession) };
+    },
+
+    listWithAttendees: async (status?: string): Promise<{ sessions: LiveSession[] }> => {
+      let query = supabase
+        .from('live_sessions')
+        .select('*, live_session_attendees(count)')
+        .order('scheduled_date', { ascending: true });
+
+      if (status) {
+        query = query.eq('status', status);
+      }
+
+      const { data: sessions, error } = await query;
+
+      if (error) {
+        console.error('❌ Database query failed:', error);
+        throw new Error('Kon sessies niet laden: ' + error.message);
+      }
+
       return { sessions: (sessions || []).map(mapRowToSession) };
     },
 

@@ -134,7 +134,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
     switch (status) {
       case "paid":
         return (
-          <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px] gap-1">
+          <Badge className="bg-hh-success-100 text-hh-success-700 border-hh-success-200 text-[11px] gap-1">
             <CheckCircle2 className="w-3 h-3" />
             Betaald
           </Badge>
@@ -148,14 +148,14 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
         );
       case "overdue":
         return (
-          <Badge className="bg-hh-error/10 text-hh-error border-hh-error/20 text-[11px] gap-1">
+          <Badge className="bg-hh-error-100 text-hh-error-700 border-hh-error-200 text-[11px] gap-1">
             <AlertCircle className="w-3 h-3" />
             Achterstallig
           </Badge>
         );
       case "failed":
         return (
-          <Badge className="bg-hh-error/10 text-hh-error border-hh-error/20 text-[11px] gap-1">
+          <Badge className="bg-hh-error-100 text-hh-error-700 border-hh-error-200 text-[11px] gap-1">
             <XCircle className="w-3 h-3" />
             Mislukt
           </Badge>
@@ -200,12 +200,12 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-success/10 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-success-100 flex items-center justify-center">
                 <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-hh-success" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success-100 text-hh-success-700 border-hh-success-200"
               >
                 +18%
               </Badge>
@@ -240,12 +240,12 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-error/10 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-error-100 flex items-center justify-center">
                 <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-hh-error" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-error/10 text-hh-error border-hh-error/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-error-100 text-hh-error-700 border-hh-error-200"
               >
                 {invoices.filter(i => i.status === "overdue").length}
               </Badge>
@@ -260,12 +260,12 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-hh-primary-100 flex items-center justify-center">
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-hh-primary" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success-100 text-hh-success-700 border-hh-success-200"
               >
                 +5%
               </Badge>

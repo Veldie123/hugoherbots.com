@@ -371,7 +371,7 @@ export function AdminSettings({ navigate, isSuperAdmin }: AdminSettingsProps) {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20">
+                          <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200">
                             {ROLE_LABELS[admin.admin_role] || admin.admin_role}
                           </Badge>
                           {admin.admin_role !== "super_admin" && (
