@@ -2,16 +2,11 @@ import { useState, useEffect } from "react";
 import { getAuthHeaders } from "../../services/hugoApi";
 import {
   Users,
-  TrendingUp,
   Video,
   Radio,
-  DollarSign,
   Activity,
   CheckCircle,
   UserPlus,
-  Eye,
-  Target,
-  Award,
   Clock,
   Play,
   Upload,
@@ -23,6 +18,12 @@ import {
   Calendar,
   Info,
   Loader2,
+  Zap,
+  ArrowRight,
+  Edit3,
+  CheckCircle2,
+  Star,
+  ThumbsUp,
 } from "lucide-react";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
@@ -39,7 +40,8 @@ interface DashboardData {
     activeUsers: { value: number; change: string };
     sessionsToday: { value: number; change: string };
     newSignups: { value: number; change: string };
-    revenue: { value: number; change: string; subscriptions: number };
+    aiSessions: { value: number; change: string };
+    revenue?: { value: number; change: string; subscriptions?: number };
   };
   recentActivity: Array<{
     id: string;
@@ -59,6 +61,22 @@ interface DashboardData {
     read: boolean;
     relatedPage: string | null;
   }>;
+  actionItems: Array<{
+    id: string;
+    icon: string;
+    label: string;
+    page: string;
+    priority: string;
+  }>;
+  coachees: Array<{
+    id: string;
+    name: string;
+    email: string;
+    avatarUrl: string | null;
+    sessionCount: number;
+    avgScore: number | null;
+    lastActive: string;
+  }>;
   unreadNotifications: number;
   topContent: Array<{
     id: string;
@@ -67,14 +85,19 @@ interface DashboardData {
     views: number;
     fase: string | null;
   }>;
+  feedbackStats?: {
+    avgSessionRating: number | null;
+    npsScore: number | null;
+    recentFeedback: Array<{
+      id: string;
+      type: string;
+      rating: number | null;
+      comment: string | null;
+      date: string;
+    }>;
+    errorCount: number;
+  };
 }
-
-const formatRevenue = (amount: number): string => {
-  if (amount >= 1000) {
-    return `€${(amount / 1000).toFixed(1)}k`;
-  }
-  return `€${amount.toFixed(0)}`;
-};
 
 const getActivityIcon = (type: string) => {
   switch (type) {
@@ -177,13 +200,13 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
       bgColor: "rgba(37, 99, 235, 0.1)",
     },
     {
-      label: "Revenue Deze Mnd",
-      value: formatRevenue(data.kpis.revenue.value),
-      change: data.kpis.revenue.change,
-      trend: data.kpis.revenue.change.startsWith("+") ? "up" : "down",
-      icon: DollarSign,
-      color: "#f97316",
-      bgColor: "rgba(249, 115, 22, 0.1)",
+      label: "NPS Score",
+      value: data.feedbackStats?.npsScore != null ? `${data.feedbackStats.npsScore}/10` : "—",
+      change: "+0%",
+      trend: "up" as const,
+      icon: ThumbsUp,
+      color: "var(--hh-success)",
+      bgColor: "color-mix(in srgb, var(--hh-success) 10%, transparent)",
     },
   ] : [];
 
@@ -219,6 +242,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
           </Card>
         ) : (
           <>
+            {/* KPI Cards */}
             {isSuperAdmin ? (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {kpiData.map((kpi) => {
@@ -277,172 +301,217 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
               </div>
             )}
 
+            {/* Action Center + Quick Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
-                <h3 className="text-[18px] leading-[24px] text-hh-text mb-4">
-                  Recent Activity
-                </h3>
-                <div className="space-y-4">
-                  {(data?.recentActivity || []).length === 0 ? (
-                    <p className="text-[14px] text-hh-muted py-4 text-center">Nog geen recente activiteit</p>
-                  ) : (
-                    (data?.recentActivity || []).slice(0, 5).map((activity) => {
-                      const Icon = getActivityIcon(activity.type);
-                      return (
-                        <div key={activity.id} className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full bg-hh-ui-50 flex items-center justify-center flex-shrink-0">
-                            <Icon className="w-4 h-4" style={{ color: getActivityColor(activity.type) }} />
+              {(() => {
+                const iconMap: Record<string, any> = { bell: Bell, edit: Edit3, 'user-plus': UserPlus };
+                const unifiedAlerts = [
+                  ...(data?.actionItems || []).map(item => ({
+                    id: item.id,
+                    icon: iconMap[item.icon] || AlertCircle,
+                    label: item.label,
+                    page: item.page,
+                    timestamp: null as string | null,
+                  })),
+                  ...(data?.notifications || []).map(notif => ({
+                    id: String(notif.id),
+                    icon: getNotificationIcon(notif.type, notif.category),
+                    label: notif.title,
+                    page: notif.relatedPage || "admin-notifications",
+                    timestamp: notif.timestamp,
+                  })),
+                ].slice(0, 5);
+
+                return unifiedAlerts.length > 0 ? (
+                  <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Zap className="w-4 h-4 text-hh-primary" />
+                      <h3 className="text-[14px] leading-[20px] font-semibold text-hh-text">Aandacht nodig</h3>
+                      <Badge variant="outline" className="ml-auto text-[10px] px-2 py-0.5 bg-hh-primary/10 text-hh-primary border-hh-primary/20">
+                        {unifiedAlerts.length}
+                      </Badge>
+                    </div>
+                    <div className="space-y-2">
+                      {unifiedAlerts.map((alert) => {
+                        const AlertIcon = alert.icon;
+                        return (
+                          <div
+                            key={alert.id}
+                            className="flex items-center gap-3 p-2.5 rounded-lg bg-white border border-hh-border hover:border-hh-primary/30 hover:bg-hh-ui-50 transition-colors cursor-pointer"
+                            onClick={() => navigate?.(alert.page)}
+                          >
+                            <AlertIcon className="w-4 h-4 text-hh-primary flex-shrink-0" />
+                            <span className="text-[13px] leading-[18px] text-hh-text flex-1">{alert.label}</span>
+                            {alert.timestamp && (
+                              <span className="text-[11px] text-hh-muted flex-shrink-0">{alert.timestamp}</span>
+                            )}
+                            <ArrowRight className="w-3.5 h-3.5 text-hh-muted" />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[14px] leading-[20px] text-hh-text">
-                              <span className="font-medium">{activity.user}</span>{" "}
-                              {activity.action}
-                            </p>
-                            <p className="text-[13px] leading-[18px] text-hh-muted truncate">
-                              {activity.detail}
-                            </p>
-                            <p className="text-[12px] leading-[16px] text-hh-muted mt-1">
-                              {activity.time}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-                <Button variant="outline" className="w-full mt-4" onClick={() => navigate?.("admin-analytics")}>
-                  Bekijk alle activiteit
-                </Button>
-              </Card>
+                        );
+                      })}
+                    </div>
+                  </Card>
+                ) : (
+                  <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-hh-success" />
+                      <span className="text-[13px] leading-[18px] text-hh-text">Alles up to date — geen openstaande acties</span>
+                    </div>
+                  </Card>
+                );
+              })()}
 
               <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[18px] leading-[24px] text-hh-text">
-                    Notificaties
-                  </h3>
-                  <Badge variant="outline" className="bg-hh-warning-100 text-hh-warning-700 border-hh-warning-200">
-                    {data?.unreadNotifications || 0} nieuw
-                  </Badge>
+                <h3 className="text-[18px] leading-[24px] text-hh-text mb-4">
+                  Quick Actions
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <Button
+                    className="flex-1 justify-start gap-2 h-auto py-3 px-4 bg-hh-primary hover:bg-hh-primary/90 rounded-xl"
+                    onClick={() => navigate?.("admin-videos")}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                      <Upload className="w-4 h-4" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[14px] leading-[18px] font-medium">Upload Video</p>
+                      <p className="text-[11px] leading-[14px] opacity-80">Nieuwe video</p>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
+                    onClick={() => navigate?.("admin-live")}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-hh-error-100 flex items-center justify-center">
+                      <Radio className="w-4 h-4 text-hh-error" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[14px] leading-[18px] font-medium text-hh-text">Plan Sessie</p>
+                      <p className="text-[11px] leading-[14px] text-hh-muted">Live coaching</p>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
+                    onClick={() => navigate?.("admin-analytics")}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-hh-success-100 flex items-center justify-center">
+                      <BarChart3 className="w-4 h-4 text-hh-success" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[14px] leading-[18px] font-medium text-hh-text">Analytics</p>
+                      <p className="text-[11px] leading-[14px] text-hh-muted">Statistieken</p>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
+                    onClick={() => navigate?.("admin-users")}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-hh-primary-100 flex items-center justify-center">
+                      <Users className="w-4 h-4 text-hh-primary" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[14px] leading-[18px] font-medium text-hh-text">Gebruikers</p>
+                      <p className="text-[11px] leading-[14px] text-hh-muted">Beheren</p>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
+                    onClick={() => navigate?.("admin-settings")}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-hh-slate-gray/10 flex items-center justify-center">
+                      <Settings className="w-4 h-4 text-hh-slate-gray" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[14px] leading-[18px] font-medium text-hh-text">Settings</p>
+                      <p className="text-[11px] leading-[14px] text-hh-muted">Configuratie</p>
+                    </div>
+                  </Button>
                 </div>
-                <div className="space-y-3">
-                  {(data?.notifications || []).length === 0 ? (
-                    <p className="text-[14px] text-hh-muted py-4 text-center">Geen notificaties</p>
-                  ) : (
-                    (data?.notifications || []).slice(0, 3).map((notif) => {
-                      const Icon = getNotificationIcon(notif.type, notif.category);
-                      const colors = getNotificationColors(notif.type);
-                      return (
-                        <div
-                          key={notif.id}
-                          className="flex items-start gap-3 p-3 rounded-lg border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors cursor-pointer"
-                          onClick={() => navigate?.(notif.relatedPage || "admin-notifications")}
-                        >
-                          <div className={`w-10 h-10 rounded-full ${colors.iconBg} flex items-center justify-center flex-shrink-0`}>
-                            <Icon className={`w-5 h-5 ${colors.iconColor}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[14px] leading-[20px] text-hh-ink font-medium">
-                              {notif.title}
-                            </p>
-                            <p className="text-[13px] leading-[18px] text-hh-muted truncate">
-                              {notif.message}
-                            </p>
-                            <p className="text-[12px] leading-[16px] text-hh-muted mt-1">
-                              {notif.timestamp}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full mt-4 gap-2"
-                  onClick={() => navigate?.("admin-notifications")}
-                >
-                  <Bell className="w-4 h-4" />
-                  Alle notificaties
-                </Button>
               </Card>
             </div>
 
-            <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
-              <h3 className="text-[18px] leading-[24px] text-hh-text mb-4">
-                Quick Actions
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                <Button
-                  className="flex-1 justify-start gap-2 h-auto py-3 px-4 bg-hh-primary hover:bg-hh-primary/90 rounded-xl"
-                  onClick={() => navigate?.("admin-videos")}
-                >
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                    <Upload className="w-4 h-4" />
+            {/* Coachees + Notificaties */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Coachees Overview */}
+              <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-[18px] leading-[24px] text-hh-text">
+                    Coachees
+                  </h3>
+                  <Button variant="outline" size="sm" onClick={() => navigate?.("admin-users")}>
+                    Bekijk allen
+                  </Button>
+                </div>
+                {(data?.coachees || []).length === 0 ? (
+                  <p className="text-[14px] text-hh-muted py-4 text-center">Nog geen coachees geregistreerd</p>
+                ) : (
+                  <div className="space-y-3">
+                    {(data?.coachees || []).slice(0, 6).map((coachee) => (
+                      <div key={coachee.id} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-hh-ui-50 transition-colors">
+                        <div className="w-8 h-8 rounded-full bg-hh-primary/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-[11px] font-semibold text-hh-primary">
+                            {coachee.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] leading-[18px] text-hh-text font-medium truncate">{coachee.name}</p>
+                          <p className="text-[11px] leading-[14px] text-hh-muted">
+                            {coachee.sessionCount} sessie{coachee.sessionCount !== 1 ? 's' : ''}
+                            {coachee.avgScore !== null && <> &bull; Gem: {coachee.avgScore}</>}
+                          </p>
+                        </div>
+                        <span className="text-[11px] text-hh-muted whitespace-nowrap">{coachee.lastActive}</span>
+                      </div>
+                    ))}
                   </div>
-                  <div className="text-left">
-                    <p className="text-[14px] leading-[18px] font-medium">Upload Video</p>
-                    <p className="text-[11px] leading-[14px] opacity-80">Nieuwe video</p>
-                  </div>
-                </Button>
+                )}
+              </Card>
 
-                <Button
-                  variant="outline"
-                  className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
-                  onClick={() => navigate?.("admin-live")}
-                >
-                  <div className="w-8 h-8 rounded-full bg-hh-error-100 flex items-center justify-center">
-                    <Radio className="w-4 h-4 text-hh-error" />
+              <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
+                <h3 className="text-[18px] leading-[24px] text-hh-text mb-4">
+                  Recente Activiteit
+                </h3>
+                {(data?.recentActivity || []).length === 0 ? (
+                  <p className="text-[14px] text-hh-muted py-4 text-center">Nog geen activiteit</p>
+                ) : (
+                  <div className="space-y-3">
+                    {(data?.recentActivity || []).slice(0, 6).map((activity) => {
+                      const Icon = getActivityIcon(activity.type);
+                      const color = getActivityColor(activity.type);
+                      return (
+                        <div key={activity.id} className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-hh-ui-50 transition-colors">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)` }}
+                          >
+                            <Icon className="w-4 h-4" style={{ color }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] leading-[18px] text-hh-text font-medium truncate">
+                              {activity.user}
+                            </p>
+                            <p className="text-[11px] leading-[14px] text-hh-muted">
+                              {activity.action} &bull; {activity.time}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <div className="text-left">
-                    <p className="text-[14px] leading-[18px] font-medium text-hh-text">Plan Sessie</p>
-                    <p className="text-[11px] leading-[14px] text-hh-muted">Live coaching</p>
-                  </div>
-                </Button>
+                )}
+              </Card>
+            </div>
 
-                <Button
-                  variant="outline"
-                  className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
-                  onClick={() => navigate?.("admin-analytics")}
-                >
-                  <div className="w-8 h-8 rounded-full bg-hh-success-100 flex items-center justify-center">
-                    <BarChart3 className="w-4 h-4 text-hh-success" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[14px] leading-[18px] font-medium text-hh-text">Analytics</p>
-                    <p className="text-[11px] leading-[14px] text-hh-muted">Statistieken</p>
-                  </div>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
-                  onClick={() => navigate?.("admin-users")}
-                >
-                  <div className="w-8 h-8 rounded-full bg-hh-primary-100 flex items-center justify-center">
-                    <Users className="w-4 h-4 text-hh-primary" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[14px] leading-[18px] font-medium text-hh-text">Gebruikers</p>
-                    <p className="text-[11px] leading-[14px] text-hh-muted">Beheren</p>
-                  </div>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
-                  onClick={() => navigate?.("admin-settings")}
-                >
-                  <div className="w-8 h-8 rounded-full bg-hh-slate-gray/10 flex items-center justify-center">
-                    <Settings className="w-4 h-4 text-hh-slate-gray" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[14px] leading-[18px] font-medium text-hh-text">Settings</p>
-                    <p className="text-[11px] leading-[14px] text-hh-muted">Configuratie</p>
-                  </div>
-                </Button>
-              </div>
-            </Card>
-
+            {/* Top Content + Feedback */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[18px] leading-[24px] text-hh-text">
@@ -503,6 +572,47 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                 </table>
               </div>
             </Card>
+
+            {/* Feedback & Issues */}
+            <Card className="rounded-[16px] border border-hh-border shadow-hh-md p-6">
+              <h3 className="text-[18px] leading-[24px] text-hh-text mb-4 flex items-center gap-2">
+                <ThumbsUp className="w-5 h-5 text-hh-primary" />
+                Feedback & Issues
+              </h3>
+
+              {(data?.feedbackStats?.recentFeedback || []).length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-[12px] font-medium text-hh-muted">Recente feedback</p>
+                  {data!.feedbackStats!.recentFeedback.map((fb) => (
+                    <div key={fb.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-hh-ui-50 transition-colors">
+                      <Badge variant="outline" className="text-[11px] flex-shrink-0 mt-0.5">
+                        {fb.type === "session_rating" ? "Rating" : fb.type === "bug_report" ? "Bug" : fb.type === "suggestion" ? "Suggestie" : "Feedback"}
+                      </Badge>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] text-hh-text truncate">
+                          {fb.comment || (fb.rating ? `${fb.rating}/5 sterren` : "Geen commentaar")}
+                        </p>
+                        <p className="text-[11px] text-hh-muted">
+                          {new Date(fb.date).toLocaleDateString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                      </div>
+                      {fb.rating && (
+                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star key={s} className={`w-3 h-3 ${s <= fb.rating! ? "text-hh-warning fill-hh-warning" : "text-hh-border"}`} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[14px] text-hh-muted text-center py-4">
+                  Nog geen feedback ontvangen
+                </p>
+              )}
+            </Card>
+            </div>
           </>
         )}
       </div>

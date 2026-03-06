@@ -928,7 +928,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
       </div>
 
       <Dialog open={bulkDialogOpen} onOpenChange={(open) => { if (!bulkRunning) setBulkDialogOpen(open); }}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogContent className="admin-session max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-[20px] text-hh-text flex items-center gap-2">
               <Files className="w-5 h-5 text-hh-primary" />

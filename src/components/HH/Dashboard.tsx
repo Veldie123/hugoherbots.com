@@ -130,7 +130,7 @@ const VideoCard = ({
   locked?: boolean;
 }) => (
   <div 
-    className={`flex-shrink-0 w-[clamp(160px,42vw,220px)] group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+    style={{ width: 200, flexShrink: 0 }} className={`dashboard-card group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
     onClick={locked ? undefined : onClick}
   >
     <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
@@ -210,7 +210,7 @@ const WebinarCard = ({
   onRegister?: () => void;
 }) => (
   <div 
-    className="flex-shrink-0 w-[clamp(160px,42vw,220px)] group cursor-pointer"
+    style={{ width: 200, flexShrink: 0 }} className="dashboard-card group cursor-pointer"
     onClick={onClick}
   >
     <div className="relative rounded-lg overflow-hidden aspect-video mb-2">
@@ -298,7 +298,7 @@ const HugoTrainingCard = ({
   
   return (
     <div 
-      className="flex-shrink-0 w-[clamp(160px,42vw,220px)] group cursor-pointer"
+      style={{ width: 200, flexShrink: 0 }} className="dashboard-card group cursor-pointer"
       onClick={onClick}
     >
       <div className={`relative rounded-lg overflow-hidden aspect-video mb-2`}>
@@ -327,12 +327,39 @@ const HugoTrainingCard = ({
   );
 };
 
+const ANALYSIS_IMAGES = [
+  "/images/Hugo-Herbots-WEB-0102.JPG",
+  "/images/Hugo-Herbots-WEB-0173.JPG",
+  "/images/Hugo-Herbots-WEB-0244.JPG",
+  "/images/Hugo-Herbots-WEB-0303.JPG",
+  "/images/Hugo-Herbots-WEB-0342.JPG",
+  "/images/Hugo-Herbots-WEB-0461.JPG",
+  "/images/Hugo-Herbots-WEB-0566.JPG",
+  "/images/Hugo-Herbots-WEB-0663.JPG",
+  "/images/Hugo-Herbots-WEB-0749.JPG",
+  "/images/Hugo-Herbots-WEB-0827.JPG",
+];
+
+const SESSION_IMAGES = [
+  "/images/Hugo-Herbots-WEB-0115.JPG",
+  "/images/Hugo-Herbots-WEB-0119.JPG",
+  "/images/Hugo-Herbots-WEB-0197.JPG",
+  "/images/Hugo-Herbots-WEB-0281.JPG",
+  "/images/Hugo-Herbots-WEB-0350.JPG",
+  "/images/Hugo-Herbots-WEB-0404.JPG",
+  "/images/Hugo-Herbots-WEB-0580.JPG",
+  "/images/Hugo-Herbots-WEB-0680.JPG",
+  "/images/Hugo-Herbots-WEB-0789.JPG",
+  "/images/Hugo-Herbots-WEB-0861.JPG",
+];
+
 const AnalysisCard = ({
   title,
   date,
   score,
   status,
   duration,
+  imageIndex = 0,
   onClick
 }: {
   title: string;
@@ -340,6 +367,7 @@ const AnalysisCard = ({
   score: number | null;
   status: string;
   duration: string;
+  imageIndex?: number;
   onClick?: () => void;
 }) => {
   const isProcessing = status !== 'completed' && status !== 'failed';
@@ -349,22 +377,16 @@ const AnalysisCard = ({
 
   return (
     <div
-      className="flex-shrink-0 w-[clamp(160px,42vw,220px)] group cursor-pointer"
+      style={{ width: 200, flexShrink: 0 }} className="dashboard-card group cursor-pointer"
       onClick={onClick}
     >
-      <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-ink to-hh-primary/60 aspect-video mb-2 flex items-center justify-center">
-        {isProcessing ? (
-          <Loader2 className="w-8 h-8 text-white/60 animate-spin" />
-        ) : status === 'failed' ? (
-          <span className="text-hh-error text-[11px] font-medium">Mislukt</span>
-        ) : (
-          <div className="text-center">
-            {score !== null && (
-              <div className={`text-[32px] font-bold ${scoreColor}`}>{score}%</div>
-            )}
-            <BarChart3 className="w-6 h-6 text-white/40 mx-auto mt-1" />
-          </div>
-        )}
+      <div className="relative rounded-lg overflow-hidden aspect-video mb-2">
+        <img
+          src={ANALYSIS_IMAGES[imageIndex % ANALYSIS_IMAGES.length]}
+          alt={title}
+          className="absolute inset-0 w-full h-full object-cover object-top"
+          loading="lazy"
+        />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
           <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
             <BarChart3 className="w-6 h-6 text-hh-ink" />
@@ -375,6 +397,16 @@ const AnalysisCard = ({
         {title}
       </h3>
       <div className="flex items-center gap-2 mt-1">
+        {isProcessing ? (
+          <span className="text-[11px] text-hh-muted flex items-center gap-1">
+            <Loader2 className="w-3 h-3 animate-spin" /> Bezig...
+          </span>
+        ) : status === 'failed' ? (
+          <span className="text-[11px] text-hh-error font-medium">Mislukt</span>
+        ) : score !== null ? (
+          <span className={`text-[11px] font-medium ${scoreColor}`}>{score}%</span>
+        ) : null}
+        {!isProcessing && <span className="text-[11px] text-hh-muted">•</span>}
         <span className="text-[11px] text-hh-muted">{date}</span>
         {duration && (
           <>
@@ -395,31 +427,30 @@ const SessionCard = ({
   date,
   score,
   type,
+  imageIndex = 0,
   onClick
 }: {
   title: string;
   date: string;
   score: number | null;
   type: string;
+  imageIndex?: number;
   onClick?: () => void;
 }) => {
   const typeLabel = type === 'ai-audio' ? 'Audio' : type === 'ai-video' ? 'Video' : 'Chat';
 
   return (
     <div
-      className="flex-shrink-0 w-[clamp(160px,42vw,220px)] group cursor-pointer"
+      style={{ width: 200, flexShrink: 0 }} className="dashboard-card group cursor-pointer"
       onClick={onClick}
     >
-      <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-primary/80 to-hh-primary/40 aspect-video mb-2 flex items-center justify-center">
-        <MessageSquare className="w-10 h-10 text-white/40" />
-        {score !== null && (
-          <Badge className="absolute top-2 right-2 bg-white/90 text-hh-ink text-[10px] px-1.5 py-0.5">
-            {score}%
-          </Badge>
-        )}
-        <Badge className="absolute top-2 left-2 bg-hh-ink/60 text-white text-[10px] px-1.5 py-0.5">
-          {typeLabel}
-        </Badge>
+      <div className="relative rounded-lg overflow-hidden aspect-video mb-2">
+        <img
+          src={SESSION_IMAGES[imageIndex % SESSION_IMAGES.length]}
+          alt={title}
+          className="absolute inset-0 w-full h-full object-cover object-top"
+          loading="lazy"
+        />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
           <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
             <MessageSquare className="w-6 h-6 text-hh-ink" />
@@ -430,6 +461,14 @@ const SessionCard = ({
         {title}
       </h3>
       <div className="flex items-center gap-2 mt-1">
+        <span className="text-[11px] text-hh-muted">{typeLabel}</span>
+        {score !== null && (
+          <>
+            <span className="text-[11px] text-hh-muted">•</span>
+            <span className={`text-[11px] font-medium ${score >= 80 ? 'text-hh-success' : score >= 50 ? 'text-amber-500' : 'text-hh-error'}`}>{score}%</span>
+          </>
+        )}
+        <span className="text-[11px] text-hh-muted">•</span>
         <span className="text-[11px] text-hh-muted">{date}</span>
       </div>
     </div>
@@ -622,7 +661,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         >
           {videosLoading ? (
             <>{[...Array(5)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[clamp(160px,42vw,220px)] space-y-2">
+              <div key={i} style={{ width: 200, flexShrink: 0 }} className="dashboard-card space-y-2">
                 <div className="aspect-video bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-24 bg-hh-border/30 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 40}ms` }} />
                 <div className="h-3 w-16 bg-hh-border/20 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 80}ms` }} />
@@ -663,7 +702,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         >
           {webinarsLoading ? (
             <>{[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[clamp(160px,42vw,220px)] p-3 bg-hh-card rounded-lg border border-hh-border space-y-2">
+              <div key={i} style={{ width: 200, flexShrink: 0 }} className="dashboard-card p-3 bg-hh-card rounded-lg border border-hh-border space-y-2">
                 <div className="h-4 w-32 bg-hh-border/30 rounded animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-20 bg-hh-border/20 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 40}ms` }} />
               </div>
@@ -708,15 +747,15 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
           </ContentRow>
         )}
 
-        {/* Train met Hugo AI — real sessions or fallback to suggestions */}
+        {/* Talk to Hugo AI — real sessions or fallback to suggestions */}
         <ContentRow
-          title="Train met Hugo AI"
+          title="Talk to Hugo AI"
           icon={MessageSquare}
           onSeeAll={() => navigate?.("hugo-overview")}
         >
           {sessionsLoading ? (
             <>{[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[clamp(160px,42vw,220px)] space-y-2">
+              <div key={i} style={{ width: 200, flexShrink: 0 }} className="dashboard-card space-y-2">
                 <div className="aspect-video bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-24 bg-hh-border/30 rounded animate-pulse" />
               </div>
@@ -729,6 +768,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
                 date={session.date}
                 score={session.score}
                 type={session.type}
+                imageIndex={index}
                 onClick={() => navigate?.("hugo-overview")}
               />
             ))
@@ -755,7 +795,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         >
           {analysesLoading ? (
             <>{[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[clamp(160px,42vw,220px)] space-y-2">
+              <div key={i} style={{ width: 200, flexShrink: 0 }} className="dashboard-card space-y-2">
                 <div className="aspect-video bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-24 bg-hh-border/30 rounded animate-pulse" />
               </div>
@@ -769,12 +809,13 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
                 score={analysis.score}
                 status={analysis.status}
                 duration={analysis.duration}
+                imageIndex={index}
                 onClick={() => navigate?.("analysis")}
               />
             ))
           ) : (
             <div
-              className="flex-shrink-0 w-[clamp(160px,42vw,220px)] cursor-pointer group"
+              style={{ width: 200, flexShrink: 0 }} className="dashboard-card cursor-pointer group"
               onClick={() => navigate?.("analysis")}
             >
               <div className="rounded-lg border-2 border-dashed border-hh-border group-hover:border-hh-primary/50 aspect-video mb-2 flex flex-col items-center justify-center gap-2 transition-colors">

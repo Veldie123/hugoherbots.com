@@ -320,7 +320,7 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
                   {sortedResources.map((resource, index) => (
                     <tr
                       key={resource.id}
-                      className={`border-t border-hh-border hover:bg-hh-ui-50 transition-colors ${
+                      className={`border-t border-hh-border hover:bg-hh-ui-50 transition-colors cursor-pointer ${
                         index % 2 === 0 ? "bg-card" : "bg-hh-ui-50/30"
                       }`}
                     >

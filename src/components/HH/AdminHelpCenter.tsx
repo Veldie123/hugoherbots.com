@@ -394,9 +394,10 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
                 {filteredArticles.map((article, index) => (
                   <tr
                     key={article.id}
-                    className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50/50 transition-colors ${
+                    className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50/50 transition-colors cursor-pointer ${
                       index % 2 === 0 ? "bg-card" : "bg-hh-ui-50/30"
                     }`}
+                    onClick={() => setSelectedArticle(article)}
                     onMouseEnter={() => setHoveredRow(article.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                   >

@@ -317,9 +317,10 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
                 {filteredResources.map((resource, index) => (
                   <tr
                     key={resource.id}
-                    className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50/50 transition-colors ${
+                    className={`border-b border-hh-border last:border-0 hover:bg-hh-ui-50/50 transition-colors cursor-pointer ${
                       index % 2 === 0 ? "bg-card" : "bg-hh-ui-50/30"
                     }`}
+                    onClick={() => setSelectedResource(resource)}
                     onMouseEnter={() => setHoveredRow(resource.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                   >

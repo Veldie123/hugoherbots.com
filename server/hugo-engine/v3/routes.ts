@@ -10,6 +10,7 @@ import { chat, createSession, type V3SessionState } from "./agent";
 import { isV3Available } from "./anthropic-client";
 import { buildUserBriefing } from "./user-briefing";
 import { saveMemory } from "./memory-service";
+import { pool } from "../db";
 import { randomUUID } from "crypto";
 
 const router = Router();
@@ -77,8 +78,33 @@ router.post(
       let openingPrompt: string;
 
       if (sessionMode === "admin") {
-        // Admin mode: daily briefing for Hugo
-        openingPrompt = `Geef me een dagelijkse briefing. Check: hoeveel webinars er gepland staan, de platform analytics van de afgelopen week, en of er iets urgents is (vastgelopen gebruikers, lage scores, lege pipeline). Eindig met 3 concrete suggesties voor wat ik vandaag kan doen.`;
+        // Admin mode: check onboarding status first
+        let onboardingComplete = false;
+        let onboardingApproved = 0;
+        let onboardingTotal = 0;
+        try {
+          const obResult = await pool.query(
+            `SELECT status, COUNT(*) as count FROM admin_onboarding_progress WHERE admin_user_id = $1 GROUP BY status`,
+            [SUPERADMIN_EMAIL]
+          );
+          for (const row of obResult.rows) {
+            const count = parseInt(row.count, 10);
+            onboardingTotal += count;
+            if (row.status === "approved" || row.status === "skipped") onboardingApproved += count;
+          }
+          onboardingComplete = onboardingTotal > 0 && onboardingApproved === onboardingTotal;
+        } catch {
+          // Table might not be seeded yet — tools will handle that
+        }
+
+        if (!onboardingComplete && onboardingTotal > 0) {
+          openingPrompt = `De onboarding is nog niet compleet: ${onboardingApproved} van ${onboardingTotal} items zijn afgehandeld. Begroet Hugo warm. Meld de onboarding-status en stel voor om verder te gaan met de review. Maar geef ook aan dat hij vrij is om iets anders te doen — schets kort de mogelijkheden (platform analytics, webinars, video's, content). Als Hugo akkoord gaat met reviewen, gebruik get_next_review_item om het eerste item te tonen. Gebruik GEEN andere tools tenzij Hugo erom vraagt.`;
+        } else if (onboardingComplete) {
+          openingPrompt = `De onboarding is compleet — alle items zijn gereviewd. Begroet Hugo kort als zijn platformassistent. Geef hem een overzicht van wat je kunt doen: platform analytics bekijken, webinars beheren, video-bibliotheek organiseren, coachingsessies bekijken, content aanpassen, rapport genereren. Vraag wat hij wil doen. Gebruik GEEN tools tenzij hij erom vraagt.`;
+        } else {
+          // No onboarding data yet — first time, tools will seed on first call
+          openingPrompt = `Begroet Hugo warm als zijn platformassistent. Dit is mogelijk zijn eerste sessie. Check de onboarding-status met get_onboarding_status om te zien of er items klaarstaan voor review. Presenteer de resultaten en bied Hugo de keuze: onboarding starten of iets anders doen.`;
+        }
       } else {
         // Coaching mode: personalized opening
         const hasSpecificTechnique = techniqueId && techniqueId !== "general";

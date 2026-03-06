@@ -1,13 +1,11 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from "react";
-import { getAuthHeaders } from "../services/hugoApi";
 
 export interface Notification {
   id: string;
-  type: "analysis_complete" | "info" | "correction_submitted" | "feedback_received";
+  type: "analysis_complete" | "info";
   title: string;
   message: string;
   conversationId?: string;
-  relatedPage?: string;
   read: boolean;
   createdAt: string;
 }
@@ -26,16 +24,13 @@ interface NotificationContextType {
   removeNotification: (id: string) => void;
   clearNotifications: () => void;
   addPendingAnalysis: (conversationId: string, title: string) => void;
-  setIsAdmin: (admin: boolean) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | null>(null);
 
 const NOTIFICATIONS_KEY = "hh_notifications";
 const PENDING_KEY = "hh_pendingAnalysis";
-const ADMIN_SEEN_KEY = "hh_admin_notif_seen";
 const POLL_INTERVAL = 5000;
-const ADMIN_POLL_INTERVAL = 30000;
 
 function loadFromStorage<T>(key: string, fallback: T): T {
   try {
@@ -46,15 +41,25 @@ function loadFromStorage<T>(key: string, fallback: T): T {
   }
 }
 
+function loadUserNotifications(): Notification[] {
+  const all = loadFromStorage<Notification[]>(NOTIFICATIONS_KEY, []);
+  // Clean out any leaked admin notifications from previous sessions
+  const cleaned = all.filter((n) => !n.id.startsWith("admin-"));
+  if (cleaned.length !== all.length) {
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(cleaned));
+  }
+  return cleaned;
+}
+
 export function NotificationProvider({ children }: { children: ReactNode }) {
-  const [notifications, setNotifications] = useState<Notification[]>(() =>
-    loadFromStorage<Notification[]>(NOTIFICATIONS_KEY, [])
-  );
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>(loadUserNotifications);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const adminPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pendingRef = useRef<PendingAnalysis[]>(loadFromStorage<PendingAnalysis[]>(PENDING_KEY, []));
-  const adminSeenIdsRef = useRef<Set<number>>(new Set(loadFromStorage<number[]>(ADMIN_SEEN_KEY, [])));
+
+  // Clean up stale admin localStorage keys
+  useEffect(() => {
+    localStorage.removeItem("hh_admin_notif_seen");
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications));
@@ -79,19 +84,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
-    const numId = parseInt(id.replace('admin-', ''));
-    if (!isNaN(numId)) {
-      fetch(`/api/v2/admin/notifications/${numId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ read: true }),
-      }).catch(() => {});
-    }
   }, []);
 
   const markAllRead = useCallback(() => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    fetch('/api/v2/admin/notifications/read-all', { method: 'PATCH' }).catch(() => {});
   }, []);
 
   const removeNotification = useCallback((id: string) => {
@@ -176,46 +172,6 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     pollPending();
   }, [pollPending]);
 
-  const fetchAdminNotifications = useCallback(async () => {
-    try {
-      const res = await fetch('/api/v2/admin/notifications', {
-        headers: await getAuthHeaders(),
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      const backendNotifs: any[] = data.notifications || [];
-
-      const newNotifs: Notification[] = [];
-      for (const bn of backendNotifs) {
-        if (adminSeenIdsRef.current.has(bn.id)) continue;
-        adminSeenIdsRef.current.add(bn.id);
-
-        newNotifs.push({
-          id: `admin-${bn.id}`,
-          type: bn.type === 'correction_submitted' ? 'correction_submitted'
-            : bn.type === 'feedback_received' ? 'feedback_received'
-            : 'info',
-          title: bn.title,
-          message: bn.message,
-          relatedPage: bn.related_page || undefined,
-          read: bn.read || false,
-          createdAt: bn.created_at || new Date().toISOString(),
-        });
-      }
-
-      if (newNotifs.length > 0) {
-        localStorage.setItem(ADMIN_SEEN_KEY, JSON.stringify([...adminSeenIdsRef.current]));
-        setNotifications((prev) => {
-          const existingIds = new Set(prev.map(n => n.id));
-          const truly = newNotifs.filter(n => !existingIds.has(n.id));
-          if (truly.length === 0) return prev;
-          return [...truly, ...prev].slice(0, 50);
-        });
-      }
-    } catch {
-    }
-  }, []);
-
   useEffect(() => {
     if (pendingRef.current.length > 0) {
       startPolling();
@@ -228,24 +184,6 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     };
   }, [startPolling]);
 
-  useEffect(() => {
-    if (isAdmin) {
-      fetchAdminNotifications();
-      adminPollRef.current = setInterval(fetchAdminNotifications, ADMIN_POLL_INTERVAL);
-    } else {
-      if (adminPollRef.current) {
-        clearInterval(adminPollRef.current);
-        adminPollRef.current = null;
-      }
-    }
-    return () => {
-      if (adminPollRef.current) {
-        clearInterval(adminPollRef.current);
-        adminPollRef.current = null;
-      }
-    };
-  }, [isAdmin, fetchAdminNotifications]);
-
   return (
     <NotificationContext.Provider
       value={{
@@ -257,7 +195,6 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         removeNotification,
         clearNotifications,
         addPendingAnalysis,
-        setIsAdmin,
       }}
     >
       {children}

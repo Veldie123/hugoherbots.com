@@ -17,6 +17,8 @@ try {
 }
 
 const server = http.createServer(handleRequest);
+server.requestTimeout = 600000; // 10 min — allow long compression + upload operations
+server.timeout = 0; // no idle timeout
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`[Production] READY on port ${PORT} — health check will pass`);

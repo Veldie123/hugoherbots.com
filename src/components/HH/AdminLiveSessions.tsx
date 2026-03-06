@@ -143,7 +143,7 @@ ${platformUrl}`;
   async function loadSessions() {
     try {
       setLoading(true);
-      const { sessions } = await liveCoachingApi.sessions.listWithAttendees();
+      const { sessions } = await liveCoachingApi.sessions.list();
       setSessions(sessions);
     } catch (error: any) {
       toast.error("Kon sessies niet laden: " + error.message);

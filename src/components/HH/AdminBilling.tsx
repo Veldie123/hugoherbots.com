@@ -358,7 +358,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
                   {filteredInvoices.map((invoice) => (
                     <tr
                       key={invoice.id}
-                      className="border-t border-hh-border hover:bg-hh-ui-50 transition-colors"
+                      className="border-t border-hh-border hover:bg-hh-ui-50 transition-colors cursor-pointer"
                     >
                       <td className="py-3 px-4">
                         <p className="text-[14px] leading-[20px] text-hh-text font-medium font-mono">

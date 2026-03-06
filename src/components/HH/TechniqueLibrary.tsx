@@ -349,7 +349,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                   }
                 }}
               >
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-hh-primary-100 text-hh-primary text-[12px] font-mono font-semibold flex-shrink-0">
+                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-hh-success/15 text-hh-success text-[12px] font-mono font-semibold flex-shrink-0">
                   {techniek.code}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -464,7 +464,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                       }}
                     >
                       <td className="py-3 px-4">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-hh-primary-100 text-hh-primary text-[12px] font-mono font-semibold">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-hh-success/15 text-hh-success text-[12px] font-mono font-semibold">
                           {techniek.code}
                         </span>
                       </td>

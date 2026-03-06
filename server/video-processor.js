@@ -2312,7 +2312,7 @@ const server = http.createServer((req, res) => {
 
         const pbResult = await supabaseAdmin
           .from('video_ingest_jobs')
-          .select('id,video_title,drive_file_name,techniek_id,playback_order,mux_playback_id,duration_seconds,mux_asset_id')
+          .select('id,video_title,drive_file_name,techniek_id,playback_order,mux_playback_id,duration_seconds,mux_asset_id,ai_attractive_title')
           .neq('status', 'deleted')
           .in('status', ['completed', 'processed'])
           .not('mux_playback_id', 'is', null);
@@ -2336,7 +2336,7 @@ const server = http.createServer((req, res) => {
 
         const mappedPipeline = (pipelineVideos || []).map(job => ({
           id: job.id,
-          title: job.video_title || job.drive_file_name,
+          title: job.ai_attractive_title || job.video_title || job.drive_file_name,
           technique_id: job.techniek_id || null,
           playback_order: pbOrderAvailable && job.playback_order != null ? job.playback_order : null,
           mux_playback_id: job.mux_playback_id,
@@ -3737,33 +3737,19 @@ Format: ["id1", "id2", "id3", ...]`;
         const sessionsToday = viewsToday.count || 0;
         const sessionsYesterday = viewsYesterday.count || 0;
 
-        // Revenue from Stripe
-        let revenueThisMonth = 0;
-        let revenuePrevMonth = 0;
+        // AI Chat Sessions (replaces Revenue — Stripe not active yet)
+        let sessionsThisMonth = 0;
+        let sessionsPrevMonth = 0;
         try {
-          const chargesThis = await stripePool.query(
-            `SELECT COALESCE(SUM(amount), 0) as total FROM stripe.charges WHERE status = 'succeeded' AND created >= $1`,
-            [Math.floor(new Date(monthStart).getTime() / 1000)]
-          );
-          revenueThisMonth = parseInt(chargesThis.rows[0]?.total || '0') / 100;
-
-          const chargesPrev = await stripePool.query(
-            `SELECT COALESCE(SUM(amount), 0) as total FROM stripe.charges WHERE status = 'succeeded' AND created >= $1 AND created < $2`,
-            [Math.floor(new Date(prevMonthStart).getTime() / 1000), Math.floor(new Date(monthStart).getTime() / 1000)]
-          );
-          revenuePrevMonth = parseInt(chargesPrev.rows[0]?.total || '0') / 100;
+          const [thisMonthResult, prevMonthResult] = await Promise.all([
+            supabaseAdmin.from('v2_sessions').select('id', { count: 'exact', head: true }).gte('created_at', monthStart),
+            supabaseAdmin.from('v2_sessions').select('id', { count: 'exact', head: true }).gte('created_at', prevMonthStart).lt('created_at', monthStart),
+          ]);
+          sessionsThisMonth = thisMonthResult.count || 0;
+          sessionsPrevMonth = prevMonthResult.count || 0;
         } catch (e) {
-          console.log('[Dashboard] Stripe revenue query failed (tables may be empty):', e.message);
+          console.log('[Dashboard] Sessions count query failed:', e.message);
         }
-
-        // Active subscriptions count
-        let activeSubscriptions = 0;
-        try {
-          const subsResult = await stripePool.query(
-            `SELECT COUNT(*) as cnt FROM stripe.subscriptions WHERE status IN ('active', 'trialing')`
-          );
-          activeSubscriptions = parseInt(subsResult.rows[0]?.cnt || '0');
-        } catch (e) { /* ignore */ }
 
         const calcChange = (current, previous) => {
           if (previous === 0 && current === 0) return '+0%';
@@ -3776,7 +3762,7 @@ Format: ["id1", "id2", "id3", ...]`;
           activeUsers: { value: activeUsersThisWeek, change: calcChange(activeUsersThisWeek, activeUsersPrevWeek) },
           sessionsToday: { value: sessionsToday, change: calcChange(sessionsToday, sessionsYesterday) },
           newSignups: { value: newSignupsThisMonth, change: calcChange(newSignupsThisMonth, newSignupsPrevMonth) },
-          revenue: { value: revenueThisMonth, change: calcChange(revenueThisMonth, revenuePrevMonth), subscriptions: activeSubscriptions },
+          aiSessions: { value: sessionsThisMonth, change: calcChange(sessionsThisMonth, sessionsPrevMonth) },
         };
 
         // --- RECENT ACTIVITY ---
@@ -3937,6 +3923,98 @@ Format: ["id1", "id2", "id3", ...]`;
         }
         const unreadCount = notifications.filter(n => !n.read).length;
 
+        // --- ACTION ITEMS ---
+        const actionItems = [];
+        if (unreadCount > 0) {
+          actionItems.push({
+            id: 'unread-notifs',
+            icon: 'bell',
+            label: `${unreadCount} ongelezen notificatie${unreadCount > 1 ? 's' : ''}`,
+            page: 'admin-notifications',
+            priority: 'high',
+          });
+        }
+        try {
+          const { count: pendingCorrections } = await supabaseAdmin
+            .from('admin_corrections')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'pending');
+          if (pendingCorrections > 0) {
+            actionItems.push({
+              id: 'pending-corrections',
+              icon: 'edit',
+              label: `${pendingCorrections} correctie${pendingCorrections > 1 ? 's' : ''} wacht${pendingCorrections === 1 ? '' : 'en'} op review`,
+              page: 'admin-config-review',
+              priority: 'high',
+            });
+          }
+        } catch (e) { /* admin_corrections may not exist */ }
+        if (newSignupsThisMonth > 0) {
+          actionItems.push({
+            id: 'new-signups',
+            icon: 'user-plus',
+            label: `${newSignupsThisMonth} nieuwe signup${newSignupsThisMonth > 1 ? 's' : ''} deze maand`,
+            page: 'admin-users',
+            priority: 'medium',
+          });
+        }
+
+        // --- COACHEES OVERVIEW ---
+        let coachees = [];
+        try {
+          const profilesRes = await supabaseAdmin.from('profiles')
+            .select('id, full_name, email, avatar_url, last_sign_in_at, created_at')
+            .order('last_sign_in_at', { ascending: false, nullsFirst: false })
+            .limit(20);
+          const allProfiles = profilesRes.data || [];
+
+          // Get session counts + avg scores per user
+          const { data: sessionsData } = await supabaseAdmin
+            .from('v2_sessions')
+            .select('user_id, total_score')
+            .eq('is_active', 1);
+          const sessionsByUser = {};
+          for (const s of (sessionsData || [])) {
+            if (!s.user_id) continue;
+            if (!sessionsByUser[s.user_id]) sessionsByUser[s.user_id] = { count: 0, scores: [] };
+            sessionsByUser[s.user_id].count++;
+            if (s.total_score > 0) sessionsByUser[s.user_id].scores.push(s.total_score);
+          }
+
+          const formatTimeAgoCoachee = (dateStr) => {
+            if (!dateStr) return 'Nooit';
+            const diff = now - new Date(dateStr);
+            const mins = Math.floor(diff / 60000);
+            if (mins < 60) return 'Zojuist';
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return 'Vandaag';
+            const days = Math.floor(hours / 24);
+            if (days === 1) return 'Gisteren';
+            if (days < 7) return `${days} dagen geleden`;
+            if (days < 30) return `${Math.floor(days / 7)} weken geleden`;
+            return `${Math.floor(days / 30)} maanden geleden`;
+          };
+
+          // Filter out admin emails
+          coachees = allProfiles
+            .filter(p => !p.email?.endsWith('@hugoherbots.com'))
+            .map(p => {
+              const stats = sessionsByUser[p.id] || { count: 0, scores: [] };
+              const avgScore = stats.scores.length > 0 ? Math.round(stats.scores.reduce((a, b) => a + b, 0) / stats.scores.length) : null;
+              return {
+                id: p.id,
+                name: p.full_name || p.email?.split('@')[0] || 'Onbekend',
+                email: p.email,
+                avatarUrl: p.avatar_url,
+                sessionCount: stats.count,
+                avgScore,
+                lastActive: formatTimeAgoCoachee(p.last_sign_in_at),
+              };
+            });
+        } catch (e) {
+          console.log('[Dashboard] Coachees error:', e.message);
+        }
+
         // --- TOP PERFORMING CONTENT ---
         let topContent = [];
         try {
@@ -3987,13 +4065,48 @@ Format: ["id1", "id2", "id3", ...]`;
           console.log('[Dashboard] Top content error:', e.message);
         }
 
+        // Feedback & Issues stats
+        let feedbackStats = { avgSessionRating: null, npsScore: null, recentFeedback: [], errorCount: 0 };
+        try {
+          const weekAgo = new Date(now.getTime() - 7 * 86400000).toISOString();
+
+          const [ratingsRes, npsRes, recentRes, errorsRes] = await Promise.all([
+            supabaseAdmin.from('platform_feedback').select('rating').eq('feedback_type', 'session_rating').not('rating', 'is', null),
+            supabaseAdmin.from('platform_nps').select('score'),
+            supabaseAdmin.from('platform_feedback').select('id, feedback_type, rating, comment, created_at').order('created_at', { ascending: false }).limit(5),
+            supabaseAdmin.from('frontend_errors').select('id', { count: 'exact', head: true }).gte('created_at', weekAgo),
+          ]);
+
+          if (ratingsRes.data && ratingsRes.data.length > 0) {
+            const avg = ratingsRes.data.reduce((sum, r) => sum + r.rating, 0) / ratingsRes.data.length;
+            feedbackStats.avgSessionRating = Math.round(avg * 10) / 10;
+          }
+          if (npsRes.data && npsRes.data.length > 0) {
+            const avg = npsRes.data.reduce((sum, r) => sum + r.score, 0) / npsRes.data.length;
+            feedbackStats.npsScore = Math.round(avg * 10) / 10;
+          }
+          feedbackStats.recentFeedback = (recentRes.data || []).map(f => ({
+            id: f.id,
+            type: f.feedback_type,
+            rating: f.rating,
+            comment: f.comment ? f.comment.substring(0, 100) : null,
+            date: f.created_at,
+          }));
+          feedbackStats.errorCount = errorsRes.count || 0;
+        } catch (e) {
+          console.log('[Dashboard] Feedback stats error:', e.message);
+        }
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           kpis,
+          actionItems,
+          coachees,
           recentActivity,
           notifications,
           unreadNotifications: unreadCount,
           topContent,
+          feedbackStats,
           generatedAt: now.toISOString(),
         }));
       } catch (err) {

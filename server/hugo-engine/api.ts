@@ -267,7 +267,10 @@ app.use('/api/v2/chat', aiLimiter);
 app.use('/api/v2/sessions', aiLimiter);
 app.use('/api/v2/roleplay', aiLimiter);
 app.use('/api/v2/analysis', (req, res, next) => {
-  if (req.path.startsWith('/upload') || req.path.startsWith('/inline')) return next();
+  // Skip rate-limit for non-AI endpoints (reads, uploads)
+  if (req.path.startsWith('/upload') || req.path.startsWith('/inline') ||
+      req.path.startsWith('/list') || req.path.startsWith('/results') ||
+      req.path.startsWith('/status') || req.path.startsWith('/percentile')) return next();
   return aiLimiter(req, res, next);
 });
 app.use('/api/chat', aiLimiter);
@@ -289,7 +292,7 @@ app.use((req, res, next) => {
 // JWT Authentication — applied to all /api/ routes with exemptions
 app.use('/api', (req: Request, res: Response, next: NextFunction) => {
   // Skip auth for health checks, Stripe webhooks, platform sync, and V3 status
-  const publicPaths = ['/health', '/stripe/webhook', '/v3/status'];
+  const publicPaths = ['/health', '/stripe/webhook', '/v3/status', '/feedback/error'];
   if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
     return next();
   }
@@ -4001,9 +4004,9 @@ app.post("/api/v2/analysis/chat-session", express.json(), async (req: Request, r
 
 app.get("/api/v2/analysis/list", async (req: Request, res: Response) => {
   try {
-    // Admins can filter by any userId; regular users only see their own analyses
-    const userId = req.isAdmin && req.query.userId
-      ? (req.query.userId as string)
+    // Admins see all analyses (optionally filtered by userId); regular users only see their own
+    const userId = req.isAdmin
+      ? (req.query.userId as string | undefined)
       : req.userId!;
     const source = req.query.source as string;
 
@@ -5620,6 +5623,95 @@ async function startServer() {
     } catch (err: any) {
       console.error('[Admin Video Proxy] Error:', err.message);
       res.status(502).json({ success: false, message: 'Video processor niet bereikbaar (poort 3001). Start de video-processor service.' });
+    }
+  });
+
+  // ============================================
+  // FEEDBACK ENDPOINTS
+  // ============================================
+
+  // POST /api/feedback/session-rating — Rate an AI chat session (1-5 stars)
+  app.post("/api/feedback/session-rating", async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId;
+      const { sessionId, rating, comment } = req.body;
+      if (!rating || rating < 1 || rating > 5) {
+        return res.status(400).json({ success: false, message: "Rating moet tussen 1 en 5 zijn" });
+      }
+      const { error } = await supabase.from("platform_feedback").insert({
+        user_id: userId,
+        session_id: sessionId || null,
+        rating,
+        comment: comment || null,
+        feedback_type: "session_rating",
+      });
+      if (error) throw error;
+      res.json({ success: true });
+    } catch (err: any) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  });
+
+  // POST /api/feedback/report — Bug report or suggestion
+  app.post("/api/feedback/report", async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId;
+      const { type, description } = req.body;
+      if (!description?.trim()) {
+        return res.status(400).json({ success: false, message: "Beschrijving is verplicht" });
+      }
+      const feedbackType = type === "bug_report" ? "bug_report" : type === "suggestion" ? "suggestion" : "general";
+      const { error } = await supabase.from("platform_feedback").insert({
+        user_id: userId,
+        feedback_type: feedbackType,
+        comment: description.trim(),
+      });
+      if (error) throw error;
+      res.json({ success: true });
+    } catch (err: any) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  });
+
+  // POST /api/feedback/nps — NPS survey response
+  app.post("/api/feedback/nps", async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId;
+      const { score, comment } = req.body;
+      if (score === undefined || score < 0 || score > 10) {
+        return res.status(400).json({ success: false, message: "Score moet tussen 0 en 10 zijn" });
+      }
+      const { error } = await supabase.from("platform_nps").insert({
+        user_id: userId,
+        score,
+        comment: comment || null,
+      });
+      if (error) throw error;
+      res.json({ success: true });
+    } catch (err: any) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  });
+
+  // POST /api/feedback/error — Log frontend error (automatic)
+  app.post("/api/feedback/error", async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId || null;
+      const { message, stack, url } = req.body;
+      if (!message) {
+        return res.status(400).json({ success: false, message: "Error message is verplicht" });
+      }
+      const { error } = await supabase.from("frontend_errors").insert({
+        user_id: userId,
+        error_message: message.slice(0, 2000),
+        error_stack: stack?.slice(0, 5000) || null,
+        url: url || null,
+        user_agent: req.headers["user-agent"] || null,
+      });
+      if (error) throw error;
+      res.json({ success: true });
+    } catch (err: any) {
+      res.status(500).json({ success: false, message: err.message });
     }
   });
 

@@ -179,7 +179,7 @@ export function MySessions({ navigate }: MySessionsProps) {
                 <TableRow
                   key={session.id}
                   className="cursor-pointer hover:bg-hh-ui-50"
-                  onClick={() => { /* TODO: implement session detail view */ }}
+                  onClick={() => navigate?.("talk-to-hugo")}
                 >
                   <TableCell>
                     <div>

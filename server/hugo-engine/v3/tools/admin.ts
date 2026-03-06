@@ -430,6 +430,65 @@ export const adminToolDefinitions: Anthropic.Tool[] = [
       required: [],
     },
   },
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // ONBOARDING TOOLS (27-29)
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  // ── 27. get_onboarding_status ────────────────────────────────────────────────
+  {
+    name: "get_onboarding_status",
+    description:
+      "Haal de onboarding-status op: hoeveel technieken en houdingen zijn al gereviewd door Hugo.",
+    input_schema: {
+      type: "object" as const,
+      properties: {},
+      required: [],
+    },
+  },
+  // ── 28. get_next_review_item ─────────────────────────────────────────────────
+  {
+    name: "get_next_review_item",
+    description:
+      "Haal het volgende item op dat Hugo moet reviewen (techniek of houding). Toont alle details voor presentatie.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        module: {
+          type: "string",
+          enum: ["technieken", "houdingen"],
+          description:
+            "Welke module ophalen. Laat leeg voor het eerstvolgende pending item over alle modules.",
+        },
+      },
+      required: [],
+    },
+  },
+  // ── 29. submit_review ────────────────────────────────────────────────────────
+  {
+    name: "submit_review",
+    description:
+      "Registreer Hugo's oordeel over een onboarding-item: goedkeuren, feedback geven, of overslaan.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        item_key: {
+          type: "string",
+          description: "De key van het item (bijv. '2.1' voor een techniek, 'positief' voor een houding)",
+        },
+        action: {
+          type: "string",
+          enum: ["approved", "feedback", "skipped"],
+          description: "Hugo's beslissing: approved, feedback (met tekst), of skipped",
+        },
+        feedback_text: {
+          type: "string",
+          description: "Hugo's feedback of correctie (alleen bij action='feedback')",
+        },
+      },
+      required: ["item_key", "action"],
+    },
+  },
 ];
 
 // ── Tool name registry ───────────────────────────────────────────────────────
@@ -440,13 +499,22 @@ export const ADMIN_TOOLS: Set<string> = new Set(
 
 // ── Cached config loaders ────────────────────────────────────────────────────
 
-let cachedTechniques: any[] | null = null;
+let cachedTechniques: any = null;
 
-function loadTechniques(): any[] {
+function loadTechniques(): any {
   if (cachedTechniques) return cachedTechniques;
   const techPath = join(process.cwd(), "config/ssot/technieken_index.json");
   cachedTechniques = JSON.parse(readFileSync(techPath, "utf-8"));
   return cachedTechniques;
+}
+
+let cachedHoudingen: any = null;
+
+function loadHoudingen(): any {
+  if (cachedHoudingen) return cachedHoudingen;
+  const houdPath = join(process.cwd(), "config/klant_houdingen.json");
+  cachedHoudingen = JSON.parse(readFileSync(houdPath, "utf-8"));
+  return cachedHoudingen;
 }
 
 // ── Main executor ────────────────────────────────────────────────────────────
@@ -509,6 +577,12 @@ export async function executeAdminTool(
         return await execGenerateSummaryReport(input.period);
       case "get_technique_usage_trends":
         return await execGetTechniqueUsageTrends();
+      case "get_onboarding_status":
+        return await execGetOnboardingStatus();
+      case "get_next_review_item":
+        return await execGetNextReviewItem(input.module);
+      case "submit_review":
+        return await execSubmitReview(input.item_key, input.action, input.feedback_text);
       default:
         return JSON.stringify({ error: `Onbekende admin tool: ${name}` });
     }
@@ -1189,5 +1263,218 @@ async function execGetTechniqueUsageTrends(): Promise<string> {
     return JSON.stringify({ trends: result.rows });
   } catch (err: any) {
     return JSON.stringify({ error: `Techniek trends ophalen mislukt: ${err.message}` });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ONBOARDING TOOL EXECUTORS (27-29)
+// ══════════════════════════════════════════════════════════════════════════════
+
+const ADMIN_USER_ID = "stephane@hugoherbots.com";
+
+async function ensureOnboardingSeed(): Promise<void> {
+  const { rows } = await pool.query(
+    `SELECT COUNT(*) as count FROM admin_onboarding_progress WHERE admin_user_id = $1`,
+    [ADMIN_USER_ID]
+  );
+  if (parseInt(rows[0].count, 10) > 0) return;
+
+  // Seed all techniques
+  const techData = loadTechniques();
+  const technieken = techData.technieken || techData;
+  for (const [key, tech] of Object.entries(technieken) as [string, any][]) {
+    await pool.query(
+      `INSERT INTO admin_onboarding_progress (admin_user_id, module, item_key, item_name, status)
+       VALUES ($1, 'technieken', $2, $3, 'pending')
+       ON CONFLICT (admin_user_id, module, item_key) DO NOTHING`,
+      [ADMIN_USER_ID, key, tech.naam || key]
+    );
+  }
+
+  // Seed all houdingen
+  const houdData = loadHoudingen();
+  const houdingen = houdData.houdingen || houdData;
+  for (const [key, houd] of Object.entries(houdingen) as [string, any][]) {
+    await pool.query(
+      `INSERT INTO admin_onboarding_progress (admin_user_id, module, item_key, item_name, status)
+       VALUES ($1, 'houdingen', $2, $3, 'pending')
+       ON CONFLICT (admin_user_id, module, item_key) DO NOTHING`,
+      [ADMIN_USER_ID, key, houd.naam || key]
+    );
+  }
+}
+
+// 27. get_onboarding_status
+async function execGetOnboardingStatus(): Promise<string> {
+  try {
+    await ensureOnboardingSeed();
+
+    const result = await pool.query(
+      `SELECT module, status, COUNT(*) as count
+       FROM admin_onboarding_progress
+       WHERE admin_user_id = $1
+       GROUP BY module, status
+       ORDER BY module, status`,
+      [ADMIN_USER_ID]
+    );
+
+    const modules: Record<string, Record<string, number>> = {};
+    let total = 0;
+    let approved = 0;
+    let skipped = 0;
+    let feedback = 0;
+    let pending = 0;
+
+    for (const row of result.rows) {
+      if (!modules[row.module]) modules[row.module] = {};
+      const count = parseInt(row.count, 10);
+      modules[row.module][row.status] = count;
+      total += count;
+      if (row.status === "approved") approved += count;
+      else if (row.status === "skipped") skipped += count;
+      else if (row.status === "feedback") feedback += count;
+      else pending += count;
+    }
+
+    return JSON.stringify({
+      total,
+      approved,
+      skipped,
+      feedback_given: feedback,
+      pending,
+      isComplete: pending === 0 && total > 0,
+      modules,
+    });
+  } catch (err: any) {
+    return JSON.stringify({ error: `Onboarding status ophalen mislukt: ${err.message}` });
+  }
+}
+
+// 28. get_next_review_item
+async function execGetNextReviewItem(module?: string): Promise<string> {
+  try {
+    await ensureOnboardingSeed();
+
+    let query = `SELECT module, item_key, item_name
+       FROM admin_onboarding_progress
+       WHERE admin_user_id = $1 AND status = 'pending'`;
+    const params: any[] = [ADMIN_USER_ID];
+
+    if (module) {
+      query += ` AND module = $2`;
+      params.push(module);
+    }
+    query += ` ORDER BY module, item_key LIMIT 1`;
+
+    const { rows } = await pool.query(query, params);
+    if (rows.length === 0) {
+      return JSON.stringify({
+        done: true,
+        message: module
+          ? `Alle ${module} zijn al gereviewd.`
+          : "Alle onboarding items zijn gereviewd!",
+      });
+    }
+
+    const item = rows[0];
+    let itemData: any = null;
+    let itemNumber = 0;
+    let totalInModule = 0;
+
+    // Count position
+    const countResult = await pool.query(
+      `SELECT COUNT(*) as total FROM admin_onboarding_progress WHERE admin_user_id = $1 AND module = $2`,
+      [ADMIN_USER_ID, item.module]
+    );
+    totalInModule = parseInt(countResult.rows[0].total, 10);
+
+    const posResult = await pool.query(
+      `SELECT COUNT(*) as pos FROM admin_onboarding_progress
+       WHERE admin_user_id = $1 AND module = $2 AND status != 'pending'`,
+      [ADMIN_USER_ID, item.module]
+    );
+    itemNumber = parseInt(posResult.rows[0].pos, 10) + 1;
+
+    // Load item data from config
+    if (item.module === "technieken") {
+      const techData = loadTechniques();
+      const technieken = techData.technieken || techData;
+      itemData = technieken[item.item_key];
+    } else if (item.module === "houdingen") {
+      const houdData = loadHoudingen();
+      const houdingen = houdData.houdingen || houdData;
+      itemData = houdingen[item.item_key];
+    }
+
+    return JSON.stringify({
+      type: item.module,
+      key: item.item_key,
+      name: item.item_name,
+      itemNumber,
+      totalInModule,
+      data: itemData || { error: `Data voor '${item.item_key}' niet gevonden in config.` },
+    });
+  } catch (err: any) {
+    return JSON.stringify({ error: `Volgend review item ophalen mislukt: ${err.message}` });
+  }
+}
+
+// 29. submit_review
+async function execSubmitReview(
+  itemKey: string,
+  action: string,
+  feedbackText?: string
+): Promise<string> {
+  try {
+    const validActions = ["approved", "feedback", "skipped"];
+    if (!validActions.includes(action)) {
+      return JSON.stringify({ error: `Ongeldige actie: ${action}. Gebruik: ${validActions.join(", ")}` });
+    }
+
+    const status = action === "feedback" ? "feedback" : action;
+
+    await pool.query(
+      `UPDATE admin_onboarding_progress
+       SET status = $1, feedback_text = $2, reviewed_at = NOW()
+       WHERE admin_user_id = $3 AND item_key = $4`,
+      [status, feedbackText || null, ADMIN_USER_ID, itemKey]
+    );
+
+    // If feedback, also store as admin_correction
+    if (action === "feedback" && feedbackText) {
+      try {
+        const corrResult = await pool.query(
+          `INSERT INTO admin_corrections (admin_user_id, category, original_text, corrected_text, context)
+           VALUES ($1, 'onboarding_review', $2, $3, $4)
+           RETURNING id`,
+          [ADMIN_USER_ID, `Item: ${itemKey}`, feedbackText, `Onboarding review feedback for ${itemKey}`]
+        );
+        if (corrResult.rows[0]) {
+          await pool.query(
+            `UPDATE admin_onboarding_progress SET correction_id = $1 WHERE admin_user_id = $2 AND item_key = $3`,
+            [corrResult.rows[0].id, ADMIN_USER_ID, itemKey]
+          );
+        }
+      } catch {
+        // admin_corrections table might not exist yet, continue
+      }
+    }
+
+    // Count remaining
+    const remaining = await pool.query(
+      `SELECT COUNT(*) as count FROM admin_onboarding_progress WHERE admin_user_id = $1 AND status = 'pending'`,
+      [ADMIN_USER_ID]
+    );
+    const remainingCount = parseInt(remaining.rows[0].count, 10);
+
+    return JSON.stringify({
+      success: true,
+      item_key: itemKey,
+      action,
+      remaining: remainingCount,
+      isComplete: remainingCount === 0,
+    });
+  } catch (err: any) {
+    return JSON.stringify({ error: `Review opslaan mislukt: ${err.message}` });
   }
 }

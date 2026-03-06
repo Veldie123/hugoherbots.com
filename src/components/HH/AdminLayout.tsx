@@ -236,97 +236,71 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
     return subPageMapping[currentPage] === itemId;
   };
 
-  const markAsRead = (id: string) => {
-    // Simulate marking a notification as read
-    const newCount = unreadCount > 0 ? unreadCount - 1 : 0;
-    setUnreadCount(newCount);
-  };
+  const [notifications, setNotifications] = useState<Array<{
+    id: string; title: string; message: string; time: string;
+    type: string; severity?: string; read: boolean;
+  }>>([]);
 
-  const markAllAsRead = () => {
-    // Simulate marking all notifications as read
-    setUnreadCount(0);
-  };
-
-  const allNotifications = [
-    {
-      id: "rag-review",
-      title: "RAG techniek review vraagt jouw aandacht",
-      message: "Er zijn nieuwe technieksuggesties die je moet reviewen",
-      time: "nu",
-      type: "rag",
-      severity: "medium",
-      read: false,
-      superAdminOnly: true,
-    },
-    {
-      id: "config-1",
-      title: "Technique 2.1 has no detector configuration",
-      message: "Missing detector entry for technique 2.1",
-      time: "2u geleden",
-      type: "config",
-      severity: "high",
-      read: false,
-      superAdminOnly: true,
-    },
-    {
-      id: "config-2",
-      title: "Pattern mismatch for technique 3.2",
-      message: "Current patterns are too broad and trigger false positives",
-      time: "5u geleden",
-      type: "config",
-      severity: "medium",
-      read: false,
-      superAdminOnly: true,
-    },
-    {
-      id: "config-3",
-      title: "Invalid phase transition detected",
-      message: "AI attempted to transition to phase 5 which doesn't exist",
-      time: "1d geleden",
-      type: "config",
-      severity: "high",
-      read: false,
-      superAdminOnly: true,
-    },
-    {
-      id: "1",
-      title: "Nieuwe upload: Discovery Technieken",
-      message: "Jan de Vries heeft een nieuwe transcript geüpload",
-      time: "5 min geleden",
-      type: "video",
-      read: false,
-    },
-    {
-      id: "2",
-      title: "Live sessie gestart",
-      message: '"SPIN Questioning Workshop" is nu live',
-      time: "12 min geleden",
-      type: "video",
-      read: false,
-    },
-    {
-      id: "3",
-      title: "Nieuwe gebruiker geregistreerd",
-      message: "Sarah van Dijk - Acme Inc",
-      time: "1 uur geleden",
-      type: "user",
-      read: false,
-    },
-    {
-      id: "4",
-      title: "Video processing voltooid",
-      message: '"Objection Handling Masterclass" is nu beschikbaar',
-      time: "3 uur geleden",
-      type: "video",
-      read: true,
-    },
-  ].filter((n): n is typeof n & { superAdminOnly?: boolean } => isSuperAdminProp || !n.superAdminOnly);
-  const notifications = allNotifications;
-
-  // Set initial unread count based on filtered notifications
   useEffect(() => {
-    setUnreadCount(allNotifications.filter(n => !n.read).length);
-  }, [isSuperAdminProp]); // eslint-disable-line react-hooks/exhaustive-deps
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch('/api/v2/admin/notifications', {
+          headers: await getAuthHeaders(),
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const items = (data.notifications || []).slice(0, 20).map((n: any) => ({
+          id: String(n.id),
+          title: n.title,
+          message: n.message || '',
+          time: formatTimeAgo(n.created_at),
+          type: n.type === 'correction_submitted' ? 'config'
+            : n.type === 'chat_feedback' ? 'user'
+            : n.type === 'onboarding_feedback' ? 'config'
+            : 'info',
+          severity: n.severity === 'warning' ? 'medium' : n.severity === 'critical' ? 'high' : undefined,
+          read: n.read || false,
+        }));
+        setNotifications(items);
+        setUnreadCount(items.filter((n: any) => !n.read).length);
+      } catch { }
+    };
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  function formatTimeAgo(dateStr: string): string {
+    const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+    if (diff < 60) return "Zojuist";
+    if (diff < 3600) return `${Math.floor(diff / 60)} min geleden`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}u geleden`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)}d geleden`;
+    return new Date(dateStr).toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
+  }
+
+  const markAsRead = async (id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+    try {
+      await fetch(`/api/v2/admin/notifications/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read: true }),
+      });
+    } catch { }
+  };
+
+  const markAllAsRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setUnreadCount(0);
+    try {
+      await fetch('/api/v2/admin/notifications/read-all', {
+        method: 'PATCH',
+        headers: await getAuthHeaders(),
+      });
+    } catch { }
+  };
 
   return (
     <div className="admin-session flex h-screen bg-hh-bg">

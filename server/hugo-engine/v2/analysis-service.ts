@@ -231,14 +231,8 @@ function deduplicateSegments(segments: WhisperSegment[]): WhisperSegment[] {
   return segments.filter((seg, i) => {
     if (i === 0) return true;
     const prev = segments[i - 1];
-    if (seg.text === prev.text) return false;
-    const words = seg.text.split(/\s+/);
-    const prevWords = prev.text.split(/\s+/);
-    if (words.length > 3) {
-      const overlap = words.filter(w => prevWords.includes(w)).length;
-      if (overlap / words.length > 0.8) return false;
-    }
-    return true;
+    // Only remove exact text duplicates (true Whisper hallucination repeats identical text)
+    return seg.text !== prev.text;
   });
 }
 

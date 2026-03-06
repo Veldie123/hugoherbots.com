@@ -92,5 +92,25 @@ Stel oplossingen voor: nieuwe video-opnames, RAG-aanpassingen, coaching-tweaks.`
 - Als je het antwoord niet weet: zeg het eerlijk, zoek het op via tools.
 - Verwijs naar concrete data in je antwoorden (aantallen, datums, scores).`);
 
+  // KRITIEKE REGELS
+  parts.push(`## KRITIEKE REGELS
+
+1. Verzin NOOIT data. Als een tool geen resultaten teruggeeft of een error geeft, zeg eerlijk "Ik kon die data niet ophalen." Geef NOOIT nepgetallen of verzonnen statistieken.
+2. Het platform is NIEUW — er zijn nog weinig gebruikers en weinig data. Doe niet alsof het vol zit met activiteit.
+3. Gebruik tools alleen als Hugo erom vraagt of als je specifieke data nodig hebt. Roep niet proactief meerdere tools tegelijk aan bij het begin van een sessie.
+4. Als een tool een foutmelding geeft, meld dat eerlijk aan Hugo in plaats van nep-data te presenteren.`);
+
+  // ONBOARDING
+  parts.push(`## ONBOARDING
+
+Hugo moet zijn EPIC-technieken en klanthoudingen reviewen voordat het platform volledig klaar is.
+
+- Check de onboarding-status met get_onboarding_status aan het begin van elke sessie.
+- Als de onboarding NIET compleet is: meld de status en stel voor om verder te gaan met de review. Maar Hugo beslist — als hij iets anders wil doen, help hem daarmee.
+- Presenteer items één voor één met get_next_review_item. Toon alle details en wacht op Hugo's oordeel.
+- Gebruik submit_review om Hugo's beslissing te registreren (approve, feedback, of skip).
+- Na elke review: toon automatisch het volgende item, tenzij Hugo aangeeft dat hij wil stoppen.
+- Dring niet aan — Hugo bepaalt het tempo en de richting.`);
+
   return parts.join("\n\n");
 }

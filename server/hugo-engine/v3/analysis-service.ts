@@ -211,19 +211,36 @@ Antwoord als JSON array:
   }
 ]`;
 
-  const result = await callClaude(
-    systemPrompt,
-    `TRANSCRIPT:\n${transcriptContext}\n\nClassificeer alle klant-turns (${customerTurns.map((t) => t.idx).join(", ")}).`,
-    2000
-  );
+  // Chunk customer turns to avoid JSON output truncation (same pattern as evaluateSellerTurnsV3)
+  const CHUNK_SIZE = 25;
+  const allSignals: CustomerSignalResult[] = [];
 
-  const parsed = parseJSON<CustomerSignalResult[]>(result, []);
+  console.log(`[V3 Analysis] Classifying ${customerTurns.length} customer turns in chunks of ${CHUNK_SIZE}`);
 
-  // Ensure all customer turns have signals
-  const signalledIdxs = new Set(parsed.map((s) => s.turnIdx));
+  for (let i = 0; i < customerTurns.length; i += CHUNK_SIZE) {
+    const chunk = customerTurns.slice(i, i + CHUNK_SIZE);
+    const chunkIdxs = chunk.map((t) => t.idx);
+    const chunkNum = Math.floor(i / CHUNK_SIZE) + 1;
+    const totalChunks = Math.ceil(customerTurns.length / CHUNK_SIZE);
+
+    console.log(`[V3 Analysis] Signal chunk ${chunkNum}/${totalChunks}: turns ${chunkIdxs[0]}-${chunkIdxs[chunkIdxs.length - 1]}`);
+
+    const result = await callClaude(
+      systemPrompt,
+      `TRANSCRIPT:\n${transcriptContext}\n\nClassificeer ALLEEN deze klant-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
+      4096
+    );
+
+    const parsed = parseJSON<CustomerSignalResult[]>(result, []);
+    console.log(`[V3 Analysis] Signal chunk ${chunkNum}: ${parsed.length} signals returned`);
+    allSignals.push(...parsed);
+  }
+
+  // Ensure all customer turns have signals (fallback for missed ones)
+  const signalledIdxs = new Set(allSignals.map((s) => s.turnIdx));
   for (const turn of customerTurns) {
     if (!signalledIdxs.has(turn.idx)) {
-      parsed.push({
+      allSignals.push({
         turnIdx: turn.idx,
         houding: "neutraal",
         confidence: 0.5,
@@ -233,7 +250,7 @@ Antwoord als JSON array:
     }
   }
 
-  return parsed.sort((a, b) => a.turnIdx - b.turnIdx);
+  return allSignals.sort((a, b) => a.turnIdx - b.turnIdx);
 }
 
 // ── V3 Detect Missed Opportunities ──────────────────────────────────────────

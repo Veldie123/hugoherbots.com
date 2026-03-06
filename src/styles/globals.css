@@ -185,6 +185,17 @@
   --hh-primary-rgb: 126, 34, 206;
 }
 
+/* Dashboard card sizing — bypasses Tailwind v4 JIT not generating base w-[160px] */
+.dashboard-card {
+  width: 200px;
+  flex-shrink: 0;
+}
+@media (max-width: 639px) {
+  .dashboard-card {
+    width: 160px;
+  }
+}
+
 /* Radix portals (Dialog, AlertDialog, Select) inherit admin purple theme */
 body:has(.admin-session) [data-radix-portal] {
   --hh-primary: #7e22ce;

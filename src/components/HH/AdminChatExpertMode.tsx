@@ -252,6 +252,10 @@ export function AdminChatExpertMode({
   const [engineModel, setEngineModel] = useState<EngineModel>(isSuperAdmin ? "v3" : "v2");
   const [sessionRestartKey, setSessionRestartKey] = useState(0);
 
+  // V3 session persistence keys
+  const V3_SESSION_KEY = "v3_admin_sessionId";
+  const V3_MESSAGES_KEY = "v3_admin_messages";
+
   // Sync engine model to hugoApi
   useEffect(() => {
     hugoApi.setV3Mode(engineModel === "v3");
@@ -264,6 +268,8 @@ export function AdminChatExpertMode({
     setMessages([]);
     setHasActiveSession(false);
     hugoApi.setCurrentSessionId(null);
+    localStorage.removeItem(V3_SESSION_KEY);
+    localStorage.removeItem(V3_MESSAGES_KEY);
     setSessionRestartKey(prev => prev + 1);
   }, []);
 
@@ -282,6 +288,18 @@ export function AdminChatExpertMode({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // V3 session persistence: save messages to localStorage
+  useEffect(() => {
+    if (engineModel !== "v3" || messages.length === 0) return;
+    const sessionId = hugoApi.getCurrentSessionId();
+    if (sessionId) {
+      localStorage.setItem(V3_SESSION_KEY, sessionId);
+      localStorage.setItem(V3_MESSAGES_KEY, JSON.stringify(
+        messages.map(m => ({ id: m.id, sender: m.sender, text: m.text, timestamp: m.timestamp }))
+      ));
+    }
+  }, [messages, engineModel]);
 
   // Load user's current competence level on mount (auto-adaptive system)
   useEffect(() => {
@@ -383,6 +401,37 @@ export function AdminChatExpertMode({
     }
 
     if (!practiceRaw) {
+      // V3 session restore from localStorage
+      if (engineModel === "v3") {
+        const savedSessionId = localStorage.getItem(V3_SESSION_KEY);
+        const savedMessages = localStorage.getItem(V3_MESSAGES_KEY);
+        if (savedSessionId && savedMessages) {
+          (async () => {
+            try {
+              const { data: sessionData } = await supabase.auth.getSession();
+              const authToken = sessionData?.session?.access_token;
+              const headers: Record<string, string> = { "Content-Type": "application/json" };
+              if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
+
+              const res = await fetch(`/api/v3/session/${savedSessionId}`, { headers });
+              if (res.ok) {
+                const parsed = JSON.parse(savedMessages);
+                setMessages(parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) })));
+                setHasActiveSession(true);
+                hugoApi.setCurrentSessionId(savedSessionId);
+                hugoApi.setV3Mode(true);
+                return;
+              }
+            } catch {
+              // Session expired or server restarted — start fresh
+            }
+            localStorage.removeItem(V3_SESSION_KEY);
+            localStorage.removeItem(V3_MESSAGES_KEY);
+          })();
+          return () => { cancelled = true; };
+        }
+      }
+
       (async () => {
         try {
           setIsLoading(true);
@@ -445,7 +494,7 @@ export function AdminChatExpertMode({
             sender: "ai",
             text: engineModel === "v3"
               ? "V3 sessie kon niet gestart worden. Controleer de server logs of schakel terug naar HugoGPT v1.0."
-              : "Dag Hugo! Waar kan ik je vandaag mee helpen? Je kunt direct beginnen met chatten, of selecteer een techniek via het E.P.I.C. TECHNIQUE menu.",
+              : "Dag Hugo! Waar kan ik je vandaag mee helpen? Je kunt vragen stellen over het platform, analyses bekijken, webinars beheren, of je content reviewen.",
             timestamp: new Date(),
           }]);
         } finally {

@@ -4,9 +4,60 @@
     "total_videos": 47
   },
   "videos": {
+    "MVI_0916.MP4": {
+      "id": "8b1a87f7-ac60-4c65-94e7-bc3823025f2b",
+      "title": "Hoe je twijfels omzet in waardevolle inzichten",
+      "file_name": "MVI_0916.MP4",
+      "fase": 4,
+      "techniek": "4.2.2",
+      "techniek_naam": "",
+      "techniek_source": "ai",
+      "ai_confidence": 0.7119,
+      "duration_seconds": 331,
+      "status": "completed",
+      "has_transcript": true,
+      "has_mux": true,
+      "mux_playback_id": "knwmMrZPqm87YDCuQq17d2fnKbzk023ksEypg027Heoys",
+      "is_hidden": false,
+      "user_ready": true
+    },
+    "MVI_0569.MP4": {
+      "id": "f8cf1dff-792e-4766-bb1c-f3f319d48b47",
+      "title": "Verkoopstijl afstemmen op klantgedrag",
+      "file_name": "MVI_0569.MP4",
+      "fase": 2,
+      "techniek": "2.1.1.7",
+      "techniek_naam": "",
+      "techniek_source": "ai",
+      "ai_confidence": 0.611,
+      "duration_seconds": 190,
+      "status": "completed",
+      "has_transcript": true,
+      "has_mux": true,
+      "mux_playback_id": "u01bZt01C2uW7wznFYAFXfPYhX7WugrGWZ006WiGo1UXCY",
+      "is_hidden": false,
+      "user_ready": true
+    },
+    "MVI_1039.MP4": {
+      "id": "5973f3f2-8617-4b0f-bb84-0bfd6c15d53a",
+      "title": "Bezorgdheden van klanten bevragen met EPICC techniek",
+      "file_name": "MVI_1039.MP4",
+      "fase": 2,
+      "techniek": "2.4",
+      "techniek_naam": "",
+      "techniek_source": "ai",
+      "ai_confidence": 0.6614,
+      "duration_seconds": null,
+      "status": "completed",
+      "has_transcript": true,
+      "has_mux": true,
+      "mux_playback_id": "ylDJIDwTlNv5Hkj502IWVJuEv81601o00tutGPBPYCpbRs",
+      "is_hidden": false,
+      "user_ready": true
+    },
     "MVI_1012.MP4": {
       "id": "bf6cfa8a-123b-48a1-94b0-e40bacc4f297",
-      "title": "De EPICC-techniek voor alternatieven verkennen",
+      "title": "EPICC-techniek voor alternatieven verkennen",
       "file_name": "MVI_1012.MP4",
       "fase": "2",
       "techniek": "2.1.1.5",
@@ -40,7 +91,7 @@
     },
     "MVI_1013.MP4": {
       "id": "e35a1397-65d1-4ad5-b1c0-7950c8e86397",
-      "title": "Hoe je de motivatie van de prospect achterhaalt",
+      "title": "Hoe je motivatie van de prospect achterhaalt",
       "file_name": "MVI_1013.MP4",
       "fase": "2",
       "techniek": "2.1.1.6",
@@ -55,26 +106,9 @@
       "is_hidden": false,
       "user_ready": true
     },
-    "MVI_0916.MP4": {
-      "id": "8b1a87f7-ac60-4c65-94e7-bc3823025f2b",
-      "title": "Twijfel van klanten herkennen en analyseren",
-      "file_name": "MVI_0916.MP4",
-      "fase": 4,
-      "techniek": "4.2.2",
-      "techniek_naam": "",
-      "techniek_source": "ai",
-      "ai_confidence": 0.7119,
-      "duration_seconds": 331,
-      "status": "completed",
-      "has_transcript": true,
-      "has_mux": true,
-      "mux_playback_id": "knwmMrZPqm87YDCuQq17d2fnKbzk023ksEypg027Heoys",
-      "is_hidden": false,
-      "user_ready": true
-    },
     "MVI_0921.MP4": {
       "id": "a1bb295c-be30-4b72-861a-963a1389a5fe",
-      "title": "Bezwaren achterhalen door exploratievragen",
+      "title": "Uitstelgedrag bij klanten achterhalen met vragen",
       "file_name": "MVI_0921.MP4",
       "fase": 4,
       "techniek": "4.2.3",
@@ -91,7 +125,7 @@
     },
     "MVI_0908.MP4": {
       "id": "99fe2ed2-8fae-47dc-9d49-4f83a44243a3",
-      "title": "Waarom klanten afritten nemen in verkoopgesprekken",
+      "title": "Afritten in verkoopgesprekken vermijden",
       "file_name": "MVI_0908.MP4",
       "fase": 4,
       "techniek": "4.1",
@@ -108,7 +142,7 @@
     },
     "MVI_0672.MP4": {
       "id": "ea684507-43b1-4f3a-9134-1e504ca4b0cc",
-      "title": "Wil, skill en dril in verkoop benutten",
+      "title": "Wil, skill en dril voor salesucces",
       "file_name": "MVI_0672.MP4",
       "fase": "4",
       "techniek": "0.4",
@@ -125,7 +159,7 @@
     },
     "MVI_0572.MP4": {
       "id": "c68ae4e1-86c0-4811-8675-6f56a7cdf184",
-      "title": "Waarom waarde creëren essentieel is voor verkoop",
+      "title": "Waarom waarde creëren cruciaal is voor verkoop",
       "file_name": "MVI_0572.MP4",
       "fase": 4,
       "techniek": "4.3.3",
@@ -142,7 +176,7 @@
     },
     "MVI_0538.MP4": {
       "id": "37d8f233-3bdf-4f92-8f28-d9212101df1b",
-      "title": "De pre-contactfase: cruciaal voor sales succes",
+      "title": "Effectieve voorbereiding in de pre-contactfase",
       "file_name": "MVI_0538.MP4",
       "fase": "0",
       "techniek": "0.1",
@@ -176,7 +210,7 @@
     },
     "MVI_0915.MP4": {
       "id": "6c615fd9-30b0-43dc-a821-37df7acfe0e1",
-      "title": "Proefafsluiting en vragen effectief sturen",
+      "title": "Proefafsluiting in fase vier toepassen",
       "file_name": "MVI_0915.MP4",
       "fase": 4,
       "techniek": "4.2.1",
@@ -193,7 +227,7 @@
     },
     "MVI_0957.MP4": {
       "id": "fc83aad1-893d-491f-8dff-669a5f6595cb",
-      "title": "Terzijdeschuiven bij hoge verwachtingen",
+      "title": "Terzijdeschuiven in de exploratiefase",
       "file_name": "MVI_0957.MP4",
       "fase": "2",
       "techniek": "2.1.4",
@@ -210,7 +244,7 @@
     },
     "MVI_0997.MP4": {
       "id": "edc6c38d-07a8-4244-aa14-a54a5973cb1a",
-      "title": "Creëer een goed gespreksklimaat bij verkoopgesprekken",
+      "title": "Hoe je het gespreksklimaat creëert",
       "file_name": "MVI_0997.MP4",
       "fase": "2",
       "techniek": "2.1.1.4",
@@ -227,7 +261,7 @@
     },
     "MVI_0927.MP4": {
       "id": "c0ffe2ce-cac9-44b1-9052-fac4c5a49b60",
-      "title": "Bezwaren analyseren en isoleren",
+      "title": "Bezwaren analyseren en neutraliseren in verkoopgesprekken",
       "file_name": "MVI_0927.MP4",
       "fase": 4,
       "techniek": "4.2.4",
@@ -244,7 +278,7 @@
     },
     "MVI_0936.MP4": {
       "id": "1f6e1dd4-469b-42e3-a78d-2e56f9574b46",
-      "title": "Wat is de EPIC-techniek voor verkoop?",
+      "title": "De EPIC-techniek voor effectieve verkoopgesprekken",
       "file_name": "MVI_0936.MP4",
       "fase": "2",
       "techniek": "2.1",
@@ -261,7 +295,7 @@
     },
     "MVI_0950.MP4": {
       "id": "2d8912cf-c134-4a79-be18-0b71c63a9a7f",
-      "title": "Hoe je meningsgerichte vragen stelt",
+      "title": "Waarom meningsgerichte vragen zo belangrijk zijn",
       "file_name": "MVI_0950.MP4",
       "fase": "2",
       "techniek": "2.1.2",
@@ -278,7 +312,7 @@
     },
     "MVI_0565.MP4": {
       "id": "7642d2bc-1c59-4deb-beb6-5cc749c80e85",
-      "title": "Begeleiden in het aankoopproces van klanten",
+      "title": "Hoe je de buying clock begrijpt in verkoop",
       "file_name": "MVI_0565.MP4",
       "fase": 4,
       "techniek": "4.2.3",
@@ -295,7 +329,7 @@
     },
     "MVI_0568.MP4": {
       "id": "967fbf0a-5e1c-44a9-a6eb-ccd3d0742fbc",
-      "title": "Herkennen van sociale gedragsstijlen in verkoopgesprekken",
+      "title": "Herken de sociale gedragsstijlen van klanten",
       "file_name": "MVI_0568.MP4",
       "fase": 1,
       "techniek": "1.1",
@@ -312,7 +346,7 @@
     },
     "MVI_0940.MP4": {
       "id": "63b53b2e-9823-4560-9113-54ec4203154a",
-      "title": "Feitgerichte vragen voor effectieve situatieanalyse",
+      "title": "Feitgerichte vragen voor een sterke situatieanalyse",
       "file_name": "MVI_0940.MP4",
       "fase": "2",
       "techniek": "2.1.1",
@@ -329,7 +363,7 @@
     },
     "MVI_0972.MP4": {
       "id": "1a413f36-c276-4872-9be5-08e55b5e9079",
-      "title": "De EPICC-techniek stap voor stap uitleggen",
+      "title": "De EPICC-techniek voor effectieve verkoopgesprekken",
       "file_name": "MVI_0972.MP4",
       "fase": "2",
       "techniek": "2.4",
@@ -344,26 +378,9 @@
       "is_hidden": false,
       "user_ready": true
     },
-    "MVI_0526.MP4": {
-      "id": "3c69ad28-f85f-4c3c-b384-f8f0fabb9e98",
-      "title": "De E.P.I.C technique in de praktijk",
-      "file_name": "MVI_0526.MP4",
-      "fase": 1,
-      "techniek": "1.3",
-      "techniek_naam": "",
-      "techniek_source": "ai",
-      "ai_confidence": 0.6126,
-      "duration_seconds": 123,
-      "status": "completed",
-      "has_transcript": true,
-      "has_mux": true,
-      "mux_playback_id": "emd6CnZRydWmPFkn45yWmtX9e8ilzROPHvAepriR8KI",
-      "is_hidden": false,
-      "user_ready": true
-    },
     "MVI_1011.MP4": {
       "id": "e6a2d4ea-1dba-48b3-b645-81853454ef58",
-      "title": "Verken de verwachtingen van je klant",
+      "title": "Verkenning van klantverwachtingen in fase 2",
       "file_name": "MVI_1011.MP4",
       "fase": "2",
       "techniek": "2.1.1.4",
@@ -378,9 +395,26 @@
       "is_hidden": false,
       "user_ready": true
     },
+    "MVI_0526.MP4": {
+      "id": "3c69ad28-f85f-4c3c-b384-f8f0fabb9e98",
+      "title": "Wat is de EPIC Sales Engine?",
+      "file_name": "MVI_0526.MP4",
+      "fase": 1,
+      "techniek": "1.3",
+      "techniek_naam": "",
+      "techniek_source": "ai",
+      "ai_confidence": 0.6126,
+      "duration_seconds": 123,
+      "status": "completed",
+      "has_transcript": true,
+      "has_mux": true,
+      "mux_playback_id": "emd6CnZRydWmPFkn45yWmtX9e8ilzROPHvAepriR8KI",
+      "is_hidden": false,
+      "user_ready": true
+    },
     "MVI_0464.MP4": {
       "id": "25528455-9c5d-4012-8939-c0a1035c912e",
-      "title": "De stappen in het salesproces begrijpen",
+      "title": "Jouw salesproces in vijf fases uitgelegd",
       "file_name": "MVI_0464.MP4",
       "fase": 2,
       "techniek": "2.1",
@@ -397,7 +431,7 @@
     },
     "MVI_0932.MP4": {
       "id": "0d89c980-cf68-4347-b2ab-9ceaf3c851ac",
-      "title": "De waarde van de ontdekkingsfase begrijpen",
+      "title": "Waarde creëren in de ontdekkingsfase",
       "file_name": "MVI_0932.MP4",
       "fase": "2",
       "techniek": "2.1",
@@ -414,7 +448,7 @@
     },
     "MVI_0971.MP4": {
       "id": "3e2f1f5f-9928-44ed-86b1-8f4305aa1193",
-      "title": "Effectief luisteren met exploratievragen en impactvragen",
+      "title": "Geleerd luisteren door exploratievragen toepassen",
       "file_name": "MVI_0971.MP4",
       "fase": "2",
       "techniek": "2.3",
@@ -431,7 +465,7 @@
     },
     "MVI_1006.MP4": {
       "id": "bb6e9fa9-9e68-49ed-9e00-0200782a67ba",
-      "title": "Bevragen van klantverwachtingen met exploratievragen",
+      "title": "Hoe je exploratievragen effectief inzet",
       "file_name": "MVI_1006.MP4",
       "fase": "2",
       "techniek": "2.4",
@@ -448,7 +482,7 @@
     },
     "MVI_0994.MP4": {
       "id": "33322946-019d-4793-be1e-c5153e065bff",
-      "title": "Hoe je je verkoopgesprek voorbereidt",
+      "title": "Voorbereiding als sleutel tot succes in verkoop",
       "file_name": "MVI_0994.MP4",
       "fase": "2",
       "techniek": "2.1.1.3",
@@ -465,7 +499,7 @@
     },
     "MVI_0645.MP4": {
       "id": "4ceaaefc-b15c-4473-ba2a-302fa395328d",
-      "title": "Herken sociale gedragsstijlen in verkoopgesprekken",
+      "title": "Herkennen van sociale gedragsstijlen in verkoopgesprekken",
       "file_name": "MVI_0645.MP4",
       "fase": 4,
       "techniek": "4.2.6",
@@ -482,7 +516,7 @@
     },
     "MVI_1029.MP4": {
       "id": "dc6d6935-09b4-44ad-a5bd-ab4a0c3ff45a",
-      "title": "Het koopklimaat creëren voor succes",
+      "title": "Koopklimaat creëren met het gun-effect",
       "file_name": "MVI_1029.MP4",
       "fase": 1,
       "techniek": "1.2",
@@ -499,7 +533,7 @@
     },
     "MVI_0519.MP4": {
       "id": "04bce5e7-11a1-49e4-85a8-609cb86ddff1",
-      "title": "Wie is jouw klant echt?",
+      "title": "Wie is jouw klant eigenlijk?",
       "file_name": "MVI_0519.MP4",
       "fase": 2,
       "techniek": "2.1.1.2",
@@ -516,7 +550,7 @@
     },
     "MVI_1028.MP4": {
       "id": "41727ef8-5292-4013-8b6a-00fdb7ba2a8e",
-      "title": "De openingsfase van je verkoopgesprek verbeteren",
+      "title": "Creëer een koopklimaat in de openingsfase",
       "file_name": "MVI_1028.MP4",
       "fase": 1,
       "techniek": "1.2",
@@ -531,26 +565,9 @@
       "is_hidden": false,
       "user_ready": true
     },
-    "MVI_0569.MP4": {
-      "id": "f8cf1dff-792e-4766-bb1c-f3f319d48b47",
-      "title": "Verkoopstijl en sociale gedragsstijl begrijpen",
-      "file_name": "MVI_0569.MP4",
-      "fase": 2,
-      "techniek": "2.1.1.7",
-      "techniek_naam": "",
-      "techniek_source": "ai",
-      "ai_confidence": 0.611,
-      "duration_seconds": 190,
-      "status": "completed",
-      "has_transcript": true,
-      "has_mux": true,
-      "mux_playback_id": "u01bZt01C2uW7wznFYAFXfPYhX7WugrGWZ006WiGo1UXCY",
-      "is_hidden": false,
-      "user_ready": true
-    },
     "MVI_1031.MP4": {
       "id": "52679415-0f9f-43a9-888d-cadb68ce5b48",
-      "title": "Hoe je de openingsfase in verkoop versterkt",
+      "title": "Openingsfase: bouw een sterke relatie op",
       "file_name": "MVI_1031.MP4",
       "fase": 1,
       "techniek": "1.3",
@@ -584,7 +601,7 @@
     },
     "MVI_0937.MP4": {
       "id": "8165481b-7207-4b70-ba41-181f5eb6a4e5",
-      "title": "Effectieve vragen in sales gesprekken",
+      "title": "Vragen die je verkoopgesprek versterken",
       "file_name": "MVI_0937.MP4",
       "fase": "2",
       "techniek": "2.1",
@@ -601,7 +618,7 @@
     },
     "MVI_0960.MP4": {
       "id": "7813e1cc-0b25-48a5-8d31-2e1af07fc82d",
-      "title": "Begrijp wat je klant werkelijk bedoelt",
+      "title": "Begrijp de onderliggende betekenis van klanten",
       "file_name": "MVI_0960.MP4",
       "fase": "2",
       "techniek": "2.1.5",
@@ -616,26 +633,9 @@
       "is_hidden": false,
       "user_ready": true
     },
-    "MVI_1039.MP4": {
-      "id": "5973f3f2-8617-4b0f-bb84-0bfd6c15d53a",
-      "title": "Bezorgdheden van klanten effectief bevragen",
-      "file_name": "MVI_1039.MP4",
-      "fase": 2,
-      "techniek": "2.4",
-      "techniek_naam": "",
-      "techniek_source": "ai",
-      "ai_confidence": 0.6614,
-      "duration_seconds": null,
-      "status": "completed",
-      "has_transcript": true,
-      "has_mux": true,
-      "mux_playback_id": "ylDJIDwTlNv5Hkj502IWVJuEv81601o00tutGPBPYCpbRs",
-      "is_hidden": false,
-      "user_ready": true
-    },
     "MVI_0969.MP4": {
       "id": "70a22bb5-2f8c-4e86-b21f-1e2f3299ea83",
-      "title": "Spanningsvelden creëren met probing vragen",
+      "title": "Hoe je spanningsvelden creëert met probing vragen",
       "file_name": "MVI_0969.MP4",
       "fase": "2",
       "techniek": "2.2",
@@ -652,7 +652,7 @@
     },
     "MVI_0987.MP4": {
       "id": "5b084d3a-0a4f-41a9-ba47-e664d2f39be1",
-      "title": "De OVB techniek toepassen in de praktijk",
+      "title": "Hoe je de OVB techniek toepast in verkoop",
       "file_name": "MVI_0987.MP4",
       "fase": "2",
       "techniek": "2.4",
@@ -669,7 +669,7 @@
     },
     "MVI_1015.MP4": {
       "id": "1b70d100-92e1-4263-bcc3-762d2266f9db",
-      "title": "De afsluitfase: zo doe je het goed",
+      "title": "Afsluittechnieken voor het 'nu' moment",
       "file_name": "MVI_1015.MP4",
       "fase": "4",
       "techniek": "4.1",
@@ -686,7 +686,7 @@
     },
     "MVI_0990.MP4": {
       "id": "095624de-b957-4439-b3c3-7dcafaacb051",
-      "title": "Creëer een effectief koopklimaat in gesprekken",
+      "title": "Creëer een koopklimaat in je verkoopgesprek",
       "file_name": "MVI_0990.MP4",
       "fase": "2",
       "techniek": "2.1",
@@ -703,7 +703,7 @@
     },
     "MVI_0993.MP4": {
       "id": "fc580829-5f30-4a80-8db1-0c6fcda3b229",
-      "title": "Hoe je EPIT en OVB in je gesprek toepast",
+      "title": "Zo stel je feitelijke en meningsvragen in je gesprek",
       "file_name": "MVI_0993.MP4",
       "fase": "2",
       "techniek": "2.1.1.3",
@@ -737,7 +737,7 @@
     },
     "MVI_0998.MP4": {
       "id": "9302aa65-dd7b-4c2a-94a2-c6a60c032f86",
-      "title": "De impact van exploratievragen in EPIC",
+      "title": "Exploratievragen in de tweede fase van EPIC",
       "file_name": "MVI_0998.MP4",
       "fase": "2",
       "techniek": "2.1.1.4",
@@ -754,7 +754,7 @@
     },
     "MVI_1000.MP4": {
       "id": "e37c8219-0b96-447b-8d37-e7a3b1946bec",
-      "title": "Verken de verwachtingen met exploratievragen",
+      "title": "Verken klantverwachtingen met exploratievragen",
       "file_name": "MVI_1000.MP4",
       "fase": "2",
       "techniek": "2.1.1.4",
@@ -771,7 +771,7 @@
     },
     "MVI_0992.MP4": {
       "id": "c10603dc-88e9-4cc5-a1ae-9504aa1e8ccd",
-      "title": "EPIC en OVB techniek in verkoopgesprekken",
+      "title": "Hoe je EPIC- en OVB-technieken toepast",
       "file_name": "MVI_0992.MP4",
       "fase": "2",
       "techniek": "2.1.1.3",
@@ -788,7 +788,7 @@
     },
     "MVI_0636.MP4": {
       "id": "a121ee0a-b9e2-4b3b-814d-24ca327e390d",
-      "title": "Het stappenplan voor een verkoopgesprek",
+      "title": "Hoe je een proefafsluiting effectief toepast",
       "file_name": "MVI_0636.MP4",
       "fase": "4",
       "techniek": "1.1",

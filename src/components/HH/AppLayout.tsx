@@ -35,6 +35,8 @@ import { getHiddenIds } from "../../utils/hiddenItems";
 import { useTheme } from "./ThemeProvider";
 import { getAuthHeaders } from "../../services/hugoApi";
 import { PageFooter } from "./PageFooter";
+import { FeedbackButton } from "./FeedbackButton";
+import { NPSSurvey } from "./NPSSurvey";
 
 interface HistoryItem {
   id: string;
@@ -153,12 +155,7 @@ export function AppLayout({
   const [analysisTotalCount, setAnalysisTotalCount] = useState(0);
   const [chatTotalCount, setChatTotalCount] = useState(0);
   const notifRef = useRef<HTMLDivElement>(null);
-  const { notifications, unreadCount, markAsRead, markAllRead, removeNotification, setIsAdmin } = useNotifications();
-
-  useEffect(() => {
-    const isAdminPage = currentPage.startsWith('admin-');
-    setIsAdmin(isAdminPage);
-  }, [isAdmin, currentPage, setIsAdmin]);
+  const { notifications, unreadCount, markAsRead, markAllRead, removeNotification } = useNotifications();
 
   const analysisHistory = analysisHistoryProp || fetchedAnalysisHistory;
   const chatHistory = chatHistoryProp.length > 0 ? chatHistoryProp : fetchedChatHistory;
@@ -344,7 +341,7 @@ export function AppLayout({
                             if (item.historyType === 'chat') {
                               navigate?.('talk-to-hugo', { loadSessionId: histItem.id });
                             } else {
-                              navigate?.('talk-to-hugo', { loadAnalysisId: histItem.id });
+                              navigate?.('analysis-results', { conversationId: histItem.id });
                             }
                           }
                         }}
@@ -472,7 +469,7 @@ export function AppLayout({
                               if (item.historyType === 'chat') {
                                 navigate?.('talk-to-hugo', { loadSessionId: histItem.id });
                               } else {
-                                navigate?.('talk-to-hugo', { loadAnalysisId: histItem.id });
+                                navigate?.('analysis-results', { conversationId: histItem.id });
                               }
                             }
                             setMobileMenuOpen(false);
@@ -682,9 +679,11 @@ export function AppLayout({
 
         <div className={contentClassName || "flex-1 overflow-y-auto min-h-0 pb-24 lg:pb-8"}>
           {children}
-          <PageFooter />
+          {!["talk-to-hugo", "admin-chat-expert", "admin-v3-chat"].includes(currentPage || "") && <PageFooter />}
         </div>
       </div>
+      <FeedbackButton />
+      <NPSSurvey />
     </div>
   );
 }
