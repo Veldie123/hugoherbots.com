@@ -66,7 +66,7 @@ export function AdminV3Chat({ navigate, isSuperAdmin }: Props) {
         const response = await fetch("/api/v3/session", {
           method: "POST",
           headers: await getAuthHeaders(),
-          body: JSON.stringify({ userProfile: {} }),
+          body: JSON.stringify({ userProfile: {}, mode: "admin" }),
         });
 
         if (!response.ok) {
