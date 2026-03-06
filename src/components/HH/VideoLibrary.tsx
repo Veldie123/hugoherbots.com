@@ -1136,31 +1136,27 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {[
-              { title: "Meningsgerichte vragen masterclass", techniek: "2.1.2", date: "12 jan 2026" },
-              { title: "Feitgerichte vragen deep-dive", techniek: "2.1.1", date: "5 jan 2026" },
-              { title: "Proefafsluiting workshop", techniek: "4.1", date: "19 dec 2025" },
-              { title: "Actief Luisteren training", techniek: "2.3.1", date: "12 dec 2025" },
+              { title: "Meningsgerichte vragen masterclass", date: "12 jan 2026", image: "/images/Hugo-Herbots-WEB-0081.JPG" },
+              { title: "Feitgerichte vragen deep-dive", date: "5 jan 2026", image: "/images/Hugo-Herbots-WEB-0251.JPG" },
+              { title: "Proefafsluiting workshop", date: "19 dec 2025", image: "/images/Hugo-Herbots-WEB-0368.JPG" },
+              { title: "Actief Luisteren training", date: "12 dec 2025", image: "/images/Hugo-Herbots-WEB-0555.JPG" },
             ].map((webinar, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="flex-shrink-0 w-[45vw] sm:w-[200px] cursor-pointer group"
                 onClick={() => navigate?.("live")}
               >
                 <div className="relative aspect-video rounded-lg overflow-hidden bg-hh-ui-100 mb-2">
                   <img
-                    src={`https://image.mux.com/${sortedVideos[idx]?.muxPlaybackId || 'placeholder'}/thumbnail.jpg?time=5&width=400`}
+                    src={webinar.image}
                     alt={webinar.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/Hugo-Herbots-WEB-0350.JPG'; }}
+                    className="absolute inset-0 w-full h-full object-cover object-top"
                   />
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
                       <Play className="w-5 h-5 text-hh-ink ml-0.5" />
                     </div>
                   </div>
-                  <Badge className="absolute top-2 left-2 bg-hh-primary-100 text-hh-primary border-0 text-[10px] font-mono font-semibold rounded-full px-1.5">
-                    {webinar.techniek}
-                  </Badge>
                   <Badge className="absolute top-2 right-2 border-0 text-[10px] text-white" style={{ backgroundColor: '#3d9a6e' }}>
                     <CheckCircle2 className="w-3 h-3 mr-0.5" />
                   </Badge>

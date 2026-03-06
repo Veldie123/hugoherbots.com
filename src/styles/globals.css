@@ -185,6 +185,13 @@
   --hh-primary-rgb: 126, 34, 206;
 }
 
+/* Radix portals (Dialog, AlertDialog, Select) inherit admin purple theme */
+body:has(.admin-session) [data-radix-portal] {
+  --hh-primary: #7e22ce;
+  --hh-primary-hover: #6b21a8;
+  --hh-primary-dark: #581c87;
+}
+
 /* Force light mode on specific elements (e.g. landing page) */
 [data-theme="light"] {
   --hh-bg: #FAFBFC;

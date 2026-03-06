@@ -20,7 +20,6 @@ import {
   Upload,
 } from "lucide-react";
 import { getDailyQuote } from "../../data/hugoQuotes";
-import { getTechniekByNummer } from "../../data/technieken-service";
 import { useDashboardWebinars } from "../../hooks/useDashboardWebinars";
 import { getFaseBadgeColors } from "../../utils/phaseColors";
 import { useDashboardVideos } from "../../hooks/useDashboardVideos";
@@ -114,8 +113,7 @@ const ContentRow = ({
 };
 
 const VideoCard = ({ 
-  title, 
-  techniqueNumber,
+  title,
   fase,
   duration,
   progress,
@@ -124,7 +122,6 @@ const VideoCard = ({
   locked
 }: {
   title: string;
-  techniqueNumber: string;
   fase: string | number;
   duration: string;
   progress: number;
@@ -133,7 +130,7 @@ const VideoCard = ({
   locked?: boolean;
 }) => (
   <div 
-    className={`flex-shrink-0 w-[45vw] sm:w-[260px] group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+    className={`flex-shrink-0 w-[clamp(160px,42vw,220px)] group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
     onClick={locked ? undefined : onClick}
   >
     <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
@@ -191,9 +188,8 @@ const WEBINAR_IMAGES = [
   "/images/Hugo-Herbots-WEB-0839.JPG",
 ];
 
-const WebinarCard = ({ 
-  title, 
-  techniqueNumber,
+const WebinarCard = ({
+  title,
   date,
   time,
   isLive,
@@ -204,7 +200,6 @@ const WebinarCard = ({
   onRegister
 }: {
   title: string;
-  techniqueNumber?: string;
   date: string;
   time: string;
   isLive?: boolean;
@@ -215,7 +210,7 @@ const WebinarCard = ({
   onRegister?: () => void;
 }) => (
   <div 
-    className="flex-shrink-0 w-[45vw] sm:w-[260px] group cursor-pointer"
+    className="flex-shrink-0 w-[clamp(160px,42vw,220px)] group cursor-pointer"
     onClick={onClick}
   >
     <div className="relative rounded-lg overflow-hidden aspect-video mb-2">
@@ -286,16 +281,14 @@ const HUGO_TRAINING_IMAGES = [
   "/images/Hugo-Herbots-WEB-0761.JPG",
 ];
 
-const HugoTrainingCard = ({ 
-  title, 
-  techniqueNumber,
+const HugoTrainingCard = ({
+  title,
   fase,
   sessions,
   imageIndex = 0,
   onClick
 }: {
   title: string;
-  techniqueNumber: string;
   fase: number;
   sessions: number;
   imageIndex?: number;
@@ -305,7 +298,7 @@ const HugoTrainingCard = ({
   
   return (
     <div 
-      className="flex-shrink-0 w-[45vw] sm:w-[260px] group cursor-pointer"
+      className="flex-shrink-0 w-[clamp(160px,42vw,220px)] group cursor-pointer"
       onClick={onClick}
     >
       <div className={`relative rounded-lg overflow-hidden aspect-video mb-2`}>
@@ -356,7 +349,7 @@ const AnalysisCard = ({
 
   return (
     <div
-      className="flex-shrink-0 w-[45vw] sm:w-[260px] group cursor-pointer"
+      className="flex-shrink-0 w-[clamp(160px,42vw,220px)] group cursor-pointer"
       onClick={onClick}
     >
       <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-ink to-hh-primary/60 aspect-video mb-2 flex items-center justify-center">
@@ -414,7 +407,7 @@ const SessionCard = ({
 
   return (
     <div
-      className="flex-shrink-0 w-[45vw] sm:w-[260px] group cursor-pointer"
+      className="flex-shrink-0 w-[clamp(160px,42vw,220px)] group cursor-pointer"
       onClick={onClick}
     >
       <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-primary/80 to-hh-primary/40 aspect-video mb-2 flex items-center justify-center">
@@ -629,7 +622,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         >
           {videosLoading ? (
             <>{[...Array(5)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[260px] space-y-2">
+              <div key={i} className="flex-shrink-0 w-[clamp(160px,42vw,220px)] space-y-2">
                 <div className="aspect-video bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-24 bg-hh-border/30 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 40}ms` }} />
                 <div className="h-3 w-16 bg-hh-border/20 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 80}ms` }} />
@@ -642,7 +635,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
               <VideoCard
                 key={video.id || index}
                 title={video.displayTitle || video.title || 'Video'}
-                techniqueNumber={video.techniqueNumber}
+
                 fase={video.fase}
                 duration={video.duration}
                 progress={video.progress || 0}
@@ -670,7 +663,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         >
           {webinarsLoading ? (
             <>{[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[260px] p-3 bg-hh-card rounded-lg border border-hh-border space-y-2">
+              <div key={i} className="flex-shrink-0 w-[clamp(160px,42vw,220px)] p-3 bg-hh-card rounded-lg border border-hh-border space-y-2">
                 <div className="h-4 w-32 bg-hh-border/30 rounded animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-20 bg-hh-border/20 rounded animate-pulse" style={{ animationDelay: `${i * 80 + 40}ms` }} />
               </div>
@@ -682,7 +675,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
               <WebinarCard
                 key={webinar.id || index}
                 title={webinar.title}
-                techniqueNumber={webinar.techniqueNumber}
+
                 date={webinar.date}
                 time={webinar.time}
                 isLive={webinar.status === "live"}
@@ -704,7 +697,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
               <WebinarCard
                 key={webinar.id || index}
                 title={webinar.title}
-                techniqueNumber={webinar.techniqueNumber}
+
                 date={webinar.date}
                 time={webinar.time}
                 isReplay={true}
@@ -723,7 +716,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         >
           {sessionsLoading ? (
             <>{[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[260px] space-y-2">
+              <div key={i} className="flex-shrink-0 w-[clamp(160px,42vw,220px)] space-y-2">
                 <div className="aspect-video bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-24 bg-hh-border/30 rounded animate-pulse" />
               </div>
@@ -744,7 +737,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
               <HugoTrainingCard
                 key={index}
                 title={training.naam}
-                techniqueNumber={training.nummer}
+
                 fase={training.fase}
                 sessions={training.sessions}
                 imageIndex={index}
@@ -762,7 +755,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         >
           {analysesLoading ? (
             <>{[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[260px] space-y-2">
+              <div key={i} className="flex-shrink-0 w-[clamp(160px,42vw,220px)] space-y-2">
                 <div className="aspect-video bg-hh-border/30 rounded-lg animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
                 <div className="h-3 w-24 bg-hh-border/30 rounded animate-pulse" />
               </div>
@@ -781,7 +774,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
             ))
           ) : (
             <div
-              className="flex-shrink-0 w-[45vw] sm:w-[260px] cursor-pointer group"
+              className="flex-shrink-0 w-[clamp(160px,42vw,220px)] cursor-pointer group"
               onClick={() => navigate?.("analysis")}
             >
               <div className="rounded-lg border-2 border-dashed border-hh-border group-hover:border-hh-primary/50 aspect-video mb-2 flex flex-col items-center justify-center gap-2 transition-colors">
