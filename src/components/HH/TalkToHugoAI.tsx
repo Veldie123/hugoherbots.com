@@ -72,6 +72,7 @@ import { InlineAnalysisCard } from "./InlineAnalysisCard";
 import type { EpicSlideContent, VideoEmbed, WebinarLink, AnalysisResultEmbed, RichContent } from "@/types/crossPlatform";
 import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
 import { CoachViewSummary } from "./CoachViewSummary";
+import { ModelSelector, type EngineModel } from "./ModelSelector";
 import { lastActivityService } from "../../services/lastActivityService";
 import { supabase } from "../../utils/supabase/client";
 
@@ -183,13 +184,26 @@ export function TalkToHugoAI({
     }
   }, []);
 
-  // Activate V3 mode for superadmin
+  // Engine model selection (V2 default, V3 for superadmin)
+  const [engineModel, setEngineModel] = useState<EngineModel>(isSuperAdmin ? "v3" : "v2");
+
+  // Sync engine model to hugoApi
   useEffect(() => {
-    if (isSuperAdmin) {
-      hugoApi.setV3Mode(true);
-    }
+    hugoApi.setV3Mode(engineModel === "v3");
     return () => { hugoApi.setV3Mode(false); };
-  }, [isSuperAdmin]);
+  }, [engineModel]);
+
+  // Handle engine model switch — reset session and restart
+  const handleEngineModelChange = useCallback((newModel: EngineModel) => {
+    setEngineModel(newModel);
+    setMessages([]);
+    setHasActiveSession(false);
+    setStreamingText("");
+    hugoApi.setCurrentSessionId(null);
+    // Force remount of the session start effect by toggling a key
+    setSessionRestartKey(prev => prev + 1);
+  }, []);
+  const [sessionRestartKey, setSessionRestartKey] = useState(0);
 
   const [activeHelpMessageId, setActiveHelpMessageId] = useState<string | null>(null);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
@@ -575,7 +589,7 @@ export function TalkToHugoAI({
       }]);
     };
     loadPersonalizedWelcome();
-  }, [user?.id, navigationData, isAdmin, adminViewMode]);
+  }, [user?.id, navigationData, isAdmin, adminViewMode, sessionRestartKey]);
 
   useEffect(() => {
     if (selectedTechnique || audioConnectionState === ConnectionState.Connected) {
@@ -2896,9 +2910,12 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             {/* Left: Help sidebar toggle + Title */}
             <div className="flex items-center gap-2 lg:gap-3 min-w-0">
               {/* E.P.I.C. sidebar toggle removed from header — accessible via lightbulb action button under messages */}
-              <span className="text-[13px] text-hh-muted font-medium whitespace-nowrap flex items-center gap-1">
-                HugoGPT <span className="text-[11px] text-hh-muted/60 font-normal">v1.0</span>
-              </span>
+              <ModelSelector
+                currentModel={engineModel}
+                onModelChange={handleEngineModelChange}
+                isSuperAdmin={!!isSuperAdmin}
+                disabled={isLoading || isStreaming}
+              />
             </div>
             
             {/* Right: Mode toggle + Stop (Niveau is now auto-adaptive, hidden) */}
