@@ -272,8 +272,8 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
           const createdDate = s.createdAt ? new Date(s.createdAt) : new Date();
           return {
             id: s.id,
-            user: s.userId || 'Onbekend',
-            userEmail: `${s.userId || 'user'}@example.com`,
+            user: s.userName || s.userId?.substring(0, 8) || 'Onbekend',
+            userEmail: '',
             workspace: 'HugoHerbots',
             techniek: `${s.techniqueNummer || s.techniqueId} - ${s.techniqueName || 'Techniek'}`,
             fase: getFaseLabel(s.fase),

@@ -1431,7 +1431,22 @@ app.get("/api/sessions", async (req, res) => {
     }
     
     const result = { rows: rows || [] };
-    
+
+    // Bulk-fetch user names from profiles
+    const userIds = [...new Set(result.rows.map(r => r.user_id).filter(Boolean))];
+    let userNames: Record<string, string> = {};
+    if (userIds.length > 0) {
+      try {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .in('id', userIds);
+        for (const p of (profiles || [])) {
+          userNames[p.id] = p.full_name || p.email?.split('@')[0] || 'Onbekend';
+        }
+      } catch (e) { /* ignore */ }
+    }
+
     const sessionList = result.rows.map(row => {
       const conversationHistory = row.conversation_history || [];
       const context = row.context || {};
@@ -1440,13 +1455,17 @@ app.get("/api/sessions", async (req, res) => {
       const epicPhase = row.epic_phase || 'explore';
       const technique = getTechnique(row.technique_id);
       
-      // Calculate duration from first to last message if available
-      const duration = conversationHistory.length > 0 
-        ? `${Math.ceil(conversationHistory.length * 0.5)}:00`
-        : "0:00";
-      
-      // Calculate score (0-100 based on turn count and phase)
-      const score = Math.min(100, Math.round(50 + row.turn_number * 5 + (row.phase >= 2 ? 20 : 0)));
+      // Calculate duration from created_at to updated_at
+      const durationMs = new Date(row.updated_at).getTime() - new Date(row.created_at).getTime();
+      const durationMins = Math.max(1, Math.round(durationMs / 60000));
+      const duration = durationMins >= 60
+        ? `${Math.floor(durationMins / 60)}:${String(durationMins % 60).padStart(2, '0')}`
+        : `${durationMins}:00`;
+
+      // Use total_score from DB if available, otherwise fallback formula
+      const score = row.total_score > 0
+        ? Math.min(100, row.total_score)
+        : Math.min(100, Math.round(50 + row.turn_number * 5 + (row.phase >= 2 ? 20 : 0)));
       
       // Build debug info per message by matching with events
       const transcript = conversationHistory.map((msg: any, idx: number) => {
@@ -1501,7 +1520,22 @@ app.get("/api/sessions", async (req, res) => {
         id: row.id,
         mode: row.current_mode,
         techniqueId: row.technique_id,
-        techniqueName: technique?.naam || row.technique_id,
+        techniqueName: (() => {
+          if (row.technique_id === 'general') {
+            try {
+              const firstUserMsg = conversationHistory?.find((m: any) => m.role === 'user');
+              if (firstUserMsg?.content) {
+                const text = typeof firstUserMsg.content === 'string'
+                  ? firstUserMsg.content
+                  : firstUserMsg.content[0]?.text || '';
+                const trimmed = text.trim().slice(0, 50);
+                return trimmed.length < text.trim().length ? trimmed + '…' : trimmed || 'Nieuw gesprek';
+              }
+            } catch {}
+            return 'Nieuw gesprek';
+          }
+          return technique?.naam || row.technique_id;
+        })(),
         techniqueNummer: technique?.nummer || row.technique_id.split('.').slice(0, 2).join('.'),
         fase: technique?.fase || parseInt(row.technique_id?.split('.')[0]) || 1,
         messageCount: conversationHistory.length,
@@ -1513,6 +1547,7 @@ app.get("/api/sessions", async (req, res) => {
         isExpert: row.expert_mode === 1,
         isActive: row.is_active === 1,
         userId: row.user_id,
+        userName: userNames[row.user_id] || row.user_id?.substring(0, 8) || 'Onbekend',
         createdAt: row.created_at,
         updatedAt: row.updated_at,
         transcript,
