@@ -30,6 +30,7 @@ import {
 } from "../v2/ssot-context-builder";
 import { searchRag } from "../v2/rag-service";
 import { computeDetailedMetrics } from "../v2/detailed-metrics";
+import { sanitizeAnalysisError } from "../error-utils";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -654,10 +655,9 @@ export async function runFullAnalysisV3(
     await persistStatus(conversationId, "evaluating");
 
     console.log(`[V3 Analysis] Evaluating ${turns.length} turns with Claude`);
-    const [evaluations, signals] = await Promise.all([
-      evaluateSellerTurnsV3(turns),
-      detectCustomerSignalsV3(turns, []), // First pass without evals
-    ]);
+    // Sequential to avoid concurrent Claude calls hitting rate limits
+    const evaluations = await evaluateSellerTurnsV3(turns);
+    const signals = await detectCustomerSignalsV3(turns, []);
 
     // Re-detect signals with evaluation context
     const signalsWithContext = await detectCustomerSignalsV3(turns, evaluations);
@@ -799,13 +799,13 @@ export async function runFullAnalysisV3(
   } catch (err: any) {
     console.error(`[V3 Analysis] Failed: ${conversationId}`, err);
     job.status = "failed";
-    job.error = err.message || "Onbekende fout";
+    job.error = sanitizeAnalysisError(err);
     analysisJobsV3.set(conversationId, { ...job });
 
     try {
       await pool.query(
         `UPDATE conversation_analyses SET status = $1, error = $2 WHERE id = $3`,
-        ["failed", err.message || "Onbekende fout", conversationId]
+        ["failed", sanitizeAnalysisError(err), conversationId]
       );
     } catch (dbErr: any) {
       console.warn("[V3 Analysis] DB error update failed:", dbErr.message);

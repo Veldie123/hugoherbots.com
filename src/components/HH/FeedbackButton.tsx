@@ -42,7 +42,7 @@ export function FeedbackButton() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-4 right-4 z-50 w-10 h-10 rounded-full bg-hh-primary text-white shadow-lg hover:bg-hh-primary/90 transition-colors flex items-center justify-center"
+        className="fixed bottom-20 right-4 z-50 w-10 h-10 rounded-full bg-hh-primary text-white shadow-lg hover:bg-hh-primary/90 transition-colors flex items-center justify-center"
         title="Feedback geven"
       >
         <MessageSquarePlus className="w-5 h-5" />
@@ -51,7 +51,7 @@ export function FeedbackButton() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-[320px] bg-white rounded-[16px] shadow-xl border border-hh-border p-4">
+    <div className="fixed bottom-20 right-4 z-50 w-[320px] bg-white rounded-[16px] shadow-xl border border-hh-border p-4">
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-[14px] font-semibold text-hh-text">Feedback</h4>
         <button onClick={() => setOpen(false)} className="text-hh-muted hover:text-hh-text">

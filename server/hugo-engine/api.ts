@@ -120,10 +120,14 @@ import {
 } from "./v2/analysis-service";
 import { runFullAnalysisV3 } from "./v3/analysis-service";
 import { isV3Available } from "./v3/anthropic-client";
+import pLimit from "p-limit";
 import multer from "multer";
 import { getAdminStats } from "./admin-stats";
 
 const SUPERADMIN_EMAIL = "stephane@hugoherbots.com";
+
+// Only 1 V3 analysis at a time to prevent Anthropic rate limit exhaustion
+const v3AnalysisLimit = pLimit(1);
 
 /** Sanitize 500 errors: show details only in dev, generic message in production */
 function sendError(res: Response, err: any, fallback = 'Er ging iets mis') {
@@ -141,8 +145,8 @@ function runAnalysisForUser(
   title?: string
 ): void {
   if (userEmail?.toLowerCase() === SUPERADMIN_EMAIL && isV3Available()) {
-    console.log(`[Analysis] Routing to V3 (Claude) for superadmin: ${conversationId}`);
-    runFullAnalysisV3(conversationId, storageKey, userId, title);
+    console.log(`[Analysis] Queuing V3 (Claude) for superadmin: ${conversationId}`);
+    v3AnalysisLimit(() => runFullAnalysisV3(conversationId, storageKey, userId, title));
   } else {
     runFullAnalysis(conversationId, storageKey, userId, title);
   }

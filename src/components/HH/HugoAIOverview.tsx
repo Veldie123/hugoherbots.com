@@ -420,7 +420,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
       <Layout {...layoutProps}>
         <div className="p-6 flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F7396] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hh-primary mx-auto mb-4"></div>
             <p className="text-hh-muted">Sessies laden...</p>
           </div>
         </div>
@@ -508,7 +508,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
           <div className="absolute inset-0 bg-black/20 pointer-events-none" />
           <div className="relative h-full flex items-center p-6 sm:p-8">
             <div className="text-white space-y-3 max-w-lg">
-              <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: '#4F7396' }}>
+              <Badge className="bg-hh-primary text-white border-0 text-[12px]">
                 <Sparkles className="w-3 h-3 mr-1" />
                 AI Sales Coach
               </Badge>

@@ -52,9 +52,9 @@ const PHASE_CIRCLE_COLORS: Record<number, string> = {
   4: 'var(--hh-success)',
 };
 
-const STEEL_BLUE = 'var(--hh-primary)';
-const STEEL_BLUE_BG = 'rgba(79, 115, 150, 0.08)';
-const STEEL_BLUE_BORDER = 'rgba(79, 115, 150, 0.18)';
+const PRIMARY_COLOR = 'var(--hh-primary)';
+const PRIMARY_BG = 'rgba(var(--hh-primary-rgb), 0.08)';
+const PRIMARY_BORDER = 'rgba(var(--hh-primary-rgb), 0.18)';
 
 export function EPICSidebar({
   fasesAccordionOpen,
@@ -1013,14 +1013,14 @@ function UserTechniqueRow({
       style={{
         cursor: isLocked ? 'not-allowed' : 'pointer',
         opacity: isLocked ? 0.45 : 1,
-        backgroundColor: isSelected ? STEEL_BLUE_BG : undefined,
-        borderLeft: isSelected ? `3px solid ${STEEL_BLUE}` : '3px solid transparent',
+        backgroundColor: isSelected ? PRIMARY_BG : undefined,
+        borderLeft: isSelected ? `3px solid ${PRIMARY_COLOR}` : '3px solid transparent',
       }}
     >
       {isSelected ? (
         <div className="flex-shrink-0 relative">
-          <span className="absolute -left-0.5 -top-0.5 w-4 h-4 rounded-full animate-ping" style={{ backgroundColor: STEEL_BLUE, opacity: 0.2 }} />
-          <Play className="w-3 h-3 relative" style={{ color: STEEL_BLUE, fill: STEEL_BLUE }} />
+          <span className="absolute -left-0.5 -top-0.5 w-4 h-4 rounded-full animate-ping" style={{ backgroundColor: PRIMARY_COLOR, opacity: 0.2 }} />
+          <Play className="w-3 h-3 relative" style={{ color: PRIMARY_COLOR, fill: PRIMARY_COLOR }} />
         </div>
       ) : (
         <span
@@ -1040,7 +1040,7 @@ function UserTechniqueRow({
         style={{
           fontSize: '13px',
           fontWeight: isSelected ? 500 : 400,
-          color: isSelected ? STEEL_BLUE : isLocked ? '#cbd5e1' : 'var(--hh-ink)',
+          color: isSelected ? PRIMARY_COLOR : isLocked ? '#cbd5e1' : 'var(--hh-ink)',
         }}
       >
         {technique.naam}

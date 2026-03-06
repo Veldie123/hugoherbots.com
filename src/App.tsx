@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { UserProvider } from "./contexts/UserContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { ThemeProvider } from "./components/HH/ThemeProvider";
+import { Toaster } from "sonner";
 import { auth } from "./utils/supabase/client";
 
 const Login = lazy(() => import("./components/HH/Login").then(m => ({ default: m.Login })));
@@ -410,6 +411,7 @@ export default function App() {
       )}
     </NotificationProvider>
     </UserProvider>
+    <Toaster position="top-center" richColors />
     </ThemeProvider>
   );
 }

@@ -30,6 +30,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useMobileViewMode } from "@/hooks/useMobileViewMode";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { getAuthHeaders } from "../../services/hugoApi";
+import { toast } from "sonner";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -173,6 +174,27 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
   useEffect(() => {
     fetchAnalyses();
   }, [fetchAnalyses]);
+
+  const handleRetryAnalysis = async (analysisId: string) => {
+    try {
+      const res = await fetch(`/api/v2/analysis/retry/${analysisId}`, {
+        method: "POST",
+        headers: await getAuthHeaders(),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Opnieuw starten mislukt");
+      setAnalyses(prev => prev.map(a =>
+        a.id === analysisId ? { ...a, status: 'transcribing', error: undefined } : a
+      ));
+      const analysis = analyses.find(a => a.id === analysisId);
+      if (analysis) {
+        setProcessingAnalyses(prev => [...prev, { id: analysisId, title: analysis.title, status: 'transcribing' }]);
+      }
+      toast.success("Analyse wordt opnieuw gestart...");
+    } catch (err: any) {
+      toast.error(err.message || "Opnieuw starten mislukt");
+    }
+  };
 
   // Poll processing analyses for live status updates
   useEffect(() => {
@@ -742,7 +764,11 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                             {analysis.title || "Zonder titel"}
                           </p>
                           <p className="text-[12px] text-hh-muted">
-                            {analysis.status === 'failed' && analysis.error ? analysis.error : analysis.status}
+                            {analysis.status === 'failed' && analysis.error ? (
+                              <span className="text-hh-error">{analysis.error}</span>
+                            ) : analysis.status === 'completed' ? '' : (
+                              ({ transcribing: 'Transcriberen...', analyzing: 'Analyseren...', evaluating: 'Evalueren...', generating_report: 'Rapport genereren...' } as Record<string, string>)[analysis.status] || analysis.status
+                            )}
                           </p>
                         </div>
                       </td>
@@ -784,7 +810,9 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        {getQualityBadge(getQualityLabel(analysis.overallScore))}
+                        {analysis.status === 'completed'
+                          ? getQualityBadge(getQualityLabel(analysis.overallScore))
+                          : getStatusBadge(analysis.status)}
                       </td>
                       <td className="px-4 py-3 text-[13px] leading-[18px] text-hh-muted">
                         {formatDate(analysis.createdAt)}
@@ -815,6 +843,12 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                               <Eye className="w-4 h-4 mr-2" />
                               Bekijk Analyse
                             </DropdownMenuItem>
+                            {analysis.status === 'failed' && (
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleRetryAnalysis(analysis.id); }}>
+                                <RefreshCw className="w-4 h-4 mr-2" />
+                                Opnieuw proberen
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
@@ -865,6 +899,12 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                             <Eye className="w-4 h-4 mr-2" />
                             Bekijk Analyse
                           </DropdownMenuItem>
+                          {analysis.status === 'failed' && (
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleRetryAnalysis(analysis.id); }}>
+                              <RefreshCw className="w-4 h-4 mr-2" />
+                              Opnieuw proberen
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -872,7 +912,11 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                   <p className="text-[14px] font-medium text-hh-text mb-1 line-clamp-1">
                     {analysis.title || "Zonder titel"}
                   </p>
-                  <p className="text-[11px] text-hh-muted mb-3">{analysis.status === 'failed' && analysis.error ? analysis.error : analysis.status}</p>
+                  <p className="text-[11px] text-hh-muted mb-3">{analysis.status === 'failed' && analysis.error ? (
+                    <span className="text-hh-error">{analysis.error}</span>
+                  ) : analysis.status === 'completed' ? '' : (
+                    ({ transcribing: 'Transcriberen...', analyzing: 'Analyseren...', evaluating: 'Evalueren...', generating_report: 'Rapport genereren...' } as Record<string, string>)[analysis.status] || analysis.status
+                  )}</p>
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-6 h-6 rounded-full bg-hh-primary-100 flex items-center justify-center text-[10px] font-semibold text-hh-primary">
                       {getInitials(analysis.userName || analysis.userId)}

@@ -10,6 +10,7 @@ import * as path from 'path';
 import { computeDetailedMetrics, DetailedMetrics } from './detailed-metrics';
 import { buildSSOTContextForEvaluation, findRelevantVideos, VideoRecommendation, buildVideoRecommendationsForMoments } from './ssot-context-builder';
 import { searchRag } from './rag-service';
+import { sanitizeAnalysisError } from '../error-utils';
 
 const MIN_SELLER_TURNS_FOR_ANALYSIS = 4;
 
@@ -1555,13 +1556,13 @@ export async function runFullAnalysis(
     } catch { /* cleanup best-effort */ }
   } catch (err: any) {
     job.status = 'failed';
-    job.error = err.message || 'Onbekende fout';
+    job.error = sanitizeAnalysisError(err);
     analysisJobs.set(conversationId, { ...job });
 
     try {
       await pool.query(
         `UPDATE conversation_analyses SET status = $1, error = $2 WHERE id = $3`,
-        ['failed', err.message || 'Onbekende fout', conversationId]
+        ['failed', sanitizeAnalysisError(err), conversationId]
       );
     } catch (dbErr: any) {
       console.warn('[Analysis] DB error update failed:', dbErr.message);
@@ -1827,13 +1828,13 @@ export async function runChatAnalysis(
   } catch (err: any) {
     console.error(`[ChatAnalysis] Failed for session ${conversationId}:`, err.message);
     job.status = 'failed';
-    job.error = err.message || 'Onbekende fout';
+    job.error = sanitizeAnalysisError(err);
     analysisJobs.set(conversationId, { ...job });
 
     try {
       await pool.query(
         `UPDATE conversation_analyses SET status = $1, error = $2 WHERE id = $3`,
-        ['failed', err.message || 'Onbekende fout', conversationId]
+        ['failed', sanitizeAnalysisError(err), conversationId]
       );
     } catch (dbErr: any) {
       console.warn('[ChatAnalysis] DB error update failed:', dbErr.message);

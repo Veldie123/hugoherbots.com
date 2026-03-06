@@ -34,12 +34,8 @@ function getConnectionString(): { url: string; source: string } {
     return { url: supabaseUrl, source: 'supabase-session-pooler' };
   }
 
-  if (process.env.DATABASE_URL) {
-    return { url: process.env.DATABASE_URL, source: 'local' };
-  }
-
   throw new Error(
-    "No database connection available. Set PostgreSQL_connection_string_supabase + SUPABASE_YOUR_PASSWORD, or DATABASE_URL.",
+    "No database connection available. Set PostgreSQL_connection_string_supabase + SUPABASE_YOUR_PASSWORD.",
   );
 }
 
@@ -58,9 +54,6 @@ pool.query('SELECT 1').then(() => {
   console.log(`[DB] Connection verified (${conn.source})`);
 }).catch((err: Error) => {
   console.error(`[DB] Connection test FAILED (${conn.source}): ${err.message}`);
-  if (isSupabase && process.env.DATABASE_URL) {
-    console.log('[DB] TIP: Fix SUPABASE_YOUR_PASSWORD secret to use Supabase. Currently falling back is not possible after pool creation.');
-  }
 });
 
 pool.query(`
