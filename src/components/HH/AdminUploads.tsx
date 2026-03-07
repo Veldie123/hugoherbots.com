@@ -572,23 +572,23 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Analyses', value: isLoading ? "-" : stats.total, icon: Upload, bgColorStyle: 'var(--hh-primary-100)', colorStyle: 'var(--hh-primary)', badge: '+24%', badgeTrend: 'up' as const },
-            { name: 'Uitstekend', value: isLoading ? "-" : stats.excellent, icon: CheckCircle2, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: 'var(--hh-success)', badge: '+43%', badgeTrend: 'up' as const },
-            { name: 'Gem. Score', value: isLoading ? "-" : `${stats.avgScore}%`, icon: BarChart3, bgColorStyle: 'var(--hh-primary-100)', colorStyle: 'var(--hh-primary)', badge: '+5%', badgeTrend: 'up' as const },
-            { name: 'Verbetering Nodig', value: isLoading ? "-" : stats.needsImprovement, icon: AlertTriangle, bgColorStyle: 'rgba(239, 68, 68, 0.1)', colorStyle: 'var(--hh-error)', badge: '15%', badgeTrend: 'down' as const },
+            { name: 'Totaal Analyses', value: isLoading ? "-" : stats.total, icon: Upload, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', badge: '+24%', badgeTrend: 'up' as const },
+            { name: 'Uitstekend', value: isLoading ? "-" : stats.excellent, icon: CheckCircle2, bgClass: 'bg-hh-success-100', textClass: 'text-hh-success', badge: '+43%', badgeTrend: 'up' as const },
+            { name: 'Gem. Score', value: isLoading ? "-" : `${stats.avgScore}%`, icon: BarChart3, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', badge: '+5%', badgeTrend: 'up' as const },
+            { name: 'Verbetering Nodig', value: isLoading ? "-" : stats.needsImprovement, icon: AlertTriangle, bgClass: 'bg-hh-error-100', textClass: 'text-hh-error', badge: '15%', badgeTrend: 'down' as const },
           ].map(stat => {
-            const badgeStyles = stat.badgeTrend === 'up'
-              ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--hh-success)', borderColor: 'rgba(16, 185, 129, 0.2)' }
+            const badgeClass = stat.badgeTrend === 'up'
+              ? 'bg-hh-success-100 text-hh-success border-hh-success-200'
               : stat.badgeTrend === 'neutral'
-              ? { backgroundColor: 'rgba(245, 158, 11, 0.1)', color: 'var(--hh-warning)', borderColor: 'rgba(245, 158, 11, 0.2)' }
-              : { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--hh-error)', borderColor: 'rgba(239, 68, 68, 0.2)' };
+              ? 'bg-hh-warning-100 text-hh-warning border-hh-warning-200'
+              : 'bg-hh-error-100 text-hh-error border-hh-error-200';
             return (
             <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
               <div className="flex items-start justify-between mb-2 sm:mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColorStyle }}>
-                  <stat.icon className="w-5 h-5" style={{ color: stat.colorStyle }} />
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${stat.bgClass}`}>
+                  <stat.icon className={`w-5 h-5 ${stat.textClass}`} />
                 </div>
-                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={badgeStyles}>
+                <span className={`text-[11px] px-2 py-0.5 rounded-full border ${badgeClass}`}>
                   {stat.badge}
                 </span>
               </div>

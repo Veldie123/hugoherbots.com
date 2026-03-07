@@ -38,7 +38,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
               </h2>
             </div>
             <p className="text-[14px] leading-[24px] text-hh-muted">
-              HugoHerbots.ai ("wij", "ons", "onze") respecteert uw privacy en zet zich in voor de bescherming 
+              hugoherbots.com ("wij", "ons", "onze") respecteert uw privacy en zet zich in voor de bescherming 
               van uw persoonsgegevens. Dit privacybeleid beschrijft hoe wij omgaan met informatie die via ons 
               AI sales coaching platform wordt verzameld, inclusief audio- en video-opnames van 
               verkoopgesprekken.
@@ -180,7 +180,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
         </Card>
 
         <p className="text-[12px] leading-[18px] text-hh-muted text-center">
-          © {new Date().getFullYear()} HugoHerbots.ai. Alle rechten voorbehouden.
+          © {new Date().getFullYear()} hugoherbots.com. Alle rechten voorbehouden.
         </p>
       </div>
     </AppLayout>

@@ -779,7 +779,7 @@ export function Landing({ navigate }: LandingProps) {
             </div>
           </div>
           <div className="pt-8 border-t border-hh-border text-center text-[14px] leading-[20px] text-hh-muted">
-            © 2025 HugoHerbots.ai. Alle rechten voorbehouden.
+            © {new Date().getFullYear()} hugoherbots.com. Alle rechten voorbehouden.
           </div>
         </div>
       </footer>

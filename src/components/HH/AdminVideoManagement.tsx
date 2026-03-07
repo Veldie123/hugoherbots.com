@@ -1707,12 +1707,12 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         {isSuperAdmin && <TooltipProvider>
           <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {[
-              { name: driveTotalCount ? `${pipelineStats.drive.done} / ${driveTotalCount}` : 'Drive', key: 'drive', stats: pipelineStats.drive, icon: FolderSync, bgColorStyle: 'rgba(37, 99, 235, 0.1)', colorStyle: '#2563eb', isClickable: false, link: undefined as string | undefined },
-              { name: 'Greenscreen', key: 'greenscreen', stats: pipelineStats.greenscreen, icon: Video, bgColorStyle: 'rgba(16, 185, 129, 0.1)', colorStyle: '#10b981', isClickable: false, link: undefined as string | undefined },
-              { name: 'Audio', key: 'audio', stats: pipelineStats.audio, icon: Volume2, bgColorStyle: 'rgba(234, 88, 12, 0.1)', colorStyle: '#ea580c', isClickable: false, link: undefined as string | undefined },
-              { name: 'Transcript', key: 'transcript', stats: pipelineStats.transcript, icon: FileText, bgColorStyle: 'var(--hh-primary-100)', colorStyle: 'var(--hh-primary)', isClickable: false, link: undefined as string | undefined },
-              { name: 'RAG', key: 'rag', stats: pipelineStats.rag, icon: Database, bgColorStyle: 'rgba(79, 70, 229, 0.1)', colorStyle: '#4f46e5', isClickable: false, link: undefined as string | undefined },
-              { name: 'Mux', key: 'mux', stats: pipelineStats.mux, icon: Tv, bgColorStyle: 'rgba(219, 39, 119, 0.1)', colorStyle: '#db2777', isClickable: false, link: undefined as string | undefined },
+              { name: driveTotalCount ? `${pipelineStats.drive.done} / ${driveTotalCount}` : 'Drive', key: 'drive', stats: pipelineStats.drive, icon: FolderSync, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', isClickable: false, link: undefined as string | undefined },
+              { name: 'Greenscreen', key: 'greenscreen', stats: pipelineStats.greenscreen, icon: Video, bgClass: 'bg-hh-success-100', textClass: 'text-hh-success', isClickable: false, link: undefined as string | undefined },
+              { name: 'Audio', key: 'audio', stats: pipelineStats.audio, icon: Volume2, bgClass: 'bg-hh-warning-100', textClass: 'text-hh-warning', isClickable: false, link: undefined as string | undefined },
+              { name: 'Transcript', key: 'transcript', stats: pipelineStats.transcript, icon: FileText, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', isClickable: false, link: undefined as string | undefined },
+              { name: 'RAG', key: 'rag', stats: pipelineStats.rag, icon: Database, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', isClickable: false, link: undefined as string | undefined },
+              { name: 'Mux', key: 'mux', stats: pipelineStats.mux, icon: Tv, bgClass: 'bg-hh-error-100', textClass: 'text-hh-error', isClickable: false, link: undefined as string | undefined },
             ].map(step => {
               const percentage = pipelineStats.total > 0 
                 ? Math.round((step.stats.done / pipelineStats.total) * 100) 
@@ -1726,19 +1726,19 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               
               // Badge priority: failed > stuck > processing > percentage
               let badgeText: string;
-              let badgeStyleObj: React.CSSProperties;
+              let badgeClass: string;
               if (hasFailed) {
                 badgeText = `${step.stats.failed} fout`;
-                badgeStyleObj = { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#dc2626', borderColor: 'rgba(239, 68, 68, 0.2)' };
+                badgeClass = 'bg-hh-error-100 text-hh-error border-hh-error-200';
               } else if (hasStuck) {
                 badgeText = `${step.stats.stuck} vast`;
-                badgeStyleObj = { backgroundColor: 'rgba(249, 115, 22, 0.1)', color: '#ea580c', borderColor: 'rgba(249, 115, 22, 0.2)' };
+                badgeClass = 'bg-hh-warning-100 text-hh-warning border-hh-warning-200';
               } else if (isProcessing) {
                 badgeText = `${step.stats.processing} bezig`;
-                badgeStyleObj = { backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' };
+                badgeClass = 'bg-hh-primary-100 text-hh-primary border-hh-primary-200';
               } else {
                 badgeText = `${percentage}%`;
-                badgeStyleObj = { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' };
+                badgeClass = 'bg-hh-success-100 text-hh-success border-hh-success-200';
               }
               
               // Error tooltip content
@@ -1772,8 +1772,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                   onClick={handleCardClick}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: step.bgColorStyle }}>
-                      <Icon className={`w-4 h-4 ${isProcessing ? 'animate-spin' : ''}`} style={{ color: step.colorStyle }} />
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step.bgClass}`}>
+                      <Icon className={`w-4 h-4 ${isProcessing ? 'animate-spin' : ''} ${step.textClass}`} />
                     </div>
                     <div className="flex items-center gap-1">
                       {hasErrors && (
@@ -1788,7 +1788,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           </TooltipContent>
                         </Tooltip>
                       )}
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full border" style={badgeStyleObj}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${badgeClass}`}>
                         {badgeText}
                       </span>
                     </div>
@@ -1819,8 +1819,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                       )}
                       {step.stats.pending > 0 && (
                         <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                          step.stats.pending >= 100 ? 'bg-hh-error/10 text-hh-error' :
-                          step.stats.pending >= 50 ? 'bg-hh-warning/10 text-hh-warning' :
+                          step.stats.pending >= 100 ? 'bg-hh-error-100 text-hh-error' :
+                          step.stats.pending >= 50 ? 'bg-hh-warning-100 text-hh-warning' :
                           'bg-hh-ui-100 text-hh-muted'
                         }`}>
                           ⏳ {step.stats.pending}
@@ -1867,10 +1867,10 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         {!isSuperAdmin && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { name: 'Drive', stats: pipelineStats.drive, icon: FolderSync, bgColor: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', label: driveTotalCount ? `${pipelineStats.drive.done} / ${driveTotalCount} in Drive` : "Video's in Drive" },
-              { name: 'Verwerkt', stats: pipelineStats.transcript, icon: Video, bgColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', label: 'Verwerkt' },
-              { name: 'RAG', stats: pipelineStats.rag, icon: Database, bgColor: 'rgba(79, 70, 229, 0.1)', color: '#4f46e5', label: 'AI Kennisbank' },
-              { name: 'Mux', stats: pipelineStats.mux, icon: Tv, bgColor: 'rgba(219, 39, 119, 0.1)', color: '#db2777', label: 'Streaming klaar' },
+              { name: 'Drive', stats: pipelineStats.drive, icon: FolderSync, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', label: driveTotalCount ? `${pipelineStats.drive.done} / ${driveTotalCount} in Drive` : "Video's in Drive" },
+              { name: 'Verwerkt', stats: pipelineStats.transcript, icon: Video, bgClass: 'bg-hh-success-100', textClass: 'text-hh-success', label: 'Verwerkt' },
+              { name: 'RAG', stats: pipelineStats.rag, icon: Database, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', label: 'AI Kennisbank' },
+              { name: 'Mux', stats: pipelineStats.mux, icon: Tv, bgClass: 'bg-hh-error-100', textClass: 'text-hh-error', label: 'Streaming klaar' },
             ].map(step => {
               const percentage = pipelineStats.total > 0 ? Math.round((step.stats.done / pipelineStats.total) * 100) : 0;
               const isProcessing = step.stats.processing > 0;
@@ -1878,14 +1878,14 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               return (
                 <Card key={step.name} className="p-3 rounded-[12px] shadow-hh-sm border-hh-border">
                   <div className="flex items-start justify-between mb-2">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: step.bgColor }}>
-                      <Icon className={`w-4 h-4 ${isProcessing ? 'animate-spin' : ''}`} style={{ color: step.color }} />
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step.bgClass}`}>
+                      <Icon className={`w-4 h-4 ${isProcessing ? 'animate-spin' : ''} ${step.textClass}`} />
                     </div>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full border" style={
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
                       isProcessing
-                        ? { backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' }
-                        : { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }
-                    }>
+                        ? 'bg-hh-primary-100 text-hh-primary border-hh-primary-200'
+                        : 'bg-hh-success-100 text-hh-success border-hh-success-200'
+                    }`}>
                       {isProcessing ? `${step.stats.processing} bezig` : `${percentage}%`}
                     </span>
                   </div>
@@ -1899,12 +1899,11 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         
         {/* Active KPI Filter indicator */}
         {isSuperAdmin && activeKpiFilter && (
-          <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ color: 'var(--hh-primary)', backgroundColor: 'var(--hh-primary-50)' }}>
+          <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg text-hh-primary bg-hh-primary-50">
             <span>Gefilterd op: <strong>{activeKpiFilter}</strong></span>
-            <button 
+            <button
               onClick={() => setActiveKpiFilter(null)}
-              className="ml-2 underline"
-              style={{ color: 'var(--hh-primary)' }}
+              className="ml-2 underline text-hh-primary"
             >
               Wis filter
             </button>
@@ -3178,11 +3177,11 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               return (
                 <>
                   {pendingVideoCorrections.length > 0 && !isEditingVideo && (
-                    <div className="p-4 rounded-lg border space-y-3" style={{ backgroundColor: 'rgba(234, 88, 12, 0.05)', borderColor: 'rgba(234, 88, 12, 0.2)' }}>
+                    <div className="p-4 rounded-lg border space-y-3 bg-hh-warning-50 border-hh-warning-200">
                       <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" style={{ color: '#ea580c' }} />
-                        <span className="text-[13px] font-semibold" style={{ color: '#ea580c' }}>Wijzigingen ingediend ter review</span>
-                        <Badge variant="outline" className="text-[10px] ml-auto" style={{ color: '#ea580c', borderColor: 'rgba(234, 88, 12, 0.3)' }}>
+                        <Clock className="w-4 h-4 text-hh-warning" />
+                        <span className="text-[13px] font-semibold text-hh-warning">Wijzigingen ingediend ter review</span>
+                        <Badge variant="outline" className="text-[10px] ml-auto text-hh-warning border-hh-warning-200">
                           Wacht op goedkeuring
                         </Badge>
                       </div>

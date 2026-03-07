@@ -891,23 +891,23 @@ ${platformUrl}`;
         {/* KPI Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)', badge: `+${Math.round(sessions.length * 0.12)}%`, badgeTrend: 'up' as const },
-            { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgColor: 'rgba(79, 70, 229, 0.12)', color: 'var(--hh-primary)', badge: `+${upcomingSessionsAll.length}`, badgeTrend: 'up' as const },
-            { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgColor: 'rgba(219, 39, 119, 0.12)', color: 'var(--hh-primary)', badge: '+8%', badgeTrend: 'up' as const },
-            { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--hh-success)', badge: '100%', badgeTrend: 'up' as const },
+            { name: 'Totaal Sessies', value: sessions.length, icon: Radio, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', badge: `+${Math.round(sessions.length * 0.12)}%`, badgeTrend: 'up' as const },
+            { name: 'Aankomend', value: upcomingSessionsAll.length, icon: CalendarIcon, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', badge: `+${upcomingSessionsAll.length}`, badgeTrend: 'up' as const },
+            { name: 'Gem. Deelnemers', value: sessions.length > 0 ? Math.round(sessions.reduce((sum, s) => sum + (s.viewerCount || 0), 0) / Math.max(sessions.length, 1)) : 0, icon: Users, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', badge: '+8%', badgeTrend: 'up' as const },
+            { name: 'Voltooide Sessies', value: pastSessions.length, icon: CheckCircle2, bgClass: 'bg-hh-success-100', textClass: 'text-hh-success', badge: '100%', badgeTrend: 'up' as const },
           ].map(stat => {
-            const badgeStyles = stat.badgeTrend === 'up'
-              ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--hh-success)', borderColor: 'rgba(16, 185, 129, 0.2)' }
+            const badgeClass = stat.badgeTrend === 'up'
+              ? 'bg-hh-success-100 text-hh-success border-hh-success-200'
               : stat.badgeTrend === 'neutral'
-              ? { backgroundColor: 'rgba(245, 158, 11, 0.1)', color: 'var(--hh-warning)', borderColor: 'rgba(245, 158, 11, 0.2)' }
-              : { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--hh-error)', borderColor: 'rgba(239, 68, 68, 0.2)' };
+              ? 'bg-hh-warning-100 text-hh-warning border-hh-warning-200'
+              : 'bg-hh-error-100 text-hh-error border-hh-error-200';
             return (
             <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
               <div className="flex items-start justify-between mb-2 sm:mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: stat.bgColor }}>
-                  <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${stat.bgClass}`}>
+                  <stat.icon className={`w-5 h-5 ${stat.textClass}`} />
                 </div>
-                <span className="text-[11px] px-2 py-0.5 rounded-full border" style={badgeStyles}>
+                <span className={`text-[11px] px-2 py-0.5 rounded-full border ${badgeClass}`}>
                   {stat.badge}
                 </span>
               </div>

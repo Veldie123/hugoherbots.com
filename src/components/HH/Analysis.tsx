@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { getAuthHeaders } from "../../services/hugoApi";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
+import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -319,8 +320,10 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
     return sum + mins;
   }, 0);
 
-  const Layout = AppLayout;
-  const layoutProps = { currentPage: "analysis", navigate, isAdmin };
+  const Layout = isAdmin ? AdminLayout : AppLayout;
+  const layoutProps = isAdmin
+    ? { currentPage: "admin-uploads" as const, navigate, isSuperAdmin: true }
+    : { currentPage: "analysis" as const, navigate, isAdmin };
 
   return (
     <Layout {...layoutProps}>

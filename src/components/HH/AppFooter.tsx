@@ -16,7 +16,7 @@ export function AppFooter({ navigate }: AppFooterProps) {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[14px] leading-[20px] text-hh-muted">
           {/* Left: Copyright */}
           <div className="flex items-center gap-2">
-            <span>© {currentYear} Hugo Herbots.ai</span>
+            <span>© {currentYear} hugoherbots.com</span>
             <span className="hidden sm:inline">•</span>
             <span className="text-[12px] leading-[16px] text-hh-ui-300">v1.0.2</span>
           </div>
@@ -32,7 +32,7 @@ export function AppFooter({ navigate }: AppFooterProps) {
             </button>
             
             <a
-              href="https://hugoherbots.ai/privacy"
+              href="https://hugoherbots.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-hh-primary transition-colors"
@@ -42,7 +42,7 @@ export function AppFooter({ navigate }: AppFooterProps) {
             </a>
             
             <a
-              href="https://hugoherbots.ai/terms"
+              href="https://hugoherbots.com/terms"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-hh-primary transition-colors"

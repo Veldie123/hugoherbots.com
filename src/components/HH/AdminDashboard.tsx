@@ -111,11 +111,11 @@ const getActivityIcon = (type: string) => {
 
 const getActivityColors = (type: string) => {
   switch (type) {
-    case "video": return { text: "text-hh-primary", bg: "bg-hh-primary/10" };
-    case "session": return { text: "text-hh-success", bg: "bg-hh-success/10" };
-    case "live": return { text: "text-hh-error", bg: "bg-hh-error/10" };
-    case "signup": return { text: "text-hh-primary", bg: "bg-hh-primary/10" };
-    default: return { text: "text-hh-primary", bg: "bg-hh-primary/10" };
+    case "video": return { text: "text-hh-primary", bg: "bg-hh-primary-100" };
+    case "session": return { text: "text-hh-success", bg: "bg-hh-success-100" };
+    case "live": return { text: "text-hh-error", bg: "bg-hh-error-100" };
+    case "signup": return { text: "text-hh-primary", bg: "bg-hh-primary-100" };
+    default: return { text: "text-hh-primary", bg: "bg-hh-primary-100" };
   }
 };
 
@@ -188,7 +188,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
       trend: data.kpis.sessionsToday.change.startsWith("+") ? "up" : "down",
       icon: Play,
       textClass: "text-hh-success",
-      bgClass: "bg-hh-success/10",
+      bgClass: "bg-hh-success-100",
     },
     {
       label: "Nieuwe Signups",
@@ -197,7 +197,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
       trend: data.kpis.newSignups.change.startsWith("+") ? "up" : "down",
       icon: UserPlus,
       textClass: "text-hh-primary",
-      bgClass: "bg-hh-primary/10",
+      bgClass: "bg-hh-primary-100",
     },
     {
       label: "NPS Score",
@@ -206,7 +206,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
       trend: "up" as const,
       icon: ThumbsUp,
       textClass: "text-hh-success",
-      bgClass: "bg-hh-success/10",
+      bgClass: "bg-hh-success-100",
     },
   ] : [];
 
@@ -253,16 +253,15 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${kpi.bgClass}`}>
                           <Icon className={`w-5 h-5 ${kpi.textClass}`} />
                         </div>
-                        <Badge
-                          variant="outline"
-                          className={`text-[11px] px-2 py-0.5 ${
+                        <span
+                          className={`text-[11px] px-2 py-0.5 rounded-full border ${
                             kpi.trend === "up"
-                              ? "bg-hh-success/10 text-hh-success border-hh-success/20"
-                              : "bg-hh-error-100 text-hh-error-700 border-hh-error-200"
+                              ? "bg-hh-success-100 text-hh-success border-hh-success-200"
+                              : "bg-hh-error-100 text-hh-error border-hh-error-200"
                           }`}
                         >
                           {kpi.change}
-                        </Badge>
+                        </span>
                       </div>
                       <p className="text-[13px] leading-[18px] text-hh-muted mb-1 sm:mb-2">
                         {kpi.label}
@@ -278,9 +277,9 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {[
                   { label: "Actieve Video's", icon: Video, textClass: "text-hh-primary", bgClass: "bg-hh-primary-100", note: "Beheer via Video's" },
-                  { label: "Live Webinars", icon: Radio, textClass: "text-hh-primary", bgClass: "bg-hh-primary/10", note: "Beheer via Webinars" },
-                  { label: "Coaching Sessies", icon: MessageSquare, textClass: "text-hh-warning", bgClass: "bg-hh-warning/10", note: "Talk to Hugo AI" },
-                  { label: "Platform Users", icon: Users, textClass: "text-hh-success", bgClass: "bg-hh-success/10", note: "Ingeschreven gebruikers" },
+                  { label: "Live Webinars", icon: Radio, textClass: "text-hh-primary", bgClass: "bg-hh-primary-100", note: "Beheer via Webinars" },
+                  { label: "Coaching Sessies", icon: MessageSquare, textClass: "text-hh-warning", bgClass: "bg-hh-warning-100", note: "Talk to Hugo AI" },
+                  { label: "Platform Users", icon: Users, textClass: "text-hh-success", bgClass: "bg-hh-success-100", note: "Ingeschreven gebruikers" },
                 ].map((kpi) => {
                   const Icon = kpi.icon;
                   return (
@@ -326,7 +325,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                     <div className="flex items-center gap-2 mb-3">
                       <Zap className="w-4 h-4 text-hh-primary" />
                       <h3 className="text-[14px] leading-[20px] font-semibold text-hh-text">Aandacht nodig</h3>
-                      <Badge variant="outline" className="ml-auto text-[10px] px-2 py-0.5 bg-hh-primary/10 text-hh-primary border-hh-primary/20">
+                      <Badge variant="outline" className="ml-auto text-[10px] px-2 py-0.5 bg-hh-primary-100 text-hh-primary border-hh-primary-200">
                         {unifiedAlerts.length}
                       </Badge>
                     </div>
@@ -383,7 +382,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                     className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
                     onClick={() => navigate?.("admin-live")}
                   >
-                    <div className="w-8 h-8 rounded-full bg-hh-error/10 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-hh-error-100 flex items-center justify-center">
                       <Radio className="w-4 h-4 text-hh-error" />
                     </div>
                     <div className="text-left">
@@ -397,7 +396,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                     className="flex-1 justify-start gap-2 h-auto py-3 px-4 rounded-xl"
                     onClick={() => navigate?.("admin-analytics")}
                   >
-                    <div className="w-8 h-8 rounded-full bg-hh-success/10 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-hh-success-100 flex items-center justify-center">
                       <BarChart3 className="w-4 h-4 text-hh-success" />
                     </div>
                     <div className="text-left">
@@ -455,7 +454,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
                   <div className="space-y-3">
                     {(data?.coachees || []).slice(0, 6).map((coachee) => (
                       <div key={coachee.id} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-hh-ui-50 transition-colors">
-                        <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-hh-primary-100 flex items-center justify-center flex-shrink-0">
                           <span className="text-[11px] font-semibold text-hh-primary">
                             {coachee.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                           </span>

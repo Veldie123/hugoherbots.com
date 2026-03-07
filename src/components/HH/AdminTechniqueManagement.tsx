@@ -320,10 +320,10 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-primary/10">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-primary-100">
                 <Award className="w-5 h-5 text-hh-primary" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">
+              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success-100 text-hh-success border-hh-success-200">
                 +5%
               </Badge>
             </div>
@@ -337,10 +337,10 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success/10">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success-100">
                 <CheckCircle className="w-5 h-5 text-hh-success" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">
+              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success-100 text-hh-success border-hh-success-200">
                 +12%
               </Badge>
             </div>
@@ -354,10 +354,10 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-primary/10">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-primary-100">
                 <BarChart3 className="w-5 h-5 text-hh-primary" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">
+              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success-100 text-hh-success border-hh-success-200">
                 +8%
               </Badge>
             </div>
@@ -371,10 +371,10 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success/10">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success-100">
                 <TrendingUp className="w-5 h-5 text-hh-success" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20">
+              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success-100 text-hh-success border-hh-success-200">
                 +4.2%
               </Badge>
             </div>
@@ -612,7 +612,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <Badge className="text-[11px] bg-hh-success/10 text-hh-success border-hh-success/20">
+                          <Badge className="text-[11px] bg-hh-success-100 text-hh-success border-hh-success-200">
                             {techniek.status}
                           </Badge>
                         </td>

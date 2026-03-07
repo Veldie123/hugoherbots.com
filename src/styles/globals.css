@@ -171,6 +171,20 @@
   --sidebar-accent-foreground: var(--hh-text);
   --sidebar-border: #2A3142;
   --sidebar-ring: var(--hh-primary);
+
+  /* Dark mode shade tokens — dark backgrounds for badges/cards */
+  --hh-primary-50: #1a2332;
+  --hh-primary-100: #1e2d42;
+  --hh-primary-200: #2a3f5c;
+  --hh-success-50: #0d2818;
+  --hh-success-100: #0f3321;
+  --hh-success-200: #164430;
+  --hh-error-50: #2a1215;
+  --hh-error-100: #3b181c;
+  --hh-error-200: #502228;
+  --hh-warning-50: #291e0a;
+  --hh-warning-100: #352810;
+  --hh-warning-200: #4a3618;
 }
 
 /* Admin/host webinar session — fuchsia purple accent instead of steel blue */
@@ -183,6 +197,13 @@
   --hh-primary-100: #F3E5FF;       /* light fuchsia — badge bg */
   --hh-primary-200: #E2C6FF;       /* medium-light fuchsia — borders */
   --hh-primary-rgb: 153, 16, 250;
+}
+
+/* Dark mode admin — purple shades for dark backgrounds */
+.dark .admin-session {
+  --hh-primary-50: #1f1528;
+  --hh-primary-100: #2a1a3d;
+  --hh-primary-200: #3d2558;
 }
 
 /* Dashboard card sizing — bypasses Tailwind v4 JIT not generating base w-[160px] */

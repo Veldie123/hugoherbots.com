@@ -100,8 +100,8 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
       change: "",
       trend: "up" as const,
       icon: Users,
-      color: "var(--hh-primary)",
-      bgColor: "var(--hh-primary-100)",
+      bgClass: "bg-hh-primary-100",
+      textClass: "text-hh-primary",
     },
     {
       label: "MAU (Monthly Active)",
@@ -109,8 +109,8 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
       change: "",
       trend: "up" as const,
       icon: TrendingUp,
-      color: "#10b981",
-      bgColor: "rgba(16, 185, 129, 0.1)",
+      bgClass: "bg-hh-success-100",
+      textClass: "text-hh-success",
     },
     {
       label: "Retention Rate",
@@ -118,8 +118,8 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
       change: "",
       trend: "up" as const,
       icon: Award,
-      color: "#f59e0b",
-      bgColor: "rgba(245, 158, 11, 0.1)",
+      bgClass: "bg-hh-warning-100",
+      textClass: "text-hh-warning",
     },
     {
       label: "Sessie Completion",
@@ -127,8 +127,8 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
       change: "",
       trend: "up" as const,
       icon: DollarSign,
-      color: "#10b981",
-      bgColor: "rgba(16, 185, 129, 0.1)",
+      bgClass: "bg-hh-success-100",
+      textClass: "text-hh-success",
     },
   ];
 
@@ -210,25 +210,25 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                 className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border"
               >
                 <div className="flex items-start justify-between mb-2 sm:mb-3">
-                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center`} style={{ backgroundColor: metric.bgColor }}>
-                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5`} style={{ color: metric.color }} />
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${metric.bgClass}`}>
+                    <Icon className={`w-5 h-5 ${metric.textClass}`} />
                   </div>
                   {metric.change ? (
-                    <Badge
-                      className={`${
+                    <span
+                      className={`text-[11px] px-2 py-0.5 rounded-full border ${
                         metric.trend === "up"
-                          ? "bg-hh-success-100 text-hh-success-700 border-hh-success-200"
-                          : "bg-hh-error-100 text-hh-error-700 border-hh-error-200"
-                      } text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5`}
+                          ? "bg-hh-success-100 text-hh-success border-hh-success-200"
+                          : "bg-hh-error-100 text-hh-error border-hh-error-200"
+                      }`}
                     >
                       {metric.change}
-                    </Badge>
+                    </span>
                   ) : null}
                 </div>
-                <p className="text-[12px] sm:text-[13px] leading-[16px] sm:leading-[18px] text-hh-muted mb-1">
+                <p className="text-[13px] leading-[18px] text-hh-muted">
                   {metric.label}
                 </p>
-                <p className="text-[24px] sm:text-[28px] leading-[32px] sm:leading-[36px] text-hh-primary">
+                <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-primary">
                   {metric.value}
                 </p>
               </Card>

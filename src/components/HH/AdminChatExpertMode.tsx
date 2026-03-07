@@ -202,6 +202,7 @@ export function AdminChatExpertMode({
     setDesktopSidebarOpenRaw(open);
     window.dispatchEvent(new CustomEvent('sidebar-collapse-request', { detail: { collapsed: open } }));
   };
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [expandedPhases, setExpandedPhases] = useState<number[]>([1]); // Phase 1 open by default
   const [expandedParents, setExpandedParents] = useState<string[]>([]); // Track expanded parent techniques
@@ -1439,6 +1440,53 @@ export function AdminChatExpertMode({
             </div>
           )}
 
+          {/* Mobile EPIC sidebar Sheet */}
+          <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+            <SheetContent side="left" className="w-[85vw] max-w-[400px] p-0 overflow-y-auto bg-hh-bg">
+              <SheetHeader className="px-4 py-3 border-b border-hh-border">
+                <SheetTitle className="text-hh-text text-[16px] font-bold tracking-[0.5px]">
+                  E.P.I.C. TECHNIQUE
+                </SheetTitle>
+              </SheetHeader>
+              <EPICSidebar
+                fasesAccordionOpen={fasesAccordionOpen}
+                setFasesAccordionOpen={setFasesAccordionOpen}
+                houdingenAccordionOpen={houdingenAccordionOpen}
+                setHoudingenAccordionOpen={setHoudingenAccordionOpen}
+                expandedPhases={expandedPhases}
+                togglePhase={togglePhase}
+                setCurrentPhase={setCurrentPhase}
+                expandedParents={expandedParents}
+                toggleParentTechnique={toggleParentTechnique}
+                expandedHoudingen={expandedHoudingen}
+                toggleHouding={toggleHouding}
+                selectedTechnique={selectedTechnique}
+                setSelectedTechnique={setSelectedTechnique}
+                activeHouding={activeHouding}
+                recommendedTechnique={recommendedTechnique}
+                openTechniqueDetails={openTechniqueDetails}
+                startTechniqueChat={startTechniqueChat}
+                techniquesByPhase={techniquesByPhase}
+                phaseNames={phaseNames}
+                getFaseBadgeColor={getFaseBadgeColor}
+                getTopLevelTechniques={getTopLevelTechniques}
+                hasChildren={hasChildren}
+                getChildTechniques={getChildTechniques}
+                klantHoudingen={klantHoudingenArray}
+                difficultyLevel={difficultyLevel}
+                isUserView={true}
+                isAdminView={true}
+                hideHeader={true}
+                onSelectTechnique={(nummer, naam) => {
+                  setCorrectionTechnique(nummer);
+                  setCorrectionTechniqueName(naam);
+                  setSelectedTechnique(naam);
+                  setMobileSidebarOpen(false);
+                }}
+              />
+            </SheetContent>
+          </Sheet>
+
         <div className={`${desktopSidebarOpen ? 'flex-1' : 'w-full'} flex flex-col bg-hh-bg overflow-hidden min-h-0`}>
 
           {/* Level transition notification banner */}
@@ -1596,7 +1644,7 @@ export function AdminChatExpertMode({
               <div key={message.id} className="space-y-2">
                 {/* Message Bubble - Modern rounded design */}
                 <div className={`flex ${message.sender === "hugo" ? "justify-end" : "justify-start"}`}>
-                  <div className="flex flex-col gap-1 max-w-[80%]">
+                  <div className={`flex flex-col gap-1 max-w-[80%] ${message.sender === "hugo" ? "items-end" : ""}`}>
                     {message.isTranscriptReplay && message.transcriptRole && (
                       <span className="text-[11px] font-medium mb-0.5 px-1" style={{ color: 'var(--hh-primary)' }}>
                         {message.transcriptRole}
@@ -1640,25 +1688,22 @@ export function AdminChatExpertMode({
                               }}
                               className="w-full text-left p-3 rounded-lg border transition-all hover:shadow-sm"
                               style={{
-                                borderColor: 'rgba(153,16,250,0.2)',
-                                backgroundColor: 'rgba(153,16,250,0.03)',
+                                borderColor: 'rgba(var(--hh-primary-rgb),0.2)',
+                                backgroundColor: 'rgba(var(--hh-primary-rgb),0.03)',
                               }}
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.borderColor = 'rgba(153,16,250,0.4)';
-                                e.currentTarget.style.backgroundColor = 'rgba(153,16,250,0.06)';
+                                e.currentTarget.style.borderColor = 'rgba(var(--hh-primary-rgb),0.4)';
+                                e.currentTarget.style.backgroundColor = 'rgba(var(--hh-primary-rgb),0.06)';
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.borderColor = 'rgba(153,16,250,0.2)';
-                                e.currentTarget.style.backgroundColor = 'rgba(153,16,250,0.03)';
+                                e.currentTarget.style.borderColor = 'rgba(var(--hh-primary-rgb),0.2)';
+                                e.currentTarget.style.backgroundColor = 'rgba(var(--hh-primary-rgb),0.03)';
                               }}
                             >
                               <div className="flex items-center justify-between">
                                 <span className="font-medium text-[13px] text-hh-ink">{card.title}</span>
                                 {card.score !== undefined && (
-                                  <span className="text-[12px] font-semibold px-2 py-0.5 rounded-full" style={{
-                                    backgroundColor: card.score >= 60 ? 'rgba(60,154,110,0.1)' : 'rgba(239,68,68,0.1)',
-                                    color: card.score >= 60 ? '#3C9A6E' : '#ef4444',
-                                  }}>
+                                  <span className={`text-[12px] font-semibold px-3 py-1 rounded-full ${card.score >= 60 ? 'bg-hh-success-100 text-hh-success' : 'bg-hh-error-100 text-hh-error'}`}>
                                     {card.score}%
                                   </span>
                                 )}
@@ -1670,9 +1715,7 @@ export function AdminChatExpertMode({
                                   {new Date(card.createdAt).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                                 </span>
                                 <span className="text-[11px] text-hh-muted/50">|</span>
-                                <span className="text-[11px]" style={{
-                                  color: card.status === 'completed' ? '#3C9A6E' : card.status === 'failed' ? '#ef4444' : '#f59e0b',
-                                }}>
+                                <span className={`text-[11px] ${card.status === 'completed' ? 'text-hh-success' : card.status === 'failed' ? 'text-hh-error' : 'text-hh-warning'}`}>
                                   {card.status === 'completed' ? 'Klaar' : card.status === 'failed' ? 'Mislukt' : 'Bezig...'}
                                 </span>
                               </div>
@@ -1729,7 +1772,13 @@ export function AdminChatExpertMode({
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <button
-                                onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
+                                onClick={() => {
+                                  if (window.innerWidth >= 1024) {
+                                    setDesktopSidebarOpen(!desktopSidebarOpen);
+                                  } else {
+                                    setMobileSidebarOpen(true);
+                                  }
+                                }}
                                 className="p-1.5 rounded-md transition-colors"
                                 style={{
                                   color: 'var(--hh-primary)',

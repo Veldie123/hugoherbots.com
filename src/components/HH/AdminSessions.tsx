@@ -507,7 +507,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
   if (loading) {
     return (
       <AdminLayout isSuperAdmin={isSuperAdmin} currentPage="admin-sessions" navigate={navigate}>
-        <div className="p-6 flex items-center justify-center h-64">
+        <div className="p-6 flex items-center justify-center flex-1 min-h-[50vh]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hh-primary mx-auto mb-4"></div>
             <p className="text-hh-muted">Sessies laden...</p>
@@ -545,7 +545,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                 <Settings className="w-4 h-4" />
                 Config Review
               </Button>
-              <Button className="gap-2 text-white" size="sm" style={{ backgroundColor: '#7e22ce' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6b21a8')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7e22ce')} onClick={() => navigate?.("admin-chat-expert")}>
+              <Button className="gap-2 text-white bg-hh-primary hover:bg-hh-primary-hover" size="sm" onClick={() => navigate?.("admin-chat-expert")}>
                 <Sparkles className="w-4 h-4" />
                 Talk to Hugo <sup className="text-[10px]">AI</sup>
               </Button>
@@ -557,7 +557,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
               <Settings className="w-3.5 h-3.5" />
               Config
             </Button>
-            <Button className="gap-1.5 text-[12px] text-white flex-1" size="sm" style={{ backgroundColor: '#7e22ce' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6b21a8')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7e22ce')} onClick={() => navigate?.("admin-chat-expert")}>
+            <Button className="gap-1.5 text-[12px] text-white flex-1 bg-hh-primary hover:bg-hh-primary-hover" size="sm" onClick={() => navigate?.("admin-chat-expert")}>
               <Sparkles className="w-3.5 h-3.5" />
               Myself <sup className="text-[9px]">AI</sup>
             </Button>
@@ -569,46 +569,29 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--hh-primary-100)' }}>
-                <MessageSquare className="w-5 h-5 text-hh-primary" />
+          {[
+            { name: 'Totaal Sessies', value: stats.totalSessions, icon: MessageSquare, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', badge: '+15%', badgeTrend: 'up' as const },
+            { name: 'Uitstekend', value: stats.excellentCount, icon: CheckCircle2, bgClass: 'bg-hh-success-100', textClass: 'text-hh-success', badge: '+8%', badgeTrend: 'up' as const },
+            { name: 'Gem. Score', value: `${stats.avgScore}%`, icon: BarChart3, bgClass: 'bg-hh-primary-100', textClass: 'text-hh-primary', badge: '+2.3%', badgeTrend: 'up' as const },
+            { name: 'Verbetering Nodig', value: stats.needsWorkCount, icon: AlertTriangle, bgClass: 'bg-hh-error-100', textClass: 'text-hh-error', badge: '-5%', badgeTrend: 'down' as const },
+          ].map(stat => {
+            const badgeClass = stat.badgeTrend === 'up'
+              ? 'bg-hh-success-100 text-hh-success border-hh-success-200'
+              : 'bg-hh-error-100 text-hh-error border-hh-error-200';
+            return (
+            <Card key={stat.name} className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
+              <div className="flex items-start justify-between mb-2 sm:mb-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${stat.bgClass}`}>
+                  <stat.icon className={`w-5 h-5 ${stat.textClass}`} />
+                </div>
+                <span className={`text-[11px] px-2 py-0.5 rounded-full border ${badgeClass}`}>
+                  {stat.badge}
+                </span>
               </div>
-              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-success) 10%, transparent)', color: 'var(--hh-success)', borderColor: 'color-mix(in srgb, var(--hh-success) 20%, transparent)' }}>+15%</span>
-            </div>
-            <p className="text-[13px] leading-[18px] text-hh-muted">Totaal Sessies</p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: 'var(--hh-primary)' }}>{stats.totalSessions}</p>
-          </Card>
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.12)' }}>
-                <CheckCircle2 className="w-5 h-5" style={{ color: '#059669' }} />
-              </div>
-              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-success) 10%, transparent)', color: 'var(--hh-success)', borderColor: 'color-mix(in srgb, var(--hh-success) 20%, transparent)' }}>+8%</span>
-            </div>
-            <p className="text-[13px] leading-[18px] text-hh-muted">Uitstekend</p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: 'var(--hh-primary)' }}>{stats.excellentCount}</p>
-          </Card>
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(2, 132, 199, 0.12)' }}>
-                <BarChart3 className="w-5 h-5" style={{ color: '#0284c7' }} />
-              </div>
-              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-success) 10%, transparent)', color: 'var(--hh-success)', borderColor: 'color-mix(in srgb, var(--hh-success) 20%, transparent)' }}>+2.3%</span>
-            </div>
-            <p className="text-[13px] leading-[18px] text-hh-muted">Gem. Score</p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: 'var(--hh-primary)' }}>{stats.avgScore}%</p>
-          </Card>
-          <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(234, 88, 12, 0.12)' }}>
-                <AlertTriangle className="w-5 h-5" style={{ color: '#ea580c' }} />
-              </div>
-              <span className="text-[11px] px-2 py-0.5 rounded-full border" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}>-5%</span>
-            </div>
-            <p className="text-[13px] leading-[18px] text-hh-muted">Verbetering Nodig</p>
-            <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px]" style={{ color: 'var(--hh-primary)' }}>{stats.needsWorkCount}</p>
-          </Card>
+              <p className="text-[13px] leading-[18px] text-hh-muted">{stat.name}</p>
+              <p className="text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] text-hh-primary">{stat.value}</p>
+            </Card>
+          );})}
         </div>
 
         {/* Filters */}

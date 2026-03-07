@@ -8,12 +8,12 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 const BUILD_DIR = path.join(__dirname, '..', 'build');
 const FALLBACK_HTML = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>HugoHerbots.ai</title></head><body><p>Loading...</p></body></html>';
 
-let cachedIndexHtml = null;
-try {
-  cachedIndexHtml = fs.readFileSync(path.join(BUILD_DIR, 'index.html'));
-  console.log(`[Production] index.html cached (${cachedIndexHtml.length} bytes)`);
-} catch (e) {
-  console.warn('[Production] index.html not found, using fallback');
+function getIndexHtml() {
+  try {
+    return fs.readFileSync(path.join(BUILD_DIR, 'index.html'));
+  } catch {
+    return FALLBACK_HTML;
+  }
 }
 
 const server = http.createServer(handleRequest);
@@ -87,7 +87,7 @@ function handleRequest(req, res) {
 
   if (pathname === '/' || pathname === '' || pathname === '/healthz' || pathname === '/health') {
     const headers = { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' };
-    const body = cachedIndexHtml || FALLBACK_HTML;
+    const body = getIndexHtml();
     if (supportsGzip(req)) {
       zlib.gzip(body, (err, compressed) => {
         if (err) { res.writeHead(200, headers); res.end(body); return; }
@@ -130,7 +130,7 @@ function handleRequest(req, res) {
       const stream = fs.createReadStream(filePath);
       stream.on('error', () => {
         res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
-        res.end(cachedIndexHtml || FALLBACK_HTML);
+        res.end(getIndexHtml());
       });
       // Gzip compressible text-based files
       if (COMPRESSIBLE_EXTENSIONS.has(ext) && supportsGzip(req)) {
@@ -145,7 +145,7 @@ function handleRequest(req, res) {
     } else {
       // SPA fallback — serve index.html for client-side routes
       const headers = { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' };
-      const body = cachedIndexHtml || FALLBACK_HTML;
+      const body = getIndexHtml();
       if (supportsGzip(req)) {
         zlib.gzip(body, (gzErr, compressed) => {
           if (gzErr) { res.writeHead(200, headers); res.end(body); return; }

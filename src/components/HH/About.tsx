@@ -532,7 +532,7 @@ export function About({ navigate }: AboutProps) {
             </div>
           </div>
           <div className="text-center text-[14px] leading-[20px] text-hh-muted pt-8 border-t border-hh-border">
-            © 2025 HugoHerbots.ai. Alle rechten voorbehouden.
+            © {new Date().getFullYear()} hugoherbots.com. Alle rechten voorbehouden.
           </div>
         </div>
       </footer>

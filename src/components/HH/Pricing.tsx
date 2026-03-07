@@ -533,7 +533,7 @@ export function Pricing({ navigate }: PricingProps) {
 
       <footer className="border-t border-hh-border py-12">
         <div className="max-w-7xl mx-auto px-6 text-center text-[14px] leading-[20px] text-hh-muted">
-          © 2025 HugoHerbots.ai. Alle rechten voorbehouden.
+          © {new Date().getFullYear()} hugoherbots.com. Alle rechten voorbehouden.
         </div>
       </footer>
     </div>
