@@ -61,6 +61,7 @@ import {
   FileAudio,
   Paperclip,
   File,
+  Phone,
 } from "lucide-react";
 import technieken_index from "../../data/technieken_index";
 import { KLANT_HOUDINGEN } from "../../data/klant_houdingen";
@@ -75,6 +76,7 @@ import { CoachViewSummary } from "./CoachViewSummary";
 import { ModelSelector, type EngineModel } from "./ModelSelector";
 import { lastActivityService } from "../../services/lastActivityService";
 import { SessionRating } from "./SessionRating";
+import { VoiceCoach } from "./VoiceCoach";
 import { supabase } from "../../utils/supabase/client";
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
@@ -174,6 +176,7 @@ export function TalkToHugoAI({
   const [showSessionRating, setShowSessionRating] = useState(false);
   const [ratingSessionId, setRatingSessionId] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [showVoiceCoach, setShowVoiceCoach] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpenRaw] = useState(
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('epic') === '1'
   );
@@ -529,7 +532,7 @@ export function TalkToHugoAI({
               mode: 'COACH_CHAT',
               isExpert: false,
               modality: 'chat',
-              viewMode: engineModel === "v3" ? 'user' : 'admin',
+              viewMode: 'admin',
             },
             (token) => {
               setMessages(prev => {
@@ -557,9 +560,51 @@ export function TalkToHugoAI({
           setMessages([{
             id: `welcome-${Date.now()}`,
             sender: "ai",
-            text: "Dag Hugo! Welkom op je platform. Waarmee kan ik je helpen?",
+            text: "Er ging iets mis bij het starten van de sessie. Probeer opnieuw of schakel naar een ander model.",
             timestamp: new Date(),
           }]);
+        } finally {
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      if (engineModel === "v3") {
+        // V3 coaching: start a real V3 session with personalized opening
+        try {
+          setIsLoading(true);
+          const welcomeMsg: Message = {
+            id: `welcome-${Date.now()}`,
+            sender: "ai",
+            text: "",
+            timestamp: new Date(),
+          };
+          setMessages([welcomeMsg]);
+
+          await hugoApi.startSessionStream(
+            {
+              techniqueId: 'general',
+              mode: 'COACH_CHAT',
+              isExpert: false,
+              modality: 'chat',
+              viewMode: 'user',
+            },
+            (token) => {
+              setMessages(prev => {
+                const updated = [...prev];
+                const lastMsg = updated[updated.length - 1];
+                if (lastMsg && lastMsg.id === welcomeMsg.id) {
+                  updated[updated.length - 1] = { ...lastMsg, text: lastMsg.text + token };
+                }
+                return updated;
+              });
+            }
+          );
+          setHasActiveSession(true);
+          console.log("[Hugo] V3 coaching session started");
+        } catch (e) {
+          console.warn("[Hugo] V3 coaching session failed, falling back to V2:", e);
+          // Fall through to V2 welcome below
         } finally {
           setIsLoading(false);
         }
@@ -2627,6 +2672,18 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           >
             <Paperclip className="w-4 h-4" />
           </Button>
+          {engineModel === "v3" && (
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={isStreaming}
+              className="flex-shrink-0 rounded-full w-9 h-9 border-hh-border hover:bg-hh-success/10 text-hh-success"
+              title="Voice coaching met Hugo"
+              onClick={() => setShowVoiceCoach(true)}
+            >
+              <Phone className="w-4 h-4" />
+            </Button>
+          )}
           <Input
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
@@ -3065,6 +3122,10 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             }}
           />
         </div>
+      )}
+
+      {showVoiceCoach && (
+        <VoiceCoach onClose={() => setShowVoiceCoach(false)} />
       )}
 
       <TechniqueDetailsDialog

@@ -14,6 +14,7 @@ import { saveMemory } from "./memory-service";
 import { supabase } from "../supabase-client";
 import { pool } from "../db";
 import { randomUUID } from "crypto";
+import { voiceRoutes } from "./voice-routes";
 
 // File upload: 5MB limit, images + PDF only
 const upload = multer({
@@ -446,5 +447,8 @@ router.get("/access", requireAuth, async (req: Request, res: Response) => {
   const access = await getV3Access(email);
   res.json(access);
 });
+
+// Mount voice routes at /api/v3/voice/*
+router.use("/voice", voiceRoutes);
 
 export { router as v3Routes };

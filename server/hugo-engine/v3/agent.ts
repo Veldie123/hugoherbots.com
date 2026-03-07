@@ -13,6 +13,7 @@ import {
   COACHING_MODEL,
 } from "./anthropic-client";
 import { buildV3SystemPrompt } from "./system-prompt";
+import { buildVoiceSystemPrompt } from "./system-prompt-voice";
 import { buildAdminSystemPrompt } from "./system-prompt-admin";
 import { type UserBriefing } from "./user-briefing";
 import {
@@ -68,6 +69,7 @@ export interface V3SessionState {
   engineVersion: "v3";
   roleplay?: RoleplayState;
   messageSummary?: string;
+  voiceMode?: boolean;
 }
 
 export interface V3Response {
@@ -162,6 +164,9 @@ async function executeTool(
 function getSystemPrompt(session: V3SessionState): string {
   if (session.mode === "admin") {
     return buildAdminSystemPrompt();
+  }
+  if (session.voiceMode) {
+    return buildVoiceSystemPrompt(session.userProfile, session.briefing);
   }
   return buildV3SystemPrompt(session.userProfile, session.briefing);
 }
