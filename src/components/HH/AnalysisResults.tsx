@@ -1011,7 +1011,7 @@ export function AnalysisResults({
     );
   }
 
-  const { phaseCoverage, missedOpportunities, strengths: rawStrengths, improvements: rawImprovements, microExperiments, overallScore } = insights;
+  const { phaseCoverage, missedOpportunities = [], strengths: rawStrengths = [], improvements: rawImprovements = [], microExperiments = [], overallScore } = insights;
 
   const strengths = rawStrengths.length > 0 ? rawStrengths : evaluations
     .filter(e => e.techniques.some(t => t.quality === 'perfect' || t.quality === 'goed'))
@@ -1267,7 +1267,9 @@ export function AnalysisResults({
 
           {/* SECTION: Coach Summary + Coaching Moments */}
           {(() => {
-            const moments = insights.moments || [];
+            const moments = (insights.moments || []).filter(
+              (m: any) => m && typeof m === 'object' && !Array.isArray(m) && m.id
+            );
             const momentConfig: Record<string, { icon: any; color: string; bg: string; iconBg: string; label: string }> = {
               'big_win': { 
                 icon: Trophy, 

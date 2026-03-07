@@ -35,14 +35,20 @@ import {
   executeAdminTool,
   ADMIN_TOOLS,
 } from "./tools/admin";
+import { buildCompactedMessages } from "./compaction";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export type V3Mode = "coaching" | "admin";
 
+export type V3ContentBlock =
+  | { type: "text"; text: string }
+  | { type: "image"; source: { type: "base64"; media_type: string; data: string } }
+  | { type: "document"; source: { type: "base64"; media_type: "application/pdf"; data: string } };
+
 export interface V3Message {
   role: "user" | "assistant";
-  content: string;
+  content: string | V3ContentBlock[];
 }
 
 export interface V3SessionState {
@@ -61,6 +67,7 @@ export interface V3SessionState {
   briefing?: UserBriefing;
   engineVersion: "v3";
   roleplay?: RoleplayState;
+  messageSummary?: string;
 }
 
 export interface V3Response {
@@ -69,6 +76,7 @@ export interface V3Response {
   model: string;
   inputTokens: number;
   outputTokens: number;
+  thinkingTokens: number;
 }
 
 export interface V3StreamEvent {
@@ -148,41 +156,51 @@ const MAX_TOOL_ROUNDS = 5;
  */
 export async function chat(
   session: V3SessionState,
-  userMessage: string
+  userMessage: string | V3ContentBlock[]
 ): Promise<V3Response> {
   const client = getAnthropicClient();
   const tools = getAllToolDefinitions(session.mode);
   const systemPrompt = getSystemPrompt(session);
   const model = COACHING_MODEL;
 
-  // Build message history for Claude
-  const messages: Anthropic.MessageParam[] = session.messages.map((m) => ({
-    role: m.role,
-    content: m.content,
-  }));
+  // Normalize user content for API and storage
+  const userContent = typeof userMessage === "string" ? userMessage : userMessage;
 
-  // Add the new user message
-  messages.push({ role: "user", content: userMessage });
+  // Build message history with context compaction
+  const allMessages = [...session.messages, { role: "user" as const, content: userContent }];
+  const { messages: apiMessages, newSummary } = await buildCompactedMessages(
+    allMessages,
+    session.messageSummary
+  );
+  if (newSummary) session.messageSummary = newSummary;
 
   const toolsUsed: string[] = [];
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
+  let totalThinkingTokens = 0;
+
+  const thinkingBudget = session.mode === "admin" ? 10000 : 5000;
 
   // Agentic loop: keep going until Claude produces a final text response
-  let currentMessages = [...messages];
+  let currentMessages = [...apiMessages];
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
     const requestParams: Anthropic.MessageCreateParams = {
       model,
-      max_tokens: session.mode === "admin" ? 4096 : 1024,
+      max_tokens: session.mode === "admin" ? 16384 : 8192,
       system: systemPrompt,
       tools,
       messages: currentMessages,
+      thinking: {
+        type: "enabled",
+        budget_tokens: thinkingBudget,
+      },
     };
 
     const response = await client.messages.create(requestParams);
 
     totalInputTokens += response.usage.input_tokens;
     totalOutputTokens += response.usage.output_tokens;
+    totalThinkingTokens += (response.usage as any).thinking_tokens || 0;
 
     // Check if the response contains tool use
     const toolUseBlocks = response.content.filter(
@@ -197,7 +215,7 @@ export async function chat(
       const text = textBlocks.map((b) => b.text).join("");
 
       // Store messages in session
-      session.messages.push({ role: "user", content: userMessage });
+      session.messages.push({ role: "user", content: userContent });
       session.messages.push({ role: "assistant", content: text });
 
       return {
@@ -206,6 +224,7 @@ export async function chat(
         model,
         inputTokens: totalInputTokens,
         outputTokens: totalOutputTokens,
+        thinkingTokens: totalThinkingTokens,
       };
     }
 
@@ -248,6 +267,7 @@ export async function chat(
     model,
     inputTokens: totalInputTokens,
     outputTokens: totalOutputTokens,
+    thinkingTokens: totalThinkingTokens,
   };
 }
 
@@ -259,67 +279,79 @@ export async function chat(
  */
 export async function* chatStream(
   session: V3SessionState,
-  userMessage: string
+  userMessage: string | V3ContentBlock[]
 ): AsyncGenerator<V3StreamEvent> {
   const client = getAnthropicClient();
   const tools = getAllToolDefinitions(session.mode);
   const systemPrompt = getSystemPrompt(session);
   const model = COACHING_MODEL;
 
-  const messages: Anthropic.MessageParam[] = session.messages.map((m) => ({
-    role: m.role,
-    content: m.content,
-  }));
-  messages.push({ role: "user", content: userMessage });
+  // Normalize user content for API and storage
+  const userContent = typeof userMessage === "string" ? userMessage : userMessage;
+
+  // Build message history with context compaction
+  const allMessages = [...session.messages, { role: "user" as const, content: userContent }];
+  const { messages: apiMessages, newSummary } = await buildCompactedMessages(
+    allMessages,
+    session.messageSummary
+  );
+  if (newSummary) session.messageSummary = newSummary;
 
   const toolsUsed: string[] = [];
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
 
-  let currentMessages = [...messages];
+  const thinkingBudget = session.mode === "admin" ? 10000 : 5000;
+
+  let currentMessages = [...apiMessages];
+  let allRoundText = ""; // Accumulate text across all rounds for session storage
+
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
     yield { type: "thinking" };
 
     const stream = client.messages.stream({
       model,
-      max_tokens: session.mode === "admin" ? 4096 : 1024,
+      max_tokens: session.mode === "admin" ? 16384 : 8192,
       system: systemPrompt,
       tools,
       messages: currentMessages,
+      thinking: {
+        type: "enabled",
+        budget_tokens: thinkingBudget,
+      },
     });
 
-    // Collect full response for tool handling
-    let currentText = "";
-
+    // Queue text tokens for real-time streaming
+    const tokenQueue: string[] = [];
     stream.on("text", (text) => {
-      currentText += text;
+      tokenQueue.push(text);
     });
 
     const finalMessage = await stream.finalMessage();
     totalInputTokens += finalMessage.usage.input_tokens;
     totalOutputTokens += finalMessage.usage.output_tokens;
-    const stopReason = finalMessage.stop_reason;
 
-    // Process content blocks
+    // Always yield queued text tokens — even when tools are also present
+    for (const token of tokenQueue) {
+      yield { type: "token", content: token };
+    }
+
+    // Extract text for session storage
+    const textBlocks = finalMessage.content.filter(
+      (block): block is Anthropic.TextBlock => block.type === "text"
+    );
+    const roundText = textBlocks.map((b) => b.text).join("");
+    allRoundText += roundText;
+
+    // Check for tool calls
     const toolUseBlocks = finalMessage.content.filter(
       (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
     );
 
-    if (toolUseBlocks.length === 0 || stopReason === "end_turn") {
-      // Stream text tokens from the final text
-      const textBlocks = finalMessage.content.filter(
-        (block): block is Anthropic.TextBlock => block.type === "text"
-      );
-      const text = textBlocks.map((b) => b.text).join("");
-
-      // Yield token by token (split into small chunks for smooth rendering)
-      const chunkSize = 4; // characters per token event
-      for (let i = 0; i < text.length; i += chunkSize) {
-        yield { type: "token", content: text.slice(i, i + chunkSize) };
-      }
-
-      session.messages.push({ role: "user", content: userMessage });
-      session.messages.push({ role: "assistant", content: text });
+    if (toolUseBlocks.length === 0) {
+      // Final response — save and done
+      session.messages.push({ role: "user", content: userContent });
+      session.messages.push({ role: "assistant", content: allRoundText });
 
       yield {
         type: "done",
@@ -329,7 +361,7 @@ export async function* chatStream(
       return;
     }
 
-    // Tool execution round
+    // Tool execution round — push assistant response + tool results to context
     currentMessages.push({ role: "assistant", content: finalMessage.content });
 
     const toolResults: Anthropic.ToolResultBlockParam[] = [];
@@ -352,10 +384,12 @@ export async function* chatStream(
     currentMessages.push({ role: "user", content: toolResults });
   }
 
-  // Max rounds fallback
+  // Max rounds fallback — also save to session
   const fallback = session.mode === "admin"
     ? "Ik heb even te veel opgezocht. Kun je je vraag herhalen?"
     : "Ik heb even te veel informatie opgezocht. Kun je je vraag herhalen?";
+  session.messages.push({ role: "user", content: userContent });
+  session.messages.push({ role: "assistant", content: allRoundText || fallback });
   yield { type: "token", content: fallback };
   yield { type: "done", usage: { inputTokens: totalInputTokens, outputTokens: totalOutputTokens }, toolsUsed };
 }

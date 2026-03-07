@@ -558,10 +558,15 @@ REGELS:
     };
   });
 
-  // Add video recommendations
+  // Add video recommendations (Map<momentType, VideoRecommendation[]>)
   try {
-    const enriched = buildVideoRecommendationsForMoments(moments);
-    moments.splice(0, moments.length, ...enriched);
+    const videoMap = buildVideoRecommendationsForMoments(moments);
+    for (const moment of moments) {
+      const videos = videoMap.get(moment.type);
+      if (videos && videos.length > 0) {
+        (moment as any).videoRecommendations = videos;
+      }
+    }
   } catch {
     // Video recommendations are optional
   }

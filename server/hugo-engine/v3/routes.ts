@@ -5,14 +5,28 @@
  * (superadmin always has full access). Sessions persisted to Supabase.
  */
 import { Router, type Request, type Response } from "express";
+import multer from "multer";
 import { requireAuth } from "../auth-middleware";
-import { chat, chatStream, createSession, type V3SessionState, type V3StreamEvent } from "./agent";
+import { chat, chatStream, createSession, type V3SessionState, type V3StreamEvent, type V3ContentBlock } from "./agent";
 import { isV3Available } from "./anthropic-client";
 import { buildUserBriefing } from "./user-briefing";
 import { saveMemory } from "./memory-service";
 import { supabase } from "../supabase-client";
 import { pool } from "../db";
 import { randomUUID } from "crypto";
+
+// File upload: 5MB limit, images + PDF only
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith("image/") || file.mimetype === "application/pdf") {
+      cb(null, true);
+    } else {
+      cb(new Error("Alleen afbeeldingen en PDF bestanden toegestaan."));
+    }
+  },
+});
 
 const router = Router();
 
@@ -30,7 +44,10 @@ async function persistSession(session: V3SessionState): Promise<void> {
       mode: session.mode,
       messages: session.messages,
       user_profile: session.userProfile || null,
-      metadata: { engineVersion: session.engineVersion },
+      metadata: {
+        engineVersion: session.engineVersion,
+        messageSummary: session.messageSummary || null,
+      },
       updated_at: new Date().toISOString(),
     }, { onConflict: "id" });
   } catch (err: any) {
@@ -59,6 +76,7 @@ async function loadSession(sessionId: string): Promise<V3SessionState | null> {
       userId: data.user_id,
       mode: data.mode as "coaching" | "admin",
       messages: data.messages || [],
+      messageSummary: data.metadata?.messageSummary || undefined,
       userProfile: data.user_profile,
       engineVersion: "v3",
     };
@@ -232,6 +250,7 @@ router.post(
         usage: {
           inputTokens: response.inputTokens,
           outputTokens: response.outputTokens,
+          thinkingTokens: response.thinkingTokens,
         },
       });
     } catch (err: any) {
@@ -278,6 +297,7 @@ router.post(
         usage: {
           inputTokens: response.inputTokens,
           outputTokens: response.outputTokens,
+          thinkingTokens: response.thinkingTokens,
         },
         messageCount: session.messages.length,
       });
@@ -291,10 +311,11 @@ router.post(
   }
 );
 
-/** Stream a message response via SSE */
+/** Stream a message response via SSE (supports optional file uploads) */
 router.post(
   "/session/:sessionId/stream",
   requireAuth,
+  upload.array("files", 5),
   async (req: Request, res: Response) => {
     const sessionId = req.params.sessionId as string;
     const { message } = req.body;
@@ -308,6 +329,34 @@ router.post(
       return res.status(404).json({ error: "Sessie niet gevonden. Start een nieuwe sessie." });
     }
 
+    // Build content: text + optional file attachments as content blocks
+    const files = (req.files as Express.Multer.File[]) || [];
+    let userContent: string | V3ContentBlock[];
+
+    if (files.length > 0) {
+      const contentBlocks: V3ContentBlock[] = [
+        { type: "text", text: message.trim() },
+      ];
+      for (const file of files) {
+        const base64 = file.buffer.toString("base64");
+        if (file.mimetype === "application/pdf") {
+          contentBlocks.push({
+            type: "document",
+            source: { type: "base64", media_type: "application/pdf", data: base64 },
+          });
+        } else {
+          contentBlocks.push({
+            type: "image",
+            source: { type: "base64", media_type: file.mimetype, data: base64 },
+          });
+        }
+      }
+      userContent = contentBlocks;
+      console.log(`[V3] Stream with ${files.length} file(s): ${files.map(f => f.originalname).join(", ")}`);
+    } else {
+      userContent = message.trim();
+    }
+
     // SSE headers
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -318,11 +367,11 @@ router.post(
     req.on("close", () => { clientDisconnected = true; });
 
     try {
-      for await (const event of chatStream(session, message.trim())) {
+      for await (const event of chatStream(session, userContent)) {
         if (clientDisconnected) break;
         res.write(`data: ${JSON.stringify(event)}\n\n`);
       }
-      persistSession(session); // async, non-blocking
+      persistSession(session);
     } catch (err: any) {
       console.error("[V3] Stream error:", err.message);
       if (!clientDisconnected) {

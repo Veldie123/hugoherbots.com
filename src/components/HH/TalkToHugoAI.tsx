@@ -1194,6 +1194,10 @@ export function TalkToHugoAI({
       : attachmentContext;
 
     const filesToAnalyze = isAnalyseIntent ? [...audioFiles] : [];
+    // Capture files for V3 multimodal upload (images + PDFs, not audio)
+    const v3Files = engineModel === "v3" && hasFiles && !isAnalyseIntent
+      ? attachedFiles.filter(f => f.type.startsWith("image/") || f.type === "application/pdf").map(f => f.file)
+      : undefined;
     attachedFiles.forEach((f) => { if (f.preview) URL.revokeObjectURL(f.preview); });
     setMessages(prev => [...prev, userMessage]);
     setInputText("");
@@ -1246,7 +1250,8 @@ export function TalkToHugoAI({
             }
             setStreamingText("");
             streamingTextRef.current = "";
-          }
+          },
+          v3Files && v3Files.length > 0 ? v3Files : undefined
         );
       } catch (error) {
         console.error("Streaming failed, falling back:", error);
@@ -1270,6 +1275,20 @@ export function TalkToHugoAI({
           }]);
         } finally {
           setIsLoading(false);
+        }
+      } finally {
+        // Safety net: if stream ended without "done" event, finalize accumulated text
+        if (streamingTextRef.current && isStreaming) {
+          const finalText = streamingTextRef.current;
+          setIsStreaming(false);
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 1).toString(),
+            sender: "ai",
+            text: finalText,
+            timestamp: new Date(),
+          }]);
+          setStreamingText("");
+          streamingTextRef.current = "";
         }
       }
     } else {

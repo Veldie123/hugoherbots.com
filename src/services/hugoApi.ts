@@ -111,7 +111,7 @@ interface V3StreamEvent {
   type: "thinking" | "tool_start" | "tool_result" | "token" | "done" | "error";
   content?: string;
   name?: string;
-  usage?: { inputTokens: number; outputTokens: number };
+  usage?: { inputTokens: number; outputTokens: number; thinkingTokens?: number };
   toolsUsed?: string[];
 }
 
@@ -331,17 +331,35 @@ class HugoApiService {
     content: string,
     isExpert = false,
     onToken: (token: string) => void,
-    onDone?: (debug?: any) => void
+    onDone?: (debug?: any) => void,
+    files?: File[]
   ): Promise<void> {
     if (!this.currentSessionId) {
       throw new Error("No active session. Call startSession first.");
     }
 
     if (this.useV3) {
+      let body: FormData | string;
+      const headers = await getAuthHeaders();
+
+      if (files && files.length > 0) {
+        // Multipart FormData for file uploads
+        const formData = new FormData();
+        formData.append("message", content);
+        for (const file of files) {
+          formData.append("files", file);
+        }
+        body = formData;
+        // Remove Content-Type so browser sets multipart boundary
+        delete (headers as Record<string, string>)["Content-Type"];
+      } else {
+        body = JSON.stringify({ message: content });
+      }
+
       const response = await fetch(`${API_BASE}/v3/session/${this.currentSessionId}/stream`, {
         method: "POST",
-        headers: await getAuthHeaders(),
-        body: JSON.stringify({ message: content }),
+        headers,
+        body,
       });
 
       if (!response.ok) {
