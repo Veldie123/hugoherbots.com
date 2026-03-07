@@ -87,6 +87,30 @@ export interface V3StreamEvent {
   toolsUsed?: string[];
 }
 
+// ── Output Validation (admin mode only) ──────────────────────────────────────
+
+const DATA_TOOLS = new Set([
+  "get_platform_analytics",
+  "list_analyses",
+  "get_technique_usage_trends",
+  "generate_summary_report",
+  "get_content_performance",
+  "get_stuck_users",
+  "get_low_performing_techniques",
+  "get_webinar_pipeline_status",
+  "get_user_detail",
+  "list_user_sessions",
+]);
+
+function validateOutput(text: string, toolsUsed: string[]): string {
+  const hasStats = /\d+\s*(gebruikers|sessies|webinars|%|procent|video|views|analyses)/i.test(text);
+  const usedDataTools = toolsUsed.some((t) => DATA_TOOLS.has(t));
+  if (hasStats && !usedDataTools) {
+    return text + "\n\n\u26a0\ufe0f *Let op: bovenstaande cijfers zijn niet geverifieerd via platform data.*";
+  }
+  return text;
+}
+
 // ── Tool Definitions (mode-specific) ────────────────────────────────────────
 
 function getAllToolDefinitions(mode: V3Mode): Anthropic.Tool[] {
@@ -212,7 +236,12 @@ export async function chat(
       const textBlocks = response.content.filter(
         (block): block is Anthropic.TextBlock => block.type === "text"
       );
-      const text = textBlocks.map((b) => b.text).join("");
+      let text = textBlocks.map((b) => b.text).join("");
+
+      // Validate output in admin mode
+      if (session.mode === "admin") {
+        text = validateOutput(text, toolsUsed);
+      }
 
       // Store messages in session
       session.messages.push({ role: "user", content: userContent });
@@ -349,6 +378,11 @@ export async function* chatStream(
     );
 
     if (toolUseBlocks.length === 0) {
+      // Validate output in admin mode
+      if (session.mode === "admin") {
+        allRoundText = validateOutput(allRoundText, toolsUsed);
+      }
+
       // Final response — save and done
       session.messages.push({ role: "user", content: userContent });
       session.messages.push({ role: "assistant", content: allRoundText });

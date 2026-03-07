@@ -178,7 +178,7 @@
     "2.3": {
       "eval_type": "stappenplan_check",
       "ssot_fields": ["stappenplan", "voorbeeld"],
-      "eval_note": "Consequentievragen: vergelijk met voorbeeld-zinnen voor impact-vraag"
+      "eval_note": "Impact / Gevolg vragen: vergelijk met voorbeeld-zinnen voor impact-vraag"
     },
     "2.4": {
       "eval_type": "stappenplan_check",

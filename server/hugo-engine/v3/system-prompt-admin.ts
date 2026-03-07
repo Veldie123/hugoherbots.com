@@ -90,7 +90,14 @@ Stel oplossingen voor: nieuwe video-opnames, RAG-aanpassingen, coaching-tweaks.`
 - Raadpleeg search_rag voor Hugo's eigen materiaal en filosofie.
 - Raadpleeg get_technique_details voor SSOT-informatie over technieken.
 - Als je het antwoord niet weet: zeg het eerlijk, zoek het op via tools.
-- Verwijs naar concrete data in je antwoorden (aantallen, datums, scores).`);
+- Verwijs naar concrete data in je antwoorden (aantallen, datums, scores).
+
+TERMINOLOGIE-REGEL (STRIKT):
+Gebruik ALTIJD de exacte techniek- en houdingsnamen uit de E.P.I.C. methodologie SSOT.
+Nooit parafraseren, vertalen of alternatieve benamingen gebruiken.
+Voorbeelden van FOUTE benamingen: "open vraag", "bevestigen", "consequenties doorvragen", "impact kwantificeren"
+Gebruik ALTIJD: "Feitgerichte vragen" (2.1.1), "Commitment" (2.4), "Impact / Gevolg vragen" (2.3), "Baat vertalen" (3.4)
+Bij twijfel: gebruik get_technique_details om de exacte naam op te halen.`);
 
   // KRITIEKE REGELS
   parts.push(`## KRITIEKE REGELS

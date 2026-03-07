@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from "react";
+import { supabase } from "../utils/supabase/client";
 
 export interface Notification {
   id: string;
-  type: "analysis_complete" | "info";
+  type: "analysis_complete" | "info" | "admin_notification";
   title: string;
   message: string;
   conversationId?: string;
@@ -183,6 +184,52 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       }
     };
   }, [startPolling]);
+
+  // Fetch admin notifications from platform_feedback on mount
+  useEffect(() => {
+    async function fetchAdminNotifications() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await supabase
+          .from("platform_feedback")
+          .select("id, metadata, created_at")
+          .eq("user_id", user.id)
+          .eq("feedback_type", "admin_notification")
+          .order("created_at", { ascending: false })
+          .limit(20);
+
+        if (error || !data || data.length === 0) return;
+
+        const seenKey = "hh_admin_notif_seen_ids";
+        const seenIds = new Set(loadFromStorage<string[]>(seenKey, []));
+
+        const newNotifs: Notification[] = [];
+        for (const row of data) {
+          if (seenIds.has(row.id)) continue;
+          const meta = typeof row.metadata === "string" ? JSON.parse(row.metadata) : row.metadata;
+          newNotifs.push({
+            id: `admin-notif-${row.id}`,
+            type: "admin_notification",
+            title: meta?.title || "Bericht van Hugo",
+            message: meta?.message || "",
+            read: false,
+            createdAt: row.created_at,
+          });
+          seenIds.add(row.id);
+        }
+
+        if (newNotifs.length > 0) {
+          localStorage.setItem(seenKey, JSON.stringify([...seenIds]));
+          setNotifications((prev) => [...newNotifs, ...prev].slice(0, 50));
+        }
+      } catch {
+        // Non-critical — silently fail
+      }
+    }
+    fetchAdminNotifications();
+  }, []);
 
   return (
     <NotificationContext.Provider

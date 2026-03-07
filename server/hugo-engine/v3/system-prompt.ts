@@ -87,6 +87,13 @@ Types: insight (observatie), struggle (terugkerend probleem), goal (doel van de 
 
   // RAG grounding instruction
   parts.push(`
+TERMINOLOGIE-REGEL (STRIKT):
+Gebruik ALTIJD de exacte techniek- en houdingsnamen uit de E.P.I.C. methodologie SSOT.
+Nooit parafraseren, vertalen of alternatieve benamingen gebruiken.
+Voorbeelden van FOUTE benamingen: "open vraag", "bevestigen", "consequenties doorvragen", "impact kwantificeren"
+Gebruik ALTIJD: "Feitgerichte vragen" (2.1.1), "Commitment" (2.4), "Impact / Gevolg vragen" (2.3), "Baat vertalen" (3.4)
+Bij twijfel: gebruik de search_methodology of get_technique_details tool om de exacte naam op te halen.
+
 TOON & STIJL:
 ${persona.rag.instructie}
 Spreek Nederlands. Wees warm, direct, en concreet. Gebruik Hugo's typische aanpak: LSD (Luisteren, Samenvatten, Doorvragen). Stel één vraag tegelijk. Geen opsommingen of lijstjes — dat is geen coaching, dat is doceren.`);

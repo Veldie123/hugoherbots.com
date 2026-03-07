@@ -1,11 +1,8 @@
 /**
  * V3 Admin Tools
  *
- * 26 admin tools for the V3 Claude agent — platform management,
- * analytics, content, users, and proactive insights.
- *
- * Converts 16 existing tools from the GPT-4 powered hugo-agent.ts
- * and adds 10 new tools for slides, sessions, users, RAG, and reporting.
+ * 31 admin tools for the V3 Claude agent — platform management,
+ * analytics, content, users, proactive insights, and notifications.
  */
 import type Anthropic from "@anthropic-ai/sdk";
 import { readFileSync } from "fs";
@@ -489,6 +486,38 @@ export const adminToolDefinitions: Anthropic.Tool[] = [
       required: ["item_key", "action"],
     },
   },
+  // ── 30. compare_ai_vs_expected ─────────────────────────────────────────────
+  {
+    name: "compare_ai_vs_expected",
+    description:
+      "Haal een coaching-sessie transcript op zodat Hugo kan vergelijken wat de AI zei vs wat hij zou zeggen.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        session_id: { type: "string", description: "ID van de coaching-sessie" },
+        turn_index: {
+          type: "number",
+          description: "Optioneel: specifieke beurt (0-based). Zonder geeft heel transcript.",
+        },
+      },
+      required: ["session_id"],
+    },
+  },
+  // ── 31. send_user_notification ─────────────────────────────────────────────
+  {
+    name: "send_user_notification",
+    description:
+      "Verstuur een notificatie naar een gebruiker (motivatie, tip, herinnering).",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        user_id: { type: "string", description: "UUID van de gebruiker" },
+        title: { type: "string", description: "Korte titel (max 60 tekens)" },
+        message: { type: "string", description: "Notificatie-inhoud" },
+      },
+      required: ["user_id", "title", "message"],
+    },
+  },
 ];
 
 // ── Tool name registry ───────────────────────────────────────────────────────
@@ -583,6 +612,10 @@ export async function executeAdminTool(
         return await execGetNextReviewItem(input.module);
       case "submit_review":
         return await execSubmitReview(input.item_key, input.action, input.feedback_text);
+      case "compare_ai_vs_expected":
+        return await execCompareAiVsExpected(input.session_id, input.turn_index);
+      case "send_user_notification":
+        return await execSendUserNotification(input.user_id, input.title, input.message);
       default:
         return JSON.stringify({ error: `Onbekende admin tool: ${name}` });
     }
@@ -1476,5 +1509,83 @@ async function execSubmitReview(
     });
   } catch (err: any) {
     return JSON.stringify({ error: `Review opslaan mislukt: ${err.message}` });
+  }
+}
+
+// 30. compare_ai_vs_expected
+async function execCompareAiVsExpected(sessionId: string, turnIndex?: number): Promise<string> {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, title, result FROM conversation_analyses WHERE id = $1 AND status = 'completed'`,
+      [sessionId]
+    );
+    if (rows.length === 0) {
+      return JSON.stringify({ error: `Geen voltooide analyse gevonden voor sessie ${sessionId}` });
+    }
+
+    const analysis = rows[0];
+    const result = typeof analysis.result === "string" ? JSON.parse(analysis.result) : analysis.result;
+
+    const transcript: Array<{ role: string; text: string }> = [];
+    if (result?.transcript) {
+      for (const turn of result.transcript) {
+        transcript.push({
+          role: turn.speaker === "seller" ? "verkoper" : "klant",
+          text: turn.text,
+        });
+      }
+    }
+
+    if (turnIndex !== undefined && turnIndex >= 0 && turnIndex < transcript.length) {
+      return JSON.stringify({
+        session_title: analysis.title,
+        turn: transcript[turnIndex],
+        turn_index: turnIndex,
+        total_turns: transcript.length,
+        ai_scores: {
+          overall: result?.insights?.overallScore,
+          technique: result?.insights?.phaseCoverage,
+        },
+      });
+    }
+
+    return JSON.stringify({
+      session_title: analysis.title,
+      transcript,
+      total_turns: transcript.length,
+      ai_scores: {
+        overall: result?.insights?.overallScore,
+        technique: result?.insights?.phaseCoverage,
+      },
+    });
+  } catch (err: any) {
+    return JSON.stringify({ error: `Sessie ophalen mislukt: ${err.message}` });
+  }
+}
+
+// 31. send_user_notification
+async function execSendUserNotification(userId: string, title: string, message: string): Promise<string> {
+  try {
+    const { rows: userRows } = await pool.query(
+      `SELECT id, full_name FROM profiles WHERE id = $1`,
+      [userId]
+    );
+    if (userRows.length === 0) {
+      return JSON.stringify({ error: `Gebruiker ${userId} niet gevonden` });
+    }
+
+    await pool.query(
+      `INSERT INTO platform_feedback (id, user_id, feedback_type, metadata, created_at)
+       VALUES (gen_random_uuid(), $1, 'admin_notification', $2, NOW())`,
+      [userId, JSON.stringify({ title, message })]
+    );
+
+    return JSON.stringify({
+      success: true,
+      recipient: userRows[0].full_name || userId,
+      title,
+    });
+  } catch (err: any) {
+    return JSON.stringify({ error: `Notificatie versturen mislukt: ${err.message}` });
   }
 }

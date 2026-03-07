@@ -1058,7 +1058,7 @@ export async function generateCoachReport(
 
 Stijl: concreet, coachend, niet academisch. Gebruik "je" (informeel). Geef concrete voorbeelden met quotes uit het gesprek.
 
-EPIC staat voor: Explore (2.1), Probe (2.2), Impact (2.3), Commitment (2.4).
+EPIC Fase 2 technieken (gebruik ALTIJD deze exacte namen): 2.1 Explore, 2.1.1 Feitgerichte vragen, 2.1.2 Meningsgerichte vragen, 2.1.3 Feitgerichte vragen onder alternatieve vorm, 2.1.4 Ter zijde schuiven, 2.1.5 Pingpong techniek, 2.1.6 Actief en empathisch luisteren, 2.2 Probe, 2.3 Impact / Gevolg vragen, 2.4 Commitment.
 
 REGELS:
 - strengths: technieken die goed of perfect werden toegepast. Gebruik het techniek-ID en naam. De quote moet letterlijk uit het transcript komen en relevant zijn voor die techniek.

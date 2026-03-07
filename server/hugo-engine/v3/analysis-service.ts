@@ -6,7 +6,7 @@
  * Used only for superadmin (stephane@hugoherbots.com).
  */
 import { getAnthropicClient, COACHING_MODEL } from "./anthropic-client";
-import { getTechnique } from "../ssot-loader";
+import { getTechnique, getTechniqueName, getAllTechniqueNummers } from "../ssot-loader";
 import { pool } from "../db";
 import {
   transcribeAudio,
@@ -76,6 +76,34 @@ function formatTimestamp(ms: number): string {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
+/** Build a compact technique list from SSOT for use in analysis prompts */
+function buildSSOTTechniqueList(): string {
+  const nummers = getAllTechniqueNummers();
+  const fases: Record<string, string[]> = {};
+  for (const nr of nummers) {
+    const name = getTechniqueName(nr);
+    if (!name) continue;
+    // Group by top-level fase (0, 1, 2, 3, 4)
+    const fase = nr.split(".")[0];
+    if (!fases[fase]) fases[fase] = [];
+    // Only include up to 2 levels deep for readability (e.g. "2.1.1" but not "2.1.1.3")
+    const depth = nr.split(".").length;
+    if (depth <= 3) {
+      fases[fase].push(`${nr}: ${name}`);
+    }
+  }
+  const faseLabels: Record<string, string> = {
+    "0": "Fase 0 (Voorbereiding)",
+    "1": "Fase 1 (Opening)",
+    "2": "Fase 2 (Ontdekking/EPIC)",
+    "3": "Fase 3 (Aanbeveling)",
+    "4": "Fase 4 (Beslissing)",
+  };
+  return Object.entries(fases)
+    .map(([fase, techniques]) => `- ${faseLabels[fase] || `Fase ${fase}`}: ${techniques.join(", ")}`)
+    .join("\n");
+}
+
 // ── V3 Evaluate Seller Turns ─────────────────────────────────────────────────
 
 async function evaluateSellerTurnsV3(
@@ -92,13 +120,13 @@ async function evaluateSellerTurnsV3(
     )
     .join("\n");
 
+  // Build EPIC technique list from SSOT (exact canonical names)
+  const ssotTechniqueList = buildSSOTTechniqueList();
+
   const systemPrompt = `Je bent een expert in de EPIC verkoopmethodologie van Hugo Herbots. Evalueer elk seller-bericht in het transcript op gebruikte technieken.
 
-EPIC Fasen:
-- Fase 1 (Opening): Koopklimaat (1.1), Gentleman's Agreement (1.2), Instapvraag (1.3)
-- Fase 2 (Ontdekking): Explore (2.1.x), Probe/Storytelling (2.2.x), Impact (2.3.x), Commit (2.4.x)
-- Fase 3 (Aanbeveling): OVB (3.1), USP's (3.2), Mening vragen (3.3)
-- Fase 4 (Beslissing): Bezwaarbehandeling (4.1.x), Closing (4.2.x)
+EPIC Technieken (gebruik ALTIJD deze exacte namen):
+${ssotTechniqueList}
 
 Kwaliteitsniveaus:
 - perfect: alle stappen correct toegepast
@@ -344,11 +372,14 @@ async function generateCoachReportV3(
     .map((m) => `Turn ${m.turnIdx} [${m.type}]: ${m.description}`)
     .join("\n");
 
+  const ssotNames = buildSSOTTechniqueList();
+
   const systemPrompt = `Je bent Hugo Herbots, verkoopcoach en expert in de EPIC-methode. Je schrijft een coachrapport in het Nederlands over een verkoopgesprek.
 
 Stijl: concreet, coachend, niet academisch. Gebruik "je" (informeel). Geef concrete voorbeelden met quotes uit het gesprek.
 
-EPIC staat voor: Explore (2.1), Probe (2.2), Impact (2.3), Commitment (2.4).
+EPIC Technieken (gebruik ALTIJD deze exacte namen, NOOIT informele alternatieven):
+${ssotNames}
 
 REGELS:
 - strengths: technieken die goed of perfect werden toegepast.
