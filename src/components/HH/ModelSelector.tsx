@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check, Sparkles, Cpu } from "lucide-react";
+import { ChevronDown, Check, Sparkles, Cpu, Zap, Brain, Gauge } from "lucide-react";
 import { hugoApi } from "../../services/hugoApi";
+import type { ThinkingMode } from "../../services/hugoApi";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -16,9 +17,18 @@ interface ModelOption {
   icon: React.ReactNode;
 }
 
+interface ThinkingOption {
+  id: ThinkingMode;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+}
+
 interface Props {
   currentModel: EngineModel;
   onModelChange: (model: EngineModel) => void;
+  thinkingMode?: ThinkingMode;
+  onThinkingModeChange?: (mode: ThinkingMode) => void;
   viewMode?: ViewMode;
   disabled?: boolean;
 }
@@ -42,9 +52,21 @@ const MODELS: ModelOption[] = [
   },
 ];
 
+const THINKING_OPTIONS: ThinkingOption[] = [
+  { id: "fast", label: "Snel", description: "Snelle antwoorden", icon: <Zap size={14} /> },
+  { id: "auto", label: "Auto", description: "Automatisch kiezen", icon: <Gauge size={14} /> },
+  { id: "deep", label: "Diep", description: "Diepgaande analyse", icon: <Brain size={14} /> },
+];
+
+const THINKING_LABELS: Record<ThinkingMode, string> = {
+  fast: "Snel",
+  auto: "Auto",
+  deep: "Diep",
+};
+
 // ── Component ───────────────────────────────────────────────────────────────
 
-export function ModelSelector({ currentModel, onModelChange, viewMode = "coaching", disabled }: Props) {
+export function ModelSelector({ currentModel, onModelChange, thinkingMode, onThinkingModeChange, viewMode = "coaching", disabled }: Props) {
   const [open, setOpen] = useState(false);
   const [hasV3Access, setHasV3Access] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -81,7 +103,9 @@ export function ModelSelector({ currentModel, onModelChange, viewMode = "coachin
     );
   }
 
-  // V3 access: interactive model selector
+  const showThinkingSection = currentModel === "v3" && thinkingMode && onThinkingModeChange;
+
+  // V3 access: interactive unified selector
   return (
     <div ref={ref} className="relative">
       <button
@@ -92,11 +116,18 @@ export function ModelSelector({ currentModel, onModelChange, viewMode = "coachin
         {current.icon}
         {current.name}
         <span className="text-[11px] font-normal text-hh-muted">{current.version}</span>
+        {showThinkingSection && (
+          <>
+            <span className="text-hh-border">·</span>
+            <span className="text-[11px] font-normal text-hh-muted">{THINKING_LABELS[thinkingMode]}</span>
+          </>
+        )}
         <ChevronDown size={12} className={`text-hh-muted transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (
         <div className="absolute top-full left-0 mt-1 w-[240px] bg-hh-bg border border-hh-border rounded-[12px] shadow-lg z-50 overflow-hidden">
+          {/* Model section */}
           {MODELS.map(model => (
             <button
               key={model.id}
@@ -127,6 +158,41 @@ export function ModelSelector({ currentModel, onModelChange, viewMode = "coachin
               )}
             </button>
           ))}
+
+          {/* Thinking mode section — only when V3 is active */}
+          {showThinkingSection && (
+            <>
+              <div className="border-t border-hh-border mx-3 my-1" />
+              <div className="px-3 pt-1 pb-0.5">
+                <span className="text-[11px] font-medium text-hh-muted uppercase tracking-wider">Denkmodus</span>
+              </div>
+              {THINKING_OPTIONS.map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => {
+                    onThinkingModeChange(opt.id);
+                    setOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-hh-ui-50 transition-colors ${
+                    thinkingMode === opt.id ? "bg-hh-primary/5" : ""
+                  }`}
+                >
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    thinkingMode === opt.id ? "bg-hh-primary text-white" : "bg-hh-ui-50 text-hh-muted"
+                  }`}>
+                    {opt.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[13px] font-medium text-hh-text">{opt.label}</span>
+                    <p className="text-[11px] text-hh-muted">{opt.description}</p>
+                  </div>
+                  {thinkingMode === opt.id && (
+                    <Check size={14} className="text-hh-primary flex-shrink-0" />
+                  )}
+                </button>
+              ))}
+            </>
+          )}
         </div>
       )}
     </div>

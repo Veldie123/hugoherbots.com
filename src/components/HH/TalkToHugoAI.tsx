@@ -75,7 +75,6 @@ import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
 import { apiFetch } from "../../services/apiFetch";
 import { CoachViewSummary } from "./CoachViewSummary";
 import { ModelSelector, type EngineModel } from "./ModelSelector";
-import { ThinkingModeSelector } from "./ThinkingModeSelector";
 import type { ThinkingMode } from "../../services/hugoApi";
 import { lastActivityService } from "../../services/lastActivityService";
 import { SessionRating } from "./SessionRating";
@@ -2464,7 +2463,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>
-                  {!assistanceConfig.blindPlay && (message.debugInfo?.expectedTechniqueId || message.debugInfo?.aiDecision?.epicFase || message.debugInfo?.aiDecision?.evaluatie) && (
+                  {!assistanceConfig.blindPlay && engineModel === "v3" && (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -2972,16 +2971,11 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               <ModelSelector
                 currentModel={engineModel}
                 onModelChange={handleEngineModelChange}
+                thinkingMode={thinkingMode}
+                onThinkingModeChange={setThinkingMode}
                 viewMode="coaching"
                 disabled={isLoading || isStreaming}
               />
-              {engineModel === "v3" && (
-                <ThinkingModeSelector
-                  mode={thinkingMode}
-                  onChange={setThinkingMode}
-                  disabled={isLoading || isStreaming}
-                />
-              )}
             </div>
             
             {/* Right: Mode toggle + Stop (Niveau is now auto-adaptive, hidden) */}

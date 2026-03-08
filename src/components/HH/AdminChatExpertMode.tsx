@@ -76,7 +76,6 @@ import { apiFetch } from "../../services/apiFetch";
 import { Loader2 } from "lucide-react";
 import { LiveAvatarComponent } from "./LiveAvatarComponent";
 import { ModelSelector, type EngineModel } from "./ModelSelector";
-import { ThinkingModeSelector } from "./ThinkingModeSelector";
 import type { ThinkingMode } from "../../services/hugoApi";
 
 interface AnalysisCard {
@@ -1361,16 +1360,11 @@ export function AdminChatExpertMode({
               <ModelSelector
                 currentModel={engineModel}
                 onModelChange={handleEngineModelChange}
+                thinkingMode={thinkingMode}
+                onThinkingModeChange={setThinkingMode}
                 viewMode="admin"
                 disabled={isLoading}
               />
-              {engineModel === "v3" && (
-                <ThinkingModeSelector
-                  mode={thinkingMode}
-                  onChange={setThinkingMode}
-                  disabled={isLoading}
-                />
-              )}
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center bg-hh-ui-50 rounded-full p-0.5">
@@ -1770,7 +1764,7 @@ export function AdminChatExpertMode({
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
                           </button>
-                          {!(onboardingStatus && !onboardingStatus.isComplete) && (message.debugInfo?.expectedTechniqueId || message.debugInfo?.aiDecision?.epicFase || message.debugInfo?.aiDecision?.evaluatie) && (
+                          {!(onboardingStatus && !onboardingStatus.isComplete) && engineModel === "v3" && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <button
