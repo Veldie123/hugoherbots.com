@@ -1640,9 +1640,66 @@ app.get("/api/user/sessions", async (req, res) => {
       };
     });
     
+    // Also fetch V3 sessions for this user
+    let v3SessionList: typeof sessionList = [];
+    try {
+      const { data: v3Rows } = await supabase
+        .from('v3_sessions')
+        .select('id, mode, messages, metadata, created_at, updated_at')
+        .eq('user_id', userId)
+        .eq('mode', 'coaching')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      v3SessionList = (v3Rows || [])
+        .filter(row => (row.messages || []).length > 1) // Only sessions with actual conversation
+        .map(row => {
+          const messages = row.messages || [];
+          // V3 first "user" message is the system opening prompt — skip it
+          // Use the second user message (the real first message from the seller)
+          const userMessages = messages.filter((m: any) => m.role === 'user');
+          const realUserMsg = userMessages.length > 1 ? userMessages[1] : null;
+          let naam = 'Nieuw gesprek';
+          if (realUserMsg) {
+            const text = typeof realUserMsg.content === 'string'
+              ? realUserMsg.content
+              : realUserMsg.content?.[0]?.text || '';
+            const trimmed = text.trim().slice(0, 50);
+            naam = trimmed.length < text.trim().length ? trimmed + '…' : trimmed || 'Nieuw gesprek';
+          }
+
+          return {
+            id: row.id,
+            nummer: 'general',
+            naam,
+            fase: 0,
+            type: 'ai-chat' as const,
+            score: 0,
+            quality: 'good' as const,
+            duration: `${Math.ceil(messages.length * 0.5)}:00`,
+            date: new Date(row.created_at).toISOString().split('T')[0],
+            time: new Date(row.created_at).toTimeString().split(' ')[0].substring(0, 5),
+            engineVersion: 'v3',
+            transcript: messages
+              .filter((m: any) => m.role === 'user' || m.role === 'assistant')
+              .map((msg: any, idx: number) => ({
+                speaker: msg.role === 'assistant' ? 'AI Coach' : 'Verkoper',
+                time: `${Math.floor(idx * 5 / 60)}:${String(idx * 5 % 60).padStart(2, '0')}`,
+                text: typeof msg.content === 'string' ? msg.content : msg.content?.[0]?.text || '',
+              })),
+          };
+        });
+    } catch (v3Err: any) {
+      console.warn("[API] V3 sessions fetch failed (non-fatal):", v3Err.message);
+    }
+
+    // Merge V2 + V3, sort by date descending
+    const allSessions = [...sessionList, ...v3SessionList]
+      .sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
+
     res.json({
-      sessions: sessionList,
-      total: sessionList.length
+      sessions: allSessions,
+      total: allSessions.length
     });
   } catch (error: any) {
     console.error("[API] Error fetching user sessions:", error.message);
@@ -1656,6 +1713,42 @@ app.get("/api/user/sessions/:id", async (req, res) => {
     const userId = req.userId!;
     const sessionId = req.params.id;
 
+    // V3 sessions have IDs starting with "v3_"
+    if (sessionId.startsWith('v3_')) {
+      const { data: v3Row, error: v3Error } = await supabase
+        .from('v3_sessions')
+        .select('id, mode, messages, metadata, created_at, updated_at')
+        .eq('id', sessionId)
+        .eq('user_id', userId)
+        .single();
+
+      if (v3Error || !v3Row) {
+        return res.status(404).json({ error: "Sessie niet gevonden" });
+      }
+
+      // V3 first message pair is system opening prompt + response — skip the prompt
+      // Keep the assistant's opening (visible to user) and all subsequent messages
+      const allMessages = (v3Row.messages || []).filter((m: any) => m.role === 'user' || m.role === 'assistant');
+      const v3Messages = allMessages
+        .filter((_: any, idx: number) => idx !== 0) // Skip first user msg (system opening prompt)
+        .map((msg: any, idx: number) => ({
+          id: `msg-${idx}`,
+          role: msg.role,
+          content: typeof msg.content === 'string' ? msg.content : (msg.content?.[0]?.text || ''),
+          timestamp: v3Row.created_at,
+        }));
+
+      return res.json({
+        id: v3Row.id,
+        engineVersion: 'v3',
+        mode: v3Row.mode,
+        createdAt: v3Row.created_at,
+        updatedAt: v3Row.updated_at,
+        messages: v3Messages,
+      });
+    }
+
+    // V2 sessions
     const { data: row, error } = await supabase
       .from('v2_sessions')
       .select('id, technique_id, current_mode, phase, turn_number, conversation_history, context, total_score, created_at, updated_at')

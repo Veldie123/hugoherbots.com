@@ -204,7 +204,7 @@ export function TalkToHugoAI({
     setMessages([]);
     setHasActiveSession(false);
     setStreamingText("");
-    hugoApi.setCurrentSessionId(null);
+    hugoApi.persistSessionId(null);
     // Force remount of the session start effect by toggling a key
     setSessionRestartKey(prev => prev + 1);
   }, []);
@@ -291,7 +291,16 @@ export function TalkToHugoAI({
       const loadSession = async () => {
         try {
           setIsLoading(true);
-          const res = await apiFetch(`/api/user/sessions/${navigationData.loadSessionId}`);
+          const sessionId = navigationData.loadSessionId;
+          const isV3Session = sessionId.startsWith('v3_');
+
+          // Switch to V3 mode if loading a V3 session
+          if (isV3Session && engineModel !== 'v3') {
+            setEngineModel('v3');
+            hugoApi.setV3Mode(true);
+          }
+
+          const res = await apiFetch(`/api/user/sessions/${sessionId}`);
           if (!res.ok) throw new Error('Sessie niet gevonden');
           const session = await res.json();
 
@@ -299,31 +308,31 @@ export function TalkToHugoAI({
             id: `hist-${idx}`,
             sender: msg.role === 'assistant' ? 'ai' as const : 'hugo' as const,
             text: msg.content,
-            timestamp: new Date(session.createdAt),
+            timestamp: new Date(session.createdAt || session.created_at),
           }));
 
           setMessages(historyMessages);
-          hugoApi.setCurrentSessionId(session.id);
+          if (isV3Session) {
+            hugoApi.persistSessionId(session.id);
+          } else {
+            hugoApi.setCurrentSessionId(session.id);
+          }
           setHasActiveSession(true);
 
-          // Check if this session has been analyzed
-          try {
-            const analysisRes = await apiFetch(`/api/v2/analysis/results/${session.id}`);
-            if (analysisRes.status === 200) {
-              const analysisData = await analysisRes.json();
-              setAnalysisResult(analysisData);
+          // Check if this session has been analyzed (V2 only)
+          if (!isV3Session) {
+            try {
+              const analysisRes = await apiFetch(`/api/v2/analysis/results/${session.id}`);
+              if (analysisRes.status === 200) {
+                const analysisData = await analysisRes.json();
+                setAnalysisResult(analysisData);
+              }
+            } catch {
+              // No analysis available — that's fine
             }
-          } catch {
-            // No analysis available — that's fine
           }
 
-          // Add a divider message to indicate continuation
-          setMessages(prev => [...prev, {
-            id: `continue-divider-${Date.now()}`,
-            sender: 'ai' as const,
-            text: `Gesprek hervat — ${session.techniqueName || 'Chat'}. Typ een bericht om verder te gaan.`,
-            timestamp: new Date(),
-          }]);
+          console.log(`[Hugo] Loaded ${isV3Session ? 'V3' : 'V2'} session:`, session.id);
         } catch (err) {
           setMessages([{
             id: `error-${Date.now()}`,
@@ -578,7 +587,38 @@ export function TalkToHugoAI({
       }
 
       if (engineModel === "v3") {
-        // V3 coaching: start a real V3 session with personalized opening
+        // V3 coaching: try to resume existing session first
+        const persistedId = hugoApi.getPersistedSessionId();
+        if (persistedId?.startsWith('v3_') && !navigationData?.loadSessionId) {
+          try {
+            setIsLoading(true);
+            const res = await apiFetch(`/api/user/sessions/${persistedId}`);
+            if (res.ok) {
+              const session = await res.json();
+              if (session.messages && session.messages.length > 0) {
+                const historyMessages: Message[] = session.messages.map((msg: any, idx: number) => ({
+                  id: `resumed-${idx}`,
+                  sender: msg.role === 'assistant' ? 'ai' as const : 'hugo' as const,
+                  text: msg.content,
+                  timestamp: new Date(session.createdAt || session.created_at || Date.now()),
+                }));
+                setMessages(historyMessages);
+                hugoApi.persistSessionId(persistedId);
+                setHasActiveSession(true);
+                console.log("[Hugo] V3 session resumed:", persistedId);
+                setIsLoading(false);
+                return;
+              }
+            }
+          } catch (e) {
+            console.warn("[Hugo] Failed to resume V3 session, creating new:", e);
+            hugoApi.persistSessionId(null);
+          } finally {
+            setIsLoading(false);
+          }
+        }
+
+        // Start a new V3 coaching session
         try {
           setIsLoading(true);
           const welcomeMsg: Message = {

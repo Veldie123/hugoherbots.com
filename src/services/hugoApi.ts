@@ -161,6 +161,21 @@ class HugoApiService {
     return this.currentSessionId;
   }
 
+  /** Persist V3 session ID across navigation via sessionStorage */
+  persistSessionId(id: string | null): void {
+    this.currentSessionId = id;
+    if (id) {
+      sessionStorage.setItem('hh_active_v3_session', id);
+    } else {
+      sessionStorage.removeItem('hh_active_v3_session');
+    }
+  }
+
+  /** Restore V3 session ID from sessionStorage */
+  getPersistedSessionId(): string | null {
+    return sessionStorage.getItem('hh_active_v3_session');
+  }
+
   async startSession(request: StartSessionRequest): Promise<StartSessionResponse> {
     if (this.useV3) {
       return this.startSessionV3(request);
@@ -196,7 +211,7 @@ class HugoApiService {
     }
 
     const data = await response.json();
-    this.currentSessionId = data.sessionId;
+    this.persistSessionId(data.sessionId);
 
     // Map V3 response to V2 format expected by frontend
     return {

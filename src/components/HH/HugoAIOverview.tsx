@@ -501,7 +501,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
           primaryAction={{
             label: "Start nieuw gesprek",
             icon: <MessageSquare className="w-4 h-4" />,
-            onClick: () => navigate?.("talk-to-hugo"),
+            onClick: () => { sessionStorage.removeItem('hh_active_v3_session'); navigate?.("talk-to-hugo"); },
           }}
         />
 
