@@ -81,7 +81,11 @@ Signaleer automatisch:
 - Lage techniek-scores (< 60% gemiddeld)
 - Vastgelopen gebruikers (14+ dagen inactief)
 - Terugkerende problemen bij sellers (via analyse-data)
-Stel oplossingen voor: nieuwe video-opnames, RAG-aanpassingen, coaching-tweaks.`);
+- Nieuwe scripts die gegenereerd zijn en wachten op review
+Stel oplossingen voor: nieuwe video-opnames, RAG-aanpassingen, coaching-tweaks.
+
+Bij sessie-start: check de notificaties. Als er nieuwe scripts wachten op review, meld dit aan Hugo:
+"Er zijn X nieuwe verkoopscripts gegenereerd die wachten op je review."`);
 
   // COHERENTIE
   parts.push(`## COHERENTIE

@@ -32,6 +32,12 @@ import {
   type RoleplayState,
 } from "./tools/roleplay";
 import {
+  scriptBuilderToolDefinitions,
+  executeScriptBuilderTool,
+  SCRIPT_BUILDER_TOOLS,
+  type ScriptBuilderState,
+} from "./tools/script-builder";
+import {
   adminToolDefinitions,
   executeAdminTool,
   ADMIN_TOOLS,
@@ -41,6 +47,7 @@ import { buildCompactedMessages } from "./compaction";
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export type V3Mode = "coaching" | "admin";
+export type ThinkingMode = "fast" | "auto" | "deep";
 
 export type V3ContentBlock =
   | { type: "text"; text: string }
@@ -68,6 +75,7 @@ export interface V3SessionState {
   briefing?: UserBriefing;
   engineVersion: "v3";
   roleplay?: RoleplayState;
+  scriptBuilder?: ScriptBuilderState;
   messageSummary?: string;
   voiceMode?: boolean;
 }
@@ -116,14 +124,18 @@ function validateOutput(text: string, toolsUsed: string[]): string {
 // ── Tool Definitions (mode-specific) ────────────────────────────────────────
 
 function getAllToolDefinitions(mode: V3Mode): Anthropic.Tool[] {
-  if (mode === "admin") {
-    return adminToolDefinitions;
+  const tools = mode === "admin"
+    ? [...adminToolDefinitions]
+    : [...knowledgeToolDefinitions, ...methodologyToolDefinitions, ...roleplayToolDefinitions, ...scriptBuilderToolDefinitions];
+
+  // Add cache_control to last tool so the entire tools array is cached
+  if (tools.length > 0) {
+    tools[tools.length - 1] = {
+      ...tools[tools.length - 1],
+      cache_control: { type: "ephemeral" as const },
+    };
   }
-  return [
-    ...knowledgeToolDefinitions,
-    ...methodologyToolDefinitions,
-    ...roleplayToolDefinitions,
-  ];
+  return tools;
 }
 
 // ── Tool Router ─────────────────────────────────────────────────────────────
@@ -156,6 +168,9 @@ async function executeTool(
   if (ROLEPLAY_TOOLS.has(name)) {
     return executeRoleplayTool(name, input, session);
   }
+  if (SCRIPT_BUILDER_TOOLS.has(name)) {
+    return executeScriptBuilderTool(name, input, session);
+  }
   return JSON.stringify({ error: `Unknown tool: ${name}` });
 }
 
@@ -169,6 +184,28 @@ function getSystemPrompt(session: V3SessionState): string {
     return buildVoiceSystemPrompt(session.userProfile, session.briefing);
   }
   return buildV3SystemPrompt(session.userProfile, session.briefing);
+}
+
+// ── Thinking Budget Heuristic ────────────────────────────────────────────────
+
+function resolveThinkingBudget(
+  mode: V3Mode,
+  thinkingMode: ThinkingMode,
+  message: string | V3ContentBlock[]
+): number | null {
+  if (thinkingMode === "fast") return null;
+  if (thinkingMode === "deep") return mode === "admin" ? 10000 : 8000;
+
+  // Auto: heuristic based on message content
+  const text = typeof message === "string" ? message : "";
+  const len = text.length;
+
+  if (len < 60 && !text.includes("?")) return 1024;
+
+  const deepPattern = /analyseer|vergelijk|waarom|roleplay|uitleg|verschil|strategie|evalueer|script|bezwaar/i;
+  if (deepPattern.test(text) || len > 400) return mode === "admin" ? 10000 : 8000;
+
+  return mode === "admin" ? 4000 : 3000;
 }
 
 // ── Agent Core ──────────────────────────────────────────────────────────────
@@ -185,7 +222,8 @@ const MAX_TOOL_ROUNDS = 5;
  */
 export async function chat(
   session: V3SessionState,
-  userMessage: string | V3ContentBlock[]
+  userMessage: string | V3ContentBlock[],
+  thinkingMode: ThinkingMode = "auto"
 ): Promise<V3Response> {
   const client = getAnthropicClient();
   const tools = getAllToolDefinitions(session.mode);
@@ -208,7 +246,7 @@ export async function chat(
   let totalOutputTokens = 0;
   let totalThinkingTokens = 0;
 
-  const thinkingBudget = session.mode === "admin" ? 10000 : 5000;
+  const thinkingBudget = resolveThinkingBudget(session.mode, thinkingMode, userMessage);
 
   // Agentic loop: keep going until Claude produces a final text response
   let currentMessages = [...apiMessages];
@@ -216,13 +254,18 @@ export async function chat(
     const requestParams: Anthropic.MessageCreateParams = {
       model,
       max_tokens: session.mode === "admin" ? 16384 : 8192,
-      system: systemPrompt,
+      system: [
+        {
+          type: "text" as const,
+          text: systemPrompt,
+          cache_control: { type: "ephemeral" as const },
+        },
+      ],
       tools,
       messages: currentMessages,
-      thinking: {
-        type: "enabled",
-        budget_tokens: thinkingBudget,
-      },
+      ...(thinkingBudget !== null
+        ? { thinking: { type: "enabled" as const, budget_tokens: thinkingBudget } }
+        : {}),
     };
 
     const response = await client.messages.create(requestParams);
@@ -230,6 +273,11 @@ export async function chat(
     totalInputTokens += response.usage.input_tokens;
     totalOutputTokens += response.usage.output_tokens;
     totalThinkingTokens += (response.usage as any).thinking_tokens || 0;
+    const cacheRead = (response.usage as any).cache_read_input_tokens || 0;
+    const cacheCreation = (response.usage as any).cache_creation_input_tokens || 0;
+    if (cacheRead > 0 || cacheCreation > 0) {
+      console.log(`[V3 Cache] read=${cacheRead} create=${cacheCreation} input=${response.usage.input_tokens}`);
+    }
 
     // Check if the response contains tool use
     const toolUseBlocks = response.content.filter(
@@ -313,7 +361,8 @@ export async function chat(
  */
 export async function* chatStream(
   session: V3SessionState,
-  userMessage: string | V3ContentBlock[]
+  userMessage: string | V3ContentBlock[],
+  thinkingMode: ThinkingMode = "auto"
 ): AsyncGenerator<V3StreamEvent> {
   const client = getAnthropicClient();
   const tools = getAllToolDefinitions(session.mode);
@@ -335,7 +384,7 @@ export async function* chatStream(
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
 
-  const thinkingBudget = session.mode === "admin" ? 10000 : 5000;
+  const thinkingBudget = resolveThinkingBudget(session.mode, thinkingMode, userMessage);
 
   let currentMessages = [...apiMessages];
   let allRoundText = ""; // Accumulate text across all rounds for session storage
@@ -346,13 +395,18 @@ export async function* chatStream(
     const stream = client.messages.stream({
       model,
       max_tokens: session.mode === "admin" ? 16384 : 8192,
-      system: systemPrompt,
+      system: [
+        {
+          type: "text" as const,
+          text: systemPrompt,
+          cache_control: { type: "ephemeral" as const },
+        },
+      ],
       tools,
       messages: currentMessages,
-      thinking: {
-        type: "enabled",
-        budget_tokens: thinkingBudget,
-      },
+      ...(thinkingBudget !== null
+        ? { thinking: { type: "enabled" as const, budget_tokens: thinkingBudget } }
+        : {}),
     });
 
     // Queue text tokens for real-time streaming
@@ -364,6 +418,11 @@ export async function* chatStream(
     const finalMessage = await stream.finalMessage();
     totalInputTokens += finalMessage.usage.input_tokens;
     totalOutputTokens += finalMessage.usage.output_tokens;
+    const cacheRead = (finalMessage.usage as any).cache_read_input_tokens || 0;
+    const cacheCreation = (finalMessage.usage as any).cache_creation_input_tokens || 0;
+    if (cacheRead > 0 || cacheCreation > 0) {
+      console.log(`[V3 Cache Stream] read=${cacheRead} create=${cacheCreation} input=${finalMessage.usage.input_tokens}`);
+    }
 
     // Always yield queued text tokens — even when tools are also present
     for (const token of tokenQueue) {

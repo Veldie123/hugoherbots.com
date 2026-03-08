@@ -830,17 +830,26 @@ async function execProposeConfigChange(
   input: Record<string, any>
 ): Promise<string> {
   try {
-    await pool.query(
-      `INSERT INTO config_proposals (proposed_by, type, field, current_value, proposed_value, reason)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+    const result = await pool.query(
+      `INSERT INTO admin_corrections (type, field, original_value, new_value, context, submitted_by, source, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id`,
       [
-        "hugo",
-        input.type,
+        input.type || "config_change",
         input.field || "",
         input.current_value || "",
         input.proposed_value,
-        input.reason,
+        input.reason || "",
+        "Hugo (AI)",
+        "v3_agent_proposal",
+        "pending",
       ]
+    );
+    const correctionId = result.rows[0]?.id;
+    await pool.query(
+      `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      ["config_proposal", `Config voorstel: ${input.field || input.type}`, input.reason || "", "content", "medium", correctionId, "admin-config-review"]
     );
     return JSON.stringify({
       proposed: true,
@@ -979,17 +988,28 @@ async function execProposeSlideChange(
 ): Promise<string> {
   try {
     const currentSlide = getSlideById(slideId);
-    await pool.query(
-      `INSERT INTO config_proposals (proposed_by, type, field, current_value, proposed_value, reason)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+    const result = await pool.query(
+      `INSERT INTO admin_corrections (type, field, original_value, new_value, context, submitted_by, source, original_json, new_json, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       RETURNING id`,
       [
-        "hugo",
-        "slide",
+        "slide_edit",
         slideId,
         currentSlide ? JSON.stringify(currentSlide) : "",
         JSON.stringify(changes),
         reason,
+        "Hugo (AI)",
+        "v3_agent_proposal",
+        currentSlide ? JSON.stringify(currentSlide) : null,
+        JSON.stringify(changes),
+        "pending",
       ]
+    );
+    const correctionId = result.rows[0]?.id;
+    await pool.query(
+      `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      ["config_proposal", `Slide voorstel: ${slideId}`, reason, "content", "medium", correctionId, "admin-config-review"]
     );
     return JSON.stringify({
       proposed: true,
@@ -1134,17 +1154,26 @@ async function execProposeRagChange(
   input: Record<string, any>
 ): Promise<string> {
   try {
-    await pool.query(
-      `INSERT INTO config_proposals (proposed_by, type, field, current_value, proposed_value, reason)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+    const result = await pool.query(
+      `INSERT INTO admin_corrections (type, field, original_value, new_value, context, submitted_by, source, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id`,
       [
-        "hugo",
-        "rag_fragment",
+        "rag_edit",
         input.fragment_id || "",
-        input.action,
-        input.content,
-        input.reason,
+        input.action || "",
+        input.content || "",
+        input.reason || "",
+        "Hugo (AI)",
+        "v3_agent_proposal",
+        "pending",
       ]
+    );
+    const correctionId = result.rows[0]?.id;
+    await pool.query(
+      `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      ["config_proposal", `RAG voorstel: ${input.action} ${input.fragment_id || "nieuw"}`, input.reason || "", "content", "medium", correctionId, "admin-config-review"]
     );
     return JSON.stringify({
       proposed: true,
@@ -1163,7 +1192,6 @@ async function execProposeTechniqueChange(
   input: Record<string, any>
 ): Promise<string> {
   try {
-    // Load current technique for reference
     const technieken = loadTechniques();
     const current = technieken.find(
       (t: any) =>
@@ -1171,17 +1199,30 @@ async function execProposeTechniqueChange(
         t.nummer?.toLowerCase() === input.technique_id?.toLowerCase()
     );
 
-    await pool.query(
-      `INSERT INTO config_proposals (proposed_by, type, field, current_value, proposed_value, reason)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+    const result = await pool.query(
+      `INSERT INTO admin_corrections (type, field, original_value, new_value, context, submitted_by, source, target_file, target_key, original_json, new_json, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+       RETURNING id`,
       [
-        "hugo",
-        "technique",
-        input.technique_id,
+        "technique_edit",
+        current?.naam || input.technique_id,
         current ? JSON.stringify(current) : "",
         JSON.stringify(input.changes),
-        input.reason,
+        input.reason || "",
+        "Hugo (AI)",
+        "v3_agent_proposal",
+        "config/ssot/technieken_index.json",
+        input.technique_id,
+        current ? JSON.stringify(current) : null,
+        JSON.stringify(input.changes),
+        "pending",
       ]
+    );
+    const correctionId = result.rows[0]?.id;
+    await pool.query(
+      `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      ["config_proposal", `Techniek voorstel: ${current?.naam || input.technique_id}`, input.reason || "", "content", "high", correctionId, "admin-config-review"]
     );
     return JSON.stringify({
       proposed: true,
