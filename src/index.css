@@ -5938,6 +5938,16 @@ h4 {
   }
 }
 
+.video-scroll-card {
+  width: 160px;
+  flex-shrink: 0;
+}
+@media (min-width: 640px) {
+  .video-scroll-card {
+    width: 200px;
+  }
+}
+
 .dashboard-card {
   transition: box-shadow .3s ease-in-out, transform .2s ease-in-out;
 }
@@ -6159,6 +6169,22 @@ body {
   color: var(--hh-warn);
 }
 
+.text-hh-error {
+  color: var(--hh-error);
+}
+
+.text-hh-warning {
+  color: var(--hh-warning);
+}
+
+.bg-hh-error {
+  background-color: var(--hh-error);
+}
+
+.bg-hh-warning {
+  background-color: var(--hh-warning);
+}
+
 .border-hh-border {
   border-color: var(--hh-border);
 }
@@ -6321,20 +6347,20 @@ body {
   --hh-slate-gray-legacy: var(--hh-slate-gray);
   --hh-primary-dark: var(--hh-steel-blue);
   --hh-primary-light: #7BA3C4;
-  --hh-primary-50: #EFF6FF;
-  --hh-primary-100: #DBEAFE;
-  --hh-primary-200: #BFDBFE;
-  --hh-success-50: #ECFDF5;
-  --hh-success-100: #D1FAE5;
-  --hh-success-200: #A7F3D0;
+  --hh-primary-50: #F4F6F8;
+  --hh-primary-100: #EDF1F5;
+  --hh-primary-200: #DCE3EB;
+  --hh-success-50: #F2FBF8;
+  --hh-success-100: #E7F8F2;
+  --hh-success-200: #CFF1E4;
   --hh-success-700: #047857;
-  --hh-warning-50: #FFFBEB;
-  --hh-warning-100: #FEF3C7;
-  --hh-warning-200: #FDE68A;
+  --hh-warning-50: #FFFAF0;
+  --hh-warning-100: #FEF5E7;
+  --hh-warning-200: #FDEACF;
   --hh-warning-700: #B45309;
-  --hh-error-50: #FEF2F2;
-  --hh-error-100: #FEE2E2;
-  --hh-error-200: #FECACA;
+  --hh-error-50: #FEF5F5;
+  --hh-error-100: #FDECEC;
+  --hh-error-200: #FBD9D9;
   --hh-error-700: #B91C1C;
   --font-size: 16px;
   --background: var(--hh-bg);
@@ -6388,6 +6414,13 @@ body {
   --hh-primary-100: #F3E8FF;
   --hh-primary-200: #E9D5FF;
   --hh-primary-rgb: 126, 34, 206;
+}
+
+/* Dark mode admin — purple shades for dark backgrounds */
+.dark .admin-session {
+  --hh-primary-50: #1f1528;
+  --hh-primary-100: #2a1a3d;
+  --hh-primary-200: #3d2558;
 }
 
 /* HH Design Token Light Shades — custom utility classes */
@@ -6469,6 +6502,25 @@ body {
   --sidebar-accent-foreground: var(--hh-text);
   --sidebar-border: #2a3142;
   --sidebar-ring: var(--hh-primary);
+
+  /* Dark mode shade tokens — dark backgrounds for badges/cards */
+  --hh-primary-50: #1a2332;
+  --hh-primary-100: #1e2d42;
+  --hh-primary-200: #2a3f5c;
+  --hh-primary-dark: #7BA3C4;
+  --hh-primary-light: #8FB8D4;
+  --hh-success-50: #0d2818;
+  --hh-success-100: #0f3321;
+  --hh-success-200: #164430;
+  --hh-success-700: #34d399;
+  --hh-error-50: #2a1215;
+  --hh-error-100: #3b181c;
+  --hh-error-200: #502228;
+  --hh-error-700: #fca5a5;
+  --hh-warning-50: #291e0a;
+  --hh-warning-100: #352810;
+  --hh-warning-200: #4a3618;
+  --hh-warning-700: #fcd34d;
 }
 
 [data-theme="light"] {

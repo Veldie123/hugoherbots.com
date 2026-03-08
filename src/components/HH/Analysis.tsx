@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { apiFetch } from "../../services/apiFetch";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
+import { HeroBanner } from "./HeroBanner";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -367,38 +368,17 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
         </div>
 
         {/* Hero Banner */}
-        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px]">
-          <img
-            src="/images/Hugo-Herbots-WEB-0309.JPG"
-            alt="Hugo Herbots Gespreksanalyse"
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: '50% 30%' }}
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
-          <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-          <div className="relative h-full flex items-center p-6 sm:p-8">
-            <div className="text-white space-y-3 max-w-lg">
-              <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: '#4F7396' }}>
-                <Sparkles className="w-3 h-3 mr-1" />
-                Gespreksanalyse
-              </Badge>
-              <h2 className="text-[20px] sm:text-[24px] font-bold leading-tight">
-                Analyseer je verkoopgesprekken
-              </h2>
-              <p className="text-white/70 text-[13px] sm:text-[14px] leading-relaxed line-clamp-2">
-                Upload een rollenspel of echt klantgesprek en ontvang gedetailleerde E.P.I.C. feedback van Hugo.
-              </p>
-              <Button
-                className="gap-2 text-white border-0 bg-hh-success hover:bg-hh-success/90"
-                onClick={() => navigate?.("upload-analysis")}
-              >
-                <Upload className="w-4 h-4" />
-                Analyseer gesprek
-              </Button>
-            </div>
-          </div>
-        </div>
+        <HeroBanner
+          image="/images/Hugo-Herbots-WEB-0309.JPG"
+          badge={{ icon: <Sparkles className="w-3 h-3 mr-1" />, label: "Gespreksanalyse" }}
+          title="Analyseer je verkoopgesprekken"
+          subtitle="Upload een rollenspel of echt klantgesprek en ontvang gedetailleerde E.P.I.C. feedback van Hugo."
+          primaryAction={{
+            label: "Analyseer gesprek",
+            icon: <Upload className="w-4 h-4" />,
+            onClick: () => navigate?.("upload-analysis"),
+          }}
+        />
 
         {/* Filters & Search */}
         <Card className="p-3 sm:p-4 rounded-[16px] shadow-hh-sm border-hh-border">

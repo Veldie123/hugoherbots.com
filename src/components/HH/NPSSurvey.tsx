@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 
 const NPS_STORAGE_KEY = "hh_last_nps_date";
 const NPS_INTERVAL_DAYS = 28;
+const NPS_FALLBACK_DELAY = 300000; // 5 minutes
 
 function shouldShowNPS(): boolean {
   try {
@@ -25,16 +26,26 @@ export function NPSSurvey() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    // Show after 30s delay if eligible
-    const timer = setTimeout(() => {
+    const handler = () => {
       if (shouldShowNPS()) setVisible(true);
-    }, 30000);
-    return () => clearTimeout(timer);
+    };
+
+    // Event-driven: triggered by session end, video completion, webinar leave
+    window.addEventListener("nps:trigger", handler);
+
+    // Fallback: 5 min timer for users who don't complete a session
+    const fallback = setTimeout(handler, NPS_FALLBACK_DELAY);
+
+    return () => {
+      window.removeEventListener("nps:trigger", handler);
+      clearTimeout(fallback);
+    };
   }, []);
 
   const dismiss = () => {
     setVisible(false);
-    // Don't update storage on dismiss — will ask again next session
+    // Save dismiss date — will wait full interval before showing again
+    localStorage.setItem(NPS_STORAGE_KEY, new Date().toISOString());
   };
 
   const handleSubmit = async () => {

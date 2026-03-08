@@ -5719,6 +5719,80 @@ async function startServer() {
     }
   });
 
+  // ── Admin Resources CRUD ──────────────────────────────────────────────────
+  app.get("/api/v2/admin/resources", async (_req: Request, res: Response) => {
+    const { data, error } = await supabase
+      .from("admin_resources")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  });
+
+  app.post("/api/v2/admin/resources", async (req: Request, res: Response) => {
+    const { title, description, category, type, fileUrl, fileSize, featured } = req.body;
+    if (!title) return res.status(400).json({ error: "Title is required" });
+    const { data, error } = await supabase
+      .from("admin_resources")
+      .insert({ title, description, category, type, file_url: fileUrl, file_size: fileSize, featured })
+      .select()
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  });
+
+  app.put("/api/v2/admin/resources/:id", async (req: Request, res: Response) => {
+    const { title, description, category, type, fileUrl, fileSize, featured } = req.body;
+    const { data, error } = await supabase
+      .from("admin_resources")
+      .update({ title, description, category, type, file_url: fileUrl, file_size: fileSize, featured, updated_at: new Date().toISOString() })
+      .eq("id", req.params.id)
+      .select()
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  });
+
+  app.delete("/api/v2/admin/resources/:id", async (req: Request, res: Response) => {
+    const { error } = await supabase.from("admin_resources").delete().eq("id", req.params.id);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+  });
+
+  // ── Help Articles CRUD ───────────────────────────────────────────────────
+  app.get("/api/v2/admin/articles", async (_req: Request, res: Response) => {
+    const { data, error } = await supabase
+      .from("help_articles")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  });
+
+  app.post("/api/v2/admin/articles", async (req: Request, res: Response) => {
+    const { title, excerpt, category, content, status, featured } = req.body;
+    if (!title) return res.status(400).json({ error: "Title is required" });
+    const { data, error } = await supabase
+      .from("help_articles")
+      .insert({ title, excerpt, category, content, status: status || "draft", featured })
+      .select()
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  });
+
+  app.put("/api/v2/admin/articles/:id", async (req: Request, res: Response) => {
+    const { title, excerpt, category, content, status, featured } = req.body;
+    const { data, error } = await supabase
+      .from("help_articles")
+      .update({ title, excerpt, category, content, status, featured, updated_at: new Date().toISOString() })
+      .eq("id", req.params.id)
+      .select()
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  });
+
   const API_PORT = parseInt(process.env.PORT || process.env.API_PORT || "3002", 10);
   server.listen(API_PORT, "0.0.0.0", () => {
     console.log(`[API] Hugo Engine V2 FULL API running on port ${API_PORT}`);

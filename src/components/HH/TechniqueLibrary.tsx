@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
+import { HeroBanner } from "./HeroBanner";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
@@ -221,65 +222,28 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
           </div>
         </div>
 
-        {/* Hero Banner - exact zoals Webinars */}
-        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px] dark:ring-1 dark:ring-white/10">
-          {/* Background Image - Hugo */}
-          <img 
-            src="/images/Hugo-Herbots-WEB-0281.JPG"
-            alt="Hugo Herbots E.P.I.C. TECHNIQUE"
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: '50% 30%' }}
-          />
-          {/* Gradient overlay - dark to light from left */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
-          <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-          
-          {/* Content */}
-          <div className="relative h-full flex items-center p-6 sm:p-8">
-            <div className="text-white space-y-3 max-w-lg">
-              {/* Green accent badge */}
-              <Badge className="text-white border-0 bg-hh-success">
-                <Award className="w-3 h-3 mr-1" />
-                54 E.P.I.C. TECHNIQUE
-              </Badge>
-              
-              <h2 className="text-[24px] sm:text-[32px] font-bold leading-tight">
-                Master de Sales Cyclus
-              </h2>
-              
-              <p className="text-white/70 text-[14px] leading-relaxed line-clamp-2">
-                Ontdek alle technieken van de 5 fases en word een top verkoper.
-              </p>
-              
-              <div className="flex flex-wrap gap-3 pt-1">
-                <button
-                  className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border border-white/60 backdrop-blur-sm transition-colors cursor-pointer"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
-                  onFocus={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                  onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
-                  onClick={() => navigate?.("videos")}
-                >
-                  <Play className="w-4 h-4" />
-                  Bekijk Video's
-                </button>
-                <Button
-                  className="gap-2 border-0 bg-hh-success hover:bg-hh-success/90"
-                  onClick={() => navigate?.("talk-to-hugo")}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Chat met Hugo
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Hero Banner */}
+        <HeroBanner
+          image="/images/Hugo-Herbots-WEB-0281.JPG"
+          badge={{ icon: <Award className="w-3 h-3 mr-1" />, label: "54 E.P.I.C. TECHNIQUE" }}
+          title="Master de Sales Cyclus"
+          subtitle="Ontdek alle technieken van de 5 fases en word een top verkoper."
+          primaryAction={{
+            label: "Talk to Hugo",
+            icon: <MessageCircle className="w-4 h-4" />,
+            onClick: () => navigate?.("talk-to-hugo"),
+          }}
+          secondaryAction={{
+            label: "Bekijk Video's",
+            icon: <Play className="w-4 h-4" />,
+            onClick: () => navigate?.("videos"),
+          }}
+        />
 
         {/* Search, View Toggle & Filters Card */}
         <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-          <div className="space-y-2">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-hh-muted" />
               <Input
                 placeholder="Zoek technieken..."
@@ -288,32 +252,30 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="flex items-center gap-2">
-              <Select value={activeFase} onValueChange={setActiveFase}>
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Alle Fases" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Fases</SelectItem>
-                  <SelectItem value="fase-0">Fase 0 - Pre-contactfase</SelectItem>
-                  <SelectItem value="fase-1">Fase 1 - Openingsfase</SelectItem>
-                  <SelectItem value="fase-2">Fase 2 - Ontdekkingsfase</SelectItem>
-                  <SelectItem value="fase-3">Fase 3 - Aanbevelingsfase</SelectItem>
-                  <SelectItem value="fase-4">Fase 4 - Beslissingsfase</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Alle Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Status</SelectItem>
-                  <SelectItem value="actief">Actief</SelectItem>
-                  <SelectItem value="concept">Concept</SelectItem>
-                  <SelectItem value="archief">Archief</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={activeFase} onValueChange={setActiveFase}>
+              <SelectTrigger className="w-full sm:w-[160px]">
+                <SelectValue placeholder="Alle Fases" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Fases</SelectItem>
+                <SelectItem value="fase-0">Fase 0 - Pre-contactfase</SelectItem>
+                <SelectItem value="fase-1">Fase 1 - Openingsfase</SelectItem>
+                <SelectItem value="fase-2">Fase 2 - Ontdekkingsfase</SelectItem>
+                <SelectItem value="fase-3">Fase 3 - Aanbevelingsfase</SelectItem>
+                <SelectItem value="fase-4">Fase 4 - Beslissingsfase</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-[160px]">
+                <SelectValue placeholder="Alle Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Status</SelectItem>
+                <SelectItem value="actief">Actief</SelectItem>
+                <SelectItem value="concept">Concept</SelectItem>
+                <SelectItem value="archief">Archief</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </Card>
 
@@ -573,16 +535,39 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
         {viewMode === "grid" && filteredTechnieken.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 pb-8">
             {filteredTechnieken.map((techniek) => {
-              const getPhaseImage = (code: string) => {
-                const phase = code.split('.')[0];
-                const images: Record<string, string> = {
-                  '0': '/images/Hugo-Herbots-WEB-0350.JPG',
-                  '1': '/images/Hugo-Herbots-WEB-0119.JPG',
-                  '2': '/images/Hugo-Herbots-WEB-0244.JPG',
-                  '3': '/images/Hugo-Herbots-WEB-0281.JPG',
-                  '4': '/images/Hugo-Herbots-WEB-0399.JPG',
-                };
-                return images[phase] || '/images/Hugo-Herbots-WEB-0350.JPG';
+              const HUGO_IMAGES = [
+                '/images/Hugo-Herbots-WEB-0081.JPG', '/images/Hugo-Herbots-WEB-0102.JPG',
+                '/images/Hugo-Herbots-WEB-0115.JPG', '/images/Hugo-Herbots-WEB-0116.JPG',
+                '/images/Hugo-Herbots-WEB-0119.JPG', '/images/Hugo-Herbots-WEB-0123.JPG',
+                '/images/Hugo-Herbots-WEB-0173.JPG', '/images/Hugo-Herbots-WEB-0197.JPG',
+                '/images/Hugo-Herbots-WEB-0244.JPG', '/images/Hugo-Herbots-WEB-0251-2.JPG',
+                '/images/Hugo-Herbots-WEB-0251.JPG', '/images/Hugo-Herbots-WEB-0281.JPG',
+                '/images/Hugo-Herbots-WEB-0303.JPG', '/images/Hugo-Herbots-WEB-0309.JPG',
+                '/images/Hugo-Herbots-WEB-0342.JPG', '/images/Hugo-Herbots-WEB-0350-2.JPG',
+                '/images/Hugo-Herbots-WEB-0350.JPG', '/images/Hugo-Herbots-WEB-0365.JPG',
+                '/images/Hugo-Herbots-WEB-0368.JPG', '/images/Hugo-Herbots-WEB-0399.JPG',
+                '/images/Hugo-Herbots-WEB-0404.JPG', '/images/Hugo-Herbots-WEB-0416-2.JPG',
+                '/images/Hugo-Herbots-WEB-0416.JPG', '/images/Hugo-Herbots-WEB-0433.JPG',
+                '/images/Hugo-Herbots-WEB-0444.JPG', '/images/Hugo-Herbots-WEB-0461.JPG',
+                '/images/Hugo-Herbots-WEB-0476.JPG', '/images/Hugo-Herbots-WEB-0536.JPG',
+                '/images/Hugo-Herbots-WEB-0555.JPG', '/images/Hugo-Herbots-WEB-0566.JPG',
+                '/images/Hugo-Herbots-WEB-0576.JPG', '/images/Hugo-Herbots-WEB-0580.JPG',
+                '/images/Hugo-Herbots-WEB-0606.JPG', '/images/Hugo-Herbots-WEB-0628.JPG',
+                '/images/Hugo-Herbots-WEB-0649.JPG', '/images/Hugo-Herbots-WEB-0663.JPG',
+                '/images/Hugo-Herbots-WEB-0676.JPG', '/images/Hugo-Herbots-WEB-0680.JPG',
+                '/images/Hugo-Herbots-WEB-0688.JPG', '/images/Hugo-Herbots-WEB-0701.JPG',
+                '/images/Hugo-Herbots-WEB-0705.JPG', '/images/Hugo-Herbots-WEB-0726.JPG',
+                '/images/Hugo-Herbots-WEB-0732.JPG', '/images/Hugo-Herbots-WEB-0749.JPG',
+                '/images/Hugo-Herbots-WEB-0761.JPG', '/images/Hugo-Herbots-WEB-0789.JPG',
+                '/images/Hugo-Herbots-WEB-0827.JPG', '/images/Hugo-Herbots-WEB-0839.JPG',
+                '/images/Hugo-Herbots-WEB-0844.JPG', '/images/Hugo-Herbots-WEB-0861.JPG',
+                '/images/Hugo-Herbots-WEB-0939.JPG', '/images/Hugo-Herbots-WEB-0962.JPG',
+                '/images/Hugo-Herbots-WEB-0968.JPG', '/images/Hugo-Herbots-WEB-1011.JPG',
+              ];
+              const getCardImage = (code: string) => {
+                let hash = 0;
+                for (let i = 0; i < code.length; i++) hash = ((hash << 5) - hash + code.charCodeAt(i)) | 0;
+                return HUGO_IMAGES[Math.abs(hash) % HUGO_IMAGES.length];
               };
               
               return (
@@ -614,9 +599,11 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                     }
                   }}
                 >
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-110 bg-gradient-to-br from-[#1e293b] to-hh-primary/80"
-                    style={{ backgroundImage: `url(${getPhaseImage(techniek.code)})` }}
+                  <img
+                    src={getCardImage(techniek.code)}
+                    alt={techniek.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                   
@@ -662,7 +649,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                           localStorage.setItem('selectedTechniek', techniek.code);
                           navigate?.("talk-to-hugo");
                         }}
-                        title="Chat met HugoAI"
+                        title="Talk to Hugo"
                       >
                         <MessageCircle className="w-5 h-5 text-hh-ink" />
                       </button>

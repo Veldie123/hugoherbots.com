@@ -90,7 +90,7 @@ export function EPICSidebar({
   onSelectTechnique,
 }: EPICSidebarProps) {
   const ACCENT = isAdminView ? 'var(--hh-primary)' : 'var(--hh-success)';
-  const ACCENT_BG = isAdminView ? 'rgba(153, 16, 250, 0.1)' : undefined;
+  const ACCENT_BG = isAdminView ? 'rgba(var(--hh-primary-rgb), 0.1)' : undefined;
   
   const isTechniqueLocked = (techniqueNumber: string) => {
     if (!isUserView) return false;

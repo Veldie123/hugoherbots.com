@@ -74,6 +74,12 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 - **CTA (admin):** `bg-hh-primary hover:bg-hh-primary/90 text-white`
 - **Destructive:** alleen voor camera uit, mic uit, sessie verlaten
 
+### Dark Mode
+
+- **Elk nieuw component MOET werken in dark mode.** Test altijd visueel met dark mode aan.
+- Gebruik NOOIT hardcoded `bg-white`, `bg-black`, of hex kleuren — gebruik `bg-hh-bg`, `text-hh-text`, etc. Deze tokens schakelen automatisch in dark mode.
+- Voor shade backgrounds: gebruik de `-50`/`-100`/`-200` tokens (bijv. `bg-hh-primary-100`) — deze hebben dark mode overrides in `src/index.css`.
+
 ### Layout Regels
 
 - **Control bars:** `justify-center` — elementen die verschijnen/verdwijnen NOOIT in dezelfde flex-rij als stabiele elementen (gebruik een aparte rij)
@@ -98,6 +104,7 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 - **Code taal:** Engels (variabelen, functies, comments)
 - **Geen `console.log`** in productie code
 - **Build check:** `npm run build` moet slagen voor elke commit
+- **Visuele verificatie:** Bij nieuwe of gewijzigde UI-componenten: neem een screenshot via `npx tsx scripts/screenshot.ts <url> /tmp/screenshot.png` en controleer het resultaat visueel voordat je commit. Doe dit altijd, zonder dat de gebruiker erom hoeft te vragen.
 - **Commit message stijl:** Korte imperatief ("Fix X", "Add Y", "Update Z")
 
 ## Local Development Server

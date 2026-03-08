@@ -7,7 +7,7 @@
 import { Router, type Request, type Response } from "express";
 import multer from "multer";
 import { requireAuth } from "../auth-middleware";
-import { chat, chatStream, createSession, type V3SessionState, type V3StreamEvent, type V3ContentBlock } from "./agent";
+import { chat, chatStream, createSession, type V3SessionState, type V3StreamEvent, type V3ContentBlock, type ThinkingMode } from "./agent";
 import { isV3Available } from "./anthropic-client";
 import { buildUserBriefing } from "./user-briefing";
 import { saveMemory } from "./memory-service";
@@ -271,7 +271,7 @@ router.post(
   requireAuth,
   async (req: Request, res: Response) => {
     const sessionId = req.params.sessionId as string;
-    const { message } = req.body;
+    const { message, thinkingMode } = req.body;
 
     if (!message || typeof message !== "string" || message.trim().length === 0) {
       return res.status(400).json({ error: "Message is verplicht." });
@@ -285,7 +285,7 @@ router.post(
     }
 
     try {
-      const response = await chat(session, message.trim());
+      const response = await chat(session, message.trim(), (thinkingMode as ThinkingMode) || "auto");
       persistSession(session);
 
       res.json({
@@ -367,8 +367,10 @@ router.post(
     let clientDisconnected = false;
     req.on("close", () => { clientDisconnected = true; });
 
+    const thinkingMode = (req.body.thinkingMode as ThinkingMode) || "auto";
+
     try {
-      for await (const event of chatStream(session, userContent)) {
+      for await (const event of chatStream(session, userContent, thinkingMode)) {
         if (clientDisconnected) break;
         res.write(`data: ${JSON.stringify(event)}\n\n`);
       }

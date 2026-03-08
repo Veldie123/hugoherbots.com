@@ -76,6 +76,8 @@ import { apiFetch } from "../../services/apiFetch";
 import { Loader2 } from "lucide-react";
 import { LiveAvatarComponent } from "./LiveAvatarComponent";
 import { ModelSelector, type EngineModel } from "./ModelSelector";
+import { ThinkingModeSelector } from "./ThinkingModeSelector";
+import type { ThinkingMode } from "../../services/hugoApi";
 
 interface AnalysisCard {
   id: string;
@@ -253,11 +255,18 @@ export function AdminChatExpertMode({
   const [engineModel, setEngineModel] = useState<EngineModel>(isSuperAdmin ? "v3" : "v2");
   const [sessionRestartKey, setSessionRestartKey] = useState(0);
 
+  // Thinking mode (Snel/Auto/Diep) — only relevant for V3
+  const [thinkingMode, setThinkingMode] = useState<ThinkingMode>("auto");
+
   // Sync engine model to hugoApi
   useEffect(() => {
     hugoApi.setV3Mode(engineModel === "v3");
     return () => { hugoApi.setV3Mode(false); };
   }, [engineModel]);
+
+  useEffect(() => {
+    hugoApi.setThinkingMode(thinkingMode);
+  }, [thinkingMode]);
 
   // Handle engine model switch — reset session and restart
   const handleEngineModelChange = useCallback((newModel: EngineModel) => {
@@ -1355,6 +1364,13 @@ export function AdminChatExpertMode({
                 viewMode="admin"
                 disabled={isLoading}
               />
+              {engineModel === "v3" && (
+                <ThinkingModeSelector
+                  mode={thinkingMode}
+                  onChange={setThinkingMode}
+                  disabled={isLoading}
+                />
+              )}
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center bg-hh-ui-50 rounded-full p-0.5">

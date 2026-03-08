@@ -371,7 +371,7 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
                 <button
                   onClick={() => setVideoOverlay(videoOverlay === "chat" ? null : "chat")}
                   className={`p-2 rounded-lg transition-colors ${videoOverlay === "chat" ? "bg-hh-ocean-blue text-white" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
-                  title="Chat met Hugo"
+                  title="Talk to Hugo"
                 >
                   <MessageSquare className="w-5 h-5" />
                 </button>

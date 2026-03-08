@@ -565,10 +565,7 @@ export function AppLayout({
 
             <Button
               onClick={() => navigate?.("talk-to-hugo")}
-              className="gap-2 text-white h-10 px-3 sm:px-4 rounded-lg"
-              style={{ backgroundColor: '#1e293b' }}
-              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#0f172a')}
-              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#1e293b')}
+              className="gap-2 h-10 px-3 sm:px-4 rounded-lg bg-hh-success hover:bg-hh-success/90 text-white"
             >
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline text-[14px]">
@@ -666,7 +663,7 @@ export function AppLayout({
           </div>
         </div>
 
-        <div className={contentClassName || "flex-1 overflow-y-auto min-h-0 pb-24 lg:pb-8"}>
+        <div className={contentClassName || "flex-1 overflow-y-auto min-h-0 pb-20 lg:pb-8"}>
           {children}
           {!["talk-to-hugo", "admin-chat-expert", "admin-v3-chat"].includes(currentPage || "") && <PageFooter />}
         </div>

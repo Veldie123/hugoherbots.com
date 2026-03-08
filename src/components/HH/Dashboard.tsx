@@ -4,6 +4,7 @@ import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { EmptyState } from "./EmptyState";
+import { HeroBanner } from "./HeroBanner";
 import {
   Play,
   ChevronLeft,
@@ -579,76 +580,25 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
           </div>
         </div>
 
-        {/* Hero Banner - Netflix Style */}
-        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px] dark:ring-1 dark:ring-white/10">
-          {videosLoading ? (
-            <div className="absolute inset-0 bg-hh-ink">
-              <div className="relative h-full flex items-center p-6 sm:p-8">
-                <div className="space-y-3 max-w-lg">
-                  <div className="h-5 w-28 bg-white/10 rounded animate-pulse" />
-                  <div className="h-7 w-64 bg-white/15 rounded animate-pulse" style={{ animationDelay: '100ms' }} />
-                  <div className="h-4 w-80 bg-white/10 rounded animate-pulse" style={{ animationDelay: '200ms' }} />
-                  <div className="h-9 w-36 bg-white/10 rounded-lg animate-pulse mt-2" style={{ animationDelay: '300ms' }} />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <>
-              <img
-                src="/images/Hugo-Herbots-WEB-0197.JPG"
-                alt="Hugo Herbots"
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ objectPosition: '50% 20%' }}
-                loading="eager"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
-              <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-              <div className="relative h-full flex items-center p-6 sm:p-8">
-                <div className="text-white space-y-3 max-w-lg">
-                  <Badge className="text-white border-0" style={{ backgroundColor: '#4F7396' }}>
-                    Aanbevolen voor jou
-                  </Badge>
-                  <h2 className="text-[24px] sm:text-[32px] font-bold leading-tight">
-                    {featuredVideo?.displayTitle || featuredVideo?.title || 'Aanbevolen video'}
-                  </h2>
-                  <p className="text-white/70 text-[14px] leading-relaxed line-clamp-2">
-                    Leer hoe je gerichte vragen stelt om de echte behoeften van je klant te ontdekken. 
-                    Dit is de basis van elke succesvolle sale.
-                  </p>
-                  <div className="flex flex-wrap gap-3 pt-1">
-                    <Button 
-                      className="gap-2 text-white border-0"
-                      style={{ backgroundColor: '#3d9a6e' }}
-                      onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#4daa7e'; }}
-                      onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#3d9a6e'; }}
-                      onClick={() => {
-                        if (featuredVideo?.id) {
-                          localStorage.setItem('currentVideoId', featuredVideo.id);
-                        }
-                        navigate?.("videos");
-                      }}
-                    >
-                      <Play className="w-4 h-4" />
-                      Verder kijken
-                    </Button>
-                    <button
-                      className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white backdrop-blur-sm transition-colors cursor-pointer"
-                      style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
-                      onFocus={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                      onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
-                      onClick={() => navigate?.("talk-to-hugo")}
-                    >
-                      <MessageSquare className="w-4 h-4" />
-                      Chat met Hugo
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+        {/* Hero Banner */}
+        <HeroBanner
+          image="/images/Hugo-Herbots-WEB-0197.JPG"
+          imagePosition="50% 20%"
+          badge={{ label: "Aanbevolen voor jou" }}
+          title={featuredVideo?.displayTitle || featuredVideo?.title || 'Aanbevolen video'}
+          subtitle="Leer hoe je gerichte vragen stelt om de echte behoeften van je klant te ontdekken. Dit is de basis van elke succesvolle sale."
+          primaryAction={{
+            label: "Verder kijken",
+            icon: <Play className="w-4 h-4" />,
+            onClick: () => { if (featuredVideo?.id) localStorage.setItem('currentVideoId', featuredVideo.id); navigate?.("videos"); },
+          }}
+          secondaryAction={{
+            label: "Talk to Hugo",
+            icon: <MessageSquare className="w-4 h-4" />,
+            onClick: () => navigate?.("talk-to-hugo"),
+          }}
+          isLoading={videosLoading}
+        />
 
         {/* Verder kijken - Videos */}
         <ContentRow 

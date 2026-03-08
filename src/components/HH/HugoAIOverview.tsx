@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { apiFetch } from "../../services/apiFetch";
 import { AppLayout } from "./AppLayout";
+import { HeroBanner } from "./HeroBanner";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -491,38 +492,18 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
         </div>
 
         {/* Hero Banner */}
-        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px]">
-          <img
-            src="/images/Hugo-Herbots-WEB-0461.JPG"
-            alt="Hugo Herbots AI Coach"
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: '50% 15%' }}
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
-          <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-          <div className="relative h-full flex items-center p-6 sm:p-8">
-            <div className="text-white space-y-3 max-w-lg">
-              <Badge className="bg-hh-primary text-white border-0 text-[12px]">
-                <Sparkles className="w-3 h-3 mr-1" />
-                AI Sales Coach
-              </Badge>
-              <h2 className="text-[20px] sm:text-[24px] font-bold leading-tight">
-                Oefen met Hugo
-              </h2>
-              <p className="text-white/70 text-[13px] sm:text-[14px] leading-relaxed line-clamp-2">
-                Train je sales skills met AI-gestuurde rollenspellen en ontvang realtime feedback op je technieken.
-              </p>
-              <Button
-                className="gap-2 text-white border-0 bg-hh-success hover:bg-hh-success/90"
-                onClick={() => navigate?.("talk-to-hugo")}
-              >
-                <MessageSquare className="w-4 h-4" />
-                Start nieuw gesprek
-              </Button>
-            </div>
-          </div>
-        </div>
+        <HeroBanner
+          image="/images/Hugo-Herbots-WEB-0461.JPG"
+          imagePosition="50% 15%"
+          badge={{ icon: <Sparkles className="w-3 h-3 mr-1" />, label: "AI Sales Coach" }}
+          title="Oefen met Hugo"
+          subtitle="Train je sales skills met AI-gestuurde rollenspellen en ontvang realtime feedback op je technieken."
+          primaryAction={{
+            label: "Start nieuw gesprek",
+            icon: <MessageSquare className="w-4 h-4" />,
+            onClick: () => navigate?.("talk-to-hugo"),
+          }}
+        />
 
         {/* Filters & Search */}
         <Card className="p-4 rounded-[16px] shadow-hh-sm border-hh-border">

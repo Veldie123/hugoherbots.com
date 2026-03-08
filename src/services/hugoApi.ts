@@ -138,12 +138,19 @@ export interface EvaluationResult {
   nextSteps: string[];
 }
 
+export type ThinkingMode = "fast" | "auto" | "deep";
+
 class HugoApiService {
   private currentSessionId: string | null = null;
   private useV3 = false;
+  private thinkingMode: ThinkingMode = "auto";
 
   setV3Mode(enabled: boolean): void {
     this.useV3 = enabled;
+  }
+
+  setThinkingMode(mode: ThinkingMode): void {
+    this.thinkingMode = mode;
   }
 
   setCurrentSessionId(id: string | null): void {
@@ -300,7 +307,7 @@ class HugoApiService {
   private async sendMessageV3(content: string): Promise<SendMessageResponse> {
     const response = await apiFetch(`${API_BASE}/v3/session/${this.currentSessionId}/message`, {
       method: "POST",
-      body: JSON.stringify({ message: content }),
+      body: JSON.stringify({ message: content, thinkingMode: this.thinkingMode }),
     });
 
     if (!response.ok) {
@@ -333,12 +340,13 @@ class HugoApiService {
       if (files && files.length > 0) {
         const formData = new FormData();
         formData.append("message", content);
+        formData.append("thinkingMode", this.thinkingMode);
         for (const file of files) {
           formData.append("files", file);
         }
         body = formData;
       } else {
-        body = JSON.stringify({ message: content });
+        body = JSON.stringify({ message: content, thinkingMode: this.thinkingMode });
       }
 
       // apiFetch auto-detects FormData and skips Content-Type

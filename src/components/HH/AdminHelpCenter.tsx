@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { apiFetch } from "../../services/apiFetch";
+import { toast } from "sonner";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -77,78 +79,16 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
     featured: false,
   });
 
-  const articles = [
-    {
-      id: "1",
-      title: "Hoe start ik mijn eerste roleplay sessie?",
-      excerpt: "Stap-voor-stap uitleg om je eerste training te beginnen met Hugo",
-      category: "Aan de slag",
-      content: "...",
-      status: "Gepubliceerd",
-      author: "Admin Team",
-      views: 1842,
-      helpful: 156,
-      notHelpful: 8,
-      createdAt: "2025-01-05",
-      featured: true,
-    },
-    {
-      id: "2",
-      title: "Overzicht van alle E.P.I.C. TECHNIQUE",
-      excerpt: "Complete lijst met uitleg van alle 25 sales technieken",
-      category: "Technieken",
-      content: "...",
-      status: "Gepubliceerd",
-      author: "Hugo Herbots",
-      views: 2134,
-      helpful: 198,
-      notHelpful: 12,
-      createdAt: "2025-01-03",
-      featured: true,
-    },
-    {
-      id: "3",
-      title: "Hoe wijzig ik mijn abonnement?",
-      excerpt: "Instructies voor het upgraden, downgraden of annuleren van je plan",
-      category: "Facturering",
-      content: "...",
-      status: "Gepubliceerd",
-      author: "Admin Team",
-      views: 567,
-      helpful: 89,
-      notHelpful: 4,
-      createdAt: "2025-01-01",
-      featured: false,
-    },
-    {
-      id: "4",
-      title: "Microfoon werkt niet tijdens roleplay",
-      excerpt: "Troubleshooting tips voor audio problemen",
-      category: "Probleemoplossing",
-      content: "...",
-      status: "Gepubliceerd",
-      author: "Tech Team",
-      views: 324,
-      helpful: 67,
-      notHelpful: 3,
-      createdAt: "2024-12-28",
-      featured: false,
-    },
-    {
-      id: "5",
-      title: "Video cursus structuur uitgelegd",
-      excerpt: "Hoe de fase-based video library werkt en hoe je progressie werkt",
-      category: "Video Cursussen",
-      content: "...",
-      status: "Concept",
-      author: "Admin Team",
-      views: 0,
-      helpful: 0,
-      notHelpful: 0,
-      createdAt: "2024-12-25",
-      featured: false,
-    },
-  ];
+  const [articles, setArticles] = useState<any[]>([]);
+
+  const fetchArticles = useCallback(async () => {
+    try {
+      const res = await apiFetch("/api/v2/admin/articles");
+      if (res.ok) setArticles(await res.json());
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
   const stats = {
     totalArticles: 48,
@@ -206,17 +146,24 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
     }
   };
 
-  const handleCreate = () => {
-    // TODO: implement article create API call
+  const handleCreate = async () => {
+    try {
+      const res = await apiFetch("/api/v2/admin/articles", {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        toast.success("Artikel aangemaakt");
+        fetchArticles();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || "Aanmaken mislukt");
+      }
+    } catch {
+      toast.error("Netwerk fout");
+    }
     setCreateDialogOpen(false);
-    setFormData({
-      title: "",
-      excerpt: "",
-      category: "getting-started",
-      content: "",
-      status: "draft",
-      featured: false,
-    });
+    setFormData({ title: "", excerpt: "", category: "getting-started", content: "", status: "draft", featured: false });
   };
 
   return (

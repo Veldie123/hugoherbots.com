@@ -318,7 +318,7 @@ export function RolePlayChat({ navigate, isAdmin }: RolePlayChatProps) {
                   </p>
                   <div className="flex flex-col gap-3">
                     <Button onClick={startChatSession} size="lg" className="gap-2 w-full">
-                      <MessageSquare className="w-4 h-4" /> Chat met Hugo
+                      <MessageSquare className="w-4 h-4" /> Talk to Hugo
                     </Button>
                     <Button onClick={startAudioSession} size="lg" variant="outline" className="gap-2 w-full">
                       <Phone className="w-4 h-4" /> Bellen met Hugo

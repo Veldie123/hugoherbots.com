@@ -75,6 +75,8 @@ import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
 import { apiFetch } from "../../services/apiFetch";
 import { CoachViewSummary } from "./CoachViewSummary";
 import { ModelSelector, type EngineModel } from "./ModelSelector";
+import { ThinkingModeSelector } from "./ThinkingModeSelector";
+import type { ThinkingMode } from "../../services/hugoApi";
 import { lastActivityService } from "../../services/lastActivityService";
 import { SessionRating } from "./SessionRating";
 import { VoiceCoach } from "./VoiceCoach";
@@ -184,11 +186,18 @@ export function TalkToHugoAI({
   // Engine model selection (V2 default, V3 for superadmin)
   const [engineModel, setEngineModel] = useState<EngineModel>(isSuperAdmin ? "v3" : "v2");
 
+  // Thinking mode (Snel/Auto/Diep) — only relevant for V3
+  const [thinkingMode, setThinkingMode] = useState<ThinkingMode>("auto");
+
   // Sync engine model to hugoApi
   useEffect(() => {
     hugoApi.setV3Mode(engineModel === "v3");
     return () => { hugoApi.setV3Mode(false); };
   }, [engineModel]);
+
+  useEffect(() => {
+    hugoApi.setThinkingMode(thinkingMode);
+  }, [thinkingMode]);
 
   // Handle engine model switch — reset session and restart
   const handleEngineModelChange = useCallback((newModel: EngineModel) => {
@@ -1578,6 +1587,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     setSelectedTechniqueName("");
     setSessionTimer(0);
     setChatMode("chat");
+    window.dispatchEvent(new Event('nps:trigger'));
     if (!selectedTechnique) {
       // Only clear messages if no analysis was triggered
       setMessages([]);
@@ -2965,6 +2975,13 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 viewMode="coaching"
                 disabled={isLoading || isStreaming}
               />
+              {engineModel === "v3" && (
+                <ThinkingModeSelector
+                  mode={thinkingMode}
+                  onChange={setThinkingMode}
+                  disabled={isLoading || isStreaming}
+                />
+              )}
             </div>
             
             {/* Right: Mode toggle + Stop (Niveau is now auto-adaptive, hidden) */}

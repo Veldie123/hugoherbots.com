@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { VideoTechniek } from "@/types/video";
 import { useMobileViewMode } from "@/hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
+import { HeroBanner } from "./HeroBanner";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -360,6 +361,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
     markVideoCompleted(videoId);
     setCompletedVideoIds(getCompletedVideoIds());
     localStorage.setItem('lastWatchedVideoProgress', '100');
+    window.dispatchEvent(new Event('nps:trigger'));
   };
 
   const handleViewTechnique = (techniqueNumber: string) => {
@@ -620,7 +622,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
           </div>
           
           {/* Compact KPI Cards - right aligned */}
-          <div className="grid grid-cols-2 sm:flex gap-2 sm:flex-wrap lg:flex-nowrap">
+          <div className="hidden sm:flex gap-2 sm:flex-wrap lg:flex-nowrap">
             <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
               <div className="w-6 h-6 rounded-full bg-hh-ink/10 flex items-center justify-center">
                 <Video className="w-3 h-3 text-hh-ink" />
@@ -660,73 +662,29 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
           </div>
         </div>
 
-        {/* Hero Banner - matching Dashboard style */}
-        <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px] dark:ring-1 dark:ring-white/10">
-          <img
-            src="/images/Hugo-Herbots-WEB-0726.JPG"
-            alt="Hugo Herbots Video Bibliotheek"
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: '50% 30%', transform: 'scaleX(-1)' }}
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
-          <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-          
-          <div className="relative h-full flex items-center p-6 sm:p-8">
-            <div className="text-white space-y-3 max-w-lg">
-              {isLoading ? (
-                <>
-                  <div className="h-6 w-40 bg-white/20 rounded-full animate-pulse" />
-                  <div className="h-7 w-64 bg-white/20 rounded animate-pulse" />
-                  <div className="h-4 w-80 bg-white/10 rounded animate-pulse" />
-                </>
-              ) : (
-                <>
-                  <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: '#4F7396' }}>
-                    <BookOpen className="w-3 h-3 mr-1" />
-                    {(featuredVideo?.fase && featuredVideo.fase !== 'Onbekend') ? featuredVideo.fase : (continueWatching?.reason === 'continue' ? 'Ga verder' : 'E.P.I.C. TECHNIQUE')}
-                  </Badge>
-                  
-                  <h2 className="text-[20px] sm:text-[24px] font-bold leading-tight">
-                    {featuredVideo?.displayTitle || 'Leer de E.P.I.C. TECHNIQUE'}
-                  </h2>
-                  
-                  <p className="text-white/70 text-[13px] sm:text-[14px] leading-relaxed line-clamp-2">
-                    {featuredVideo?.aiSummary || 'Bekijk Hugo\'s training video\'s en leer alle sales technieken stap voor stap.'}
-                  </p>
-                </>
-              )}
-              
-              <div className="flex flex-wrap gap-3 pt-1">
-                <Button 
-                  className="gap-2 text-white border-0"
-                  style={{ backgroundColor: '#3d9a6e' }}
-                  onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#4daa7e'; }}
-                  onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#3d9a6e'; }}
-                  disabled={isLoading}
-                  onClick={() => {
-                    if (featuredVideo) handlePlayVideo(featuredVideo);
-                  }}
-                >
-                  <Play className="w-4 h-4" />
-                  Verder kijken
-                </Button>
-                <button
-                  className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border border-white/60 backdrop-blur-sm transition-colors cursor-pointer"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
-                  onFocus={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                  onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
-                  onClick={() => navigate?.("talk-to-hugo")}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Chat met Hugo
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Hero Banner */}
+        <HeroBanner
+          image="/images/Hugo-Herbots-WEB-0726.JPG"
+          flipImage
+          badge={{
+            icon: <BookOpen className="w-3 h-3 mr-1" />,
+            label: (featuredVideo?.fase && featuredVideo.fase !== 'Onbekend') ? featuredVideo.fase : (continueWatching?.reason === 'continue' ? 'Ga verder' : 'E.P.I.C. TECHNIQUE'),
+          }}
+          title={featuredVideo?.displayTitle || 'Leer de E.P.I.C. TECHNIQUE'}
+          subtitle={featuredVideo?.aiSummary || "Bekijk Hugo's training video's en leer alle sales technieken stap voor stap."}
+          primaryAction={{
+            label: "Verder kijken",
+            icon: <Play className="w-4 h-4" />,
+            onClick: () => { if (featuredVideo) handlePlayVideo(featuredVideo); },
+            disabled: isLoading,
+          }}
+          secondaryAction={{
+            label: "Talk to Hugo",
+            icon: <MessageSquare className="w-4 h-4" />,
+            onClick: () => navigate?.("talk-to-hugo"),
+          }}
+          isLoading={isLoading}
+        />
 
         {/* Vervolg video training - Horizontal scroll row or expanded view */}
         <div className="space-y-3 min-w-0">
@@ -796,7 +754,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
           {!showAllVideos && isLoading && (
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                <div key={i} className="video-scroll-card">
                   <div className="rounded-lg overflow-hidden bg-hh-ui-100 aspect-video mb-2 animate-pulse" />
                   <div className="h-4 w-3/4 bg-hh-ui-100 rounded animate-pulse mb-1.5" />
                   <div className="h-3 w-1/2 bg-hh-ui-100 rounded animate-pulse" />
@@ -813,7 +771,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
               return (
                 <div 
                   key={video.id}
-                  className={`flex-shrink-0 w-[45vw] sm:w-[200px] group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`video-scroll-card group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={() => !locked && handlePlayVideo(video)}
                 >
                   <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
@@ -1095,7 +1053,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
               { title: "Klant zegt 'te duur' - wat nu?", duration: "1:30" },
               { title: "Eerste indruk optimaliseren", duration: "0:52" },
             ].map((short, idx) => (
-              <div key={idx} className="flex-shrink-0 w-[45vw] sm:w-[200px] opacity-60">
+              <div key={idx} className="video-scroll-card opacity-60">
                 <div className="relative rounded-lg overflow-hidden bg-hh-ui-100 aspect-video mb-2 flex items-center justify-center">
                   <div className="text-center space-y-1">
                     <Zap className="w-6 h-6 text-hh-muted/40 mx-auto" />
@@ -1143,7 +1101,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
             ].map((webinar, idx) => (
               <div
                 key={idx}
-                className="flex-shrink-0 w-[45vw] sm:w-[200px] cursor-pointer group"
+                className="video-scroll-card cursor-pointer group"
                 onClick={() => navigate?.("live")}
               >
                 <div className="relative aspect-video rounded-lg overflow-hidden bg-hh-ui-100 mb-2">
@@ -1200,7 +1158,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
               return (
                 <div 
                   key={video.id}
-                  className={`flex-shrink-0 w-[45vw] sm:w-[200px] group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`video-scroll-card group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={() => !locked && handlePlayVideo(video)}
                 >
                   <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">

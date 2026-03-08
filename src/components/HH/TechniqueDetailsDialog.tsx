@@ -146,9 +146,9 @@ export function TechniqueDetailsDialog({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent 
-        side="left" 
-        className="p-0 overflow-hidden"
+      <SheetContent
+        side="left"
+        className={`p-0 overflow-hidden ${isAdmin ? 'admin-session' : ''}`}
         style={isDesktop ? { width: 'calc(60px + (100vw - 60px) / 3)', maxWidth: 'none' } : { width: '100%' }}
       >
         <div className="flex flex-col h-full">
@@ -156,14 +156,22 @@ export function TechniqueDetailsDialog({
             <div
               className="p-6 pb-5"
               style={{
-                background: `linear-gradient(135deg, ${phaseColor}18 0%, ${phaseColor}08 100%)`,
-                borderBottom: `2px solid ${phaseColor}25`,
+                background: isAdmin
+                  ? `linear-gradient(135deg, rgba(var(--hh-primary-rgb), 0.09) 0%, rgba(var(--hh-primary-rgb), 0.03) 100%)`
+                  : `linear-gradient(135deg, ${phaseColor}18 0%, ${phaseColor}08 100%)`,
+                borderBottom: isAdmin
+                  ? `2px solid rgba(var(--hh-primary-rgb), 0.15)`
+                  : `2px solid ${phaseColor}25`,
               }}
             >
               <div className="flex items-center gap-3.5 mb-3">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold shrink-0 border"
-                  style={{
+                  style={isAdmin ? {
+                    backgroundColor: `rgba(var(--hh-primary-rgb), 0.12)`,
+                    color: `var(--hh-primary)`,
+                    borderColor: `rgba(var(--hh-primary-rgb), 0.2)`,
+                  } : {
                     backgroundColor: `${phaseColor}20`,
                     color: phaseColor,
                     borderColor: `${phaseColor}35`,
@@ -174,7 +182,7 @@ export function TechniqueDetailsDialog({
                 <div className="flex flex-col">
                   <span
                     className="text-[11px] font-bold uppercase tracking-widest"
-                    style={{ color: phaseColor }}
+                    style={{ color: isAdmin ? 'var(--hh-primary)' : phaseColor }}
                   >
                     Fase {displayData.fase}
                   </span>

@@ -1,5 +1,6 @@
 import { apiFetch } from "../../services/apiFetch";
 import { AppLayout } from "./AppLayout";
+import { HeroBanner } from "./HeroBanner";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -8,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { ScrollArea } from "../ui/scroll-area";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import { useIsMobile } from "../ui/use-mobile";
 import {
   Collapsible,
   CollapsibleContent,
@@ -217,75 +220,39 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
   const countdown = useCountdown(nextSession?.scheduledDate || null);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl h-[200px] sm:h-[240px]">
-      {/* Background Image - Hugo */}
-      <img 
-        src={hugoLivePhoto}
-        alt="Hugo Herbots Webinar"
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ objectPosition: '50% 35%' }}
-      />
-      {/* Gradient overlay - dark to light from left */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
-      
-      {/* Content */}
-      <div className="relative h-full flex items-center p-6 sm:p-8">
-        <div className="text-white space-y-3 max-w-lg">
-          {/* Green accent badge - dynamic date */}
-          <Badge className="text-white border-0 bg-hh-primary">
-            <CalendarIcon className="w-3 h-3 mr-1" />
-            {nextSession?.scheduledDate 
-              ? formatNextSessionDate(new Date(nextSession.scheduledDate))
-              : 'Elke dinsdag om 10:00'}
-          </Badge>
-          
-          <h2 className="text-[24px] sm:text-[32px] font-bold leading-tight">
-            Webinar met Hugo
-          </h2>
-          
-          <p className="text-white/70 text-[14px] leading-relaxed line-clamp-2">
-            Wekelijks live met Hugo — stel vragen, oefen samen en leer van andere verkopers.
-          </p>
-          
-          {/* Countdown inline if session exists */}
-          {nextSession && !countdown.isExpired && (
-            <div className="flex items-center gap-2 text-[13px]">
-              <span className="text-white/60">Nog:</span>
-              <span className="font-semibold text-hh-success">
-                {countdown.days}d {countdown.hours}u {countdown.minutes}m
-              </span>
-              <span className="text-white/80">— {nextSession.title}</span>
-            </div>
-          )}
-          
-          <div className="flex flex-wrap gap-3 pt-1">
-            {nextSession && (
-              <Button
-                className={`gap-2 border-0 transition-colors ${isRegistered ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-hh-success hover:bg-hh-success/90 text-white'}`}
-                onClick={onRegister}
-              >
-                {isRegistered ? <CheckCircle className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-                {isRegistered ? 'Ingeschreven' : 'Inschrijven'}
-              </Button>
-            )}
-            {hasPastSessions && (
-              <button
-                className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border backdrop-blur-sm transition-colors cursor-pointer"
-                style={{ backgroundColor: 'rgba(255,255,255,0.25)', borderColor: 'rgba(255,255,255,0.6)' }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
-                onFocus={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
-                onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
-                onClick={onScrollToRecordings}
-              >
-                <Play className="w-4 h-4" />
-                Opgenomen Webinars
-              </button>
-            )}
-          </div>
+    <HeroBanner
+      image={hugoLivePhoto}
+      imagePosition="50% 35%"
+      badge={{
+        icon: <CalendarIcon className="w-3 h-3 mr-1" />,
+        label: nextSession?.scheduledDate
+          ? formatNextSessionDate(new Date(nextSession.scheduledDate))
+          : 'Elke dinsdag om 10:00',
+      }}
+      title="Webinar met Hugo"
+      subtitle="Wekelijks live met Hugo — stel vragen, oefen samen en leer van andere verkopers."
+      primaryAction={nextSession ? {
+        label: isRegistered ? 'Ingeschreven' : 'Inschrijven',
+        icon: isRegistered ? <CheckCircle className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />,
+        onClick: onRegister,
+        variant: isRegistered ? 'muted' as const : 'success' as const,
+      } : undefined}
+      secondaryAction={hasPastSessions ? {
+        label: "Opgenomen Webinars",
+        icon: <Play className="w-4 h-4" />,
+        onClick: onScrollToRecordings,
+      } : undefined}
+    >
+      {nextSession && !countdown.isExpired && (
+        <div className="flex items-center gap-2 text-[13px]">
+          <span className="text-white/60">Nog:</span>
+          <span className="font-semibold text-hh-success">
+            {countdown.days}d {countdown.hours}u {countdown.minutes}m
+          </span>
+          <span className="text-white/80">— {nextSession.title}</span>
         </div>
-      </div>
-    </div>
+      )}
+    </HeroBanner>
   );
 }
 
@@ -313,6 +280,7 @@ export function LiveCoaching({
   const [votingPollId, setVotingPollId] = useState<string | null>(null);
   const [reminderSessionIds, setReminderSessionIds] = useState<Set<string>>(new Set());
   const chatScrollRef = useRef<HTMLDivElement>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
   
   const [userStats, setUserStats] = useState<UserProgressStats>({ sessionsAttended: 0, recordingsWatched: 0, questionsAsked: 0 });
   const [userStatsLoading, setUserStatsLoading] = useState(true);
@@ -347,6 +315,7 @@ export function LiveCoaching({
   }>({});
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
 
+  const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useMobileViewMode("grid", "list");
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | null>(null);
@@ -732,6 +701,7 @@ export function LiveCoaching({
   const handleLeaveCall = () => {
     setActiveCall(null);
     loadSessions();
+    window.dispatchEvent(new Event('nps:trigger'));
   };
 
   const toggleReminder = async (sessionId: string) => {
@@ -791,29 +761,15 @@ export function LiveCoaching({
               andere verkopers.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            {liveSession && (
-              <Button
-                variant="default"
-                className="gap-2 text-white animate-pulse cursor-default bg-hh-success"
-              >
-                <Radio className="w-4 h-4" />
-                <span>LIVE NU</span>
-              </Button>
-            )}
-            {!liveSession && (
-              <Button
-                onClick={() => {
-                  setShowCalendar(!showCalendar);
-                  if (showCalendar) setSelectedCalendarDate(null);
-                }}
-                className="gap-2 transition-colors bg-hh-primary hover:bg-hh-primary/90 text-white"
-              >
-                <CalendarIcon className="w-4 h-4" />
-                <span className="hidden sm:inline">Kalender</span>
-              </Button>
-            )}
-          </div>
+          {liveSession && (
+            <Button
+              variant="default"
+              className="gap-2 text-white animate-pulse cursor-default bg-hh-success"
+            >
+              <Radio className="w-4 h-4" />
+              <span>LIVE NU</span>
+            </Button>
+          )}
         </div>
 
         {/* TODO[REMINDER-SYSTEM]: Implementeer belletje notificatie systeem
@@ -1173,28 +1129,62 @@ export function LiveCoaching({
                     <SelectItem value="past">Afgelopen</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="hidden sm:flex gap-1">
+                <div className="hidden sm:flex gap-1 flex-shrink-0">
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setViewMode("list")}
-                    className={`${viewMode === "list" ? "bg-hh-success text-white hover:opacity-90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
+                    onClick={() => { setViewMode("list"); setShowCalendar(false); }}
+                    className={`h-9 w-9 p-0 ${viewMode === "list" && !showCalendar ? "bg-hh-primary text-white hover:bg-hh-primary/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
                   >
                     <List className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setViewMode("grid")}
-                    className={`${viewMode === "grid" ? "bg-hh-success text-white hover:opacity-90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
+                    onClick={() => { setViewMode("grid"); setShowCalendar(false); }}
+                    className={`h-9 w-9 p-0 ${viewMode === "grid" && !showCalendar ? "bg-hh-primary text-white hover:bg-hh-primary/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
                   >
                     <LayoutGrid className="w-4 h-4" />
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const wasHidden = !showCalendar;
+                      setShowCalendar(!showCalendar);
+                      if (showCalendar) setSelectedCalendarDate(null);
+                      if (wasHidden) {
+                        setTimeout(() => calendarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                      }
+                    }}
+                    className={`h-9 w-9 p-0 ${showCalendar ? "bg-hh-primary text-white hover:bg-hh-primary/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
+                  >
+                    <CalendarIcon className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
+              {/* Mobile calendar toggle */}
+              <button
+                className={`sm:hidden flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-[13px] font-medium transition-colors mt-2 ${
+                  showCalendar
+                    ? 'bg-hh-primary/10 text-hh-primary border border-hh-primary/20'
+                    : 'bg-hh-ui-50 text-hh-muted border border-hh-border'
+                }`}
+                onClick={() => {
+                  const wasHidden = !showCalendar;
+                  setShowCalendar(!showCalendar);
+                  if (showCalendar) setSelectedCalendarDate(null);
+                  if (wasHidden) {
+                    setTimeout(() => calendarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                  }
+                }}
+              >
+                <CalendarIcon className="w-4 h-4" />
+                {showCalendar ? 'Toon lijst' : 'Toon kalender'}
+              </button>
             </Card>
 
-            <div>
+            <div ref={calendarRef}>
 
               {showCalendar && (() => {
                 const MONTH_NAMES = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'];
@@ -2106,121 +2096,102 @@ export function LiveCoaching({
         </DialogContent>
       </Dialog>
 
-      {/* Calendar Session Detail Dialog */}
-      <Dialog open={!!calendarDetailSession} onOpenChange={(open) => { if (!open) setCalendarDetailSession(null); }}>
-        <DialogContent className="p-0 overflow-hidden max-h-[85vh]" style={{ maxWidth: '420px', borderRadius: '16px' }}>
-          {calendarDetailSession && (() => {
-            const sessionIdx = [...upcomingSessionsSorted, ...pastSessions].findIndex(s => s.id === calendarDetailSession.id);
-            const imgSrc = SESSION_IMAGES[(sessionIdx >= 0 ? sessionIdx : 0) % SESSION_IMAGES.length];
-            const isRegistered = registeredSessionIds.has(calendarDetailSession.id);
-            const hasReminder = reminderSessionIds.has(calendarDetailSession.id);
-            return (
-              <>
-                <div className="relative" style={{ aspectRatio: '16/10' }}>
-                  <img
-                    src={imgSrc}
-                    alt={calendarDetailSession.title}
-                    className="absolute inset-0 w-full h-full object-cover object-top"
-                  />
-                  <div className="absolute top-3 right-3">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 bg-card/90 hover:bg-card shadow-sm rounded-full"
-                      onClick={() => toggleReminder(calendarDetailSession.id)}
-                    >
-                      {hasReminder ? (
-                        <BellOff className="w-4 h-4 text-hh-primary" />
-                      ) : (
-                        <Bell className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
+      {/* Calendar Session Detail — Drawer on mobile, Dialog on desktop */}
+      {calendarDetailSession && (() => {
+        const sessionIdx = [...upcomingSessionsSorted, ...pastSessions].findIndex(s => s.id === calendarDetailSession.id);
+        const imgSrc = SESSION_IMAGES[(sessionIdx >= 0 ? sessionIdx : 0) % SESSION_IMAGES.length];
+        const isReg = registeredSessionIds.has(calendarDetailSession.id);
+        const hasReminder = reminderSessionIds.has(calendarDetailSession.id);
+
+        const detailContent = (
+          <div className="px-5 pb-5 space-y-4">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge className="text-[11px] px-2.5 py-0.5 bg-hh-primary text-white border-none">
+                Gepland
+              </Badge>
+              {calendarDetailSession.topic && (
+                <Badge variant="outline" className="text-[11px] px-2.5 py-0.5">
+                  {calendarDetailSession.topic}
+                </Badge>
+              )}
+            </div>
+            {calendarDetailSession.description && (
+              <p className="text-[14px] leading-[20px] text-hh-muted">
+                {calendarDetailSession.description}
+              </p>
+            )}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2.5 text-[14px] text-hh-text">
+                <CalendarIcon className="w-4 h-4 text-hh-muted flex-shrink-0" />
+                <span>
+                  {new Date(calendarDetailSession.scheduledDate).toLocaleDateString("nl-NL", {
+                    weekday: "long", day: "numeric", month: "long",
+                  })}
+                </span>
+              </div>
+              <div className="flex items-center gap-2.5 text-[14px] text-hh-text">
+                <Clock className="w-4 h-4 text-hh-muted flex-shrink-0" />
+                <span>
+                  {new Date(calendarDetailSession.scheduledDate).toLocaleTimeString("nl-NL", {
+                    hour: "2-digit", minute: "2-digit",
+                  })}
+                  {" "}• {calendarDetailSession.durationMinutes || 60} min
+                </span>
+              </div>
+              {calendarDetailSession.viewerCount && calendarDetailSession.viewerCount > 0 && (
+                <div className="flex items-center gap-2.5 text-[14px] text-hh-primary">
+                  <Users className="w-4 h-4 flex-shrink-0" />
+                  <span>{calendarDetailSession.viewerCount} verkopers nemen deel</span>
                 </div>
-                <div className="p-5 space-y-4">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Badge className="text-[11px] px-2.5 py-0.5 bg-hh-primary text-white border-none">
-                      Gepland
-                    </Badge>
-                    {calendarDetailSession.topic && (
-                      <Badge variant="outline" className="text-[11px] px-2.5 py-0.5">
-                        {calendarDetailSession.topic}
-                      </Badge>
-                    )}
-                  </div>
-                  <div>
-                    <h2 className="text-[20px] leading-[26px] font-semibold text-hh-text mb-1">
-                      {calendarDetailSession.title}
-                    </h2>
-                    {calendarDetailSession.description && (
-                      <p className="text-[14px] leading-[20px] text-hh-muted">
-                        {calendarDetailSession.description}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2.5 text-[14px] text-hh-text">
-                      <CalendarIcon className="w-4 h-4 text-hh-muted flex-shrink-0" />
-                      <span>
-                        {new Date(calendarDetailSession.scheduledDate).toLocaleDateString("nl-NL", {
-                          weekday: "long",
-                          day: "numeric",
-                          month: "long",
-                        })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2.5 text-[14px] text-hh-text">
-                      <Clock className="w-4 h-4 text-hh-muted flex-shrink-0" />
-                      <span>
-                        {new Date(calendarDetailSession.scheduledDate).toLocaleTimeString("nl-NL", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                        {" "}• {calendarDetailSession.durationMinutes || 60} min
-                      </span>
-                    </div>
-                    {calendarDetailSession.viewerCount && calendarDetailSession.viewerCount > 0 && (
-                      <div className="flex items-center gap-2.5 text-[14px] text-hh-primary">
-                        <Users className="w-4 h-4 flex-shrink-0" />
-                        <span>{calendarDetailSession.viewerCount} verkopers nemen deel</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="pt-2 border-t border-hh-border space-y-2.5">
-                    <Button
-                      className={`w-full gap-2 h-11 text-[15px] ${isRegistered ? 'bg-hh-ui-100 text-hh-text hover:bg-hh-ui-200' : 'bg-hh-primary hover:bg-hh-primary/90 text-white'}`}
-                      onClick={() => {
-                        setCalendarDetailSession(null);
-                        handleRegisterSession(calendarDetailSession);
-                      }}
-                    >
-                      {isRegistered ? (
-                        <>
-                          <CheckCircle className="w-4 h-4" />
-                          Ingeschreven
-                        </>
-                      ) : (
-                        <>
-                          <UserPlus className="w-4 h-4" />
-                          Inschrijven
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full h-11 text-[15px]"
-                      onClick={() => downloadIcsFile(calendarDetailSession)}
-                    >
-                      <CalendarIcon className="w-4 h-4 mr-2" />
-                      Voeg toe aan agenda
-                    </Button>
-                  </div>
+              )}
+            </div>
+            <div className="pt-2 border-t border-hh-border space-y-2.5">
+              <Button
+                className={`w-full gap-2 h-11 text-[15px] ${isReg ? 'bg-hh-ui-100 text-hh-text hover:bg-hh-ui-200' : 'bg-hh-primary hover:bg-hh-primary/90 text-white'}`}
+                onClick={() => { setCalendarDetailSession(null); handleRegisterSession(calendarDetailSession); }}
+              >
+                {isReg ? (<><CheckCircle className="w-4 h-4" /> Ingeschreven</>) : (<><UserPlus className="w-4 h-4" /> Inschrijven</>)}
+              </Button>
+              <Button variant="outline" className="w-full h-11 text-[15px]" onClick={() => downloadIcsFile(calendarDetailSession)}>
+                <CalendarIcon className="w-4 h-4 mr-2" />
+                Voeg toe aan agenda
+              </Button>
+            </div>
+          </div>
+        );
+
+        return isMobile ? (
+          <Drawer open onOpenChange={(open) => { if (!open) setCalendarDetailSession(null); }}>
+            <DrawerContent className="max-h-[70vh]">
+              <DrawerHeader>
+                <DrawerTitle className="text-[20px] leading-[26px] text-hh-text">
+                  {calendarDetailSession.title}
+                </DrawerTitle>
+              </DrawerHeader>
+              {detailContent}
+            </DrawerContent>
+          </Drawer>
+        ) : (
+          <Dialog open onOpenChange={(open) => { if (!open) setCalendarDetailSession(null); }}>
+            <DialogContent className="p-0 overflow-hidden max-h-[85vh]" style={{ maxWidth: '420px', borderRadius: '16px' }}>
+              <div className="relative" style={{ aspectRatio: '16/10' }}>
+                <img src={imgSrc} alt={calendarDetailSession.title} className="absolute inset-0 w-full h-full object-cover object-top" />
+                <div className="absolute top-3 right-3">
+                  <Button variant="ghost" size="icon" className="h-9 w-9 bg-card/90 hover:bg-card shadow-sm rounded-full" onClick={() => toggleReminder(calendarDetailSession.id)}>
+                    {hasReminder ? <BellOff className="w-4 h-4 text-hh-primary" /> : <Bell className="w-4 h-4" />}
+                  </Button>
                 </div>
-              </>
-            );
-          })()}
-        </DialogContent>
-      </Dialog>
+              </div>
+              <div className="pt-1">
+                <h2 className="text-[20px] leading-[26px] font-semibold text-hh-text px-5 mb-3">
+                  {calendarDetailSession.title}
+                </h2>
+                {detailContent}
+              </div>
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
     </AppLayout>
   );
 }

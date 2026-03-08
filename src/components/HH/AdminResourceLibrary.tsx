@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { apiFetch } from "../../services/apiFetch";
+import { toast } from "sonner";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -77,8 +79,16 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
     featured: false,
   });
 
-  // TODO: fetch real resources from API when resource management is implemented
-  const resources: any[] = [];
+  const [resources, setResources] = useState<any[]>([]);
+
+  const fetchResources = useCallback(async () => {
+    try {
+      const res = await apiFetch("/api/v2/admin/resources");
+      if (res.ok) setResources(await res.json());
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => { fetchResources(); }, [fetchResources]);
 
   const stats = {
     totalResources: resources.length,
@@ -123,22 +133,43 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
     }
   };
 
-  const handleCreate = () => {
-    // TODO: implement resource create API call
+  const handleCreate = async () => {
+    try {
+      const res = await apiFetch("/api/v2/admin/resources", {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        toast.success("Resource aangemaakt");
+        fetchResources();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || "Aanmaken mislukt");
+      }
+    } catch {
+      toast.error("Netwerk fout");
+    }
     setCreateDialogOpen(false);
-    setFormData({
-      title: "",
-      description: "",
-      category: "methodology",
-      type: "pdf",
-      fileUrl: "",
-      fileSize: "",
-      featured: false,
-    });
+    setFormData({ title: "", description: "", category: "methodology", type: "pdf", fileUrl: "", fileSize: "", featured: false });
   };
 
-  const handleEdit = () => {
-    // TODO: implement resource edit API call
+  const handleEdit = async () => {
+    if (!selectedResource) return;
+    try {
+      const res = await apiFetch(`/api/v2/admin/resources/${selectedResource.id}`, {
+        method: "PUT",
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        toast.success("Resource bijgewerkt");
+        fetchResources();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || "Bijwerken mislukt");
+      }
+    } catch {
+      toast.error("Netwerk fout");
+    }
     setEditDialogOpen(false);
   };
 
