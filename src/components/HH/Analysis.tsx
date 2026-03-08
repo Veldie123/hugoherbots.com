@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
-import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -86,18 +85,15 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
 
   const retryAnalysis = async (conversationId: string) => {
     try {
-      const res = await fetch(`/api/v2/analysis/retry/${conversationId}`, {
+      const res = await apiFetch(`/api/v2/analysis/retry/${conversationId}`, {
         method: 'POST',
-        headers: await getAuthHeaders(),
       });
       if (!res.ok) {
         const data = await res.json();
         toast.error(data.error || 'Opnieuw proberen mislukt');
         return;
       }
-      const listRes = await fetch('/api/v2/analysis/list?source=upload', {
-        headers: await getAuthHeaders(),
-      });
+      const listRes = await apiFetch('/api/v2/analysis/list?source=upload');
       if (listRes.ok) {
         const data = await listRes.json();
         const mapped: ConversationRecord[] = (data.analyses || []).map((a: any) => ({
@@ -132,48 +128,46 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
     }
   };
 
-  useEffect(() => {
-    const fetchAnalyses = async () => {
-      try {
-        const res = await fetch('/api/v2/analysis/list?source=upload', {
-          headers: await getAuthHeaders(),
-        });
-        if (!res.ok) throw new Error('Analyses ophalen mislukt');
-        const data = await res.json();
-        
-        const mapped: ConversationRecord[] = (data.analyses || []).map((a: any) => ({
-          id: a.id,
-          title: a.title || 'Untitled',
-          date: a.createdAt ? new Date(a.createdAt).toLocaleDateString('nl-NL') : '',
-          duration: a.durationMs 
-            ? `${Math.floor(a.durationMs / 60000)}:${String(Math.floor((a.durationMs % 60000) / 1000)).padStart(2, '0')}`
-            : '—',
-          type: 'audio' as const,
-          techniquesUsed: a.techniquesFound || [],
-          score: a.overallScore ?? null,
-          status: a.status === 'completed' ? 'completed' : 
-                 a.status === 'failed' ? 'failed' : 
-                 a.status as any,
-          phaseCoverage: a.phaseCoverage || null,
-        }));
-        
-        setConversations(mapped);
-        setError(null);
-      } catch (err: any) {
-        console.error('Failed to fetch analyses:', err);
-        setConversations(prev => {
-          if (prev.length === 0) {
-            setError(err.message);
-          }
-          return prev;
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchAnalyses();
+  const fetchAnalyses = useCallback(async () => {
+    try {
+      const res = await apiFetch('/api/v2/analysis/list?source=upload');
+      if (!res.ok) throw new Error('Analyses ophalen mislukt');
+      const data = await res.json();
+
+      const mapped: ConversationRecord[] = (data.analyses || []).map((a: any) => ({
+        id: a.id,
+        title: a.title || 'Untitled',
+        date: a.createdAt ? new Date(a.createdAt).toLocaleDateString('nl-NL') : '',
+        duration: a.durationMs
+          ? `${Math.floor(a.durationMs / 60000)}:${String(Math.floor((a.durationMs % 60000) / 1000)).padStart(2, '0')}`
+          : '—',
+        type: 'audio' as const,
+        techniquesUsed: a.techniquesFound || [],
+        score: a.overallScore ?? null,
+        status: a.status === 'completed' ? 'completed' :
+               a.status === 'failed' ? 'failed' :
+               a.status as any,
+        phaseCoverage: a.phaseCoverage || null,
+      }));
+
+      setConversations(mapped);
+      setError(null);
+    } catch (err: any) {
+      console.error('Failed to fetch analyses:', err);
+      setConversations(prev => {
+        if (prev.length === 0) {
+          setError(err.message);
+        }
+        return prev;
+      });
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchAnalyses();
+  }, [fetchAnalyses]);
 
   const conversationsRef = useRef(conversations);
   conversationsRef.current = conversations;
@@ -182,9 +176,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
     let timeoutId: ReturnType<typeof setTimeout>;
     const poll = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list?source=upload', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/v2/analysis/list?source=upload');
         if (res.ok) {
           const data = await res.json();
           const mapped: ConversationRecord[] = (data.analyses || []).map((a: any) => ({
@@ -203,6 +195,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
             phaseCoverage: a.phaseCoverage || null,
           }));
           setConversations(mapped);
+          setError(null);
         }
       } catch {}
       const hasProcessing = conversationsRef.current.some(c => 
@@ -320,13 +313,8 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
     return sum + mins;
   }, 0);
 
-  const Layout = isAdmin ? AdminLayout : AppLayout;
-  const layoutProps = isAdmin
-    ? { currentPage: "admin-uploads" as const, navigate, isSuperAdmin: true }
-    : { currentPage: "analysis" as const, navigate, isAdmin };
-
   return (
-    <Layout {...layoutProps}>
+    <AppLayout currentPage="analysis" navigate={navigate} isAdmin={isAdmin}>
       <div className="p-3 sm:p-4 lg:p-6 space-y-6">
         {/* Header with compact KPI pills */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
@@ -456,8 +444,15 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
         {!loading && error && (
           <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
             <div className="p-12 text-center">
-              <p className="text-[16px] text-red-500 mb-2">Er is een fout opgetreden</p>
-              <p className="text-[14px] text-hh-muted">{error}</p>
+              <p className="text-[16px] text-hh-error mb-2">Er is een fout opgetreden</p>
+              <p className="text-[14px] text-hh-muted mb-4">{error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { setLoading(true); setError(null); fetchAnalyses(); }}
+              >
+                Opnieuw proberen
+              </Button>
             </div>
           </Card>
         )}
@@ -819,6 +814,6 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
           </div>
         )}
       </div>
-    </Layout>
+    </AppLayout>
   );
 }

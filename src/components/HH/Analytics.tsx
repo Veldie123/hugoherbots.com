@@ -30,6 +30,7 @@ import { ProgressBar } from "./ProgressBar";
 import { getTechniekByNummer, getFaseNaam } from "../../data/technieken-service";
 import { getCodeBadgeColors } from "../../utils/phaseColors";
 import { supabase } from "@/utils/supabase/client";
+import { apiFetch } from "../../services/apiFetch";
 
 interface AnalyticsProps {
   navigate?: (page: string) => void;
@@ -68,7 +69,7 @@ export function Analytics({ navigate, isAdmin, onboardingMode }: AnalyticsProps)
           setLoading(false);
           return;
         }
-        const res = await fetch(`/api/analytics/user?user_id=${userId}`);
+        const res = await apiFetch(`/api/analytics/user?user_id=${userId}`);
         if (!res.ok) {
           console.error('[Analytics] API error:', res.status);
           setApiData(null);

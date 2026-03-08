@@ -25,12 +25,17 @@ import {
   Loader2,
   Crown,
   ExternalLink,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { auth } from "../../utils/supabase/client";
+import { useTheme } from "./ThemeProvider";
 import { uploadAvatar } from "../../utils/supabase/storage";
 import { useUser } from "../../contexts/UserContext";
 import { toast } from "sonner";
+import { apiFetch } from "../../services/apiFetch";
 
 interface StripeSubscription {
   id: string;
@@ -74,13 +79,14 @@ const DEFAULT_NOTIFICATIONS: NotificationPreferences = {
 
 interface SettingsProps {
   navigate?: (page: string) => void;
-  initialSection?: "profile" | "notifications" | "subscription" | "team" | "danger";
+  initialSection?: "profile" | "appearance" | "notifications" | "subscription" | "team" | "danger";
   isAdmin?: boolean;
   onboardingMode?: boolean;
 }
 
 export function Settings({ navigate, initialSection = "profile", isAdmin, onboardingMode }: SettingsProps) {
   const { user, workspace, session, logout, refreshUser } = useUser();
+  const { theme, setTheme } = useTheme();
   const [activeSection, setActiveSection] = useState(initialSection);
   const [changePlanModalOpen, setChangePlanModalOpen] = useState(false);
 
@@ -106,7 +112,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
   // Fetch Stripe subscription data
   useEffect(() => {
     if (!user?.email) return;
-    fetch(`/api/stripe/subscription?email=${encodeURIComponent(user.email)}`)
+    apiFetch(`/api/stripe/subscription?email=${encodeURIComponent(user.email)}`)
       .then(r => r.json())
       .then(data => { if (data.subscription) setSubscription(data.subscription); })
       .catch(() => {});
@@ -114,7 +120,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
 
   // Fetch Stripe products for plan change modal
   useEffect(() => {
-    fetch("/api/stripe/products")
+    apiFetch("/api/stripe/products")
       .then(r => r.json())
       .then(data => {
         const products = data.data || [];
@@ -148,9 +154,8 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
   const handlePlanCheckout = useCallback(async (tier: string, priceId: string) => {
     setLoadingCheckout(tier);
     try {
-      const resp = await fetch("/api/stripe/checkout", {
+      const resp = await apiFetch("/api/stripe/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           priceId,
           customerEmail: user?.email,
@@ -175,9 +180,8 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
       return;
     }
     try {
-      const resp = await fetch("/api/stripe/portal", {
+      const resp = await apiFetch("/api/stripe/portal", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           customerId,
           returnUrl: window.location.origin + "/settings?section=subscription",
@@ -234,6 +238,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
 
   const sections = [
     { id: "profile", label: "Profiel", icon: User },
+    { id: "appearance", label: "Weergave", icon: Monitor },
     { id: "notifications", label: "Notificaties", icon: Bell },
     { id: "subscription", label: "Abonnement", icon: CreditCard },
     ...(isTeamPlan ? [{ id: "team", label: "Team", icon: Users }] : []),
@@ -517,6 +522,65 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                     {profileSaved ? "Opgeslagen" : "Opslaan"}
                   </Button>
                 </div>
+              </div>
+            </Card>
+
+            {/* Appearance / Weergave */}
+            <Card
+              className="p-4 sm:p-6 rounded-[16px] shadow-hh-sm border-hh-border"
+              id="section-appearance"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
+                  <Monitor className="w-5 h-5 text-hh-primary" />
+                </div>
+                <div>
+                  <h2 className="mb-0">Weergave</h2>
+                  <p className="text-[14px] leading-[20px] text-hh-muted">
+                    Kies je thema voorkeur
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                {([
+                  { value: 'light' as const, label: 'Licht', icon: Sun, desc: 'Altijd licht thema' },
+                  { value: 'dark' as const, label: 'Donker', icon: Moon, desc: 'Altijd donker thema' },
+                  { value: 'auto' as const, label: 'Automatisch', icon: Monitor, desc: 'Volgt je systeem' },
+                ]).map((opt) => {
+                  const Icon = opt.icon;
+                  const isActive = theme === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      onClick={() => setTheme(opt.value)}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                        isActive
+                          ? "border-hh-primary bg-hh-primary/5"
+                          : "border-hh-border hover:border-hh-primary/30 bg-hh-bg"
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        isActive ? "bg-hh-primary/10" : "bg-hh-ui-50"
+                      }`}>
+                        <Icon className={`w-5 h-5 ${isActive ? "text-hh-primary" : "text-hh-muted"}`} />
+                      </div>
+                      <div className="text-center">
+                        <p className={`text-[14px] leading-[20px] font-medium ${isActive ? "text-hh-text" : "text-hh-muted"}`}>
+                          {opt.label}
+                        </p>
+                        <p className="text-[11px] leading-[16px] text-hh-muted mt-0.5">
+                          {opt.desc}
+                        </p>
+                      </div>
+                      {isActive && (
+                        <div className="w-5 h-5 rounded-full bg-hh-primary flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </Card>
 

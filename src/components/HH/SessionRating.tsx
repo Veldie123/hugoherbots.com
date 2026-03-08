@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Star } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 
 interface SessionRatingProps {
   sessionId: string;
@@ -19,10 +19,8 @@ export function SessionRating({ sessionId, onClose }: SessionRatingProps) {
     if (rating === 0) return;
     setSubmitting(true);
     try {
-      const headers = await getAuthHeaders();
-      await fetch("/api/feedback/session-rating", {
+      await apiFetch("/api/feedback/session-rating", {
         method: "POST",
-        headers,
         body: JSON.stringify({ sessionId, rating, comment: comment || undefined }),
       });
       toast.success("Bedankt voor je beoordeling!");

@@ -1,17 +1,9 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/utils/supabase/client';
 import { projectId } from '@/utils/supabase/info';
+import { apiFetch } from '@/services/apiFetch';
 
 const VIDEO_API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-b9a572ea/api/videos`;
 const LIVE_API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-b9a572ea/api/live`;
-
-async function getAuthHeaders(): Promise<HeadersInit> {
-  const { data: { session } } = await supabase.auth.getSession();
-  return {
-    'Content-Type': 'application/json',
-    ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}),
-  };
-}
 
 export interface VideoAnalytics {
   totalVideos: number;
@@ -68,9 +60,7 @@ export function useVideoAnalytics() {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`${VIDEO_API_BASE}/analytics`, { 
-          headers: await getAuthHeaders() 
-        });
+        const response = await apiFetch(`${VIDEO_API_BASE}/analytics`);
         
         if (!response.ok) {
           const err = await response.json().catch(() => ({ error: 'Kon analytics niet ophalen' }));
@@ -102,9 +92,7 @@ export function useLiveSessionAnalytics() {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`${LIVE_API_BASE}/analytics`, { 
-          headers: await getAuthHeaders() 
-        });
+        const response = await apiFetch(`${LIVE_API_BASE}/analytics`);
         
         if (!response.ok) {
           const err = await response.json().catch(() => ({ error: 'Kon analytics niet ophalen' }));
@@ -127,9 +115,7 @@ export function useLiveSessionAnalytics() {
 }
 
 export async function exportVideosCsv(): Promise<void> {
-  const response = await fetch(`${VIDEO_API_BASE}/export/csv`, { 
-    headers: await getAuthHeaders() 
-  });
+  const response = await apiFetch(`${VIDEO_API_BASE}/export/csv`);
   
   if (!response.ok) {
     const err = await response.text();
@@ -148,9 +134,7 @@ export async function exportVideosCsv(): Promise<void> {
 }
 
 export async function exportLiveSessionsCsv(): Promise<void> {
-  const response = await fetch(`${LIVE_API_BASE}/sessions/export/csv`, { 
-    headers: await getAuthHeaders() 
-  });
+  const response = await apiFetch(`${LIVE_API_BASE}/sessions/export/csv`);
   
   if (!response.ok) {
     const err = await response.text();
@@ -194,7 +178,7 @@ export function usePlatformMetrics() {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('/api/analytics/platform');
+        const response = await apiFetch('/api/analytics/platform');
         
         if (!response.ok) {
           const err = await response.json().catch(() => ({ error: 'Analytics ophalen mislukt' }));

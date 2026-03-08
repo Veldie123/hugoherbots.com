@@ -23,6 +23,7 @@ import {
   Edit,
 } from "lucide-react";
 import { toast } from "sonner";
+import { apiFetch } from '../../services/apiFetch';
 import { CustomCheckbox } from "../ui/custom-checkbox";
 import { useState, useEffect } from "react";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
@@ -74,7 +75,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/analytics/users')
+    apiFetch('/api/analytics/users')
       .then(res => res.json())
       .then((data: any) => {
         const usersList = Array.isArray(data) ? data : data.users || [];
@@ -119,7 +120,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
   // Refetch user list (reused after mutations)
   const refetchUsers = () => {
-    fetch("/api/analytics/users")
+    apiFetch("/api/analytics/users")
       .then((res) => res.json())
       .then((data: any) => {
         const usersList = Array.isArray(data) ? data : data.users || [];
@@ -154,7 +155,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
   // Action handlers
   const handleSuspendUser = (user: any) => {
     if (!window.confirm(`Weet je zeker dat je "${user.name}" wilt opschorten?`)) return;
-    fetch(`/api/admin/users/${user.id}/suspend`, { method: "POST" })
+    apiFetch(`/api/admin/users/${user.id}/suspend`, { method: "POST" })
       .then((res) => {
         if (!res.ok) throw new Error("Suspend failed");
         toast.success(`${user.name} is opgeschort`);
@@ -167,7 +168,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
   };
 
   const handleActivateUser = (user: any) => {
-    fetch(`/api/admin/users/${user.id}/activate`, { method: "POST" })
+    apiFetch(`/api/admin/users/${user.id}/activate`, { method: "POST" })
       .then((res) => {
         if (!res.ok) throw new Error("Activate failed");
         toast.success(`${user.name} is geactiveerd`);
@@ -181,7 +182,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
   const handleDeleteUser = (user: any) => {
     if (!window.confirm(`Weet je zeker dat je "${user.name}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`)) return;
-    fetch(`/api/admin/users/${user.id}`, { method: "DELETE" })
+    apiFetch(`/api/admin/users/${user.id}`, { method: "DELETE" })
       .then((res) => {
         if (!res.ok) throw new Error("Delete failed");
         toast.success(`${user.name} is verwijderd`);

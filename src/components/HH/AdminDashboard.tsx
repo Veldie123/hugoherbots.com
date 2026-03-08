@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import {
   Users,
   Video,
@@ -146,8 +146,7 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
     const fetchDashboard = async () => {
       try {
         setLoading(true);
-        const headers = await getAuthHeaders();
-        const response = await fetch("/api/admin/dashboard-stats", { headers });
+        const response = await apiFetch("/api/admin/dashboard-stats");
         if (!response.ok) {
           const errorBody = await response.json().catch(() => null);
           throw new Error(errorBody?.message || `HTTP ${response.status}`);
@@ -196,8 +195,8 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
       change: data.kpis.newSignups.change,
       trend: data.kpis.newSignups.change.startsWith("+") ? "up" : "down",
       icon: UserPlus,
-      textClass: "text-hh-primary",
-      bgClass: "bg-hh-primary-100",
+      textClass: "text-hh-success",
+      bgClass: "bg-hh-success-100",
     },
     {
       label: "NPS Score",
@@ -205,8 +204,8 @@ export function AdminDashboard({ navigate, isSuperAdmin }: AdminDashboardProps) 
       change: "+0%",
       trend: "up" as const,
       icon: ThumbsUp,
-      textClass: "text-hh-success",
-      bgClass: "bg-hh-success-100",
+      textClass: "text-hh-warning",
+      bgClass: "bg-hh-warning-100",
     },
   ] : [];
 

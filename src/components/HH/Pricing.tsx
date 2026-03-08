@@ -9,6 +9,7 @@ import { StickyHeader } from "./StickyHeader";
 import { BrowserMockup } from "./BrowserMockup";
 import { getDailyQuote } from "../../data/hugoQuotes";
 import { Check, X, Shield, Lock, Zap, ArrowRight, Loader2 } from "lucide-react";
+import { apiFetch } from "../../services/apiFetch";
 
 const roleplayScreenshot = "/images/5e0311347e22c63626fd6f5cd1e39d5971c229ea.png";
 const analyticsScreenshot = "/images/7a290f0c53177769ed05ab1ba994d8689b9b2339.png";
@@ -71,7 +72,7 @@ export function Pricing({ navigate }: PricingProps) {
   const [priceMap, setPriceMap] = useState<Record<string, Record<string, string>>>({});
 
   useEffect(() => {
-    fetch("/api/stripe/products")
+    apiFetch("/api/stripe/products")
       .then((r) => r.json())
       .then((data) => {
         const products: StripeProduct[] = data.data || [];
@@ -102,9 +103,8 @@ export function Pricing({ navigate }: PricingProps) {
 
     setLoadingTier(tier);
     try {
-      const resp = await fetch("/api/stripe/checkout", {
+      const resp = await apiFetch("/api/stripe/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ priceId }),
       });
       const data = await resp.json();

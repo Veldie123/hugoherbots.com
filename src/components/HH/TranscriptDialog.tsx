@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { getCodeBadgeColors } from "../../utils/phaseColors";
 import { getAllTechnieken } from "../../data/technieken-service";
+import { apiFetch } from "../../services/apiFetch";
 
 export interface TranscriptDebugInfo {
   signal?: "positief" | "neutraal" | "negatief";
@@ -181,9 +182,8 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
     const isCorrection = detectedTechnique && detectedTechnique !== techniqueId;
 
     try {
-      const response = await fetch('/api/v2/session/save-reference', {
+      const response = await apiFetch('/api/v2/session/save-reference', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: session.sessionId,
           techniqueId,
@@ -213,9 +213,8 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
     }
 
     try {
-      const response = await fetch('/api/v2/session/flag-customer-response', {
+      const response = await apiFetch('/api/v2/session/flag-customer-response', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: session.sessionId,
           turnNumber: lineIndex,
@@ -273,9 +272,8 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
 
     try {
       // Save the reference answer
-      const response = await fetch('/api/v2/session/save-reference', {
+      const response = await apiFetch('/api/v2/session/save-reference', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: session.sessionId,
           techniqueId: editState.expectedTechnique,
@@ -302,9 +300,8 @@ export function TranscriptDialog({ open, onOpenChange, session, isAdmin = false 
       }
 
       // Submit to config review
-      await fetch('/api/v2/config/conflicts', {
+      await apiFetch('/api/v2/config/conflicts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           techniqueNumber: editState.expectedTechnique,
           type: 'Manual Correction',

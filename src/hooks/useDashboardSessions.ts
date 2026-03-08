@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAuthHeaders } from '@/services/hugoApi';
+import { apiFetch } from '@/services/apiFetch';
 
 export interface DashboardSession {
   id: string;
@@ -18,9 +18,7 @@ export function useDashboardSessions() {
     async function fetchSessions() {
       try {
         setLoading(true);
-        const res = await fetch('/api/user/sessions', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/user/sessions');
         if (!res.ok) return;
         const data = await res.json();
         const mapped: DashboardSession[] = (data.sessions || []).slice(0, 8).map((s: any) => ({

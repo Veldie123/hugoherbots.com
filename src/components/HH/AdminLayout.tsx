@@ -25,12 +25,13 @@ import {
   AlertCircle,
   Sparkles,
   Zap,
-  Moon,
   Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { Logo } from "./Logo";
 import React, { useState, useEffect } from "react";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
@@ -62,7 +63,7 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isSuperAdminProp, contentClassName }: AdminLayoutProps) {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   // Module mapping: admin view → user view equivalent
   const adminToUserMap: Record<string, string> = {
@@ -120,9 +121,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
   useEffect(() => {
     const fetchChatSessions = async () => {
       try {
-        const res = await fetch('/api/user/sessions', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/user/sessions');
         if (!res.ok) return;
         const data = await res.json();
         const items: HistoryItem[] = (data.sessions || []).slice(0, 5).map((s: any) => ({
@@ -136,9 +135,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
     };
     const fetchAnalyses = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list?source=upload', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/v2/analysis/list?source=upload');
         if (!res.ok) return;
         const data = await res.json();
         const items: HistoryItem[] = (data.analyses || []).slice(0, 5).map((a: any) => ({
@@ -245,9 +242,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const res = await fetch('/api/v2/admin/notifications', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/v2/admin/notifications');
         if (!res.ok) return;
         const data = await res.json();
         const items = (data.notifications || []).slice(0, 20).map((n: any) => ({
@@ -284,9 +279,8 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
     setUnreadCount(prev => Math.max(0, prev - 1));
     try {
-      await fetch(`/api/v2/admin/notifications/${id}`, {
+      await apiFetch(`/api/v2/admin/notifications/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ read: true }),
       });
     } catch { }
@@ -296,15 +290,14 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     setUnreadCount(0);
     try {
-      await fetch('/api/v2/admin/notifications/read-all', {
+      await apiFetch('/api/v2/admin/notifications/read-all', {
         method: 'PATCH',
-        headers: await getAuthHeaders(),
       });
     } catch { }
   };
 
   return (
-    <div className="admin-session flex h-screen bg-hh-bg">
+    <div className="admin-session flex h-dvh bg-hh-bg" style={{ height: '100dvh' }}>
       {/* Mobile Menu Sheet - Full screen */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="admin-session w-full p-0 flex flex-col bg-hh-bg">
@@ -437,7 +430,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
       <aside
         className={`hidden lg:flex flex-col flex-shrink-0 ${
           collapsed ? "w-16" : "w-56"
-        } bg-hh-bg border-r border-hh-border transition-all duration-300 h-screen`}
+        } bg-hh-bg border-r border-hh-border transition-all duration-300 h-dvh`}
       >
         {/* Logo - Fixed top - Klikbaar voor collapse/expand */}
         <button
@@ -594,10 +587,6 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
 
           {/* Quick Actions + User Menu */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-hh-ui-50 transition-colors" title={theme === 'dark' ? 'Licht thema' : 'Donker thema'}>
-              {theme === 'dark' ? <Sun className="w-5 h-5 text-hh-text" /> : <Moon className="w-5 h-5 text-hh-text" />}
-            </button>
-
             <button
               onClick={() => navigate?.("admin-chat-expert")}
               className="flex items-center gap-2 text-white h-10 px-3 sm:px-4 rounded-lg transition-colors"
@@ -727,20 +716,45 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-2 px-2">
-                  <Avatar className="w-8 h-8">
+                <button className="focus:outline-none focus:ring-2 focus:ring-hh-primary rounded-full">
+                  <Avatar className="w-8 h-8 cursor-pointer hover:ring-2 hover:ring-hh-ui-200 transition-all">
                     <AvatarFallback className="bg-hh-primary text-white text-[12px]">
                       {adminUserInitials}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="text-left hidden sm:block">
-                    <p className="text-[13px] leading-[18px] text-hh-text">{adminUserName}</p>
-                    <p className="text-[11px] leading-[14px] text-hh-muted">{adminUserRole}</p>
-                  </div>
-                </Button>
+                </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuLabel>Admin Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {/* Theme Picker */}
+                <div className="px-3 py-2">
+                  <p className="text-[11px] leading-[14px] text-hh-muted font-medium mb-1.5">Weergave</p>
+                  <div className="flex gap-1 p-1 bg-hh-ui-50 rounded-lg">
+                    {([
+                      { value: 'light' as const, label: 'Licht', icon: Sun },
+                      { value: 'dark' as const, label: 'Donker', icon: Moon },
+                      { value: 'auto' as const, label: 'Auto', icon: Monitor },
+                    ]).map((opt) => {
+                      const Icon = opt.icon;
+                      const isActive = theme === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTheme(opt.value); }}
+                          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[12px] font-medium transition-all ${
+                            isActive
+                              ? "bg-hh-bg text-hh-text shadow-sm"
+                              : "text-hh-muted hover:text-hh-text"
+                          }`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate?.(adminToUserMap[currentPage] || "dashboard")}>
                   <Eye className="w-4 h-4 mr-2" />

@@ -1,3 +1,4 @@
+import { apiFetch } from "../../services/apiFetch";
 import { AppLayout } from "./AppLayout";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
@@ -269,8 +270,8 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
             )}
             {hasPastSessions && (
               <button
-                className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border border-white/60 backdrop-blur-sm transition-colors cursor-pointer"
-                style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
+                className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border backdrop-blur-sm transition-colors cursor-pointer"
+                style={{ backgroundColor: 'rgba(255,255,255,0.25)', borderColor: 'rgba(255,255,255,0.6)' }}
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
                 onFocus={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
@@ -458,14 +459,8 @@ export function LiveCoaching({
   async function loadRecordings() {
     try {
       setRecordingsLoading(true);
-      const { supabase } = await import('@/utils/supabase/client');
-      const { data: { session: authSession } } = await supabase.auth.getSession();
-      
-      const response = await fetch('/api/live-sessions/recordings', {
-        headers: authSession?.access_token ? {
-          'Authorization': `Bearer ${authSession.access_token}`
-        } : {}
-      });
+
+      const response = await apiFetch('/api/live-sessions/recordings');
       
       if (response.ok) {
         const data = await response.json();
@@ -551,24 +546,18 @@ export function LiveCoaching({
 
   useEffect(() => {
     let isCancelled = false;
-    let authSubscription: { unsubscribe: () => void } | null = null;
 
-    async function loadReminders(accessToken: string) {
+    async function loadReminders() {
       if (upcomingSessions.length === 0 || isCancelled) {
         if (!isCancelled) setReminderSessionIds(new Set());
         return;
       }
       try {
-        const headers: HeadersInit = {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        };
         const ids = new Set<string>();
         await Promise.all(upcomingSessions.map(async (session) => {
           try {
-            const response = await fetch(`/api/live-sessions/${session.id}/reminder`, {
+            const response = await apiFetch(`/api/live-sessions/${session.id}/reminder`, {
               method: 'GET',
-              headers,
             });
             if (response.ok) {
               const data = await response.json();
@@ -589,21 +578,8 @@ export function LiveCoaching({
     }
 
     async function initReminders() {
-      const { supabase } = await import('@/utils/supabase/client');
-      const { data: { session: authSession } } = await supabase.auth.getSession();
-      
-      if (authSession?.access_token && !isCancelled) {
-        loadReminders(authSession.access_token);
-      } else {
-        if (!isCancelled) setReminderSessionIds(new Set());
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-          if (session?.access_token && !isCancelled) {
-            loadReminders(session.access_token);
-            subscription.unsubscribe();
-            authSubscription = null;
-          }
-        });
-        authSubscription = subscription;
+      if (!isCancelled) {
+        loadReminders();
       }
     }
 
@@ -615,7 +591,6 @@ export function LiveCoaching({
 
     return () => {
       isCancelled = true;
-      authSubscription?.unsubscribe();
     };
   }, [sessions]);
 

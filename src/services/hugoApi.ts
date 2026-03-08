@@ -2,18 +2,12 @@
  * Hugo Engine API Service
  * Connects frontend to the V2 backend
  */
-import { supabase } from '../utils/supabase/client';
+import { apiFetch } from './apiFetch';
 
 const API_BASE = "/api";
 
-export async function getAuthHeaders(): Promise<Record<string, string>> {
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token || '';
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-  };
-}
+// Backward-compatible re-export — use apiFetch directly in new code
+export { apiFetch as fetchWithAuth } from './apiFetch';
 
 export interface StartSessionRequest {
   techniqueId: string;
@@ -165,9 +159,8 @@ class HugoApiService {
       return this.startSessionV3(request);
     }
 
-    const response = await fetch(`${API_BASE}/v2/sessions`, {
+    const response = await apiFetch(`${API_BASE}/v2/sessions`, {
       method: "POST",
-      headers: await getAuthHeaders(),
       body: JSON.stringify(request),
     });
 
@@ -181,9 +174,8 @@ class HugoApiService {
   }
 
   private async startSessionV3(request: StartSessionRequest): Promise<StartSessionResponse> {
-    const response = await fetch(`${API_BASE}/v3/session`, {
+    const response = await apiFetch(`${API_BASE}/v3/session`, {
       method: "POST",
-      headers: await getAuthHeaders(),
       body: JSON.stringify({
         techniqueId: request.techniqueId,
         userProfile: {},
@@ -221,9 +213,8 @@ class HugoApiService {
       return result.sessionId;
     }
 
-    const response = await fetch(`${API_BASE}/v2/sessions/stream`, {
+    const response = await apiFetch(`${API_BASE}/v2/sessions/stream`, {
       method: "POST",
-      headers: await getAuthHeaders(),
       body: JSON.stringify(request),
     });
 
@@ -294,9 +285,8 @@ class HugoApiService {
       body.systemContext = systemContext;
     }
 
-    const response = await fetch(`${API_BASE}/v2/session/message`, {
+    const response = await apiFetch(`${API_BASE}/v2/session/message`, {
       method: "POST",
-      headers: await getAuthHeaders(),
       body: JSON.stringify(body),
     });
 
@@ -308,9 +298,8 @@ class HugoApiService {
   }
 
   private async sendMessageV3(content: string): Promise<SendMessageResponse> {
-    const response = await fetch(`${API_BASE}/v3/session/${this.currentSessionId}/message`, {
+    const response = await apiFetch(`${API_BASE}/v3/session/${this.currentSessionId}/message`, {
       method: "POST",
-      headers: await getAuthHeaders(),
       body: JSON.stringify({ message: content }),
     });
 
@@ -340,25 +329,21 @@ class HugoApiService {
 
     if (this.useV3) {
       let body: FormData | string;
-      const headers = await getAuthHeaders();
 
       if (files && files.length > 0) {
-        // Multipart FormData for file uploads
         const formData = new FormData();
         formData.append("message", content);
         for (const file of files) {
           formData.append("files", file);
         }
         body = formData;
-        // Remove Content-Type so browser sets multipart boundary
-        delete (headers as Record<string, string>)["Content-Type"];
       } else {
         body = JSON.stringify({ message: content });
       }
 
-      const response = await fetch(`${API_BASE}/v3/session/${this.currentSessionId}/stream`, {
+      // apiFetch auto-detects FormData and skips Content-Type
+      const response = await apiFetch(`${API_BASE}/v3/session/${this.currentSessionId}/stream`, {
         method: "POST",
-        headers,
         body,
       });
 
@@ -402,9 +387,8 @@ class HugoApiService {
       return;
     }
 
-    const response = await fetch(`${API_BASE}/session/${this.currentSessionId}/message/stream`, {
+    const response = await apiFetch(`${API_BASE}/session/${this.currentSessionId}/message/stream`, {
       method: "POST",
-      headers: await getAuthHeaders(),
       body: JSON.stringify({ content, isExpert }),
     });
 
@@ -452,9 +436,7 @@ class HugoApiService {
   }
 
   async getTechnieken(): Promise<Technique[]> {
-    const response = await fetch(`${API_BASE}/technieken`, {
-      headers: await getAuthHeaders(),
-    });
+    const response = await apiFetch(`${API_BASE}/technieken`);
     if (!response.ok) {
       throw new Error(`Failed to load techniques: ${response.statusText}`);
     }
@@ -465,9 +447,7 @@ class HugoApiService {
     const url = userId
       ? `${API_BASE}/user/context?userId=${userId}`
       : `${API_BASE}/user/context`;
-    const response = await fetch(url, {
-      headers: await getAuthHeaders(),
-    });
+    const response = await apiFetch(url);
     if (!response.ok) {
       throw new Error(`Failed to get user context: ${response.statusText}`);
     }
@@ -476,9 +456,8 @@ class HugoApiService {
   }
 
   async saveUserContext(context: UserContext, userId?: string): Promise<UserContext> {
-    const response = await fetch(`${API_BASE}/user/context`, {
+    const response = await apiFetch(`${API_BASE}/user/context`, {
       method: "POST",
-      headers: await getAuthHeaders(),
       body: JSON.stringify({ userId, context }),
     });
     if (!response.ok) {
@@ -492,9 +471,8 @@ class HugoApiService {
     if (!this.currentSessionId) {
       throw new Error("No active session.");
     }
-    const response = await fetch(`${API_BASE}/session/${this.currentSessionId}/start-roleplay`, {
+    const response = await apiFetch(`${API_BASE}/session/${this.currentSessionId}/start-roleplay`, {
       method: "POST",
-      headers: await getAuthHeaders(),
     });
     if (!response.ok) {
       throw new Error(`Failed to start roleplay: ${response.statusText}`);
@@ -506,9 +484,8 @@ class HugoApiService {
     if (!this.currentSessionId) {
       throw new Error("No active session.");
     }
-    const response = await fetch(`${API_BASE}/session/${this.currentSessionId}/feedback`, {
+    const response = await apiFetch(`${API_BASE}/session/${this.currentSessionId}/feedback`, {
       method: "POST",
-      headers: await getAuthHeaders(),
     });
     if (!response.ok) {
       throw new Error(`Failed to get feedback: ${response.statusText}`);
@@ -520,9 +497,8 @@ class HugoApiService {
     if (!this.currentSessionId) {
       throw new Error("No active session.");
     }
-    const response = await fetch(`${API_BASE}/session/${this.currentSessionId}/evaluate`, {
+    const response = await apiFetch(`${API_BASE}/session/${this.currentSessionId}/evaluate`, {
       method: "POST",
-      headers: await getAuthHeaders(),
     });
     if (!response.ok) {
       throw new Error(`Failed to evaluate: ${response.statusText}`);
@@ -535,9 +511,8 @@ class HugoApiService {
     if (!this.currentSessionId) {
       throw new Error("No active session.");
     }
-    const response = await fetch(`${API_BASE}/session/${this.currentSessionId}/reset-context`, {
+    const response = await apiFetch(`${API_BASE}/session/${this.currentSessionId}/reset-context`, {
       method: "POST",
-      headers: await getAuthHeaders(),
     });
     if (!response.ok) {
       throw new Error(`Failed to reset context: ${response.statusText}`);
@@ -549,9 +524,7 @@ class HugoApiService {
     if (!this.currentSessionId) {
       throw new Error("No active session.");
     }
-    const response = await fetch(`${API_BASE}/session/${this.currentSessionId}/turns`, {
-      headers: await getAuthHeaders(),
-    });
+    const response = await apiFetch(`${API_BASE}/session/${this.currentSessionId}/turns`);
     if (!response.ok) {
       throw new Error(`Failed to get turns: ${response.statusText}`);
     }
@@ -560,9 +533,7 @@ class HugoApiService {
 
   async checkV3Access(): Promise<{ admin_v3: boolean; coaching_v3: boolean }> {
     try {
-      const response = await fetch(`${API_BASE}/v3/access`, {
-        headers: await getAuthHeaders(),
-      });
+      const response = await apiFetch(`${API_BASE}/v3/access`);
       if (!response.ok) return { admin_v3: false, coaching_v3: false };
       return response.json();
     } catch {
@@ -586,9 +557,7 @@ class HugoApiService {
    * Get current competence level and assistance config
    */
   async getUserLevel(userId: string = "demo-user"): Promise<UserLevelResponse> {
-    const response = await fetch(`${API_BASE}/v2/user/level?userId=${encodeURIComponent(userId)}`, {
-      headers: await getAuthHeaders(),
-    });
+    const response = await apiFetch(`${API_BASE}/v2/user/level?userId=${encodeURIComponent(userId)}`);
     if (!response.ok) {
       throw new Error(`Failed to get user level: ${response.statusText}`);
     }
@@ -599,9 +568,8 @@ class HugoApiService {
    * Record performance after a roleplay and check for level transitions
    */
   async recordPerformance(data: RecordPerformanceRequest): Promise<RecordPerformanceResponse> {
-    const response = await fetch(`${API_BASE}/v2/user/performance`, {
+    const response = await apiFetch(`${API_BASE}/v2/user/performance`, {
       method: "POST",
-      headers: await getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) {
@@ -614,9 +582,7 @@ class HugoApiService {
    * Get technique mastery summary for user
    */
   async getUserMastery(userId: string = "demo-user"): Promise<UserMasteryResponse> {
-    const response = await fetch(`${API_BASE}/v2/user/mastery?userId=${encodeURIComponent(userId)}`, {
-      headers: await getAuthHeaders(),
-    });
+    const response = await apiFetch(`${API_BASE}/v2/user/mastery?userId=${encodeURIComponent(userId)}`);
     if (!response.ok) {
       throw new Error(`Failed to get user mastery: ${response.statusText}`);
     }

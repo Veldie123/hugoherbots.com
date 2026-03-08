@@ -1,127 +1,59 @@
 /**
  * VoiceCoach — Real-time voice coaching with Hugo's cloned voice
  *
- * Uses ElevenLabs Conversational AI via @elevenlabs/react.
- * ElevenLabs handles WebRTC, STT, TTS, turn-taking, and interruptions.
- * Our server provides Claude V3 agent as Custom LLM backend.
+ * iOS-call-style interface using ElevenLabs Conversational AI.
+ * Auto-starts the call on mount — one click on the phone toggle = call begins.
  */
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useConversation } from "@elevenlabs/react";
-import { Phone, PhoneOff, Volume2, Mic, MicOff } from "lucide-react";
+import { Phone, Volume2, Mic, MicOff, AlertCircle, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 
 interface VoiceCoachProps {
   onClose: () => void;
 }
 
-interface TranscriptEntry {
-  role: "user" | "agent";
-  text: string;
-  timestamp: number;
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+  const s = (seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
 }
 
 export function VoiceCoach({ onClose }: VoiceCoachProps) {
-  const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [micMuted, setMicMuted] = useState(false);
-  const transcriptEndRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [sessionTimer, setSessionTimer] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [waveformHeights, setWaveformHeights] = useState<number[]>(new Array(15).fill(15));
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const waveformRef = useRef<number | null>(null);
+  const startedRef = useRef(false);
 
   const conversation = useConversation({
+    micMuted,
     onConnect: () => {
       toast.success("Verbonden met Hugo");
     },
     onDisconnect: () => {
       toast.info("Voice sessie beëindigd");
     },
-    onMessage: (message: any) => {
-      if (message.source === "user" || message.role === "user") {
-        setTranscript(prev => [...prev, {
-          role: "user",
-          text: typeof message === "string" ? message : message.message || message.text || "",
-          timestamp: Date.now(),
-        }]);
-      } else if (message.source === "ai" || message.role === "assistant") {
-        setTranscript(prev => [...prev, {
-          role: "agent",
-          text: typeof message === "string" ? message : message.message || message.text || "",
-          timestamp: Date.now(),
-        }]);
-      }
-    },
-    onError: (error: any) => {
-      console.error("[VoiceCoach] Error:", error);
-      toast.error("Voice fout: " + (error?.message || "Verbinding mislukt"));
+    onError: (err: any) => {
+      console.error("[VoiceCoach] Error:", err);
+      setError(err?.message || "Verbinding mislukt");
     },
   });
 
-  // Auto-scroll transcript
-  useEffect(() => {
-    transcriptEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [transcript]);
+  const isConnected = conversation.status === "connected";
+  const isConnecting = conversation.status === "connecting";
+  const isSpeaking = conversation.isSpeaking;
 
-  // Audio visualization
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || conversation.status !== "connected") {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      return;
-    }
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    function draw() {
-      if (!ctx || !canvas) return;
-      const width = canvas.width;
-      const height = canvas.height;
-      ctx.clearRect(0, 0, width, height);
-
-      const outputData = conversation.getOutputByteFrequencyData();
-      const inputData = conversation.getInputByteFrequencyData();
-      const data = conversation.isSpeaking ? outputData : inputData;
-
-      if (data && data.length > 0) {
-        const barCount = 32;
-        const barWidth = width / barCount - 2;
-        const step = Math.floor(data.length / barCount);
-
-        for (let i = 0; i < barCount; i++) {
-          const value = data[i * step] || 0;
-          const barHeight = (value / 255) * height * 0.8;
-          const x = i * (barWidth + 2);
-          const y = (height - barHeight) / 2;
-
-          ctx.fillStyle = conversation.isSpeaking
-            ? "var(--hh-success)"
-            : "var(--hh-primary)";
-          ctx.fillRect(x, y, barWidth, barHeight);
-        }
-      }
-
-      animationRef.current = requestAnimationFrame(draw);
-    }
-
-    draw();
-    return () => {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
-    };
-  }, [conversation.status, conversation.isSpeaking]);
-
+  // Auto-start session on mount
   const startSession = useCallback(async () => {
     try {
-      // Request microphone permission
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      // Get signed URL from our server
-      const headers = getAuthHeaders();
-      const response = await fetch("/api/v3/voice/signed-url", {
+      const response = await apiFetch("/api/v3/voice/signed-url", {
         method: "POST",
-        headers: {
-          ...headers,
-          "Content-Type": "application/json",
-        },
       });
 
       if (!response.ok) {
@@ -130,7 +62,6 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
 
       const { signedUrl, agentId } = await response.json();
 
-      // Start ElevenLabs conversation via signed URL or agent ID
       if (signedUrl) {
         await conversation.startSession({
           url: signedUrl,
@@ -145,12 +76,68 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
     } catch (err: any) {
       console.error("[VoiceCoach] Start failed:", err);
       if (err.name === "NotAllowedError") {
-        toast.error("Microfoon toegang geweigerd. Sta microfoon toe in je browser.");
+        setError("Microfoon toegang geweigerd. Sta microfoon toe in je browser.");
       } else {
-        toast.error(err.message || "Kon voice niet starten");
+        setError(err.message || "Kon voice niet starten");
       }
     }
   }, [conversation]);
+
+  useEffect(() => {
+    if (!startedRef.current) {
+      startedRef.current = true;
+      startSession();
+    }
+  }, [startSession]);
+
+  // Session timer
+  useEffect(() => {
+    if (isConnected) {
+      timerRef.current = setInterval(() => {
+        setSessionTimer(prev => prev + 1);
+      }, 1000);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isConnected]);
+
+  // Waveform animation using ElevenLabs frequency data
+  useEffect(() => {
+    if (!isConnected) {
+      if (waveformRef.current) cancelAnimationFrame(waveformRef.current);
+      return;
+    }
+
+    function animate() {
+      const outputData = conversation.getOutputByteFrequencyData();
+      const inputData = conversation.getInputByteFrequencyData();
+      const data = isSpeaking ? outputData : inputData;
+
+      if (data && data.length > 0) {
+        const barCount = 15;
+        const step = Math.floor(data.length / barCount);
+        const heights = [];
+        for (let i = 0; i < barCount; i++) {
+          const value = data[i * step] || 0;
+          heights.push(Math.max(8, (value / 255) * 56));
+        }
+        setWaveformHeights(heights);
+      } else {
+        // Idle animation
+        setWaveformHeights(prev =>
+          prev.map((_, i) => 10 + (i % 3) * 8)
+        );
+      }
+
+      waveformRef.current = requestAnimationFrame(animate);
+    }
+
+    animate();
+    return () => {
+      if (waveformRef.current) cancelAnimationFrame(waveformRef.current);
+    };
+  }, [isConnected, isSpeaking, conversation]);
 
   const endSession = useCallback(async () => {
     try {
@@ -161,140 +148,167 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
     onClose();
   }, [conversation, onClose]);
 
-  const toggleMic = useCallback(() => {
-    setMicMuted(prev => !prev);
-    // ElevenLabs SDK handles mic muting via controlled state
-  }, []);
-
-  const isConnected = conversation.status === "connected";
-  const isConnecting = conversation.status === "connecting";
+  const retrySession = useCallback(() => {
+    setError(null);
+    startedRef.current = false;
+    startSession();
+  }, [startSession]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-hh-bg/95 backdrop-blur-sm flex flex-col items-center justify-center">
-      {/* Header */}
-      <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-        <div className="text-[14px] text-hh-muted">
-          {isConnected ? "Voice coaching actief" : isConnecting ? "Verbinden..." : "Voice coaching"}
+    <div
+      className="fixed inset-0 z-50 flex flex-col"
+      style={{ background: "linear-gradient(180deg, var(--hh-success) 0%, #0d9488 50%, #0f766e 100%)" }}
+    >
+      {/* Error banner */}
+      {error && (
+        <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-10">
+          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          <span className="text-[14px]">{error}</span>
+          <button onClick={() => setError(null)} className="ml-auto">
+            <X className="w-4 h-4" />
+          </button>
         </div>
-        <button
-          onClick={endSession}
-          className="text-[14px] text-hh-muted hover:text-hh-error transition-colors"
-        >
-          Sluiten
-        </button>
+      )}
+
+      {/* Main content — centered */}
+      <div className="flex-1 flex flex-col items-center justify-center">
+        {/* Avatar */}
+        <div className="relative mb-6">
+          <div
+            className="rounded-full flex items-center justify-center"
+            style={{ width: "180px", height: "180px", backgroundColor: "rgba(255,255,255,0.25)" }}
+          >
+            {isConnecting ? (
+              <Loader2 className="w-16 h-16 text-white animate-spin" />
+            ) : (
+              <span className="text-white font-bold" style={{ fontSize: "64px" }}>HH</span>
+            )}
+          </div>
+        </div>
+
+        {/* Name + status */}
+        <h3 className="text-white text-[26px] font-bold mb-1">
+          Hugo Herbots <sup className="text-[14px] font-semibold" style={{ verticalAlign: "super" }}>AI</sup>
+        </h3>
+        <p className="text-[16px] mb-2" style={{ color: "rgba(255,255,255,0.8)" }}>
+          {isConnecting
+            ? "Verbinden..."
+            : isConnected
+              ? isSpeaking ? "Hugo spreekt..." : "Verbonden"
+              : error
+                ? "Verbinding mislukt"
+                : "Starten..."
+          }
+        </p>
+
+        {/* Timer */}
+        {isConnected && (
+          <p className="text-[22px] font-mono" style={{ color: "rgba(255,255,255,0.6)" }}>
+            {formatTime(sessionTimer)}
+          </p>
+        )}
+
+        {/* Waveform visualization */}
+        <div className="flex items-end justify-center gap-1.5 h-16 mt-8">
+          {waveformHeights.map((h, i) => (
+            <div
+              key={i}
+              className="rounded-full transition-all duration-100"
+              style={{
+                width: "6px",
+                backgroundColor: "rgba(255,255,255,0.7)",
+                height: `${h}px`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Status message */}
+        <p className="text-white/60 text-[14px] mt-4">
+          {isConnected
+            ? isSpeaking ? "Je kunt Hugo onderbreken door te praten" : "Spraakcoaching actief"
+            : error
+              ? "Controleer microfoon en probeer opnieuw"
+              : "ElevenLabs voice verbinding"
+          }
+        </p>
       </div>
 
-      {/* Main visual */}
-      <div className="flex flex-col items-center gap-6 max-w-md w-full px-6">
-        {/* Avatar ring */}
-        <div className={`relative w-32 h-32 rounded-full flex items-center justify-center ${
-          conversation.isSpeaking
-            ? "ring-4 ring-hh-success/50 animate-pulse"
-            : isConnected
-              ? "ring-2 ring-hh-primary/30"
-              : "ring-2 ring-hh-border"
-        }`}>
-          <div className="w-28 h-28 rounded-full bg-hh-ui-50 flex items-center justify-center">
-            <span className="text-[40px] font-bold text-hh-primary">H</span>
-          </div>
-          {/* Speaking indicator */}
-          {conversation.isSpeaking && (
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-hh-success text-white text-[11px] font-medium">
-              Hugo spreekt
-            </div>
-          )}
-          {isConnected && !conversation.isSpeaking && (
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-hh-primary text-white text-[11px] font-medium">
-              Hugo luistert
-            </div>
-          )}
-        </div>
-
-        {/* Audio visualization */}
-        {isConnected && (
-          <canvas
-            ref={canvasRef}
-            width={256}
-            height={48}
-            className="w-64 h-12 opacity-60"
-          />
-        )}
-
-        {/* Status text */}
-        <div className="text-center">
-          <h2 className="text-[20px] leading-[28px] font-semibold text-hh-text">
-            {isConnected
-              ? conversation.isSpeaking ? "Hugo aan het woord..." : "Spreek vrijuit..."
-              : isConnecting
-                ? "Verbinden met Hugo..."
-                : "Praat met Hugo"
-            }
-          </h2>
-          <p className="text-[14px] text-hh-muted mt-1">
-            {isConnected
-              ? "Je kunt Hugo onderbreken door te praten"
-              : "Start een voice coaching sessie met Hugo's AI"
-            }
-          </p>
-        </div>
-
-        {/* Controls */}
-        <div className="flex items-center gap-4 mt-4">
-          {!isConnected && !isConnecting && (
+      {/* Bottom controls */}
+      <div className="pb-8 pt-4">
+        <div className="flex items-center justify-center gap-8">
+          {/* Mute */}
+          <div className="flex flex-col items-center gap-2">
             <button
-              onClick={startSession}
-              className="flex items-center gap-2 px-6 py-3 rounded-full bg-hh-success hover:bg-hh-success/90 text-white font-medium text-[16px] transition-colors"
+              onClick={() => setMicMuted(prev => !prev)}
+              className="flex items-center justify-center transition-colors"
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "50%",
+                backgroundColor: micMuted ? "white" : "rgba(255,255,255,0.2)",
+              }}
             >
-              <Phone className="w-5 h-5" />
-              Start gesprek
+              {micMuted
+                ? <MicOff className="w-5 h-5 text-teal-700" />
+                : <Mic className="w-5 h-5 text-white" />
+              }
             </button>
-          )}
+            <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.7)" }}>
+              {micMuted ? "Unmute" : "Mute"}
+            </span>
+          </div>
 
-          {isConnecting && (
-            <div className="flex items-center gap-2 px-6 py-3 rounded-full bg-hh-ui-200 text-hh-muted font-medium text-[16px]">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-hh-primary" />
-              Verbinden...
-            </div>
-          )}
-
-          {isConnected && (
-            <>
+          {/* Hangup / Retry */}
+          <div className="flex flex-col items-center gap-2">
+            {error && !isConnected && !isConnecting ? (
               <button
-                onClick={toggleMic}
-                className={`w-12 h-12 rounded-full p-0 flex items-center justify-center transition-colors ${
-                  micMuted
-                    ? "bg-hh-error/10 text-hh-error"
-                    : "bg-hh-ui-50 text-hh-primary hover:bg-hh-ui-200"
-                }`}
+                onClick={retrySession}
+                className="flex items-center justify-center shadow-xl"
+                style={{
+                  width: "64px",
+                  height: "64px",
+                  borderRadius: "50%",
+                  backgroundColor: "white",
+                }}
               >
-                {micMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                <Phone className="w-6 h-6 text-teal-700" />
               </button>
+            ) : (
               <button
                 onClick={endSession}
-                className="w-14 h-14 rounded-full p-0 flex items-center justify-center bg-hh-error hover:bg-hh-error/90 text-white transition-colors"
+                className="flex items-center justify-center shadow-xl"
+                style={{
+                  width: "64px",
+                  height: "64px",
+                  borderRadius: "50%",
+                  backgroundColor: "#ef4444",
+                }}
               >
-                <PhoneOff className="w-6 h-6" />
+                <Phone className="w-6 h-6 text-white" style={{ transform: "rotate(135deg)" }} />
               </button>
-            </>
-          )}
-        </div>
-
-        {/* Transcript */}
-        {transcript.length > 0 && (
-          <div className="w-full mt-6 max-h-48 overflow-y-auto border border-hh-border rounded-[16px] p-4 bg-hh-ui-50">
-            <div className="space-y-2">
-              {transcript.map((entry, i) => (
-                <div key={i} className={`text-[13px] ${entry.role === "agent" ? "text-hh-text" : "text-hh-muted"}`}>
-                  <span className="font-medium">
-                    {entry.role === "agent" ? "Hugo: " : "Jij: "}
-                  </span>
-                  {entry.text}
-                </div>
-              ))}
-              <div ref={transcriptEndRef} />
-            </div>
+            )}
+            <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.7)" }}>
+              {error && !isConnected && !isConnecting ? "Opnieuw" : "Ophangen"}
+            </span>
           </div>
-        )}
+
+          {/* Speaker/Volume */}
+          <div className="flex flex-col items-center gap-2">
+            <button
+              className="flex items-center justify-center"
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "50%",
+                backgroundColor: "rgba(255,255,255,0.2)",
+              }}
+            >
+              <Volume2 className="w-5 h-5 text-white" />
+            </button>
+            <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.7)" }}>Speaker</span>
+          </div>
+        </div>
       </div>
     </div>
   );

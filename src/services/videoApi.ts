@@ -1,6 +1,6 @@
 import type { Video, VideoProgress, CreateVideoRequest, UpdateVideoRequest, UpdateProgressRequest, MuxUploadResponse, VideoWithProgress } from '@/types/video';
-import { supabase } from '@/utils/supabase/client';
 import { projectId } from '@/utils/supabase/info';
+import { apiFetch } from './apiFetch';
 
 const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-b9a572ea/api/videos`;
 const LOCAL_API_BASE = '/api/videos';
@@ -12,14 +12,6 @@ export function clearLibraryCache(): void {
   libraryCache.clear();
 }
 
-async function getAuthHeaders(): Promise<HeadersInit> {
-  const { data: { session } } = await supabase.auth.getSession();
-  return {
-    'Content-Type': 'application/json',
-    ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}),
-  };
-}
-
 export const videoApi = {
   async getVideos(status?: string, module?: string): Promise<Video[]> {
     const params = new URLSearchParams();
@@ -27,27 +19,26 @@ export const videoApi = {
     if (module) params.append('module', module);
     
     const url = params.toString() ? `${API_BASE}?${params}` : API_BASE;
-    const response = await fetch(url, { headers: await getAuthHeaders() });
+    const response = await apiFetch(url);
     if (!response.ok) throw new Error('Failed to fetch videos');
     return response.json();
   },
 
   async getVideo(id: string): Promise<VideoWithProgress> {
-    const response = await fetch(`${API_BASE}/${id}`, { headers: await getAuthHeaders() });
+    const response = await apiFetch(`${API_BASE}/${id}`);
     if (!response.ok) throw new Error('Failed to fetch video');
     return response.json();
   },
 
   async getVideosByModule(module: string): Promise<Video[]> {
-    const response = await fetch(`${API_BASE}/module/${encodeURIComponent(module)}`, { headers: await getAuthHeaders() });
+    const response = await apiFetch(`${API_BASE}/module/${encodeURIComponent(module)}`);
     if (!response.ok) throw new Error('Failed to fetch videos by module');
     return response.json();
   },
 
   async createUpload(data: CreateVideoRequest): Promise<MuxUploadResponse> {
-    const response = await fetch(`${API_BASE}/upload`, {
+    const response = await apiFetch(`${API_BASE}/upload`, {
       method: 'POST',
-      headers: await getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Failed to create upload');
@@ -55,9 +46,8 @@ export const videoApi = {
   },
 
   async updateVideo(id: string, data: UpdateVideoRequest): Promise<Video> {
-    const response = await fetch(`${API_BASE}/${id}`, {
+    const response = await apiFetch(`${API_BASE}/${id}`, {
       method: 'PUT',
-      headers: await getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Failed to update video');
@@ -65,24 +55,22 @@ export const videoApi = {
   },
 
   async deleteVideo(id: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/${id}`, {
+    const response = await apiFetch(`${API_BASE}/${id}`, {
       method: 'DELETE',
-      headers: await getAuthHeaders(),
     });
     if (!response.ok) throw new Error('Failed to delete video');
   },
 
   async getProgress(videoId: string): Promise<VideoProgress | null> {
-    const response = await fetch(`${API_BASE}/${videoId}/progress`, { headers: await getAuthHeaders() });
+    const response = await apiFetch(`${API_BASE}/${videoId}/progress`);
     if (response.status === 404) return null;
     if (!response.ok) throw new Error('Failed to fetch progress');
     return response.json();
   },
 
   async updateProgress(videoId: string, data: UpdateProgressRequest): Promise<VideoProgress> {
-    const response = await fetch(`${API_BASE}/${videoId}/progress`, {
+    const response = await apiFetch(`${API_BASE}/${videoId}/progress`, {
       method: 'POST',
-      headers: await getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Failed to update progress');
@@ -90,15 +78,14 @@ export const videoApi = {
   },
 
   async getUserStats(): Promise<{ totalVideos: number; completedVideos: number; totalWatchTime: number }> {
-    const response = await fetch(`${API_BASE}/stats`, { headers: await getAuthHeaders() });
+    const response = await apiFetch(`${API_BASE}/stats`);
     if (!response.ok) throw new Error('Failed to fetch stats');
     return response.json();
   },
 
   async importFromUrl(data: { url: string; title: string; description?: string; course_module?: string; technique_id?: string }): Promise<{ video_id: string; asset_id: string; status: string }> {
-    const response = await fetch(`${API_BASE}/import-url`, {
+    const response = await apiFetch(`${API_BASE}/import-url`, {
       method: 'POST',
-      headers: await getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) {
@@ -117,7 +104,7 @@ export const videoApi = {
     totalWatchTimeMinutes: number;
     lastActivity: string | null;
   }>> {
-    const response = await fetch(`${API_BASE}/admin/progress`, { headers: await getAuthHeaders() });
+    const response = await apiFetch(`${API_BASE}/admin/progress`);
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Kon voortgang niet ophalen' }));
       throw new Error(error.error || 'Kon voortgang niet ophalen');
@@ -195,15 +182,14 @@ export const videoApi = {
     created_at: string;
     updated_at: string;
   }> {
-    const response = await fetch(`${API_BASE}/library/${id}`, { headers: await getAuthHeaders() });
+    const response = await apiFetch(`${API_BASE}/library/${id}`);
     if (!response.ok) throw new Error('Video niet gevonden');
     return response.json();
   },
 
   async updateLibraryVideo(id: string, data: { title?: string; techniek_id?: string; fase?: string }): Promise<any> {
-    const response = await fetch(`${API_BASE}/library/${id}`, {
+    const response = await apiFetch(`${API_BASE}/library/${id}`, {
       method: 'PUT',
-      headers: await getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Video bijwerken mislukt');
@@ -274,7 +260,7 @@ export const videoApi = {
   },
 
   async exportCsv(): Promise<void> {
-    const response = await fetch(`${API_BASE}/export/csv`, { headers: await getAuthHeaders() });
+    const response = await apiFetch(`${API_BASE}/export/csv`);
     
     if (!response.ok) {
       const errorText = await response.text();

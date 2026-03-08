@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { X } from "lucide-react";
 
 const NPS_STORAGE_KEY = "hh_last_nps_date";
@@ -41,10 +41,8 @@ export function NPSSurvey() {
     if (score === null) return;
     setSubmitting(true);
     try {
-      const headers = await getAuthHeaders();
-      await fetch("/api/feedback/nps", {
+      await apiFetch("/api/feedback/nps", {
         method: "POST",
-        headers,
         body: JSON.stringify({ score, comment: comment || undefined }),
       });
       localStorage.setItem(NPS_STORAGE_KEY, new Date().toISOString());

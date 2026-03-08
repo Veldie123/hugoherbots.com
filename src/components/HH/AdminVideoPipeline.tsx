@@ -38,6 +38,7 @@ import {
   DialogFooter,
 } from "../ui/dialog";
 import { supabase } from "../../utils/supabase/client";
+import { apiFetch } from "../../services/apiFetch";
 import { toast } from "sonner";
 
 // Note: Google Drive sync runs via backend/local script, not browser
@@ -209,14 +210,8 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
     try {
       toast.info("Google Drive synchronisatie gestart...");
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token || '';
-      const response = await fetch("/api/admin-video/video-processor/sync", {
+      const response = await apiFetch("/api/admin-video/video-processor/sync", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify({ folderId })
       });
 
@@ -282,14 +277,8 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
 
     setProcessing(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token || '';
-      const response = await fetch("/api/admin-video/video-processor/start", {
+      const response = await apiFetch("/api/admin-video/video-processor/start", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
       });
 
       const result = await response.json();
@@ -298,7 +287,7 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
         toast.success("Video verwerking gestart! Dit kan enkele minuten duren.");
         const checkInterval = setInterval(async () => {
           await fetchJobs();
-          const statusRes = await fetch("/api/admin-video/video-processor/status");
+          const statusRes = await apiFetch("/api/admin-video/video-processor/status");
           const status = await statusRes.json();
           if (!status.processing) {
             clearInterval(checkInterval);

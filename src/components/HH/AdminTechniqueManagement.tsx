@@ -26,6 +26,7 @@ import {
   Tag,
 } from "lucide-react";
 import { toast } from "sonner";
+import { apiFetch } from '../../services/apiFetch';
 import { useState } from "react";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AdminLayout } from "./AdminLayout";
@@ -146,9 +147,8 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
     }
     
     try {
-      const response = await fetch('/api/v2/admin/corrections', {
+      const response = await apiFetch('/api/v2/admin/corrections', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'technique',
           field: `${editingTechnique} - ${originalTech?.naam || ''}`,

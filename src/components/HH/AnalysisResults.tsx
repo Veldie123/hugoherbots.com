@@ -44,7 +44,7 @@ import { toast } from "sonner";
 import MuxPlayer from "@mux/mux-player-react";
 import { getTechniekByNummer, getAllTechnieken, getTechniekenByFase } from "../../data/technieken-service";
 import { useTheme } from "./ThemeProvider";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { EPICSidebar } from "./AdminChatExpertModeSidebar";
 import technieken_index from "../../data/technieken_index.json";
 import { KLANT_HOUDINGEN as KLANT_HOUDINGEN_DATA } from "../../data/klant_houdingen";
@@ -388,9 +388,8 @@ export function AnalysisResults({
     if (originalValue === newValue) return;
     setSubmittingCorrection(true);
     try {
-      const response = await fetch('/api/v2/admin/corrections', {
+      const response = await apiFetch('/api/v2/admin/corrections', {
         method: 'POST',
-        headers: await getAuthHeaders(),
         body: JSON.stringify({
           analysisId: result?.conversation?.id || conversationId,
           type,
@@ -432,9 +431,8 @@ export function AnalysisResults({
     const signal = result.signals.find(s => s.turnIdx === turn.idx);
     try {
       const techniqueIds = evaluation?.techniques.map(t => t.id) || [];
-      const res = await fetch('/api/v2/session/save-reference', {
+      const res = await apiFetch('/api/v2/session/save-reference', {
         method: 'POST',
-        headers: await getAuthHeaders(),
         body: JSON.stringify({
           sessionId: conversationId,
           techniqueId: techniqueIds[0] || 'unknown',
@@ -463,9 +461,8 @@ export function AnalysisResults({
         ? evaluation?.techniques.map(t => `${t.id}:${t.quality}`).join(', ') || 'geen'
         : signal?.houding || 'neutraal';
 
-      await fetch('/api/v2/admin/corrections', {
+      await apiFetch('/api/v2/admin/corrections', {
         method: 'POST',
-        headers: await getAuthHeaders(),
         body: JSON.stringify({
           analysisId: conversationId,
           type: correctionType,
@@ -477,9 +474,8 @@ export function AnalysisResults({
         }),
       });
 
-      await fetch('/api/v2/session/save-reference', {
+      await apiFetch('/api/v2/session/save-reference', {
         method: 'POST',
-        headers: await getAuthHeaders(),
         body: JSON.stringify({
           sessionId: conversationId,
           techniqueId: correctionType === 'technique' ? correctionValue : (evaluation?.techniques[0]?.id || 'unknown'),
@@ -538,9 +534,7 @@ export function AnalysisResults({
     }
     const loadFirst = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list?source=upload', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/v2/analysis/list?source=upload');
         if (!res.ok) { setError('Kon analyses niet ophalen'); setLoading(false); return; }
         const data = await res.json();
         const analyses = data.analyses || [];
@@ -567,9 +561,7 @@ export function AnalysisResults({
 
     const fetchResults = async () => {
       try {
-        const response = await fetch(`/api/v2/analysis/results/${resolvedConversationId}`, {
-          headers: await getAuthHeaders(),
-        });
+        const response = await apiFetch(`/api/v2/analysis/results/${resolvedConversationId}`);
         const data = await response.json();
 
         if (response.status === 202) {
@@ -595,9 +587,8 @@ export function AnalysisResults({
         if (response.status === 404 && sessionStorage.getItem('analysisFromHugo') === 'true') {
           setProcessingStep('Analyse starten...');
           try {
-            const triggerRes = await fetch('/api/v2/analysis/chat-session', {
+            const triggerRes = await apiFetch('/api/v2/analysis/chat-session', {
               method: 'POST',
-              headers: await getAuthHeaders(),
               body: JSON.stringify({ sessionId: resolvedConversationId }),
             });
             const triggerData = await triggerRes.json();
@@ -647,9 +638,7 @@ export function AnalysisResults({
     if (!resolvedConversationId || !result) return;
     (async () => {
       try {
-        const r = await fetch(`/api/v2/analysis/percentile/${resolvedConversationId}?period=${percentilePeriod}`, {
-          headers: await getAuthHeaders(),
-        });
+        const r = await apiFetch(`/api/v2/analysis/percentile/${resolvedConversationId}?period=${percentilePeriod}`);
         if (r.ok) { const data = await r.json(); if (data) setPercentileData(data); }
       } catch {}
     })();
@@ -663,12 +652,11 @@ export function AnalysisResults({
     
     setRegeneratingCoach(true);
     (async () => {
-      const headers = await getAuthHeaders();
-      fetch(`/api/v2/analysis/regenerate-coach/${resolvedConversationId}`, { method: 'POST', headers })
+      apiFetch(`/api/v2/analysis/regenerate-coach/${resolvedConversationId}`, { method: 'POST' })
         .then(r => r.json())
         .then(data => {
           if (data.success) {
-            return fetch(`/api/v2/analysis/results/${resolvedConversationId}`, { headers })
+            return apiFetch(`/api/v2/analysis/results/${resolvedConversationId}`)
               .then(r => r.json())
               .then(updatedData => {
                 if (updatedData.insights) {
@@ -914,9 +902,8 @@ export function AnalysisResults({
     setActionLoading(`${momentId}-${actionType}`);
     setActionResult(null);
     try {
-      const res = await fetch('/api/v2/analysis/coach-action', {
+      const res = await apiFetch('/api/v2/analysis/coach-action', {
         method: 'POST',
-        headers: await getAuthHeaders(),
         body: JSON.stringify({ analysisId: resolvedConversationId, momentId, actionType }),
       });
       if (!res.ok) throw new Error('Action failed');
@@ -1143,7 +1130,7 @@ export function AnalysisResults({
                   <button
                     onClick={async () => {
                       try {
-                        const res = await fetch(`/api/v2/analysis/retry/${conversationId}`, { method: 'POST', headers: await getAuthHeaders() });
+                        const res = await apiFetch(`/api/v2/analysis/retry/${conversationId}`, { method: 'POST' });
                         const data = await res.json();
                         if (res.ok) {
                           toast?.('Analyse wordt opnieuw gestart...', { description: 'De pagina wordt automatisch ververst.' });

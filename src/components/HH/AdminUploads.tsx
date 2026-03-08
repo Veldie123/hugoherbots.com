@@ -29,7 +29,7 @@ import {
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useMobileViewMode } from "@/hooks/useMobileViewMode";
 import { useNotifications } from "@/contexts/NotificationContext";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { toast } from "sonner";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
@@ -158,9 +158,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
     setError(null);
 
     try {
-      const res = await fetch("/api/v2/analysis/list?source=upload", {
-        headers: await getAuthHeaders(),
-      });
+      const res = await apiFetch("/api/v2/analysis/list?source=upload");
       if (!res.ok) throw new Error("Analyses ophalen mislukt");
       const data = await res.json();
       setAnalyses(data.analyses || []);
@@ -177,9 +175,8 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
 
   const handleRetryAnalysis = async (analysisId: string) => {
     try {
-      const res = await fetch(`/api/v2/analysis/retry/${analysisId}`, {
+      const res = await apiFetch(`/api/v2/analysis/retry/${analysisId}`, {
         method: "POST",
-        headers: await getAuthHeaders(),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Opnieuw starten mislukt");
@@ -203,13 +200,12 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
     if (!hasActive) return;
 
     const interval = setInterval(async () => {
-      const headers = await getAuthHeaders();
       let anyChanged = false;
       const updated = await Promise.all(
         processingAnalyses.map(async (pa) => {
           if (['completed', 'failed'].includes(pa.status)) return pa;
           try {
-            const res = await fetch(`/api/v2/analysis/status/${pa.id}`, { headers });
+            const res = await apiFetch(`/api/v2/analysis/status/${pa.id}`);
             if (res.ok) {
               const data = await res.json();
               if (data.status !== pa.status) anyChanged = true;
@@ -423,14 +419,11 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
 
       try {
         let result: any;
-        const authHeaders = await getAuthHeaders();
-        const { 'Content-Type': _, ...formDataAuth } = authHeaders;
 
         if (bf.file.size > CHUNK_SIZE) {
           const totalChunks = Math.ceil(bf.file.size / CHUNK_SIZE);
-          const initRes = await fetch('/api/v2/analysis/upload/init', {
+          const initRes = await apiFetch('/api/v2/analysis/upload/init', {
             method: 'POST',
-            headers: authHeaders,
             body: JSON.stringify({
               fileName: bf.file.name,
               fileSize: bf.file.size,
@@ -452,13 +445,13 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
             fd.append('chunk', chunk, `chunk_${c}`);
             fd.append('uploadId', uploadId);
             fd.append('chunkIndex', String(c));
-            const chunkRes = await fetch('/api/v2/analysis/upload/chunk', { method: 'POST', headers: formDataAuth, body: fd });
+            // apiFetch auto-detects FormData, skips Content-Type
+            const chunkRes = await apiFetch('/api/v2/analysis/upload/chunk', { method: 'POST', body: fd });
             if (!chunkRes.ok) throw new Error(`Chunk ${c + 1} mislukt`);
           }
 
-          const completeRes = await fetch('/api/v2/analysis/upload/complete', {
+          const completeRes = await apiFetch('/api/v2/analysis/upload/complete', {
             method: 'POST',
-            headers: authHeaders,
             body: JSON.stringify({
               uploadId,
               title: bf.title,
@@ -477,9 +470,9 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
           formData.append('userId', 'admin-bulk');
           formData.append('consentConfirmed', 'true');
 
-          const response = await fetch('/api/v2/analysis/upload', {
+          // apiFetch auto-detects FormData, skips Content-Type
+          const response = await apiFetch('/api/v2/analysis/upload', {
             method: 'POST',
-            headers: formDataAuth,
             body: formData,
           });
           result = await response.json();

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAuthHeaders } from '@/services/hugoApi';
+import { apiFetch } from '@/services/apiFetch';
 
 export interface DashboardAnalysis {
   id: string;
@@ -18,9 +18,7 @@ export function useDashboardAnalyses() {
     async function fetchAnalyses() {
       try {
         setLoading(true);
-        const res = await fetch('/api/v2/analysis/list?source=upload', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/v2/analysis/list?source=upload');
         if (!res.ok) return;
         const data = await res.json();
         const mapped: DashboardAnalysis[] = (data.analyses || []).slice(0, 8).map((a: any) => ({

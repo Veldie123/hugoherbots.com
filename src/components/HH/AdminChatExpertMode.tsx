@@ -72,7 +72,7 @@ import {
 } from "../../utils/displayMappings";
 import { EPICSidebar } from "./AdminChatExpertModeSidebar";
 import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
-import { supabase } from "../../utils/supabase/client";
+import { apiFetch } from "../../services/apiFetch";
 import { Loader2 } from "lucide-react";
 import { LiveAvatarComponent } from "./LiveAvatarComponent";
 import { ModelSelector, type EngineModel } from "./ModelSelector";
@@ -400,7 +400,7 @@ export function AdminChatExpertMode({
             {
               techniqueId: 'general',
               mode: 'COACH_CHAT',
-              isExpert: false,
+              isExpert: true,
               modality: 'chat',
               viewMode: 'admin',
             },
@@ -427,7 +427,7 @@ export function AdminChatExpertMode({
         } catch (e) {
           console.error("[Admin] Failed to start admin session:", e);
           try {
-            const res = await fetch('/api/v2/admin/welcome');
+            const res = await apiFetch('/api/v2/admin/welcome');
             if (res.ok) {
               const data = await res.json();
               setMessages([{
@@ -492,9 +492,8 @@ export function AdminChatExpertMode({
         .reverse()
         .find(m => m.sender === 'ai');
       
-      const response = await fetch('/api/v2/session/save-reference', {
+      const response = await apiFetch('/api/v2/session/save-reference', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId,
           techniqueId: expectedTechnique,
@@ -531,14 +530,13 @@ export function AdminChatExpertMode({
         .reverse()
         .find(m => m.sender === 'ai');
       
-      const response = await fetch('/api/v2/session/flag-customer-response', {
+      const response = await apiFetch('/api/v2/session/flag-customer-response', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId,
           turnNumber: messages.findIndex(m => m.id === message.id),
           customerMessage: isForSeller ? (prevCustomerMessage?.text || '') : message.text,
-          customerSignal: isForSeller 
+          customerSignal: isForSeller
             ? (prevCustomerMessage?.debugInfo?.klantSignaal || 'neutraal')
             : (message.debugInfo?.klantSignaal || 'neutraal'),
           currentPhase: message.debugInfo?.context?.fase || currentPhase,
@@ -574,9 +572,8 @@ export function AdminChatExpertMode({
     setAudioError(null);
     
     try {
-      const response = await fetch('/api/livekit/token', {
+      const response = await apiFetch('/api/livekit/token', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomName: `hugo-admin-${Date.now()}` })
       });
       
@@ -845,7 +842,7 @@ export function AdminChatExpertMode({
   const handleNavigationIntent = async (intent: string, userText: string): Promise<boolean> => {
     if (intent === "analysis") {
       try {
-        const res = await fetch('/api/v2/analysis/list');
+        const res = await apiFetch('/api/v2/analysis/list');
         if (!res.ok) return false;
         const analyses = await res.json();
         const recent = analyses.slice(0, 5);
@@ -1079,16 +1076,8 @@ export function AdminChatExpertMode({
     }
 
     try {
-      const { data: { session: authSession } } = await supabase.auth.getSession();
-      const authToken = authSession?.access_token || '';
-      const authHeaders: Record<string, string> = {
-        'Content-Type': 'application/json',
-        ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
-      };
-
-      const response = await fetch('/api/v2/admin/corrections', {
+      const response = await apiFetch('/api/v2/admin/corrections', {
         method: 'POST',
-        headers: authHeaders,
         body: JSON.stringify({
           type: 'chat_feedback',
           field: correctionTechnique ? 'technique_correction' : 'general_feedback',
@@ -1112,9 +1101,8 @@ export function AdminChatExpertMode({
           ? `CORRECTIE (${correctionTechniqueName}): Hugo corrigeerde het AI-antwoord "${message.text.slice(0, 100)}..." met: "${finalCorrectionText}"`
           : `CORRECTIE: Hugo corrigeerde het AI-antwoord "${message.text.slice(0, 100)}..." met: "${finalCorrectionText}"`;
 
-        await fetch('/api/v3/memory/save', {
+        await apiFetch('/api/v3/memory/save', {
           method: 'POST',
-          headers: authHeaders,
           body: JSON.stringify({
             content: memoryContent,
             memoryType: 'admin_correction',
@@ -1135,9 +1123,8 @@ export function AdminChatExpertMode({
       if (onboardingStatus && !onboardingStatus.isComplete && onboardingCurrentItem) {
         // Meld feedback aan onboarding backend
         try {
-          await fetch('/api/v2/admin/onboarding/feedback', {
+          await apiFetch('/api/v2/admin/onboarding/feedback', {
             method: 'POST',
-            headers: authHeaders,
             body: JSON.stringify({
               itemKey: onboardingCurrentItem.key,
               module: onboardingCurrentItem.module,
@@ -1163,9 +1150,7 @@ export function AdminChatExpertMode({
           setMessages(prev => [...prev, aiMsg]);
 
           // Update onboarding status
-          const statusRes = await fetch(`/api/v2/admin/onboarding/status?userId=hugo`, {
-            headers: authHeaders,
-          });
+          const statusRes = await apiFetch(`/api/v2/admin/onboarding/status?userId=hugo`);
           if (statusRes.ok) {
             const status = await statusRes.json();
             setOnboardingStatus(status);
@@ -1384,16 +1369,6 @@ export function AdminChatExpertMode({
                   <Video className="w-4 h-4" strokeWidth={1.5} />
                 </button>
               </div>
-              {messages.length > 0 && (
-                <button
-                  onClick={confirmStopRoleplay}
-                  className="h-8 px-3 rounded-md border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors flex items-center gap-1.5"
-                  title="Opnieuw starten"
-                >
-                  <X className="w-3.5 h-3.5 text-hh-muted" />
-                  <span className="text-[12px] text-hh-text">Stop</span>
-              </button>
-            )}
             </div>
           </div>
         </div>
@@ -2581,8 +2556,45 @@ export function AdminChatExpertMode({
         technique={selectedTechniqueDetails}
         isEditable={true}
         isAdmin={true}
-        onSave={(_updatedTechnique) => {
-          // TODO: Save to backend
+        onSave={async (updatedTechnique) => {
+          if (!selectedTechniqueDetails || !updatedTechnique) return;
+          const original = selectedTechniqueDetails;
+          const changedFields: string[] = [];
+          for (const key of Object.keys(updatedTechnique)) {
+            if (JSON.stringify((original as any)?.[key]) !== JSON.stringify((updatedTechnique as any)?.[key])) {
+              changedFields.push(key);
+            }
+          }
+          if (changedFields.length === 0) {
+            toast.info("Geen wijzigingen gedetecteerd");
+            return;
+          }
+          try {
+            const response = await apiFetch("/api/v2/admin/corrections", {
+              method: "POST",
+              body: JSON.stringify({
+                type: "technique",
+                field: `${original.nummer || ""} - ${original.naam || ""}`,
+                originalValue: changedFields.map(f => `${f}: ${JSON.stringify((original as any)?.[f])}`).join("\n"),
+                newValue: changedFields.map(f => `${f}: ${JSON.stringify((updatedTechnique as any)?.[f])}`).join("\n"),
+                context: `Techniek ${original.nummer} bewerkt via EPIC sidebar. Gewijzigde velden: ${changedFields.join(", ")}`,
+                submittedBy: "Hugo",
+                source: "technique_edit",
+                targetFile: "technieken_index.json",
+                targetKey: original.nummer,
+                originalJson: JSON.stringify(original),
+                newJson: JSON.stringify(updatedTechnique),
+              }),
+            });
+            if (response.ok) {
+              toast.success("Wijziging ingediend voor review door superadmin");
+            } else {
+              const err = await response.json();
+              toast.error(`Fout: ${err.error || "Opslaan mislukt"}`);
+            }
+          } catch {
+            toast.error("Netwerk fout bij opslaan");
+          }
         }}
       />
     </AdminLayout>

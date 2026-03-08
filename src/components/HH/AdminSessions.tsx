@@ -1,4 +1,4 @@
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { AdminLayout } from "./AdminLayout";
 import { useState, useEffect, useMemo } from "react";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
@@ -186,9 +186,8 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
     setAnalyzingSessionIds(prev => new Set(prev).add(sessionId));
 
     try {
-      const response = await fetch('/api/v2/analysis/chat-session', {
+      const response = await apiFetch('/api/v2/analysis/chat-session', {
         method: 'POST',
-        headers: await getAuthHeaders(),
         body: JSON.stringify({ sessionId }),
       });
       const data = await safeJsonParse(response);
@@ -216,9 +215,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
 
       const pollInterval = setInterval(async () => {
         try {
-          const statusRes = await fetch(`/api/v2/analysis/status/${sessionId}`, {
-            headers: await getAuthHeaders(),
-          });
+          const statusRes = await apiFetch(`/api/v2/analysis/status/${sessionId}`);
           const statusData = await safeJsonParse(statusRes);
 
           if (statusData.status === 'completed') {
@@ -262,9 +259,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
     async function fetchSessions() {
       try {
         setLoading(true);
-        const response = await fetch('/api/sessions', {
-          headers: await getAuthHeaders(),
-        });
+        const response = await apiFetch('/api/sessions');
         if (!response.ok) throw new Error('Failed to fetch sessions');
         const data = await response.json();
         
@@ -458,11 +453,28 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
     }
   };
 
-  const handleSubmitFeedback = (lineId: string) => {
+  const handleSubmitFeedback = async (lineId: string) => {
     const feedback = feedbackText[lineId];
-    if (feedback?.trim()) {
-      // TODO: implement feedback save API call
-      setShowFeedbackInput((prev) => ({ ...prev, [lineId]: false }));
+    if (!feedback?.trim()) return;
+    try {
+      const response = await apiFetch("/api/v2/admin/corrections", {
+        method: "POST",
+        body: JSON.stringify({
+          type: "session_feedback",
+          field: `Sessie transcript regel ${lineId}`,
+          originalValue: "",
+          newValue: feedback.trim(),
+          context: `Admin feedback op transcript regel in sessie-overzicht`,
+          submittedBy: "Hugo",
+          source: "session_review",
+        }),
+      });
+      if (response.ok) {
+        setShowFeedbackInput((prev) => ({ ...prev, [lineId]: false }));
+        setFeedbackText((prev) => ({ ...prev, [lineId]: "" }));
+      }
+    } catch {
+      // Silently fail — feedback is non-critical
     }
   };
 

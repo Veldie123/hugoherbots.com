@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { apiFetch } from "../../services/apiFetch";
 import { MuxVideoPlayer } from "./MuxVideoPlayer";
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
@@ -191,7 +192,7 @@ export function VideoWatchPage({
     let cancelled = false;
     setTimeline([]);
     lastAutoScrollTech.current = null;
-    fetch(`/api/videos/timeline?video_id=${video.id}`)
+    apiFetch(`/api/videos/timeline?video_id=${video.id}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!cancelled && data?.timeline?.length > 0) {

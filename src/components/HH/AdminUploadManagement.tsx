@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { CustomCheckbox } from "../ui/custom-checkbox";
 import { useState, useEffect, useRef } from "react";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { AdminLayout } from "./AdminLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -85,9 +85,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
     const fetchAnalyses = async () => {
       try {
         setLoading(true);
-        const res = await fetch('/api/v2/analysis/list', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/v2/analysis/list');
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
 
@@ -139,9 +137,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
     let timeoutId: ReturnType<typeof setTimeout>;
     const poll = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/v2/analysis/list');
         if (res.ok) {
           const data = await res.json();
           const mapped: UploadItem[] = (data.analyses || []).map((a: any) => {
@@ -151,7 +147,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
               score >= 60 ? 'Good' : 'Needs Work';
             const createdAt = a.createdAt ? new Date(a.createdAt) : new Date();
             const userName = a.userName || 'Anoniem';
-            const initials = userName !== 'Anoniem' 
+            const initials = userName !== 'Anoniem'
               ? userName.split(/\s+/).filter(Boolean).slice(0, 2).map((s: string) => s[0]?.toUpperCase() || '').join('')
               : (a.userId || 'AN').split(/[_@.-]/).filter(Boolean).slice(0, 2).map((s: string) => s[0]?.toUpperCase() || '').join('');
             return {

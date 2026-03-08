@@ -12,7 +12,7 @@ import {
   Hash,
   Wrench,
 } from "lucide-react";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { AdminLayout } from "./AdminLayout";
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -63,9 +63,8 @@ export function AdminV3Chat({ navigate, isSuperAdmin }: Props) {
       setError(null);
 
       try {
-        const response = await fetch("/api/v3/session", {
+        const response = await apiFetch("/api/v3/session", {
           method: "POST",
-          headers: await getAuthHeaders(),
           body: JSON.stringify({ userProfile: {}, mode: "admin" }),
         });
 
@@ -123,9 +122,8 @@ export function AdminV3Chat({ navigate, isSuperAdmin }: Props) {
     setError(null);
 
     try {
-      const response = await fetch(`/api/v3/session/${sessionId}/message`, {
+      const response = await apiFetch(`/api/v3/session/${sessionId}/message`, {
         method: "POST",
-        headers: await getAuthHeaders(),
         body: JSON.stringify({ message: text }),
       });
 

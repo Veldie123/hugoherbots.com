@@ -3,7 +3,7 @@ import { MessageSquarePlus, Bug, Lightbulb, Send, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { toast } from "sonner";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 
 const feedbackTypes = [
   { value: "bug_report", label: "Bug", icon: Bug, color: "text-hh-error" },
@@ -21,10 +21,8 @@ export function FeedbackButton() {
     if (!description.trim()) return;
     setSubmitting(true);
     try {
-      const headers = await getAuthHeaders();
-      const response = await fetch("/api/feedback/report", {
+      const response = await apiFetch("/api/feedback/report", {
         method: "POST",
-        headers,
         body: JSON.stringify({ type, description }),
       });
       if (!response.ok) throw new Error("Feedback verzenden mislukt");
@@ -42,7 +40,7 @@ export function FeedbackButton() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 right-4 z-50 w-10 h-10 rounded-full bg-hh-primary text-white shadow-lg hover:bg-hh-primary/90 transition-colors flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-40 w-10 h-10 rounded-full bg-hh-primary text-white shadow-lg hover:bg-hh-primary/90 transition-colors flex items-center justify-center"
         title="Feedback geven"
       >
         <MessageSquarePlus className="w-5 h-5" />
@@ -51,7 +49,7 @@ export function FeedbackButton() {
   }
 
   return (
-    <div className="fixed bottom-20 right-4 z-50 w-[320px] bg-white rounded-[16px] shadow-xl border border-hh-border p-4">
+    <div className="fixed bottom-6 right-6 z-40 w-[320px] bg-white rounded-[16px] shadow-xl border border-hh-border p-4">
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-[14px] font-semibold text-hh-text">Feedback</h4>
         <button onClick={() => setOpen(false)} className="text-hh-muted hover:text-hh-text">

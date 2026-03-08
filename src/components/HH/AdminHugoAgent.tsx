@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Send, Bot, User, Loader2, AlertTriangle, Info, ChevronUp, ChevronDown, Save, Play, ExternalLink, CheckCircle, Clock, BarChart3 } from "lucide-react";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 
 interface Message {
   role: "user" | "assistant";
@@ -444,9 +444,8 @@ function WebinarListCard({ data }: { data: any[] }) {
     if (!patch || !Object.keys(patch).length) return;
     setSaving(id);
     try {
-      const res = await fetch(`/api/admin-video/admin/sessions/${id}`, {
+      const res = await apiFetch(`/api/admin-video/admin/sessions/${id}`, {
         method: "PATCH",
-        headers: { ...await getAuthHeaders() },
         body: JSON.stringify(patch)
       });
       const result = await res.json();
@@ -566,9 +565,8 @@ function VideoOrderCard({ data }: { data: any[] }) {
     setSaving(true);
     try {
       const items = videos.map((v, i) => ({ id: v.id, playback_order: i + 1 }));
-      await fetch("/api/admin-video/videos/reorder", {
+      await apiFetch("/api/admin-video/videos/reorder", {
         method: "POST",
-        headers: { ...await getAuthHeaders() },
         body: JSON.stringify({ videos: items })
       });
       setIsDirty(false);
@@ -696,9 +694,8 @@ function StartWebinarCard({ data, navigate }: { data: any; navigate?: (page: str
   const handleStart = async () => {
     setStarting(true);
     try {
-      const res = await fetch(`/api/admin-video/admin/sessions/${data.session_id}/start`, {
+      const res = await apiFetch(`/api/admin-video/admin/sessions/${data.session_id}/start`, {
         method: "POST",
-        headers: { ...await getAuthHeaders() }
       });
       const result = await res.json();
       if (result.success) {

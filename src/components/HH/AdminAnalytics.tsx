@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiFetch } from '../../services/apiFetch';
 import {
   TrendingUp,
   TrendingDown,
@@ -62,8 +63,8 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
       setLoading(true);
       try {
         const [platformRes, contentRes] = await Promise.all([
-          fetch("/api/analytics/platform"),
-          fetch("/api/analytics/content-performance"),
+          apiFetch("/api/analytics/platform"),
+          apiFetch("/api/analytics/content-performance"),
         ]);
 
         if (platformRes.ok) {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { AppLayout } from "./AppLayout";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -157,9 +157,8 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
     setAnalyzingSessionIds(prev => new Set(prev).add(sessionId));
 
     try {
-      const response = await fetch('/api/v2/analysis/chat-session', {
+      const response = await apiFetch('/api/v2/analysis/chat-session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId }),
       });
       const data = await safeJsonParse(response);
@@ -188,7 +187,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
 
       const pollInterval = setInterval(async () => {
         try {
-          const statusRes = await fetch(`/api/v2/analysis/status/${sessionId}`);
+          const statusRes = await apiFetch(`/api/v2/analysis/status/${sessionId}`);
           const statusData = await safeJsonParse(statusRes);
 
           if (statusData.status === 'completed') {
@@ -253,9 +252,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('/api/user/sessions', {
-          headers: await getAuthHeaders(),
-        });
+        const response = await apiFetch('/api/user/sessions');
         if (!response.ok) throw new Error('Failed to fetch sessions');
         const data = await response.json();
         
@@ -297,9 +294,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
     }
 
     try {
-      const statusRes = await fetch(`/api/v2/analysis/status/${sessionId}`, {
-        headers: await getAuthHeaders(),
-      });
+      const statusRes = await apiFetch(`/api/v2/analysis/status/${sessionId}`);
       const statusData = await safeJsonParse(statusRes);
       if (statusData.status === 'completed') {
         sessionStorage.setItem('analysisId', sessionId);
@@ -315,7 +310,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
         setAnalyzingSessionIds(prev => new Set(prev).add(sessionId));
         const pollInterval = setInterval(async () => {
           try {
-            const res = await fetch(`/api/v2/analysis/status/${sessionId}`);
+            const res = await apiFetch(`/api/v2/analysis/status/${sessionId}`);
             const data = await safeJsonParse(res);
             if (data.status === 'completed') {
               clearInterval(pollInterval);

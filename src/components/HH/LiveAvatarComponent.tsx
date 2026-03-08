@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Video, VideoOff, Mic, MicOff, Phone, PhoneOff } from "lucide-react";
+import { apiFetch } from "../../services/apiFetch";
 
 interface LiveAvatarProps {
   v2SessionId?: string;
@@ -56,9 +57,8 @@ export function LiveAvatarComponent({
       setStatus("connecting");
       setErrorMessage(null);
       
-      const response = await fetch("/api/liveavatar/session", {
+      const response = await apiFetch("/api/liveavatar/session", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ language })
       });
       

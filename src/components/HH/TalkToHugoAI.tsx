@@ -72,21 +72,12 @@ import { InlineWebinarCard } from "./InlineWebinarCard";
 import { InlineAnalysisCard } from "./InlineAnalysisCard";
 import type { EpicSlideContent, VideoEmbed, WebinarLink, AnalysisResultEmbed, RichContent } from "@/types/crossPlatform";
 import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { CoachViewSummary } from "./CoachViewSummary";
 import { ModelSelector, type EngineModel } from "./ModelSelector";
 import { lastActivityService } from "../../services/lastActivityService";
 import { SessionRating } from "./SessionRating";
 import { VoiceCoach } from "./VoiceCoach";
-import { supabase } from "../../utils/supabase/client";
-
-async function getAuthHeaders(): Promise<Record<string, string>> {
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token || '';
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-  };
-}
 import StreamingAvatar, { AvatarQuality, StreamingEvents, TaskType } from "@heygen/streaming-avatar";
 import { Room, RoomEvent, Track, ConnectionState } from "livekit-client";
 
@@ -281,8 +272,7 @@ export function TalkToHugoAI({
       const loadSession = async () => {
         try {
           setIsLoading(true);
-          const headers = await getAuthHeaders();
-          const res = await fetch(`/api/user/sessions/${navigationData.loadSessionId}`, { headers });
+          const res = await apiFetch(`/api/user/sessions/${navigationData.loadSessionId}`);
           if (!res.ok) throw new Error('Sessie niet gevonden');
           const session = await res.json();
 
@@ -299,7 +289,7 @@ export function TalkToHugoAI({
 
           // Check if this session has been analyzed
           try {
-            const analysisRes = await fetch(`/api/v2/analysis/results/${session.id}`, { headers });
+            const analysisRes = await apiFetch(`/api/v2/analysis/results/${session.id}`);
             if (analysisRes.status === 200) {
               const analysisData = await analysisRes.json();
               setAnalysisResult(analysisData);
@@ -334,8 +324,7 @@ export function TalkToHugoAI({
       const loadAnalysis = async () => {
         try {
           setIsLoading(true);
-          const headers = await getAuthHeaders();
-          const res = await fetch(`/api/v2/analysis/results/${navigationData.loadAnalysisId}`, { headers });
+          const res = await apiFetch(`/api/v2/analysis/results/${navigationData.loadAnalysisId}`);
           if (res.status === 202) {
             setMessages([{
               id: `analysis-loading-${Date.now()}`,
@@ -667,7 +656,7 @@ export function TalkToHugoAI({
     
     try {
       // Fetch token and avatarId from backend
-      const tokenResponse = await fetch("/api/heygen/token", { method: "POST" });
+      const tokenResponse = await apiFetch("/api/heygen/token", { method: "POST" });
       if (!tokenResponse.ok) {
         const errorData = await tokenResponse.json().catch(() => ({}));
         throw new Error(errorData.details || "Kon HeyGen token niet ophalen");
@@ -800,9 +789,8 @@ export function TalkToHugoAI({
       await navigator.mediaDevices.getUserMedia({ audio: true });
       
       // Get token from backend
-      const response = await fetch("/api/livekit/token", {
+      const response = await apiFetch("/api/livekit/token", {
         method: "POST",
-        headers: await getAuthHeaders(),
         body: JSON.stringify({ techniqueId: selectedTechnique || "general" })
       });
       
@@ -895,8 +883,12 @@ export function TalkToHugoAI({
   useEffect(() => {
     if (chatMode === "video" && !avatarSession && !isAvatarLoading) {
       initHeygenAvatar();
-    } else if (chatMode === "audio" && audioConnectionState === ConnectionState.Disconnected && !isAudioConnecting) {
-      initLiveKitAudio();
+    } else if (chatMode === "audio") {
+      if (engineModel === "v3") {
+        setShowVoiceCoach(true);
+      } else if (audioConnectionState === ConnectionState.Disconnected && !isAudioConnecting) {
+        initLiveKitAudio();
+      }
     }
   }, [chatMode, avatarSession, isAvatarLoading, audioConnectionState, isAudioConnecting, initHeygenAvatar, initLiveKitAudio]);
 
@@ -1090,11 +1082,9 @@ export function TalkToHugoAI({
       formData.append('title', title);
       formData.append('userId', user?.id || 'anonymous');
 
-      const { data: { session: authSession } } = await supabase.auth.getSession();
-      const authToken = authSession?.access_token || '';
-      const response = await fetch('/api/v2/analysis/inline', {
+      // apiFetch auto-detects FormData, skips Content-Type
+      const response = await apiFetch('/api/v2/analysis/inline', {
         method: 'POST',
-        headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
         body: formData,
       });
 
@@ -1118,16 +1108,12 @@ export function TalkToHugoAI({
 
       const pollInterval = setInterval(async () => {
         try {
-          const statusRes = await fetch(`/api/v2/analysis/status/${conversationId}`, {
-            headers: await getAuthHeaders(),
-          });
+          const statusRes = await apiFetch(`/api/v2/analysis/status/${conversationId}`);
           const statusData = await statusRes.json();
 
           if (statusData.status === 'completed') {
             clearInterval(pollInterval);
-            const resultsRes = await fetch(`/api/v2/analysis/results/${conversationId}`, {
-              headers: await getAuthHeaders(),
-            });
+            const resultsRes = await apiFetch(`/api/v2/analysis/results/${conversationId}`);
             const results = await resultsRes.json();
 
             const analysisEmbed: AnalysisResultEmbed = {
@@ -1459,8 +1445,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         return;
       }
       try {
-        const headers = await getAuthHeaders();
-        const res = await fetch(`/api/v2/analysis/results/${analysisId}`, { headers });
+        const res = await apiFetch(`/api/v2/analysis/results/${analysisId}`);
         if (res.status === 200) {
           const data = await res.json();
           setAnalysisResult(data);
@@ -1514,10 +1499,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     const sessionId = hugoApi.getSessionId();
     if (!sessionId) return;
     try {
-      const headers = await getAuthHeaders();
-      const res = await fetch('/api/v2/analysis/chat-session', {
+      const res = await apiFetch('/api/v2/analysis/chat-session', {
         method: 'POST',
-        headers,
         body: JSON.stringify({ sessionId }),
       });
       if (res.ok) {
@@ -1550,10 +1533,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     const sessionId = hugoApi.getSessionId();
     if (sessionId && selectedTechnique) {
       try {
-        const headers = await getAuthHeaders();
-        const res = await fetch('/api/v2/analysis/chat-session', {
+        const res = await apiFetch('/api/v2/analysis/chat-session', {
           method: 'POST',
-          headers,
           body: JSON.stringify({ sessionId }),
         });
         if (res.ok) {
@@ -1776,8 +1757,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
   const refreshOnboardingStatus = async () => {
     try {
-      const headers = await getAuthHeaders();
-      const res = await fetch(`/api/v2/admin/onboarding/status?userId=${user?.id || 'hugo'}`, { headers });
+      const res = await apiFetch(`/api/v2/admin/onboarding/status?userId=${user?.id || 'hugo'}`);
       if (res.ok) {
         const status = await res.json();
         setOnboardingStatus(status);
@@ -1790,8 +1770,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
   const fetchNextOnboardingCard = async (): Promise<{ module: string; key: string; name: string; data: any } | null> => {
     try {
-      const headers = await getAuthHeaders();
-      const statusRes = await fetch(`/api/v2/admin/onboarding/status?userId=${user?.id || 'hugo'}`, { headers });
+      const statusRes = await apiFetch(`/api/v2/admin/onboarding/status?userId=${user?.id || 'hugo'}`);
       if (!statusRes.ok) return null;
       const status = await statusRes.json();
       setOnboardingStatus(status);
@@ -1800,7 +1779,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         return null;
       }
       setOnboardingCurrentItem(status.nextItem);
-      const itemRes = await fetch(`/api/v2/admin/onboarding/item/${status.nextItem.module}/${status.nextItem.key}`, { headers });
+      const itemRes = await apiFetch(`/api/v2/admin/onboarding/item/${status.nextItem.module}/${status.nextItem.key}`);
       if (!itemRes.ok) return null;
       const itemJson = await itemRes.json();
       return { ...status.nextItem, data: itemJson.data || itemJson };
@@ -1810,9 +1789,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
   const handleOnboardingApprove = async () => {
     if (!onboardingCurrentItem) return;
     try {
-      await fetch('/api/v2/admin/onboarding/approve', {
+      await apiFetch('/api/v2/admin/onboarding/approve', {
         method: 'POST',
-        headers: await getAuthHeaders(),
         body: JSON.stringify({
           itemKey: onboardingCurrentItem.key,
           module: onboardingCurrentItem.module,
@@ -1854,9 +1832,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     if (!onboardingCurrentItem || !feedbackText.trim()) return;
     const currentName = onboardingCurrentItem.name;
     try {
-      const fbRes = await fetch('/api/v2/admin/onboarding/feedback', {
+      const fbRes = await apiFetch('/api/v2/admin/onboarding/feedback', {
         method: 'POST',
-        headers: await getAuthHeaders(),
         body: JSON.stringify({
           itemKey: onboardingCurrentItem.key,
           module: onboardingCurrentItem.module,
@@ -1909,9 +1886,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
   const handleOnboardingSkip = async () => {
     if (!onboardingCurrentItem) return;
     try {
-      await fetch('/api/v2/admin/onboarding/skip', {
+      await apiFetch('/api/v2/admin/onboarding/skip', {
         method: 'POST',
-        headers: await getAuthHeaders(),
         body: JSON.stringify({
           itemKey: onboardingCurrentItem.key,
           module: onboardingCurrentItem.module,
@@ -1969,9 +1945,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     const newFeedback = message.feedback === feedback ? null : feedback;
 
     try {
-      await fetch('/api/v2/chat/feedback', {
+      await apiFetch('/api/v2/chat/feedback', {
         method: 'POST',
-        headers: await getAuthHeaders(),
         body: JSON.stringify({
           messageId,
           sessionId: null,
@@ -2661,7 +2636,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           </div>
         )}
 
-        <div className="p-4 border-t border-hh-border flex gap-2 items-end">
+        <div className="p-4 border-t border-hh-border flex gap-2 items-end flex-shrink-0">
           <Button
             variant="outline"
             size="icon"
@@ -2672,18 +2647,6 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           >
             <Paperclip className="w-4 h-4" />
           </Button>
-          {engineModel === "v3" && (
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={isStreaming}
-              className="flex-shrink-0 rounded-full w-9 h-9 border-hh-border hover:bg-hh-success/10 text-hh-success"
-              title="Voice coaching met Hugo"
-              onClick={() => setShowVoiceCoach(true)}
-            >
-              <Phone className="w-4 h-4" />
-            </Button>
-          )}
           <Input
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
@@ -3032,17 +2995,6 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 </button>
               </div>
               
-              {/* Stop button when technique active - hide in audio/video mode (red phone handles it) */}
-              {selectedTechnique && chatMode === "chat" && (
-                <button
-                  onClick={handleStopRoleplay}
-                  className="h-8 px-3 rounded-md border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors flex items-center gap-1.5"
-                  title="Stop rollenspel"
-                >
-                  <X className="w-3.5 h-3.5 text-hh-muted" />
-                  <span className="text-[12px] text-hh-text">Stop</span>
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -3125,7 +3077,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
       )}
 
       {showVoiceCoach && (
-        <VoiceCoach onClose={() => setShowVoiceCoach(false)} />
+        <VoiceCoach onClose={() => { setShowVoiceCoach(false); setChatMode("chat"); }} />
       )}
 
       <TechniqueDetailsDialog

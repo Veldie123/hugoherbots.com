@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { getCodeBadgeColors } from "../../utils/phaseColors";
 import { toast } from "sonner";
+import { apiFetch } from '../../services/apiFetch';
 
 interface AdminRAGReviewProps {
   navigate?: (page: string) => void;
@@ -87,10 +88,10 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
     setLoading(true);
     try {
       const [chunksRes, reviewStatsRes, tagStatsRes, namesRes] = await Promise.all([
-        fetch("/api/v2/rag/review?limit=100"),
-        fetch("/api/v2/rag/review-stats"),
-        fetch("/api/v2/rag/tag-stats"),
-        fetch("/api/v2/technieken/names"),
+        apiFetch("/api/v2/rag/review?limit=100"),
+        apiFetch("/api/v2/rag/review-stats"),
+        apiFetch("/api/v2/rag/tag-stats"),
+        apiFetch("/api/v2/technieken/names"),
       ]);
 
       if (!chunksRes.ok || !reviewStatsRes.ok || !tagStatsRes.ok) {
@@ -120,7 +121,7 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
   const runHeuristics = async () => {
     setBulkLoading(true);
     try {
-      const res = await fetch("/api/v2/rag/suggest-bulk", { method: "POST" });
+      const res = await apiFetch("/api/v2/rag/suggest-bulk", { method: "POST" });
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || "Server error");
@@ -137,7 +138,7 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
   const runVideoTagging = async () => {
     setBulkLoading(true);
     try {
-      const res = await fetch("/api/v2/rag/tag-bulk", { method: "POST" });
+      const res = await apiFetch("/api/v2/rag/tag-bulk", { method: "POST" });
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || "Server error");
@@ -153,7 +154,7 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
 
   const approveChunk = async (id: string) => {
     try {
-      const res = await fetch(`/api/v2/rag/approve/${id}`, { method: "POST" });
+      const res = await apiFetch(`/api/v2/rag/approve/${id}`, { method: "POST" });
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || "Server error");
@@ -179,9 +180,8 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
         ? JSON.stringify({ newTechniqueId: correctTechniqueId })
         : undefined;
       
-      const res = await fetch(`/api/v2/rag/reject/${rejectChunkId}`, { 
+      const res = await apiFetch(`/api/v2/rag/reject/${rejectChunkId}`, {
         method: "POST",
-        headers: body ? { "Content-Type": "application/json" } : undefined,
         body
       });
       if (!res.ok) {
@@ -200,9 +200,8 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
   const bulkApprove = async (techniqueId: string) => {
     setBulkLoading(true);
     try {
-      const res = await fetch("/api/v2/rag/approve-bulk", {
+      const res = await apiFetch("/api/v2/rag/approve-bulk", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ techniqueId }),
       });
       if (!res.ok) {

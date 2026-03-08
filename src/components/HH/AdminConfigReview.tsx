@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { apiFetch } from '../../services/apiFetch';
 import { AdminLayout } from "./AdminLayout";
 import { TrackChange } from "./TrackChange";
 import { Card } from "../ui/card";
@@ -78,7 +79,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
   const fetchCorrections = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/v2/admin/corrections');
+      const response = await apiFetch('/api/v2/admin/corrections');
       if (response.ok) {
         const data = await response.json();
         const mapped = (data.corrections || []).map((c: any) => {
@@ -170,9 +171,8 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
 
   const handleApprove = async (id: string) => {
     try {
-      const response = await fetch(`/api/v2/admin/corrections/${id}`, {
+      const response = await apiFetch(`/api/v2/admin/corrections/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'approved', reviewedBy: 'superadmin' }),
       });
       if (response.ok) {
@@ -191,9 +191,8 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
 
   const handleReject = async (id: string) => {
     try {
-      const response = await fetch(`/api/v2/admin/corrections/${id}`, {
+      const response = await apiFetch(`/api/v2/admin/corrections/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'rejected', reviewedBy: 'superadmin' }),
       });
       if (response.ok) {
@@ -209,9 +208,8 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
 
   const handleResetStatus = async (id: string) => {
     try {
-      const response = await fetch(`/api/v2/admin/corrections/${id}`, {
+      const response = await apiFetch(`/api/v2/admin/corrections/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'pending', reviewedBy: null }),
       });
       if (response.ok) {

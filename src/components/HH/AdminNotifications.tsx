@@ -34,6 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { toast } from "sonner";
+import { apiFetch } from '../../services/apiFetch';
 
 interface AdminNotificationsProps {
   navigate?: (page: string) => void;
@@ -65,7 +66,7 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/v2/admin/notifications');
+      const response = await apiFetch('/api/v2/admin/notifications');
       if (response.ok) {
         const data = await response.json();
         setNotifications((data.notifications || []).map((n: any) => ({
@@ -117,9 +118,8 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
 
   const handleMarkRead = async (id: number) => {
     try {
-      await fetch(`/api/v2/admin/notifications/${id}`, {
+      await apiFetch(`/api/v2/admin/notifications/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ read: true }),
       });
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
@@ -131,7 +131,7 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
 
   const handleDelete = async (id: number) => {
     try {
-      const res = await fetch(`/api/v2/admin/notifications/${id}`, { method: 'DELETE' });
+      const res = await apiFetch(`/api/v2/admin/notifications/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setNotifications(prev => prev.filter(n => n.id !== id));
         setSelectedNotifications(prev => prev.filter(nId => nId !== id));
@@ -144,9 +144,8 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
 
   const handleBulkMarkRead = async () => {
     for (const id of selectedNotifications) {
-      await fetch(`/api/v2/admin/notifications/${id}`, {
+      await apiFetch(`/api/v2/admin/notifications/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ read: true }),
       });
     }
@@ -159,7 +158,7 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
 
   const handleBulkDelete = async () => {
     for (const id of selectedNotifications) {
-      await fetch(`/api/v2/admin/notifications/${id}`, { method: 'DELETE' });
+      await apiFetch(`/api/v2/admin/notifications/${id}`, { method: 'DELETE' });
     }
     setNotifications(prev => prev.filter(n => !selectedNotifications.includes(n.id)));
     toast.success(`${selectedNotifications.length} notificatie(s) verwijderd`);

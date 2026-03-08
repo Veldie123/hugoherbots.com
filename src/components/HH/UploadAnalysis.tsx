@@ -25,7 +25,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "../../contexts/UserContext";
 import { useNotifications } from "../../contexts/NotificationContext";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 
 interface UploadAnalysisProps {
   navigate?: (page: string, data?: any) => void;
@@ -190,8 +190,6 @@ export function UploadAnalysis({
 
   const uploadChunked = async (file: File, userId: string): Promise<any> => {
     const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-    const authHeaders = await getAuthHeaders();
-    const { 'Content-Type': _, ...formDataAuth } = authHeaders;
 
     setAnalysisStatus({
       conversationId: '',
@@ -199,9 +197,8 @@ export function UploadAnalysis({
       step: 'Uploaden... (0%)',
     });
 
-    const initRes = await fetch('/api/v2/analysis/upload/init', {
+    const initRes = await apiFetch('/api/v2/analysis/upload/init', {
       method: 'POST',
-      headers: authHeaders,
       body: JSON.stringify({
         fileName: file.name,
         fileSize: file.size,
@@ -225,9 +222,8 @@ export function UploadAnalysis({
       formData.append('uploadId', uploadId);
       formData.append('chunkIndex', String(i));
 
-      const chunkRes = await fetch('/api/v2/analysis/upload/chunk', {
+      const chunkRes = await apiFetch('/api/v2/analysis/upload/chunk', {
         method: 'POST',
-        headers: formDataAuth,
         body: formData,
       });
       if (!chunkRes.ok) {
@@ -249,9 +245,8 @@ export function UploadAnalysis({
       step: 'Bestand samenvoegen & comprimeren...',
     });
 
-    const completeRes = await fetch('/api/v2/analysis/upload/complete', {
+    const completeRes = await apiFetch('/api/v2/analysis/upload/complete', {
       method: 'POST',
-      headers: authHeaders,
       body: JSON.stringify({
         uploadId,
         title,
@@ -301,9 +296,6 @@ export function UploadAnalysis({
           step: `Uploaden & comprimeren...`,
         });
 
-        const authHeaders = await getAuthHeaders();
-        const { 'Content-Type': _, ...formDataAuth } = authHeaders;
-
         const formData = new FormData();
         formData.append('file', selectedFile);
         formData.append('title', title);
@@ -311,9 +303,8 @@ export function UploadAnalysis({
         formData.append('userId', user.id);
         formData.append('consentConfirmed', 'true');
 
-        const response = await fetch('/api/v2/analysis/upload', {
+        const response = await apiFetch('/api/v2/analysis/upload', {
           method: 'POST',
-          headers: formDataAuth,
           body: formData,
         });
 
@@ -356,7 +347,7 @@ export function UploadAnalysis({
 
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`/api/v2/analysis/status/${conversationId}`);
+        const response = await apiFetch(`/api/v2/analysis/status/${conversationId}`);
         if (response.status === 404) {
           clearInterval(interval);
           pollIntervalRef.current = null;

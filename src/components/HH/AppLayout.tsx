@@ -22,8 +22,6 @@ import {
   HelpCircle,
   FileText,
   Settings,
-  Moon,
-  Sun,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -33,9 +31,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { useNotifications } from "../../contexts/NotificationContext";
 import { getHiddenIds } from "../../utils/hiddenItems";
 import { useTheme } from "./ThemeProvider";
-import { getAuthHeaders } from "../../services/hugoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { PageFooter } from "./PageFooter";
-import { FeedbackButton } from "./FeedbackButton";
 import { NPSSurvey } from "./NPSSurvey";
 
 interface HistoryItem {
@@ -100,7 +97,7 @@ export function AppLayout({
   analysisHistory: analysisHistoryProp,
   onSelectHistoryItem,
 }: AppLayoutProps) {
-  const { theme, toggleTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   // Module mapping: user view → admin view equivalent
   const userToAdminMap: Record<string, string> = {
@@ -173,9 +170,7 @@ export function AppLayout({
     } catch { }
     const fetchHistory = async () => {
       try {
-        const res = await fetch('/api/v2/analysis/list?source=upload', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/v2/analysis/list?source=upload');
         if (!res.ok) return;
         const data = await res.json();
         const items: HistoryItem[] = (data.analyses || []).slice(0, 5).map((a: any) => ({
@@ -207,9 +202,7 @@ export function AppLayout({
     } catch { }
     const fetchChatHistory = async () => {
       try {
-        const res = await fetch('/api/user/sessions', {
-          headers: await getAuthHeaders(),
-        });
+        const res = await apiFetch('/api/user/sessions');
         if (!res.ok) return;
         const data = await res.json();
         const items: HistoryItem[] = (data.sessions || []).slice(0, 5).map((s: any) => ({
@@ -273,7 +266,7 @@ export function AppLayout({
   };
 
   return (
-    <div className="flex h-screen bg-hh-bg">
+    <div className="flex h-dvh bg-hh-bg" style={{ height: '100dvh' }}>
       <div
         data-sidebar-collapsed={collapsed ? 'true' : 'false'}
         className={`hidden lg:flex ${
@@ -570,10 +563,6 @@ export function AppLayout({
               <Search className="w-5 h-5" />
             </Button>
 
-            <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-hh-ui-50 transition-colors" title={theme === 'dark' ? 'Licht thema' : 'Donker thema'}>
-              {theme === 'dark' ? <Sun className="w-5 h-5 text-hh-text" /> : <Moon className="w-5 h-5 text-hh-text" />}
-            </button>
-
             <Button
               onClick={() => navigate?.("talk-to-hugo")}
               className="gap-2 text-white h-10 px-3 sm:px-4 rounded-lg"
@@ -593,7 +582,7 @@ export function AppLayout({
                 style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', cursor: 'pointer', border: 'none', background: 'transparent', position: 'relative', padding: 0 }}
               >
                 <span style={{ display: 'inline-flex', width: '24px', height: '24px' }}>
-                  <Bell style={{ width: '24px', height: '24px', color: theme === 'dark' ? '#e2e8f0' : '#334155', stroke: theme === 'dark' ? '#e2e8f0' : '#334155', fill: 'none', strokeWidth: 2, display: 'block' }} />
+                  <Bell style={{ width: '24px', height: '24px', color: resolvedTheme === 'dark' ? '#e2e8f0' : '#334155', stroke: resolvedTheme === 'dark' ? '#e2e8f0' : '#334155', fill: 'none', strokeWidth: 2, display: 'block' }} />
                 </span>
                 {unreadCount > 0 && (
                   <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '20px', height: '20px', backgroundColor: '#DC2626', color: 'white', fontSize: '10px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
@@ -682,7 +671,6 @@ export function AppLayout({
           {!["talk-to-hugo", "admin-chat-expert", "admin-v3-chat"].includes(currentPage || "") && <PageFooter />}
         </div>
       </div>
-      <FeedbackButton />
       <NPSSurvey />
     </div>
   );

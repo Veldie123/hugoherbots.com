@@ -39,6 +39,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { toast } from "sonner";
+import { apiFetch } from '../../services/apiFetch';
 
 interface AdminSettingsProps {
   navigate?: (page: string) => void;
@@ -103,7 +104,7 @@ export function AdminSettings({ navigate, isSuperAdmin }: AdminSettingsProps) {
 
   const fetchSettings = useCallback(async () => {
     try {
-      const resp = await fetch("/api/admin/settings");
+      const resp = await apiFetch("/api/admin/settings");
       const data = await resp.json();
       if (data.success && data.settings) {
         if (data.settings.branding) {
@@ -124,7 +125,7 @@ export function AdminSettings({ navigate, isSuperAdmin }: AdminSettingsProps) {
 
   const fetchAdmins = useCallback(async () => {
     try {
-      const resp = await fetch("/api/admin/admins");
+      const resp = await apiFetch("/api/admin/admins");
       const data = await resp.json();
       if (data.success) setAdmins(data.admins || []);
     } catch {
@@ -140,9 +141,8 @@ export function AdminSettings({ navigate, isSuperAdmin }: AdminSettingsProps) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const resp = await fetch("/api/admin/settings", {
+      const resp = await apiFetch("/api/admin/settings", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ settings: { branding, platform } }),
       });
       const data = await resp.json();
@@ -170,9 +170,8 @@ export function AdminSettings({ navigate, isSuperAdmin }: AdminSettingsProps) {
     if (!newAdminEmail.trim()) return;
     setAddingAdmin(true);
     try {
-      const resp = await fetch("/api/admin/admins", {
+      const resp = await apiFetch("/api/admin/admins", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: newAdminEmail.trim(), role: newAdminRole }),
       });
       const data = await resp.json();
@@ -194,7 +193,7 @@ export function AdminSettings({ navigate, isSuperAdmin }: AdminSettingsProps) {
   const handleRemoveAdmin = async (adminId: string, adminEmail: string) => {
     if (!confirm(`Weet je zeker dat je ${adminEmail} als admin wilt verwijderen?`)) return;
     try {
-      const resp = await fetch(`/api/admin/admins/${adminId}`, { method: "DELETE" });
+      const resp = await apiFetch(`/api/admin/admins/${adminId}`, { method: "DELETE" });
       const data = await resp.json();
       if (data.success) {
         toast.success("Admin verwijderd");

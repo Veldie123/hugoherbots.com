@@ -63,6 +63,7 @@ import { AutoResizeTextarea } from "../ui/auto-resize-textarea";
 import { ScrollArea } from "../ui/scroll-area";
 import { TrackChange } from "./TrackChange";
 import { videoApi } from "@/services/videoApi";
+import { apiFetch } from "../../services/apiFetch";
 import { supabase } from "../../utils/supabase/client";
 
 interface LibraryVideo {
@@ -162,12 +163,6 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
   const [filterStatus, setFilterStatus] = useState("all");
   const [activeKpiFilter, setActiveKpiFilter] = useState<string | null>(null);
   
-  // SEC-029: Get Supabase session token for admin-video proxy auth
-  const getAuthToken = async (): Promise<string> => {
-    const { data: { session } } = await supabase.auth.getSession();
-    return session?.access_token || '';
-  };
-
   // Helper function to get fase from technique number (e.g., "4.2.4" -> "4", "2.1" -> "2")
   const getFaseFromTechniqueId = (techId: string | null): string => {
     if (!techId) return '';
@@ -376,7 +371,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
   // Fetch batch queue status - now reads from Supabase via server, no rate limiting
   const fetchBatchStatus = async () => {
     try {
-      const resp = await fetch('/api/admin-video/video-processor/batch/status');
+      const resp = await apiFetch('/api/admin-video/video-processor/batch/status');
       if (resp.ok) {
         const data = await resp.json();
         setBatchQueueStatus(data);
@@ -398,7 +393,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     // Fetch pipeline health once on mount
     (async () => {
       try {
-        const resp = await fetch('/api/admin-video/video-processor/pipeline-health');
+        const resp = await apiFetch('/api/admin-video/video-processor/pipeline-health');
         if (resp.ok) setPipelineHealth(await resp.json());
       } catch {}
     })();
@@ -413,7 +408,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     if (forceRestart || batchQueueStatus?.isStalled) {
       toast.info('Vastgelopen worker resetten...');
       try {
-        await fetch('/api/admin-video/video-processor/batch/stop', { method: 'POST' });
+        await apiFetch('/api/admin-video/video-processor/batch/stop', { method: 'POST' });
         await new Promise(r => setTimeout(r, 1000)); // Wait for stop to complete
       } catch (e) {
         // Ignore stop errors, continue with start
@@ -426,9 +421,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const resp = await fetch('/api/admin-video/video-processor/batch/start', {
+        const resp = await apiFetch('/api/admin-video/video-processor/batch/start', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ intervalMinutes: 15 })
         });
         const data = await resp.json();
@@ -450,7 +444,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         } else if (data.message?.includes('already running')) {
           // Force stop and retry
           toast.info('Oude batch resetten...');
-          await fetch('/api/admin-video/video-processor/batch/stop', { method: 'POST' });
+          await apiFetch('/api/admin-video/video-processor/batch/stop', { method: 'POST' });
           await new Promise(r => setTimeout(r, 1500));
           continue;
         } else if (data.message?.includes('Rate exceeded') && attempt < maxRetries) {
@@ -478,7 +472,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
   
   const handleStopBatchQueue = async () => {
     try {
-      const resp = await fetch('/api/admin-video/video-processor/batch/stop', { method: 'POST' });
+      const resp = await apiFetch('/api/admin-video/video-processor/batch/stop', { method: 'POST' });
       const data = await resp.json();
       if (data.success) {
         toast.success(`Batch queue gestopt: ${data.sentCount} verstuurd, ${data.remainingJobs} overgebleven`);
@@ -547,9 +541,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     toast.loading(`${videosToSend.length} video's naar Cloud Run sturen...`, { id: 'bulk-cloud-run' });
     for (const video of videosToSend) {
       try {
-        const response = await fetch('/api/admin-video/video-processor/external', {
+        const response = await apiFetch('/api/admin-video/video-processor/external', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ job_id: video.id, drive_file_id: video.drive_file_id })
         });
         if (response.ok) successCount++;
@@ -1024,9 +1017,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     setIsAiOrdering(true);
     try {
       toast.loading("AI analyseert video's voor optimale volgorde...", { id: 'ai-order' });
-      const response = await fetch('/api/admin-video/videos/ai-order', {
+      const response = await apiFetch('/api/admin-video/videos/ai-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || 'AI volgorde mislukt');
@@ -1054,13 +1046,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
   const handleDriveOrder = async (dryRun = false) => {
     setIsDriveOrdering(true);
     try {
-      const token = await getAuthToken();
-      const response = await fetch('/api/admin-video/videos/auto-order-from-drive', {
+      const response = await apiFetch('/api/admin-video/videos/auto-order-from-drive', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ dry_run: dryRun })
       });
       const result = await response.json();
@@ -1090,13 +1077,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     try {
       toast.loading("Preview bezig...", { id: 'preview' });
 
-      const token = await getAuthToken();
-      const response = await fetch("/api/admin-video/video-processor/sync-preview", {
+      const response = await apiFetch("/api/admin-video/video-processor/sync-preview", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify({ folderIds: SYNC_FOLDERS.map(f => f.id) })
       });
 
@@ -1132,15 +1114,9 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     try {
       toast.loading("Google Drive synchronisatie bezig...", { id: 'sync' });
 
-      const token = await getAuthToken();
-
       // Sync all folders in one call (important: must sync all at once to correctly detect deletions)
-      const response = await fetch("/api/admin-video/video-processor/sync", {
+      const response = await apiFetch("/api/admin-video/video-processor/sync", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify({ folderIds: SYNC_FOLDERS.map(f => f.id) })
       });
 
@@ -1200,13 +1176,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     try {
       toast.loading("Cloud Run worker deployen...", { id: 'deploy' });
 
-      const token = await getAuthToken();
-      const response = await fetch("/api/admin-video/admin/cloud-run/deploy", {
+      const response = await apiFetch("/api/admin-video/admin/cloud-run/deploy", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
       });
 
       const result = await response.json();
@@ -1227,10 +1198,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
   useEffect(() => {
     const checkCredentials = async () => {
       try {
-        const token = await getAuthToken();
-        const response = await fetch("/api/admin-video/admin/cloud-run/check-credentials", {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
+        const response = await apiFetch("/api/admin-video/admin/cloud-run/check-credentials");
         const result = await response.json();
         setCredentialsValid(result.valid);
       } catch {
@@ -1246,10 +1214,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
   useEffect(() => {
     const fetchDriveCount = async () => {
       try {
-        const token = await getAuthToken();
-        const resp = await fetch("/api/admin-video/video-processor/sync-preview", {
+        const resp = await apiFetch("/api/admin-video/video-processor/sync-preview", {
           method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
           body: JSON.stringify({ folderIds: SYNC_FOLDERS.map(f => f.id) })
         });
         const result = await resp.json();
@@ -1270,13 +1236,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
 
     setProcessing(true);
     try {
-      const token = await getAuthToken();
-      const response = await fetch("/api/admin-video/video-processor/batch/start", {
+      const response = await apiFetch("/api/admin-video/video-processor/batch/start", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify({ intervalMinutes: 15 })
       });
 
@@ -1289,7 +1250,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         const checkInterval = setInterval(async () => {
           await fetchVideos();
           try {
-            const statusRes = await fetch("/api/admin-video/video-processor/batch/status");
+            const statusRes = await apiFetch("/api/admin-video/video-processor/batch/status");
             const status = await statusRes.json();
             if (!status.active) {
               clearInterval(checkInterval);
@@ -1343,7 +1304,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     
     if (video.has_transcript && !video.transcript) {
       try {
-        const response = await fetch(`/api/admin-video/videos/${video.id}/transcript`);
+        const response = await apiFetch(`/api/admin-video/videos/${video.id}/transcript`);
         if (response.ok) {
           const data = await response.json();
           setDetailsVideo(prev => prev ? { ...prev, transcript: data.transcript || null, ai_summary: data.ai_summary || null } : null);
@@ -1469,9 +1430,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
     }
     try {
       toast.loading("Video wordt naar Cloud Run gestuurd...", { id: 'cloud-run' });
-      const response = await fetch('/api/admin-video/video-processor/external', {
+      const response = await apiFetch('/api/admin-video/video-processor/external', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           job_id: video.id,
           drive_file_id: video.drive_file_id
@@ -2177,7 +2137,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                                     setTranscriptModal({ open: true, title: video.title, content: video.transcript });
                                   } else {
                                     try {
-                                      const response = await fetch(`/api/admin-video/videos/${video.id}/transcript`);
+                                      const response = await apiFetch(`/api/admin-video/videos/${video.id}/transcript`);
                                       if (response.ok) {
                                         const data = await response.json();
                                         setTranscriptModal({ open: true, title: video.title, content: data.transcript || "Geen transcript beschikbaar" });
@@ -2491,7 +2451,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                                       setTranscriptModal({ open: true, title: video.title, content: video.transcript });
                                     } else {
                                       try {
-                                        const response = await fetch(`/api/admin-video/videos/${video.id}/transcript`);
+                                        const response = await apiFetch(`/api/admin-video/videos/${video.id}/transcript`);
                                         if (response.ok) {
                                           const data = await response.json();
                                           setTranscriptModal({ open: true, title: video.title, content: data.transcript || "Geen transcript beschikbaar" });
@@ -2715,7 +2675,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                                 setTranscriptModal({ open: true, title: video.title, content: video.transcript });
                               } else {
                                 try {
-                                  const response = await fetch(`/api/admin-video/videos/${video.id}/transcript`);
+                                  const response = await apiFetch(`/api/admin-video/videos/${video.id}/transcript`);
                                   if (response.ok) {
                                     const data = await response.json();
                                     setTranscriptModal({ open: true, title: video.title, content: data.transcript || "Geen transcript beschikbaar" });
@@ -2940,9 +2900,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                   if (isSuperAdmin) {
                     try {
                       if (titleChanged || origTitleChanged) {
-                        const res = await fetch('/api/admin-video/videos/update-title', {
+                        const res = await apiFetch('/api/admin-video/videos/update-title', {
                           method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
                             videoId: detailsVideo.id,
                             attractiveTitle: titleChanged ? (editedVideoData.attractiveTitle || null) : undefined,
@@ -2977,9 +2936,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           !arraysEqual(parseLines(editedVideoData.techniqueThemas), currentTechnique.themas || []) ||
                           !arraysEqual(parseLines(editedVideoData.techniqueContextRequirements), currentTechnique.context_requirements || []);
                         if (techniqueChanged) {
-                          await fetch('/api/v2/admin/corrections', {
+                          await apiFetch('/api/v2/admin/corrections', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                               type: 'technique',
                               field: currentTechnique.nummer,
@@ -3027,9 +2985,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                       const corrections: Promise<Response>[] = [];
 
                       if (titleChanged) {
-                        corrections.push(fetch('/api/v2/admin/corrections', {
+                        corrections.push(apiFetch('/api/v2/admin/corrections', {
                           method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
                             type: 'video',
                             field: 'ai_attractive_title',
@@ -3042,9 +2999,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         }));
                       }
                       if (origTitleChanged) {
-                        corrections.push(fetch('/api/v2/admin/corrections', {
+                        corrections.push(apiFetch('/api/v2/admin/corrections', {
                           method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
                             type: 'video',
                             field: 'title',
@@ -3073,9 +3029,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           !arraysEqual(parseLines(editedVideoData.techniqueThemas), currentTechnique.themas || []) ||
                           !arraysEqual(parseLines(editedVideoData.techniqueContextRequirements), currentTechnique.context_requirements || []);
                         if (techniqueChanged) {
-                          corrections.push(fetch('/api/v2/admin/corrections', {
+                          corrections.push(apiFetch('/api/v2/admin/corrections', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                               type: 'technique',
                               field: currentTechnique.nummer,
@@ -3243,10 +3198,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                               onClick={async () => {
                                 setGeneratingSummary(true);
                                 try {
-                                  const token = await getAuthToken();
-                                  const response = await fetch(`/api/admin-video/videos/${detailsVideo.id}/summary`, {
+                                  const response = await apiFetch(`/api/admin-video/videos/${detailsVideo.id}/summary`, {
                                     method: 'POST',
-                                    headers: { 'Authorization': `Bearer ${token}` },
                                   });
                                   const data = await response.json();
                                   if (data.summary) {
@@ -3300,10 +3253,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                                 setGeneratingSummary(true);
                                 try {
                                   setDetailsVideo(prev => prev ? { ...prev, ai_summary: null } : null);
-                                  const token = await getAuthToken();
-                                  const response = await fetch(`/api/admin-video/videos/${detailsVideo.id}/summary?force=true`, {
+                                  const response = await apiFetch(`/api/admin-video/videos/${detailsVideo.id}/summary?force=true`, {
                                     method: 'POST',
-                                    headers: { 'Authorization': `Bearer ${token}` },
                                   });
                                   const data = await response.json();
                                   if (data.summary) {

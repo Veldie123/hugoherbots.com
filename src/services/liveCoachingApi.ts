@@ -1,4 +1,5 @@
 import { supabase } from '../utils/supabase/client';
+import { apiFetch } from './apiFetch';
 import type { 
   LiveSession, 
   LiveChatMessage, 
@@ -45,9 +46,8 @@ function mapRowToSession(row: any): LiveSession {
 export const liveCoachingApi = {
   sessions: {
     triggerProcess: async (sessionId: string): Promise<{ success: boolean }> => {
-      const response = await fetch('/api/admin/sessions/process-recording', {
+      const response = await apiFetch('/api/admin/sessions/process-recording', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId })
       });
 
@@ -58,9 +58,8 @@ export const liveCoachingApi = {
       return { success: true };
     },
     approveRecording: async (sessionId: string, approved: boolean = true): Promise<{ success: boolean }> => {
-      const response = await fetch(`/api/admin/sessions/${sessionId}/approve-recording`, {
+      const response = await apiFetch(`/api/admin/sessions/${sessionId}/approve-recording`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ approved })
       });
 
@@ -174,7 +173,7 @@ export const liveCoachingApi = {
     },
 
     delete: async (id: string): Promise<{ success: boolean }> => {
-      const response = await fetch(`/api/admin/sessions/${id}`, {
+      const response = await apiFetch(`/api/admin/sessions/${id}`, {
         method: 'DELETE',
       });
       
@@ -189,9 +188,8 @@ export const liveCoachingApi = {
     },
 
     start: async (id: string): Promise<LiveSession & { dailyRoomName: string; dailyRoomUrl: string }> => {
-      const response = await fetch(`/api/admin/sessions/${id}/start`, {
+      const response = await apiFetch(`/api/admin/sessions/${id}/start`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
       });
       
       const result = await response.json();
@@ -223,9 +221,8 @@ export const liveCoachingApi = {
     },
 
     end: async (id: string): Promise<LiveSession> => {
-      const response = await fetch(`/api/admin/sessions/${id}/end`, {
+      const response = await apiFetch(`/api/admin/sessions/${id}/end`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
       });
       
       const result = await response.json();
@@ -244,7 +241,7 @@ export const liveCoachingApi = {
       roomName: string; 
       isHost: boolean 
     }> => {
-      const response = await fetch(`/api/admin/sessions/${id}/token`);
+      const response = await apiFetch(`/api/admin/sessions/${id}/token`);
       const result = await response.json();
       
       if (!response.ok || !result.success) {
@@ -518,9 +515,8 @@ export const liveCoachingApi = {
         throw new Error('Geen room naam gevonden voor deze sessie');
       }
       
-      const response = await fetch('/api/daily/recording/start', {
+      const response = await apiFetch('/api/daily/recording/start', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomName, sessionId })
       });
       
@@ -547,9 +543,8 @@ export const liveCoachingApi = {
         throw new Error('Geen room naam gevonden voor deze sessie');
       }
       
-      const response = await fetch('/api/daily/recording/stop', {
+      const response = await apiFetch('/api/daily/recording/stop', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomName, sessionId })
       });
       
@@ -581,7 +576,7 @@ export const liveCoachingApi = {
         url += `?roomName=${encodeURIComponent(roomName)}`;
       }
       
-      const response = await fetch(url);
+      const response = await apiFetch(url);
       const result = await response.json();
       
       if (!result.success) {
@@ -592,7 +587,7 @@ export const liveCoachingApi = {
     },
 
     getAccessLink: async (recordingId: string): Promise<{ downloadLink: string; expiresAt: string }> => {
-      const response = await fetch(`/api/daily/recordings/${recordingId}/access-link`);
+      const response = await apiFetch(`/api/daily/recordings/${recordingId}/access-link`);
       const result = await response.json();
       
       if (!result.success) {

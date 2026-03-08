@@ -1,4 +1,4 @@
-import { getAuthHeaders } from "./hugoApi";
+import { apiFetch } from "./apiFetch";
 
 export interface LastActivity {
   type: 'technique' | 'video' | 'webinar';
@@ -117,8 +117,7 @@ export const lastActivityService = {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 2000);
-      const response = await fetch(`/api/v2/user/activity-summary?userId=${userId}`, {
-        headers: await getAuthHeaders(),
+      const response = await apiFetch(`/api/v2/user/activity-summary?userId=${userId}`, {
         signal: controller.signal,
       });
       clearTimeout(timeout);
