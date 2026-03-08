@@ -57,6 +57,8 @@ import {
 import { getTechnique } from "./ssot-loader";
 import { AccessToken } from "livekit-server-sdk";
 import { setupScribeWebSocket } from "./elevenlabs-stt";
+import { setupLiveAnalyseWebSocket } from "./live-analyse-ws";
+import { liveAnalyseRoutes } from "./v3/live-analyse-routes";
 import { pool } from "./db";
 
 // Roleplay Engine imports
@@ -5038,6 +5040,9 @@ app.use("/api/hugo-agent", hugoAgentRouter);
 // V3 Agent router — Claude-powered coaching agent (superadmin only)
 app.use("/api/v3", v3Routes);
 
+// Live Analyse routes — real-time in-call coaching sessions
+app.use("/api/v3/live-analyse", liveAnalyseRoutes);
+
 // Error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   sendError(res, err);
@@ -5555,6 +5560,9 @@ const server = createServer(app);
 
 // Setup ElevenLabs Scribe WebSocket for STT
 setupScribeWebSocket(server);
+
+// Setup Live Analyse WebSocket for real-time coaching
+setupLiveAnalyseWebSocket(server);
 
 async function startServer() {
   // ============================================================================

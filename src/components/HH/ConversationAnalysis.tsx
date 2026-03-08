@@ -14,12 +14,6 @@ import {
   Loader2,
   AlertCircle,
   Sparkles,
-  Mic,
-  MicOff,
-  MessageSquare,
-  Lock,
-  Target,
-  Lightbulb,
   Search,
   ChevronLeft,
   FileText,
@@ -29,6 +23,7 @@ import {
 import { useState, useEffect } from "react";
 import { useUser } from "../../contexts/UserContext";
 import { roleplayUploadsApi, RoleplayUpload, UploadStats } from "../../services/roleplayUploadsApi";
+import { LiveAnalysePanel } from "./LiveAnalysePanel";
 
 interface ConversationAnalysisProps {
   navigate?: (page: string, data?: any) => void;
@@ -55,14 +50,6 @@ export function ConversationAnalysis({
   const [stats, setStats] = useState<UploadStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [copilotActive, setCopilotActive] = useState(false);
-  const [copilotListening, setCopilotListening] = useState(false);
-  const [copilotTranscript, setCopilotTranscript] = useState<Array<{ speaker: "you" | "client"; text: string; timestamp: string }>>([]);
-  const [copilotTips, setCopilotTips] = useState<Array<{ 
-    type: "wedervraag" | "lock" | "waarschuwing" | "open" | "positief"; 
-    text: string; 
-    timestamp: string;
-  }>>([]);
 
   useEffect(() => {
     loadData();
@@ -611,172 +598,7 @@ export function ConversationAnalysis({
             )}
           </Card>
 
-          <Card className="p-6 rounded-[16px] border-hh-border hover:border-hh-primary/40 hover:shadow-lg hover:bg-hh-ui-50/30 transition-all">
-            <div className="mb-5">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-hh-primary" />
-                <h2 className="text-[24px] leading-[30px] text-hh-text font-semibold">
-                  Live Analyse
-                </h2>
-              </div>
-              <p className="text-[14px] leading-[20px] text-hh-muted">
-                Real-time coaching tijdens gesprekken
-              </p>
-            </div>
-
-            <div className="mb-6">
-              <div className="text-[13px] leading-[18px] text-hh-muted mb-2">
-                Status
-              </div>
-              <div className="text-[18px] leading-[24px] text-hh-text font-semibold mb-1">
-                {copilotActive ? "Live aan het luisteren" : "Klaar om te starten"}
-              </div>
-              <div className="text-[13px] leading-[18px] text-hh-muted">
-                Hugo luistert mee en geeft real-time tips
-              </div>
-            </div>
-
-            <Button
-              onClick={() => {
-                setCopilotActive(!copilotActive);
-                if (!copilotActive) {
-                  setCopilotListening(true);
-                  setTimeout(() => {
-                    setCopilotTranscript([
-                      { speaker: "you", text: "Hoi, bedankt voor je tijd. Ik wilde even sparren over jullie CRM uitdagingen.", timestamp: "14:23" },
-                      { speaker: "client", text: "Ja natuurlijk, we zitten inderdaad met wat problemen.", timestamp: "14:23" }
-                    ]);
-                    setCopilotTips([
-                      { type: "open", text: "Probeer nu een open vraag te stellen om het probleem te verkennen (Techniek 2.1.2)", timestamp: "14:23" }
-                    ]);
-                  }, 1500);
-                } else {
-                  setCopilotListening(false);
-                  setCopilotTranscript([]);
-                  setCopilotTips([]);
-                }
-              }}
-              variant={copilotActive ? "destructive" : "default"}
-              className="w-full h-11 gap-2"
-            >
-              {copilotActive ? (
-                <>
-                  <MicOff className="w-4 h-4" />
-                  Stop coaching
-                </>
-              ) : (
-                <>
-                  <Mic className="w-4 h-4" />
-                  Start live coaching
-                </>
-              )}
-            </Button>
-
-            {copilotActive && (
-              <div className="space-y-4 mt-6">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-hh-ui-50">
-                  <div className="flex items-center gap-2">
-                    {copilotListening ? (
-                      <>
-                        <div className="w-2 h-2 rounded-full bg-hh-success animate-pulse" />
-                        <span className="text-[12px] leading-[16px] text-hh-text">Listening...</span>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-2 h-2 rounded-full bg-hh-muted" />
-                        <span className="text-[12px] leading-[16px] text-hh-muted">Paused</span>
-                      </>
-                    )}
-                  </div>
-                  <div className="h-4 w-px bg-hh-ui-200" />
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-hh-muted" />
-                    <span className="text-[12px] leading-[16px] text-hh-muted">2:34</span>
-                  </div>
-                </div>
-
-                {copilotTips.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-[13px] leading-[18px] text-hh-muted">Hugo's Tips</h4>
-                    {copilotTips.map((tip, idx) => (
-                      <div
-                        key={idx}
-                        className={`p-3 rounded-lg border-l-4 ${
-                          tip.type === "wedervraag"
-                            ? "bg-blue-50 border-blue-500"
-                            : tip.type === "lock"
-                            ? "bg-slate-50 border-hh-primary"
-                            : tip.type === "waarschuwing"
-                            ? "bg-red-50 border-red-500"
-                            : tip.type === "open"
-                            ? "bg-teal-50 border-teal-500"
-                            : "bg-green-50 border-green-500"
-                        }`}
-                      >
-                        <div className="flex items-start gap-2">
-                          <div className="flex-shrink-0 mt-0.5">
-                            {tip.type === "wedervraag" && (
-                              <MessageSquare className="w-4 h-4 text-blue-600" />
-                            )}
-                            {tip.type === "lock" && (
-                              <Lock className="w-4 h-4 text-hh-primary" />
-                            )}
-                            {tip.type === "waarschuwing" && (
-                              <Target className="w-4 h-4 text-red-600" />
-                            )}
-                            {tip.type === "open" && (
-                              <Lightbulb className="w-4 h-4 text-hh-primary" />
-                            )}
-                            {tip.type === "positief" && (
-                              <CheckCircle2 className="w-4 h-4 text-green-600" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[12px] leading-[17px] text-hh-text">
-                              <strong>
-                                {tip.type === "wedervraag"
-                                  ? "Wedervraag:"
-                                  : tip.type === "lock"
-                                  ? "Lock!:"
-                                  : tip.type === "waarschuwing"
-                                  ? "Let op:"
-                                  : tip.type === "open"
-                                  ? "Verdiep:"
-                                  : "Goed bezig:"}
-                              </strong>{" "}
-                              {tip.text}
-                            </p>
-                            <span className="text-[10px] leading-[14px] text-hh-muted">{tip.timestamp}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {copilotTranscript.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-[13px] leading-[18px] text-hh-muted">Live Transcript</h4>
-                    <div className="max-h-48 overflow-y-auto space-y-2 p-3 rounded-lg bg-hh-ui-50">
-                      {copilotTranscript.map((line, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          <span className="text-[11px] leading-[16px] text-hh-muted flex-shrink-0">
-                            {line.timestamp}
-                          </span>
-                          <p className="text-[12px] leading-[17px] text-hh-text flex-1">
-                            <strong className={line.speaker === "you" ? "text-hh-primary" : "text-hh-text"}>
-                              {line.speaker === "you" ? "Jij:" : "Klant:"}
-                            </strong>{" "}
-                            {line.text}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </Card>
+          <LiveAnalysePanel />
         </div>
 
         <Card className="p-5 rounded-[16px] border-hh-border bg-card">
