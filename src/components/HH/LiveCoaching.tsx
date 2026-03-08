@@ -1637,15 +1637,15 @@ export function LiveCoaching({
                       />
                       
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                        <div 
-                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100 bg-black/80"
+                        <div
+                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100 bg-white/90"
                         >
-                          <Play className="w-5 h-5 text-white ml-0.5" />
+                          <Play className="w-6 h-6 ml-0.5 text-hh-ink" />
                         </div>
                       </div>
-                      
+
                       <div className="absolute top-2 left-2 flex gap-2">
-                        <Badge className="text-[10px] px-2 py-0.5 bg-[#1e293b] text-white border-none">
+                        <Badge className="text-[10px] px-2 py-0.5 bg-hh-ink/80 text-white border-none">
                           Webinar Opname
                         </Badge>
                       </div>
@@ -1712,13 +1712,13 @@ export function LiveCoaching({
                       />
                       
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                        <div 
-                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100 bg-black/80"
+                        <div
+                          className="w-12 h-12 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100 bg-white/90"
                         >
-                          <Play className="w-5 h-5 text-white ml-0.5" />
+                          <Play className="w-6 h-6 ml-0.5 text-hh-ink" />
                         </div>
                       </div>
-                      
+
                       {isNew && (
                         <div className="absolute top-2 left-2">
                           <Badge className="text-[10px] px-2 py-0.5 bg-hh-primary text-white border-none">

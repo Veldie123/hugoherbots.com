@@ -277,11 +277,22 @@ export function AdminChatExpertMode({
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const userHasScrolledUp = useRef(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  const handleChatScroll = () => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+    userHasScrolledUp.current = !isNearBottom;
+  };
+
+  // Auto-scroll to bottom when new messages arrive (only if user is near bottom)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!userHasScrolledUp.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   // Load user's current competence level on mount (auto-adaptive system)
@@ -1319,9 +1330,9 @@ export function AdminChatExpertMode({
 
   return (
     <AdminLayout currentPage={sessionId === "hugo-agent" ? "admin-hugo-agent" : "admin-chat-expert"} navigate={navigate} isSuperAdmin={isSuperAdmin} contentClassName="flex-1 overflow-hidden min-h-0 flex flex-col">
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full min-h-0">
         {/* Unified header row — matching user view */}
-        <div className="flex items-stretch border-b border-hh-border flex-shrink-0">
+        <div className="flex items-stretch border-b border-hh-border flex-shrink-0 z-10">
           {desktopSidebarOpen && (
             <div className="hidden lg:flex items-center justify-between px-4 w-1/3 flex-shrink-0 bg-hh-bg" style={{ borderRight: '1px solid var(--hh-border)' }}>
               <h3 className="text-hh-text" style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '0.5px', margin: 0 }}>
@@ -1614,7 +1625,7 @@ export function AdminChatExpertMode({
 
           {/* Chat Mode - Messages */}
           {chatMode === "chat" && (
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div ref={scrollContainerRef} onScroll={handleChatScroll} className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message) => (
               <div key={message.id} className="space-y-2">
                 {/* Message Bubble - Modern rounded design */}
@@ -1651,7 +1662,7 @@ export function AdminChatExpertMode({
                             : undefined
                       }
                     >
-                      <div className="text-[14px] leading-[20px]">{renderSimpleMarkdown(message.text)}</div>
+                      <div className="text-[14px] leading-[20px] whitespace-pre-line">{renderSimpleMarkdown(message.text)}</div>
                       {message.analysisCards && message.analysisCards.length > 0 && (
                         <div className="mt-3 space-y-2">
                           {message.analysisCards.map((card) => (
@@ -1733,7 +1744,7 @@ export function AdminChatExpertMode({
                           </button>
                           <button
                             onClick={() => {
-                              const lastUserMsg = [...messages].reverse().find(m => m.sender === "hugo");
+                              const lastUserMsg = [...messages].reverse().find(m => m.sender === "verkoper");
                               if (lastUserMsg) {
                                 setInputText(lastUserMsg.text);
                               }
