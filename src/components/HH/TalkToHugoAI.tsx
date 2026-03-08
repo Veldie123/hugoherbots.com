@@ -219,6 +219,8 @@ export function TalkToHugoAI({
   const [useStreaming, setUseStreaming] = useState(true);
   const streamingTextRef = useRef("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const userHasScrolledUp = useRef(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [onboardingStatus, setOnboardingStatus] = useState<{
@@ -247,8 +249,17 @@ export function TalkToHugoAI({
   const [audioConnectionState, setAudioConnectionState] = useState<ConnectionState>(ConnectionState.Disconnected);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
 
+  const handleChatScroll = () => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+    userHasScrolledUp.current = !isNearBottom;
+  };
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!userHasScrolledUp.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages, streamingText]);
 
   // Load user's current competence level on mount (auto-adaptive system)
@@ -2031,7 +2042,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           </div>
         </div>
       )}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div ref={scrollContainerRef} onScroll={handleChatScroll} className="flex-1 overflow-y-auto p-4 space-y-3">
         {/* Coach View Summary — shown when analysis data is loaded */}
         {analysisResult?.insights && (
           <CoachViewSummary
@@ -2149,7 +2160,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     ))}
                   </div>
                 )}
-                {message.text && <div className="text-[14px] leading-[22px]">{renderSimpleMarkdown(message.text)}</div>}
+                {message.text && <div className="text-[14px] leading-[22px] whitespace-pre-line">{renderSimpleMarkdown(message.text)}</div>}
               </div>
 
               {message.richContent && message.richContent.length > 0 && (
@@ -2433,7 +2444,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                   </button>
                   <button
                     onClick={() => {
-                      const lastUserMsg = [...messages].reverse().find(m => m.sender === "hugo");
+                      const lastUserMsg = [...messages].reverse().find(m => m.sender === "verkoper");
                       if (lastUserMsg) {
                         setInputText(lastUserMsg.text);
                       }
@@ -2443,7 +2454,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>
-                  {!assistanceConfig.blindPlay && (message.debugInfo?.expectedTechniqueId || message.debugInfo?.epicFase || message.debugInfo?.evaluatie) && (
+                  {!assistanceConfig.blindPlay && (message.debugInfo?.expectedTechniqueId || message.debugInfo?.aiDecision?.epicFase || message.debugInfo?.aiDecision?.evaluatie) && (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -2655,17 +2666,6 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             className={`flex-1 ${isRecording ? "border-hh-error/30 bg-hh-error/5" : ""}`}
             disabled={isStreaming}
           />
-          {messages.length > 2 && (
-            <button
-              onClick={handleRequestFeedback}
-              disabled={isLoading || isStreaming}
-              className="flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-full border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors disabled:opacity-40"
-              title="Vraag Hugo om feedback"
-            >
-              <Award className="w-3.5 h-3.5 text-hh-primary" />
-              <span className="text-[11px] font-medium text-hh-muted hidden sm:inline">Feedback</span>
-            </button>
-          )}
           <Button
             variant="outline"
             size="icon"
@@ -2940,7 +2940,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     <AppLayout currentPage="talk-to-hugo" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} contentClassName="flex-1 overflow-hidden min-h-0 flex flex-col">
       <div className="flex flex-col flex-1 min-h-0">
         {/* Unified header row — one continuous border-bottom */}
-        <div className="flex items-stretch border-b border-hh-border flex-shrink-0">
+        <div className="flex items-stretch border-b border-hh-border flex-shrink-0 z-10">
           {!assistanceConfig.blindPlay && desktopSidebarOpen && (
             <div className="hidden lg:flex items-center justify-between px-4 w-1/3 flex-shrink-0 bg-hh-bg border-r border-hh-border">
               <h3 style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '0.5px', margin: 0 }} className="text-hh-ink">

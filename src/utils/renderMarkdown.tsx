@@ -18,14 +18,10 @@ export function renderSimpleMarkdown(text: string): React.ReactNode {
     }
 
     if (i > 0) {
-      elements.push(<br key={`br-${i}`} />);
+      elements.push(<React.Fragment key={`nl-${i}`}>{'\n'}</React.Fragment>);
     }
 
-    if (Array.isArray(processed)) {
-      elements.push(<React.Fragment key={`line-${i}`}>{processed}</React.Fragment>);
-    } else {
-      elements.push(<React.Fragment key={`line-${i}`}>{processed}</React.Fragment>);
-    }
+    elements.push(<React.Fragment key={`line-${i}`}>{processed}</React.Fragment>);
   });
 
   return <>{elements}</>;

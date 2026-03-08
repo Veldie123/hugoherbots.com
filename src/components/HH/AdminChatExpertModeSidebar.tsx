@@ -147,8 +147,7 @@ export function EPICSidebar({
               const subTechniques = getTopLevelTechniques(phase);
               const phaseProgress = getPhaseProgress(phase);
               const isPhaseLocked = phase > currentUnlockedPhase;
-              const baseCircleColor = PHASE_CIRCLE_COLORS[phase] || '#64748B';
-              const circleColor = isAdminView ? '#9910FA' : baseCircleColor;
+              const circleColor = 'var(--hh-primary)';
 
               if (subTechniques.length === 0) return null;
 
@@ -188,20 +187,32 @@ export function EPICSidebar({
                         phase
                       )}
                     </div>
-                    <span
-                      className="flex-1 text-left"
-                      style={{
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        color: isPhaseLocked ? 'var(--hh-muted)' : 'var(--hh-ink)',
-                      }}
-                    >
-                      {phaseName}
-                    </span>
+                    <div className="flex-1 text-left flex flex-col gap-0">
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase' as const,
+                          color: isPhaseLocked ? 'var(--hh-muted)' : 'var(--hh-primary)',
+                        }}
+                      >
+                        Fase {phase}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          color: isPhaseLocked ? 'var(--hh-muted)' : 'var(--hh-ink)',
+                        }}
+                      >
+                        {phaseName}
+                      </span>
+                    </div>
                     <span
                       style={{
                         fontSize: '12px',
-                        color: isPhaseLocked ? '#cbd5e1' : '#94a3b8',
+                        color: isPhaseLocked ? 'var(--hh-ui-200)' : 'var(--hh-muted)',
                         fontWeight: 500,
                         marginRight: '4px',
                       }}
@@ -209,7 +220,7 @@ export function EPICSidebar({
                       {phaseProgress.completed}/{phaseProgress.total}
                     </span>
                     {isPhaseLocked ? (
-                      <Lock className="w-3.5 h-3.5" style={{ color: '#cbd5e1' }} />
+                      <Lock className="w-3.5 h-3.5" style={{ color: 'var(--hh-ui-200)' }} />
                     ) : isExpanded ? (
                       <ChevronDown className="w-4 h-4" style={{ color: '#94a3b8' }} />
                     ) : (
