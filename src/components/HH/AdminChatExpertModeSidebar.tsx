@@ -222,9 +222,9 @@ export function EPICSidebar({
                     {isPhaseLocked ? (
                       <Lock className="w-3.5 h-3.5" style={{ color: 'var(--hh-ui-200)' }} />
                     ) : isExpanded ? (
-                      <ChevronDown className="w-4 h-4" style={{ color: '#94a3b8' }} />
+                      <ChevronDown className="w-4 h-4" style={{ color: 'var(--hh-muted)' }} />
                     ) : (
-                      <ChevronRight className="w-4 h-4" style={{ color: '#94a3b8' }} />
+                      <ChevronRight className="w-4 h-4" style={{ color: 'var(--hh-muted)' }} />
                     )}
                   </button>
 

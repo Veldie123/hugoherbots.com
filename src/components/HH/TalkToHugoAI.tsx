@@ -522,7 +522,7 @@ export function TalkToHugoAI({
     }
 
     const loadPersonalizedWelcome = async () => {
-      if (isAdmin && adminViewMode) {
+      if (onboardingMode && engineModel === "v3") {
         try {
           setIsLoading(true);
 
@@ -645,7 +645,7 @@ export function TalkToHugoAI({
       }]);
     };
     loadPersonalizedWelcome();
-  }, [user?.id, navigationData, isAdmin, adminViewMode, sessionRestartKey]);
+  }, [user?.id, navigationData, isAdmin, onboardingMode, engineModel, sessionRestartKey]);
 
   useEffect(() => {
     if (selectedTechnique || audioConnectionState === ConnectionState.Connected) {
@@ -1945,7 +1945,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
   };
 
   const handleMessageFeedback = async (messageId: string, feedback: "up" | "down") => {
-    if (isAdmin && adminViewMode && onboardingStatus && !onboardingStatus.isComplete && onboardingCurrentItem) {
+    if (onboardingMode && onboardingStatus && !onboardingStatus.isComplete && onboardingCurrentItem) {
       if (feedback === "up") {
         handleOnboardingApprove();
         return;
@@ -2019,7 +2019,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           </div>
         </div>
       )}
-      {isAdmin && adminViewMode && onboardingStatus && !onboardingStatus.isComplete && (
+      {onboardingMode && onboardingStatus && !onboardingStatus.isComplete && (
         <div className="flex items-center justify-center gap-3 py-2 px-4 border-b border-hh-border bg-hh-ui-50/50">
           <div className="flex items-center gap-2">
             <span className="text-[12px] font-medium text-hh-primary">
@@ -2475,10 +2475,10 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                               setMobileSidebarOpen(!mobileSidebarOpen);
                             }
                           }}
-                          className={`p-1.5 rounded-md transition-colors text-hh-success ${
+                          className={`p-1.5 rounded-md transition-colors text-hh-primary ${
                             (desktopSidebarOpen || mobileSidebarOpen)
-                              ? "bg-hh-success/10"
-                              : "hover:bg-hh-success/10"
+                              ? "bg-hh-primary/10"
+                              : "hover:bg-hh-primary/10"
                           }`}
                         >
                           <Lightbulb className="w-3.5 h-3.5" />

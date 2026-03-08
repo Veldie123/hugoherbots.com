@@ -164,7 +164,7 @@ export function TechniqueDetailsDialog({
                   : `2px solid ${phaseColor}25`,
               }}
             >
-              <div className="flex items-center gap-3.5 mb-3">
+              <div className="flex items-center gap-4 mb-3">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold shrink-0 border"
                   style={isAdmin ? {
@@ -179,7 +179,7 @@ export function TechniqueDetailsDialog({
                 >
                   {technique.nummer}
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col gap-0.5">
                   <span
                     className="text-[11px] font-bold uppercase tracking-widest"
                     style={{ color: isAdmin ? 'var(--hh-primary)' : phaseColor }}
@@ -215,9 +215,9 @@ export function TechniqueDetailsDialog({
                       variant="outline"
                       className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
                       style={{
-                        backgroundColor: `${phaseColor}12`,
-                        color: phaseColor,
-                        borderColor: `${phaseColor}30`,
+                        backgroundColor: isAdmin ? `rgba(var(--hh-primary-rgb), 0.08)` : `${phaseColor}12`,
+                        color: isAdmin ? 'var(--hh-primary)' : phaseColor,
+                        borderColor: isAdmin ? `rgba(var(--hh-primary-rgb), 0.2)` : `${phaseColor}30`,
                       }}
                     >
                       {tag}
