@@ -118,6 +118,7 @@ interface Message {
   isTranscriptReplay?: boolean;
   transcriptRole?: string;
   richContent?: import("@/types/crossPlatform").RichContent[];
+  isThinking?: boolean;
 }
 
 type ChatMode = "chat" | "audio" | "video";
@@ -226,6 +227,8 @@ export function TalkToHugoAI({
   const [streamingText, setStreamingText] = useState("");
   const [useStreaming, setUseStreaming] = useState(true);
   const streamingTextRef = useRef("");
+  const messageQueueRef = useRef<string[]>([]);
+  const isProcessingRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const userHasScrolledUp = useRef(false);
@@ -306,7 +309,7 @@ export function TalkToHugoAI({
 
           const historyMessages: Message[] = session.messages.map((msg: any, idx: number) => ({
             id: `hist-${idx}`,
-            sender: msg.role === 'assistant' ? 'ai' as const : 'user' as const,
+            sender: msg.role === 'assistant' ? 'ai' as const : 'hugo' as const,
             text: msg.content,
             timestamp: new Date(session.createdAt || session.created_at),
           }));
@@ -538,8 +541,9 @@ export function TalkToHugoAI({
           const welcomeMsg: Message = {
             id: `admin-welcome-${Date.now()}`,
             sender: "ai",
-            text: "",
+            text: "Hugo denkt na...",
             timestamp: new Date(),
+            isThinking: true,
           };
           setMessages([welcomeMsg]);
 
@@ -556,7 +560,8 @@ export function TalkToHugoAI({
                 const updated = [...prev];
                 const lastMsg = updated[updated.length - 1];
                 if (lastMsg && lastMsg.id === welcomeMsg.id) {
-                  updated[updated.length - 1] = { ...lastMsg, text: lastMsg.text + token };
+                  const currentText = lastMsg.isThinking ? '' : lastMsg.text;
+                  updated[updated.length - 1] = { ...lastMsg, text: currentText + token, isThinking: false };
                 }
                 return updated;
               });
@@ -598,7 +603,7 @@ export function TalkToHugoAI({
               if (session.messages && session.messages.length > 0) {
                 const historyMessages: Message[] = session.messages.map((msg: any, idx: number) => ({
                   id: `resumed-${idx}`,
-                  sender: msg.role === 'assistant' ? 'ai' as const : 'user' as const,
+                  sender: msg.role === 'assistant' ? 'ai' as const : 'hugo' as const,
                   text: msg.content,
                   timestamp: new Date(session.createdAt || session.created_at || Date.now()),
                 }));
@@ -1259,7 +1264,9 @@ export function TalkToHugoAI({
 
   const handleSendMessage = async () => {
     const hasFiles = attachedFiles.length > 0;
-    if ((!inputText.trim() && !hasFiles) || isLoading || isStreaming) return;
+    if (!inputText.trim() && !hasFiles) return;
+    // If loading initial session, block completely
+    if (isLoading && !hasActiveSession) return;
 
     const messageAttachments: MessageAttachment[] = attachedFiles.map((f) => ({
       id: f.id,
@@ -1306,6 +1313,12 @@ export function TalkToHugoAI({
       return;
     }
 
+    // Queue if already processing a response
+    if (isProcessingRef.current) {
+      messageQueueRef.current.push(messageText);
+      return;
+    }
+
     if (!hasActiveSession) {
       try {
         await hugoApi.startSession({
@@ -1322,11 +1335,17 @@ export function TalkToHugoAI({
       }
     }
 
+    await processMessageSend(messageText, v3Files);
+  };
+
+  const processMessageSend = async (messageText: string, v3Files?: File[]) => {
+    isProcessingRef.current = true;
+
     if (useStreaming) {
       setIsStreaming(true);
       setStreamingText("");
       streamingTextRef.current = "";
-      
+
       try {
         await hugoApi.sendMessageStream(
           messageText,
@@ -1393,7 +1412,7 @@ export function TalkToHugoAI({
       setIsLoading(true);
       try {
         const response = await hugoApi.sendMessage(messageText, difficultyLevel === "onbewuste_kunde");
-        
+
         const aiMessage: Message = {
           id: (Date.now() + 1).toString(),
           sender: "ai",
@@ -1402,7 +1421,7 @@ export function TalkToHugoAI({
           richContent: response.richContent,
         };
         setMessages(prev => [...prev, aiMessage]);
-        
+
         // Handle level transition (invisible auto-adaptive system)
         if (response.levelTransition) {
           const { previousLevel, newLevel, shouldCongratulate } = response.levelTransition;
@@ -1437,6 +1456,14 @@ export function TalkToHugoAI({
       } finally {
         setIsLoading(false);
       }
+    }
+
+    isProcessingRef.current = false;
+
+    // Process queued messages
+    if (messageQueueRef.current.length > 0) {
+      const nextMessage = messageQueueRef.current.shift()!;
+      await processMessageSend(nextMessage);
     }
   };
 
@@ -2217,7 +2244,11 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     ))}
                   </div>
                 )}
-                {message.text && <div className="text-[14px] leading-[22px] whitespace-pre-line">{renderSimpleMarkdown(message.text)}</div>}
+                {message.isThinking ? (
+                  <div className="text-[14px] leading-[22px] text-hh-muted italic animate-pulse">{message.text}</div>
+                ) : message.text ? (
+                  <div className="text-[14px] leading-[22px] whitespace-pre-line">{renderSimpleMarkdown(message.text)}</div>
+                ) : null}
               </div>
 
               {message.richContent && message.richContent.length > 0 && (
@@ -2734,16 +2765,12 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           </Button>
           <Button
             onClick={handleSendMessage}
-            disabled={(!inputText.trim() && attachedFiles.length === 0) || isLoading || isStreaming}
+            disabled={(!inputText.trim() && attachedFiles.length === 0) || (isLoading && !hasActiveSession)}
             variant="ghost"
             className="gap-2 px-3 sm:px-4 text-white rounded-md hover:text-white bg-hh-success hover:bg-hh-success/90"
           >
-            {isLoading || isStreaming ? (
-              <Loader2 className="w-4 h-4 text-white animate-spin" />
-            ) : (
-              <Send className="w-4 h-4 text-white" />
-            )}
-            <span className="text-white hidden sm:inline">{isLoading || isStreaming ? "Bezig..." : "Verzend"}</span>
+            <Send className="w-4 h-4 text-white" />
+            <span className="text-white hidden sm:inline">Verzend</span>
           </Button>
         </div>
       </div>
@@ -2995,7 +3022,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
   return (
     <AppLayout currentPage="talk-to-hugo" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} contentClassName="flex-1 overflow-hidden min-h-0 flex flex-col">
-      <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden relative">
         {/* Unified header row — one continuous border-bottom */}
         <div className="flex items-stretch border-b border-hh-border flex-shrink-0 z-10">
           {!assistanceConfig.blindPlay && desktopSidebarOpen && (

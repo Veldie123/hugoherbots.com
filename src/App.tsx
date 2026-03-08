@@ -196,6 +196,7 @@ export default function App() {
       setViewMode('user');
       setNavigationData(undefined);
       setCurrentPage("landing");
+      window.history.pushState({ page: "landing" }, "", "/");
       window.scrollTo(0, 0);
       return;
     }
@@ -210,12 +211,37 @@ export default function App() {
       const section = page.split(":")[1] as "profile" | "notifications" | "subscription" | "team" | "danger";
       setSettingsSection(section);
       setCurrentPage("settings");
+      window.history.pushState({ page: "settings", section }, "", `/${page}`);
     } else {
       setCurrentPage(page as Page);
       setSettingsSection("profile");
+      window.history.pushState({ page }, "", `/${page}`);
     }
     window.scrollTo(0, 0);
   };
+
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const state = event.state;
+      if (state?.page) {
+        setCurrentPage(state.page as Page);
+        if (state.section) setSettingsSection(state.section);
+        setNavigationData(undefined);
+        if (typeof state.page === 'string' && state.page.startsWith('admin-')) {
+          setViewMode('admin');
+        } else {
+          setViewMode('user');
+        }
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    // Set initial history state
+    if (currentPage && !window.history.state?.page) {
+      window.history.replaceState({ page: currentPage }, "", window.location.pathname === "/" ? "/" : `/${currentPage}`);
+    }
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   return (
     <ThemeProvider>

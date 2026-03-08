@@ -156,15 +156,24 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col"
+      className="absolute inset-0 z-30 flex flex-col rounded-[16px] overflow-hidden"
       style={{ background: "linear-gradient(180deg, var(--hh-success) 0%, #0d9488 50%, #0f766e 100%)" }}
     >
+      {/* Close button */}
+      <button
+        onClick={endSession}
+        className="absolute top-4 right-4 z-20 flex items-center justify-center rounded-full transition-colors hover:bg-white/20"
+        style={{ width: "36px", height: "36px", backgroundColor: "rgba(255,255,255,0.1)" }}
+      >
+        <X className="w-5 h-5 text-white" />
+      </button>
+
       {/* Error banner */}
       {error && (
         <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-10">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span className="text-[14px]">{error}</span>
-          <button onClick={() => setError(null)} className="ml-auto">
+          <button onClick={endSession} className="ml-auto">
             <X className="w-4 h-4" />
           </button>
         </div>

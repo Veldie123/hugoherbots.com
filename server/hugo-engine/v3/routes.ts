@@ -164,8 +164,9 @@ router.post(
       });
     }
 
-    const { techniqueId, userProfile, mode } = req.body;
+    const { techniqueId, userProfile, mode, thinkingMode } = req.body;
     const sessionMode = mode === "admin" ? "admin" as const : "coaching" as const;
+    const resolvedThinkingMode = (thinkingMode === "fast" || thinkingMode === "deep") ? thinkingMode : "auto";
 
     // Access check based on requested mode
     const access = await getV3Access(req.userEmail!);
@@ -236,7 +237,7 @@ router.post(
         }
       }
 
-      const response = await chat(session, openingPrompt);
+      const response = await chat(session, openingPrompt, resolvedThinkingMode as any);
       persistSession(session);
 
       res.json({
