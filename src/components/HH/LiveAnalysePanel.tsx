@@ -119,7 +119,7 @@ export function LiveAnalysePanel() {
       <Button
         onClick={isActive ? stop : start}
         variant={isActive ? "destructive" : "default"}
-        className="w-full h-11 gap-2"
+        className={`w-full h-11 gap-2 ${!isActive ? "bg-hh-success hover:bg-hh-success/90 text-white" : ""}`}
       >
         {isActive ? (
           <>

@@ -90,6 +90,7 @@ export function useLiveAnalyse(): UseLiveAnalyseReturn {
     wsRef.current = ws;
 
     ws.onopen = () => {
+      setIsActive(true);
       setIsListening(true);
       startAudioCapture(stream, ws);
     };
@@ -101,7 +102,6 @@ export function useLiveAnalyse(): UseLiveAnalyseReturn {
         switch (data.type) {
           case "la:session_started":
             setSessionId(data.sessionId);
-            setIsActive(true);
             break;
 
           case "partial_transcript":
