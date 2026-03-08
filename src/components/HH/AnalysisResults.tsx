@@ -1258,33 +1258,33 @@ export function AnalysisResults({
               (m: any) => m && typeof m === 'object' && !Array.isArray(m) && m.id
             );
             const momentConfig: Record<string, { icon: any; color: string; bg: string; iconBg: string; label: string }> = {
-              'big_win': { 
-                icon: Trophy, 
-                color: isDark ? '#34D399' : '#047857', 
-                bg: isDark ? '#064E3B' : '#ECFDF5', 
-                iconBg: isDark ? '#065F46' : '#D1FAE5', 
-                label: 'Big Win' 
+              'big_win': {
+                icon: Trophy,
+                color: 'var(--hh-success)',
+                bg: 'var(--hh-success-50)',
+                iconBg: 'var(--hh-success-100)',
+                label: 'Big Win'
               },
-              'quick_fix': { 
-                icon: Wrench, 
-                color: isDark ? '#FBBF24' : '#B45309', 
-                bg: isDark ? '#78350F' : '#FFFBEB', 
-                iconBg: isDark ? '#92400E' : '#FEF3C7', 
-                label: 'Quick Fix' 
+              'quick_fix': {
+                icon: Wrench,
+                color: 'var(--hh-warning)',
+                bg: 'var(--hh-warning-50)',
+                iconBg: 'var(--hh-warning-100)',
+                label: 'Quick Fix'
               },
-              'turning_point': { 
-                icon: RotateCcw, 
-                color: isDark ? '#FB7185' : '#BE123C', 
-                bg: isDark ? '#881337' : '#FFF1F2', 
-                iconBg: isDark ? '#9F1239' : '#FFE4E6', 
-                label: 'Scharnierpunt' 
+              'turning_point': {
+                icon: RotateCcw,
+                color: 'var(--hh-error)',
+                bg: 'var(--hh-error-50)',
+                iconBg: 'var(--hh-error-100)',
+                label: 'Scharnierpunt'
               },
             };
 
             return (
               <div className="space-y-4 mb-8 sm:mb-10">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="rounded-2xl p-4 sm:p-5 relative group flex flex-col justify-center" style={{ backgroundColor: 'var(--hh-ui-50)', border: '1px solid var(--hh-border)', borderLeft: adminColors ? '3px solid #9910FA' : '3px solid #3C9A6E' }}>
+                  <div className="rounded-2xl p-4 sm:p-5 relative group flex flex-col justify-center" style={{ backgroundColor: 'var(--hh-ui-50)', border: '1px solid var(--hh-border)', borderLeft: adminColors ? '3px solid var(--hh-primary)' : '3px solid var(--hh-success)' }}>
                     {useAdminLayout && editingDebrief ? (
                       <div className="space-y-2">
                         <textarea

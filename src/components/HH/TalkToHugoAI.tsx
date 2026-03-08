@@ -306,7 +306,7 @@ export function TalkToHugoAI({
 
           const historyMessages: Message[] = session.messages.map((msg: any, idx: number) => ({
             id: `hist-${idx}`,
-            sender: msg.role === 'assistant' ? 'ai' as const : 'hugo' as const,
+            sender: msg.role === 'assistant' ? 'ai' as const : 'user' as const,
             text: msg.content,
             timestamp: new Date(session.createdAt || session.created_at),
           }));
@@ -598,7 +598,7 @@ export function TalkToHugoAI({
               if (session.messages && session.messages.length > 0) {
                 const historyMessages: Message[] = session.messages.map((msg: any, idx: number) => ({
                   id: `resumed-${idx}`,
-                  sender: msg.role === 'assistant' ? 'ai' as const : 'hugo' as const,
+                  sender: msg.role === 'assistant' ? 'ai' as const : 'user' as const,
                   text: msg.content,
                   timestamp: new Date(session.createdAt || session.created_at || Date.now()),
                 }));
@@ -624,8 +624,9 @@ export function TalkToHugoAI({
           const welcomeMsg: Message = {
             id: `welcome-${Date.now()}`,
             sender: "ai",
-            text: "",
+            text: "Hugo denkt na...",
             timestamp: new Date(),
+            isThinking: true,
           };
           setMessages([welcomeMsg]);
 
@@ -642,7 +643,9 @@ export function TalkToHugoAI({
                 const updated = [...prev];
                 const lastMsg = updated[updated.length - 1];
                 if (lastMsg && lastMsg.id === welcomeMsg.id) {
-                  updated[updated.length - 1] = { ...lastMsg, text: lastMsg.text + token };
+                  // Replace thinking placeholder with actual content
+                  const currentText = lastMsg.isThinking ? '' : lastMsg.text;
+                  updated[updated.length - 1] = { ...lastMsg, text: currentText + token, isThinking: false };
                 }
                 return updated;
               });
@@ -650,9 +653,14 @@ export function TalkToHugoAI({
           );
           setHasActiveSession(true);
           console.log("[Hugo] V3 coaching session started");
-        } catch (e) {
-          console.warn("[Hugo] V3 coaching session failed, falling back to V2:", e);
-          // Fall through to V2 welcome below
+        } catch (e: any) {
+          console.warn("[Hugo] V3 coaching session failed:", e);
+          setMessages([{
+            id: `error-${Date.now()}`,
+            sender: "ai",
+            text: "Er ging iets mis bij het starten van de sessie. Probeer het opnieuw of schakel naar een ander model.",
+            timestamp: new Date(),
+          }]);
         } finally {
           setIsLoading(false);
         }
@@ -2987,7 +2995,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
   return (
     <AppLayout currentPage="talk-to-hugo" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} contentClassName="flex-1 overflow-hidden min-h-0 flex flex-col">
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
         {/* Unified header row — one continuous border-bottom */}
         <div className="flex items-stretch border-b border-hh-border flex-shrink-0 z-10">
           {!assistanceConfig.blindPlay && desktopSidebarOpen && (

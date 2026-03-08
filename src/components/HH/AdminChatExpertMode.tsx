@@ -1338,7 +1338,7 @@ export function AdminChatExpertMode({
 
   return (
     <AdminLayout currentPage={sessionId === "hugo-agent" ? "admin-hugo-agent" : "admin-chat-expert"} navigate={navigate} isSuperAdmin={isSuperAdmin} contentClassName="flex-1 overflow-hidden min-h-0 flex flex-col">
-      <div className="flex flex-col h-full min-h-0">
+      <div className="flex flex-col h-full min-h-0 overflow-hidden">
         {/* Unified header row — matching user view */}
         <div className="flex items-stretch border-b border-hh-border flex-shrink-0 z-10">
           {desktopSidebarOpen && (

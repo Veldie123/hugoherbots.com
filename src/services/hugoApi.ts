@@ -202,6 +202,7 @@ class HugoApiService {
         techniqueId: request.techniqueId,
         userProfile: {},
         mode: request.viewMode === "admin" ? "admin" : "coaching",
+        thinkingMode: this.thinkingMode,
       }),
     });
 
