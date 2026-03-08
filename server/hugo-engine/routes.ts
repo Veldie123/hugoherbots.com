@@ -42,6 +42,8 @@ import { generateCustomerProfile, recordPersonaStart, recordSessionOutcome } fro
 import { aggregateFeedback, renderFeedbackTemplate } from "./feedback-aggregator";
 import type { MessageResponse, CustomerProfile } from "@shared/schema";
 import { setupScribeWebSocket } from "./elevenlabs-stt";
+import { setupLiveAnalyseWebSocket } from "./live-analyse-ws";
+import { liveAnalyseRoutes } from "./v3/live-analyse-routes";
 import { setupStreamingResponseWebSocket } from "./streaming-response";
 import { canAccessTechnique, getUserProgress, getMissingContextSlots } from "./v2/technique-sequence";
 
@@ -4989,10 +4991,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Live Analyse routes — real-time in-call coaching sessions
+  app.use("/api/v3/live-analyse", liveAnalyseRoutes);
+
   const httpServer = createServer(app);
-  
+
   // Setup ElevenLabs Scribe WebSocket for real-time STT
   setupScribeWebSocket(httpServer);
+
+  // Setup Live Analyse WebSocket for real-time coaching
+  setupLiveAnalyseWebSocket(httpServer);
   
   // Setup streaming response WebSocket for low-latency LLM->TTS->Audio
   setupStreamingResponseWebSocket(httpServer);
