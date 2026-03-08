@@ -14,18 +14,13 @@ import {
   Loader2,
   AlertCircle,
   Sparkles,
-  Mic,
-  MicOff,
-  MessageSquare,
-  Lock,
-  Target,
-  Lightbulb,
   Bell,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "../../contexts/UserContext";
 import { useNotifications } from "../../contexts/NotificationContext";
 import { apiFetch } from "../../services/apiFetch";
+import { LiveAnalysePanel } from "./LiveAnalysePanel";
 
 interface UploadAnalysisProps {
   navigate?: (page: string, data?: any) => void;
@@ -88,16 +83,6 @@ export function UploadAnalysis({
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
     };
   }, []);
-
-  // Live Copilot state
-  const [copilotActive, setCopilotActive] = useState(false);
-  const [copilotListening, setCopilotListening] = useState(false);
-  const [copilotTranscript, setCopilotTranscript] = useState<Array<{ speaker: "you" | "client"; text: string; timestamp: string }>>([]);
-  const [copilotTips, setCopilotTips] = useState<Array<{ 
-    type: "wedervraag" | "lock" | "waarschuwing" | "open" | "positief"; 
-    text: string; 
-    timestamp: string;
-  }>>([]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -570,10 +555,7 @@ export function UploadAnalysis({
                   <Button
                     onClick={handleUpload}
                     disabled={!title.trim() || isUploading || !consentConfirmed}
-                    className="w-full sm:w-auto gap-2 text-white"
-                    style={{ backgroundColor: '#3C9A6E' }}
-                    onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#2D7F57')}
-                    onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = '#3C9A6E')}
+                    className="w-full sm:w-auto gap-2 text-white bg-hh-success hover:bg-hh-success/90"
                   >
                     <Upload className="w-4 h-4" />
                     Start analyse
@@ -588,216 +570,7 @@ export function UploadAnalysis({
             )}
           </Card>
 
-          {/* Live Copilot - Real-time Coaching */}
-          <Card className="p-6 rounded-[16px] border-hh-border hover:border-hh-primary/40 hover:shadow-lg hover:bg-hh-ui-50/30 transition-all">
-            <div className="mb-5">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-hh-primary" />
-                <h2 className="text-[24px] leading-[30px] text-hh-text font-semibold">
-                  Live Analyse
-                </h2>
-              </div>
-              <p className="text-[14px] leading-[20px] text-hh-muted">
-                Real-time coaching tijdens gesprekken
-              </p>
-            </div>
-
-            <div className="mb-6">
-              <div className="text-[13px] leading-[18px] text-hh-muted mb-2">
-                Status
-              </div>
-              <div className="text-[18px] leading-[24px] text-hh-text font-semibold mb-1">
-                {copilotActive ? "Live aan het luisteren" : "Klaar om te starten"}
-              </div>
-              <div className="text-[13px] leading-[18px] text-hh-muted">
-                Hugo luistert mee en geeft real-time tips
-              </div>
-            </div>
-
-            <Button
-              onClick={() => {
-                setCopilotActive(!copilotActive);
-                if (!copilotActive) {
-                  // Start demo mode
-                  setCopilotListening(true);
-                  // Simulate initial transcript
-                  setTimeout(() => {
-                    setCopilotTranscript([
-                      { speaker: "you", text: "Hoi, bedankt voor je tijd. Ik wilde even sparren over jullie CRM uitdagingen.", timestamp: "14:23" },
-                      { speaker: "client", text: "Ja natuurlijk, we zitten inderdaad met wat problemen.", timestamp: "14:23" }
-                    ]);
-                    setCopilotTips([
-                      { type: "open", text: "Probeer nu een open vraag te stellen om het probleem te verkennen (Techniek 2.1.2)", timestamp: "14:23" }
-                    ]);
-                  }, 1500);
-                } else {
-                  // Stop
-                  setCopilotListening(false);
-                  setCopilotTranscript([]);
-                  setCopilotTips([]);
-                }
-              }}
-              variant={copilotActive ? "destructive" : "default"}
-              className={`w-full h-11 gap-2 ${!copilotActive ? 'text-white' : ''}`}
-              style={!copilotActive ? { backgroundColor: '#3C9A6E' } : {}}
-              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { if (!copilotActive) e.currentTarget.style.backgroundColor = '#2D7F57'; }}
-              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { if (!copilotActive) e.currentTarget.style.backgroundColor = '#3C9A6E'; }}
-            >
-              {copilotActive ? (
-                <>
-                  <MicOff className="w-4 h-4" />
-                  Stop coaching
-                </>
-              ) : (
-                <>
-                  <Mic className="w-4 h-4" />
-                  Start live coaching
-                </>
-              )}
-            </Button>
-
-            {copilotActive && (
-              <div className="space-y-4 mt-6">
-                {/* Status Bar */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-hh-ui-50">
-                  <div className="flex items-center gap-2">
-                    {copilotListening ? (
-                      <>
-                        <div className="w-2 h-2 rounded-full bg-hh-success animate-pulse" />
-                        <span className="text-[12px] leading-[16px] text-hh-text">Listening...</span>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-2 h-2 rounded-full bg-hh-muted" />
-                        <span className="text-[12px] leading-[16px] text-hh-muted">Paused</span>
-                      </>
-                    )}
-                  </div>
-                  <div className="h-4 w-px bg-hh-ui-200" />
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-hh-muted" />
-                    <span className="text-[12px] leading-[16px] text-hh-muted">2:34</span>
-                  </div>
-                </div>
-
-                {/* Live Tips from Hugo */}
-                {copilotTips.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-[13px] leading-[18px] text-hh-muted">Hugo's Tips</h4>
-                    {copilotTips.map((tip, idx) => (
-                      <div
-                        key={idx}
-                        className={`p-3 rounded-lg border-l-4 ${
-                          tip.type === "wedervraag"
-                            ? "bg-hh-primary/10 border-hh-primary"
-                            : tip.type === "lock"
-                            ? "bg-hh-primary/10 border-hh-primary"
-                            : tip.type === "waarschuwing"
-                            ? "bg-hh-error/10 border-hh-error"
-                            : tip.type === "open"
-                            ? "bg-hh-primary/10 border-hh-primary"
-                            : "bg-hh-success/10 border-hh-success"
-                        }`}
-                      >
-                        <div className="flex items-start gap-2">
-                          <div className="flex-shrink-0 mt-0.5">
-                            {tip.type === "wedervraag" && (
-                              <MessageSquare className="w-4 h-4 text-hh-primary" />
-                            )}
-                            {tip.type === "lock" && (
-                              <Lock className="w-4 h-4 text-hh-primary" />
-                            )}
-                            {tip.type === "waarschuwing" && (
-                              <Target className="w-4 h-4 text-hh-error" />
-                            )}
-                            {tip.type === "open" && (
-                              <Lightbulb className="w-4 h-4 text-hh-primary" />
-                            )}
-                            {tip.type === "positief" && (
-                              <CheckCircle2 className="w-4 h-4 text-hh-success" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[12px] leading-[17px] text-hh-text">
-                              <strong>
-                                {tip.type === "wedervraag"
-                                  ? "Wedervraag:"
-                                  : tip.type === "lock"
-                                  ? "Lock!:"
-                                  : tip.type === "waarschuwing"
-                                  ? "Let op:"
-                                  : tip.type === "open"
-                                  ? "Verdiep:"
-                                  : "Goed bezig:"}
-                              </strong>{" "}
-                              {tip.text}
-                            </p>
-                            <span className="text-[10px] leading-[14px] text-hh-muted">{tip.timestamp}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Live Transcript */}
-                {copilotTranscript.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-[13px] leading-[18px] text-hh-muted">Live Transcript</h4>
-                    <div className="max-h-48 overflow-y-auto space-y-2 p-3 rounded-lg bg-hh-ui-50">
-                      {copilotTranscript.map((line, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          <span className="text-[11px] leading-[16px] text-hh-muted flex-shrink-0">
-                            {line.timestamp}
-                          </span>
-                          <p className="text-[12px] leading-[17px] text-hh-text flex-1">
-                            <strong className={line.speaker === "you" ? "text-hh-primary" : "text-hh-text"}>
-                              {line.speaker === "you" ? "Jij:" : "Klant:"}
-                            </strong>{" "}
-                            {line.text}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Quick Actions */}
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => {
-                      // Simulate adding more transcript + tip
-                      setCopilotTranscript(prev => [...prev, 
-                        { speaker: "you", text: "Wat zijn jullie grootste uitdagingen op dit moment?", timestamp: "14:24" }
-                      ]);
-                      setCopilotTips(prev => [...prev,
-                        { type: "positief", text: "Perfecte open vraag! Laat de klant nu praten.", timestamp: "14:24" }
-                      ]);
-                    }}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5 mr-1.5" />
-                    Test Open Vraag
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setCopilotTips(prev => [...prev,
-                        { type: "lock", text: "Dus als ik het goed begrijp, zoek je een manier om leads sneller op te volgen?", timestamp: "14:25" }
-                      ]);
-                    }}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                  >
-                    <Lock className="w-3.5 h-3.5 mr-1.5" />
-                    Test Lock
-                  </Button>
-                </div>
-              </div>
-            )}
-          </Card>
+          <LiveAnalysePanel />
         </div>
 
         {/* Privacy Notice - Applies to both Upload and Live Analysis */}
