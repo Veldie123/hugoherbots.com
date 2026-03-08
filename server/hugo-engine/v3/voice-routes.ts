@@ -57,7 +57,8 @@ async function persistVoiceSession(session: V3SessionState): Promise<void> {
  * NOTE: This endpoint is called by ElevenLabs servers, not by our frontend.
  * Authentication is handled by ElevenLabs signed URLs.
  */
-router.post("/llm", async (req: Request, res: Response) => {
+// ElevenLabs appends /chat/completions to the Server URL, so we handle both paths
+const llmHandler = async (req: Request, res: Response) => {
   const { messages } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
@@ -139,7 +140,11 @@ router.post("/llm", async (req: Request, res: Response) => {
   }
 
   res.end();
-});
+};
+
+// Register on both paths: /llm (direct) and /chat/completions (ElevenLabs default)
+router.post("/llm", llmHandler);
+router.post("/chat/completions", llmHandler);
 
 /**
  * POST /voice/signed-url — Get a conversation token for ElevenLabs WebRTC
