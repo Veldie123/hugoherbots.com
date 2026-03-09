@@ -3643,6 +3643,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/liveavatar/avatars - List available avatars from both APIs
+  app.get("/api/liveavatar/avatars", async (_req, res) => {
+    const results: Record<string, any> = {};
+
+    // Try HeyGen Streaming Avatar list (api.heygen.com)
+    const heygenKey = process.env.HEYGEN_API_KEY;
+    if (heygenKey) {
+      try {
+        const resp = await fetch("https://api.heygen.com/v1/streaming/avatar.list", {
+          headers: { "x-api-key": heygenKey }
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          results.streamingAvatars = (data.data?.avatars || []).map((a: any) => ({
+            id: a.avatar_id,
+            name: a.avatar_name,
+            type: a.type,
+            gender: a.gender,
+            premium: a.premium,
+          }));
+        } else {
+          results.streamingAvatarsError = `${resp.status}: ${await resp.text()}`;
+        }
+      } catch (e: any) {
+        results.streamingAvatarsError = e.message;
+      }
+    }
+
+    // Try LiveAvatar avatar list (api.liveavatar.com)
+    const liveAvatarKey = process.env.HEYGEN_LIVEAVATAR_API_KEY;
+    if (liveAvatarKey) {
+      try {
+        const resp = await fetch("https://api.liveavatar.com/v1/avatars", {
+          headers: { "X-API-KEY": liveAvatarKey }
+        });
+        if (resp.ok) {
+          results.liveAvatars = await resp.json();
+        } else {
+          results.liveAvatarsError = `${resp.status}: ${await resp.text()}`;
+        }
+      } catch (e: any) {
+        results.liveAvatarsError = e.message;
+      }
+    }
+
+    results.currentConfig = {
+      liveAvatarId: process.env.Live_avatar_ID_heygen_hugoherbots || "not set",
+      streamingAvatarId: process.env.Heygen_streaming_interactive_avatar_ID || "not set",
+    };
+
+    res.json(results);
+  });
+
   // GET /api/avatar/capabilities - Test which avatar SDK works
   app.get("/api/avatar/capabilities", async (req, res) => {
     const liveAvatarApiKey = process.env.HEYGEN_LIVEAVATAR_API_KEY || process.env.HEYGEN_API_KEY;

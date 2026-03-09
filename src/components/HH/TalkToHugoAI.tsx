@@ -2575,7 +2575,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             </div>
           </div>
         )}
-        {isLoading && !isStreaming && (
+        {isLoading && !isStreaming && !messages.some(m => m.isThinking) && (
           <div className="flex justify-start">
             <div className="bg-hh-ui-100 text-hh-text rounded-2xl rounded-bl-md p-3 flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-hh-muted" />

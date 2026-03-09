@@ -8,7 +8,7 @@ import { Router, type Request, type Response } from "express";
 import multer from "multer";
 import { requireAuth } from "../auth-middleware";
 import { chat, chatStream, createSession, type V3SessionState, type V3StreamEvent, type V3ContentBlock, type ThinkingMode } from "./agent";
-import { isV3Available } from "./anthropic-client";
+import { isV3Available, getAnthropicClient } from "./anthropic-client";
 import { buildUserBriefing } from "./user-briefing";
 import { saveMemory } from "./memory-service";
 import { supabase } from "../supabase-client";
@@ -36,8 +36,12 @@ const sessions = new Map<string, V3SessionState>();
 
 const SUPERADMIN_EMAIL = "stephane@hugoherbots.com";
 
-/** Save session to Supabase (async, non-blocking) */
+/** Save session to Supabase (async, non-blocking).
+ *  Only persists when the user has sent at least one message. */
 async function persistSession(session: V3SessionState): Promise<void> {
+  const userMessageCount = session.messages.filter(m => m.role === "user").length;
+  if (userMessageCount === 0) return; // don't save sessions where the user hasn't spoken
+
   try {
     await supabase.from("v3_sessions").upsert({
       id: session.sessionId,
@@ -53,6 +57,47 @@ async function persistSession(session: V3SessionState): Promise<void> {
     }, { onConflict: "id" });
   } catch (err: any) {
     console.error("[V3] Session persist failed:", err.message);
+  }
+}
+
+/** Generate and save a session summary using Claude Haiku (fire-and-forget) */
+async function saveSessionSummary(session: V3SessionState): Promise<void> {
+  const userMessages = session.messages.filter(m => m.role === "user");
+  if (userMessages.length < 2) return; // not enough content
+
+  try {
+    const transcript = session.messages
+      .filter(m => m.role === "user" || m.role === "assistant")
+      .map(m => `${m.role}: ${typeof m.content === "string" ? m.content.slice(0, 300) : "[multimodal]"}`)
+      .join("\n");
+
+    const anthropic = getAnthropicClient();
+    const summaryResponse = await anthropic.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 300,
+      messages: [{
+        role: "user",
+        content: `Vat dit coaching gesprek samen in 2-3 zinnen. Focus op: onderwerp, belangrijkste inzichten, en waar de verkoper aan werkte.\n\n${transcript.slice(0, 4000)}`,
+      }],
+    });
+
+    const summary = summaryResponse.content[0]?.type === "text"
+      ? summaryResponse.content[0].text
+      : "";
+
+    if (summary) {
+      await saveMemory({
+        userId: session.userId,
+        content: summary,
+        memoryType: "session_summary",
+        source: "autonomous",
+        sessionId: session.sessionId,
+        metadata: { messageCount: session.messages.length },
+      });
+      console.log(`[V3] Session summary saved for ${session.sessionId}`);
+    }
+  } catch (err: any) {
+    console.warn("[V3] Session summary generation failed:", err.message);
   }
 }
 
@@ -198,6 +243,36 @@ router.post(
     sessions.set(sessionId, session);
     persistSession(session);
     console.log(`[V3] Session created: ${sessionId} (mode: ${sessionMode})`);
+
+    // Auto-summarize previous coaching session (fire-and-forget)
+    if (sessionMode === "coaching") {
+      (async () => {
+        try {
+          const { data } = await supabase
+            .from("v3_sessions")
+            .select("id, messages, user_id, mode")
+            .eq("user_id", req.userId!)
+            .eq("mode", "coaching")
+            .neq("id", sessionId)
+            .order("updated_at", { ascending: false })
+            .limit(1)
+            .single();
+
+          if (data && data.messages) {
+            const prevSession: V3SessionState = {
+              sessionId: data.id,
+              userId: data.user_id,
+              mode: data.mode,
+              messages: data.messages,
+              engineVersion: "v3",
+            };
+            await saveSessionSummary(prevSession);
+          }
+        } catch {
+          // No previous session — that's fine
+        }
+      })();
+    }
 
     // Auto-send opening message with context-aware prompt
     try {

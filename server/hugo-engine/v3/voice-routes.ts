@@ -61,6 +61,11 @@ async function persistVoiceSession(session: V3SessionState): Promise<void> {
  */
 // ElevenLabs appends /chat/completions to the Server URL, so we handle both paths
 const llmHandler = async (req: Request, res: Response) => {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error("[V3 Voice] ANTHROPIC_API_KEY is missing — voice LLM will fail");
+    return res.status(503).json({ error: "AI backend niet beschikbaar" });
+  }
+
   const { messages } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
@@ -158,6 +163,7 @@ router.post("/signed-url", requireAuth, async (_req: Request, res: Response) => 
   if (!ELEVENLABS_API_KEY || !ELEVENLABS_AGENT_ID) {
     return res.status(503).json({ error: "ElevenLabs niet geconfigureerd." });
   }
+  console.log(`[V3 Voice] Returning agentId: ${ELEVENLABS_AGENT_ID} (from ${process.env.ELEVENLABS_AGENT_ID ? 'env' : 'hardcoded fallback'})`);
   res.json({ agentId: ELEVENLABS_AGENT_ID });
 });
 
