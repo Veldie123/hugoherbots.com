@@ -3504,15 +3504,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("[LiveAvatar] Creating session with avatar:", avatarId);
       
       // Use LiveAvatar API to create a session token
-      // FULL mode is required when using avatar_persona (CUSTOM mode expects livekit_config)
-      const requestBody = {
-        mode: "FULL",
+      // CUSTOM mode for preset avatars (FULL mode requires avatar_persona which fails on free tier)
+      const requestBody: Record<string, any> = {
+        mode: "CUSTOM",
         avatar_id: avatarId,
-        avatar_persona: {
-          voice_id: voiceId || undefined,
-          context_id: contextId || undefined,
-          language: language
-        }
       };
       
       console.log("[LiveAvatar] Token request body:", JSON.stringify(requestBody, null, 2));

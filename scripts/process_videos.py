@@ -683,6 +683,90 @@ def extract_audio(video_path: Path, audio_path: Path) -> bool:
         return False
 
 
+def normalize_video_audio(video_path: Path, output_path: Path) -> bool:
+    """
+    2-pass audio normalisatie: highpass + noise reduction + EBU R128 loudnorm.
+    Video stream wordt ongewijzigd gekopieerd (-c:v copy), alleen audio wordt verwerkt.
+    """
+    import json as _json
+    print(f"  Audio normalisatie (2-pass EBU R128)...", end=" ", flush=True)
+
+    FILTER_BASE = "highpass=f=80,afftdn=nf=-25"
+    LOUDNORM_TARGET = "loudnorm=I=-16:LRA=11:TP=-1.5"
+
+    try:
+        # Pass 1: Analyse — meet werkelijke loudness
+        pass1 = subprocess.run(
+            [
+                "ffmpeg", "-i", str(video_path),
+                "-af", f"{FILTER_BASE},{LOUDNORM_TARGET}:print_format=json",
+                "-f", "null", "-"
+            ],
+            capture_output=True,
+            text=True,
+            timeout=600
+        )
+
+        if pass1.returncode != 0:
+            print(f"FOUT pass 1: {pass1.stderr[:200]}")
+            return False
+
+        # Parse loudnorm JSON from stderr (ffmpeg prints it after [Parsed_loudnorm...])
+        stderr = pass1.stderr
+        json_start = stderr.rfind("{\n")
+        json_end = stderr.rfind("\n}") + 2
+        if json_start < 0 or json_end <= json_start:
+            print("FOUT: kan loudnorm metingen niet parsen")
+            return False
+
+        measured = _json.loads(stderr[json_start:json_end])
+        measured_I = measured.get("input_i", "-24.0")
+        measured_LRA = measured.get("input_lra", "7.0")
+        measured_TP = measured.get("input_tp", "-2.0")
+        measured_thresh = measured.get("input_thresh", "-34.0")
+
+        # Pass 2: Normaliseer met gemeten waarden
+        loudnorm_pass2 = (
+            f"{LOUDNORM_TARGET}"
+            f":measured_I={measured_I}"
+            f":measured_LRA={measured_LRA}"
+            f":measured_TP={measured_TP}"
+            f":measured_thresh={measured_thresh}"
+            f":linear=true"
+        )
+
+        pass2 = subprocess.run(
+            [
+                "ffmpeg", "-i", str(video_path),
+                "-af", f"{FILTER_BASE},{loudnorm_pass2}",
+                "-c:v", "copy",
+                "-c:a", "aac", "-b:a", "192k",
+                "-y", str(output_path)
+            ],
+            capture_output=True,
+            text=True,
+            timeout=600
+        )
+
+        if pass2.returncode != 0:
+            print(f"FOUT pass 2: {pass2.stderr[:200]}")
+            return False
+
+        size_mb = output_path.stat().st_size / (1024 * 1024)
+        print(f"✓ ({size_mb:.1f} MB, LUFS: {measured_I} → -16)")
+        return True
+
+    except subprocess.TimeoutExpired:
+        print("FOUT: Timeout (>10 min)")
+        return False
+    except FileNotFoundError:
+        print("FOUT: ffmpeg niet gevonden")
+        return False
+    except (_json.JSONDecodeError, KeyError) as e:
+        print(f"FOUT: loudnorm parse error: {e}")
+        return False
+
+
 def wait_for_mux_playback_id(asset_id: str, max_wait: int = 120) -> str | None:
     """
     Poll Mux API until asset is ready and has playback_id.
@@ -1064,11 +1148,20 @@ def process_single_job(job: dict, access_token: str):
             update_job_status(job_id, "chromakey_failed", "Greenscreen verwijdering mislukt, video overgeslagen")
             return False
         
+        # Audio normalisatie: noise reduction + EBU R128 loudness matching
+        update_job_status(job_id, "normalizing_audio")
+        normalized_path = tmpdir / f"video_normalized_{job_id}.mp4"
+        if normalize_video_audio(video_path, normalized_path):
+            video_path.unlink()
+            normalized_path.rename(video_path)
+        else:
+            print("  ⚠ Audio normalisatie mislukt, ga door met originele audio")
+
         update_job_status(job_id, "extracting_audio")
         if not extract_audio(video_path, audio_path):
             update_job_status(job_id, "failed", "Audio extractie mislukt")
             return False
-        
+
         update_job_status(job_id, "uploading_mux")
         mux_result = upload_to_mux(video_path, video_title)
         

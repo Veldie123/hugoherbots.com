@@ -61,7 +61,7 @@ export function setupScribeWebSocket(server: Server) {
     const connectionId = `scribe-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     console.log(`[Scribe] Client connected: ${connectionId} (${connections.size + 1}/${MAX_WS_CONNECTIONS})`);
 
-    const apiKey = process.env.ELEVENLABS_API_KEY;
+    const apiKey = process.env.ELEVENLABS_API_KEY || process.env.Elevenlabs_api_key;
     if (!apiKey) {
       console.error("[Scribe] ELEVENLABS_API_KEY not configured");
       clientWs.send(JSON.stringify({ message_type: "error", error: "ElevenLabs API key not configured" }));

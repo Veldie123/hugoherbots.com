@@ -1,26 +1,15 @@
 /**
  * LiveAvatar React Component
- * 
- * Volledige frontend implementatie voor HeyGen LiveAvatar SDK.
- * GEEN iframe - dit gebruikt de officiële SDK.
- * 
- * Vereist:
- * - npm install @heygen/liveavatar-web-sdk
- * - Backend endpoint /api/liveavatar/session (zie liveavatar-backend.ts)
+ *
+ * UI wrapper around useLiveAvatar hook for admin view.
+ * Shows a Card with video, controls, and transcript.
  */
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { 
-  LiveAvatarSession, 
-  SessionState, 
-  SessionEvent,
-  AgentEventsEnum
-} from "@heygen/liveavatar-web-sdk";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Video, VideoOff, Mic, MicOff, Phone, PhoneOff } from "lucide-react";
-import { apiFetch } from "../../services/apiFetch";
+import { useLiveAvatar } from "../../hooks/useLiveAvatar";
 
 interface LiveAvatarProps {
   v2SessionId?: string;
@@ -29,177 +18,22 @@ interface LiveAvatarProps {
   language?: string;
 }
 
-type ConnectionStatus = "idle" | "connecting" | "connected" | "error" | "disconnected";
-
-export function LiveAvatarComponent({ 
-  v2SessionId,
+export function LiveAvatarComponent({
   onAvatarSpeech,
   onUserSpeech,
   language = "nl"
 }: LiveAvatarProps) {
-  const [status, setStatus] = useState<ConnectionStatus>("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isAvatarTalking, setIsAvatarTalking] = useState(false);
-  const [isUserTalking, setIsUserTalking] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  
-  const [transcript, setTranscript] = useState<Array<{
-    role: "avatar" | "user";
-    text: string;
-    timestamp: Date;
-  }>>([]);
-  
-  const sessionRef = useRef<LiveAvatarSession | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  
-  const startSession = useCallback(async () => {
-    try {
-      setStatus("connecting");
-      setErrorMessage(null);
-      
-      const response = await apiFetch("/api/liveavatar/session", {
-        method: "POST",
-        body: JSON.stringify({ language })
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.details || error.error || "Failed to create session");
-      }
-      
-      const { session_token } = await response.json();
+  const avatar = useLiveAvatar({ language, onAvatarSpeech, onUserSpeech });
 
-      const session = new LiveAvatarSession(session_token, {
-        voiceChat: true
-      });
-      
-      sessionRef.current = session;
-      
-      session.on(SessionEvent.SESSION_STATE_CHANGED, (state: SessionState) => {
-        if (state === SessionState.CONNECTED) {
-          setStatus("connected");
-        } else if (state === SessionState.DISCONNECTED) {
-          setStatus("disconnected");
-        }
-      });
-      
-      session.on(SessionEvent.SESSION_STREAM_READY, () => {
-        if (videoRef.current) {
-          session.attach(videoRef.current);
-        }
-      });
-      
-      session.on(SessionEvent.SESSION_DISCONNECTED, () => {
-        setStatus("disconnected");
-      });
-      
-      session.on(AgentEventsEnum.AVATAR_SPEAK_STARTED, () => {
-        setIsAvatarTalking(true);
-      });
-      
-      session.on(AgentEventsEnum.AVATAR_SPEAK_ENDED, () => {
-        setIsAvatarTalking(false);
-      });
-      
-      session.on(AgentEventsEnum.AVATAR_TRANSCRIPTION, (event) => {
-        setTranscript(prev => [...prev, {
-          role: "avatar",
-          text: event.text,
-          timestamp: new Date()
-        }]);
-        onAvatarSpeech?.(event.text);
-      });
-      
-      session.on(AgentEventsEnum.USER_SPEAK_STARTED, () => {
-        setIsUserTalking(true);
-      });
-      
-      session.on(AgentEventsEnum.USER_SPEAK_ENDED, () => {
-        setIsUserTalking(false);
-      });
-      
-      session.on(AgentEventsEnum.USER_TRANSCRIPTION, (event) => {
-        setTranscript(prev => [...prev, {
-          role: "user",
-          text: event.text,
-          timestamp: new Date()
-        }]);
-        onUserSpeech?.(event.text);
-      });
-      
-      await session.start();
-
-      setStatus("connected");
-      
-    } catch (error: any) {
-      console.error("[LiveAvatar] Start error:", error);
-      setStatus("error");
-      setErrorMessage(error.message);
-    }
-  }, [language, onAvatarSpeech, onUserSpeech]);
-  
-  const stopSession = useCallback(async () => {
-    try {
-      if (sessionRef.current) {
-        await sessionRef.current.stop();
-        sessionRef.current = null;
-      }
-      setStatus("disconnected");
-      setIsAvatarTalking(false);
-      setIsUserTalking(false);
-    } catch (error: any) {
-      console.error("[LiveAvatar] Stop error:", error);
-    }
-  }, []);
-  
-  const speakText = useCallback(async (text: string) => {
-    if (sessionRef.current && status === "connected") {
-      try {
-        sessionRef.current.message(text);
-      } catch (error: any) {
-        console.error("[LiveAvatar] Message error:", error);
-      }
-    }
-  }, [status]);
-  
-  const interrupt = useCallback(() => {
-    if (sessionRef.current && isAvatarTalking) {
-      try {
-        sessionRef.current.interrupt();
-      } catch (error: any) {
-        console.error("[LiveAvatar] Interrupt error:", error);
-      }
-    }
-  }, [isAvatarTalking]);
-  
-  const toggleMute = useCallback(() => {
-    if (sessionRef.current) {
-      if (isMuted) {
-        sessionRef.current.startListening();
-      } else {
-        sessionRef.current.stopListening();
-      }
-      setIsMuted(prev => !prev);
-    }
-  }, [isMuted]);
-  
-  useEffect(() => {
-    return () => {
-      if (sessionRef.current) {
-        sessionRef.current.stop().catch(console.error);
-      }
-    };
-  }, []);
-  
   const getStatusColor = () => {
-    switch (status) {
+    switch (avatar.status) {
       case "connected": return "bg-green-500";
       case "connecting": return "bg-yellow-500";
       case "error": return "bg-red-500";
       default: return "bg-gray-500";
     }
   };
-  
+
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="flex flex-row items-center justify-between gap-2">
@@ -208,38 +42,38 @@ export function LiveAvatarComponent({
           LiveAvatar Video
         </CardTitle>
         <Badge className={getStatusColor()}>
-          {status === "connecting" && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-          {status}
+          {avatar.status === "connecting" && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {avatar.status}
         </Badge>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-          {status === "connected" ? (
+          {avatar.status === "connected" ? (
             <video
-              ref={videoRef}
+              ref={avatar.videoRef}
               autoPlay
               playsInline
               className="w-full h-full object-cover"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              {status === "connecting" ? (
+              {avatar.status === "connecting" ? (
                 <Loader2 className="h-12 w-12 animate-spin text-white" />
               ) : (
                 <VideoOff className="h-12 w-12 text-gray-500" />
               )}
             </div>
           )}
-          
-          {status === "connected" && (
+
+          {avatar.status === "connected" && (
             <div className="absolute bottom-4 left-4 flex gap-2">
-              {isAvatarTalking && (
+              {avatar.isAvatarTalking && (
                 <Badge className="bg-blue-500 animate-pulse">
                   Avatar speaking...
                 </Badge>
               )}
-              {isUserTalking && (
+              {avatar.isUserTalking && (
                 <Badge className="bg-green-500 animate-pulse">
                   You're speaking...
                 </Badge>
@@ -247,24 +81,24 @@ export function LiveAvatarComponent({
             </div>
           )}
         </div>
-        
-        {errorMessage && (
+
+        {avatar.errorMessage && (
           <div className="p-3 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm">
-            {errorMessage}
+            {avatar.errorMessage}
           </div>
         )}
-        
+
         <div className="flex justify-center gap-3">
-          {status === "idle" || status === "disconnected" || status === "error" ? (
-            <Button 
-              onClick={startSession}
+          {avatar.status === "idle" || avatar.status === "disconnected" || avatar.status === "error" ? (
+            <Button
+              onClick={avatar.start}
               className="gap-2"
               data-testid="button-start-liveavatar"
             >
               <Phone className="h-4 w-4" />
               Start Video Call
             </Button>
-          ) : status === "connecting" ? (
+          ) : avatar.status === "connecting" ? (
             <Button disabled className="gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
               Connecting...
@@ -273,27 +107,27 @@ export function LiveAvatarComponent({
             <>
               <Button
                 variant="outline"
-                onClick={toggleMute}
+                onClick={avatar.toggleMute}
                 className="gap-2"
                 data-testid="button-toggle-mute"
               >
-                {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                {isMuted ? "Unmute" : "Mute"}
+                {avatar.isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                {avatar.isMuted ? "Unmute" : "Mute"}
               </Button>
-              
-              {isAvatarTalking && (
+
+              {avatar.isAvatarTalking && (
                 <Button
                   variant="outline"
-                  onClick={interrupt}
+                  onClick={avatar.interrupt}
                   data-testid="button-interrupt"
                 >
                   Interrupt
                 </Button>
               )}
-              
+
               <Button
                 variant="destructive"
-                onClick={stopSession}
+                onClick={avatar.stop}
                 className="gap-2"
                 data-testid="button-stop-liveavatar"
               >
@@ -303,16 +137,16 @@ export function LiveAvatarComponent({
             </>
           )}
         </div>
-        
-        {transcript.length > 0 && (
+
+        {avatar.transcript.length > 0 && (
           <div className="mt-4 max-h-48 overflow-y-auto space-y-2 p-3 bg-muted rounded-lg">
             <h4 className="text-sm font-medium mb-2">Transcript</h4>
-            {transcript.map((entry, i) => (
-              <div 
+            {avatar.transcript.map((entry, i) => (
+              <div
                 key={i}
                 className={`text-sm p-2 rounded ${
-                  entry.role === "avatar" 
-                    ? "bg-blue-100 dark:bg-blue-900/30" 
+                  entry.role === "avatar"
+                    ? "bg-blue-100 dark:bg-blue-900/30"
                     : "bg-green-100 dark:bg-green-900/30"
                 }`}
               >

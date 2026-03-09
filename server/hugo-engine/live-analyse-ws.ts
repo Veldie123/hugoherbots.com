@@ -88,7 +88,7 @@ export function setupLiveAnalyseWebSocket(server: Server) {
     }
 
     // Connect to ElevenLabs Scribe
-    const apiKey = process.env.ELEVENLABS_API_KEY;
+    const apiKey = process.env.ELEVENLABS_API_KEY || process.env.Elevenlabs_api_key;
     if (!apiKey) {
       clientWs.send(JSON.stringify({ type: "la:error", message: "ElevenLabs API key not configured" }));
       clientWs.close();

@@ -253,6 +253,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
           type: n.type === 'correction_submitted' ? 'config'
             : n.type === 'chat_feedback' ? 'user'
             : n.type === 'onboarding_feedback' ? 'config'
+            : n.type === 'resource_created' || n.type === 'resource_updated' ? 'config'
             : 'info',
           severity: n.severity === 'warning' ? 'medium' : n.severity === 'critical' ? 'high' : undefined,
           read: n.read || false,

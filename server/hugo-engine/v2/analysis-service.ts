@@ -58,7 +58,7 @@ export interface TurnEvaluation {
 
 export interface CustomerSignalResult {
   turnIdx: number;
-  houding: 'vraag' | 'twijfel' | 'bezwaar' | 'uitstel' | 'interesse' | 'akkoord' | 'neutraal' | 'negatief' | 'vaag' | 'ontwijkend';
+  houding: string; // SSOT: "H1: Positief antwoord" .. "H9: Angst / Bezorgdheid", or legacy V2 labels
   confidence: number;
   recommendedTechniqueIds: string[];
   currentPhase: number;

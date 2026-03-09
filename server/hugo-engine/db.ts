@@ -134,4 +134,11 @@ pool.query(`
   )
 `).then(() => {
   console.log('[DB] admin_notifications table ensured');
+  // Sync SERIAL sequences to prevent "duplicate key" errors after manual/imported inserts
+  return Promise.all([
+    pool.query(`SELECT setval('admin_notifications_id_seq', COALESCE((SELECT MAX(id) FROM admin_notifications), 0))`),
+    pool.query(`SELECT setval('admin_corrections_id_seq', COALESCE((SELECT MAX(id) FROM admin_corrections), 0))`),
+  ]).then(() => {
+    console.log('[DB] SERIAL sequences synced');
+  });
 }).catch((err: Error) => console.warn('[DB] admin_notifications table check failed:', err.message));

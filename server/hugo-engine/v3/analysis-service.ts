@@ -134,6 +134,13 @@ Kwaliteitsniveaus:
 - bijna: intentie aanwezig maar onvolledig
 - gemist: techniek niet toegepast waar het had moeten
 
+STRENGHEIDSREGELS:
+- "Actief en empathisch luisteren" (2.1.2) vereist MINIMAAL parafraseren of samenvatten van wat de klant zei. Alleen "Ja", "Oké", "Hmhm" of korte bevestigingen zijn GEEN actief luisteren — geef dan geen techniek voor die turn.
+- Max 2 technieken per turn. Kies de meest dominante.
+- "Koopklimaat creëren" (1.1) vereist expliciete small talk of relationele opening. Niet elke vriendelijke zin is koopklimaat.
+- Reserveer "perfect" voor volledige toepassing van alle stappen. Bij twijfel: "bijna" boven "goed".
+- Geef GEEN techniek als de turn te kort of te generiek is om een concrete techniektoepassing te herkennen.
+
 Antwoord als JSON array van evaluaties, één per seller-turn:
 [
   {
@@ -191,6 +198,23 @@ Wees concreet en verwijs naar specifieke techniek-IDs.`;
   return allEvaluations.sort((a, b) => a.turnIdx - b.turnIdx);
 }
 
+// ── SSOT Houding list builder ────────────────────────────────────────────────
+
+function buildSSOTHoudingList(currentPhase: number): string {
+  const filePath = path.join(process.cwd(), "config/klant_houdingen.json");
+  const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  const lines: string[] = [];
+  for (const [, h] of Object.entries(data.houdingen) as [string, any][]) {
+    const restricted = h.fase_restrictie;
+    if (!restricted.allowed_at_any_phase && !restricted.allowed_phases.includes(currentPhase)) {
+      continue;
+    }
+    const shortDesc = h.houding_beschrijving.split("\n")[0];
+    lines.push(`- ${h.id}: ${h.naam} — ${shortDesc}`);
+  }
+  return lines.join("\n");
+}
+
 // ── V3 Detect Customer Signals ───────────────────────────────────────────────
 
 async function detectCustomerSignalsV3(
@@ -200,13 +224,17 @@ async function detectCustomerSignalsV3(
   const customerTurns = turns.filter((t) => t.speaker === "customer");
   if (customerTurns.length === 0) return [];
 
-  // Determine current phase from evaluations
+  // Determine current phase from evaluations (require 2+ techniques in a phase before advancing)
   let currentPhase = 1;
+  const phaseCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
   for (const evalItem of evaluations) {
     for (const tech of evalItem.techniques) {
       const phaseNum = parseInt(tech.id.charAt(0));
-      if (phaseNum > currentPhase) currentPhase = phaseNum;
+      if (phaseNum >= 1 && phaseNum <= 4) phaseCounts[phaseNum]++;
     }
+  }
+  for (let p = 4; p >= 1; p--) {
+    if (phaseCounts[p] >= 2) { currentPhase = p; break; }
   }
 
   const transcriptContext = turns
@@ -216,26 +244,25 @@ async function detectCustomerSignalsV3(
     )
     .join("\n");
 
+  const houdingList = buildSSOTHoudingList(currentPhase);
+
   const systemPrompt = `Je classificeert klant-reacties in een verkoopgesprek op basis van de EPIC-methodologie.
 
-Mogelijke houdingen:
-- positief: klant toont interesse, bevestigt, is enthousiast
-- negatief: klant uit ontevredenheid, kritiek
-- vaag: klant geeft geen duidelijk standpunt
-- ontwijkend: klant wijkt bewust af van de vraag
-- vraag: klant stelt een vraag
-- interesse: klant toont expliciete interesse
-- akkoord: klant stemt in
-- neutraal: neutraal antwoord
-${currentPhase >= 3 ? "- twijfel: klant is onzeker over beslissing\n- bezwaar: klant brengt tegenargument\n- uitstel: klant wil beslissing uitstellen" : ""}
+KLANTHOUDINGEN (gebruik ALTIJD deze exacte IDs en namen):
+${houdingList}
+
+FASE-REGELS:
+- Fase-toewijzing is grotendeels voorwaarts. Een enkele korte turn verandert de fase niet.
+- Fase-wisselingen KUNNEN voorkomen (vooral fase 2 ↔ 3), maar vereisen meerdere opeenvolgende turns in de nieuwe fase.
+- Geef bij elke turn de currentPhase die past bij de CONTEXT van het hele gesprek tot nu toe.
 
 Antwoord als JSON array:
 [
   {
     "turnIdx": 0,
-    "houding": "positief",
+    "houding": "H1: Positief antwoord",
     "confidence": 0.85,
-    "recommendedTechniqueIds": ["2.1.3"],
+    "recommendedTechniqueIds": ["2.4"],
     "currentPhase": 2
   }
 ]`;
@@ -271,7 +298,7 @@ Antwoord als JSON array:
     if (!signalledIdxs.has(turn.idx)) {
       allSignals.push({
         turnIdx: turn.idx,
-        houding: "neutraal",
+        houding: "H4: Te algemeen antwoord",
         confidence: 0.5,
         recommendedTechniqueIds: [],
         currentPhase,
