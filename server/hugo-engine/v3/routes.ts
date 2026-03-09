@@ -141,6 +141,12 @@ function requireV3Access(mode: "admin" | "coaching") {
   };
 }
 
+/** Validate user has access to the session's mode (backend safety net) */
+async function validateSessionAccess(session: V3SessionState, userEmail: string): Promise<boolean> {
+  const access = await getV3Access(userEmail);
+  return session.mode === "admin" ? access.admin_v3 : access.coaching_v3;
+}
+
 /** Health check — is V3 available? */
 router.get("/status", (_req: Request, res: Response) => {
   res.json({
@@ -285,6 +291,11 @@ router.post(
       });
     }
 
+    // Mode-guard: validate user has access to this session's mode
+    if (!await validateSessionAccess(session, req.userEmail!)) {
+      return res.status(403).json({ error: "Geen toegang tot deze sessie mode." });
+    }
+
     try {
       const response = await chat(session, message.trim(), (thinkingMode as ThinkingMode) || "auto");
       persistSession(session);
@@ -329,6 +340,11 @@ router.post(
     const session = await loadSession(sessionId);
     if (!session) {
       return res.status(404).json({ error: "Sessie niet gevonden. Start een nieuwe sessie." });
+    }
+
+    // Mode-guard: validate user has access to this session's mode
+    if (!await validateSessionAccess(session, req.userEmail!)) {
+      return res.status(403).json({ error: "Geen toegang tot deze sessie mode." });
     }
 
     // Build content: text + optional file attachments as content blocks
@@ -396,6 +412,11 @@ router.get(
     const session = await loadSession(sessionId);
     if (!session) {
       return res.status(404).json({ error: "Sessie niet gevonden." });
+    }
+
+    // Mode-guard: validate user has access to this session's mode
+    if (!await validateSessionAccess(session, req.userEmail!)) {
+      return res.status(403).json({ error: "Geen toegang tot deze sessie mode." });
     }
 
     res.json({

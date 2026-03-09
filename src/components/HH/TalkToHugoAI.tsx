@@ -1,23 +1,6 @@
 /**
- * TODO: HEYGEN-VIDEO-FIX
- * ----------------------
- * Issue: MediaStream van HeyGen avatar wordt niet correct aan video element gekoppeld.
- * Status: Skipped (user fixing in original replit first)
- * 
- * Bron: NIET IN ZIP - HeyGen integratie is frontend-specifiek
- * Gebruiker fixt dit eerst in originele replit, daarna code overnemen.
- * 
- * Symptomen:
- * - STREAM_READY event fires maar event.detail is leeg
- * - avatar.mediaStream property bestaat maar video toont niet
- * - "Spreekt" badge verschijnt maar geen audio/video output
- * 
- * Aanpak (wanneer opgepakt):
- * 1. Neem werkende code over van originele replit
- * 2. Check of avatar.mediaStream een valid MediaStream is na createStartAvatar()
- * 3. Explicit play() call na metadata loaded
- * 
- * Frontend koppeling: Dit IS de frontend component
+ * Talk to Hugo AI — User-facing chat + voice + video interface.
+ * Video mode uses HeyGen LiveAvatar SDK (via useLiveAvatar hook).
  */
 
 import { useState, useRef, useEffect, useCallback, Fragment } from "react";
@@ -79,7 +62,7 @@ import type { ThinkingMode } from "../../services/hugoApi";
 import { lastActivityService } from "../../services/lastActivityService";
 import { SessionRating } from "./SessionRating";
 import { VoiceCoach } from "./VoiceCoach";
-import StreamingAvatar, { AvatarQuality, StreamingEvents, TaskType } from "@heygen/streaming-avatar";
+import { useLiveAvatar } from "../../hooks/useLiveAvatar";
 import { Room, RoomEvent, Track, ConnectionState } from "livekit-client";
 
 interface MessageDebugInfo {
@@ -252,13 +235,18 @@ export function TalkToHugoAI({
   const [onboardingFeedbackInput, setOnboardingFeedbackInput] = useState<string | null>(null);
   const [onboardingCurrentItem, setOnboardingCurrentItem] = useState<{ module: string; key: string; name: string } | null>(null);
 
-  // HeyGen Streaming Avatar state
-  const [heygenToken, setHeygenToken] = useState<string | null>(null);
-  const [avatarSession, setAvatarSession] = useState<StreamingAvatar | null>(null);
-  const [isAvatarLoading, setIsAvatarLoading] = useState(false);
-  const [avatarError, setAvatarError] = useState<string | null>(null);
-  const [isAvatarSpeaking, setIsAvatarSpeaking] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  // HeyGen LiveAvatar (video mode)
+  const avatar = useLiveAvatar({
+    language: "nl",
+    onAvatarSpeech: (text) => {
+      setMessages(prev => [...prev, {
+        id: `avatar-${Date.now()}`,
+        sender: "ai",
+        text,
+        timestamp: new Date(),
+      }]);
+    },
+  });
   const lastSpokenMessageIdRef = useRef<string | null>(null);
 
   // LiveKit Audio state
@@ -543,6 +531,11 @@ export function TalkToHugoAI({
     }
 
     const loadPersonalizedWelcome = async () => {
+      // Structural mode isolation: set session mode BEFORE any session logic
+      const sessionMode = adminViewMode ? "admin" : "coaching";
+      hugoApi.setSessionMode(sessionMode);
+      hugoApi.clearOppositeSessionMode();
+
       if (onboardingMode && engineModel === "v3") {
         try {
           setIsLoading(true);
@@ -728,135 +721,10 @@ export function TalkToHugoAI({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Initialize HeyGen avatar session
-  const initHeygenAvatar = useCallback(async () => {
-    if (avatarSession) return;
-    
-    setIsAvatarLoading(true);
-    setAvatarError(null);
-    
-    try {
-      // Fetch token and avatarId from backend
-      const tokenResponse = await apiFetch("/api/heygen/token", { method: "POST" });
-      if (!tokenResponse.ok) {
-        const errorData = await tokenResponse.json().catch(() => ({}));
-        throw new Error(errorData.details || "Kon HeyGen token niet ophalen");
-      }
-      const { token, avatarId } = await tokenResponse.json();
-      setHeygenToken(token);
-      
-      console.log("[HeyGen] Token received, avatarId:", avatarId || "not configured");
-      
-      // Create avatar instance
-      const avatar = new StreamingAvatar({ token });
-      
-      // Setup event listeners
-      avatar.on(StreamingEvents.AVATAR_START_TALKING, () => {
-        setIsAvatarSpeaking(true);
-      });
-      
-      avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () => {
-        setIsAvatarSpeaking(false);
-      });
-      
-      avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
-        console.log("[HeyGen] Stream disconnected");
-        setAvatarSession(null);
-      });
-      
-      avatar.on(StreamingEvents.STREAM_READY, (event: any) => {
-        console.log("[HeyGen] Stream ready, event:", event);
-        // Try multiple ways to get the stream
-        const stream = event.detail?.stream || event.detail || (avatar as any).mediaStream;
-        console.log("[HeyGen] Stream object:", stream, "typeof:", typeof stream);
-        console.log("[HeyGen] Avatar properties:", Object.keys(avatar));
-        
-        if (videoRef.current && stream instanceof MediaStream) {
-          console.log("[HeyGen] Attaching MediaStream to video element");
-          videoRef.current.srcObject = stream;
-          videoRef.current.onloadedmetadata = () => {
-            videoRef.current?.play().catch(e => console.error("[HeyGen] Play error:", e));
-          };
-        } else {
-          console.warn("[HeyGen] MediaStream not found in event, will try from avatar instance after start");
-        }
-      });
-      
-      // Start avatar session - use custom avatar from backend or fallback to public avatar
-      const avatarName = avatarId || "Shawn_Therapist_public";
-      console.log("[HeyGen] Starting avatar session with:", avatarName);
-      
-      const sessionData = await avatar.createStartAvatar({
-        quality: AvatarQuality.Medium,
-        avatarName: avatarName,
-        language: "nl",
-      });
-      
-      console.log("[HeyGen] Session data:", sessionData);
-      console.log("[HeyGen] Avatar after start:", Object.keys(avatar));
-      
-      // Get mediaStream from avatar instance - this is how HeyGen SDK exposes the stream
-      const avatarStream = (avatar as any).mediaStream;
-      console.log("[HeyGen] Avatar mediaStream:", avatarStream);
-      console.log("[HeyGen] Is MediaStream?", avatarStream instanceof MediaStream);
-      
-      if (videoRef.current && avatarStream) {
-        console.log("[HeyGen] Attaching mediaStream to video element");
-        videoRef.current.srcObject = avatarStream;
-        videoRef.current.onloadedmetadata = () => {
-          console.log("[HeyGen] Video metadata loaded, calling play()");
-          videoRef.current?.play().catch(e => console.error("[HeyGen] Play error:", e));
-        };
-      } else {
-        console.error("[HeyGen] Failed to get mediaStream from avatar:", { 
-          hasVideoRef: !!videoRef.current, 
-          hasStream: !!avatarStream,
-          avatarKeys: Object.keys(avatar)
-        });
-      }
-      
-      setAvatarSession(avatar);
-      console.log("[HeyGen] Avatar session started successfully");
-    } catch (error: any) {
-      console.error("[HeyGen] Error:", error);
-      setAvatarError(error.message || "Kon video avatar niet starten");
-    } finally {
-      setIsAvatarLoading(false);
-    }
-  }, [avatarSession]);
-  
-  // Stop HeyGen avatar session
-  const stopHeygenAvatar = useCallback(async () => {
-    // Clean up video stream
-    if (videoRef.current?.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
-      videoRef.current.srcObject = null;
-    }
-    
-    if (avatarSession) {
-      try {
-        await avatarSession.stopAvatar();
-      } catch (error) {
-        console.error("[HeyGen] Stop error:", error);
-      }
-      setAvatarSession(null);
-    }
-  }, [avatarSession]);
-  
-  // Make avatar speak
-  const avatarSpeak = useCallback(async (text: string) => {
-    if (!avatarSession) return;
-    
-    try {
-      await avatarSession.speak({
-        text,
-        taskType: TaskType.REPEAT,
-      });
-    } catch (error) {
-      console.error("[HeyGen] Speak error:", error);
-    }
-  }, [avatarSession]);
+  // LiveAvatar convenience aliases
+  const isAvatarLoading = avatar.status === "connecting";
+  const avatarError = avatar.errorMessage;
+  const isAvatarSpeaking = avatar.isAvatarTalking;
 
   // Initialize LiveKit audio session
   const initLiveKitAudio = useCallback(async () => {
@@ -962,8 +830,8 @@ export function TalkToHugoAI({
 
   // Handle chat mode change
   useEffect(() => {
-    if (chatMode === "video" && !avatarSession && !isAvatarLoading) {
-      initHeygenAvatar();
+    if (chatMode === "video" && avatar.status === "idle") {
+      avatar.start();
     } else if (chatMode === "audio") {
       if (engineModel === "v3") {
         setShowVoiceCoach(true);
@@ -971,19 +839,18 @@ export function TalkToHugoAI({
         initLiveKitAudio();
       }
     }
-  }, [chatMode, avatarSession, isAvatarLoading, audioConnectionState, isAudioConnecting, initHeygenAvatar, initLiveKitAudio]);
+  }, [chatMode, avatar.status, avatar.start, audioConnectionState, isAudioConnecting, initLiveKitAudio]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount (LiveAvatar cleanup handled by the hook)
   useEffect(() => {
     return () => {
-      stopHeygenAvatar();
       stopLiveKitAudio();
       if (recognitionRef.current) {
         recognitionRef.current.stop();
         recognitionRef.current = null;
       }
     };
-  }, [stopHeygenAvatar, stopLiveKitAudio]);
+  }, [stopLiveKitAudio]);
   
   // Handle mute toggle for LiveKit
   useEffect(() => {
@@ -994,17 +861,15 @@ export function TalkToHugoAI({
 
   // Wire avatar speaking to new AI messages in video mode
   useEffect(() => {
-    if (chatMode !== "video" || !avatarSession || messages.length === 0) return;
-    
+    if (chatMode !== "video" || avatar.status !== "connected" || messages.length === 0) return;
+
     const lastMessage = messages[messages.length - 1];
-    // Only speak if this is a new AI message we haven't spoken yet
     if (lastMessage.sender === "ai" && lastMessage.id !== lastSpokenMessageIdRef.current) {
       lastSpokenMessageIdRef.current = lastMessage.id;
-      // Limit text length for avatar speech (HeyGen has limits)
       const textToSpeak = lastMessage.text.slice(0, 500);
-      avatarSpeak(textToSpeak);
+      avatar.speakText(textToSpeak);
     }
-  }, [messages, chatMode, avatarSession, avatarSpeak]);
+  }, [messages, chatMode, avatar.status, avatar.speakText]);
 
   const techniquesByPhase: Record<number, any[]> = {};
   Object.values(technieken_index.technieken).forEach((technique: any) => {
@@ -2907,24 +2772,19 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-20">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span className="text-[14px]">{avatarError}</span>
-          <button onClick={() => setAvatarError(null)} className="ml-auto">
-            <X className="w-4 h-4" />
-          </button>
         </div>
       )}
-      
-      {/* Main video area - HeyGen avatar stream or fallback */}
+
+      {/* Main video area — LiveAvatar stream or fallback */}
       <div className="absolute inset-0 flex items-center justify-center">
-        {/* Video element always rendered so ref is available for stream attachment */}
         <video
-          ref={videoRef}
+          ref={avatar.videoRef}
           autoPlay
           playsInline
-          className={`w-full h-full object-cover ${avatarSession ? '' : 'hidden'}`}
+          className={`w-full h-full object-cover ${avatar.status === "connected" ? '' : 'hidden'}`}
         />
-        {/* Fallback avatar when no session */}
-        {!avatarSession && (
-          <div 
+        {avatar.status !== "connected" && (
+          <div
             className="rounded-full flex items-center justify-center absolute"
             style={{ width: '220px', height: '220px', backgroundColor: '#6B7A92' }}
           >
@@ -2937,26 +2797,28 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         )}
       </div>
 
-      {/* Top overlay with name and status */}
-      <div className="absolute top-0 left-0 right-0 p-4 z-10" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)' }}>
-        <div className="flex items-center gap-2">
-          <h3 className="text-white text-[18px] font-semibold">Hugo Herbots</h3>
-          {isAvatarSpeaking && (
-            <span className="bg-hh-success text-white text-[10px] px-2 py-0.5 rounded-full">Spreekt</span>
+      {/* Top overlay with name and status — hidden when error banner is showing */}
+      {!avatarError && (
+        <div className="absolute top-0 left-0 right-0 p-4 z-10" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)' }}>
+          <div className="flex items-center gap-2">
+            <h3 className="text-white text-[18px] font-semibold">Hugo Herbots</h3>
+            {isAvatarSpeaking && (
+              <span className="bg-hh-success text-white text-[10px] px-2 py-0.5 rounded-full">Spreekt</span>
+            )}
+          </div>
+          <p className="text-white/70 text-[14px]">{formatTime(sessionTimer)}</p>
+          {isAvatarLoading && (
+            <p className="text-white/60 text-[12px] mt-1">Avatar laden...</p>
           )}
         </div>
-        <p className="text-white/70 text-[14px]">{formatTime(sessionTimer)}</p>
-        {isAvatarLoading && (
-          <p className="text-white/60 text-[12px] mt-1">Avatar laden...</p>
-        )}
-      </div>
+      )}
 
-      {/* PiP preview - user camera - circular */}
-      <div 
+      {/* PiP preview — user camera circle */}
+      <div
         className="absolute top-4 right-4 flex items-center justify-center border-2 border-white/30 shadow-xl z-10"
         style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#475569' }}
       >
-        <div 
+        <div
           className="flex items-center justify-center"
           style={{ width: '50px', height: '50px', borderRadius: '50%', backgroundColor: 'var(--hh-ui-100)' }}
         >
@@ -2964,52 +2826,52 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         </div>
       </div>
 
-      {/* Bottom controls - circular buttons */}
+      {/* Bottom controls — mute, camera, end call */}
       <div className="absolute bottom-0 left-0 right-0 p-6 z-10" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
         <div className="flex items-center justify-center gap-6">
           <div className="flex flex-col items-center gap-2">
-            <button 
-              onClick={() => setIsMuted(!isMuted)}
+            <button
+              onClick={avatar.toggleMute}
               className="flex items-center justify-center transition-colors"
-              style={{ 
-                width: '56px', 
-                height: '56px', 
+              style={{
+                width: '56px',
+                height: '56px',
                 borderRadius: '50%',
-                backgroundColor: isMuted ? 'white' : 'rgba(255,255,255,0.2)' 
+                backgroundColor: avatar.isMuted ? 'white' : 'rgba(255,255,255,0.2)'
               }}
             >
-              {isMuted ? <MicOff className="w-5 h-5 text-hh-text" /> : <Mic className="w-5 h-5 text-white" />}
+              {avatar.isMuted ? <MicOff className="w-5 h-5 text-hh-text" /> : <Mic className="w-5 h-5 text-white" />}
             </button>
-            <span className="text-white/70 text-[11px]">{isMuted ? "Unmute" : "Mute"}</span>
+            <span className="text-white/70 text-[11px]">{avatar.isMuted ? "Unmute" : "Mute"}</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2">
-            <button 
+            <button
               className="flex items-center justify-center"
-              style={{ 
-                width: '56px', 
-                height: '56px', 
+              style={{
+                width: '56px',
+                height: '56px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(255,255,255,0.2)' 
+                backgroundColor: 'rgba(255,255,255,0.2)'
               }}
             >
               <Video className="w-5 h-5 text-white" />
             </button>
             <span className="text-white/70 text-[11px]">Camera</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2">
-            <button 
+            <button
               onClick={() => {
-                stopHeygenAvatar();
+                avatar.stop();
                 setChatMode("chat");
               }}
               className="flex items-center justify-center shadow-xl"
-              style={{ 
-                width: '56px', 
-                height: '56px', 
+              style={{
+                width: '56px',
+                height: '56px',
                 borderRadius: '50%',
-                backgroundColor: '#ef4444' 
+                backgroundColor: '#ef4444'
               }}
             >
               <X className="w-5 h-5 text-white" />

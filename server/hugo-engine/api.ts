@@ -4431,18 +4431,20 @@ app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
     const notifSeverity = ['technique_edit', 'ssot_edit'].includes(corrSource) ? 'warning' : 'info';
     const notifMessage = `${submitter} heeft ${field} gewijzigd van "${originalValue || '(leeg)'}" naar "${newValue}". Bron: ${corrSource}${targetFile ? `, bestand: ${targetFile}` : ''}${targetKey ? `, key: ${targetKey}` : ''}`;
 
+    let notificationCreated = false;
     try {
       await pool.query(
         `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         ['correction_submitted', notifTitle, notifMessage, 'content', notifSeverity, correction.id, 'admin-config-review']
       );
+      notificationCreated = true;
       console.log(`[Admin] Notification created for correction #${correction.id}`);
     } catch (notifErr: any) {
-      console.error('[Admin] Failed to create notification:', notifErr.message);
+      console.error(`[Admin] Failed to create notification for correction #${correction.id}:`, notifErr.message, notifErr.code, notifErr.detail);
     }
 
-    res.json({ correction, message: 'Correctie ingediend voor review' });
+    res.json({ correction, notificationCreated, message: 'Correctie ingediend voor review' });
   } catch (err: any) {
     console.error('[Admin] Correction submit error:', err);
     sendError(res, err, 'Correctie opslaan mislukt');
@@ -5852,6 +5854,15 @@ async function startServer() {
       .select()
       .single();
     if (error) return res.status(500).json({ error: error.message });
+    try {
+      await pool.query(
+        `INSERT INTO admin_notifications (type, title, message, category, severity, related_page)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        ['resource_created', `Resource aangemaakt: ${title}`, `Nieuwe ${type || 'resource'} "${title}" toegevoegd aan bibliotheek.`, 'content', 'info', 'admin-resources']
+      );
+    } catch (notifErr: any) {
+      console.error('[Admin] Resource notification failed:', notifErr.message);
+    }
     res.json(data);
   });
 
@@ -5864,6 +5875,15 @@ async function startServer() {
       .select()
       .single();
     if (error) return res.status(500).json({ error: error.message });
+    try {
+      await pool.query(
+        `INSERT INTO admin_notifications (type, title, message, category, severity, related_page)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        ['resource_updated', `Resource bijgewerkt: ${title}`, `Resource "${title}" is bijgewerkt.`, 'content', 'info', 'admin-resources']
+      );
+    } catch (notifErr: any) {
+      console.error('[Admin] Resource notification failed:', notifErr.message);
+    }
     res.json(data);
   });
 

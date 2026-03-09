@@ -257,9 +257,11 @@ export function AdminChatExpertMode({
   // Thinking mode (Snel/Auto/Diep) — only relevant for V3
   const [thinkingMode, setThinkingMode] = useState<ThinkingMode>("auto");
 
-  // Sync engine model to hugoApi
+  // Sync engine model and session mode to hugoApi
   useEffect(() => {
     hugoApi.setV3Mode(engineModel === "v3");
+    hugoApi.setSessionMode("admin");
+    hugoApi.clearOppositeSessionMode();
     return () => { hugoApi.setV3Mode(false); };
   }, [engineModel]);
 

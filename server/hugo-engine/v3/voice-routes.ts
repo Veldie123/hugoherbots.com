@@ -21,6 +21,8 @@ const router = Router();
 // Voice sessions: ElevenLabs conversation_id → V3 session
 const voiceSessions = new Map<string, V3SessionState>();
 
+// Support both casing conventions for the ElevenLabs API key
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || process.env.Elevenlabs_api_key || "";
 const ELEVENLABS_AGENT_ID = process.env.ELEVENLABS_AGENT_ID || "agent_3501kcs7vst6f1jvv85sjm27ba7r";
 
 /** Save voice session to Supabase (async, non-blocking) */
@@ -153,7 +155,7 @@ router.post("/chat/completions", llmHandler);
  * from ElevenLabs and return it. Supports both WebRTC (token) and WebSocket (signed URL).
  */
 router.post("/signed-url", requireAuth, async (req: Request, res: Response) => {
-  const apiKey = process.env.ELEVENLABS_API_KEY;
+  const apiKey = ELEVENLABS_API_KEY;
   if (!apiKey) {
     return res.status(503).json({ error: "ElevenLabs API key niet geconfigureerd." });
   }
@@ -191,7 +193,7 @@ router.post("/signed-url", requireAuth, async (req: Request, res: Response) => {
  * GET /voice/health — Voice subsystem health check
  */
 router.get("/health", (_req: Request, res: Response) => {
-  const hasApiKey = !!process.env.ELEVENLABS_API_KEY;
+  const hasApiKey = !!ELEVENLABS_API_KEY;
   const hasAgentId = !!ELEVENLABS_AGENT_ID;
 
   res.json({

@@ -144,6 +144,7 @@ class HugoApiService {
   private currentSessionId: string | null = null;
   private useV3 = false;
   private thinkingMode: ThinkingMode = "auto";
+  private sessionMode: "coaching" | "admin" = "coaching";
 
   setV3Mode(enabled: boolean): void {
     this.useV3 = enabled;
@@ -151,6 +152,15 @@ class HugoApiService {
 
   setThinkingMode(mode: ThinkingMode): void {
     this.thinkingMode = mode;
+  }
+
+  /** Set session mode — determines which sessionStorage key is used */
+  setSessionMode(mode: "coaching" | "admin"): void {
+    this.sessionMode = mode;
+  }
+
+  private get sessionKey(): string {
+    return `hh_v3_session_${this.sessionMode}`;
   }
 
   setCurrentSessionId(id: string | null): void {
@@ -161,19 +171,38 @@ class HugoApiService {
     return this.currentSessionId;
   }
 
-  /** Persist V3 session ID across navigation via sessionStorage */
+  /** Persist V3 session ID — scoped to current session mode */
   persistSessionId(id: string | null): void {
     this.currentSessionId = id;
+    // Migrate legacy key on first use
+    const legacyKey = 'hh_active_v3_session';
+    const legacy = sessionStorage.getItem(legacyKey);
+    if (legacy) sessionStorage.removeItem(legacyKey);
+
     if (id) {
-      sessionStorage.setItem('hh_active_v3_session', id);
+      sessionStorage.setItem(this.sessionKey, id);
     } else {
-      sessionStorage.removeItem('hh_active_v3_session');
+      sessionStorage.removeItem(this.sessionKey);
     }
   }
 
-  /** Restore V3 session ID from sessionStorage */
+  /** Restore V3 session ID — only returns sessions for the current mode */
   getPersistedSessionId(): string | null {
-    return sessionStorage.getItem('hh_active_v3_session');
+    // Migrate legacy key if present
+    const legacyKey = 'hh_active_v3_session';
+    const legacy = sessionStorage.getItem(legacyKey);
+    if (legacy) {
+      sessionStorage.removeItem(legacyKey);
+      // Assume legacy sessions are coaching (the common case)
+      sessionStorage.setItem('hh_v3_session_coaching', legacy);
+    }
+    return sessionStorage.getItem(this.sessionKey);
+  }
+
+  /** Clear the opposite mode's persisted session to prevent stale cross-mode loads */
+  clearOppositeSessionMode(): void {
+    const otherMode = this.sessionMode === "coaching" ? "admin" : "coaching";
+    sessionStorage.removeItem(`hh_v3_session_${otherMode}`);
   }
 
   async startSession(request: StartSessionRequest): Promise<StartSessionResponse> {
