@@ -39,6 +39,7 @@ import {
   ArrowUpDown,
   Trash2,
   BarChart3,
+  RotateCcw,
 } from "lucide-react";
 import { getFaseNaam } from "../../data/technieken-service";
 import { hideItem, getHiddenIds } from "../../utils/hiddenItems";
@@ -502,6 +503,11 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
             label: "Start nieuw gesprek",
             icon: <MessageSquare className="w-4 h-4" />,
             onClick: () => { sessionStorage.removeItem('hh_active_v3_session'); navigate?.("talk-to-hugo"); },
+          }}
+          secondaryAction={{
+            label: "Vervolg coaching",
+            icon: <RotateCcw className="w-4 h-4" />,
+            onClick: () => navigate?.("talk-to-hugo"),
           }}
         />
 

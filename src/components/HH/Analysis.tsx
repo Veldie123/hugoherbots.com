@@ -39,6 +39,7 @@ import {
   RotateCcw,
   CheckCircle2,
   Sparkles,
+  Radio,
 } from "lucide-react";
 
 import { getCodeBadgeColors } from "../../utils/phaseColors";
@@ -373,6 +374,11 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
             label: "Analyseer gesprek",
             icon: <Upload className="w-4 h-4" />,
             onClick: () => navigate?.("upload-analysis"),
+          }}
+          secondaryAction={{
+            label: "Live gespreksanalyse",
+            icon: <Radio className="w-4 h-4" />,
+            onClick: () => navigate?.("upload-analysis", { liveMode: true }),
           }}
         />
 

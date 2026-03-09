@@ -534,7 +534,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
     const activeVideoData = videos.find(v => v.id === activeVideo.id);
     if (activeVideoData) {
       return (
-        <AppLayout currentPage="video-watch" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} isPreview={isPreview}>
+        <AppLayout currentPage="video-watch" navigate={(page: string, data?: any) => { if (page === 'videos') { setActiveVideo(null); return; } navigate?.(page, data); }} isAdmin={isAdmin} onboardingMode={onboardingMode} isPreview={isPreview}>
           <VideoWatchPage
             video={{
               id: activeVideoData.id,
@@ -671,7 +671,14 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
             label: (featuredVideo?.fase && featuredVideo.fase !== 'Onbekend') ? featuredVideo.fase : (continueWatching?.reason === 'continue' ? 'Ga verder' : 'E.P.I.C. TECHNIQUE'),
           }}
           title={featuredVideo?.displayTitle || 'Leer de E.P.I.C. TECHNIQUE'}
-          subtitle={featuredVideo?.aiSummary || "Bekijk Hugo's training video's en leer alle sales technieken stap voor stap."}
+          subtitle={(() => {
+            const summary = featuredVideo?.aiSummary;
+            if (!summary) return "Bekijk Hugo's training video's en leer alle sales technieken stap voor stap.";
+            // Truncate to ~3 sentences for hero readability
+            const sentences = summary.match(/[^.!?]+[.!?]+/g);
+            if (sentences && sentences.length > 3) return sentences.slice(0, 3).join('').trim();
+            return summary;
+          })()}
           primaryAction={{
             label: "Verder kijken",
             icon: <Play className="w-4 h-4" />,
