@@ -1,6 +1,7 @@
 import { apiFetch } from "../../services/apiFetch";
 import { AppLayout } from "./AppLayout";
 import { HeroBanner } from "./HeroBanner";
+import { useHeroText } from "../../hooks/useHeroText";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -218,6 +219,11 @@ function UserProgressCard({ stats, loading }: { stats: UserProgressStats; loadin
 
 function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, onToggleReminder, hasReminder, onRegister, isRegistered }: LiveCoachingHeroProps) {
   const countdown = useCountdown(nextSession?.scheduledDate || null);
+  const { heroText } = useHeroText("webinar", {
+    badge: "Live Coaching",
+    title: "Webinar met Hugo",
+    subtitle: "Wekelijks live met Hugo — stel vragen, oefen samen en leer van andere verkopers.",
+  });
 
   return (
     <HeroBanner
@@ -229,8 +235,8 @@ function LiveCoachingHero({ nextSession, hasPastSessions, onScrollToRecordings, 
           ? formatNextSessionDate(new Date(nextSession.scheduledDate))
           : 'Elke dinsdag om 10:00',
       }}
-      title="Webinar met Hugo"
-      subtitle="Wekelijks live met Hugo — stel vragen, oefen samen en leer van andere verkopers."
+      title={heroText.title}
+      subtitle={heroText.subtitle}
       primaryAction={nextSession ? {
         label: isRegistered ? 'Ingeschreven' : 'Inschrijven',
         icon: isRegistered ? <CheckCircle className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />,

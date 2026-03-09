@@ -5,6 +5,7 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { EmptyState } from "./EmptyState";
 import { HeroBanner } from "./HeroBanner";
+import { useHeroText } from "../../hooks/useHeroText";
 import {
   Play,
   ChevronLeft,
@@ -477,6 +478,11 @@ const SessionCard = ({
 };
 
 export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isPreview = false, onboardingMode }: DashboardProps) {
+  const { heroText } = useHeroText("dashboard", {
+    badge: "Aanbevolen voor jou",
+    title: "Welkom bij Hugo Herbots",
+    subtitle: "Leer hoe je gerichte vragen stelt om de echte behoeften van je klant te ontdekken. Dit is de basis van elke succesvolle sale.",
+  });
   const { videos: realVideos, featuredVideo, loading: videosLoading } = useDashboardVideos();
   const { firstName, loginStreak, phaseProgress, totalCompleted, totalVideos } = useDashboardUserData();
   const { upcomingWebinars, completedWebinars, loading: webinarsLoading } = useDashboardWebinars();
@@ -584,9 +590,9 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         <HeroBanner
           image="/images/Hugo-Herbots-WEB-0197.JPG"
           imagePosition="50% 20%"
-          badge={{ label: "Aanbevolen voor jou" }}
-          title={featuredVideo?.displayTitle || featuredVideo?.title || 'Aanbevolen video'}
-          subtitle="Leer hoe je gerichte vragen stelt om de echte behoeften van je klant te ontdekken. Dit is de basis van elke succesvolle sale."
+          badge={{ label: heroText.badge }}
+          title={heroText.title}
+          subtitle={heroText.subtitle}
           primaryAction={{
             label: "Verder kijken",
             icon: <Play className="w-4 h-4" />,

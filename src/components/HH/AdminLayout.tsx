@@ -28,6 +28,8 @@ import {
   Sun,
   Moon,
   Monitor,
+  Check,
+  Send,
 } from "lucide-react";
 import { Logo } from "./Logo";
 import React, { useState, useEffect } from "react";
@@ -236,7 +238,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
 
   const [notifications, setNotifications] = useState<Array<{
     id: string; title: string; message: string; time: string;
-    type: string; severity?: string; read: boolean;
+    type: string; originalType: string; severity?: string; read: boolean;
   }>>([]);
 
   useEffect(() => {
@@ -254,7 +256,9 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
             : n.type === 'chat_feedback' ? 'user'
             : n.type === 'onboarding_feedback' ? 'config'
             : n.type === 'resource_created' || n.type === 'resource_updated' ? 'config'
+            : n.type === 'business_plan_review' || n.type === 'business_plan_distributed' ? 'business'
             : 'info',
+          originalType: n.type,
           severity: n.severity === 'warning' ? 'medium' : n.severity === 'critical' ? 'high' : undefined,
           read: n.read || false,
         }));
@@ -295,6 +299,29 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
         method: 'PATCH',
       });
     } catch { }
+  };
+
+  const [approvingBP, setApprovingBP] = useState(false);
+  const handleApproveBusinessPlan = async (notificationId: string) => {
+    setApprovingBP(true);
+    try {
+      const res = await apiFetch('/api/v2/admin/business-plan/approve', {
+        method: 'POST',
+        body: JSON.stringify({ notificationId: parseInt(notificationId) }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        markAsRead(notificationId);
+        alert(data.message);
+      } else {
+        const err = await res.json().catch(() => ({ error: 'Onbekende fout' }));
+        alert(`Fout: ${err.error}`);
+      }
+    } catch {
+      alert('Kon business plan niet goedkeuren');
+    } finally {
+      setApprovingBP(false);
+    }
   };
 
   return (
@@ -682,6 +709,32 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                               <p className="text-[11px] text-hh-muted mt-1">
                                 {notif.time}
                               </p>
+                              {notif.originalType === 'business_plan_review' && isSuperAdminProp && !notif.read && (
+                                <Button
+                                  size="sm"
+                                  className="mt-2 h-7 px-3 text-[11px] bg-hh-success hover:bg-hh-success/90 text-white rounded-full"
+                                  disabled={approvingBP}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleApproveBusinessPlan(notif.id);
+                                  }}
+                                >
+                                  <Send className="w-3 h-3 mr-1" />
+                                  {approvingBP ? 'Bezig...' : 'Goedkeuren & Versturen'}
+                                </Button>
+                              )}
+                              {notif.originalType === 'business_plan_distributed' && (
+                                <a
+                                  href="/business-plan.html"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-2 inline-flex items-center gap-1 text-[11px] text-hh-primary hover:underline"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <FileText className="w-3 h-3" />
+                                  Bekijk business plan
+                                </a>
+                              )}
                             </div>
                             {notif.type === "video" && (
                               <Video className="w-4 h-4 text-hh-primary flex-shrink-0" />
@@ -694,6 +747,9 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                             )}
                             {notif.type === "rag" && (
                               <Zap className="w-4 h-4 text-hh-primary flex-shrink-0" />
+                            )}
+                            {notif.type === "business" && (
+                              <FileText className="w-4 h-4 text-hh-primary flex-shrink-0" />
                             )}
                           </div>
                         </div>

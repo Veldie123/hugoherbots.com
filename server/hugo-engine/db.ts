@@ -142,3 +142,40 @@ pool.query(`
     console.log('[DB] SERIAL sequences synced');
   });
 }).catch((err: Error) => console.warn('[DB] admin_notifications table check failed:', err.message));
+
+// Add audience column to admin_notifications (superadmin/hugo/all filtering)
+pool.query(`
+  ALTER TABLE admin_notifications ADD COLUMN IF NOT EXISTS audience VARCHAR(50) DEFAULT 'all'
+`).then(() => {
+  console.log('[DB] admin_notifications audience column ensured');
+}).catch((err: Error) => console.warn('[DB] audience column check failed:', err.message));
+
+// Business plan review tracking
+pool.query(`
+  CREATE TABLE IF NOT EXISTS business_plan_reviews (
+    id SERIAL PRIMARY KEY,
+    review_notification_id INTEGER,
+    status VARCHAR(20) DEFAULT 'pending',
+    approved_at TIMESTAMPTZ,
+    email_sent BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  )
+`).then(() => {
+  console.log('[DB] business_plan_reviews table ensured');
+}).catch((err: Error) => console.warn('[DB] business_plan_reviews table check failed:', err.message));
+
+pool.query(`
+  CREATE TABLE IF NOT EXISTS hero_text_cache (
+    id SERIAL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    module TEXT NOT NULL,
+    badge_label TEXT NOT NULL,
+    title TEXT NOT NULL,
+    subtitle TEXT NOT NULL,
+    generated_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    data_hash TEXT NOT NULL,
+    UNIQUE(user_id, module)
+  )
+`).then(() => {
+  console.log('[DB] hero_text_cache table ensured');
+}).catch((err: Error) => console.warn('[DB] hero_text_cache table check failed:', err.message));

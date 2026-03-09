@@ -170,6 +170,12 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
       'correction_submitted': 'Correctie',
       'feedback_received': 'Feedback',
       'system': 'Systeem',
+      'business_plan_review': 'Business Plan Review',
+      'business_plan_distributed': 'Business Plan',
+      'chat_feedback': 'Chat Feedback',
+      'onboarding_feedback': 'Onboarding',
+      'resource_created': 'Resource',
+      'resource_updated': 'Resource Update',
     };
     return map[type] || type;
   };

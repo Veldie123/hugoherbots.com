@@ -1847,7 +1847,7 @@ def run_pipeline(job_id, drive_file_id, access_token, callback_url):
             filter_complex = (
                 "[0:v]format=yuva444p,chromakey=0x00FF00:0.29:0.10,"
                 "despill=type=green:mix=0.78:expand=0.06,"
-                "lutyuv=a='if(lt(val,64),0,if(gt(val,160),255,val))'[fg];"
+                "lutyuv=a='if(lt(val,90),0,if(gt(val,140),255,val))'[fg];"
                 "[1:v][fg]scale2ref=iw:ih:flags=lanczos[bg][fgref];"
                 "[bg][fgref]overlay=0:0:shortest=1,format=yuv420p[out]"
             )

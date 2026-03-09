@@ -32,6 +32,7 @@ import fs from "fs";
 import os from "os";
 import { nanoid } from "nanoid";
 import { requireAuth, requireAdmin, optionalAuth } from "./auth-middleware";
+import { Resend } from "resend";
 
 // FULL ENGINE IMPORTS - Replacing simplified versions
 import { 
@@ -60,6 +61,7 @@ import { setupScribeWebSocket } from "./elevenlabs-stt";
 import { setupLiveAnalyseWebSocket } from "./live-analyse-ws";
 import { liveAnalyseRoutes } from "./v3/live-analyse-routes";
 import { pool } from "./db";
+import { getHeroTexts } from "./hero-text-service";
 
 // Roleplay Engine imports
 import {
@@ -1575,6 +1577,28 @@ app.get("/api/sessions", async (req, res) => {
   } catch (error: any) {
     console.error("[API] Error fetching sessions:", error.message);
     sendError(res, error);
+  }
+});
+
+// AI-generated personalized hero banner text
+app.get("/api/hero-text", async (req: Request, res: Response) => {
+  try {
+    const userId = req.userId!;
+    const modulesParam = (req.query.modules as string) || "";
+    const validModules = ["dashboard", "hugo-ai", "analysis", "webinar", "techniques"];
+    const modules = modulesParam
+      .split(",")
+      .filter((m) => validModules.includes(m)) as any[];
+
+    if (modules.length === 0) {
+      return res.status(400).json({ error: "modules parameter required" });
+    }
+
+    const results = await getHeroTexts(userId, modules);
+    res.json(results);
+  } catch (err: any) {
+    console.error("[HeroText] Endpoint error:", err);
+    res.json({});
   }
 });
 
@@ -4632,12 +4656,17 @@ app.patch("/api/v2/admin/corrections/:id", async (req: Request, res: Response) =
 app.get("/api/v2/admin/notifications", async (req: Request, res: Response) => {
   try {
     const readFilter = req.query.read;
-    let queryText = 'SELECT * FROM admin_notifications';
+    const isSuperAdmin = (req as any).userEmail === SUPERADMIN_EMAIL;
+    const audienceFilter = isSuperAdmin
+      ? `audience IN ('all', 'superadmin')`
+      : `audience IN ('all', 'hugo')`;
+
+    let queryText = `SELECT * FROM admin_notifications WHERE ${audienceFilter}`;
     const params: any[] = [];
     if (readFilter === 'true') {
-      queryText += ' WHERE read = true';
+      queryText += ' AND read = true';
     } else if (readFilter === 'false') {
-      queryText += ' WHERE read = false';
+      queryText += ' AND read = false';
     }
     queryText += ' ORDER BY created_at DESC LIMIT 200';
     const { rows } = await pool.query(queryText, params);
@@ -5969,6 +5998,164 @@ async function startServer() {
     if (error) return res.status(500).json({ error: error.message });
     res.json(data);
   });
+
+  // ===========================================
+  // BUSINESS PLAN REVIEW & DISTRIBUTION
+  // ===========================================
+
+  const resendClient = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+  async function sendBusinessPlanEmail(): Promise<boolean> {
+    if (!resendClient) {
+      console.warn('[BusinessPlan] RESEND_API_KEY not configured, skipping email');
+      return false;
+    }
+    try {
+      const { error } = await resendClient.emails.send({
+        from: 'HugoHerbots.ai <noreply@hugoherbots.com>',
+        to: 'hugoherbots@telenet.be',
+        subject: 'Business Plan — Bijgewerkt en goedgekeurd',
+        html: `
+          <div style="font-family:'Outfit',Arial,sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;">
+            <h2 style="color:#4F7396;margin-bottom:8px;">Business Plan HugoHerbots.ai</h2>
+            <p style="color:#0F1826;line-height:1.6;">Het business plan is bijgewerkt en goedgekeurd door Stéphane. Bekijk de laatste versie via onderstaande link.</p>
+            <p style="margin:24px 0;">
+              <a href="https://hugoherbots.com/business-plan.html"
+                 style="background:#4F7396;color:white;padding:14px 28px;border-radius:12px;text-decoration:none;display:inline-block;font-weight:600;">
+                Bekijk Business Plan
+              </a>
+            </p>
+            <p style="color:#9CA3AF;font-size:13px;margin-top:32px;">
+              Dit is een automatisch bericht van HugoHerbots.ai
+            </p>
+          </div>
+        `,
+      });
+      if (error) {
+        console.error('[BusinessPlan] Email send error:', error);
+        return false;
+      }
+      console.log('[BusinessPlan] Email sent to hugoherbots@telenet.be');
+      return true;
+    } catch (err: any) {
+      console.error('[BusinessPlan] Email failed:', err.message);
+      return false;
+    }
+  }
+
+  app.post("/api/v2/admin/business-plan/approve", async (req: Request, res: Response) => {
+    try {
+      if ((req as any).userEmail !== SUPERADMIN_EMAIL) {
+        return res.status(403).json({ error: 'Alleen superadmin kan het business plan goedkeuren' });
+      }
+
+      const { notificationId } = req.body;
+      if (!notificationId) return res.status(400).json({ error: 'notificationId is vereist' });
+
+      // Find the pending review
+      const { rows } = await pool.query(
+        `SELECT * FROM business_plan_reviews WHERE review_notification_id = $1 AND status = 'pending'`,
+        [parseInt(notificationId)]
+      );
+      if (rows.length === 0) {
+        return res.status(404).json({ error: 'Geen openstaande review gevonden' });
+      }
+
+      const review = rows[0];
+
+      // 1. Send email to Hugo
+      const emailSent = await sendBusinessPlanEmail();
+
+      // 2. Create notification for Hugo (audience = 'hugo')
+      await pool.query(
+        `INSERT INTO admin_notifications (type, title, message, category, severity, audience, related_page)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          'business_plan_distributed',
+          'Nieuw business plan beschikbaar',
+          'Stéphane heeft het business plan bijgewerkt. Bekijk het via hugoherbots.com/business-plan.html',
+          'business',
+          'info',
+          'hugo',
+          'business-plan'
+        ]
+      );
+
+      // 3. Mark review as approved
+      await pool.query(
+        `UPDATE business_plan_reviews SET status = 'approved', approved_at = NOW(), email_sent = $1 WHERE id = $2`,
+        [emailSent, review.id]
+      );
+
+      // 4. Mark the original notification as read
+      await pool.query(`UPDATE admin_notifications SET read = true WHERE id = $1`, [parseInt(notificationId)]);
+
+      console.log(`[BusinessPlan] Review #${review.id} approved, email=${emailSent}`);
+      res.json({
+        success: true,
+        emailSent,
+        message: emailSent
+          ? 'Business plan goedgekeurd, email verstuurd en Hugo genotificeerd'
+          : 'Business plan goedgekeurd en Hugo genotificeerd (email niet geconfigureerd)'
+      });
+    } catch (err: any) {
+      console.error('[BusinessPlan] Approve error:', err.message);
+      sendError(res, err);
+    }
+  });
+
+  // Business plan review scheduler — checks hourly, creates review notification every week
+  const BP_CHECK_INTERVAL = 60 * 60 * 1000; // 1 hour
+  const BP_REVIEW_CADENCE_DAYS = 7;
+
+  async function checkBusinessPlanReview() {
+    try {
+      const { rows } = await pool.query(
+        `SELECT created_at, status FROM business_plan_reviews ORDER BY created_at DESC LIMIT 1`
+      );
+
+      const lastReview = rows[0];
+      const now = new Date();
+      const shouldCreate = !lastReview ||
+        (now.getTime() - new Date(lastReview.created_at).getTime() > BP_REVIEW_CADENCE_DAYS * 24 * 60 * 60 * 1000);
+
+      if (!shouldCreate) return;
+
+      // Don't create if there's already a pending review
+      const { rows: pending } = await pool.query(
+        `SELECT id FROM business_plan_reviews WHERE status = 'pending'`
+      );
+      if (pending.length > 0) return;
+
+      // Create superadmin-only notification
+      const notifResult = await pool.query(
+        `INSERT INTO admin_notifications (type, title, message, category, severity, audience, related_page)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+        [
+          'business_plan_review',
+          'Business plan review gepland',
+          'Het is tijd om het business plan te reviewen en door te sturen naar Hugo. Klik op "Goedkeuren & Versturen" na je review.',
+          'business',
+          'warning',
+          'superadmin',
+          'business-plan'
+        ]
+      );
+
+      await pool.query(
+        `INSERT INTO business_plan_reviews (review_notification_id, status) VALUES ($1, 'pending')`,
+        [notifResult.rows[0].id]
+      );
+
+      console.log(`[BusinessPlan] Review notification #${notifResult.rows[0].id} created`);
+    } catch (err: any) {
+      console.error('[BusinessPlan] Review check failed:', err.message);
+    }
+  }
+
+  // Initial check 60s after startup, then every hour
+  setTimeout(checkBusinessPlanReview, 60 * 1000);
+  setInterval(checkBusinessPlanReview, BP_CHECK_INTERVAL);
 
   const API_PORT = parseInt(process.env.PORT || process.env.API_PORT || "3002", 10);
   server.listen(API_PORT, "0.0.0.0", () => {

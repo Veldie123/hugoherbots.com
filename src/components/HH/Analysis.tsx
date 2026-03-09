@@ -4,6 +4,7 @@ import { apiFetch } from "../../services/apiFetch";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
 import { HeroBanner } from "./HeroBanner";
+import { useHeroText } from "../../hooks/useHeroText";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -69,6 +70,11 @@ interface ConversationRecord {
 }
 
 export function Analysis({ navigate, isAdmin }: AnalysisProps) {
+  const { heroText } = useHeroText("analysis", {
+    badge: "Gespreksanalyse",
+    title: "Analyseer je verkoopgesprekken",
+    subtitle: "Upload een rollenspel of echt klantgesprek en ontvang gedetailleerde E.P.I.C. feedback van Hugo.",
+  });
   const [viewMode] = useMobileViewMode("grid", "list");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -367,9 +373,9 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
         {/* Hero Banner */}
         <HeroBanner
           image="/images/Hugo-Herbots-WEB-0309.JPG"
-          badge={{ icon: <Sparkles className="w-3 h-3 mr-1" />, label: "Gespreksanalyse" }}
-          title="Analyseer je verkoopgesprekken"
-          subtitle="Upload een rollenspel of echt klantgesprek en ontvang gedetailleerde E.P.I.C. feedback van Hugo."
+          badge={{ icon: <Sparkles className="w-3 h-3 mr-1" />, label: heroText.badge }}
+          title={heroText.title}
+          subtitle={heroText.subtitle}
           primaryAction={{
             label: "Analyseer gesprek",
             icon: <Upload className="w-4 h-4" />,

@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { AppLayout } from "./AppLayout";
 import { HeroBanner } from "./HeroBanner";
+import { useHeroText } from "../../hooks/useHeroText";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
@@ -48,6 +49,11 @@ interface TechniqueLibraryProps {
 }
 
 export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: TechniqueLibraryProps) {
+  const { heroText } = useHeroText("techniques", {
+    badge: "54 E.P.I.C. TECHNIQUE",
+    title: "Master de Sales Cyclus",
+    subtitle: "Ontdek alle technieken van de 5 fases en word een top verkoper.",
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFase, setActiveFase] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -225,9 +231,9 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
         {/* Hero Banner */}
         <HeroBanner
           image="/images/Hugo-Herbots-WEB-0281.JPG"
-          badge={{ icon: <Award className="w-3 h-3 mr-1" />, label: "54 E.P.I.C. TECHNIQUE" }}
-          title="Master de Sales Cyclus"
-          subtitle="Ontdek alle technieken van de 5 fases en word een top verkoper."
+          badge={{ icon: <Award className="w-3 h-3 mr-1" />, label: heroText.badge }}
+          title={heroText.title}
+          subtitle={heroText.subtitle}
           primaryAction={{
             label: "Talk to Hugo",
             icon: <MessageCircle className="w-4 h-4" />,

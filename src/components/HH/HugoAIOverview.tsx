@@ -4,6 +4,7 @@ import { useMobileViewMode } from "../../hooks/useMobileViewMode";
 import { apiFetch } from "../../services/apiFetch";
 import { AppLayout } from "./AppLayout";
 import { HeroBanner } from "./HeroBanner";
+import { useHeroText } from "../../hooks/useHeroText";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -120,6 +121,11 @@ const getQualityBadge = (quality: "excellent" | "good" | "needs-improvement") =>
 };
 
 export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
+  const { heroText } = useHeroText("hugo-ai", {
+    badge: "AI Sales Coach",
+    title: "Oefen met Hugo",
+    subtitle: "Train je sales skills met AI-gestuurde rollenspellen en ontvang realtime feedback op je technieken.",
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterQuality, setFilterQuality] = useState<string>("all");
@@ -496,9 +502,9 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
         <HeroBanner
           image="/images/Hugo-Herbots-WEB-0461.JPG"
           imagePosition="50% 15%"
-          badge={{ icon: <Sparkles className="w-3 h-3 mr-1" />, label: "AI Sales Coach" }}
-          title="Oefen met Hugo"
-          subtitle="Train je sales skills met AI-gestuurde rollenspellen en ontvang realtime feedback op je technieken."
+          badge={{ icon: <Sparkles className="w-3 h-3 mr-1" />, label: heroText.badge }}
+          title={heroText.title}
+          subtitle={heroText.subtitle}
           primaryAction={{
             label: "Start nieuw gesprek",
             icon: <MessageSquare className="w-4 h-4" />,
