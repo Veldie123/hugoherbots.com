@@ -163,8 +163,9 @@ router.post("/signed-url", requireAuth, async (_req: Request, res: Response) => 
   if (!ELEVENLABS_API_KEY || !ELEVENLABS_AGENT_ID) {
     return res.status(503).json({ error: "ElevenLabs niet geconfigureerd." });
   }
-  console.log(`[V3 Voice] Returning agentId: ${ELEVENLABS_AGENT_ID} (from ${process.env.ELEVENLABS_AGENT_ID ? 'env' : 'hardcoded fallback'})`);
-  res.json({ agentId: ELEVENLABS_AGENT_ID });
+  const voiceId = process.env.Elevenlabs_Hugo_voice_clone || "sOsTzBXVBqNYMd5L4sCU";
+  console.log(`[V3 Voice] Returning agentId: ${ELEVENLABS_AGENT_ID} voiceId: ${voiceId}`);
+  res.json({ agentId: ELEVENLABS_AGENT_ID, voiceId });
 });
 
 /**

@@ -74,7 +74,8 @@ const PORT_3002_PREFIXES = [
   '/api/v2/', '/api/v3/', '/api/session/', '/api/sessions/', '/api/user/',
   '/api/technieken/', '/api/heygen/', '/api/livekit/', '/api/health/',
   '/api/live-sessions/', '/api/roleplay/', '/api/live/',
-  '/api/admin-video/',
+  '/api/admin-video/', '/api/liveavatar/', '/api/tavus/',
+  '/api/stripe/',
 ];
 
 function handleRequest(req, res) {

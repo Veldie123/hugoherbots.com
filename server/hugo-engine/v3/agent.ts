@@ -138,6 +138,18 @@ function getAllToolDefinitions(mode: V3Mode): Anthropic.Tool[] {
   return tools;
 }
 
+/** Voice mode: knowledge + methodology only (no roleplay/script builder — impractical in voice) */
+function getVoiceToolDefinitions(): Anthropic.Tool[] {
+  const tools = [...knowledgeToolDefinitions, ...methodologyToolDefinitions];
+  if (tools.length > 0) {
+    tools[tools.length - 1] = {
+      ...tools[tools.length - 1],
+      cache_control: { type: "ephemeral" as const },
+    };
+  }
+  return tools;
+}
+
 // ── Tool Router ─────────────────────────────────────────────────────────────
 
 const KNOWLEDGE_TOOLS = new Set([
@@ -227,9 +239,13 @@ export async function chat(
   thinkingMode: ThinkingMode = "auto"
 ): Promise<V3Response> {
   const client = getAnthropicClient();
-  const tools = getAllToolDefinitions(session.mode);
+  const tools = session.voiceMode ? getVoiceToolDefinitions() : getAllToolDefinitions(session.mode);
   const systemPrompt = getSystemPrompt(session);
   const model = COACHING_MODEL;
+  const maxTokens = session.voiceMode ? 500 : (session.mode === "admin" ? 16384 : 8192);
+
+  // Voice mode: no thinking (biggest latency win, no quality loss for short responses)
+  const thinkingBudget = session.voiceMode ? null : resolveThinkingBudget(session.mode, thinkingMode, userMessage);
 
   // Normalize user content for API and storage
   const userContent = typeof userMessage === "string" ? userMessage : userMessage;
@@ -247,14 +263,12 @@ export async function chat(
   let totalOutputTokens = 0;
   let totalThinkingTokens = 0;
 
-  const thinkingBudget = resolveThinkingBudget(session.mode, thinkingMode, userMessage);
-
   // Agentic loop: keep going until Claude produces a final text response
   let currentMessages = [...apiMessages];
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
     const requestParams: Anthropic.MessageCreateParams = {
       model,
-      max_tokens: session.mode === "admin" ? 16384 : 8192,
+      max_tokens: maxTokens,
       system: [
         {
           type: "text" as const,
@@ -366,9 +380,13 @@ export async function* chatStream(
   thinkingMode: ThinkingMode = "auto"
 ): AsyncGenerator<V3StreamEvent> {
   const client = getAnthropicClient();
-  const tools = getAllToolDefinitions(session.mode);
+  const tools = session.voiceMode ? getVoiceToolDefinitions() : getAllToolDefinitions(session.mode);
   const systemPrompt = getSystemPrompt(session);
   const model = COACHING_MODEL;
+  const maxTokens = session.voiceMode ? 500 : (session.mode === "admin" ? 16384 : 8192);
+
+  // Voice mode: no thinking (biggest latency win, no quality loss for short responses)
+  const thinkingBudget = session.voiceMode ? null : resolveThinkingBudget(session.mode, thinkingMode, userMessage);
 
   // Normalize user content for API and storage
   const userContent = typeof userMessage === "string" ? userMessage : userMessage;
@@ -385,8 +403,6 @@ export async function* chatStream(
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
 
-  const thinkingBudget = resolveThinkingBudget(session.mode, thinkingMode, userMessage);
-
   let currentMessages = [...apiMessages];
   let allRoundText = ""; // Accumulate text across all rounds for session storage
 
@@ -395,7 +411,7 @@ export async function* chatStream(
 
     const stream = client.messages.stream({
       model,
-      max_tokens: session.mode === "admin" ? 16384 : 8192,
+      max_tokens: maxTokens,
       system: [
         {
           type: "text" as const,

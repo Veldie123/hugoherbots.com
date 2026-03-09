@@ -1,7 +1,7 @@
-import { getUncachableStripeClient } from '../src/server/stripeClient';
+import { getStripeClient } from '../src/server/stripeClient';
 
 async function seedProducts() {
-  const stripe = await getUncachableStripeClient();
+  const stripe = getStripeClient();
   console.log('[Stripe Seed] Connected to Stripe');
 
   const products = [

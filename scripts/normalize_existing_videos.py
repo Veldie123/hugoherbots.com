@@ -2,8 +2,8 @@
 """
 Batch audio normalisatie voor bestaande video's.
 
-Downloadt originelen van Google Drive, normaliseert audio (2-pass EBU R128),
-uploadt opnieuw naar Mux, en updatet de database.
+Downloadt verwerkte video's van Mux (chromakey al toegepast), normaliseert audio
+(2-pass EBU R128), uploadt opnieuw naar Mux, en updatet de database.
 
 Gebruik:
     python scripts/normalize_existing_videos.py                  # Alle completed video's
@@ -15,12 +15,10 @@ Gebruik:
 import os
 import sys
 import json
-import base64
 import argparse
-import tempfile
 import subprocess
+import tempfile
 from pathlib import Path
-from datetime import datetime, timezone
 
 # Load .env from project root
 from dotenv import load_dotenv
@@ -31,15 +29,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from process_videos import (
     init_clients,
-    get_google_access_token,
-    download_video_from_drive,
     normalize_video_audio,
     extract_audio,
     upload_to_mux,
     delete_mux_asset,
     update_job_status,
     transcribe_with_elevenlabs,
-    store_in_rag,
 )
 
 
@@ -65,6 +60,29 @@ def get_completed_jobs(limit: int = None, job_id: str = None):
     return result.data or []
 
 
+def download_from_mux(playback_id: str, output_path: Path, timeout: int = 600) -> bool:
+    """Download processed video from Mux HLS stream via ffmpeg."""
+    url = f"https://stream.mux.com/{playback_id}.m3u8"
+    print(f"  Downloaden van Mux stream...", end=" ", flush=True)
+    try:
+        result = subprocess.run(
+            ["ffmpeg", "-i", url, "-c", "copy", "-y", str(output_path)],
+            capture_output=True, text=True, timeout=timeout
+        )
+        if result.returncode != 0:
+            print(f"FOUT: {result.stderr[:200]}")
+            return False
+        size_mb = output_path.stat().st_size / (1024 * 1024)
+        print(f"✓ ({size_mb:.1f} MB)")
+        return True
+    except subprocess.TimeoutExpired:
+        print("FOUT: Timeout")
+        return False
+    except FileNotFoundError:
+        print("FOUT: ffmpeg niet gevonden")
+        return False
+
+
 def update_video_mapping(old_playback_id: str, new_playback_id: str):
     """Update config/video_mapping.json with new Mux playback ID."""
     mapping_path = Path(__file__).parent.parent / "config" / "video_mapping.json"
@@ -76,7 +94,8 @@ def update_video_mapping(old_playback_id: str, new_playback_id: str):
         mapping = json.load(f)
 
     updated = False
-    for video in mapping:
+    videos = mapping.get("videos", {})
+    for key, video in videos.items():
         if video.get("mux_playback_id") == old_playback_id:
             video["mux_playback_id"] = new_playback_id
             updated = True
@@ -91,10 +110,9 @@ def update_video_mapping(old_playback_id: str, new_playback_id: str):
     return updated
 
 
-def process_single_job(job: dict, access_token: str, dry_run: bool = False, retranscribe: bool = False):
-    """Download, normalize, re-upload a single video."""
+def process_single_job(job: dict, dry_run: bool = False, retranscribe: bool = False):
+    """Download from Mux, normalize audio, re-upload."""
     job_id = job["id"]
-    file_id = job["drive_file_id"]
     file_name = job["drive_file_name"] or f"video_{job_id}"
     old_asset_id = job.get("mux_asset_id")
     old_playback_id = job.get("mux_playback_id")
@@ -102,11 +120,14 @@ def process_single_job(job: dict, access_token: str, dry_run: bool = False, retr
     print(f"\n{'='*60}")
     print(f"Video: {file_name}")
     print(f"  Job ID: {job_id}")
-    print(f"  Drive: {file_id}")
     print(f"  Mux: {old_playback_id or '(geen)'}")
 
+    if not old_playback_id:
+        print(f"  ✗ Geen Mux playback ID, skip")
+        return False
+
     if dry_run:
-        print(f"  [DRY RUN] Zou downloaden, normaliseren, en opnieuw uploaden")
+        print(f"  [DRY RUN] Zou downloaden van Mux, normaliseren, en opnieuw uploaden")
         return True
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -115,9 +136,9 @@ def process_single_job(job: dict, access_token: str, dry_run: bool = False, retr
         normalized_path = tmpdir / f"video_normalized_{job_id}.mp4"
         audio_path = tmpdir / f"audio_{job_id}.m4a"
 
-        # 1. Download from Drive
-        print(f"  Stap 1/4: Downloaden van Google Drive...")
-        if not download_video_from_drive(file_id, access_token, video_path):
+        # 1. Download processed video from Mux (chromakey already applied)
+        print(f"  Stap 1/4: Downloaden van Mux...")
+        if not download_from_mux(old_playback_id, video_path):
             print(f"  ✗ Download mislukt, skip")
             return False
 
@@ -157,7 +178,7 @@ def process_single_job(job: dict, access_token: str, dry_run: bool = False, retr
 
         # Delete old Mux asset
         if old_asset_id and old_asset_id != new_asset_id:
-            print(f"  Oud Mux asset verwijderen: {old_asset_id}...")
+            print(f"  Oud Mux asset verwijderen: {old_asset_id[:20]}...")
             delete_mux_asset(asset_id=old_asset_id)
 
         # Optional: re-transcribe for better quality
@@ -189,11 +210,8 @@ def main():
         print("MODE: DRY RUN (geen wijzigingen)")
     print()
 
-    # Initialize clients
+    # Initialize clients (Mux credentials needed for upload)
     init_clients()
-    access_token = None
-    if not args.dry_run:
-        access_token = get_google_access_token()
 
     # Get jobs
     jobs = get_completed_jobs(limit=args.limit, job_id=args.job_id)
@@ -208,7 +226,7 @@ def main():
     for i, job in enumerate(jobs, 1):
         print(f"\n[{i}/{len(jobs)}]", end="")
         try:
-            if process_single_job(job, access_token, dry_run=args.dry_run, retranscribe=args.retranscribe):
+            if process_single_job(job, dry_run=args.dry_run, retranscribe=args.retranscribe):
                 success += 1
             else:
                 failed += 1

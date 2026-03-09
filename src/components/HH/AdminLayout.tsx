@@ -261,6 +261,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
           originalType: n.type,
           severity: n.severity === 'warning' ? 'medium' : n.severity === 'critical' ? 'high' : undefined,
           read: n.read || false,
+          relatedPage: n.related_page || null,
         }));
         setNotifications(items);
         setUnreadCount(items.filter((n: any) => !n.read).length);
@@ -677,6 +678,12 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                               setNotificationsOpen(false);
                             } else if (notif.type === "rag") {
                               navigate?.("admin-rag-review");
+                              setNotificationsOpen(false);
+                            } else if (notif.type === "business") {
+                              window.open('/business-plan.html', '_blank');
+                              setNotificationsOpen(false);
+                            } else if (notif.relatedPage && navigate) {
+                              navigate(notif.relatedPage);
                               setNotificationsOpen(false);
                             }
                           }}

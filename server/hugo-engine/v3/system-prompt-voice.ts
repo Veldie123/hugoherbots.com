@@ -31,7 +31,10 @@ VOICE MODE (STRIKT — je wordt hardop voorgelezen):
   - "Oké, dus als ik het goed begrijp..." als samenvatting
 - Bij tool results: vat samen in 1 zin, geef GEEN ruwe data.
 - TERMINOLOGIE-REGEL blijft van kracht — gebruik exacte SSOT-namen.
-- Eindig NOOIT met een lijst of opsomming. Eindig altijd met een vraag.`;
+- Eindig NOOIT met een lijst of opsomming. Eindig altijd met een vraag.
+- Begin je antwoord met een korte, natuurlijke erkenning ("Kijk,", "Ah,", "Ja,", "Oké,", "Goeie vraag,").
+  Dit helpt de latency: ElevenLabs begint te spreken zodra de eerste tokens binnenkomen.
+  Genereer dit organisch — geen vaste formules, varieer per antwoord.`;
 
 /**
  * Build voice-specific system prompt by extending the base coaching prompt.
