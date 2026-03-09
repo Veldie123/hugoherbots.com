@@ -61,7 +61,9 @@ const AdminChatExpertMode = lazy(() => import("./components/HH/AdminChatExpertMo
 const AdminRAGReview = lazy(() => import("./components/HH/AdminRAGReview").then(m => ({ default: m.AdminRAGReview })));
 const AdminConflicts = lazy(() => import("./components/HH/AdminConflicts").then(m => ({ default: m.AdminConflicts })));
 const AdminV3Chat = lazy(() => import("./components/HH/AdminV3Chat").then(m => ({ default: m.AdminV3Chat })));
-type Page = "landing" | "landing-v2" | "pricing" | "about" | "login" | "signup" | "authcallback" | "preview" | "onboarding" | "dashboard" | "technieken" | "techniques" | "coaching" | "roleplay" | "roleplays" | "roleplaychat" | "roleplays-chat" | "overviewprogress" | "builder" | "videos" | "live" | "team" | "analytics" | "settings" | "analysis" | "analysis-results" | "upload-analysis" | "privacy-policy" | "help" | "resources" | "hugo-overview" | "talk-to-hugo" | "library" | "notifications" | "admin-dashboard" | "admin-videos" | "admin-live" | "admin-progress" | "admin-users" | "admin-techniques" | "admin-transcripts" | "admin-uploads" | "admin-content" | "admin-analytics" | "admin-settings" | "admin-help" | "admin-resources" | "admin-sessions" | "admin-config-review" | "admin-notifications" | "admin-chat-expert" | "admin-rag-review" | "admin-conflicts" | "admin-analysis-results" | "admin-upload-analysis" | "admin-hugo-agent" | "admin-v3-chat" | "sso-validate" | "showcase" | "showcase-video" | "showcase-roleplay" | "showcase-analysis";
+const PAGES = ["landing", "landing-v2", "pricing", "about", "login", "signup", "authcallback", "preview", "onboarding", "dashboard", "technieken", "techniques", "coaching", "roleplay", "roleplays", "roleplaychat", "roleplays-chat", "overviewprogress", "builder", "videos", "live", "team", "analytics", "settings", "analysis", "analysis-results", "upload-analysis", "privacy-policy", "help", "resources", "hugo-overview", "talk-to-hugo", "library", "notifications", "admin-dashboard", "admin-videos", "admin-live", "admin-progress", "admin-users", "admin-techniques", "admin-transcripts", "admin-uploads", "admin-content", "admin-analytics", "admin-settings", "admin-help", "admin-resources", "admin-sessions", "admin-config-review", "admin-notifications", "admin-chat-expert", "admin-rag-review", "admin-conflicts", "admin-analysis-results", "admin-upload-analysis", "admin-hugo-agent", "admin-v3-chat", "sso-validate", "showcase", "showcase-video", "showcase-roleplay", "showcase-analysis"] as const;
+type Page = (typeof PAGES)[number];
+const PAGE_SET: Set<string> = new Set(PAGES);
 
 export default function App() {
   // Development screenshot bypass: check URL path immediately (synchronously)
@@ -152,13 +154,35 @@ export default function App() {
           setIsSuperAdmin(superAdmin);
           setOnboardingMode(isHugoOnboarding);
           
+          // Restore page from URL on refresh (if valid)
+          const rawPath = window.location.pathname.replace(/^\//, '');
+
           if (isHugoOnboarding) {
             localStorage.setItem('hugo_onboarding_mode', 'true');
             setViewMode('admin');
             setCurrentPage("talk-to-hugo");
           } else {
             localStorage.removeItem('hugo_onboarding_mode');
-            if (userIsAdmin) {
+
+            // Handle settings:section URL format (e.g. /settings:notifications)
+            const isSettingsPath = rawPath.startsWith('settings:');
+            const pageName = isSettingsPath ? 'settings' : rawPath;
+            const isAdminPage = rawPath.startsWith('admin-');
+            const isValidPath = PAGE_SET.has(pageName);
+
+            if (isValidPath && rawPath !== '') {
+              // Prevent non-admins from accessing admin pages
+              if (isAdminPage && !userIsAdmin) {
+                setCurrentPage("dashboard");
+              } else {
+                setViewMode(isAdminPage ? 'admin' : 'user');
+                setCurrentPage(pageName as Page);
+                if (isSettingsPath) {
+                  const section = rawPath.split(':')[1] as "profile" | "notifications" | "subscription" | "team" | "danger";
+                  if (section) setSettingsSection(section);
+                }
+              }
+            } else if (userIsAdmin) {
               setViewMode('admin');
               setCurrentPage("admin-dashboard");
             } else {
