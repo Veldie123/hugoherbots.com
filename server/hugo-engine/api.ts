@@ -4146,7 +4146,14 @@ app.get("/api/v2/analysis/list", async (req: Request, res: Response) => {
       : req.userId!;
     const source = req.query.source as string;
 
-    let queryText = 'SELECT id, user_id, title, status, error, created_at, completed_at, result FROM conversation_analyses';
+    // Extract only summary fields from JSONB — avoids loading full transcript per row
+    let queryText = `SELECT id, user_id, title, status, error, created_at, completed_at,
+      (result->'insights'->>'overallScore')::int AS overall_score,
+      jsonb_array_length(COALESCE(result->'transcript', '[]'::jsonb)) AS turn_count,
+      (result->'transcript'->-1->>'endMs')::int AS duration_ms,
+      result->'insights'->'phaseCoverage' AS phase_coverage,
+      result->'evaluations' AS evaluations
+    FROM conversation_analyses`;
     const conditions: string[] = [];
     const params: any[] = [];
 
@@ -4165,7 +4172,7 @@ app.get("/api/v2/analysis/list", async (req: Request, res: Response) => {
       queryText += ' WHERE ' + conditions.join(' AND ');
     }
 
-    queryText += ' ORDER BY created_at DESC';
+    queryText += ' ORDER BY created_at DESC LIMIT 200';
 
     const { rows } = await pool.query(queryText, params);
 
@@ -4188,7 +4195,8 @@ app.get("/api/v2/analysis/list", async (req: Request, res: Response) => {
     }
 
     const analyses = rows.map(row => {
-      const result = row.result as any;
+      const evals = row.evaluations as any[] | null;
+      const pc = row.phase_coverage as any;
       const userInfo = userMap[row.user_id];
       return {
         id: row.id,
@@ -4200,21 +4208,19 @@ app.get("/api/v2/analysis/list", async (req: Request, res: Response) => {
         error: row.error,
         createdAt: row.created_at,
         completedAt: row.completed_at,
-        overallScore: result?.insights?.overallScore ?? null,
-        turnCount: result?.transcript?.length ?? null,
-        durationMs: result?.transcript?.length > 0
-          ? result.transcript[result.transcript.length - 1].endMs
-          : null,
-        techniquesFound: result?.evaluations
-          ? [...new Set(result.evaluations.flatMap((e: any) => e.techniques.map((t: any) => t.id)))]
+        overallScore: row.overall_score ?? null,
+        turnCount: row.turn_count ?? null,
+        durationMs: row.duration_ms ?? null,
+        techniquesFound: evals
+          ? [...new Set(evals.flatMap((e: any) => e.techniques.map((t: any) => t.id)))]
           : [],
-        phaseCoverage: result?.insights?.phaseCoverage
+        phaseCoverage: pc
           ? {
-              phase1: result.insights.phaseCoverage.phase1?.score ?? 0,
-              phase2: result.insights.phaseCoverage.phase2?.overall?.score ?? 0,
-              phase3: result.insights.phaseCoverage.phase3?.score ?? 0,
-              phase4: result.insights.phaseCoverage.phase4?.score ?? 0,
-              overall: result.insights.phaseCoverage.overall ?? 0,
+              phase1: pc.phase1?.score ?? 0,
+              phase2: pc.phase2?.overall?.score ?? 0,
+              phase3: pc.phase3?.score ?? 0,
+              phase4: pc.phase4?.score ?? 0,
+              overall: pc.overall ?? 0,
             }
           : null,
       };
