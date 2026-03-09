@@ -876,6 +876,119 @@ export async function runFullAnalysisV3(
   }
 }
 
+// ── V3 Re-Analyze from existing transcript (no audio needed) ────────────────
+
+export async function reAnalyzeFromTranscriptV3(
+  conversationId: string,
+  existingTurns: TranscriptTurn[],
+  userId: string,
+  title?: string
+): Promise<void> {
+  const effectiveTitle = title || `Analyse ${new Date().toLocaleDateString("nl-NL")}`;
+  const job: ConversationAnalysis = {
+    id: conversationId,
+    userId,
+    title: effectiveTitle,
+    type: "upload",
+    status: "evaluating",
+    consentConfirmed: true,
+    createdAt: new Date().toISOString(),
+  };
+  analysisJobsV3.set(conversationId, job);
+
+  try {
+    const turns = existingTurns;
+    if (turns.length === 0) {
+      throw new Error("Geen transcript turns beschikbaar voor re-analyse.");
+    }
+
+    console.log(`[V3 Re-Analysis] Re-evaluating ${turns.length} turns with Claude for ${conversationId}`);
+
+    // Steps 3-10 identical to runFullAnalysisV3
+    job.status = "evaluating";
+    analysisJobsV3.set(conversationId, { ...job });
+    await persistStatus(conversationId, "evaluating");
+
+    const evaluations = await evaluateSellerTurnsV3(turns);
+    const signalsWithContext = await detectCustomerSignalsV3(turns, evaluations);
+    const phaseCoverage = calculatePhaseCoverage(evaluations, turns);
+
+    const missedOpps = await detectMissedOpportunitiesV3(evaluations, signalsWithContext, turns);
+
+    const allDetectedTechIds = evaluations.flatMap((e) => e.techniques.map((t) => t.id));
+    const uniqueTechIds = [...new Set(allDetectedTechIds)];
+    const ssotContext = buildSSOTContextForEvaluation(uniqueTechIds);
+
+    let ragContext = "";
+    try {
+      const techNames = uniqueTechIds.slice(0, 3).map((id) => {
+        const t = getTechnique(id);
+        return t ? t.naam : id;
+      }).join(", ");
+      const ragResult = await searchRag(`verkooptechnieken feedback: ${techNames}`, { limit: 3, threshold: 0.25 });
+      if (ragResult.documents.length > 0) {
+        ragContext = "\nRAG GROUNDING (cursusmateriaal & eerdere correcties):\n" +
+          ragResult.documents.map((d) => `- [${d.docType}] ${d.title}: ${d.content.substring(0, 200)}`).join("\n");
+      }
+    } catch (ragErr: any) {
+      console.warn("[V3 Re-Analysis] RAG search failed (non-fatal):", ragErr.message);
+    }
+
+    job.status = "generating_report";
+    analysisJobsV3.set(conversationId, { ...job });
+    await persistStatus(conversationId, "generating_report");
+
+    const insights = await generateCoachReportV3(turns, evaluations, signalsWithContext, phaseCoverage, missedOpps, ssotContext, ragContext);
+    const { coachDebrief, moments } = await generateCoachArtifactsV3(turns, evaluations, signalsWithContext, phaseCoverage, missedOpps, insights, ssotContext, ragContext);
+    insights.coachDebrief = coachDebrief;
+    insights.moments = moments;
+
+    try {
+      const detailedMetrics = await computeDetailedMetrics(turns, evaluations, signalsWithContext, phaseCoverage);
+      insights.detailedMetrics = detailedMetrics;
+    } catch (err: any) {
+      console.warn("[V3 Re-Analysis] Detailed metrics failed (non-fatal):", err.message);
+    }
+
+    job.status = "completed";
+    job.completedAt = new Date().toISOString();
+    analysisJobsV3.set(conversationId, { ...job });
+
+    const fullResult: FullAnalysisResult = {
+      conversation: { ...job },
+      transcript: turns,
+      evaluations,
+      signals: signalsWithContext,
+      insights,
+    };
+    analysisResultsV3.set(conversationId, fullResult);
+
+    try {
+      await pool.query(
+        `UPDATE conversation_analyses SET status = $1, completed_at = $2, result = $3 WHERE id = $4`,
+        ["completed", new Date().toISOString(), JSON.stringify(fullResult), conversationId]
+      );
+    } catch (err: any) {
+      console.warn("[V3 Re-Analysis] DB completed update failed:", err.message);
+    }
+
+    console.log(`[V3 Re-Analysis] Complete: ${conversationId} — score ${insights.overallScore}%`);
+  } catch (err: any) {
+    console.error(`[V3 Re-Analysis] Failed: ${conversationId}`, err);
+    job.status = "failed";
+    job.error = sanitizeAnalysisError(err);
+    analysisJobsV3.set(conversationId, { ...job });
+    try {
+      await pool.query(
+        `UPDATE conversation_analyses SET status = $1, error = $2 WHERE id = $3`,
+        ["failed", sanitizeAnalysisError(err), conversationId]
+      );
+    } catch (dbErr: any) {
+      console.warn("[V3 Re-Analysis] DB error update failed:", dbErr.message);
+    }
+  }
+}
+
 async function persistStatus(
   conversationId: string,
   status: string

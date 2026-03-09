@@ -282,6 +282,10 @@ def get_google_access_token() -> str:
         except Exception:
             raise ValueError("GOOGLE_CLOUD_SECRET is geen geldige JSON of base64")
 
+    # Fix: python-dotenv loads \n as literal \\n in PEM keys
+    if "private_key" in key_data and "\\n" in key_data["private_key"]:
+        key_data["private_key"] = key_data["private_key"].replace("\\n", "\n")
+
     credentials = service_account.Credentials.from_service_account_info(
         key_data,
         scopes=["https://www.googleapis.com/auth/drive.readonly"]

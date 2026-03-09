@@ -145,6 +145,7 @@ const KNOWLEDGE_TOOLS = new Set([
   "search_training_materials",
   "get_user_profile",
   "suggest_video",
+  "get_technique_script",
   "recall_memories",
   "save_insight",
 ]);

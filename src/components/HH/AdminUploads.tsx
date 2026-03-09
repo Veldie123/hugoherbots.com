@@ -153,16 +153,17 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
   const bulkAbortRef = useRef(false);
   const [processingAnalyses, setProcessingAnalyses] = useState<{id: string, title: string, status: string}[]>([]);
 
-  const fetchAnalyses = useCallback(async () => {
+  const fetchAnalyses = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const res = await apiFetch("/api/v2/analysis/list?source=upload");
+      const res = await apiFetch("/api/v2/analysis/list?source=upload", { signal });
       if (!res.ok) throw new Error("Analyses ophalen mislukt");
       const data = await res.json();
       setAnalyses(data.analyses || []);
     } catch (err: any) {
+      if (err.name === 'AbortError') return;
       setError(err.message || "Kon analyses niet laden");
     } finally {
       setIsLoading(false);
@@ -170,7 +171,9 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
   }, []);
 
   useEffect(() => {
-    fetchAnalyses();
+    const controller = new AbortController();
+    fetchAnalyses(controller.signal);
+    return () => controller.abort();
   }, [fetchAnalyses]);
 
   const handleRetryAnalysis = async (analysisId: string) => {
@@ -836,10 +839,10 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                               <Eye className="w-4 h-4 mr-2" />
                               Bekijk Analyse
                             </DropdownMenuItem>
-                            {analysis.status === 'failed' && (
+                            {(analysis.status === 'failed' || analysis.status === 'completed') && (
                               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleRetryAnalysis(analysis.id); }}>
                                 <RefreshCw className="w-4 h-4 mr-2" />
-                                Opnieuw proberen
+                                {analysis.status === 'failed' ? 'Opnieuw proberen' : 'Opnieuw analyseren'}
                               </DropdownMenuItem>
                             )}
                           </DropdownMenuContent>
@@ -892,10 +895,10 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                             <Eye className="w-4 h-4 mr-2" />
                             Bekijk Analyse
                           </DropdownMenuItem>
-                          {analysis.status === 'failed' && (
+                          {(analysis.status === 'failed' || analysis.status === 'completed') && (
                             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleRetryAnalysis(analysis.id); }}>
                               <RefreshCw className="w-4 h-4 mr-2" />
-                              Opnieuw proberen
+                              {analysis.status === 'failed' ? 'Opnieuw proberen' : 'Opnieuw analyseren'}
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>

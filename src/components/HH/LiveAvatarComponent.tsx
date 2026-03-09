@@ -9,21 +9,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Video, VideoOff, Mic, MicOff, Phone, PhoneOff } from "lucide-react";
-import { useLiveAvatar } from "../../hooks/useLiveAvatar";
+import { useAvatarProvider, type AvatarPlatform } from "../../hooks/useAvatarProvider";
 
 interface LiveAvatarProps {
   v2SessionId?: string;
   onAvatarSpeech?: (text: string) => void;
   onUserSpeech?: (text: string) => void;
   language?: string;
+  platform?: AvatarPlatform;
 }
 
 export function LiveAvatarComponent({
   onAvatarSpeech,
   onUserSpeech,
-  language = "nl"
+  language = "nl",
+  platform = "heygen"
 }: LiveAvatarProps) {
-  const avatar = useLiveAvatar({ language, onAvatarSpeech, onUserSpeech });
+  const avatar = useAvatarProvider(platform, { language, onAvatarSpeech, onUserSpeech });
 
   const getStatusColor = () => {
     switch (avatar.status) {

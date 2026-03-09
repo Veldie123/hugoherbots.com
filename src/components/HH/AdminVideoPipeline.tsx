@@ -73,6 +73,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: any }> 
   pending: { label: "Wachtend", color: "bg-yellow-500/10 text-yellow-600", icon: Clock },
   downloading: { label: "Downloaden", color: "bg-hh-primary/10 text-hh-primary", icon: HardDrive },
   processing: { label: "Verwerken", color: "bg-hh-ui-100 text-hh-ink", icon: FileVideo },
+  normalizing_audio: { label: "Audio normalisatie", color: "bg-violet-500/10 text-violet-600", icon: Mic },
   extracting_audio: { label: "Audio extractie", color: "bg-indigo-500/10 text-indigo-600", icon: Mic },
   transcribing: { label: "Transcriberen", color: "bg-cyan-500/10 text-cyan-600", icon: FileText },
   embedding: { label: "RAG embeddings", color: "bg-teal-500/10 text-teal-600", icon: FileText },
@@ -121,7 +122,7 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
         comparison = nameA.localeCompare(nameB);
         break;
       case 'status':
-        const statusOrder = ['pending', 'downloading', 'processing', 'extracting_audio', 'transcribing', 'embedding', 'completed', 'failed'];
+        const statusOrder = ['pending', 'downloading', 'processing', 'normalizing_audio', 'extracting_audio', 'transcribing', 'embedding', 'completed', 'failed'];
         comparison = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
         break;
       case 'size':
@@ -173,6 +174,7 @@ export function AdminVideoPipeline({ navigate }: AdminVideoPipelineProps) {
             break;
           case "downloading":
           case "processing":
+          case "normalizing_audio":
           case "extracting_audio":
           case "transcribing":
           case "embedding":

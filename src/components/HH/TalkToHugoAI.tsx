@@ -868,6 +868,9 @@ export function TalkToHugoAI({
     if (chatMode !== "video") {
       avatarModeSignalSentRef.current = false;
     }
+    if (chatMode !== "audio") {
+      setShowVoiceCoach(false);
+    }
   }, [chatMode, avatar.status, avatar.start, audioConnectionState, isAudioConnecting, initLiveKitAudio]);
 
   // When avatar connects in V3 mode, send [AVATAR_MODE] signal to trigger script presentation
@@ -2816,7 +2819,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
   );
 
   const renderVideoInterface = () => (
-    <div className="h-full w-full relative" style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%)' }}>
+    <div className="flex-1 min-h-0 w-full relative" style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%)' }}>
       {/* Error message */}
       {avatarError && (
         <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-20">

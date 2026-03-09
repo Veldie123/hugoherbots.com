@@ -98,6 +98,13 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 | Tabs | shadcn `Tabs` |
 | Video calls | `@daily-co/daily-js` + `CustomDailyCall` component |
 
+## SSOT Terminologie (STRIKT)
+
+- **Methodologie:** Altijd "E.P.I.C. TECHNIQUE" — met puntjes, met TECHNIQUE erachter. NOOIT "EPIC", "Epic", "E.P.I.C." zonder TECHNIQUE.
+- **Technieken:** Bij elke referentie naar een verkooptechniek ALLEEN de exacte benaming uit `config/ssot/technieken_index.json`. NOOIT parafraseren, vertalen, of generieke alternatieven gebruiken. Voorbeeld: "Feitgerichte vragen (2.1.1)" niet "stel open vragen".
+- **Klanthoudingen:** ALLEEN de exacte 9 namen uit `config/klant_houdingen.json` (H1-H9). NOOIT "de klant twijfelt" als je "Twijfel (H6)" bedoelt.
+- **Check:** Zoek de exacte naam op in de SSOT files voor je een techniek of houding noemt.
+
 ## Code Conventions
 
 - **Interface taal:** Nederlands (labels, placeholders, toasts, foutmeldingen)

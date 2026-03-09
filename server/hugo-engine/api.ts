@@ -118,9 +118,10 @@ import {
   getAnalysisStatus,
   getAnalysisResults,
   generateCoachArtifacts,
+  reAnalyzeFromTranscriptV2,
   type ConversationAnalysis,
 } from "./v2/analysis-service";
-import { runFullAnalysisV3 } from "./v3/analysis-service";
+import { runFullAnalysisV3, reAnalyzeFromTranscriptV3 } from "./v3/analysis-service";
 import { isV3Available } from "./v3/anthropic-client";
 import pLimit from "p-limit";
 import multer from "multer";
@@ -3960,13 +3961,38 @@ app.post("/api/v2/analysis/retry/:conversationId", express.json(), async (req: R
     }
 
     const storageKey = analysis.storage_key;
-    if (!storageKey) {
-      return res.status(400).json({ error: 'Audiobestand niet meer beschikbaar. Upload het gesprek opnieuw.' });
-    }
+    const filePath = storageKey ? path.join(process.cwd(), 'tmp/uploads', storageKey) : null;
+    const fileExists = filePath && fs.existsSync(filePath);
 
-    const filePath = path.join(process.cwd(), 'tmp/uploads', storageKey);
-    if (!fs.existsSync(filePath)) {
-      return res.status(400).json({ error: 'Audiobestand niet meer beschikbaar. Upload het gesprek opnieuw.' });
+    if (!fileExists) {
+      // Audio file gone — try re-evaluating from existing transcript in DB
+      const { rows: resultRows } = await pool.query(
+        'SELECT result FROM conversation_analyses WHERE id = $1 AND result IS NOT NULL',
+        [conversationId]
+      );
+      const existingTranscript = resultRows[0]?.result?.transcript;
+      if (!existingTranscript || !Array.isArray(existingTranscript) || existingTranscript.length === 0) {
+        return res.status(400).json({ error: 'Audiobestand niet meer beschikbaar. Upload het gesprek opnieuw.' });
+      }
+
+      await pool.query(
+        'UPDATE conversation_analyses SET status = $1, error = NULL WHERE id = $2',
+        ['evaluating', conversationId]
+      );
+
+      const isSuperadmin = req.userEmail?.toLowerCase() === SUPERADMIN_EMAIL && isV3Available();
+      if (isSuperadmin) {
+        v3AnalysisLimit(() => reAnalyzeFromTranscriptV3(conversationId as string, existingTranscript, analysis.user_id, analysis.title));
+      } else {
+        reAnalyzeFromTranscriptV2(conversationId as string, existingTranscript, analysis.user_id, analysis.title);
+      }
+
+      return res.json({
+        success: true,
+        conversationId,
+        status: 'evaluating',
+        message: 'Analyse wordt opnieuw geëvalueerd...'
+      });
     }
 
     await pool.query(
@@ -3974,7 +4000,7 @@ app.post("/api/v2/analysis/retry/:conversationId", express.json(), async (req: R
       ['transcribing', conversationId]
     );
 
-    runAnalysisForUser(conversationId as string, storageKey, analysis.user_id, req.userEmail, analysis.title);
+    runAnalysisForUser(conversationId as string, storageKey!, analysis.user_id, req.userEmail, analysis.title);
 
     res.json({
       success: true,

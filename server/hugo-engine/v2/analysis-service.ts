@@ -795,35 +795,24 @@ export function calculatePhaseCoverage(
   }
   const exploreScore = EXPLORE_THEMES.length > 0 ? Math.round((coveredThemes.length / EXPLORE_THEMES.length) * 100) : 0;
 
-  const probeFound = allTechIds.some(id => id.startsWith('2.2'));
-  const probeExamples: string[] = [];
-  if (probeFound) {
-    const probeEvals = evaluations.filter(e => e.techniques.some(t => t.id.startsWith('2.2')));
-    for (const ev of probeEvals) {
-      const turn = turns.find(t => t.idx === ev.turnIdx);
-      if (turn) probeExamples.push(turn.text.substring(0, 100));
-    }
+  // Quality-based sub-component scoring (not binary)
+  function epicSubScore(prefix: string): { score: number; found: boolean; examples: string[] } {
+    const relevant = evaluations.filter(e => e.techniques.some(t => t.id.startsWith(prefix)));
+    if (relevant.length === 0) return { score: 0, found: false, examples: [] };
+    const qualities = relevant.flatMap(e =>
+      e.techniques.filter(t => t.id.startsWith(prefix)).map(t => qualityToScore(t.quality))
+    );
+    const avgScore = Math.round((qualities.reduce((a, b) => a + b, 0) / qualities.length / 10) * 100);
+    const examples = relevant.slice(0, 3).map(e => {
+      const turn = turns.find(t => t.idx === e.turnIdx);
+      return turn ? turn.text.substring(0, 100) : '';
+    }).filter(Boolean);
+    return { score: avgScore, found: true, examples };
   }
 
-  const impactFound = allTechIds.some(id => id.startsWith('2.3'));
-  const impactExamples: string[] = [];
-  if (impactFound) {
-    const impactEvals = evaluations.filter(e => e.techniques.some(t => t.id.startsWith('2.3')));
-    for (const ev of impactEvals) {
-      const turn = turns.find(t => t.idx === ev.turnIdx);
-      if (turn) impactExamples.push(turn.text.substring(0, 100));
-    }
-  }
-
-  const commitFound = allTechIds.some(id => id.startsWith('2.4'));
-  const commitExamples: string[] = [];
-  if (commitFound) {
-    const commitEvals = evaluations.filter(e => e.techniques.some(t => t.id.startsWith('2.4')));
-    for (const ev of commitEvals) {
-      const turn = turns.find(t => t.idx === ev.turnIdx);
-      if (turn) commitExamples.push(turn.text.substring(0, 100));
-    }
-  }
+  const probe = epicSubScore('2.2');
+  const impact = epicSubScore('2.3');
+  const commit = epicSubScore('2.4');
 
   const phase3 = calculatePhaseScore(
     evaluations,
@@ -849,9 +838,9 @@ export function calculatePhaseCoverage(
     phase2: {
       overall: phase2Overall,
       explore: { score: exploreScore, themes: coveredThemes, missing: missingThemes },
-      probe: { score: probeFound ? 100 : 0, found: probeFound, examples: probeExamples },
-      impact: { score: impactFound ? 100 : 0, found: impactFound, examples: impactExamples },
-      commit: { score: commitFound ? 100 : 0, found: commitFound, examples: commitExamples },
+      probe: { score: probe.score, found: probe.found, examples: probe.examples },
+      impact: { score: impact.score, found: impact.found, examples: impact.examples },
+      commit: { score: commit.score, found: commit.found, examples: commit.examples },
     },
     phase3,
     phase4,
@@ -1566,6 +1555,117 @@ export async function runFullAnalysis(
       );
     } catch (dbErr: any) {
       console.warn('[Analysis] DB error update failed:', dbErr.message);
+    }
+  }
+}
+
+// ── V2 Re-Analyze from existing transcript (no audio needed) ────────────────
+
+export async function reAnalyzeFromTranscriptV2(
+  conversationId: string,
+  existingTurns: TranscriptTurn[],
+  userId: string,
+  title?: string
+): Promise<void> {
+  const effectiveTitle = title || `Analyse ${new Date().toLocaleDateString('nl-NL')}`;
+  const job: ConversationAnalysis = {
+    id: conversationId,
+    userId,
+    title: effectiveTitle,
+    type: 'upload',
+    status: 'evaluating',
+    consentConfirmed: true,
+    createdAt: new Date().toISOString(),
+  };
+  analysisJobs.set(conversationId, job);
+
+  try {
+    const turns = existingTurns;
+    if (turns.length === 0) {
+      throw new Error('Geen transcript turns beschikbaar voor re-analyse.');
+    }
+
+    console.log(`[V2 Re-Analysis] Re-evaluating ${turns.length} turns for ${conversationId}`);
+
+    job.status = 'evaluating';
+    analysisJobs.set(conversationId, { ...job });
+    await persistStatusToDb(conversationId, 'evaluating');
+
+    const evaluations = await evaluateSellerTurns(turns);
+    const signals = await detectCustomerSignals(turns, evaluations);
+    const phaseCoverage = calculatePhaseCoverage(evaluations, turns);
+    const missedOpps = await detectMissedOpportunities(evaluations, signals, turns);
+
+    const allDetectedTechIds = evaluations.flatMap(e => e.techniques.map(t => t.id));
+    const uniqueTechIds = [...new Set(allDetectedTechIds)];
+    const ssotContext = buildSSOTContextForEvaluation(uniqueTechIds);
+
+    let ragContext = '';
+    try {
+      const techNames = uniqueTechIds.slice(0, 3).map(id => {
+        const t = getTechnique(id);
+        return t ? t.naam : id;
+      }).join(', ');
+      const ragResult = await searchRag(`verkooptechnieken feedback: ${techNames}`, { limit: 3, threshold: 0.25 });
+      if (ragResult.documents.length > 0) {
+        ragContext = '\nRAG GROUNDING (cursusmateriaal & eerdere correcties):\n' +
+          ragResult.documents.map(d => `- [${d.docType}] ${d.title}: ${d.content.substring(0, 200)}`).join('\n');
+      }
+    } catch (ragErr: any) {
+      console.warn('[V2 Re-Analysis] RAG search failed (non-fatal):', ragErr.message);
+    }
+
+    job.status = 'generating_report';
+    analysisJobs.set(conversationId, { ...job });
+    await persistStatusToDb(conversationId, 'generating_report');
+
+    const insights = await generateCoachReport(turns, evaluations, signals, phaseCoverage, missedOpps, ssotContext, ragContext);
+    const { coachDebrief, moments } = await generateCoachArtifacts(turns, evaluations, signals, phaseCoverage, missedOpps, insights, ssotContext, ragContext);
+    insights.coachDebrief = coachDebrief;
+    insights.moments = moments;
+
+    try {
+      const detailedMetrics = await computeDetailedMetrics(turns, evaluations, signals, phaseCoverage);
+      insights.detailedMetrics = detailedMetrics;
+    } catch (err: any) {
+      console.warn('[V2 Re-Analysis] Detailed metrics failed (non-fatal):', err.message);
+    }
+
+    job.status = 'completed';
+    job.completedAt = new Date().toISOString();
+    analysisJobs.set(conversationId, { ...job });
+
+    const fullResult: FullAnalysisResult = {
+      conversation: { ...job },
+      transcript: turns,
+      evaluations,
+      signals,
+      insights,
+    };
+    analysisResults.set(conversationId, fullResult);
+
+    try {
+      await pool.query(
+        `UPDATE conversation_analyses SET status = $1, completed_at = $2, result = $3 WHERE id = $4`,
+        ['completed', new Date().toISOString(), JSON.stringify(fullResult), conversationId]
+      );
+    } catch (err: any) {
+      console.warn('[V2 Re-Analysis] DB completed update failed:', err.message);
+    }
+
+    console.log(`[V2 Re-Analysis] Complete: ${conversationId} — score ${insights.overallScore}%`);
+  } catch (err: any) {
+    console.error(`[V2 Re-Analysis] Failed: ${conversationId}`, err);
+    job.status = 'failed';
+    job.error = sanitizeAnalysisError(err);
+    analysisJobs.set(conversationId, { ...job });
+    try {
+      await pool.query(
+        `UPDATE conversation_analyses SET status = $1, error = $2 WHERE id = $3`,
+        ['failed', sanitizeAnalysisError(err), conversationId]
+      );
+    } catch (dbErr: any) {
+      console.warn('[V2 Re-Analysis] DB error update failed:', dbErr.message);
     }
   }
 }
