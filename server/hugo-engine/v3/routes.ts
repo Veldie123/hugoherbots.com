@@ -547,6 +547,69 @@ router.get("/access", requireAuth, async (req: Request, res: Response) => {
   res.json(access);
 });
 
+// ── Admin maintenance endpoints ──────────────────────────────────────────────
+
+/** Backfill session summaries for all existing coaching sessions */
+router.post("/admin/backfill-summaries", requireAuth, async (req: Request, res: Response) => {
+  if (req.userEmail !== SUPERADMIN_EMAIL) {
+    return res.status(403).json({ error: "Alleen superadmin." });
+  }
+
+  try {
+    const { data } = await supabase
+      .from("v3_sessions")
+      .select("id, user_id, mode, messages")
+      .eq("mode", "coaching");
+
+    let saved = 0;
+    for (const row of data || []) {
+      const userMsgs = (row.messages || []).filter((m: any) => m.role === "user");
+      if (userMsgs.length < 2) continue;
+
+      await saveSessionSummary({
+        sessionId: row.id,
+        userId: row.user_id,
+        mode: row.mode,
+        messages: row.messages,
+        engineVersion: "v3",
+      } as V3SessionState);
+      saved++;
+    }
+
+    res.json({ backfilled: saved, total: (data || []).length });
+  } catch (err: any) {
+    console.error("[V3] Backfill error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/** Delete empty coaching sessions (no real user messages) */
+router.post("/admin/cleanup-empty-sessions", requireAuth, async (req: Request, res: Response) => {
+  if (req.userEmail !== SUPERADMIN_EMAIL) {
+    return res.status(403).json({ error: "Alleen superadmin." });
+  }
+
+  try {
+    const { data } = await supabase
+      .from("v3_sessions")
+      .select("id, messages")
+      .eq("mode", "coaching");
+
+    const emptyIds = (data || [])
+      .filter(row => (row.messages || []).filter((m: any) => m.role === "user").length < 2)
+      .map(row => row.id);
+
+    if (emptyIds.length > 0) {
+      await supabase.from("v3_sessions").delete().in("id", emptyIds);
+    }
+
+    res.json({ deleted: emptyIds.length, remaining: (data || []).length - emptyIds.length });
+  } catch (err: any) {
+    console.error("[V3] Cleanup error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Mount voice routes at /api/v3/voice/*
 router.use("/voice", voiceRoutes);
 

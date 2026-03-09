@@ -62,7 +62,7 @@ import type { ThinkingMode } from "../../services/hugoApi";
 import { lastActivityService } from "../../services/lastActivityService";
 import { SessionRating } from "./SessionRating";
 import { VoiceCoach } from "./VoiceCoach";
-import { useLiveAvatar } from "../../hooks/useLiveAvatar";
+import { useAvatarProvider, type AvatarPlatform } from "../../hooks/useAvatarProvider";
 import { Room, RoomEvent, Track, ConnectionState } from "livekit-client";
 
 interface MessageDebugInfo {
@@ -235,8 +235,9 @@ export function TalkToHugoAI({
   const [onboardingFeedbackInput, setOnboardingFeedbackInput] = useState<string | null>(null);
   const [onboardingCurrentItem, setOnboardingCurrentItem] = useState<{ module: string; key: string; name: string } | null>(null);
 
-  // HeyGen LiveAvatar (video mode)
-  const avatar = useLiveAvatar({
+  // Avatar platform: superadmin can toggle between HeyGen and Tavus for A/B testing
+  const [avatarPlatform, setAvatarPlatform] = useState<AvatarPlatform>("heygen");
+  const avatar = useAvatarProvider(avatarPlatform, {
     language: "nl",
     onAvatarSpeech: (text) => {
       setMessages(prev => [...prev, {
@@ -323,6 +324,10 @@ export function TalkToHugoAI({
           }));
 
           setMessages(historyMessages);
+          // Scroll to top for historical sessions (prevent auto-scroll to bottom)
+          userHasScrolledUp.current = true;
+          setTimeout(() => scrollContainerRef.current?.scrollTo({ top: 0 }), 50);
+
           if (isV3Session) {
             hugoApi.persistSessionId(session.id);
           } else {
@@ -2822,10 +2827,19 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             {isAvatarSpeaking && (
               <span className="bg-hh-success text-white text-[10px] px-2 py-0.5 rounded-full">Spreekt</span>
             )}
+            {/* A/B platform toggle — superadmin only */}
+            {isSuperAdmin && avatar.status !== "connected" && (
+              <button
+                onClick={() => setAvatarPlatform(prev => prev === "heygen" ? "tavus" : "heygen")}
+                className="text-white/60 text-[10px] px-2 py-0.5 rounded-full border border-white/20 hover:bg-white/10 transition-colors ml-auto"
+              >
+                {avatarPlatform === "heygen" ? "HeyGen" : "Tavus"}
+              </button>
+            )}
           </div>
           <p className="text-white/70 text-[14px]">{formatTime(sessionTimer)}</p>
           {isAvatarLoading && (
-            <p className="text-white/60 text-[12px] mt-1">Avatar laden...</p>
+            <p className="text-white/60 text-[12px] mt-1">Avatar laden ({avatarPlatform})...</p>
           )}
         </div>
       )}

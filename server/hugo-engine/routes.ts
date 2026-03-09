@@ -3576,6 +3576,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/tavus/session - Create Tavus Phoenix-4 conversation
+  // Returns conversation_url (Daily.co WebRTC) for the frontend to join
+  app.post("/api/tavus/session", async (req, res) => {
+    try {
+      const tavusApiKey = process.env.TAVUS_API_KEY;
+      const replicaId = process.env.TAVUS_REPLICA_ID;
+      const personaId = process.env.TAVUS_PERSONA_ID;
+
+      if (!tavusApiKey) {
+        console.error("[Tavus] TAVUS_API_KEY is missing from environment");
+        return res.status(500).json({
+          error: "Tavus API key not configured",
+          details: "TAVUS_API_KEY environment variable is not set"
+        });
+      }
+
+      if (!replicaId) {
+        console.error("[Tavus] TAVUS_REPLICA_ID is missing from environment");
+        return res.status(500).json({
+          error: "Tavus replica not configured",
+          details: "TAVUS_REPLICA_ID environment variable is not set"
+        });
+      }
+
+      console.log("[Tavus] Creating conversation with replica:", replicaId);
+
+      const requestBody: Record<string, any> = {
+        replica_id: replicaId,
+        conversational_context: "You are Hugo Herbots, an 82-year-old Belgian sales coach. Respond in the user's language. Be warm, direct, and use your decades of experience in sales coaching.",
+        properties: {
+          max_call_duration: 3600,
+          enable_recording: false,
+        },
+      };
+
+      if (personaId) {
+        requestBody.persona_id = personaId;
+      }
+
+      const response = await fetch("https://tavusapi.com/v2/conversations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": tavusApiKey,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error(`[Tavus] Conversation creation failed - Status: ${response.status}, Body: ${errorBody}`);
+        return res.status(response.status).json({
+          error: "Failed to create Tavus conversation",
+          details: errorBody,
+          status: response.status,
+        });
+      }
+
+      const data = await response.json();
+      console.log("[Tavus] Conversation created:", data.conversation_id);
+
+      res.json({
+        conversation_id: data.conversation_id,
+        conversation_url: data.conversation_url,
+      });
+    } catch (error: any) {
+      console.error("[Tavus] Unexpected error:", error.message, error.stack);
+      res.status(500).json({ error: safeErrorMessage(error) });
+    }
+  });
+
   // POST /api/heygen/token - Get streaming avatar access token
   // Uses HeyGen Streaming Avatar API at api.heygen.com
   app.post("/api/heygen/token", async (req, res) => {

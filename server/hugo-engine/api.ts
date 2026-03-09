@@ -1652,13 +1652,18 @@ app.get("/api/user/sessions", async (req, res) => {
         .limit(20);
 
       v3SessionList = (v3Rows || [])
-        .filter(row => (row.messages || []).length > 1) // Only sessions with actual conversation
+        .filter(row => {
+          // Filter: must have at least 1 real seller message (not the system opening prompt)
+          const msgs = row.messages || [];
+          const userMsgs = msgs.filter((m: any) => m.role === 'user');
+          return userMsgs.length >= 2; // 1st = system prompt, 2nd = real seller
+        })
         .map(row => {
           const messages = row.messages || [];
-          // V3 first "user" message is the system opening prompt — skip it
-          // Use the second user message (the real first message from the seller)
-          const userMessages = messages.filter((m: any) => m.role === 'user');
-          const realUserMsg = userMessages.length > 1 ? userMessages[1] : null;
+          // V3: find first user message AFTER the opening assistant response
+          const firstAssistantIdx = messages.findIndex((m: any) => m.role === 'assistant');
+          const afterOpening = firstAssistantIdx >= 0 ? messages.slice(firstAssistantIdx + 1) : messages;
+          const realUserMsg = afterOpening.find((m: any) => m.role === 'user');
           let naam = 'Nieuw gesprek';
           if (realUserMsg) {
             const text = typeof realUserMsg.content === 'string'
