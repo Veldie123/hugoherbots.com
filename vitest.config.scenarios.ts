@@ -3,7 +3,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     include: ["tests/scenarios/**/*.test.ts"],
-    testTimeout: 120_000, // 2 minutes per scenario (LLM calls are slow)
+    testTimeout: 300_000, // 5 minutes per scenario (multi-turn LLM conversations)
     hookTimeout: 30_000,
     // Run scenarios sequentially to avoid API rate limits
     sequence: { concurrent: false },
