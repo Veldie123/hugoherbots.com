@@ -13,6 +13,7 @@ import { supabase } from "../../supabase-client";
 import {
   saveMemory,
   recallMemories as recallMemoriesFromService,
+  getMemoriesForUser,
   type MemoryType,
 } from "../memory-service";
 
@@ -109,6 +110,26 @@ export const knowledgeToolDefinitions: Anthropic.Tool[] = [
     },
   },
   {
+    name: "get_technique_script",
+    description:
+      "Haal het volledige transcript op van een trainingsvideo voor een specifieke techniek. Geeft de tekst terug die Hugo in de video uitspreekt, gesegmenteerd per paragraaf. Gebruik dit in avatar-modus om de les-content via de avatar te presenteren. Optioneel: vertaal naar een doeltaal.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        technique_id: {
+          type: "string",
+          description: "De techniek-ID waarvoor het script opgehaald wordt (bv. '1.1', '2.1.3').",
+        },
+        target_language: {
+          type: "string",
+          enum: ["nl", "fr", "en", "de"],
+          description: "Doeltaal voor vertaling. Default: nl (origineel, geen vertaling).",
+        },
+      },
+      required: ["technique_id"],
+    },
+  },
+  {
     name: "save_insight",
     description:
       "Sla een inzicht of observatie op over deze seller. Wordt opgeslagen in episodisch geheugen en is beschikbaar in toekomstige sessies. Gebruik dit na belangrijke observaties, patronen, of persoonlijke context.",
@@ -162,6 +183,8 @@ export async function executeKnowledgeTool(
       return await getUserProfile(input.user_id);
     case "suggest_video":
       return await suggestVideo(input.technique_id);
+    case "get_technique_script":
+      return await getTechniqueScript(input.technique_id, input.target_language);
     case "recall_memories":
       return await recallMemories(input.user_id, input.query, input.memory_type);
     case "save_insight":
@@ -357,6 +380,109 @@ async function suggestVideo(techniqueId: string): Promise<string> {
   }
 }
 
+async function getTechniqueScript(
+  techniqueId: string,
+  targetLanguage?: string
+): Promise<string> {
+  try {
+    // Load video mapping to find videos for this technique
+    const mappingPath = join(process.cwd(), "config/video_mapping.json");
+    const mapping = JSON.parse(readFileSync(mappingPath, "utf-8"));
+    const videoEntries = Object.values(mapping.videos || mapping) as any[];
+
+    // Find video for this technique
+    const video = videoEntries.find(
+      (v: any) =>
+        v.techniek === techniqueId ||
+        v.techniek_id === techniqueId ||
+        v.technique_id === techniqueId
+    );
+
+    if (!video) {
+      return JSON.stringify({
+        error: `Geen video gevonden voor techniek ${techniqueId}.`,
+        fallback: "Gebruik de techniek-definitie uit de SSOT om de les zelf te presenteren.",
+      });
+    }
+
+    // Fetch transcript from Supabase (video_ingest_jobs table)
+    const { data: jobData, error: jobError } = await supabase
+      .from("video_ingest_jobs")
+      .select("transcript, video_title, ai_attractive_title, ai_summary")
+      .or(`techniek_id.eq.${techniqueId},ai_suggested_techniek_id.eq.${techniqueId}`)
+      .not("transcript", "is", null)
+      .limit(1)
+      .single();
+
+    if (jobError || !jobData?.transcript) {
+      // Fallback: try matching by video file name
+      const fileName = video.file_name;
+      if (fileName) {
+        const { data: fallbackData } = await supabase
+          .from("video_ingest_jobs")
+          .select("transcript, video_title, ai_attractive_title, ai_summary")
+          .eq("drive_file_name", fileName)
+          .not("transcript", "is", null)
+          .limit(1)
+          .single();
+
+        if (fallbackData?.transcript) {
+          return formatScriptResponse(fallbackData, techniqueId, targetLanguage);
+        }
+      }
+
+      return JSON.stringify({
+        error: `Transcript niet gevonden voor techniek ${techniqueId}.`,
+        fallback: "Gebruik de techniek-definitie uit de SSOT om de les zelf te presenteren.",
+      });
+    }
+
+    return formatScriptResponse(jobData, techniqueId, targetLanguage);
+  } catch (error: any) {
+    return JSON.stringify({ error: `Script ophalen mislukt: ${error.message}` });
+  }
+}
+
+function formatScriptResponse(
+  jobData: any,
+  techniqueId: string,
+  targetLanguage?: string
+): string {
+  const transcript: string = jobData.transcript;
+
+  // Split transcript into segments (paragraphs or sentences)
+  const segments = transcript
+    .split(/\n\n+/)
+    .map((s: string) => s.trim())
+    .filter((s: string) => s.length > 0);
+
+  const result: any = {
+    technique_id: techniqueId,
+    title: jobData.ai_attractive_title || jobData.video_title,
+    summary: jobData.ai_summary,
+    language: "nl",
+    segment_count: segments.length,
+    segments,
+    instruction:
+      "Presenteer deze segmenten één voor één via de avatar. " +
+      "Pauzeer kort tussen segmenten zodat de seller kan onderbreken. " +
+      "Als de seller onderbreekt, schakel naar coaching modus. " +
+      "Na coaching, hervat bij het volgende segment.",
+  };
+
+  if (targetLanguage && targetLanguage !== "nl") {
+    result.translation_needed = true;
+    result.target_language = targetLanguage;
+    result.translation_instruction =
+      `Vertaal elk segment naar ${targetLanguage} voordat je het via de avatar uitspreekt. ` +
+      "Behoud Hugo's persoonlijke stijl en toon. " +
+      "Verkooptermen mogen in het Engels blijven (explore, probe, etc.). " +
+      "Whiteboard-termen mogen in het Nederlands blijven — leg ze uit in de doeltaal.";
+  }
+
+  return JSON.stringify(result);
+}
+
 async function recallMemories(
   userId: string,
   query?: string,
@@ -386,7 +512,19 @@ async function recallMemories(
       });
     }
 
-    // Fallback: recent historical sessions
+    // Fallback 1: recent memories directly (no semantic search, just newest entries)
+    const recentMemories = await getMemoriesForUser(userId, 5);
+    if (recentMemories.length > 0) {
+      return JSON.stringify({
+        memories: recentMemories.map((m) => ({
+          content: m.content,
+          type: m.memoryType,
+          date: m.createdAt,
+        })),
+      });
+    }
+
+    // Fallback 2: V2 historical sessions
     const result = await pool.query(
       `SELECT technique_id, mode, total_score, context, created_at
        FROM v2_sessions

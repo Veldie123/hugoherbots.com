@@ -3533,7 +3533,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const responseData = await response.json();
-      console.log("[LiveAvatar] Token response code:", responseData.code);
+      console.log("[LiveAvatar] Token response:", JSON.stringify(responseData).slice(0, 500));
       
       // LiveAvatar returns { code: 1000, data: { session_id, session_token } }
       const sessionData = responseData.data || responseData;

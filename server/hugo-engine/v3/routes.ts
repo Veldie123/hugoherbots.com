@@ -54,6 +54,9 @@ function enrichTraceMetadata(req: Request, sessionId: string, mode: string): voi
   }
 }
 
+/** Track which sessions have already been summarized (prevents duplicate summaries) */
+const summarizedSessions = new Set<string>();
+
 /** Save session to Supabase (async, non-blocking).
  *  Only persists when the user has sent at least one message. */
 async function persistSession(session: V3SessionState): Promise<void> {
@@ -73,6 +76,12 @@ async function persistSession(session: V3SessionState): Promise<void> {
       },
       updated_at: new Date().toISOString(),
     }, { onConflict: "id" });
+
+    // Auto-generate session summary after enough real conversation (fire-and-forget)
+    if (session.mode === "coaching" && userMessageCount >= 3 && !summarizedSessions.has(session.sessionId)) {
+      summarizedSessions.add(session.sessionId);
+      saveSessionSummary(session).catch(() => {});
+    }
   } catch (err: any) {
     console.error("[V3] Session persist failed:", err.message);
   }
@@ -123,7 +132,15 @@ async function saveSessionSummary(session: V3SessionState): Promise<void> {
 async function loadSession(sessionId: string): Promise<V3SessionState | null> {
   // Check memory first
   const cached = sessions.get(sessionId);
-  if (cached) return cached;
+  if (cached) {
+    // Ensure briefing exists for coaching sessions (may be lost after server restart)
+    if (cached.mode === "coaching" && !cached.briefing) {
+      try {
+        cached.briefing = await buildUserBriefing(cached.userId);
+      } catch { /* continue without */ }
+    }
+    return cached;
+  }
 
   // Try Supabase
   try {
@@ -144,6 +161,16 @@ async function loadSession(sessionId: string): Promise<V3SessionState | null> {
       userProfile: data.user_profile,
       engineVersion: "v3",
     };
+
+    // Rebuild briefing for coaching sessions so system prompt has user context
+    if (session.mode === "coaching") {
+      try {
+        session.briefing = await buildUserBriefing(session.userId);
+        console.log(`[V3] Briefing rebuilt for loaded session ${sessionId}`);
+      } catch {
+        // Briefing is nice-to-have, continue without
+      }
+    }
 
     sessions.set(sessionId, session);
     return session;
@@ -331,9 +358,9 @@ router.post(
         if (hasSpecificTechnique) {
           openingPrompt = `De seller wil werken aan techniek ${techniqueId}. Begroet hem kort en natuurlijk als Hugo. Verwijs naar wat je weet over deze seller uit je briefing.`;
         } else if (briefing && !briefing.isNewUser) {
-          openingPrompt = `Je hebt zojuist de briefing van deze seller gelezen in je system prompt. Begroet hem kort en natuurlijk als Hugo. Verwijs naar iets concreets uit zijn geschiedenis en stel een logische volgende stap voor. Eindig met "of zit je ergens anders mee?" zodat hij ook vrij kan kiezen.`;
+          openingPrompt = `Je hebt de briefing van deze seller gelezen. Begroet hem warm als Hugo. Verwijs kort naar zijn activiteit (video's, analyses, eerdere sessies). Maar Hugo begint ALTIJD met begrijpen: als je niet weet wat hij verkoopt of aan wie (check je briefing — staat er een product of sector?), vraag dat eerst. Hugo stelt pas iets voor (oefening, rollenspel, coaching) als hij de concrete situatie van de seller snapt. Eindig met een open vraag.`;
         } else {
-          openingPrompt = `Dit is een nieuwe seller${briefing?.sector ? ` in de sector ${briefing.sector}` : ''}. Begroet hem warm als Hugo. Vertel kort wat je voor hem kunt doen (oefenen met technieken, rollenspel, feedback op gesprekken, analyse van echte verkoopgesprekken) en vraag wat hij verkoopt en waar hij tegenaan loopt, zodat je hem gericht kunt helpen.`;
+          openingPrompt = `Dit is een nieuwe seller${briefing?.sector ? ` in de sector ${briefing.sector}` : ''}. Begroet hem warm als Hugo. Hugo is nieuwsgierig: wie is deze verkoper? Wat verkoopt hij? Aan wie? Waar loopt hij tegenaan? Stel een open, warme vraag om zijn situatie te leren kennen. Noem nog geen oefeningen of rollenspellen — die komen pas als je zijn wereld begrijpt.`;
         }
       }
 

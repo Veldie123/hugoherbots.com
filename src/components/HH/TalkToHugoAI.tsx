@@ -850,10 +850,14 @@ export function TalkToHugoAI({
     }
   }, [liveKitRoom]);
 
+  // Track whether we've sent the avatar mode signal for this session
+  const avatarModeSignalSentRef = useRef(false);
+
   // Handle chat mode change
   useEffect(() => {
     if (chatMode === "video" && avatar.status === "idle") {
       avatar.start();
+      avatarModeSignalSentRef.current = false;
     } else if (chatMode === "audio") {
       if (engineModel === "v3") {
         setShowVoiceCoach(true);
@@ -861,7 +865,31 @@ export function TalkToHugoAI({
         initLiveKitAudio();
       }
     }
+    if (chatMode !== "video") {
+      avatarModeSignalSentRef.current = false;
+    }
   }, [chatMode, avatar.status, avatar.start, audioConnectionState, isAudioConnecting, initLiveKitAudio]);
+
+  // When avatar connects in V3 mode, send [AVATAR_MODE] signal to trigger script presentation
+  useEffect(() => {
+    if (
+      chatMode === "video" &&
+      avatar.status === "connected" &&
+      engineModel === "v3" &&
+      !avatarModeSignalSentRef.current
+    ) {
+      avatarModeSignalSentRef.current = true;
+      // Add system message to chat and send to V3 agent
+      const systemMsg: Message = {
+        id: `avatar-mode-${Date.now()}`,
+        sender: "hugo",
+        text: "Video-sessie gestart",
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, systemMsg]);
+      processMessageSend("[AVATAR_MODE] De seller heeft een video-sessie gestart. Start met de volgende techniek.");
+    }
+  }, [chatMode, avatar.status, engineModel]);
 
   // Cleanup on unmount (LiveAvatar cleanup handled by the hook)
   useEffect(() => {
@@ -2022,7 +2050,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           </div>
         </div>
       )}
-      <div ref={scrollContainerRef} onScroll={handleChatScroll} className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div ref={scrollContainerRef} onScroll={handleChatScroll} className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
         {/* Coach View Summary — shown when analysis data is loaded */}
         {analysisResult?.insights && (
           <CoachViewSummary
@@ -2674,7 +2702,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
   );
 
   const renderAudioInterface = () => (
-    <div className="h-full w-full flex flex-col" style={{ background: 'linear-gradient(180deg, var(--hh-success) 0%, #0d9488 50%, #0f766e 100%)' }}>
+    <div className="flex-1 min-h-0 w-full flex flex-col" style={{ background: 'linear-gradient(180deg, var(--hh-success) 0%, #0d9488 50%, #0f766e 100%)' }}>
       {/* Error message */}
       {audioError && (
         <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-10">

@@ -164,7 +164,7 @@ async function fetchUserName(userId: string): Promise<{
     const { data: userData } = await supabase.auth.admin.getUserById(userId);
     const name = userData?.user?.user_metadata?.first_name || null;
 
-    // Also fetch user context from last session
+    // Fetch user context from last V2 session
     let context: any = null;
     try {
       const contextResult = await pool.query(
@@ -175,6 +175,18 @@ async function fetchUserName(userId: string): Promise<{
       );
       context = contextResult.rows[0]?.context;
     } catch (e) { console.error('[UserBriefing] Error fetching session context:', e); }
+
+    // Fallback: if no V2 context, check V3 session memories for context clues
+    if (!context) {
+      try {
+        const memories = await getMemoriesForUser(userId, 3);
+        if (memories.length > 0) {
+          // Session summaries may contain product/sector mentions
+          // For now, having memories means this is NOT a new user
+          // The actual product/sector will come from the conversation + memory content in briefing
+        }
+      } catch { /* best-effort */ }
+    }
 
     return {
       name: name || "daar",
@@ -194,7 +206,8 @@ async function fetchSessions(userId: string): Promise<{
   lastActivity?: { type: string; name: string; when: string };
 }> {
   try {
-    const { data: sessions } = await supabase
+    // V2 sessions
+    const { data: v2Sessions } = await supabase
       .from("v2_sessions")
       .select("technique_id, mode, total_score, conversation_history, created_at")
       .eq("user_id", userId)
@@ -202,33 +215,77 @@ async function fetchSessions(userId: string): Promise<{
       .order("created_at", { ascending: false })
       .limit(50);
 
-    if (!sessions || sessions.length === 0) {
+    // V3 coaching sessions (count + last activity)
+    const { data: v3Sessions } = await supabase
+      .from("v3_sessions")
+      .select("id, messages, created_at, updated_at")
+      .eq("user_id", userId)
+      .eq("mode", "coaching")
+      .order("updated_at", { ascending: false })
+      .limit(10);
+
+    // Filter V3 sessions with real user messages (not just opening)
+    const v3WithContent = (v3Sessions || []).filter(s => {
+      const userMsgs = (s.messages || []).filter((m: any) => m.role === "user");
+      return userMsgs.length >= 2;
+    });
+
+    const v2Count = v2Sessions?.length || 0;
+    const v3Count = v3WithContent.length;
+    const totalCount = v2Count + v3Count;
+
+    if (totalCount === 0) {
       return { count: 0, avgScore: 0 };
     }
 
-    const scores = sessions.map(
-      (s) => Math.min(100, Math.round(50 + (s.conversation_history?.length || 0) * 2.5))
-    );
-    const avgScore = Math.round(
-      scores.reduce((a, b) => a + b, 0) / scores.length
-    );
+    // Average score from V2 sessions (V3 doesn't have scores yet)
+    let avgScore = 0;
+    if (v2Count > 0) {
+      const scores = v2Sessions!.map(
+        (s) => Math.min(100, Math.round(50 + (s.conversation_history?.length || 0) * 2.5))
+      );
+      avgScore = Math.round(
+        scores.reduce((a, b) => a + b, 0) / scores.length
+      );
+    }
 
-    const last = sessions[0];
-    const techName = last.technique_id
-      ? getTechniqueName(last.technique_id)
-      : null;
+    // Last activity: check both V2 and V3
+    let lastActivity: { type: string; name: string; when: string } | undefined;
 
-    return {
-      count: sessions.length,
-      avgScore,
-      lastActivity: techName
-        ? {
-            type: last.mode || "sessie",
-            name: techName,
-            when: timeAgo(last.created_at),
-          }
-        : undefined,
-    };
+    const lastV2 = v2Sessions?.[0];
+    const lastV3 = v3WithContent[0];
+
+    const v2Time = lastV2 ? new Date(lastV2.created_at).getTime() : 0;
+    const v3Time = lastV3 ? new Date(lastV3.updated_at).getTime() : 0;
+
+    if (v3Time > v2Time && lastV3) {
+      // Most recent activity is a V3 coaching session
+      const msgs = lastV3.messages || [];
+      const firstRealUser = msgs.find((m: any, i: number) =>
+        m.role === "user" && i > 0
+      );
+      const preview = firstRealUser
+        ? (typeof firstRealUser.content === "string" ? firstRealUser.content : "").slice(0, 40)
+        : "coaching sessie";
+      lastActivity = {
+        type: "V3 coaching",
+        name: preview || "coaching sessie",
+        when: timeAgo(lastV3.updated_at),
+      };
+    } else if (lastV2) {
+      const techName = lastV2.technique_id
+        ? getTechniqueName(lastV2.technique_id)
+        : null;
+      if (techName) {
+        lastActivity = {
+          type: lastV2.mode || "sessie",
+          name: techName,
+          when: timeAgo(lastV2.created_at),
+        };
+      }
+    }
+
+    return { count: totalCount, avgScore, lastActivity };
   } catch {
     return { count: 0, avgScore: 0 };
   }
