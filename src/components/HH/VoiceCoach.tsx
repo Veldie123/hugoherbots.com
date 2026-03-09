@@ -173,7 +173,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
         <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-10">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span className="text-[14px]">{error}</span>
-          <button onClick={endSession} className="ml-auto">
+          <button onClick={() => setError(null)} className="ml-auto">
             <X className="w-4 h-4" />
           </button>
         </div>

@@ -142,7 +142,12 @@ export function LiveAnalysePanel() {
             <div className="flex items-center gap-3">
               {/* Listening indicator */}
               <div className="flex items-center gap-2">
-                {isListening ? (
+                {!isListening && !error ? (
+                  <>
+                    <div className="w-2 h-2 rounded-full bg-hh-warning animate-pulse" />
+                    <span className="text-[12px] leading-[16px] text-hh-muted">Verbinding maken...</span>
+                  </>
+                ) : isListening ? (
                   <>
                     <div className="w-2 h-2 rounded-full bg-hh-success animate-pulse" />
                     <span className="text-[12px] leading-[16px] text-hh-text">Listening...</span>

@@ -38,8 +38,7 @@ const connections = new Map<string, LiveAnalyseConnection>();
 
 export function setupLiveAnalyseWebSocket(server: Server) {
   const wss = new WebSocketServer({
-    server,
-    path: "/ws/live-analyse",
+    noServer: true,
     maxPayload: MAX_WS_MESSAGE_SIZE,
   });
 

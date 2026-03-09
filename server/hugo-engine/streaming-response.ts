@@ -95,8 +95,7 @@ const MAX_WS_MESSAGE_SIZE = 64 * 1024; // SEC-060: 64KB max message size
 
 export function setupStreamingResponseWebSocket(server: Server) {
   const wss = new WebSocketServer({
-    server,
-    path: "/ws/stream-response",
+    noServer: true,
     maxPayload: MAX_WS_MESSAGE_SIZE,
   });
 

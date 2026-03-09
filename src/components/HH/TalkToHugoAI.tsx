@@ -170,6 +170,7 @@ export function TalkToHugoAI({
   const [ratingSessionId, setRatingSessionId] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showVoiceCoach, setShowVoiceCoach] = useState(false);
+  const [voiceAvailable, setVoiceAvailable] = useState<boolean | null>(null);
   const [desktopSidebarOpen, setDesktopSidebarOpenRaw] = useState(
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('epic') === '1'
   );
@@ -198,6 +199,14 @@ export function TalkToHugoAI({
   useEffect(() => {
     hugoApi.setThinkingMode(thinkingMode);
   }, [thinkingMode]);
+
+  // Check voice availability on mount
+  useEffect(() => {
+    apiFetch("/api/v3/voice/health")
+      .then(r => r.json())
+      .then(data => setVoiceAvailable(data.available === true))
+      .catch(() => setVoiceAvailable(false));
+  }, []);
 
   // Handle engine model switch — reset session and restart
   const handleEngineModelChange = useCallback((newModel: EngineModel) => {
@@ -3067,8 +3076,9 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 </button>
                 <button
                   onClick={() => setChatMode("audio")}
-                  className={`p-2 rounded-full transition-all ${chatMode === "audio" ? "bg-card shadow-sm text-hh-ink" : "text-hh-primary/60 hover:text-hh-primary"}`}
-                  title="Bellen"
+                  className={`p-2 rounded-full transition-all ${chatMode === "audio" ? "bg-card shadow-sm text-hh-ink" : voiceAvailable === false ? "text-hh-muted cursor-not-allowed" : "text-hh-primary/60 hover:text-hh-primary"}`}
+                  title={voiceAvailable === false ? "Voice niet beschikbaar" : "Bellen"}
+                  disabled={voiceAvailable === false}
                 >
                   <Phone className="w-4 h-4" strokeWidth={1.5} />
                 </button>
@@ -3142,6 +3152,10 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             </div>
           </div>
         </div>
+
+        {showVoiceCoach && (
+          <VoiceCoach onClose={() => { setShowVoiceCoach(false); setChatMode("chat"); }} />
+        )}
       </div>
 
       <StopRoleplayDialog
@@ -3160,10 +3174,6 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             }}
           />
         </div>
-      )}
-
-      {showVoiceCoach && (
-        <VoiceCoach onClose={() => { setShowVoiceCoach(false); setChatMode("chat"); }} />
       )}
 
       <TechniqueDetailsDialog

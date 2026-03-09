@@ -188,12 +188,15 @@ server.on('upgrade', (req, socket, head) => {
   let pathname;
   try { pathname = new URL(req.url, `http://localhost:${PORT}`).pathname; } catch(e) { pathname = req.url; }
 
+  console.log(`[Production] WebSocket upgrade: ${pathname}`);
+
   if (pathname.startsWith('/ws/')) {
     const proxyReq = http.request({
       hostname: '127.0.0.1', port: 3002, path: req.url, method: req.method,
       headers: { ...req.headers, host: '127.0.0.1:3002' },
     });
     proxyReq.on('upgrade', (proxyRes, proxySocket) => {
+      console.log(`[Production] WebSocket upgrade success: ${pathname}`);
       socket.write(
         'HTTP/1.1 101 Switching Protocols\r\n' +
         Object.entries(proxyRes.headers).map(([k, v]) => `${k}: ${v}`).join('\r\n') +
@@ -202,7 +205,10 @@ server.on('upgrade', (req, socket, head) => {
       proxySocket.pipe(socket);
       socket.pipe(proxySocket);
     });
-    proxyReq.on('error', () => socket.destroy());
+    proxyReq.on('error', (err) => {
+      console.error(`[Production] WebSocket proxy error for ${pathname}:`, err.message);
+      socket.destroy();
+    });
     proxyReq.end();
   } else {
     socket.destroy();

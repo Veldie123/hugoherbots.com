@@ -4996,14 +4996,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
 
-  // Setup ElevenLabs Scribe WebSocket for real-time STT
-  setupScribeWebSocket(httpServer);
+  // Setup WebSocket servers (noServer mode — manual upgrade routing)
+  const scribeWss = setupScribeWebSocket(httpServer);
+  const liveAnalyseWss = setupLiveAnalyseWebSocket(httpServer);
+  const streamingWss = setupStreamingResponseWebSocket(httpServer);
 
-  // Setup Live Analyse WebSocket for real-time coaching
-  setupLiveAnalyseWebSocket(httpServer);
-  
-  // Setup streaming response WebSocket for low-latency LLM->TTS->Audio
-  setupStreamingResponseWebSocket(httpServer);
-  
+  httpServer.on("upgrade", (request, socket, head) => {
+    const pathname = new URL(request.url || "", `http://${request.headers.host}`).pathname;
+    if (pathname === "/ws/scribe") {
+      scribeWss.handleUpgrade(request, socket, head, (ws) => {
+        scribeWss.emit("connection", ws, request);
+      });
+    } else if (pathname === "/ws/live-analyse") {
+      liveAnalyseWss.handleUpgrade(request, socket, head, (ws) => {
+        liveAnalyseWss.emit("connection", ws, request);
+      });
+    } else if (pathname === "/ws/stream-response") {
+      streamingWss.handleUpgrade(request, socket, head, (ws) => {
+        streamingWss.emit("connection", ws, request);
+      });
+    } else {
+      socket.destroy();
+    }
+  });
+
   return httpServer;
 }

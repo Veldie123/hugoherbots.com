@@ -57,6 +57,8 @@ export function useLiveAnalyse(): UseLiveAnalyseReturn {
     };
   }, [isActive]);
 
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const start = useCallback(async () => {
     setError(null);
     setTranscript([]);
@@ -83,14 +85,28 @@ export function useLiveAnalyse(): UseLiveAnalyseReturn {
       return;
     }
 
+    // Show active UI immediately (before WebSocket connects)
+    setIsActive(true);
+
     // Connect WebSocket
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws/live-analyse?token=${token}`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
+    // Connection timeout — 10s
+    timeoutRef.current = setTimeout(() => {
+      if (ws.readyState !== WebSocket.OPEN) {
+        setError("Verbinding timeout — controleer je internetverbinding");
+        ws.close();
+        stopAudioCapture();
+        setIsActive(false);
+        setIsListening(false);
+      }
+    }, 10000);
+
     ws.onopen = () => {
-      setIsActive(true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setIsListening(true);
       startAudioCapture(stream, ws);
     };
@@ -142,16 +158,20 @@ export function useLiveAnalyse(): UseLiveAnalyseReturn {
     };
 
     ws.onerror = () => {
-      setError("Verbinding verbroken");
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      setError("Verbinding mislukt — probeer opnieuw");
     };
 
     ws.onclose = () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setIsListening(false);
       stopAudioCapture();
     };
   }, []);
 
   const stop = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
     // Send stop message
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ type: "stop_session" }));
@@ -219,6 +239,7 @@ export function useLiveAnalyse(): UseLiveAnalyseReturn {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       wsRef.current?.close();
       stopAudioCapture();
       if (durationIntervalRef.current) clearInterval(durationIntervalRef.current);

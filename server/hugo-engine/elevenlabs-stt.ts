@@ -24,8 +24,7 @@ const connections = new Map<string, ScribeConnection>();
 
 export function setupScribeWebSocket(server: Server) {
   const wss = new WebSocketServer({
-    server,
-    path: "/ws/scribe",
+    noServer: true,
     maxPayload: MAX_WS_MESSAGE_SIZE,
   });
 

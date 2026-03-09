@@ -297,8 +297,8 @@ app.use((req, res, next) => {
 
 // JWT Authentication — applied to all /api/ routes with exemptions
 app.use('/api', (req: Request, res: Response, next: NextFunction) => {
-  // Skip auth for health checks, Stripe webhooks, platform sync, and V3 status
-  const publicPaths = ['/health', '/stripe/webhook', '/v3/status', '/feedback/error'];
+  // Skip auth for health checks, Stripe webhooks, platform sync, V3 status, and voice endpoints
+  const publicPaths = ['/health', '/stripe/webhook', '/v3/status', '/feedback/error', '/v3/voice/health', '/v3/voice/llm', '/v3/voice/chat/completions'];
   if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
     return next();
   }
@@ -5651,11 +5651,24 @@ app.post("/api/sso/cleanup", async (req, res) => {
 
 const server = createServer(app);
 
-// Setup ElevenLabs Scribe WebSocket for STT
-setupScribeWebSocket(server);
+// Setup WebSocket servers (noServer mode — manual upgrade routing)
+const scribeWss = setupScribeWebSocket(server);
+const liveAnalyseWss = setupLiveAnalyseWebSocket(server);
 
-// Setup Live Analyse WebSocket for real-time coaching
-setupLiveAnalyseWebSocket(server);
+server.on("upgrade", (request, socket, head) => {
+  const pathname = new URL(request.url || "", `http://${request.headers.host}`).pathname;
+  if (pathname === "/ws/scribe") {
+    scribeWss.handleUpgrade(request, socket, head, (ws) => {
+      scribeWss.emit("connection", ws, request);
+    });
+  } else if (pathname === "/ws/live-analyse") {
+    liveAnalyseWss.handleUpgrade(request, socket, head, (ws) => {
+      liveAnalyseWss.emit("connection", ws, request);
+    });
+  } else {
+    socket.destroy();
+  }
+});
 
 async function startServer() {
   // ============================================================================
