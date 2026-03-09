@@ -11,10 +11,16 @@ console.log('[HugoEngine] Environment:', {
   AI_INTEGRATIONS_OPENAI_BASE_URL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL ? 'set' : 'NOT SET',
   AI_INTEGRATIONS_OPENAI_API_KEY: process.env.AI_INTEGRATIONS_OPENAI_API_KEY ? 'set' : 'NOT SET',
   DATABASE_URL: process.env.DATABASE_URL ? 'set' : 'NOT SET',
+  LANGWATCH_API_KEY: process.env.LANGWATCH_API_KEY ? 'set' : 'NOT SET',
 });
 
-import('./api').catch(err => {
-  console.error('[HugoEngine] Failed to start:', err.message);
-  console.error('[HugoEngine] Stack:', err.stack);
-  process.exit(1);
-});
+// Initialize LangWatch observability BEFORE importing api (which loads Anthropic SDK)
+import { initObservability } from './v3/observability';
+
+initObservability()
+  .then(() => import('./api'))
+  .catch(err => {
+    console.error('[HugoEngine] Failed to start:', err.message);
+    console.error('[HugoEngine] Stack:', err.stack);
+    process.exit(1);
+  });

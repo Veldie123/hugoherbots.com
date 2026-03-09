@@ -15,6 +15,7 @@ import { supabase } from "../supabase-client";
 import { pool } from "../db";
 import { randomUUID } from "crypto";
 import { voiceRoutes } from "./voice-routes";
+import { trace } from "@opentelemetry/api";
 
 // File upload: 5MB limit, images + PDF only
 const upload = multer({
@@ -35,6 +36,23 @@ const router = Router();
 const sessions = new Map<string, V3SessionState>();
 
 const SUPERADMIN_EMAIL = "stephane@hugoherbots.com";
+
+/** Enrich the current OpenTelemetry span with V3 session metadata */
+function enrichTraceMetadata(req: Request, sessionId: string, mode: string): void {
+  try {
+    const span = trace.getActiveSpan();
+    if (!span) return;
+    span.setAttributes({
+      "langwatch.user.id": req.userId || "unknown",
+      "langwatch.thread.id": sessionId,
+      "hugoclaw.mode": mode,
+      "hugoclaw.user_email": req.userEmail || "unknown",
+      "hugoclaw.thinking_mode": req.body?.thinkingMode || "auto",
+    });
+  } catch {
+    // Tracing is best-effort — never break the request
+  }
+}
 
 /** Save session to Supabase (async, non-blocking).
  *  Only persists when the user has sent at least one message. */
@@ -241,6 +259,7 @@ router.post(
 
     const session = createSession(sessionId, req.userId!, sessionMode, userProfile, briefing);
     sessions.set(sessionId, session);
+    enrichTraceMetadata(req, sessionId, sessionMode);
     persistSession(session);
     console.log(`[V3] Session created: ${sessionId} (mode: ${sessionMode})`);
 
@@ -371,6 +390,8 @@ router.post(
       return res.status(403).json({ error: "Geen toegang tot deze sessie mode." });
     }
 
+    enrichTraceMetadata(req, sessionId, session.mode);
+
     try {
       const response = await chat(session, message.trim(), (thinkingMode as ThinkingMode) || "auto");
       persistSession(session);
@@ -421,6 +442,8 @@ router.post(
     if (!await validateSessionAccess(session, req.userEmail!)) {
       return res.status(403).json({ error: "Geen toegang tot deze sessie mode." });
     }
+
+    enrichTraceMetadata(req, sessionId, session.mode);
 
     // Build content: text + optional file attachments as content blocks
     const files = (req.files as Express.Multer.File[]) || [];
