@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HugoHerbots.ai — Businessplan 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #F8FAFC 0%, #EDF1F5 100%); color: #0F1826; line-height: 1.7; font-size: 16px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 50px; padding: 60px 40px; background: linear-gradient(135deg, #0F1826 0%, #1e3a5f 50%, #4F7396 100%); border-radius: 20px; box-shadow: 0 10px 40px rgba(15, 24, 38, 0.2); color: white; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 200%; background: radial-gradient(circle, rgba(79, 115, 150, 0.3) 0%, transparent 60%); }
+        .header h1 { font-size: 2.8rem; font-weight: 700; margin-bottom: 8px; position: relative; }
+        .header .subtitle { font-size: 1.3rem; font-weight: 300; opacity: 0.9; margin-bottom: 20px; position: relative; }
+        .header .date { font-size: 0.9rem; opacity: 0.6; position: relative; }
+        .section { background: white; border-radius: 20px; padding: 40px; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(15, 24, 38, 0.06); border: 1px solid #E2E8F0; }
+        .section h2 { font-size: 1.6rem; font-weight: 600; color: #0F1826; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #4F7396; display: flex; align-items: center; gap: 15px; }
+        .section-number { background: #4F7396; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+        .section h3 { font-size: 1.2rem; font-weight: 600; color: #4F7396; margin: 28px 0 12px 0; }
+        .section h4 { font-size: 1.05rem; font-weight: 600; color: #475569; margin: 20px 0 8px 0; }
+        .section p { margin-bottom: 12px; color: #0F1826; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+        .stat-grid.four { grid-template-columns: repeat(4, 1fr); }
+        .stat-card { background: #F8FAFC; border-radius: 16px; padding: 24px 20px; text-align: center; border: 1px solid #E2E8F0; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: #4F7396; line-height: 1.2; }
+        .stat-value.success { color: #10B981; }
+        .stat-value.small { font-size: 1.4rem; }
+        .stat-label { font-size: 0.85rem; color: #9CA3AF; margin-top: 4px; font-weight: 400; }
+        .feature-list { list-style: none; margin: 20px 0; }
+        .feature-list li { padding: 16px 20px; margin: 8px 0; background: #F8FAFC; border-radius: 12px; border-left: 4px solid #4F7396; }
+        .feature-list li strong { color: #0F1826; }
+        .feature-list li.success { border-left-color: #10B981; }
+        .feature-list li.warning { border-left-color: #F59E0B; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid #E2E8F0; }
+        th { background: #4F7396; color: white; padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.9rem; }
+        td { padding: 12px 16px; border-bottom: 1px solid #E2E8F0; font-size: 0.95rem; }
+        tr:nth-child(even) td { background: #F8FAFC; }
+        tr:last-child td { border-bottom: none; }
+        td.number { font-weight: 600; font-variant-numeric: tabular-nums; }
+        td.positive { color: #10B981; font-weight: 600; }
+        td.negative { color: #EF4444; font-weight: 600; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .badge-done { background: #D1FAE5; color: #065F46; }
+        .badge-partial { background: #FEF3C7; color: #92400E; }
+        .badge-planned { background: #E2E8F0; color: #475569; }
+        .badge-next { background: #DBEAFE; color: #1E40AF; }
+        .badge-live { background: #D1FAE5; color: #065F46; }
+        .highlight-box { background: linear-gradient(135deg, #EDF5EC 0%, #D1FAE5 100%); border-radius: 16px; padding: 24px; margin: 20px 0; border-left: 5px solid #10B981; }
+        .highlight-box h4 { color: #065F46; margin-bottom: 8px; font-size: 1.05rem; }
+        .highlight-box p { color: #065F46; margin-bottom: 0; }
+        .warning-box { background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border-radius: 16px; padding: 24px; margin: 20px 0; border-left: 5px solid #F59E0B; }
+        .warning-box h4 { color: #92400E; margin-bottom: 8px; font-size: 1.05rem; }
+        .warning-box p { color: #92400E; margin-bottom: 0; }
+        blockquote { border-left: 4px solid #4F7396; padding: 16px 24px; margin: 24px 0; background: #F8FAFC; border-radius: 0 12px 12px 0; font-style: italic; color: #4F7396; font-size: 1.1rem; }
+        .progress-bar-container { margin: 16px 0; }
+        .progress-bar-label { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; }
+        .progress-bar { height: 12px; background: #E2E8F0; border-radius: 6px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 6px; }
+        .progress-fill.primary { background: #4F7396; }
+        .progress-fill.success { background: #10B981; }
+        .engine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .engine-card { background: #F8FAFC; border-radius: 12px; padding: 16px; border: 1px solid #E2E8F0; }
+        .engine-card h4 { color: #4F7396; margin: 0 0 6px 0; font-size: 0.95rem; }
+        .engine-card p { font-size: 0.9rem; color: #64748B; margin: 0; }
+        .flywheel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+        .flywheel-step { background: #F8FAFC; border-radius: 16px; padding: 20px; border: 1px solid #E2E8F0; position: relative; }
+        .flywheel-step .step-num { position: absolute; top: -10px; left: 16px; background: #4F7396; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+        .flywheel-step h4 { color: #4F7396; margin-bottom: 6px; margin-top: 8px; font-size: 1rem; }
+        .flywheel-step p { font-size: 0.9rem; color: #9CA3AF; margin-bottom: 0; }
+        .timeline { margin: 24px 0; position: relative; }
+        .timeline::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 3px; background: #E2E8F0; }
+        .timeline-item { padding-left: 52px; padding-bottom: 24px; position: relative; }
+        .timeline-dot { position: absolute; left: 12px; top: 4px; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px #E2E8F0; }
+        .timeline-dot.active { background: #10B981; box-shadow: 0 0 0 2px #10B981; }
+        .timeline-dot.next { background: #4F7396; box-shadow: 0 0 0 2px #4F7396; }
+        .timeline-dot.future { background: #E2E8F0; }
+        .timeline-label { font-weight: 600; font-size: 1rem; color: #0F1826; }
+        .timeline-desc { font-size: 0.9rem; color: #9CA3AF; margin-top: 2px; }
+        .appendix { background: #F8FAFC; border-radius: 20px; padding: 40px; margin-bottom: 32px; border: 2px dashed #D1D5DB; }
+        .appendix-label { display: inline-block; background: #9CA3AF; color: white; padding: 4px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .appendix h2 { color: #475569; border-bottom-color: #9CA3AF; }
+        .appendix .section-number { background: #9CA3AF; }
+        .appendix h3 { color: #475569; }
+        .appendix table th { background: #64748B; }
+        .footer { text-align: center; padding: 30px; color: #9CA3AF; font-size: 0.9rem; }
+        .toc { background: #F8FAFC; border-radius: 16px; padding: 24px 32px; margin: 24px 0; border: 1px solid #E2E8F0; }
+        .toc h3 { margin: 0 0 12px 0; color: #0F1826; font-size: 1.1rem; }
+        .toc-list { list-style: none; columns: 2; column-gap: 32px; }
+        .toc-list li { padding: 6px 0; font-size: 0.95rem; }
+        .toc-list li a { color: #4F7396; text-decoration: none; }
+        .toc-list li a:hover { text-decoration: underline; }
+        .toc-list .appendix-item a { color: #9CA3AF; }
+        @media (max-width: 640px) {
+            .container { padding: 20px 12px; }
+            .header { padding: 40px 24px; }
+            .header h1 { font-size: 2rem; }
+            .section { padding: 24px 20px; }
+            .stat-grid, .stat-grid.four { grid-template-columns: 1fr 1fr; }
+            .engine-grid { grid-template-columns: 1fr; }
+            .flywheel { grid-template-columns: 1fr; }
+            .toc-list { columns: 1; }
+            table { font-size: 0.85rem; }
+            th, td { padding: 10px 12px; }
+        }
+        @media print {
+            body { background: white; font-size: 14px; }
+            .section, .appendix { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .header { background: #0F1826 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- VOORBLAD -->
+        <div class="header">
+            <h1>HugoHerbots.ai</h1>
+            <p class="subtitle">Businessplan 2026 — 40 Jaar Sales Expertise, Versterkt door AI</p>
+            <p class="date">Laatst bijgewerkt: 9 maart 2026</p>
+        </div>
+
+        <!-- INHOUD -->
+        <div class="section">
+            <div class="toc">
+                <h3>Inhoud</h3>
+                <ul class="toc-list">
+                    <li><a href="#summary">1. Executive Summary</a></li>
+                    <li><a href="#platform">2. Het Platform</a></li>
+                    <li><a href="#methodology">3. E.P.I.C. TECHNIQUE</a></li>
+                    <li><a href="#roadmap">4. Roadmap</a></li>
+                    <li><a href="#vision">5. Langetermijnvisie</a></li>
+                    <li><a href="#financials">6. Financieel Model</a></li>
+                    <li><a href="#competition">7. Concurrentiepositie</a></li>
+                    <li><a href="#marketing">8. Marketing &amp; Groei</a></li>
+                    <li><a href="#risks">9. Risico's &amp; Mitigatie</a></li>
+                    <li><a href="#actions">10. Actieplan</a></li>
+                    <li class="appendix-item"><a href="#appendix">11. Technische Appendix</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 1. EXECUTIVE SUMMARY -->
+        <div class="section" id="summary">
+            <h2><span class="section-number">1</span> Executive Summary</h2>
+
+            <p>HugoHerbots.ai is een AI-gestuurd sales methodologie systeem dat de E.P.I.C. TECHNIQUE van Hugo Herbots — 40 jaar ervaring, 20.000+ opgeleide verkopers, 500+ bedrijven — beschikbaar maakt als intelligent platform. Niet een chatbot met tips. Een compleet ecosysteem van 7 gecoördineerde AI-engines die samen coachen, oefenen, analyseren en real-time bijsturen.</p>
+
+            <div class="stat-grid four">
+                <div class="stat-card">
+                    <div class="stat-value small">7</div>
+                    <div class="stat-label">AI Engines in productie</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value small">47+</div>
+                    <div class="stat-label">Technieken gecodeerd</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value small">559</div>
+                    <div class="stat-label">RAG documenten</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value small">151+</div>
+                    <div class="stat-label">UI componenten</div>
+                </div>
+            </div>
+
+            <p>Het platform draait in productie (V2). Gebruikers kunnen tekst-coachen, rollenspellen uitvoeren met een AI-klant die 9 psychologische houdingen simuleert, echte salesgesprekken uploaden voor turn-by-turn analyse, real-time coaching ontvangen tijdens live calls, en praten met Hugo's video-avatar. Alles grounded in Hugo's authentieke trainingsmateriaal via een RAG-corpus van 559 semantisch geïndexeerde documenten.</p>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-value">9</div>
+                    <div class="stat-label">Users voor break-even</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value success">67%</div>
+                    <div class="stat-label">Marge op Pro (€98/mo)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">9-10</div>
+                    <div class="stat-label">Maanden naar €10k/mo winst</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. HET PLATFORM -->
+        <div class="section" id="platform">
+            <h2><span class="section-number">2</span> Het Platform</h2>
+
+            <h3>2.1 Multi-Engine AI Architectuur (V2 — Productie)</h3>
+            <p>Het platform draait op 7 gespecialiseerde AI-engines die samenwerken. Elke engine heeft een specifiek domein en communiceert met de anderen om een coherente coaching-ervaring te leveren.</p>
+
+            <div class="engine-grid">
+                <div class="engine-card">
+                    <h4>Context Engine</h4>
+                    <p>Bouwt progressief een profiel op: sector, product, verkoopkanaal, klanttype, dealgrootte, koopmotieven, verliesredenen. Persistent over sessies heen.</p>
+                </div>
+                <div class="engine-card">
+                    <h4>Coach Engine</h4>
+                    <p>Socratische coaching in Hugo's stijl. Grounded via RAG in Hugo's 559 originele trainingsdocumenten. Helpt verkopers theorie vertalen naar hun concrete situatie.</p>
+                </div>
+                <div class="engine-card">
+                    <h4>Customer Engine</h4>
+                    <p>Simuleert realistische klanten met 9 psychologische houdingen (H1-H9). Past dynamisch rapport, waardetensie en koopbereidheid aan op basis van verkopertechnieken.</p>
+                </div>
+                <div class="engine-card">
+                    <h4>Evaluator</h4>
+                    <p>Scoort techniek-toepassing per beurt: perfect (10), goed (5), bijna (2), gemist (0). Detecteert max 2 technieken per beurt tegen SSOT stappenplannen.</p>
+                </div>
+                <div class="engine-card">
+                    <h4>RAG Service</h4>
+                    <p>559 semantisch geïndexeerde documenten uit Hugo's trainingsmateriaal. OpenAI embeddings (1536 dims) + pgvector. Elke coaching-response is grounded in authentiek materiaal.</p>
+                </div>
+                <div class="engine-card">
+                    <h4>Intent Detector</h4>
+                    <p>Herkent gebruikersintentie: chat, leren, oefenen, analyseren, verkennen. Triggert contextgevoelige content-suggesties (video's, slides, rollenspellen).</p>
+                </div>
+                <div class="engine-card">
+                    <h4>Speech Humanizer</h4>
+                    <p>Maakt AI-output natuurlijk: pauzes, ademhaling, Dutch filler words (euh, nou, hmm), emphasis detectie. Klaar voor ElevenLabs v3 audio tags.</p>
+                </div>
+                <div class="engine-card">
+                    <h4>Analysis Service</h4>
+                    <p>Pipeline: transcriptie → turn-by-turn evaluatie → klanthouding-detectie → fase-dekking → video-aanbevelingen. Analyseert echte salesgesprekken.</p>
+                </div>
+            </div>
+
+            <h3>2.2 Wat Gebruikers Kunnen</h3>
+
+            <ul class="feature-list">
+                <li class="success"><strong>AI Coaching</strong> — Tekst, stem, of video met Hugo's AI. Cross-session geheugen onthoudt sterktes, zwaktes en context per gebruiker. Multimodal: afbeeldingen en PDF's kunnen meegestuurd worden.</li>
+                <li class="success"><strong>Rollenspel met AI-Klant</strong> — De Customer Engine simuleert een realistische klant die reageert met 9 psychologische houdingen. De klant past rapport, waardetensie en koopbereidheid dynamisch aan. De Evaluator scoort elke techniek-toepassing real-time.</li>
+                <li class="success"><strong>Gesprekanalyse</strong> — Upload een echt salesgesprek. Het platform transcribeert, detecteert technieken per beurt, identificeert klanthoudingen, berekent fase-dekking, en geeft concrete video-aanbevelingen voor verbetering.</li>
+                <li class="success"><strong>Real-time In-Call Coaching (Live Analyse)</strong> — Tijdens een live salesgesprek detecteert het platform de klanthouding en genereert 5 soorten tips: <em>positief</em>, <em>waarschuwing</em>, <em>open</em>, <em>wedervraag</em>, <em>lock</em>. Via ElevenLabs STT real-time transcriptie.</li>
+                <li class="success"><strong>Video Bibliotheek</strong> — 47 trainingsvideo's, elk gekoppeld aan meerdere technieken via AI-gestuurde multi-technique mapping. Adaptive bitrate streaming via Mux.</li>
+                <li class="success"><strong>Video-Avatar</strong> — Tavus Phoenix-4 (actief) en HeyGen (legacy): live video-avatar van Hugo die praat, reageert, en onderbroken kan worden. Real-time transcript van beide kanten.</li>
+                <li class="success"><strong>Live Coaching Sessies</strong> — Daily.co video calls voor groepscoaching met chat, polls, kalender-export, opnames. Registratie en replay.</li>
+                <li class="success"><strong>Techniek-Mastery Tracking</strong> — Per-techniek voortgang, trends, sessie-aantallen, en score-evolutie over tijd. Heatmaps per E.P.I.C. TECHNIQUE fase.</li>
+                <li class="success"><strong>Team Features</strong> — Teamlidmaatschap, gezamenlijke doelen, vergelijkende analytics, en manager-overzicht voor enterprise-klanten.</li>
+            </ul>
+
+            <h3>2.3 V3 — Next-Generation Claude Agent</h3>
+            <p>Naast V2 is een experimenteel V3-systeem in ontwikkeling: één Claude agent met agentic tool loop (max 5 rondes), 31 admin tools, SSE streaming, adaptief denk-budget (fast/deep/auto — geïmplementeerd), context compaction bij 80K tokens, en cross-session geheugen via pgvector. V3 is beschikbaar voor superadmins en wordt geleidelijk uitgerold.</p>
+
+            <h3>2.4 Admin &amp; Creator Tools</h3>
+            <p>Hugo heeft toegang tot een volledig admin dashboard: KPI's, user management, content management, sessie-transcripten, 31 gespecialiseerde AI-tools (RAG-search, techniek-lookup, AI-vs-expected vergelijking, notificaties sturen), en een expert chat mode met debug-panel. Observability via LangWatch + OpenTelemetry.</p>
+        </div>
+
+        <!-- 3. E.P.I.C. TECHNIQUE -->
+        <div class="section" id="methodology">
+            <h2><span class="section-number">3</span> E.P.I.C. TECHNIQUE Methodologie</h2>
+
+            <p>Het complete verkoopproces is gestructureerd in 5 fases met 47+ technieken. Elke techniek is vastgelegd in een Single Source of Truth (SSOT) met doel, stappenplan, voorbeeldzinnen, detectiecriteria, en klantdynamiek-effecten. De AI wijkt hier nooit van af.</p>
+
+            <table>
+                <tr>
+                    <th>Fase</th>
+                    <th>Naam</th>
+                    <th>Technieken</th>
+                    <th>Voorbeelden</th>
+                </tr>
+                <tr>
+                    <td class="number">0</td>
+                    <td><strong>Voorbereiding</strong></td>
+                    <td>5</td>
+                    <td>Prospectanalyse, SWOT-analyse prospect, CRM-historiek raadplegen, One Minute Manager, Gespreksvoorbereiding</td>
+                </tr>
+                <tr>
+                    <td class="number">1</td>
+                    <td><strong>Opening</strong></td>
+                    <td>4</td>
+                    <td>Koopklimaat creëren, Gentleman's agreement, Firmavoorstelling (POP) + Reference Story, Instapvraag</td>
+                </tr>
+                <tr>
+                    <td class="number">2</td>
+                    <td><strong>Ontdekking (E.P.I.C. TECHNIQUE)</strong></td>
+                    <td>16</td>
+                    <td><strong>Explore:</strong> Feitgerichte vragen (Bron, Motivatie, Ervaring, Verwachtingen, Alternatieven, Budget, Timing, Beslissingscriteria), Meningsgerichte vragen, Pingpong techniek, Actief en empathisch luisteren<br><strong>Probe:</strong> Hypothetische verdiepingsvragen<br><strong>Impact:</strong> Impact / Gevolg vragen<br><strong>Commitment:</strong> Expliciete bevestiging</td>
+                </tr>
+                <tr>
+                    <td class="number">3</td>
+                    <td><strong>Aanbeveling (O.V.B.)</strong></td>
+                    <td>7</td>
+                    <td>Empathie tonen, Oplossing presenteren, Voordeel benoemen, Baat vertalen, Mening vragen + standpunt uitlokken, Technisch voorrekenen, Vat baten samen</td>
+                </tr>
+                <tr>
+                    <td class="number">4</td>
+                    <td><strong>Afsluiting</strong></td>
+                    <td>15+</td>
+                    <td>Proefafsluiting, Afritten behandelen (Vragen, Twijfels, Uitstel, Bezwaren, Angst, Risico-inschatting), ABC-techniek, Indien-techniek, Finale Closing (5 substappen)</td>
+                </tr>
+            </table>
+
+            <h3>De 9 Klanthoudingen (H1-H9)</h3>
+            <p>Hugo's model classificeert elke klantreactie in één van 9 psychologische houdingen. De AI herkent deze in real-time en koppelt ze aan de juiste techniek.</p>
+
+            <table>
+                <tr><th>ID</th><th>Houding</th><th>Aanbevolen respons</th></tr>
+                <tr><td>H1</td><td><strong>Positief antwoord</strong></td><td>Bevestigen, doorpakken naar volgende fase</td></tr>
+                <tr><td>H2</td><td><strong>Negatief antwoord</strong></td><td>Aanpak bijsturen, alternatieve vraagstelling</td></tr>
+                <tr><td>H3</td><td><strong>Schijninstemming</strong></td><td>Doorvragen, concretiseren, Pingpong techniek</td></tr>
+                <tr><td>H4</td><td><strong>Te algemeen antwoord</strong></td><td>Verdiepen via Feitgerichte vragen</td></tr>
+                <tr><td>H5</td><td><strong>Vraag</strong></td><td>Wedervraag stellen, informatie strategisch delen</td></tr>
+                <tr><td>H6</td><td><strong>Twijfel</strong></td><td>Twijfels behandelen (4.2.2), Impact / Gevolg vragen</td></tr>
+                <tr><td>H7</td><td><strong>Bezwaar</strong></td><td>Bezwaren behandelen (4.2.4), Indien-techniek</td></tr>
+                <tr><td>H8</td><td><strong>Uitstel</strong></td><td>Uitstel behandelen (4.2.3), ABC-techniek</td></tr>
+                <tr><td>H9</td><td><strong>Angst / Bezorgdheid</strong></td><td>Risico-inschatting behandelen (4.2.6), Empathie tonen</td></tr>
+            </table>
+
+            <div class="highlight-box">
+                <h4>Waarom dit uniek is</h4>
+                <p>Elke techniek heeft een exact stappenplan, voorbeeld uit Hugo's trainingen, en detectiecriteria. De Evaluator scoort niet op vaag "goed gedaan" maar op concrete stappen: heeft de verkoper de juiste vragen gesteld in de juiste volgorde? Dit is geen generieke AI — dit is Hugo's 40 jaar methodologie, gecodeerd als executable kennis.</p>
+            </div>
+        </div>
+
+        <!-- 4. ROADMAP -->
+        <div class="section" id="roadmap">
+            <h2><span class="section-number">4</span> Roadmap</h2>
+
+            <h3>Wat er gebouwd is</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot active"></div>
+                    <div class="timeline-label">V2 Multi-Engine Platform — Live</div>
+                    <div class="timeline-desc">7 AI engines, 47+ technieken, 559 RAG docs, rollenspel, analyse, video's, live coaching, avatar, team features</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot active"></div>
+                    <div class="timeline-label">V3 Productie Foundation — Done</div>
+                    <div class="timeline-desc">SSE streaming, Supabase session persistence, access control, adaptief denk-budget (fast/deep/auto)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot active"></div>
+                    <div class="timeline-label">Intelligence Upgrade — Done</div>
+                    <div class="timeline-desc">Context compaction (80K threshold), multimodal input (afbeeldingen + PDF), cross-session geheugen (pgvector)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot active"></div>
+                    <div class="timeline-label">Live Analyse Panel — Live</div>
+                    <div class="timeline-desc">Real-time coaching tips tijdens live calls. ElevenLabs STT, klanthouding-detectie, 5 tip-types.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot active"></div>
+                    <div class="timeline-label">Video-Avatar — Live</div>
+                    <div class="timeline-desc">Tavus Phoenix-4 (actief, goedkoper alternatief in test), HeyGen LiveAvatar (legacy). Real-time video-interactie.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot active"></div>
+                    <div class="timeline-label">Observability — Live</div>
+                    <div class="timeline-desc">LangWatch + OpenTelemetry trace enrichment. Scenario testing via Vitest.</div>
+                </div>
+            </div>
+
+            <h3>Wat er komt</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot next"></div>
+                    <div class="timeline-label">Voice Agent — Gebouwd, in testing</div>
+                    <div class="timeline-desc">Conversational AI met Hugo's gekloonde stem. ElevenLabs STT → Claude V3 → TTS. Voice-specifieke system prompt, korte antwoorden, WebRTC. Code live — finetuning bezig.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot active"></div>
+                    <div class="timeline-label">Script Builder — Operationeel (V3)</div>
+                    <div class="timeline-desc">4 tools live: start_script_builder, build_script_phase, finalize_script, load_script. Completeness scoring, SSOT phase mapping, iteratieve verbetering. Genereert gepersonaliseerde verkoopscripts per E.P.I.C. TECHNIQUE fase.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot next"></div>
+                    <div class="timeline-label">Marketing Automation — Architectuur klaar</div>
+                    <div class="timeline-desc">MCP server design met 10 tools. AI genereert content in Hugo's stijl, Hugo keurt goed. Automatische budget allocatie (% van MRR), publishing pipeline, performance tracking.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot future"></div>
+                    <div class="timeline-label">Management Dashboard — Concept</div>
+                    <div class="timeline-desc">Sales managers: team E.P.I.C. TECHNIQUE scores, techniek-heatmaps, ROI-bewijs, live sessie-activiteit.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. LANGETERMIJNVISIE -->
+        <div class="section" id="vision">
+            <h2><span class="section-number">5</span> Langetermijnvisie: Agent-First</h2>
+
+            <blockquote>"Eén Hugo. Eén gesprek. Alles op maat."</blockquote>
+
+            <p>De langetermijnvisie is radicaal eenvoudig: geen losse features meer. Geen video bibliotheek, geen webinars, geen analyse-upload als apart proces. Alleen Hugo — die zelf bepaalt of hij chat, praat of op video verschijnt. Eén "Talk to Hugo" knop, achter de schermen een agent die 47+ technieken, 559 RAG-documenten, cross-session geheugen en mastery tracking orkestreert.</p>
+
+            <h3>Van Features naar Agent</h3>
+            <div class="flywheel">
+                <div class="flywheel-step">
+                    <div class="step-num">Nu</div>
+                    <h4>Feature-platform</h4>
+                    <p>7 aparte functies: coaching, rollenspel, video's, analyse, live coaching, avatar, script builder. Gebruiker kiest.</p>
+                </div>
+                <div class="flywheel-step">
+                    <div class="step-num">→</div>
+                    <h4>Agent-first</h4>
+                    <p>Eén gesprek met Hugo. Hugo kiest de juiste modaliteit (chat/audio/video) en het juiste format (uitleg/oefening/analyse/script) op basis van context.</p>
+                </div>
+            </div>
+
+            <h3>Wat verdwijnt, wat versterkt</h3>
+            <table>
+                <tr><th style="width:50%">Verdwijnt als los feature</th><th>Wordt onderdeel van het gesprek</th></tr>
+                <tr><td>Video bibliotheek (47 video's)</td><td>Hugo presenteert technieken segment per segment, onderbreken = vragen stellen</td></tr>
+                <tr><td>Webinars</td><td>Live groepscoaching via avatar — interactief, niet passief</td></tr>
+                <tr><td>Analyse-upload workflow</td><td>"Hugo, analyseer dit gesprek" — in dezelfde chat</td></tr>
+                <tr><td>Script builder als tool</td><td>Hugo bouwt scripts incrementeel, gebaseerd op jouw coaching-data</td></tr>
+                <tr><td>Model selector (V2/V3)</td><td>Eén agent, beste model automatisch</td></tr>
+            </table>
+
+            <h3>Internationalisering zonder vertalen</h3>
+            <p>Het oude model: 47 video's × 4 talen = 188 video's opnemen, monteren, ondertitelen. Onschaalbaar. Het agent-first model: één Hugo die Frans, Duits en Engels spreekt. E.P.I.C. TECHNIQUE termen blijven Nederlands — dat is het merk. De agent past voorbeelden, scenario's en culturele context aan per taal.</p>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-value small">1</div>
+                    <div class="stat-label">Agent voor alle talen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value small">0</div>
+                    <div class="stat-label">Video's te vertalen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value small">∞</div>
+                    <div class="stat-label">Personalisatie per gebruiker</div>
+                </div>
+            </div>
+
+            <h3>Kostenmodel per modaliteit</h3>
+            <table>
+                <tr><th>Modaliteit</th><th>Kost/min</th><th>Marge</th><th>Pro user (€98/mo)</th></tr>
+                <tr><td><strong>Chat (tekst)</strong></td><td class="number">~€0,02</td><td class="positive">98%+</td><td>Onbeperkt</td></tr>
+                <tr><td><strong>Audio (stem)</strong></td><td class="number">~€0,05</td><td class="positive">95%+</td><td>Onbeperkt</td></tr>
+                <tr><td><strong>Video (Tavus avatar)</strong></td><td class="number">~€0,10</td><td class="positive">90%+</td><td>Tot 20 uur/maand</td></tr>
+            </table>
+            <p>Bij Tavus Phoenix-4 pricing kan een Pro-gebruiker <strong>20 uur video-coaching per maand</strong> krijgen — binnen marge. Pricing wordt "toegang tot Hugo's aandacht": meer avatar-minuten = hogere tier.</p>
+
+            <h3>Roadmap naar Agent-First</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot active"></div>
+                    <div class="timeline-label">A. Foundation (Q1 2026) — Done</div>
+                    <div class="timeline-desc">V3 agentic loop, cross-session memory, mastery tracking, SSOT enforcement, avatar abstractie (HeyGen + Tavus), script engine, interrupt/resume flow.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot next"></div>
+                    <div class="timeline-label">B. Unified Experience (Q2 2026)</div>
+                    <div class="timeline-desc">Voice agent (ElevenLabs), modaliteit-switcher (chat ↔ audio ↔ video), "Talk to Hugo" als enige entry point, gepersonaliseerde techniek-presentaties, proactieve coaching triggers.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot future"></div>
+                    <div class="timeline-label">C. Internationaal (Q3 2026)</div>
+                    <div class="timeline-desc">Frans (eerste target), Duits, Engels. Tavus replica getraind op Hugo-footage. Cultureel aangepaste voorbeelden. Franse landingspagina + content engine.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot future"></div>
+                    <div class="timeline-label">D. Full Autonomy (Q4 2026)</div>
+                    <div class="timeline-desc">Hugo initieert sessies proactief. Contextual roleplay vanuit CRM-data. Team coaching met manager-rapportage. Maandrapportages als gesprekken, niet documenten.</div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>Business impact</h4>
+                <p>Churn daalt door emotionele band met video-avatar + proactieve coaching. Hugo onthoudt alles, ziet patronen, stuurt bij. Gebruikers ervaren een persoonlijke coach — niet een tool. De methodologie is de moat, de agent is de interface, de avatar is de ervaring.</p>
+            </div>
+        </div>
+
+        <!-- 6. FINANCIEEL MODEL -->
+        <div class="section" id="financials">
+            <h2><span class="section-number">6</span> Financieel Model</h2>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-value">€606</div>
+                    <div class="stat-label">Vaste kosten per maand</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">~€31</div>
+                    <div class="stat-label">Per actieve user per maand</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value success">9</div>
+                    <div class="stat-label">Users voor break-even</div>
+                </div>
+            </div>
+
+            <h3>Prijzen</h3>
+            <table>
+                <tr><th>Abonnement</th><th>Maandelijks</th><th>Jaarlijks</th><th>Voor wie</th></tr>
+                <tr><td><strong>Pro</strong></td><td class="number">€98/mo</td><td class="number">€49/mo</td><td>Individuele verkopers</td></tr>
+                <tr><td><strong>Founder</strong></td><td class="number">€498/mo</td><td class="number">€249/mo</td><td>Ambitieuze verkopers, kleine teams</td></tr>
+                <tr><td><strong>Inner Circle</strong></td><td class="number">€2.498/mo</td><td class="number">€1.249/mo</td><td>Exclusief (max 20), directe toegang Hugo</td></tr>
+            </table>
+
+            <h3>Marges</h3>
+            <div class="progress-bar-container">
+                <div class="progress-bar-label"><span><strong>Pro</strong> — €98/mo</span><span>67% marge (€66 netto)</span></div>
+                <div class="progress-bar"><div class="progress-fill success" style="width: 67%"></div></div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-label"><span><strong>Founder</strong> — €498/mo</span><span>92% marge (€460 netto)</span></div>
+                <div class="progress-bar"><div class="progress-fill success" style="width: 92%"></div></div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-label"><span><strong>Inner Circle</strong> — €2.498/mo</span><span>96% marge (€2.409 netto)</span></div>
+                <div class="progress-bar"><div class="progress-fill success" style="width: 96%"></div></div>
+            </div>
+
+            <h3>Groeiprojectie — Baseline Scenario</h3>
+            <p>Volume-gericht: breed bereik, overwegend Pro-gebruikers. ~75% Pro, ~20% Founder, ~5% Inner Circle.</p>
+            <table>
+                <tr><th>Users</th><th>Pro</th><th>Founder</th><th>Inner Circle</th><th>MRR</th><th>Kosten</th><th>Winst/mo</th></tr>
+                <tr><td class="number">9</td><td class="number">7</td><td class="number">2</td><td class="number">0</td><td class="number">€1.682</td><td class="number">€885</td><td class="positive">€797</td></tr>
+                <tr><td class="number">25</td><td class="number">19</td><td class="number">5</td><td class="number">1</td><td class="number">€6.850</td><td class="number">€1.381</td><td class="positive">€5.469</td></tr>
+                <tr><td class="number">50</td><td class="number">38</td><td class="number">10</td><td class="number">2</td><td class="number">€13.700</td><td class="number">€2.156</td><td class="positive">€11.544</td></tr>
+                <tr><td class="number">100</td><td class="number">75</td><td class="number">20</td><td class="number">5</td><td class="number">€29.800</td><td class="number">€3.706</td><td class="positive">€26.094</td></tr>
+                <tr><td class="number">250</td><td class="number">188</td><td class="number">50</td><td class="number">12</td><td class="number">€73.400</td><td class="number">€8.356</td><td class="positive">€65.044</td></tr>
+                <tr><td class="number">500</td><td class="number">375</td><td class="number">100</td><td class="number">25</td><td class="number">€149.200</td><td class="number">€16.106</td><td class="positive">€133.094</td></tr>
+                <tr><td class="number">1.000</td><td class="number">750</td><td class="number">200</td><td class="number">50</td><td class="number">€298.400</td><td class="number">€31.606</td><td class="positive">€266.794</td></tr>
+            </table>
+
+            <h3>Groeiprojectie — Premium Pad</h3>
+            <p>Minder gebruikers, hogere gemiddelde waarde. Past bij Hugo's positionering als premium coach. ~50% Pro, ~30% Founder, ~20% Inner Circle.</p>
+            <table>
+                <tr><th>Users</th><th>Pro</th><th>Founder</th><th>Inner Circle</th><th>MRR</th><th>Kosten</th><th>Winst/mo</th></tr>
+                <tr><td class="number">9</td><td class="number">5</td><td class="number">3</td><td class="number">1</td><td class="number">€4.482</td><td class="number">€885</td><td class="positive">€3.597</td></tr>
+                <tr><td class="number">25</td><td class="number">13</td><td class="number">7</td><td class="number">5</td><td class="number">€17.250</td><td class="number">€1.381</td><td class="positive">€15.869</td></tr>
+                <tr><td class="number">50</td><td class="number">25</td><td class="number">15</td><td class="number">10</td><td class="number">€34.900</td><td class="number">€2.156</td><td class="positive">€32.744</td></tr>
+                <tr><td class="number">100</td><td class="number">50</td><td class="number">30</td><td class="number">20</td><td class="number">€69.800</td><td class="number">€3.706</td><td class="positive">€66.094</td></tr>
+                <tr><td class="number">250</td><td class="number">125</td><td class="number">75</td><td class="number">50</td><td class="number">€174.600</td><td class="number">€8.356</td><td class="positive">€166.244</td></tr>
+                <tr><td class="number">500</td><td class="number">250</td><td class="number">150</td><td class="number">100</td><td class="number">€349.200</td><td class="number">€16.106</td><td class="positive">€333.094</td></tr>
+                <tr><td class="number">1.000</td><td class="number">500</td><td class="number">300</td><td class="number">200</td><td class="number">€698.400</td><td class="number">€31.606</td><td class="positive">€666.794</td></tr>
+            </table>
+
+            <h3>Avatar Kosten: HeyGen vs Tavus</h3>
+            <table>
+                <tr><th>Platform</th><th>Kost/min</th><th>Factor</th><th>1 uur coaching</th><th>20 uur/maand</th></tr>
+                <tr><td><strong>HeyGen</strong> (legacy)</td><td class="number">~€3,00</td><td class="number">1x</td><td class="number">€180</td><td class="negative">€3.600</td></tr>
+                <tr><td><strong>Tavus Phoenix-4</strong> (actief)</td><td class="number">~€0,10</td><td class="number">30x goedkoper</td><td class="number">€6</td><td class="positive">€120</td></tr>
+            </table>
+            <p>Tavus levert vergelijkbare kwaliteit tegen <strong>30x lagere kosten</strong>. Bij Tavus-pricing kan een Pro-gebruiker (€98/mo) tot 20 uur video-avatar per maand krijgen — binnen marge. Dit maakt de agent-first visie (alles via avatar) financieel haalbaar.</p>
+
+            <div class="highlight-box">
+                <h4>Kostenoptimalisatie</h4>
+                <p>Prompt caching (live, 15-26% besparing) en denk-budget optimalisatie (live, fast/deep/auto modes) zijn al geïmplementeerd. Verdere hefbomen: tool subset per context (-40% admin input tokens), compaction threshold verlagen (-30% context kosten).</p>
+            </div>
+        </div>
+
+        <!-- 7. CONCURRENTIEPOSITIE -->
+        <div class="section" id="competition">
+            <h2><span class="section-number">7</span> Concurrentiepositie &amp; Moat</h2>
+
+            <blockquote>"AI-modellen worden commodity. 40 jaar gestructureerde sales-methodologie niet."</blockquote>
+
+            <table>
+                <tr><th style="width:30%">Differentiator</th><th>HugoHerbots.ai</th><th>Generieke sales AI</th></tr>
+                <tr>
+                    <td><strong>Methodologie</strong></td>
+                    <td>47+ technieken met exact stappenplan, detectiecriteria, en scoring rubric. SSOT-enforced — de AI wijkt nooit af.</td>
+                    <td>Generieke tips op basis van LLM-kennis. Geen gestructureerde evaluatie.</td>
+                </tr>
+                <tr>
+                    <td><strong>Klantpsychologie</strong></td>
+                    <td>9 psychologische houdingen (H1-H9) met per-houding techniek-mapping. Real-time detectie in live calls.</td>
+                    <td>Sentiment-analyse (positief/negatief). Geen gestructureerd model.</td>
+                </tr>
+                <tr>
+                    <td><strong>Evaluatie</strong></td>
+                    <td>Turn-by-turn scoring tegen SSOT stappenplannen. Perfect/goed/bijna/gemist per techniek.</td>
+                    <td>"Goed bezig!" of vage feedback.</td>
+                </tr>
+                <tr>
+                    <td><strong>Grounding</strong></td>
+                    <td>559 RAG-documenten uit Hugo's originele trainingsmateriaal. Elke response is authentiek.</td>
+                    <td>Generiek LLM-antwoord. Geen domein-specifieke grounding.</td>
+                </tr>
+                <tr>
+                    <td><strong>Architectuur</strong></td>
+                    <td>7 gecoördineerde AI-engines. Elk gespecialiseerd (coach, klant-sim, evaluator, RAG, intent, speech, context).</td>
+                    <td>Eén LLM met een system prompt.</td>
+                </tr>
+                <tr>
+                    <td><strong>Taal</strong></td>
+                    <td>Nederlandstalig. Eerste-mover in NL/BE AI-salescoaching.</td>
+                    <td>Engels-georiënteerd. Vertaald Nederlands.</td>
+                </tr>
+            </table>
+
+            <ul class="feature-list">
+                <li class="success"><strong>Data-vliegwiel</strong> — Elke sessie, elk rollenspel, elke analyse maakt het platform slimmer. Cross-session geheugen en techniek-mastery tracking per gebruiker. Een concurrent die morgen start, begint op nul data.</li>
+                <li class="success"><strong>Hugo's persona is gecodeerd</strong> — Tone of voice, favoriete uitdrukkingen, directe maar warme stijl. Dynamisch geïnjecteerd per coaching-modus (context gathering, coaching, rollenspel, feedback). Dit is geen chatbot — gebruikers voelen dat ze met Hugo praten.</li>
+                <li class="success"><strong>Config-driven, niet hardcoded</strong> — Alle technieken, houdingen, prompts laden uit JSON config met STRICT validatie. Nieuwe technieken toevoegen = config wijzigen, geen code. Schaalbaar naar andere methodologieën.</li>
+            </ul>
+        </div>
+
+        <!-- 8. MARKETING -->
+        <div class="section" id="marketing">
+            <h2><span class="section-number">8</span> Marketing &amp; Groei</h2>
+
+            <h3>Zelfvoorzienende Content Engine</h3>
+            <p>Een percentage van de maandelijkse inkomsten vloeit automatisch terug naar marketing. AI genereert content in Hugo's stijl, gebaseerd op zijn E.P.I.C. TECHNIQUE methodologie. Hugo keurt goed in het admin dashboard — daarna automatisch gepubliceerd.</p>
+
+            <table>
+                <tr><th>Omzet</th><th>Marketing %</th><th>Budget</th><th>Kanalen</th></tr>
+                <tr><td>€0 - €1.000</td><td class="number">20%</td><td class="number">tot €200</td><td>Organic (gratis)</td></tr>
+                <tr><td>€1.000 - €5.000</td><td class="number">15%</td><td class="number">€150 - €750</td><td>70% ads, 30% tools</td></tr>
+                <tr><td>€5.000 - €10.000</td><td class="number">12%</td><td class="number">€600 - €1.200</td><td>Ads + partnerships</td></tr>
+                <tr><td>€10.000+</td><td class="number">10%</td><td class="number">€1.000+</td><td>Ads + retargeting + partnerships</td></tr>
+            </table>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-value success">1.6x</div>
+                    <div class="stat-label">ROAS maand 1</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value success">6.5x</div>
+                    <div class="stat-label">ROAS na 6 maanden</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Users/maand voor break-even marketing</div>
+                </div>
+            </div>
+
+            <h3>Content Types &amp; Bereik</h3>
+            <table>
+                <tr><th>Content</th><th>Type</th><th>Ad Budget</th><th>Bereik</th></tr>
+                <tr><td>LinkedIn post</td><td>Organic</td><td class="number">€0</td><td>500 - 2K impressies</td></tr>
+                <tr><td>LinkedIn post (promoted)</td><td>Paid</td><td class="number">€50 - €150</td><td>5K - 20K impressies</td></tr>
+                <tr><td>LinkedIn Thought Leader Ad</td><td>Paid</td><td class="number">€100 - €300</td><td>10K - 50K impressies</td></tr>
+                <tr><td>Video (YouTube/LinkedIn)</td><td>Organic + Paid</td><td class="number">€100 - €500</td><td>1K - 10K views</td></tr>
+            </table>
+
+            <h3>ROI Analyse (bij €5K MRR)</h3>
+            <p>Bij €5.000 MRR × 15% = <strong>€750 marketingbudget/maand</strong>:</p>
+            <div class="stat-grid four">
+                <div class="stat-card">
+                    <div class="stat-value small">5.600</div>
+                    <div class="stat-label">Clicks/maand</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value small">€3,41</div>
+                    <div class="stat-label">Cost per lead</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value success small">11,5</div>
+                    <div class="stat-label">Conversies/maand</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value success small">€56</div>
+                    <div class="stat-label">Netto winst maand 1</div>
+                </div>
+            </div>
+
+            <h3>Automatiseringsgraad</h3>
+            <table>
+                <tr><th>Stap</th><th>Geautomatiseerd?</th><th>Implementatie</th></tr>
+                <tr><td>Budget berekening</td><td class="positive">✅ Ja</td><td>Stripe webhook → % van MRR</td></tr>
+                <tr><td>Content plan generatie</td><td class="positive">✅ Ja</td><td>AI + MCP tools (Hugo's stijl, SSOT-grounded)</td></tr>
+                <tr><td>Content schrijven</td><td class="positive">✅ Ja</td><td>AI genereert in Hugo's tone of voice</td></tr>
+                <tr><td>Goedkeuring</td><td class="negative">❌ Menselijk</td><td>Hugo keurt goed in admin dashboard</td></tr>
+                <tr><td>Publicatie (organic)</td><td class="positive">✅ Ja</td><td>LinkedIn API / Zapier na goedkeuring</td></tr>
+                <tr><td>Ad campagne</td><td>🟡 Semi</td><td>Hugo keurt budget goed per item</td></tr>
+                <tr><td>Performance tracking</td><td class="positive">✅ Ja</td><td>LinkedIn Analytics → dashboard</td></tr>
+            </table>
+
+            <p>Hugo's inzet: ~15 minuten per maand content plan reviewen. Budget goedkeuren per promoted item. Alles anders geautomatiseerd.</p>
+        </div>
+
+        <!-- 9. RISICO'S -->
+        <div class="section" id="risks">
+            <h2><span class="section-number">9</span> Risico's &amp; Mitigatie</h2>
+
+            <table>
+                <tr><th style="width:25%">Risico</th><th>Mitigatie</th></tr>
+                <tr><td><strong>AI-kosten stijgen</strong></td><td>Prompt caching (live), denk-budget optimalisatie (live), tool subset (gepland). Usage caps als noodrem. AI-kosten dalen historisch ~30% per jaar.</td></tr>
+                <tr><td><strong>Trage start</strong></td><td>Lage vaste kosten (€606/mo). Break-even bij 9 users. Zonder avatar: €116/mo vast, break-even bij 2 users.</td></tr>
+                <tr><td><strong>Heavy users</strong></td><td>Fair use policy op Pro tier. Heavy Pro marge: nog steeds 46%. Upgrade-pad naar Founder.</td></tr>
+                <tr><td><strong>Concurrentie</strong></td><td>47 technieken + 9 houdingen + 559 RAG docs + Hugo's persona = niet kopieerbaar. Data-vliegwiel vergroot voorsprong. Nederlandstalig = niche.</td></tr>
+                <tr><td><strong>Afhankelijkheid Hugo</strong></td><td>
+                    <strong>Fase 1 (Launch, nu):</strong> Hoog. Inner Circle = 1-op-1 coaching met Hugo. Founder = groepssessies (max 30). Hugo reviewt content, keurt scripts goed.<br>
+                    <strong>Fase 2 (6-12 maanden):</strong> Medium. Kennis-cloning vordert — AI neemt steeds meer over. Hugo focust op Inner Circle + content review (~2 uur/week).<br>
+                    <strong>Fase 3 (12+ maanden):</strong> Laag. 100% kennis gecloned. Platform draait autonoom. Hugo's rol: face/brand, Inner Circle (optioneel), sporadische review. Methodologie is gecodeerd — niet afhankelijk van beschikbaarheid.
+                </td></tr>
+            </table>
+        </div>
+
+        <!-- 10. ACTIEPLAN -->
+        <div class="section" id="actions">
+            <h2><span class="section-number">10</span> Actieplan</h2>
+
+            <table>
+                <tr><th style="width:5%">#</th><th>Actie</th><th style="width:20%">Tijdframe</th><th style="width:15%">Status</th></tr>
+                <tr>
+                    <td class="number">1</td>
+                    <td><strong>Voice Agent</strong><br>Conversational AI met Hugo's gekloonde stem via ElevenLabs</td>
+                    <td>Komende weken</td>
+                    <td><span class="badge badge-partial">Gebouwd, in testing</span></td>
+                </tr>
+                <tr>
+                    <td class="number">2</td>
+                    <td><strong>Stripe integratie</strong><br>Betalingen activeren voor Pro, Founder, Inner Circle</td>
+                    <td>Voor launch</td>
+                    <td><span class="badge badge-partial">Gebouwd, niet live</span></td>
+                </tr>
+                <tr>
+                    <td class="number">3</td>
+                    <td><strong>Beta-programma</strong><br>Eerste verkopers uitnodigen (Bart als eerste)</td>
+                    <td>Deze week</td>
+                    <td><span class="badge badge-next">Start deze week</span></td>
+                </tr>
+                <tr>
+                    <td class="number">4</td>
+                    <td><strong>Marketing engine</strong><br>Automatische content generatie bij eerste omzet</td>
+                    <td>Bij eerste omzet</td>
+                    <td><span class="badge badge-planned">Architectuur klaar</span></td>
+                </tr>
+                <tr>
+                    <td class="number">5</td>
+                    <td><strong>Script Builder</strong><br>Gepersonaliseerde verkoopscripts uit coaching data (4 tools)</td>
+                    <td>Live (V3)</td>
+                    <td><span class="badge badge-done">Operationeel</span></td>
+                </tr>
+                <tr>
+                    <td class="number">6</td>
+                    <td><strong>Management Dashboard</strong><br>Team E.P.I.C. TECHNIQUE scores, heatmaps, ROI-bewijs voor sales managers</td>
+                    <td>Q2-Q3 2026</td>
+                    <td><span class="badge badge-planned">Concept</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 11. TECHNISCHE APPENDIX -->
+        <div class="appendix" id="appendix">
+            <span class="appendix-label">Technisch — Optioneel</span>
+            <h2><span class="section-number" style="background:#9CA3AF">11</span> Technische Appendix</h2>
+            <p style="color:#64748B;">Technische details voor investeerders, partners, of ontwikkelaars.</p>
+
+            <h3>A. Stack</h3>
+            <table>
+                <tr><th>Component</th><th>Technologie</th><th>Details</th></tr>
+                <tr><td>AI (V2)</td><td>OpenAI GPT + 7 engines</td><td>Multi-engine orchestratie: coach, customer, evaluator, RAG, intent, speech humanizer, context</td></tr>
+                <tr><td>AI (V3)</td><td>Claude Sonnet 4 / Opus 4.6</td><td>Agentic tool loop (max 5 rondes), 31 admin tools, extended thinking</td></tr>
+                <tr><td>RAG</td><td>OpenAI embeddings + pgvector</td><td>559 documenten, 1536 dimensies, Supabase PostgreSQL</td></tr>
+                <tr><td>Stem</td><td>ElevenLabs</td><td>TTS (Hugo's voice clone), STT (Scribe v2 Realtime)</td></tr>
+                <tr><td>Avatar</td><td>Tavus Phoenix-4 (actief), HeyGen (legacy)</td><td>Real-time video-avatar, WebRTC</td></tr>
+                <tr><td>Video</td><td>Mux (hosting), Daily.co (calls), LiveKit (agent)</td><td>Adaptive bitrate, 47 video's, live sessies</td></tr>
+                <tr><td>Database</td><td>Supabase PostgreSQL</td><td>Auth, sessies, analyses, geheugen, RAG corpus</td></tr>
+                <tr><td>Hosting</td><td>Railway (auto-deploy)</td><td>3 processen: main (5001), video (3001), standalone (3002)</td></tr>
+                <tr><td>Frontend</td><td>React 19 + Vite 6 + Tailwind v4</td><td>151+ componenten, hh-* design tokens, dark mode</td></tr>
+                <tr><td>Observability</td><td>LangWatch + OpenTelemetry</td><td>Trace enrichment, scenario testing (Vitest)</td></tr>
+            </table>
+
+            <h3>B. Token Kosten per Sessie</h3>
+            <table>
+                <tr><th>Type</th><th>Met caching</th><th>Zonder</th><th>Besparing</th></tr>
+                <tr><td>Coaching (10 turns)</td><td class="number">€2,20</td><td class="number">€2,60</td><td class="number">~15%</td></tr>
+                <tr><td>Admin (3 turns, 31 tools)</td><td class="number">€1,36</td><td class="number">€1,85</td><td class="number">~26%</td></tr>
+                <tr><td>Analyse (6 calls)</td><td class="number">€0,47</td><td class="number">€0,47</td><td class="number">n.v.t.</td></tr>
+            </table>
+            <p style="color:#64748B;">Thinking tokens = ~55% van sessiekosten. Denk-budget optimalisatie is geïmplementeerd (fast/deep/auto modes). Prompt caching live. Volgende optimalisatie: tool subset per context (-40%).</p>
+
+            <h3>C. Technische Roadmap</h3>
+            <table>
+                <tr><th>Fase</th><th>Naam</th><th>Status</th></tr>
+                <tr><td>0</td><td>V3 Admin Bruikbaar</td><td><span class="badge badge-done">Done</span></td></tr>
+                <tr><td>1</td><td>Production Foundation (SSE, persistence, access)</td><td><span class="badge badge-done">Done</span></td></tr>
+                <tr><td>2</td><td>Intelligence (thinking, compaction, multimodal)</td><td><span class="badge badge-done">Done</span></td></tr>
+                <tr><td>2.5</td><td>SSOT enforcement, admin tools, output validatie</td><td><span class="badge badge-done">Done</span></td></tr>
+                <tr><td>3</td><td>Voice Agent (ElevenLabs Conversational AI)</td><td><span class="badge badge-next">Volgende</span></td></tr>
+                <tr><td>4</td><td>Agent SDK Migratie (optioneel)</td><td><span class="badge badge-planned">Gepland</span></td></tr>
+                <tr><td>5</td><td>Platform Intelligence (MCP, multi-agent)</td><td><span class="badge badge-planned">Gepland</span></td></tr>
+            </table>
+
+            <h3>D. Marketing Infrastructuur</h3>
+            <p style="color:#64748B;">MCP Server tools: <code>get_monthly_budget</code>, <code>submit_content_plan</code>, <code>submit_for_approval</code>, <code>publish_approved_content</code>, <code>get_content_performance</code>, <code>search_creator_methodology</code>. Publishing: start met Zapier webhook, gradueel naar LinkedIn API. Database: <code>content_drafts</code>, <code>marketing_budgets</code>, <code>publish_history</code>.</p>
+
+            <h3>E. Boris Power Principes</h3>
+            <p style="color:#64748B;"><strong>"Build for the model six months from now" (score: 9/10)</strong> — De tool-based architectuur, SSOT configs, en memory-systemen schalen automatisch mee met betere modellen. De drie product-pijlers zijn features die onmogelijk waren met eerdere modellen maar vanzelfsprekend worden met modellen van september 2026.</p>
+            <p style="color:#64748B;"><strong>"Latent demand" (score: 7/10)</strong> — Pre-launch, geen echte data. Maar: verkopers gaan de Live Analyse ook gebruiken voor non-sales gesprekken. Managers gaan team-data gebruiken voor hiring beslissingen. Script builder en management layer vergroten het oppervlak voor onverwacht gebruik.</p>
+            <div class="warning-box" style="background:linear-gradient(135deg,#F8FAFC 0%,#E2E8F0 100%);border-left-color:#4F7396;">
+                <h4 style="color:#4F7396;">Key Takeaway</h4>
+                <p style="color:#475569;">Hugo's 47 technieken + 9 houdingen in structured SSOT = de moat. AI-modellen worden commodity. 40 jaar ervaring, gecodeerd als executable kennis, niet.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>HugoHerbots.ai</strong> — AI-Powered Sales Methodology System</p>
+            <p>Dit document wordt regelmatig bijgewerkt. Vragen? Contacteer Stéphane.</p>
+        </div>
+    </div>
+</body>
+</html>
