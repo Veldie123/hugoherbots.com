@@ -173,7 +173,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
         });
         sessionStorage.setItem('analysisId', sessionId);
         sessionStorage.setItem('analysisFromHugo', 'true');
-        if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
+        if (navigate) navigate('analysis-results', { fromAdmin: false });
         return;
       }
 
@@ -201,7 +201,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
             });
             sessionStorage.setItem('analysisId', sessionId);
             sessionStorage.setItem('analysisFromHugo', 'true');
-            if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
+            if (navigate) navigate('analysis-results', { fromAdmin: false });
           } else if (statusData.status === 'failed') {
             clearInterval(pollInterval);
             setAnalyzingSessionIds(prev => {
@@ -301,7 +301,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
       if (statusData.status === 'completed') {
         sessionStorage.setItem('analysisId', sessionId);
         sessionStorage.setItem('analysisFromHugo', 'true');
-        if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
+        if (navigate) navigate('analysis-results', { fromAdmin: false });
         return;
       }
       if (statusData.status === 'failed') {
@@ -319,7 +319,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
               setAnalyzingSessionIds(prev => { const n = new Set(prev); n.delete(sessionId); return n; });
               sessionStorage.setItem('analysisId', sessionId);
               sessionStorage.setItem('analysisFromHugo', 'true');
-              if (navigate) navigate(isAdmin ? 'admin-analysis-results' : 'analysis-results');
+              if (navigate) navigate('analysis-results', { fromAdmin: false });
             } else if (data.status === 'failed') {
               clearInterval(pollInterval);
               setAnalyzingSessionIds(prev => { const n = new Set(prev); n.delete(sessionId); return n; });

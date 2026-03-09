@@ -334,7 +334,7 @@ export function AppLayout({
                             if (item.historyType === 'chat') {
                               navigate?.('talk-to-hugo', { loadSessionId: histItem.id });
                             } else {
-                              navigate?.('analysis-results', { conversationId: histItem.id });
+                              navigate?.('analysis-results', { conversationId: histItem.id, fromAdmin: false });
                             }
                           }
                         }}
@@ -462,7 +462,7 @@ export function AppLayout({
                               if (item.historyType === 'chat') {
                                 navigate?.('talk-to-hugo', { loadSessionId: histItem.id });
                               } else {
-                                navigate?.('analysis-results', { conversationId: histItem.id });
+                                navigate?.('analysis-results', { conversationId: histItem.id, fromAdmin: false });
                               }
                             }
                             setMobileMenuOpen(false);

@@ -3071,7 +3071,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               </div>
             )}
 
-            <div className="flex-1 overflow-hidden min-h-0 flex flex-col">
+            <div className="flex-1 overflow-hidden min-h-0 flex flex-col" key={chatMode}>
               {renderMainContent()}
             </div>
           </div>

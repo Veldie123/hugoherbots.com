@@ -122,7 +122,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
 
   const openTranscript = (conv: ConversationRecord) => {
     if (conv.status === 'completed') {
-      navigate?.('analysis-results', { conversationId: conv.id });
+      navigate?.('analysis-results', { conversationId: conv.id, fromAdmin: false });
     }
   };
 
