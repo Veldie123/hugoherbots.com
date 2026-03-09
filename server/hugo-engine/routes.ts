@@ -3482,14 +3482,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { voiceId, contextId, language = "nl" } = req.body;
       
       // Validate required environment variables upfront
-      const heygenApiKey = process.env.HEYGEN_API_KEY;
+      const heygenApiKey = process.env.HEYGEN_LIVEAVATAR_API_KEY || process.env.HEYGEN_API_KEY;
       const avatarId = process.env.Live_avatar_ID_heygen_hugoherbots;
-      
+
       if (!heygenApiKey) {
-        console.error("[LiveAvatar] HEYGEN_API_KEY is missing from environment");
-        return res.status(500).json({ 
+        console.error("[LiveAvatar] HEYGEN_LIVEAVATAR_API_KEY is missing from environment");
+        return res.status(500).json({
           error: "HeyGen API key not configured",
-          details: "HEYGEN_API_KEY environment variable is not set"
+          details: "HEYGEN_LIVEAVATAR_API_KEY environment variable is not set"
         });
       }
       
@@ -3645,15 +3645,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // GET /api/avatar/capabilities - Test which avatar SDK works
   app.get("/api/avatar/capabilities", async (req, res) => {
-    const heygenApiKey = process.env.HEYGEN_API_KEY;
+    const liveAvatarApiKey = process.env.HEYGEN_LIVEAVATAR_API_KEY || process.env.HEYGEN_API_KEY;
     const streamingApiKey = process.env.API_Heygen_streaming_interactive_avatar_ID;
     const streamingAvatarId = process.env.Heygen_streaming_interactive_avatar_ID;
-    
+    const liveAvatarId = process.env.Live_avatar_ID_heygen_hugoherbots || "not configured";
+
     const results = {
       streamingAvatar: { ok: false, status: 0, message: "", avatarId: streamingAvatarId || "not configured" },
-      liveAvatar: { ok: false, status: 0, message: "", avatarId: "f8343d95-8dd8-4318-aec0-597199fa99ac" }
+      liveAvatar: { ok: false, status: 0, message: "", avatarId: liveAvatarId }
     };
-    
+
     // Test Streaming Avatar API with dedicated credentials
     if (!streamingApiKey) {
       results.streamingAvatar.message = "API_Heygen_streaming_interactive_avatar_ID not configured";
@@ -3672,15 +3673,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
     
-    // Test LiveAvatar API with HEYGEN_API_KEY
-    if (!heygenApiKey) {
-      results.liveAvatar.message = "HEYGEN_API_KEY not configured";
+    // Test LiveAvatar API with dedicated LiveAvatar key
+    if (!liveAvatarApiKey) {
+      results.liveAvatar.message = "HEYGEN_LIVEAVATAR_API_KEY not configured";
     } else {
       try {
         const liveRes = await fetch("https://api.liveavatar.com/v1/sessions/token", {
           method: "POST",
-          headers: { 
-            "X-API-KEY": heygenApiKey,
+          headers: {
+            "X-API-KEY": liveAvatarApiKey,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({ mode: "CUSTOM", avatar_id: "f8343d95-8dd8-4318-aec0-597199fa99ac" })
