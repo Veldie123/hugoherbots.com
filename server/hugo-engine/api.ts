@@ -1726,6 +1726,12 @@ app.get("/api/user/sessions/:id", async (req, res) => {
         return res.status(404).json({ error: "Sessie niet gevonden" });
       }
 
+      // Mode guard: if mode query param is given, validate it matches
+      const requestedMode = req.query.mode as string | undefined;
+      if (requestedMode && v3Row.mode !== requestedMode) {
+        return res.status(403).json({ error: "Sessie hoort bij een andere modus" });
+      }
+
       // V3 first message pair is system opening prompt + response — skip the prompt
       // Keep the assistant's opening (visible to user) and all subsequent messages
       const allMessages = (v3Row.messages || []).filter((m: any) => m.role === 'user' || m.role === 'assistant');

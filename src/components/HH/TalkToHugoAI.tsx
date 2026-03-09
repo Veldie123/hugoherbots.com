@@ -291,6 +291,10 @@ export function TalkToHugoAI({
       const loadSession = async () => {
         try {
           setIsLoading(true);
+          // Mode isolation: set session mode BEFORE any session logic
+          const expectedMode = adminViewMode ? "admin" : "coaching";
+          hugoApi.setSessionMode(expectedMode);
+
           const sessionId = navigationData.loadSessionId;
           const isV3Session = sessionId.startsWith('v3_');
 
@@ -300,9 +304,16 @@ export function TalkToHugoAI({
             hugoApi.setV3Mode(true);
           }
 
-          const res = await apiFetch(`/api/user/sessions/${sessionId}`);
+          const res = await apiFetch(`/api/user/sessions/${sessionId}?mode=${expectedMode}`);
           if (!res.ok) throw new Error('Sessie niet gevonden');
           const session = await res.json();
+
+          // Mode guard: refuse to load sessions from wrong mode
+          if (isV3Session && session.mode && session.mode !== expectedMode) {
+            console.warn(`[Hugo] Mode mismatch: session=${session.mode}, expected=${expectedMode}. Skipping.`);
+            hugoApi.persistSessionId(null);
+            return;
+          }
 
           const historyMessages: Message[] = session.messages.map((msg: any, idx: number) => ({
             id: `hist-${idx}`,
@@ -599,9 +610,15 @@ export function TalkToHugoAI({
         if (persistedId?.startsWith('v3_') && !navigationData?.loadSessionId) {
           try {
             setIsLoading(true);
-            const res = await apiFetch(`/api/user/sessions/${persistedId}`);
+            const res = await apiFetch(`/api/user/sessions/${persistedId}?mode=${sessionMode}`);
             if (res.ok) {
               const session = await res.json();
+              // Mode guard: refuse to resume sessions from wrong mode
+              if (session.mode && session.mode !== sessionMode) {
+                console.warn(`[Hugo] Resume mode mismatch: session=${session.mode}, expected=${sessionMode}. Creating new.`);
+                hugoApi.persistSessionId(null);
+                throw new Error("mode_mismatch");
+              }
               if (session.messages && session.messages.length > 0) {
                 const historyMessages: Message[] = session.messages.map((msg: any, idx: number) => ({
                   id: `resumed-${idx}`,

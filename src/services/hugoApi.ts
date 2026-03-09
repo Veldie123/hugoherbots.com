@@ -188,14 +188,8 @@ class HugoApiService {
 
   /** Restore V3 session ID — only returns sessions for the current mode */
   getPersistedSessionId(): string | null {
-    // Migrate legacy key if present
-    const legacyKey = 'hh_active_v3_session';
-    const legacy = sessionStorage.getItem(legacyKey);
-    if (legacy) {
-      sessionStorage.removeItem(legacyKey);
-      // Assume legacy sessions are coaching (the common case)
-      sessionStorage.setItem('hh_v3_session_coaching', legacy);
-    }
+    // Delete legacy key — don't migrate (could be from wrong mode)
+    sessionStorage.removeItem('hh_active_v3_session');
     return sessionStorage.getItem(this.sessionKey);
   }
 
@@ -203,6 +197,7 @@ class HugoApiService {
   clearOppositeSessionMode(): void {
     const otherMode = this.sessionMode === "coaching" ? "admin" : "coaching";
     sessionStorage.removeItem(`hh_v3_session_${otherMode}`);
+    sessionStorage.removeItem('hh_active_v3_session'); // legacy cleanup
   }
 
   async startSession(request: StartSessionRequest): Promise<StartSessionResponse> {

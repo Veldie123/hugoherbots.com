@@ -52,6 +52,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
+      // Auth gate: get agentId from our backend
       const response = await apiFetch("/api/v3/voice/signed-url", {
         method: "POST",
       });
@@ -60,19 +61,13 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
         throw new Error("Kon voice sessie niet starten");
       }
 
-      const { signedUrl, agentId } = await response.json();
+      const { agentId } = await response.json();
 
-      if (signedUrl) {
-        await conversation.startSession({
-          url: signedUrl,
-          connectionType: "webrtc",
-        });
-      } else {
-        await conversation.startSession({
-          agentId,
-          connectionType: "webrtc",
-        });
-      }
+      // Connect directly via WebRTC (agent is public, no token needed)
+      await conversation.startSession({
+        agentId,
+        connectionType: "webrtc",
+      });
     } catch (err: any) {
       console.error("[VoiceCoach] Start failed:", err);
       if (err.name === "NotAllowedError") {

@@ -149,44 +149,16 @@ router.post("/llm", llmHandler);
 router.post("/chat/completions", llmHandler);
 
 /**
- * POST /voice/signed-url — Get a conversation token for ElevenLabs WebRTC
+ * POST /voice/signed-url — Auth gate for ElevenLabs WebRTC voice session
  *
- * Frontend calls this to start a voice session. We request a signed URL
- * from ElevenLabs and return it. Supports both WebRTC (token) and WebSocket (signed URL).
+ * Returns the agentId so the frontend can connect directly via WebRTC.
+ * The agent is public (requires_auth=false) so no server-side token is needed.
  */
-router.post("/signed-url", requireAuth, async (req: Request, res: Response) => {
-  const apiKey = ELEVENLABS_API_KEY;
-  if (!apiKey) {
-    return res.status(503).json({ error: "ElevenLabs API key niet geconfigureerd." });
+router.post("/signed-url", requireAuth, async (_req: Request, res: Response) => {
+  if (!ELEVENLABS_API_KEY || !ELEVENLABS_AGENT_ID) {
+    return res.status(503).json({ error: "ElevenLabs niet geconfigureerd." });
   }
-
-  try {
-    // Try signed URL endpoint (works for both WebRTC and WebSocket)
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${ELEVENLABS_AGENT_ID}`,
-      {
-        method: "GET",
-        headers: { "xi-api-key": apiKey },
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("[V3 Voice] ElevenLabs signed-url error:", response.status, errorText);
-      return res.status(502).json({ error: "Kon geen voice sessie starten." });
-    }
-
-    const data = await response.json();
-    console.log(`[V3 Voice] Signed URL generated for user ${req.userId}`);
-
-    res.json({
-      signedUrl: data.signed_url,
-      agentId: ELEVENLABS_AGENT_ID,
-    });
-  } catch (err: any) {
-    console.error("[V3 Voice] Signed URL fetch error:", err.message);
-    res.status(500).json({ error: "Voice verbinding mislukt." });
-  }
+  res.json({ agentId: ELEVENLABS_AGENT_ID });
 });
 
 /**
