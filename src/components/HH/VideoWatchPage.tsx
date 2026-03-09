@@ -435,8 +435,8 @@ export function VideoWatchPage({
                           backgroundColor: "rgba(30,58,95,0.06)",
                           borderLeft: "3px solid #1e3a5f",
                         } : isHighlighted ? {
-                          backgroundColor: "rgba(30,58,95,0.03)",
-                          borderLeft: "2px solid rgba(30,58,95,0.4)",
+                          backgroundColor: "rgba(30,58,95,0.08)",
+                          borderLeft: "3px solid rgba(30,58,95,0.6)",
                         } : {}),
                       }}
                       onClick={() => {
@@ -449,7 +449,7 @@ export function VideoWatchPage({
                         ) : isPrimary ? (
                           <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: "#1e3a5f" }} />
                         ) : isHighlighted ? (
-                          <Tag className="w-3 h-3" style={{ color: "#1e3a5f" }} />
+                          <Tag className="w-3 h-3" style={{ color: "#1e3a5f", opacity: 0.85 }} />
                         ) : isCompleted ? (
                           <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "#3d9a6e" }} />
                         ) : null}
@@ -478,11 +478,6 @@ export function VideoWatchPage({
                           </p>
                         )}
                       </div>
-                      {isHighlighted && techConfidence && !isPrimary && !isLiveActive && (
-                        <span className="text-[8px] text-[#1e3a5f]/60 font-mono flex-shrink-0">
-                          {Math.round(techConfidence.confidence * 100)}%
-                        </span>
-                      )}
                       <button
                         className="text-hh-muted/30 flex-shrink-0 hover:text-hh-muted/70 transition-colors p-1.5 rounded-md hover:bg-hh-ui-50 ml-auto"
                         onClick={(e) => {
@@ -719,8 +714,7 @@ export function VideoWatchPage({
                     return (
                       <button
                         key={t.nummer}
-                        onClick={() => scrollToTechnique(t.nummer)}
-                        onDoubleClick={() => setDetailTechnique(t)}
+                        onClick={() => setDetailTechnique(t)}
                         className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full transition-colors hover:opacity-90 cursor-pointer"
                         style={{
                           backgroundColor: `${phaseColor}${isPrimary ? '20' : '10'}`,
@@ -728,12 +722,9 @@ export function VideoWatchPage({
                           border: `1px solid ${phaseColor}${isPrimary ? '50' : '25'}`,
                           fontWeight: isPrimary ? 600 : 400,
                         }}
-                        title={`${isPrimary ? 'Hoofdtechniek' : 'Ook besproken'} — dubbelklik voor details`}
+                        title={`${isPrimary ? 'Hoofdtechniek' : 'Ook besproken'} — klik voor details`}
                       >
                         #{t.nummer} {t.naam}
-                        {!isPrimary && vt.confidence < 1 && (
-                          <span className="opacity-50 ml-0.5">{Math.round(vt.confidence * 100)}%</span>
-                        )}
                       </button>
                     );
                   })}
