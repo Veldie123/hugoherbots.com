@@ -77,7 +77,6 @@ export function ImmersiveVideoPlayer({
     if (countdownRef.current) clearInterval(countdownRef.current);
     setActiveVideoId(videoId);
     localStorage.setItem('lastWatchedVideoId', videoId);
-    localStorage.setItem('lastWatchedVideoProgress', '0');
   }, []);
 
   useEffect(() => {
@@ -108,13 +107,9 @@ export function ImmersiveVideoPlayer({
     }
   }, [activeVideoId, nextVideo, onVideoComplete, goToVideo]);
 
-  const handleProgress = useCallback((currentTime: number, duration: number) => {
-    if (duration > 0) {
-      const pct = Math.round((currentTime / duration) * 100);
-      localStorage.setItem('lastWatchedVideoProgress', String(pct));
-      localStorage.setItem(`hh_video_progress_${activeVideoId}`, String(pct));
-    }
-  }, [activeVideoId]);
+  const handleProgress = useCallback((_currentTime: number, _duration: number) => {
+    // Progress is tracked to DB by MuxVideoPlayer automatically
+  }, []);
 
   useEffect(() => {
     return () => {

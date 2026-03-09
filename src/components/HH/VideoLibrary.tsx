@@ -114,13 +114,6 @@ const markVideoCompleted = (videoId: string) => {
   localStorage.setItem(COMPLETED_VIDEOS_KEY, JSON.stringify([...completed]));
 };
 
-const getVideoProgress = (videoId: string): number => {
-  try {
-    const stored = localStorage.getItem(`hh_video_progress_${videoId}`);
-    return stored ? Math.min(parseInt(stored, 10), 100) : 0;
-  } catch { return 0; }
-};
-
 export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: VideoLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterPhase, setFilterPhase] = useState<string>("all");
@@ -144,6 +137,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
   const [activeVideo, setActiveVideo] = useState<ActiveVideo | null>(null);
   const [fullscreenMode, setFullscreenMode] = useState(false);
   const [completedVideoIds, setCompletedVideoIds] = useState<Set<string>>(getCompletedVideoIds());
+  const [progressMap, setProgressMap] = useState<Map<string, { watchedSeconds: number; completed: boolean }>>(new Map());
 
   const [autoPlayTechniek, setAutoPlayTechniek] = useState<string | null>(null);
   const [hoveredVideoId, setHoveredVideoId] = useState<string | null>(null);
@@ -175,7 +169,24 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
         if (data && data.length > 0) {
           setLibraryVideos(data);
           setUseFallback(false);
-          
+
+          // Load progress from database
+          try {
+            const dbProgress = await videoApi.getAllProgress();
+            if (dbProgress.length > 0) {
+              const pMap = new Map<string, { watchedSeconds: number; completed: boolean }>();
+              const dbCompleted = new Set<string>();
+              for (const p of dbProgress) {
+                pMap.set(p.videoId, { watchedSeconds: p.watchedSeconds, completed: !!p.completed });
+                if (p.completed) dbCompleted.add(p.videoId);
+              }
+              setProgressMap(pMap);
+              // Merge DB completed with localStorage (localStorage as fallback)
+              const merged = new Set([...getCompletedVideoIds(), ...dbCompleted]);
+              setCompletedVideoIds(merged);
+            }
+          } catch { /* localStorage fallback remains active */ }
+
           const urlParams = new URLSearchParams(window.location.search);
           const watchParam = urlParams.get('watch');
           const devWatchFirst = localStorage.getItem('dev_watch_first');
@@ -255,6 +266,15 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getVideoProgressPct = (videoId: string, durationSeconds?: number | null): number => {
+    const p = progressMap.get(videoId);
+    if (!p || !p.watchedSeconds) return 0;
+    if (p.completed) return 100;
+    const dur = durationSeconds || libraryVideos.find(v => v.id === videoId)?.duration || 0;
+    if (!dur) return 0;
+    return Math.min(Math.round((p.watchedSeconds / dur) * 100), 99);
   };
 
   const getPhaseFromTechnique = (techniqueId: string | null) => {
@@ -366,8 +386,12 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
 
   const handleVideoComplete = (videoId: string) => {
     markVideoCompleted(videoId);
-    setCompletedVideoIds(getCompletedVideoIds());
-    localStorage.setItem('lastWatchedVideoProgress', '100');
+    setCompletedVideoIds(prev => new Set([...prev, videoId]));
+    setProgressMap(prev => {
+      const next = new Map(prev);
+      next.set(videoId, { watchedSeconds: 9999, completed: true });
+      return next;
+    });
     window.dispatchEvent(new Event('nps:trigger'));
   };
 
@@ -820,7 +844,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
                       <div
                         className="h-full bg-[#3d9a6e] transition-all duration-300"
-                        style={{ width: completed ? '100%' : `${getVideoProgress(video.id)}%` }}
+                        style={{ width: completed ? '100%' : `${getVideoProgressPct(video.id)}%` }}
                       />
                     </div>
                   </div>
@@ -934,7 +958,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
                       <div
                         className="h-full bg-[#3d9a6e] transition-all duration-300"
-                        style={{ width: completed ? '100%' : `${getVideoProgress(video.id)}%` }}
+                        style={{ width: completed ? '100%' : `${getVideoProgressPct(video.id)}%` }}
                       />
                     </div>
                   </div>
@@ -1199,7 +1223,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       </div>
                     )}
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
-                      <div className="h-full bg-[#3d9a6e] transition-all duration-300" style={{ width: completed ? '100%' : `${getVideoProgress(video.id)}%` }} />
+                      <div className="h-full bg-[#3d9a6e] transition-all duration-300" style={{ width: completed ? '100%' : `${getVideoProgressPct(video.id)}%` }} />
                     </div>
                   </div>
                   <h3 className="text-[12px] font-medium text-hh-text leading-tight line-clamp-2 group-hover:text-hh-primary transition-colors">

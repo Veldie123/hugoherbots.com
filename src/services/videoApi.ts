@@ -77,6 +77,14 @@ export const videoApi = {
     return response.json();
   },
 
+  async getAllProgress(): Promise<Array<{ videoId: string; watchedSeconds: number; totalSeconds: number; completed: number; lastPosition: number }>> {
+    try {
+      const response = await apiFetch(`${LOCAL_API_BASE}/my-progress`);
+      if (!response.ok) return [];
+      return response.json();
+    } catch { return []; }
+  },
+
   async getUserStats(): Promise<{ totalVideos: number; completedVideos: number; totalWatchTime: number }> {
     const response = await apiFetch(`${API_BASE}/stats`);
     if (!response.ok) throw new Error('Failed to fetch stats');

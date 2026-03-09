@@ -2407,6 +2407,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/videos/my-progress - get all video progress for authenticated user
+  app.get("/api/videos/my-progress", async (req, res) => {
+    try {
+      const userId = req.userId!;
+      const progress = await storage.getUserVideoProgress(userId);
+      res.json(progress);
+    } catch (error: any) {
+      res.status(500).json({ error: safeErrorMessage(error) });
+    }
+  });
+
   // GET /api/videos/:id - get single video with details
   app.get("/api/videos/:id", async (req, res) => {
     try {
