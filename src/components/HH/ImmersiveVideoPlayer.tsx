@@ -112,8 +112,9 @@ export function ImmersiveVideoPlayer({
     if (duration > 0) {
       const pct = Math.round((currentTime / duration) * 100);
       localStorage.setItem('lastWatchedVideoProgress', String(pct));
+      localStorage.setItem(`hh_video_progress_${activeVideoId}`, String(pct));
     }
-  }, []);
+  }, [activeVideoId]);
 
   useEffect(() => {
     return () => {

@@ -114,6 +114,13 @@ const markVideoCompleted = (videoId: string) => {
   localStorage.setItem(COMPLETED_VIDEOS_KEY, JSON.stringify([...completed]));
 };
 
+const getVideoProgress = (videoId: string): number => {
+  try {
+    const stored = localStorage.getItem(`hh_video_progress_${videoId}`);
+    return stored ? Math.min(parseInt(stored, 10), 100) : 0;
+  } catch { return 0; }
+};
+
 export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: VideoLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterPhase, setFilterPhase] = useState<string>("all");
@@ -811,9 +818,9 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                     )}
                     {/* Green progress bar at bottom */}
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
-                      <div 
-                        className="h-full bg-[#3d9a6e]" 
-                        style={{ width: completed ? '100%' : '0%' }}
+                      <div
+                        className="h-full bg-[#3d9a6e] transition-all duration-300"
+                        style={{ width: completed ? '100%' : `${getVideoProgress(video.id)}%` }}
                       />
                     </div>
                   </div>
@@ -925,9 +932,9 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       </Badge>
                     )}
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
-                      <div 
-                        className="h-full bg-[#3d9a6e]" 
-                        style={{ width: completed ? '100%' : '0%' }}
+                      <div
+                        className="h-full bg-[#3d9a6e] transition-all duration-300"
+                        style={{ width: completed ? '100%' : `${getVideoProgress(video.id)}%` }}
                       />
                     </div>
                   </div>
@@ -1192,7 +1199,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       </div>
                     )}
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
-                      <div className="h-full bg-[#3d9a6e]" style={{ width: completed ? '100%' : '0%' }} />
+                      <div className="h-full bg-[#3d9a6e] transition-all duration-300" style={{ width: completed ? '100%' : `${getVideoProgress(video.id)}%` }} />
                     </div>
                   </div>
                   <h3 className="text-[12px] font-medium text-hh-text leading-tight line-clamp-2 group-hover:text-hh-primary transition-colors">
