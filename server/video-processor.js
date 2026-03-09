@@ -2884,6 +2884,7 @@ Format: ["id1", "id2", "id3", ...]`;
             ai_attractive_title: job.ai_attractive_title || null,
             drive_file_id: job.drive_file_id,
             drive_folder_id: job.drive_folder_id,
+            detected_technieken: job.detected_technieken || null,
             playback_order: job.playback_order != null ? job.playback_order : null,
             source: 'pipeline',
             is_hidden: job.is_hidden || false,
