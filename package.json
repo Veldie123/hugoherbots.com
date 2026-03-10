@@ -60,7 +60,7 @@
             "helmet": "^8.1.0",
             "hono": "^4.11.4",
             "jspdf": "^4.2.0",
-            "langwatch": "^0.17.0",
+            "langwatch": "0.16.1",
             "livekit-client": "^2.17.2",
             "livekit-server-sdk": "^2.15.0",
             "lucide-react": "^0.487.0",
