@@ -271,6 +271,23 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  // Force light mode on public pages — prevent dark mode CSS variables from bleeding through
+  useEffect(() => {
+    const publicPages: Page[] = ['landing', 'landing-v2', 'login', 'signup', 'pricing', 'about', 'privacy-policy', 'onboarding', 'showcase', 'showcase-video', 'showcase-roleplay', 'showcase-analysis'];
+    const isPublicPage = currentPage && publicPages.includes(currentPage);
+    const root = document.documentElement;
+
+    if (isPublicPage) {
+      root.classList.remove('dark');
+    } else if (currentPage) {
+      // Restore user's theme preference on authenticated pages
+      const saved = localStorage.getItem('hh-theme');
+      if (saved === 'dark' || (saved === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        root.classList.add('dark');
+      }
+    }
+  }, [currentPage]);
+
   return (
     <ThemeProvider>
     <UserProvider>
