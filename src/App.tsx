@@ -214,6 +214,10 @@ export default function App() {
   // Navigation context - doorgeven aan alle pages
   const navigate = (page: Page | string, data?: Record<string, any>) => {
     if (page === "landing" || page === "logout") {
+      if (page === "logout") {
+        auth.signOut().catch(() => {});
+        localStorage.removeItem('hh_workspace');
+      }
       setIsAdmin(false);
       setIsSuperAdmin(false);
       setOnboardingMode(false);
@@ -368,9 +372,9 @@ export default function App() {
             <AuthCallback navigate={navigate} />
           )}
 
-          {/* Landing page — ComingSoon tijdelijk uit voor Stripe verificatie */}
-          {currentPage === "landing" && <Landing navigate={navigate} />}
-          {/* {currentPage === "landing" && <ComingSoon navigate={navigate} />} */}
+          {/* Landing page */}
+          {/* {currentPage === "landing" && <Landing navigate={navigate} />} */}
+          {currentPage === "landing" && <ComingSoon navigate={navigate} />}
           {currentPage === "landing-v2" && <LandingV2 navigate={navigate} />}
 
           {/* Dev showcase preview */}

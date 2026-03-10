@@ -659,7 +659,7 @@ export function AppLayout({
                 </>
               )}
             </div>
-            <UserMenu navigate={navigate} onLogout={() => navigate?.("landing")} />
+            <UserMenu navigate={navigate} onLogout={() => navigate?.("logout")} />
           </div>
         </div>
 

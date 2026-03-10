@@ -308,7 +308,7 @@ export function AppLayout({ children, currentPage = "home", navigate }: AppLayou
             <Button variant="ghost" size="icon" className="h-10 w-10">
               <Bell className="w-5 h-5" />
             </Button>
-            <UserMenu navigate={navigate} onLogout={() => navigate?.("landing")} />
+            <UserMenu navigate={navigate} onLogout={() => navigate?.("logout")} />
           </div>
         </div>
 
