@@ -219,9 +219,9 @@
   --switch-background: #433E38;
 
   /* Purple shades on warm background */
-  --hh-primary-50: #1a1430;
-  --hh-primary-100: #2a1a3a;
-  --hh-primary-200: #3d2552;
+  --hh-primary-50: #1e1838;
+  --hh-primary-100: #2f1f4a;
+  --hh-primary-200: #452d62;
 
   /* Feedback shades on warm background */
   --hh-success-50: #131f18;
@@ -290,9 +290,9 @@ body.dark:has(.admin-session) [data-radix-portal] {
   --hh-ui-50: #1A1715;
   --hh-ui-100: #211E1B;
   --hh-ui-200: #302C28;
-  --hh-primary-50: #1a1430;
-  --hh-primary-100: #2a1a3a;
-  --hh-primary-200: #3d2552;
+  --hh-primary-50: #1e1838;
+  --hh-primary-100: #2f1f4a;
+  --hh-primary-200: #452d62;
   --background: #12100F;
   --popover: #211E1B;
   --popover-foreground: #F5F0EB;
