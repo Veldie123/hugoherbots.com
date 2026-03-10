@@ -199,11 +199,61 @@
   --hh-primary-rgb: 153, 16, 250;
 }
 
-/* Dark mode admin — purple shades for dark backgrounds */
+/* Dark mode admin — "Warm Dusk" palette: warm brown-gray base + purple accent
+   Applied at :root level via :has() so <body> background also gets warm tones */
+.dark:has(.admin-session),
 .dark .admin-session {
-  --hh-primary-50: #1f1528;
-  --hh-primary-100: #2a1a3d;
-  --hh-primary-200: #3d2558;
+  /* Warm neutral backgrounds (brown-gray, no blue tint) */
+  --hh-bg: #12100F;
+  --hh-ink: #E8E0D8;
+  --hh-text: #F5F0EB;
+  --hh-muted: #9E948A;
+  --hh-border: #2E2A25;
+  --hh-ui-50: #1A1715;
+  --hh-ui-100: #211E1B;
+  --hh-ui-200: #302C28;
+  --hh-ui-300: #433E38;
+  --hh-ui-400: #6B6358;
+  --hh-ui-500: #9E948A;
+  --input-background: #211E1B;
+  --switch-background: #433E38;
+
+  /* Purple shades on warm background */
+  --hh-primary-50: #1a1430;
+  --hh-primary-100: #2a1a3a;
+  --hh-primary-200: #3d2552;
+
+  /* Feedback shades on warm background */
+  --hh-success-50: #131f18;
+  --hh-success-100: #152a1c;
+  --hh-success-200: #1c3a28;
+  --hh-error-50: #1f1414;
+  --hh-error-100: #2e1818;
+  --hh-error-200: #401f20;
+  --hh-warning-50: #1e1a10;
+  --hh-warning-100: #2a2210;
+  --hh-warning-200: #3a3018;
+
+  /* Shadcn token overrides for warm background */
+  --background: var(--hh-bg);
+  --foreground: var(--hh-text);
+  --card: var(--hh-ui-100);
+  --card-foreground: var(--hh-text);
+  --popover: var(--hh-ui-100);
+  --popover-foreground: var(--hh-text);
+  --secondary: var(--hh-ui-100);
+  --secondary-foreground: var(--hh-text);
+  --muted: var(--hh-ui-100);
+  --muted-foreground: var(--hh-ui-400);
+  --accent: var(--hh-ui-100);
+  --accent-foreground: var(--hh-text);
+  --border: var(--hh-border);
+  --input: var(--hh-ui-100);
+  --sidebar: var(--hh-bg);
+  --sidebar-foreground: var(--hh-text);
+  --sidebar-accent: var(--hh-ui-100);
+  --sidebar-accent-foreground: var(--hh-text);
+  --sidebar-border: var(--hh-border);
 }
 
 /* Dashboard card sizing — bypasses Tailwind v4 JIT not generating base w-[160px] */
@@ -229,12 +279,24 @@ body:has(.admin-session) [data-radix-portal] {
   --hh-primary-rgb: 153, 16, 250;
 }
 
-/* Dark mode portal variant */
+/* Dark mode portal variant — Warm Dusk background + purple shades */
 .dark body:has(.admin-session) [data-radix-portal],
 body.dark:has(.admin-session) [data-radix-portal] {
-  --hh-primary-50: #1f1528;
-  --hh-primary-100: #2a1a3d;
-  --hh-primary-200: #3d2558;
+  --hh-bg: #12100F;
+  --hh-text: #F5F0EB;
+  --hh-ink: #E8E0D8;
+  --hh-muted: #9E948A;
+  --hh-border: #2E2A25;
+  --hh-ui-50: #1A1715;
+  --hh-ui-100: #211E1B;
+  --hh-ui-200: #302C28;
+  --hh-primary-50: #1a1430;
+  --hh-primary-100: #2a1a3a;
+  --hh-primary-200: #3d2552;
+  --background: #12100F;
+  --popover: #211E1B;
+  --popover-foreground: #F5F0EB;
+  --border: #2E2A25;
 }
 
 /* Force light mode on specific elements (e.g. landing page) */

@@ -116,7 +116,7 @@ export function AppLayout({
     'resources': 'admin-resources',
   };
 
-  const shouldAutoCollapse = currentPage === 'video-watch';
+  const shouldAutoCollapse = currentPage === 'video-watch' || currentPage === 'settings';
   const [collapsed, setCollapsed] = useState(shouldAutoCollapse);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

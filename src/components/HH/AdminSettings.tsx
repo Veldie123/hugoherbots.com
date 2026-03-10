@@ -3,7 +3,6 @@ import {
   Settings as SettingsIcon,
   Palette,
   Database,
-  Shield,
   Users,
   Save,
   Loader2,
@@ -68,7 +67,8 @@ interface AdminUser {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  super_admin: "Super Admin",
+  super_admin: "Admin",
+  admin: "Admin",
   content_manager: "Content Manager",
   support_agent: "Support Agent",
 };
@@ -390,23 +390,6 @@ export function AdminSettings({ navigate, isSuperAdmin }: AdminSettingsProps) {
                 </div>
               </Card>
 
-              <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
-                <h3 className="text-[18px] leading-[24px] text-hh-text mb-4 flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-hh-primary" />
-                  Role Permissions
-                </h3>
-                <div className="space-y-3">
-                  <p className="text-[13px] leading-[18px] text-hh-muted">
-                    <strong>Super Admin:</strong> Volledige toegang tot alles
-                  </p>
-                  <p className="text-[13px] leading-[18px] text-hh-muted">
-                    <strong>Content Manager:</strong> Video's, scenario's, live sessies beheren
-                  </p>
-                  <p className="text-[13px] leading-[18px] text-hh-muted">
-                    <strong>Support Agent:</strong> User support en tickets
-                  </p>
-                </div>
-              </Card>
             </TabsContent>
           </Tabs>
         )}
