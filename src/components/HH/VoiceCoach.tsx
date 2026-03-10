@@ -61,14 +61,12 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
         throw new Error("Kon voice sessie niet starten");
       }
 
-      const { agentId, voiceId } = await response.json();
+      const { agentId } = await response.json();
 
-      // Connect via WebRTC with Hugo's cloned voice override
+      // Connect via WebRTC — voice clone is configured in ElevenLabs dashboard
       await conversation.startSession({
         agentId,
-        overrides: {
-          tts: { voiceId },
-        },
+        connectionType: "webrtc",
       });
     } catch (err: any) {
       console.error("[VoiceCoach] Start failed:", err);

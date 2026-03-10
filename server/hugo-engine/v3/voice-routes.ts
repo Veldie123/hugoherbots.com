@@ -10,8 +10,7 @@
 import { Router, type Request, type Response } from "express";
 import { requireAuth } from "../auth-middleware";
 import { chatStream, createSession, type V3SessionState } from "./agent";
-import { buildUserBriefing } from "./user-briefing";
-import { buildVoiceSystemPrompt } from "./system-prompt-voice";
+import { buildUserBriefing, type UserBriefing } from "./user-briefing";
 import { extractUserMessage, claudeStreamToOpenaiSSE } from "./voice-adapter";
 import { supabase } from "../supabase-client";
 import { randomUUID } from "crypto";
@@ -20,6 +19,9 @@ const router = Router();
 
 // Voice sessions: ElevenLabs conversation_id → V3 session
 const voiceSessions = new Map<string, V3SessionState>();
+
+// Pre-fetched voice data: stored at /signed-url (where we have auth), consumed by /llm (no auth)
+const pendingVoiceData = new Map<string, { userId: string; briefing?: UserBriefing; ts: number }>();
 
 // Support both casing conventions for the ElevenLabs API key
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || process.env.Elevenlabs_api_key || "";
@@ -85,21 +87,23 @@ const llmHandler = async (req: Request, res: Response) => {
   let session = voiceSessions.get(conversationId);
 
   if (!session) {
-    // Create new V3 session for this voice conversation
     const sessionId = `v3_voice_${randomUUID()}`;
-    // Voice sessions use a default user until we implement user linking
-    const userId = "voice-user";
 
-    let briefing;
-    try {
-      briefing = await buildUserBriefing(userId);
-    } catch {
-      // No briefing for anonymous voice users — that's fine
+    // Find pre-fetched user data (stored at /signed-url where we have auth)
+    let userId = "voice-user";
+    let briefing: UserBriefing | undefined;
+    for (const [key, data] of pendingVoiceData) {
+      if (Date.now() - data.ts < 60_000) {
+        userId = data.userId;
+        briefing = data.briefing;
+        pendingVoiceData.delete(key);
+        break;
+      }
     }
 
     session = createSession(sessionId, userId, "coaching", undefined, briefing);
     voiceSessions.set(conversationId, session);
-    console.log(`[V3 Voice] New session: ${sessionId} (conversation: ${conversationId})`);
+    console.log(`[V3 Voice] New session: ${sessionId} user=${userId} briefing=${briefing ? "yes" : "no"} (conversation: ${conversationId})`);
   }
 
   // SSE headers (OpenAI streaming format)
@@ -111,17 +115,21 @@ const llmHandler = async (req: Request, res: Response) => {
   let clientDisconnected = false;
   req.on("close", () => { clientDisconnected = true; });
 
+  const t0 = Date.now();
   try {
     // Tag session for voice-mode system prompt
     session.voiceMode = true;
 
     const v3Stream = chatStream(session, userMessage);
 
+    let firstChunkMs = 0;
     for await (const chunk of claudeStreamToOpenaiSSE(v3Stream)) {
       if (clientDisconnected) break;
+      if (!firstChunkMs) firstChunkMs = Date.now() - t0;
       res.write(chunk);
     }
 
+    console.log(`[V3 Voice] Response: first_chunk=${firstChunkMs}ms total=${Date.now() - t0}ms user=${session.userId}`);
     persistVoiceSession(session);
   } catch (err: any) {
     console.error("[V3 Voice] LLM error:", err.message);
@@ -159,13 +167,32 @@ router.post("/chat/completions", llmHandler);
  * Returns the agentId so the frontend can connect directly via WebRTC.
  * The agent is public (requires_auth=false) so no server-side token is needed.
  */
-router.post("/signed-url", requireAuth, async (_req: Request, res: Response) => {
+router.post("/signed-url", requireAuth, async (req: Request, res: Response) => {
   if (!ELEVENLABS_API_KEY || !ELEVENLABS_AGENT_ID) {
     return res.status(503).json({ error: "ElevenLabs niet geconfigureerd." });
   }
-  const voiceId = process.env.Elevenlabs_Hugo_voice_clone || "sOsTzBXVBqNYMd5L4sCU";
-  console.log(`[V3 Voice] Returning agentId: ${ELEVENLABS_AGENT_ID} voiceId: ${voiceId}`);
-  res.json({ agentId: ELEVENLABS_AGENT_ID, voiceId });
+
+  const userId = (req as any).userId as string;
+  const t0 = Date.now();
+
+  // Pre-fetch user briefing (memories, profile, mastery) while we have auth context
+  let briefing: UserBriefing | undefined;
+  try {
+    briefing = await buildUserBriefing(userId);
+  } catch (err: any) {
+    console.warn(`[V3 Voice] Briefing pre-fetch failed for ${userId}:`, err.message);
+  }
+
+  // Store for the LLM handler to pick up (ElevenLabs calls /llm without our auth)
+  pendingVoiceData.set(userId, { userId, briefing, ts: Date.now() });
+
+  // Cleanup stale entries (>60s)
+  for (const [key, data] of pendingVoiceData) {
+    if (Date.now() - data.ts > 60_000) pendingVoiceData.delete(key);
+  }
+
+  console.log(`[V3 Voice] signed-url: user=${userId} briefing=${briefing ? "yes" : "no"} (${Date.now() - t0}ms)`);
+  res.json({ agentId: ELEVENLABS_AGENT_ID });
 });
 
 /**

@@ -138,9 +138,16 @@ function getAllToolDefinitions(mode: V3Mode): Anthropic.Tool[] {
   return tools;
 }
 
-/** Voice mode: knowledge + methodology only (no roleplay/script builder — impractical in voice) */
+/** Voice mode: only fast (<50ms) tools — roleplay + methodology + search_methodology */
 function getVoiceToolDefinitions(): Anthropic.Tool[] {
-  const tools = [...knowledgeToolDefinitions, ...methodologyToolDefinitions];
+  const tools: Anthropic.Tool[] = [
+    ...roleplayToolDefinitions,     // start_roleplay, process_roleplay_turn, end_roleplay (<50ms, in-memory)
+    ...methodologyToolDefinitions,  // select_customer_attitude, classify_customer_signal, get_recommended_techniques, evaluate_technique (<50ms)
+  ];
+  // Cherry-pick search_methodology from knowledge tools (fast, cached JSON) — skip slow DB/RAG tools
+  const searchMethodology = knowledgeToolDefinitions.find(t => t.name === "search_methodology");
+  if (searchMethodology) tools.push(searchMethodology);
+
   if (tools.length > 0) {
     tools[tools.length - 1] = {
       ...tools[tools.length - 1],
