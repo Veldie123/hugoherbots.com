@@ -6240,12 +6240,12 @@ async function startServer() {
     }
     try {
       const { error } = await resendClient.emails.send({
-        from: 'HugoHerbots.ai <noreply@hugoherbots.com>',
+        from: 'Hugo Herbots <noreply@hugoherbots.com>',
         to: 'hugoherbots@telenet.be',
         subject: 'Business Plan — Bijgewerkt en goedgekeurd',
         html: `
           <div style="font-family:'Outfit',Arial,sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;">
-            <h2 style="color:#4F7396;margin-bottom:8px;">Business Plan HugoHerbots.ai</h2>
+            <h2 style="color:#4F7396;margin-bottom:8px;">Business Plan Hugo Herbots</h2>
             <p style="color:#0F1826;line-height:1.6;">Het business plan is bijgewerkt en goedgekeurd door Stéphane. Bekijk de laatste versie via onderstaande link.</p>
             <p style="margin:24px 0;">
               <a href="https://hugoherbots.com/business-plan.html"
@@ -6254,7 +6254,7 @@ async function startServer() {
               </a>
             </p>
             <p style="color:#9CA3AF;font-size:13px;margin-top:32px;">
-              Dit is een automatisch bericht van HugoHerbots.ai
+              Dit is een automatisch bericht van hugoherbots.com
             </p>
           </div>
         `,
