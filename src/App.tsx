@@ -368,9 +368,9 @@ export default function App() {
             <AuthCallback navigate={navigate} />
           )}
 
-          {/* Coming Soon page (tijdelijk — verwijder deze lijn en uncomment Landing om terug te schakelen) */}
-          {currentPage === "landing" && <ComingSoon navigate={navigate} />}
-          {/* {currentPage === "landing" && <Landing navigate={navigate} />} */}
+          {/* Landing page — ComingSoon tijdelijk uit voor Stripe verificatie */}
+          {currentPage === "landing" && <Landing navigate={navigate} />}
+          {/* {currentPage === "landing" && <ComingSoon navigate={navigate} />} */}
           {currentPage === "landing-v2" && <LandingV2 navigate={navigate} />}
 
           {/* Dev showcase preview */}
