@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { auth } from '../utils/supabase/client';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { apiFetch } from '../services/apiFetch';
 
 interface User {
   id: string;
@@ -39,6 +40,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [session, setSession] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Track whether preflight has been triggered this browser session
+  const preflightTriggered = useRef(false);
+
+  // Fire-and-forget: trigger V3 brain preflight (once per browser session)
+  const triggerPreflight = () => {
+    if (preflightTriggered.current) return;
+    preflightTriggered.current = true;
+    apiFetch('/api/v3/preflight', { method: 'POST' }).catch(() => {
+      // Preflight is best-effort — never block login
+    });
+  };
 
   const loadUserData = async () => {
     try {
@@ -124,6 +137,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
         }
       }
 
+      // Trigger brain preflight when user is authenticated
+      triggerPreflight();
+
     } catch (error) {
       console.error('❌ Error loading user data:', error);
     } finally {
@@ -154,10 +170,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const subscription = auth.onAuthStateChange((event, newSession) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         loadUserData();
+        // Trigger preflight on sign-in
+        if (event === 'SIGNED_IN') triggerPreflight();
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setWorkspace(null);
         setSession(null);
+        preflightTriggered.current = false;
       }
     });
 

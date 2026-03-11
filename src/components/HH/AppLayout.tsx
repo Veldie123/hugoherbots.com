@@ -123,7 +123,7 @@ export function AppLayout({
   const autoDetectPreview = typeof document !== 'undefined' && !!document.querySelector('[data-preview-mode="true"]');
   const effectivePreview = isPreview || autoDetectPreview;
 
-  const HUGO_HIDDEN_MAIN = new Set(['techniques', 'analysis', 'talk-to-hugo']);
+  const HUGO_HIDDEN_MAIN = new Set(['techniques']);
   const HUGO_HIDDEN_BOTTOM = new Set(['team', 'resources', 'settings']);
   const PREVIEW_HIDDEN_MAIN = new Set(['techniques']);
   const visibleMainNavItems = onboardingMode
@@ -266,7 +266,7 @@ export function AppLayout({
   };
 
   return (
-    <div className="flex h-dvh bg-hh-bg" style={{ height: '100dvh' }}>
+    <div className={`flex bg-hh-bg ${effectivePreview ? 'h-[calc(100dvh-48px)]' : 'h-dvh'}`} style={{ height: effectivePreview ? 'calc(100dvh - 48px)' : '100dvh' }}>
       <div
         data-sidebar-collapsed={collapsed ? 'true' : 'false'}
         className={`hidden lg:flex ${

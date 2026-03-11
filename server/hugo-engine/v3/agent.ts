@@ -12,7 +12,7 @@ import {
   getAnthropicClient,
   COACHING_MODEL,
 } from "./anthropic-client";
-import { buildV3SystemPrompt } from "./system-prompt";
+import { buildV3SystemPrompt, buildBrainSystemPrompt } from "./system-prompt";
 import { buildVoiceSystemPrompt } from "./system-prompt-voice";
 import { buildAdminSystemPrompt } from "./system-prompt-admin";
 import { type UserBriefing } from "./user-briefing";
@@ -73,6 +73,7 @@ export interface V3SessionState {
     bedrijfsnaam?: string;
   };
   briefing?: UserBriefing;
+  brain?: string;
   engineVersion: "v3";
   roleplay?: RoleplayState;
   scriptBuilder?: ScriptBuilderState;
@@ -129,6 +130,28 @@ function getAllToolDefinitions(mode: V3Mode): Anthropic.Tool[] {
     : [...knowledgeToolDefinitions, ...methodologyToolDefinitions, ...roleplayToolDefinitions, ...scriptBuilderToolDefinitions];
 
   // Add cache_control to last tool so the entire tools array is cached
+  if (tools.length > 0) {
+    tools[tools.length - 1] = {
+      ...tools[tools.length - 1],
+      cache_control: { type: "ephemeral" as const },
+    };
+  }
+  return tools;
+}
+
+/** Brain mode: fast tools + script builder + save_insight (no slow lookups — brain has it all) */
+function getBrainToolDefinitions(): Anthropic.Tool[] {
+  const tools: Anthropic.Tool[] = [
+    ...roleplayToolDefinitions,
+    ...methodologyToolDefinitions,
+    ...scriptBuilderToolDefinitions,
+  ];
+  // Cherry-pick fast knowledge tools: search_methodology (cached JSON) + save_insight (async, fire-and-forget)
+  const fastKnowledge = knowledgeToolDefinitions.filter(t =>
+    t.name === "search_methodology" || t.name === "save_insight"
+  );
+  tools.push(...fastKnowledge);
+
   if (tools.length > 0) {
     tools[tools.length - 1] = {
       ...tools[tools.length - 1],
@@ -203,6 +226,10 @@ function getSystemPrompt(session: V3SessionState): string {
   if (session.voiceMode) {
     return buildVoiceSystemPrompt(session.userProfile, session.briefing);
   }
+  // Brain mode: inject pre-computed brain document instead of briefing
+  if (session.brain) {
+    return buildBrainSystemPrompt(session.brain);
+  }
   return buildV3SystemPrompt(session.userProfile, session.briefing);
 }
 
@@ -246,7 +273,11 @@ export async function chat(
   thinkingMode: ThinkingMode = "auto"
 ): Promise<V3Response> {
   const client = getAnthropicClient();
-  const tools = session.voiceMode ? getVoiceToolDefinitions() : getAllToolDefinitions(session.mode);
+  const tools = session.voiceMode
+    ? getVoiceToolDefinitions()
+    : session.brain
+      ? getBrainToolDefinitions()
+      : getAllToolDefinitions(session.mode);
   const systemPrompt = getSystemPrompt(session);
   const model = COACHING_MODEL;
   const maxTokens = session.voiceMode ? 500 : (session.mode === "admin" ? 16384 : 8192);
@@ -387,7 +418,11 @@ export async function* chatStream(
   thinkingMode: ThinkingMode = "auto"
 ): AsyncGenerator<V3StreamEvent> {
   const client = getAnthropicClient();
-  const tools = session.voiceMode ? getVoiceToolDefinitions() : getAllToolDefinitions(session.mode);
+  const tools = session.voiceMode
+    ? getVoiceToolDefinitions()
+    : session.brain
+      ? getBrainToolDefinitions()
+      : getAllToolDefinitions(session.mode);
   const systemPrompt = getSystemPrompt(session);
   const model = COACHING_MODEL;
   const maxTokens = session.voiceMode ? 500 : (session.mode === "admin" ? 16384 : 8192);
@@ -524,7 +559,8 @@ export function createSession(
   userId: string,
   mode: V3Mode = "coaching",
   userProfile?: V3SessionState["userProfile"],
-  briefing?: UserBriefing
+  briefing?: UserBriefing,
+  brain?: string | null
 ): V3SessionState {
   return {
     sessionId,
@@ -533,6 +569,7 @@ export function createSession(
     messages: [],
     userProfile,
     briefing,
+    brain: brain || undefined,
     engineVersion: "v3",
   };
 }
