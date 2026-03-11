@@ -26,6 +26,8 @@ const pendingVoiceData = new Map<string, { userId: string; briefing?: UserBriefi
 // Support both casing conventions for the ElevenLabs API key
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || process.env.Elevenlabs_api_key || "";
 const ELEVENLABS_AGENT_ID = process.env.ELEVENLABS_AGENT_ID || "agent_3501kcs7vst6f1jvv85sjm27ba7r";
+// Shared secret for ElevenLabs server-to-server calls (set in .env)
+const VOICE_LLM_SECRET = process.env.VOICE_LLM_SECRET || "";
 
 /** Save voice session to Supabase (async, non-blocking) */
 async function persistVoiceSession(session: V3SessionState): Promise<void> {
@@ -63,6 +65,16 @@ async function persistVoiceSession(session: V3SessionState): Promise<void> {
  */
 // ElevenLabs appends /chat/completions to the Server URL, so we handle both paths
 const llmHandler = async (req: Request, res: Response) => {
+  // Verify shared secret to prevent unauthorized access to Claude API credits
+  if (VOICE_LLM_SECRET) {
+    const provided = req.headers["x-voice-secret"] as string || "";
+    if (provided !== VOICE_LLM_SECRET) {
+      return res.status(401).json({ error: "Unauthorized — invalid voice secret" });
+    }
+  } else if (process.env.NODE_ENV === "production") {
+    console.warn("[V3 Voice] VOICE_LLM_SECRET not set — LLM endpoints are unprotected in production!");
+  }
+
   if (!process.env.ANTHROPIC_API_KEY) {
     console.error("[V3 Voice] ANTHROPIC_API_KEY is missing — voice LLM will fail");
     return res.status(503).json({ error: "AI backend niet beschikbaar" });

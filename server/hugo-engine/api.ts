@@ -862,17 +862,22 @@ app.post("/api/v2/message", async (req, res) => {
     if (!session) {
       return res.status(404).json({ error: "Session not found. Please start a new session." });
     }
-    
+
+    // Ownership check: only session owner or admin can access
+    if (session.userId && session.userId !== req.userId && !req.isAdmin) {
+      return res.status(403).json({ error: "Geen toegang tot deze sessie." });
+    }
+
     // Add user message to history
     session.conversationHistory.push({
       role: "user",
       content
     });
-    
+
     let response: string;
     let debug: any = {};
     let validatorInfo: any = null;
-    
+
     // Route to the correct engine based on mode
     switch (session.mode) {
       case "CONTEXT_GATHERING": {
@@ -1130,11 +1135,16 @@ app.post("/api/v2/session/message", async (req, res) => {
         sessions.set(session.id, session);
       }
     }
-    
+
     if (!session) {
       return res.status(404).json({ error: "Session not found. Please start a new session." });
     }
-    
+
+    // Ownership check: only session owner or admin can access
+    if (session.userId && session.userId !== req.userId && !req.isAdmin) {
+      return res.status(403).json({ error: "Geen toegang tot deze sessie." });
+    }
+
     // SEC-024: systemContext injection removed for security (prompt injection risk)
     
     // Add user message to history
@@ -1448,7 +1458,7 @@ app.post("/api/v2/session/message", async (req, res) => {
 app.get("/api/v2/sessions/:sessionId", async (req, res) => {
   try {
     let session = sessions.get(req.params.sessionId);
-    
+
     // Try to load from database if not in memory
     if (!session) {
       session = await loadSessionFromDb(req.params.sessionId) ?? undefined;
@@ -1456,11 +1466,16 @@ app.get("/api/v2/sessions/:sessionId", async (req, res) => {
         sessions.set(session.id, session);
       }
     }
-    
+
     if (!session) {
       return res.status(404).json({ error: "Session not found" });
     }
-    
+
+    // Ownership check: only session owner or admin can access
+    if (session.userId && session.userId !== req.userId && !req.isAdmin) {
+      return res.status(403).json({ error: "Geen toegang tot deze sessie." });
+    }
+
     res.json({
       id: session.id,
       mode: session.mode,
@@ -1479,10 +1494,25 @@ app.get("/api/v2/sessions/:sessionId", async (req, res) => {
 // Delete session
 app.delete("/api/v2/sessions/:sessionId", async (req, res) => {
   try {
-    const deleted = sessions.delete(req.params.sessionId);
-    if (!deleted) {
+    const session = sessions.get(req.params.sessionId);
+    if (!session) {
       return res.status(404).json({ error: "Session not found" });
     }
+
+    // Ownership check: only session owner or admin can delete
+    if (session.userId && session.userId !== req.userId && !req.isAdmin) {
+      return res.status(403).json({ error: "Geen toegang tot deze sessie." });
+    }
+
+    sessions.delete(req.params.sessionId);
+
+    // Also remove from database
+    try {
+      await supabase.from('v2_sessions').delete().eq('id', req.params.sessionId);
+    } catch (dbErr: any) {
+      console.error("[API] Failed to delete session from DB:", dbErr.message);
+    }
+
     res.json({ success: true });
   } catch (error: any) {
     sendError(res, error);
@@ -3063,7 +3093,7 @@ app.post("/api/v2/context/snapshot", async (req, res) => {
 });
 
 // POST /api/v2/rag/index - Index the RAG corpus (admin only)
-app.post("/api/v2/rag/index", async (req, res) => {
+app.post("/api/v2/rag/index", requireAdmin, async (req, res) => {
   try {
     console.log("[RAG] Starting corpus indexing...");
     const result = await indexCorpus();
@@ -3100,7 +3130,7 @@ import {
 } from "./v2/rag-techniek-tagger";
 
 // POST /api/v2/rag/tag-bulk - Bulk tag all chunks from video mapping
-app.post("/api/v2/rag/tag-bulk", async (req, res) => {
+app.post("/api/v2/rag/tag-bulk", requireAdmin, async (req, res) => {
   try {
     console.log("[RAG-TAGGER] Starting bulk tagging from video_mapping.json");
     const result = await bulkTagFromVideoMapping();
@@ -3169,7 +3199,7 @@ app.get("/api/v2/rag/untagged", async (req, res) => {
 });
 
 // POST /api/v2/rag/tag-video - Tag all chunks for a specific video
-app.post("/api/v2/rag/tag-video", async (req, res) => {
+app.post("/api/v2/rag/tag-video", requireAdmin, async (req, res) => {
   try {
     const { sourceId, technikId } = req.body;
     if (!sourceId || !technikId) {
@@ -3204,7 +3234,7 @@ import {
 } from "./v2/rag-heuristic-tagger-v2";
 
 // POST /api/v2/rag/suggest-bulk - Run heuristic tagging on untagged chunks (V2 with primary/mentions)
-app.post("/api/v2/rag/suggest-bulk", async (req, res) => {
+app.post("/api/v2/rag/suggest-bulk", requireAdmin, async (req, res) => {
   try {
     console.log("[HEURISTIC-V2] Starting bulk suggestion with SSOT validation");
     clearHeuristicsCacheV2();
@@ -3240,7 +3270,7 @@ app.get("/api/v2/rag/review-stats", async (req, res) => {
 });
 
 // POST /api/v2/rag/approve/:id - Approve a chunk's suggested technique
-app.post("/api/v2/rag/approve/:id", async (req, res) => {
+app.post("/api/v2/rag/approve/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const success = await approveChunk(id);
@@ -3252,7 +3282,7 @@ app.post("/api/v2/rag/approve/:id", async (req, res) => {
 });
 
 // POST /api/v2/rag/reject/:id - Reject a suggestion with optional correction
-app.post("/api/v2/rag/reject/:id", async (req, res) => {
+app.post("/api/v2/rag/reject/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { newTechniqueId } = req.body;
@@ -3265,7 +3295,7 @@ app.post("/api/v2/rag/reject/:id", async (req, res) => {
 });
 
 // POST /api/v2/rag/approve-bulk - Bulk approve all suggestions for a technique
-app.post("/api/v2/rag/approve-bulk", async (req, res) => {
+app.post("/api/v2/rag/approve-bulk", requireAdmin, async (req, res) => {
   try {
     const { techniqueId } = req.body;
     if (!techniqueId) {
@@ -3280,7 +3310,7 @@ app.post("/api/v2/rag/approve-bulk", async (req, res) => {
 });
 
 // POST /api/v2/rag/reset-suggestions - Reset all heuristic suggestions (V2)
-app.post("/api/v2/rag/reset-suggestions", async (req, res) => {
+app.post("/api/v2/rag/reset-suggestions", requireAdmin, async (req, res) => {
   try {
     clearHeuristicsCacheV2();
     const result = await resetHeuristicSuggestionsV2();
@@ -6167,7 +6197,9 @@ async function startServer() {
   app.get("/api/stripe/subscription", async (req: Request, res: Response) => {
     try {
       const stripeClient = getStripeClient();
-      const email = (req.query.email as string) || (req as any).userEmail;
+      // Only admins can look up other users' subscriptions
+      const requestedEmail = req.query.email as string | undefined;
+      const email = (req.isAdmin && requestedEmail) ? requestedEmail : (req as any).userEmail;
       if (!email) return res.json({ subscription: null });
 
       const customers = await stripeClient.customers.list({ email, limit: 1 });

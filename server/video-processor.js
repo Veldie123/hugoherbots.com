@@ -673,60 +673,16 @@ async function stripeQuery(text, params) {
 const { register } = require('tsx/cjs/api');
 register();
 const stripeClientPath = path.resolve(__dirname, '../src/server/stripeClient.ts');
-const { getStripeSync, getUncachableStripeClient, getStripePublishableKey } = require(stripeClientPath);
-const { WebhookHandlers } = (() => {
-  const _getStripeSync = getStripeSync;
-  return {
-    WebhookHandlers: {
-      async processWebhook(payload, signature) {
-        if (!Buffer.isBuffer(payload)) {
-          throw new Error('Payload must be a Buffer');
-        }
-        const sync = await _getStripeSync();
-        await sync.processWebhook(payload, signature);
-      }
-    }
-  };
-})();
+const { getStripeClient } = require(stripeClientPath);
 
+// Stripe is now handled by api.ts (port 3002). video-processor only needs the client
+// for legacy endpoints that may still be called directly.
 async function initStripe() {
   try {
-    const databaseUrl = process.env.DATABASE_URL;
-    if (!databaseUrl) {
-      console.warn('[Stripe] DATABASE_URL not set, skipping Stripe init');
-      return;
-    }
-
-    const { runMigrations } = require('stripe-replit-sync');
-    await runMigrations({ databaseUrl });
-    console.log('[Stripe] Schema ready');
-
-    const stripeSync = await getStripeSync();
-
-    const publicDomain = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.PUBLIC_URL || 'hugoherbots.com';
-    if (publicDomain) {
-      try {
-        const webhookBaseUrl = publicDomain.startsWith('http') ? publicDomain : `https://${publicDomain}`;
-        const result = await stripeSync.findOrCreateManagedWebhook(
-          `${webhookBaseUrl}/api/stripe/webhook`
-        );
-        if (result?.webhook?.url) {
-          console.log(`[Stripe] Webhook configured: ${result.webhook.url}`);
-        } else {
-          console.log('[Stripe] Webhook setup returned no URL, skipping (Stripe Sandbox may not support webhooks)');
-        }
-      } catch (webhookErr) {
-        console.log(`[Stripe] Webhook setup skipped: ${webhookErr.message}`);
-      }
-    } else {
-      console.log('[Stripe] No public domain available, skipping webhook setup (dev mode)');
-    }
-
-    stripeSync.syncBackfill()
-      .then(() => console.log('[Stripe] Data synced'))
-      .catch((err) => console.error('[Stripe] Sync error:', err.message));
+    getStripeClient();
+    console.log('[Stripe] Client ready (webhook + billing handled by api.ts)');
   } catch (err) {
-    console.error('[Stripe] Init error:', err.message);
+    console.warn('[Stripe] Not configured:', err.message);
   }
 }
 
@@ -4121,12 +4077,12 @@ Format: ["id1", "id2", "id3", ...]`;
 
   // Platform Analytics - Aggregated metrics (bypasses RLS with service role)
   if (pathname === '/api/analytics/platform' && req.method === 'GET') {
-    if (!checkAuth(req)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
-      return;
-    }
     (async () => {
+      if (!(await checkAdminAuth(req))) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+        return;
+      }
       try {
         if (!supabaseAdmin) {
           throw new Error('Supabase niet geconfigureerd');
@@ -4233,12 +4189,12 @@ Format: ["id1", "id2", "id3", ...]`;
   }
 
   if (pathname === '/api/analytics/user' && req.method === 'GET') {
-    if (!checkAuth(req)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
-      return;
-    }
     (async () => {
+      if (!(await checkAdminAuth(req))) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+        return;
+      }
       try {
         if (!supabaseAdmin) {
           throw new Error('Supabase niet geconfigureerd');
@@ -4453,12 +4409,12 @@ Format: ["id1", "id2", "id3", ...]`;
   }
 
   if (pathname === '/api/analytics/content-performance' && req.method === 'GET') {
-    if (!checkAuth(req)) {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
-      return;
-    }
     (async () => {
+      if (!(await checkAdminAuth(req))) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Niet geautoriseerd' }));
+        return;
+      }
       try {
         if (!supabaseAdmin) {
           throw new Error('Supabase niet geconfigureerd');
@@ -6635,7 +6591,12 @@ ANTWOORD FORMAT:
           return;
         }
         const sig = Array.isArray(signature) ? signature[0] : signature;
-        await WebhookHandlers.processWebhook(rawBody, sig);
+        // Webhook is now handled by api.ts — this endpoint is a legacy fallback
+        const stripe = getStripeClient();
+        const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+        if (!webhookSecret) throw new Error('STRIPE_WEBHOOK_SECRET not set');
+        stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
+        console.log('[Stripe] Webhook received (legacy path — should be handled by api.ts)');
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ received: true }));
       } catch (err) {
@@ -6716,7 +6677,7 @@ ANTWOORD FORMAT:
           return;
         }
 
-        const stripe = await getUncachableStripeClient();
+        const stripe = getStripeClient();
         const sessionParams = {
           payment_method_types: ['card'],
           line_items: [{ price: priceId, quantity: 1 }],
@@ -6752,7 +6713,7 @@ ANTWOORD FORMAT:
           res.end(JSON.stringify({ error: 'customerId is verplicht' }));
           return;
         }
-        const stripe = await getUncachableStripeClient();
+        const stripe = getStripeClient();
         const session = await stripe.billingPortal.sessions.create({
           customer: customerId,
           return_url: returnUrl || `https://${process.env.RAILWAY_PUBLIC_DOMAIN || process.env.PUBLIC_URL || 'hugoherbots.com'}/pricing`,
@@ -6855,7 +6816,8 @@ ANTWOORD FORMAT:
   if (pathname === '/api/stripe/publishable-key' && req.method === 'GET') {
     (async () => {
       try {
-        const key = await getStripePublishableKey();
+        const key = process.env.STRIPE_PUBLISHABLE_KEY || '';
+        if (!key) throw new Error('STRIPE_PUBLISHABLE_KEY not set');
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ publishableKey: key }));
       } catch (err) {

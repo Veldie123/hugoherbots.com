@@ -11,6 +11,7 @@ import { chat, chatStream, createSession, type V3SessionState, type V3StreamEven
 import { isV3Available, getAnthropicClient } from "./anthropic-client";
 import { buildUserBriefing } from "./user-briefing";
 import { saveMemory } from "./memory-service";
+import { generateBrain, getCachedBrain } from "./preflight";
 import { supabase } from "../supabase-client";
 import { pool } from "../db";
 import { randomUUID } from "crypto";
@@ -34,8 +35,28 @@ const router = Router();
 
 // In-memory session store with Supabase write-through
 const sessions = new Map<string, V3SessionState>();
+// Track when sessions were last active (for cleanup)
+const sessionLastActive = new Map<string, number>();
 
 const SUPERADMIN_EMAIL = "stephane@hugoherbots.com";
+
+// Cleanup stale V3 sessions every 30 minutes (sessions idle >2 hours)
+const V3_SESSION_MAX_IDLE_MS = 2 * 60 * 60 * 1000; // 2 hours
+setInterval(() => {
+  const now = Date.now();
+  let cleaned = 0;
+  for (const [id, lastActive] of sessionLastActive) {
+    if (now - lastActive > V3_SESSION_MAX_IDLE_MS) {
+      sessions.delete(id);
+      sessionLastActive.delete(id);
+      summarizedSessions.delete(id);
+      cleaned++;
+    }
+  }
+  if (cleaned > 0) {
+    console.log(`[V3] Cleaned ${cleaned} stale sessions (${sessions.size} remaining)`);
+  }
+}, 30 * 60 * 1000);
 
 /** Enrich the current OpenTelemetry span with V3 session metadata */
 function enrichTraceMetadata(req: Request, sessionId: string, mode: string): void {
@@ -133,11 +154,18 @@ async function loadSession(sessionId: string): Promise<V3SessionState | null> {
   // Check memory first
   const cached = sessions.get(sessionId);
   if (cached) {
+    sessionLastActive.set(sessionId, Date.now());
     // Ensure briefing exists for coaching sessions (may be lost after server restart)
     if (cached.mode === "coaching" && !cached.briefing) {
       try {
         cached.briefing = await buildUserBriefing(cached.userId);
       } catch { /* continue without */ }
+    }
+    // Ensure brain is loaded if available (may be lost after server restart)
+    if (cached.mode === "coaching" && !cached.brain) {
+      try {
+        cached.brain = (await getCachedBrain(cached.userId)) || undefined;
+      } catch { /* brain is optional */ }
     }
     return cached;
   }
@@ -162,17 +190,21 @@ async function loadSession(sessionId: string): Promise<V3SessionState | null> {
       engineVersion: "v3",
     };
 
-    // Rebuild briefing for coaching sessions so system prompt has user context
+    // Rebuild briefing + brain for coaching sessions so system prompt has user context
     if (session.mode === "coaching") {
       try {
+        session.brain = (await getCachedBrain(session.userId)) || undefined;
+      } catch { /* brain is optional */ }
+      try {
         session.briefing = await buildUserBriefing(session.userId);
-        console.log(`[V3] Briefing rebuilt for loaded session ${sessionId}`);
+        console.log(`[V3] Briefing rebuilt for loaded session ${sessionId}${session.brain ? ' (brain available)' : ''}`);
       } catch {
         // Briefing is nice-to-have, continue without
       }
     }
 
     sessions.set(sessionId, session);
+    sessionLastActive.set(sessionId, Date.now());
     return session;
   } catch {
     return null;
@@ -231,8 +263,12 @@ function requireV3Access(mode: "admin" | "coaching") {
   };
 }
 
-/** Validate user has access to the session's mode (backend safety net) */
-async function validateSessionAccess(session: V3SessionState, userEmail: string): Promise<boolean> {
+/** Validate user owns the session AND has access to its mode (backend safety net) */
+async function validateSessionAccess(session: V3SessionState, userEmail: string, userId?: string): Promise<boolean> {
+  // Ownership check: only session owner or superadmin can access
+  if (userId && session.userId !== userId && userEmail !== SUPERADMIN_EMAIL) {
+    return false;
+  }
   const access = await getV3Access(userEmail);
   return session.mode === "admin" ? access.admin_v3 : access.coaching_v3;
 }
@@ -275,7 +311,18 @@ router.post(
 
     // Fetch rich user context for personalized opening (coaching only)
     let briefing;
+    let brain: string | null = null;
     if (sessionMode === "coaching") {
+      try {
+        // Try to load pre-computed brain first (generated at login via /preflight)
+        brain = await getCachedBrain(req.userId!);
+        if (brain) {
+          console.log(`[V3] Brain loaded from cache for ${req.userId} (${brain.length} chars)`);
+        }
+      } catch {
+        // Brain is optional — fall back to briefing
+      }
+
       try {
         briefing = await buildUserBriefing(req.userId!);
         console.log(`[V3] Briefing loaded for ${briefing.name}: ${briefing.isNewUser ? 'new user' : `${briefing.sessionsPlayed} sessions`}`);
@@ -284,8 +331,9 @@ router.post(
       }
     }
 
-    const session = createSession(sessionId, req.userId!, sessionMode, userProfile, briefing);
+    const session = createSession(sessionId, req.userId!, sessionMode, userProfile, briefing, brain);
     sessions.set(sessionId, session);
+    sessionLastActive.set(sessionId, Date.now());
     enrichTraceMetadata(req, sessionId, sessionMode);
     persistSession(session);
     console.log(`[V3] Session created: ${sessionId} (mode: ${sessionMode})`);
@@ -413,7 +461,7 @@ router.post(
     }
 
     // Mode-guard: validate user has access to this session's mode
-    if (!await validateSessionAccess(session, req.userEmail!)) {
+    if (!await validateSessionAccess(session, req.userEmail!, req.userId)) {
       return res.status(403).json({ error: "Geen toegang tot deze sessie mode." });
     }
 
@@ -466,7 +514,7 @@ router.post(
     }
 
     // Mode-guard: validate user has access to this session's mode
-    if (!await validateSessionAccess(session, req.userEmail!)) {
+    if (!await validateSessionAccess(session, req.userEmail!, req.userId)) {
       return res.status(403).json({ error: "Geen toegang tot deze sessie mode." });
     }
 
@@ -540,7 +588,7 @@ router.get(
     }
 
     // Mode-guard: validate user has access to this session's mode
-    if (!await validateSessionAccess(session, req.userEmail!)) {
+    if (!await validateSessionAccess(session, req.userEmail!, req.userId)) {
       return res.status(403).json({ error: "Geen toegang tot deze sessie mode." });
     }
 
@@ -657,6 +705,34 @@ router.post("/admin/cleanup-empty-sessions", requireAuth, async (req: Request, r
   } catch (err: any) {
     console.error("[V3] Cleanup error:", err.message);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Preflight Brain ─────────────────────────────────────────────────────────
+
+/** Trigger brain generation (fire-and-forget from frontend at login) */
+router.post("/preflight", requireAuth, async (req: Request, res: Response) => {
+  if (!isV3Available()) {
+    return res.status(503).json({ error: "V3 niet beschikbaar." });
+  }
+
+  // Only superadmin for now (V3 is superadmin-only)
+  const access = await getV3Access(req.userEmail!);
+  if (!access.coaching_v3) {
+    return res.status(403).json({ error: "Geen V3 toegang." });
+  }
+
+  try {
+    const result = await generateBrain(req.userId!);
+    console.log(`[Preflight] Done for ${req.userId}: cached=${result.cached}, ${result.timing.totalMs}ms`);
+    res.json({
+      cached: result.cached,
+      templateVersion: result.templateVersion,
+      timing: result.timing,
+    });
+  } catch (err: any) {
+    console.error("[Preflight] Endpoint error:", err.message);
+    res.status(500).json({ error: "Brain generatie mislukt.", details: err.message });
   }
 });
 
