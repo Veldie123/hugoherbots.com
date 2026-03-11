@@ -44,7 +44,6 @@ import {
   FileAudio,
   Paperclip,
   File,
-  Phone,
 } from "lucide-react";
 import technieken_index from "../../data/technieken_index";
 import { KLANT_HOUDINGEN } from "../../data/klant_houdingen";
@@ -2756,7 +2755,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           {/* Speaking indicator removed — waveform animation shows agent state */}
         </div>
         
-        <h3 className="text-white text-[26px] font-bold mb-1">Hugo Herbots <sup className="text-[14px] font-semibold" style={{ verticalAlign: 'super' }}>AI</sup></h3>
+        <h3 className="text-white text-[26px] font-medium mb-1">Hugo Herbots <sup className="text-[14px] font-semibold" style={{ verticalAlign: 'super' }}>AI</sup></h3>
         <p className="text-[16px] mb-2" style={{ color: 'color-mix(in srgb, var(--hh-bg) 80%, transparent)' }}>
           {isAudioConnecting ? "Verbinden..." : audioConnectionState === ConnectionState.Connected ? "Verbonden" : "Audio modus"}
         </p>

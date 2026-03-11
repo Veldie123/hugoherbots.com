@@ -56,24 +56,24 @@ import {
   FileText,
   File,
   Image,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getAllTechnieken } from "../../data/technieken-service";
 import technieken_index from "../../data/technieken_index.json";
 import { KLANT_HOUDINGEN } from "../../data/klant_houdingen";
 import { cn } from "../ui/utils";
-import { 
-  buyingClockToDisplay, 
-  behaviorStyleToDisplay, 
+import {
+  buyingClockToDisplay,
+  behaviorStyleToDisplay,
   difficultyToDisplay,
   difficultyLevels,
   translate,
-  buildDebugInfoFromResponse 
+  buildDebugInfoFromResponse
 } from "../../utils/displayMappings";
 import { EPICSidebar } from "./AdminChatExpertModeSidebar";
 import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
 import { apiFetch } from "../../services/apiFetch";
-import { Loader2 } from "lucide-react";
 import { LiveAvatarComponent } from "./LiveAvatarComponent";
 import { ModelSelector, type EngineModel } from "./ModelSelector";
 import type { ThinkingMode } from "../../services/hugoApi";
@@ -1448,7 +1448,7 @@ export function AdminChatExpertMode({
           <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
             <SheetContent side="left" className="w-[85vw] max-w-[400px] p-0 overflow-y-auto bg-hh-bg">
               <SheetHeader className="px-4 py-3 border-b border-hh-border">
-                <SheetTitle className="text-hh-text text-[16px] font-bold tracking-[0.5px]">
+                <SheetTitle className="text-hh-text text-[16px] font-medium tracking-[0.5px]">
                   E.P.I.C. TECHNIQUE
                 </SheetTitle>
               </SheetHeader>
