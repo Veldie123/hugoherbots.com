@@ -107,11 +107,11 @@ export function HeroBanner({
                 {secondaryAction && (
                   <button
                     className="hidden sm:flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-white border backdrop-blur-sm transition-colors cursor-pointer"
-                    style={{ backgroundColor: 'color-mix(in srgb, var(--hh-bg) 25%, transparent)', borderColor: 'color-mix(in srgb, var(--hh-bg) 60%, transparent)' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--hh-bg)'; e.currentTarget.style.color = 'var(--hh-ink)'; e.currentTarget.style.borderColor = 'var(--hh-bg)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--hh-bg) 25%, transparent)'; e.currentTarget.style.color = 'var(--hh-bg)'; e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--hh-bg) 60%, transparent)'; }}
-                    onFocus={(e) => { e.currentTarget.style.backgroundColor = 'var(--hh-bg)'; e.currentTarget.style.color = 'var(--hh-ink)'; e.currentTarget.style.borderColor = 'var(--hh-bg)'; }}
-                    onBlur={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--hh-bg) 25%, transparent)'; e.currentTarget.style.color = 'var(--hh-bg)'; e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--hh-bg) 60%, transparent)'; }}
+                    style={{ backgroundColor: 'rgba(255,255,255,0.25)', borderColor: 'rgba(255,255,255,0.6)' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
+                    onFocus={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
+                    onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
                     onClick={secondaryAction.onClick}
                   >
                     {secondaryAction.icon}

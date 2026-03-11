@@ -258,8 +258,8 @@ function VideoRecommendationCard({ video, adminColors }: { video: any; adminColo
             autoPlay
             style={{ width: '100%', aspectRatio: '16/9' }}
             streamType="on-demand"
-            primaryColor="var(--hh-success)"
-            accentColor={adminColors ? 'var(--hh-primary)' : 'var(--hh-success)'}
+            primaryColor="#10B981"
+            accentColor={adminColors ? '#4F7396' : '#10B981'}
           />
         </div>
         <div className="px-3 py-2" style={{ backgroundColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 2%, transparent)' : 'color-mix(in srgb, var(--hh-primary) 2%, transparent)' }}>
@@ -2273,6 +2273,11 @@ export function AnalysisResults({
                                   </span>
                                 );
                               })()}
+                              {turn.speaker === 'customer' && signal && signal.recommendedTechniqueIds && signal.recommendedTechniqueIds.length > 0 && (
+                                <span className="inline-flex items-center gap-1 text-[10px] px-2.5 py-0.5 rounded-full font-medium border border-hh-primary/20 bg-hh-primary/10 text-hh-primary">
+                                  → {signal.recommendedTechniqueIds.map(id => getTechniekByNummer(id)?.naam || id).join(', ')}
+                                </span>
+                              )}
                               {evaluation && evaluation.techniques.length > 0 && evaluation.techniques.map((tech, i) => {
                                 const badge = getQualityBadge(tech.quality);
                                 const badgeKey = `tech-${turn.idx}-${tech.id}`;

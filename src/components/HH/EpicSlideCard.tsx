@@ -4,10 +4,10 @@ import type { EpicSlideContent } from "@/types/crossPlatform";
 const PHASE_COLORS: Record<string, { bg: string; border: string; badge: string; badgeText: string; label: string }> = {
   intro: { bg: 'color-mix(in srgb, var(--hh-ink) 85%, var(--hh-muted))', border: 'color-mix(in srgb, var(--hh-muted) 40%, var(--hh-ink))', badge: 'color-mix(in srgb, var(--hh-muted) 40%, var(--hh-ink))', badgeText: 'var(--hh-muted)', label: 'Introductie' },
   pre: { bg: 'color-mix(in srgb, var(--hh-ink) 85%, var(--hh-muted))', border: 'color-mix(in srgb, var(--hh-muted) 40%, var(--hh-ink))', badge: 'color-mix(in srgb, var(--hh-muted) 40%, var(--hh-ink))', badgeText: 'var(--hh-muted)', label: 'Voorbereiding' },
-  E: { bg: 'color-mix(in srgb, var(--hh-primary) 15%, var(--hh-ink))', border: 'var(--hh-primary)', badge: 'var(--hh-primary)', badgeText: 'var(--hh-bg)', label: 'Explore' },
-  P: { bg: 'color-mix(in srgb, var(--hh-success) 15%, var(--hh-ink))', border: 'var(--hh-success)', badge: 'var(--hh-success)', badgeText: 'var(--hh-bg)', label: 'Probe' },
-  I: { bg: 'color-mix(in srgb, var(--hh-purple) 15%, var(--hh-ink))', border: 'var(--hh-purple)', badge: 'var(--hh-purple)', badgeText: 'var(--hh-bg)', label: 'Impact' },
-  C: { bg: 'color-mix(in srgb, var(--hh-warning) 15%, var(--hh-ink))', border: 'var(--hh-warning)', badge: 'var(--hh-warning)', badgeText: 'var(--hh-bg)', label: 'Commit' },
+  E: { bg: 'color-mix(in srgb, var(--hh-primary) 15%, var(--hh-ink))', border: 'var(--hh-primary)', badge: 'var(--hh-primary)', badgeText: '#FFFFFF', label: 'Explore' },
+  P: { bg: 'color-mix(in srgb, var(--hh-success) 15%, var(--hh-ink))', border: 'var(--hh-success)', badge: 'var(--hh-success)', badgeText: '#FFFFFF', label: 'Probe' },
+  I: { bg: 'color-mix(in srgb, var(--hh-purple) 15%, var(--hh-ink))', border: 'var(--hh-purple)', badge: 'var(--hh-purple)', badgeText: '#FFFFFF', label: 'Impact' },
+  C: { bg: 'color-mix(in srgb, var(--hh-warning) 15%, var(--hh-ink))', border: 'var(--hh-warning)', badge: 'var(--hh-warning)', badgeText: '#FFFFFF', label: 'Commit' },
 };
 
 function getPhaseStyle(phase: string) {
@@ -50,7 +50,7 @@ export function EpicSlideCard({ slide }: EpicSlideCardProps) {
       </div>
 
       <div className="px-4 pb-2">
-        <h4 className="text-sm font-bold text-hh-bg leading-tight">
+        <h4 className="text-sm font-bold text-white leading-tight">
           {slide.titel}
         </h4>
       </div>

@@ -128,8 +128,8 @@ export function MuxVideoPlayer({
         preferPlayback="mse"
         minResolution="720p"
         maxResolution="2160p"
-        primaryColor="var(--hh-bg)"
-        accentColor="var(--hh-primary)"
+        primaryColor="#ffffff"
+        accentColor="#3b82f6"
         style={{ 
           width: "100%", 
           height: "100%",

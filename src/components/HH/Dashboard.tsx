@@ -158,7 +158,7 @@ const VideoCard = ({
       ) : (
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
           <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-            <Play className="w-6 h-6 ml-0.5" style={{ color: 'var(--hh-ink)' }} />
+            <Play className="w-6 h-6 ml-0.5" style={{ color: '#1e293b' }} />
           </div>
         </div>
       )}
@@ -238,7 +238,7 @@ const WebinarCard = ({
       )}
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
         <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-          <Play className="w-6 h-6 ml-0.5" style={{ color: 'var(--hh-ink)' }} />
+          <Play className="w-6 h-6 ml-0.5" style={{ color: '#1e293b' }} />
         </div>
       </div>
     </div>

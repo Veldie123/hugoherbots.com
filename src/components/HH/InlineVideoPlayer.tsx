@@ -52,7 +52,7 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
             autoPlay
             style={{ width: "100%", aspectRatio: "16/9" }}
             streamType="on-demand"
-            accentColor="var(--hh-success)"
+            accentColor="#10B981"
           />
         </div>
         <div className="px-3 py-2 bg-hh-bg">

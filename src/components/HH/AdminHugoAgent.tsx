@@ -137,7 +137,7 @@ export function AdminHugoAgent({ navigate }: Props) {
             alignItems: "center",
             justifyContent: "center"
           }}>
-            <Bot size={22} color="var(--hh-bg)" />
+            <Bot size={22} color="#FFFFFF" />
           </div>
           <div>
             <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--hh-text)", margin: 0 }}>Talk to Hugo AI</h1>
@@ -158,7 +158,7 @@ export function AdminHugoAgent({ navigate }: Props) {
               alignItems: "center",
               justifyContent: "center"
             }}>
-              <Loader2 size={26} color="var(--hh-bg)" style={{ animation: "spin 1s linear infinite" }} />
+              <Loader2 size={26} color="#FFFFFF" style={{ animation: "spin 1s linear infinite" }} />
             </div>
             <p style={{ fontSize: 18, color: "var(--hh-muted)", fontWeight: 500 }}>Uw dagelijkse briefing wordt geladen...</p>
           </div>
@@ -193,8 +193,8 @@ export function AdminHugoAgent({ navigate }: Props) {
                 justifyContent: "center"
               }}>
                 {message.role === "user"
-                  ? <User size={18} color="var(--hh-bg)" />
-                  : <Bot size={18} color="var(--hh-bg)" />}
+                  ? <User size={18} color="#FFFFFF" />
+                  : <Bot size={18} color="#FFFFFF" />}
               </div>
 
               <div style={{ maxWidth: "80%", display: "flex", flexDirection: "column", gap: 8 }}>
@@ -269,7 +269,7 @@ export function AdminHugoAgent({ navigate }: Props) {
               background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary-dark, var(--hh-primary)))",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
             }}>
-              <Loader2 size={18} color="var(--hh-bg)" style={{ animation: "spin 1s linear infinite" }} />
+              <Loader2 size={18} color="#FFFFFF" style={{ animation: "spin 1s linear infinite" }} />
             </div>
             <div style={{
               backgroundColor: "var(--hh-bg)", borderRadius: "18px 18px 18px 4px",
