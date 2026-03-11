@@ -1766,7 +1766,7 @@ export function AdminChatExpertMode({
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
                           </button>
-                          {!(onboardingStatus && !onboardingStatus.isComplete) && engineModel === "v3" && (
+                          {!(onboardingStatus && !onboardingStatus.isComplete) && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <button
