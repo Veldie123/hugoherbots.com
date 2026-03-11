@@ -1686,7 +1686,7 @@ app.get("/api/user/sessions", async (req, res) => {
           return technique?.naam || row.technique_id;
         })(),
         fase: technique?.fase || parseInt(row.technique_id?.split('.')[0]) || 1,
-        type: 'ai-chat' as const, // TODO: detect from session metadata
+        type: (row.current_mode === 'roleplay' ? 'roleplay' : 'ai-chat') as 'ai-chat' | 'roleplay',
         score,
         quality: score >= 80 ? 'excellent' : score >= 60 ? 'good' : 'needs-improvement',
         duration,
