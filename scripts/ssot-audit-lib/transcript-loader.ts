@@ -11,7 +11,7 @@ export interface TranscriptMap {
 
 interface VideoEntry {
   file_name: string;
-  techniek: string;
+  techniek: string | number;
   is_hidden: boolean;
   has_transcript?: boolean;
   [key: string]: unknown;
@@ -30,11 +30,16 @@ export function loadTranscripts(projectRoot: string = PROJECT_ROOT): TranscriptM
   const transcripts = new Map<string, string>();
   let videoCount = 0;
 
+  if (!mapping.videos || typeof mapping.videos !== "object") {
+    process.stderr.write(`[transcript-loader] Error: video_mapping.json has no "videos" object\n`);
+    return { transcripts, videoCount: 0, uncoveredTechniqueIds: [] };
+  }
+
   for (const [, entry] of Object.entries(mapping.videos)) {
     // Only process visible videos
     if (entry.is_hidden) continue;
 
-    const techniqueId = entry.techniek;
+    const techniqueId = String(entry.techniek ?? "");
     if (!techniqueId) continue;
 
     const stem = path.parse(entry.file_name).name;
@@ -45,7 +50,11 @@ export function loadTranscripts(projectRoot: string = PROJECT_ROOT): TranscriptM
       continue;
     }
 
-    const transcriptText = fs.readFileSync(transcriptPath, "utf-8");
+    const transcriptText = fs.readFileSync(transcriptPath, "utf-8").trim();
+    if (!transcriptText) {
+      process.stderr.write(`[transcript-loader] Warning: empty transcript for ${entry.file_name}, skipping\n`);
+      continue;
+    }
     videoCount++;
 
     const existing = transcripts.get(techniqueId);

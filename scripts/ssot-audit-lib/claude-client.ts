@@ -33,6 +33,10 @@ export async function callClaude(systemPrompt: string, userPrompt: string): Prom
     messages: [{ role: "user", content: userPrompt }],
   });
 
+  if (response.stop_reason === "max_tokens") {
+    process.stderr.write(`[ssot-audit] Warning: Claude response truncated (hit max_tokens). Output may be incomplete.\n`);
+  }
+
   const firstBlock = response.content[0];
   if (!firstBlock || firstBlock.type !== "text") {
     throw new Error("[ssot-audit] Unexpected response from Claude: no text block in response");
