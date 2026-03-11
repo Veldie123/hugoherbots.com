@@ -124,6 +124,8 @@
             "typecheck": "npx tsc --noEmit && npx tsc --noEmit -p server/hugo-engine/tsconfig.json",
             "test": "vitest run --config vitest.config.unit.ts",
             "config-lint": "node scripts/config-lint.js",
+            "ssot:audit": "tsx --env-file=.env scripts/ssot-audit.ts",
+            "ssot:apply": "tsx --env-file=.env scripts/ssot-apply-patches.ts",
             "audit:screenshot": "tsx scripts/audit/screenshot-all.ts",
             "audit:report": "tsx scripts/audit/generate-report.ts",
             "audit:full": "npm run audit:screenshot && npm run audit:report",
