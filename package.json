@@ -116,7 +116,7 @@
             "test:scenarios": "vitest run --config vitest.config.scenarios.ts",
             "test:scenarios:auto": "SCENARIO_AUTH_TOKEN=$(npx tsx --env-file=.env scripts/generate-test-token.ts) vitest run --config vitest.config.scenarios.ts",
             "lint": "echo 'No linter configured' && exit 0",
-            "typecheck": "npx tsc --noEmit",
+            "typecheck": "npx tsc --noEmit && npx tsc --noEmit -p server/hugo-engine/tsconfig.json",
             "test": "node scripts/config-lint.js",
             "config-lint": "node scripts/config-lint.js",
             "audit:screenshot": "tsx scripts/audit/screenshot-all.ts",

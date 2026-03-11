@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --legacy-peer-deps
+
+      - name: Typecheck (frontend)
+        run: npx tsc --noEmit
+
+      - name: Typecheck (server)
+        run: npx tsc --noEmit -p server/hugo-engine/tsconfig.json
+
+      - name: Config lint
+        run: node scripts/config-lint.js
+
+      - name: Build
+        run: npm run build

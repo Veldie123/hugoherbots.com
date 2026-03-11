@@ -216,12 +216,18 @@ server.on('upgrade', (req, socket, head) => {
   }
 });
 
+const children = [];
+let shuttingDown = false;
+
 function spawnService(name, command, args) {
+  if (shuttingDown) return;
   console.log(`[Production] Starting ${name}...`);
   const child = spawn(command, args, {
     stdio: ['ignore', 'pipe', 'pipe'],
     env: process.env,
   });
+
+  children.push(child);
 
   child.stdout.on('data', (data) => {
     data.toString().trim().split('\n').forEach(line => {
@@ -236,13 +242,25 @@ function spawnService(name, command, args) {
   });
 
   child.on('exit', (code, signal) => {
+    const idx = children.indexOf(child);
+    if (idx !== -1) children.splice(idx, 1);
+    if (shuttingDown) return;
     console.error(`[Production] ${name} exited (code=${code}, signal=${signal}). Restarting in 5s...`);
     setTimeout(() => spawnService(name, command, args), 5000);
   });
 }
 
-process.on('SIGTERM', () => { console.log('[Production] SIGTERM'); process.exit(0); });
-process.on('SIGINT', () => { console.log('[Production] SIGINT'); process.exit(0); });
+function gracefulShutdown(signal) {
+  console.log(`[Production] ${signal} — shutting down children...`);
+  shuttingDown = true;
+  children.forEach(child => {
+    try { child.kill('SIGTERM'); } catch {}
+  });
+  setTimeout(() => process.exit(0), 3000);
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 process.on('uncaughtException', (err) => {
   console.error('[Production] Uncaught exception:', err.message);
 });

@@ -125,7 +125,7 @@ import {
   type ConversationAnalysis,
 } from "./v2/analysis-service";
 import { runFullAnalysisV3, reAnalyzeFromTranscriptV3 } from "./v3/analysis-service";
-import { isV3Available } from "./v3/anthropic-client";
+import { isV3Available, getAnthropicClient, HERO_MODEL } from "./v3/anthropic-client";
 import pLimit from "p-limit";
 import multer from "multer";
 import { getAdminStats } from "./admin-stats";
@@ -4638,6 +4638,119 @@ app.post("/api/v2/admin/corrections", async (req: Request, res: Response) => {
   }
 });
 
+// AI-interpreted correction from Hugo's free-text feedback
+app.post("/api/v2/admin/corrections/interpret", async (req: Request, res: Response) => {
+  try {
+    const { analysisId, turnIdx, turnText, turnSpeaker, expertFeedback, context } = req.body;
+    if (!expertFeedback?.trim()) {
+      return res.status(400).json({ error: 'expertFeedback is required' });
+    }
+
+    // Build SSOT technique list for the prompt
+    const { buildSSOTTechniqueList } = await import("./v3/live-analyse-prompt");
+    const techniqueList = buildSSOTTechniqueList();
+
+    // Build houding list
+    const fs = await import("fs");
+    const path = await import("path");
+    const houdPath = path.join(process.cwd(), "config/klant_houdingen.json");
+    const houdData = JSON.parse(fs.readFileSync(houdPath, "utf-8"));
+    const houdingList = Object.values(houdData.houdingen)
+      .map((h: any) => `${h.id} "${h.naam}"`)
+      .join(", ");
+
+    const anthropic = getAnthropicClient();
+    const response = await anthropic.messages.create({
+      model: HERO_MODEL,
+      max_tokens: 500,
+      messages: [{
+        role: "user",
+        content: `Hugo Herbots (sales coach, expert in EPIC-methodologie) heeft feedback gegeven op een AI-analyse van een verkoopgesprek.
+
+Turn ${turnIdx} (${turnSpeaker}): "${turnText}"
+AI detecteerde: technieken=${context?.detectedTechniques || 'geen'}, houding=${context?.detectedHouding || 'onbekend'}
+
+Hugo's feedback: "${expertFeedback}"
+
+EPIC Technieken (exacte nummers en namen):
+${techniqueList}
+
+Klanthoudingen: ${houdingList}
+
+Interpreteer Hugo's feedback. Antwoord ALLEEN in valid JSON:
+{
+  "type": "technique" | "houding" | "other",
+  "detectedValue": "wat AI detecteerde (nummer of houding-id)",
+  "correctedValue": "wat Hugo zegt dat correct is (exact techniek-nummer of houding-id)",
+  "confidence": 0.0-1.0,
+  "reasoning": "korte uitleg in het Nederlands"
+}`,
+      }],
+    });
+
+    const aiText = response.content[0].type === "text" ? response.content[0].text : "";
+    let interpretation: any;
+    try {
+      const jsonMatch = aiText.match(/\{[\s\S]*\}/);
+      interpretation = jsonMatch ? JSON.parse(jsonMatch[0]) : { type: "other", detectedValue: "", correctedValue: expertFeedback, confidence: 0.5, reasoning: "Kon niet automatisch interpreteren" };
+    } catch {
+      interpretation = { type: "other", detectedValue: "", correctedValue: expertFeedback, confidence: 0.3, reasoning: "JSON parse fout — handmatige review nodig" };
+    }
+
+    // Store in admin_corrections
+    const corrType = `ai_interpreted_${interpretation.type}`;
+    const field = interpretation.type === "technique" ? "detected_technique" : interpretation.type === "houding" ? "houding" : "general";
+    const insertResult = await pool.query(
+      `INSERT INTO admin_corrections (analysis_id, type, field, original_value, new_value, context, submitted_by, source)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING *`,
+      [
+        analysisId || null,
+        corrType,
+        field,
+        interpretation.detectedValue || context?.detectedTechniques || '',
+        interpretation.correctedValue || expertFeedback,
+        JSON.stringify({
+          turnIdx,
+          turnText: turnText?.substring(0, 200),
+          turnSpeaker,
+          expertFeedback,
+          aiInterpretation: interpretation,
+          originalContext: context,
+        }),
+        'hugo',
+        'transcript_feedback',
+      ]
+    );
+    const correction = insertResult.rows[0];
+
+    // Create notification for superadmin
+    try {
+      await pool.query(
+        `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          'correction_submitted',
+          `Hugo: ${interpretation.type === 'technique' ? 'Techniek' : interpretation.type === 'houding' ? 'Houding' : 'Feedback'} correctie`,
+          `Hugo zegt: "${expertFeedback}". AI-interpretatie (${Math.round(interpretation.confidence * 100)}%): ${interpretation.reasoning}`,
+          'content',
+          interpretation.confidence >= 0.7 ? 'info' : 'warning',
+          correction.id,
+          'admin-config-review',
+        ]
+      );
+    } catch (notifErr: any) {
+      console.error(`[Admin] Failed to create notification for interpreted correction #${correction.id}:`, notifErr.message);
+    }
+
+    console.log(`[Admin] AI-interpreted correction #${correction.id}: type=${interpretation.type}, confidence=${interpretation.confidence}`);
+    res.json({ success: true, correction, interpretation });
+  } catch (err: any) {
+    console.error('[Admin] Correction interpret error:', err);
+    sendError(res, err, 'Feedback interpreteren mislukt');
+  }
+});
+
 app.get("/api/v2/admin/corrections", async (req: Request, res: Response) => {
   try {
     const status = req.query.status as string || 'all';
@@ -6151,7 +6264,7 @@ async function startServer() {
       res.json({ data });
     } catch (err: any) {
       console.error("[Stripe] Products error:", err.message);
-      res.status(500).json({ error: err.message });
+      sendError(res, err, 'Stripe-fout');
     }
   });
 
@@ -6189,7 +6302,7 @@ async function startServer() {
       res.json({ url: session.url });
     } catch (err: any) {
       console.error("[Stripe] Checkout error:", err.message);
-      res.status(500).json({ error: err.message });
+      sendError(res, err, 'Stripe-fout');
     }
   });
 
@@ -6236,7 +6349,7 @@ async function startServer() {
       });
     } catch (err: any) {
       console.error("[Stripe] Subscription error:", err.message);
-      res.status(500).json({ error: err.message });
+      sendError(res, err, 'Stripe-fout');
     }
   });
 
@@ -6255,7 +6368,7 @@ async function startServer() {
       res.json({ url: session.url });
     } catch (err: any) {
       console.error("[Stripe] Portal error:", err.message);
-      res.status(500).json({ error: err.message });
+      sendError(res, err, 'Stripe-fout');
     }
   });
 
