@@ -45,18 +45,32 @@ REGELS:
 - Een ankerterm is "ok maar afwezig" als het concept zijdelings aanwezig is maar de exacte term ontbreekt
 - Stel concrete vervangende of aanvullende anchor-termen voor op basis van Hugo's eigen woorden
 - Bij twijfel: rapporteer niets — liever te weinig dan te veel flags
-- Antwoord UITSLUITEND in JSON. Geen tekst buiten het JSON-object.`;
+- Elke finding MOET een letterlijk citaat uit het transcript bevatten als bewijs (transcript_evidence veld)
+- Antwoord UITSLUITEND in JSON. Geen tekst buiten het JSON-object.
+- Geen markdown code fences (\`\`\` of ~~~). Begin direct met [ en eindig met ].`;
+}
+
+export function batchNeedsClaude(batch: RagHeuristicBatchItem[]): boolean {
+  return batch.some(item => item.missingAnchors.length > 0);
 }
 
 export function buildRagHeuristicsUserPrompt(batch: RagHeuristicBatchItem[]): string {
-  const items = batch.map(item => {
+  // Filter out items with no missing anchors — nothing for Claude to evaluate
+  const filteredBatch = batch.filter(item => item.missingAnchors.length > 0);
+
+  // If no items remain, signal to caller that this API call should be skipped
+  if (filteredBatch.length === 0) {
+    return "";
+  }
+
+  const items = filteredBatch.map(item => {
     const truncatedTranscript =
       item.transcript.length > 8000
         ? item.transcript.slice(0, 8000) + "\n[transcript truncated]"
         : item.transcript;
 
     return `--- TECHNIEK ${item.techniqueId}: ${item.entry.naam} ---
-Ontbrekende ankerterms: ${item.missingAnchors.length > 0 ? item.missingAnchors.join(", ") : "(geen)"}
+Ontbrekende ankerterms: ${item.missingAnchors.join(", ")}
 Alle anchors: ${item.allAnchors.join(", ")}
 Support-termen: ${item.supportTerms.length > 0 ? item.supportTerms.join(", ") : "(geen)"}
 

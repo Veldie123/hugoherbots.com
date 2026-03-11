@@ -30,7 +30,8 @@ REGELS:
 - Bij twijfel: status "ok" — liever te weinig dan te veel flags
 - Elke non-ok finding MOET een letterlijk citaat uit het transcript bevatten als bewijs
 - Als het transcript geen informatie geeft over een veld, geef dan status "ok" (niet "needs_review")
-- Antwoord UITSLUITEND in JSON. Geen tekst buiten het JSON-object.`;
+- Antwoord UITSLUITEND in JSON. Geen tekst buiten het JSON-object.
+- Geen markdown code fences (\`\`\` of ~~~). Begin direct met [ en eindig met ].`;
 }
 
 export function buildHoudingenUserPrompt(houding: HoudingEntry, techniqueTranscripts: string): string {

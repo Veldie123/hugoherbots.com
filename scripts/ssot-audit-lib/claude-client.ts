@@ -28,7 +28,7 @@ export async function callClaude(systemPrompt: string, userPrompt: string): Prom
 
   const response = await anthropic.messages.create({
     model: AUDIT_MODEL,
-    max_tokens: 4096,
+    max_tokens: 8192,
     system: systemPrompt,
     messages: [{ role: "user", content: userPrompt }],
   });
@@ -42,5 +42,10 @@ export async function callClaude(systemPrompt: string, userPrompt: string): Prom
     throw new Error("[ssot-audit] Unexpected response from Claude: no text block in response");
   }
 
-  return firstBlock.text;
+  // Strip markdown code fences if Claude wraps output
+  const cleaned = firstBlock.text
+    .replace(/^```(?:json)?\s*\n?/, "")
+    .replace(/\n?```\s*$/, "")
+    .trim();
+  return cleaned;
 }

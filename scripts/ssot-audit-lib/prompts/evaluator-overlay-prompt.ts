@@ -32,7 +32,8 @@ REGELS:
 - Elke non-ok finding MOET een letterlijk citaat uit het transcript bevatten als bewijs
 - Als het transcript geen informatie geeft over een eval_note-veld, geef dan status "ok"
 - Bij twijfel: status "ok" — liever te weinig dan te veel flags
-- Antwoord UITSLUITEND in JSON. Geen tekst buiten het JSON-object.`;
+- Antwoord UITSLUITEND in JSON. Geen tekst buiten het JSON-object.
+- Geen markdown code fences (\`\`\` of ~~~). Begin direct met [ en eindig met ].`;
 }
 
 export function buildEvaluatorUserPrompt(batch: EvaluatorBatchItem[]): string {
