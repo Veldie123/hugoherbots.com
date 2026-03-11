@@ -85,6 +85,8 @@ export interface V3Response {
   text: string;
   toolsUsed: string[];
   navigationDestination?: string;
+  navigationItemId?: string;
+  navigationLabel?: string;
   model: string;
   inputTokens: number;
   outputTokens: number;
@@ -301,6 +303,8 @@ export async function chat(
 
   const toolsUsed: string[] = [];
   let navigationDestination: string | undefined;
+  let navigationItemId: string | undefined;
+  let navigationLabel: string | undefined;
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
   let totalThinkingTokens = 0;
@@ -361,6 +365,8 @@ export async function chat(
         text,
         toolsUsed,
         navigationDestination,
+        navigationItemId,
+        navigationLabel,
         model,
         inputTokens: totalInputTokens,
         outputTokens: totalOutputTokens,
@@ -378,6 +384,8 @@ export async function chat(
       toolsUsed.push(toolUse.name);
       if (toolUse.name === "navigate_user") {
         navigationDestination = (toolUse.input as any).destination as string;
+        navigationItemId = (toolUse.input as any).itemId as string | undefined;
+        navigationLabel = (toolUse.input as any).label as string | undefined;
       }
 
       let result: string;

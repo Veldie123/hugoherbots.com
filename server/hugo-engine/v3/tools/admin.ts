@@ -522,7 +522,7 @@ export const adminToolDefinitions: Anthropic.Tool[] = [
   {
     name: "navigate_user",
     description:
-      "Stuur Hugo naar een specifieke pagina in het admin-platform. Gebruik ALLEEN als het overzicht echt nodig is. Data opvragen, analyses en acties → altijd inline via tools. Leg altijd eerst kort in tekst uit wat er gaat gebeuren.",
+      "Stuur Hugo naar een specifieke pagina in het admin-platform. Gebruik ALLEEN als het overzicht echt nodig is. Data opvragen, analyses en acties → altijd inline via tools.",
     input_schema: {
       type: "object" as const,
       properties: {
@@ -531,8 +531,16 @@ export const adminToolDefinitions: Anthropic.Tool[] = [
           enum: ["users", "sessions", "analytics", "settings"],
           description: "Pagina: 'users' voor gebruikersbeheer, 'sessions' voor sessie-overzicht, 'analytics' voor statistieken, 'settings' voor instellingen.",
         },
+        itemId: {
+          type: "string",
+          description: "Optioneel: specifiek item ID.",
+        },
+        label: {
+          type: "string",
+          description: "Leesbare naam voor de navigatiekaart, bv. 'Gebruikersbeheer' of 'Analytics dashboard'.",
+        },
       },
-      required: ["destination"],
+      required: ["destination", "label"],
     },
   },
 ];

@@ -6,7 +6,7 @@
  * Used only for superadmin (stephane@hugoherbots.com).
  */
 import { getAnthropicClient, COACHING_MODEL, EVALUATION_MODEL } from "./anthropic-client";
-import { getTechnique, getTechniqueName, getAllTechniqueNummers } from "../ssot-loader";
+import { getTechnique, getTechniqueName, getAllTechniqueNummers, getFases, getChildTechniques } from "../ssot-loader";
 import { pool } from "../db";
 import {
   transcribeAudio,
@@ -42,20 +42,40 @@ async function callClaude(
   systemPrompt: string,
   userPrompt: string,
   maxTokens = 2000,
-  model: string = COACHING_MODEL
+  model: string = COACHING_MODEL,
+  thinkingBudget?: number
 ): Promise<string> {
   const client = getAnthropicClient();
-  const response = await client.messages.create({
+  const createParams: Parameters<typeof client.messages.create>[0] = {
     model,
     max_tokens: maxTokens,
     messages: [{ role: "user", content: userPrompt }],
     system: systemPrompt,
-  });
+  };
+  if (thinkingBudget) {
+    (createParams as any).thinking = { type: "enabled", budget_tokens: thinkingBudget };
+  }
 
-  const textBlocks = response.content.filter(
-    (b): b is { type: "text"; text: string } => b.type === "text"
-  );
-  return textBlocks.map((b) => b.text).join("");
+  const MAX_RETRIES = 3;
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      const response = await client.messages.create(createParams);
+      const textBlocks = response.content.filter(
+        (b): b is { type: "text"; text: string } => b.type === "text"
+      );
+      return textBlocks.map((b) => b.text).join("");
+    } catch (err: any) {
+      const isRateLimit = err?.status === 429 || err?.message?.includes("rate_limit") || err?.message?.includes("overloaded");
+      if (isRateLimit && attempt < MAX_RETRIES - 1) {
+        const waitMs = (attempt + 1) * 60_000;
+        console.warn(`[callClaude] Rate limited. Wachten ${waitMs / 1000}s (poging ${attempt + 1}/${MAX_RETRIES})...`);
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error("[callClaude] Max retries bereikt.");
 }
 
 function parseJSON<T>(raw: string, fallback: T): T {
@@ -105,6 +125,42 @@ function buildSSOTTechniqueList(): string {
     .join("\n");
 }
 
+/** Build houding → verwachte technieken mapping from SSOT for use in evaluation prompts */
+function buildHoudingReactieMapping(): string {
+  const filePath = path.join(process.cwd(), "config/klant_houdingen.json");
+  const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  const lines: string[] = [];
+  for (const [, h] of Object.entries(data.houdingen) as [string, any][]) {
+    const techNames = (h.recommended_technique_ids as string[])
+      .map((id) => `${getTechniqueName(id) || id} (${id})`)
+      .join(", ");
+    lines.push(`${h.id} (${h.naam}): verwachte technieken = [${techNames || "geen specifieke verwachting"}]`);
+  }
+  return lines.join("\n");
+}
+
+/** Build EPIC phase sequence context from SSOT for use in evaluation prompts */
+function buildEPICSequenceContext(): string {
+  const fases = getFases().filter((f) => ["1", "2", "3", "4"].includes(f.nummer));
+  const lines: string[] = [];
+  for (const fase of fases) {
+    const children = getChildTechniques(fase.nummer);
+    if (children.length === 0) continue;
+    const isFase2 = fase.nummer === "2";
+    const isFase3 = fase.nummer === "3";
+    const separator = isFase2 || isFase3 ? " → " : ", ";
+    const childList = children.map((c) => `${c.nummer}: ${c.naam}`).join(separator);
+    lines.push(`Fase ${fase.nummer} (${fase.naam}): ${childList}`);
+    if (isFase2) {
+      lines.push("  ↪ Fase 2 sequentie is verplicht in volgorde. Fase 3 vereist voltooide Fase 2 (inclusief het laatste onderdeel van Fase 2).");
+    }
+    if (isFase3) {
+      lines.push("  ↪ OVB-sequentie verplicht in volgorde. De Baat-stap vereist grondslag in klantuitspraken uit Fase 2.");
+    }
+  }
+  return lines.join("\n");
+}
+
 // ── Conversation Narrative ────────────────────────────────────────────────────
 
 interface ConversationNarrative {
@@ -122,6 +178,19 @@ interface ConversationNarrative {
     trigger: string;
   }>;
   narrative: string;
+  customerRevelations: Array<{
+    turnIdx: number;
+    summary: string;
+    type: "need" | "problem" | "impact" | "commitment" | "objection";
+  }>;
+  epicSequenceAudit: {
+    exploreHappened: boolean;
+    probeHappened: boolean;
+    impactHappened: boolean;
+    commitmentBeforeSolution: boolean;
+    solutionPresentedPrematurely: boolean;
+    comments: string;
+  };
 }
 
 async function analyzeConversationNarrative(
@@ -135,11 +204,8 @@ async function analyzeConversationNarrative(
 
   const systemPrompt = `Je bent een expert in de EPIC verkoopmethodologie van Hugo Herbots. Analyseer de structuur van een verkoopgesprek.
 
-EPIC FASES:
-- Fase 1 (Opening): small talk, begroeting, koopklimaat creëren, Gentleman's Agreement, Instapvraag
-- Fase 2 (Ontdekking/EPIC): Explore (feitgerichte vragen), Probe (doorvragen), Impact (gevolgvragen), Commitment
-- Fase 3 (Aanbeveling): OVB presentatie, USP's, mening vragen
-- Fase 4 (Beslissing): bezwaarbehandeling, closing technieken
+EPIC METHODOLOGIE SEQUENTIE (SSOT):
+${buildEPICSequenceContext()}
 
 Antwoord als JSON (geen markdown, geen uitleg buiten het JSON):
 {
@@ -150,7 +216,18 @@ Antwoord als JSON (geen markdown, geen uitleg buiten het JSON):
   "transitions": [
     { "turnIdx": 13, "from": 1, "to": 2, "trigger": "Eerste echte EPIC-vraag" }
   ],
-  "narrative": "2-3 zinnen over het verloop van het gesprek"
+  "narrative": "2-3 zinnen over het verloop van het gesprek",
+  "customerRevelations": [
+    { "turnIdx": 5, "summary": "Klant noemde dat ze 12 verkopers hebben zonder structuur", "type": "need" }
+  ],
+  "epicSequenceAudit": {
+    "exploreHappened": true,
+    "probeHappened": false,
+    "impactHappened": false,
+    "commitmentBeforeSolution": false,
+    "solutionPresentedPrematurely": true,
+    "comments": "Verkoper sprong van Explore direct naar Oplossing zonder Probe/Impact/Commitment"
+  }
 }`;
 
   const userPrompt = `TRANSCRIPT (${turns.length} turns, indices 0-${lastTurnIdx}):
@@ -160,15 +237,26 @@ Analyseer de structuur van dit gesprek:
 1. Verdeel het gesprek in EPIC-fases (startTurn/endTurn zijn inclusief).
 2. Geef alle turn-indices die puur small talk, begroetingen, fillers of te kort zijn voor enige verkooptechniek (nonTechniqueTurns). Wees ruimhartig — twijfelgevallen horen erbij.
 3. Identificeer de fase-overgangen met de trigger die de overgang markeert.
-4. Schrijf een korte narratief over het gesprek.`;
+4. Schrijf een korte narratief over het gesprek.
+5. Identificeer alle klant-onthullingen (customerRevelations): wat onthulde de klant over hun situatie, problemen, gevolgen of commitment? Alleen inhoudelijk relevante turns (geen small talk).
+6. Analyseer de EPIC sequentie (epicSequenceAudit): werden alle onderdelen van Fase 2 voltooid voordat Fase 3 startte? Was er een te vroege overgang naar Fase 3?`;
 
-  const result = await callClaude(systemPrompt, userPrompt, 2048);
+  const result = await callClaude(systemPrompt, userPrompt, 12000, EVALUATION_MODEL, 8000);
 
   const fallback: ConversationNarrative = {
     phases: [{ phase: 1, startTurn: 0, endTurn: lastTurnIdx, description: "Volledig gesprek" }],
     nonTechniqueTurns: [],
     transitions: [],
     narrative: "Gespreksstructuur kon niet worden bepaald.",
+    customerRevelations: [],
+    epicSequenceAudit: {
+      exploreHappened: false,
+      probeHappened: false,
+      impactHappened: false,
+      commitmentBeforeSolution: false,
+      solutionPresentedPrematurely: false,
+      comments: "Sequentie-analyse niet beschikbaar.",
+    },
   };
 
   const parsed = parseJSON<ConversationNarrative>(result, fallback);
@@ -184,7 +272,8 @@ Analyseer de structuur van dit gesprek:
 
 async function evaluateSellerTurnsV3(
   turns: TranscriptTurn[],
-  narrative: ConversationNarrative
+  narrative: ConversationNarrative,
+  customerSignals: CustomerSignalResult[] = []
 ): Promise<TurnEvaluation[]> {
   const sellerTurns = turns.filter((t) => t.speaker === "seller");
   if (sellerTurns.length === 0) return [];
@@ -200,37 +289,65 @@ async function evaluateSellerTurnsV3(
   // Build EPIC technique list from SSOT (exact canonical names)
   const ssotTechniqueList = buildSSOTTechniqueList();
 
-  const systemPrompt = `Je bent een expert in de EPIC verkoopmethodologie van Hugo Herbots. Evalueer elk seller-bericht in het transcript op gebruikte technieken.
+  const houdingReactieMapping = buildHoudingReactieMapping();
+  const epicSequenceContext = buildEPICSequenceContext();
 
-EPIC Technieken (gebruik ALTIJD deze exacte namen):
+  const systemPrompt = `Je bent een expert in de EPIC verkoopmethodologie van Hugo Herbots. Evalueer elk verkoper-bericht op gebruikte technieken — maar ook op de JUISTHEID van die keuze gezien de klanthouding en de fase-sequentie.
+
+BESCHIKBARE TECHNIEKEN (SSOT):
 ${ssotTechniqueList}
 
-Kwaliteitsniveaus:
-- perfect: alle stappen correct toegepast
-- goed: meeste stappen correct
-- bijna: intentie aanwezig maar onvolledig
-- gemist: techniek niet toegepast waar het had moeten
+EPIC METHODOLOGIE SEQUENTIE (SSOT):
+${epicSequenceContext}
 
-STRENGHEIDSREGELS:
-- "Actief en empathisch luisteren" (2.1.2) vereist MINIMAAL parafraseren of samenvatten van wat de klant zei. Alleen "Ja", "Oké", "Hmhm" of korte bevestigingen zijn GEEN actief luisteren — geef dan geen techniek voor die turn.
-- Max 2 technieken per turn. Kies de meest dominante.
-- "Koopklimaat creëren" (1.1) vereist expliciete small talk of relationele opening. Niet elke vriendelijke zin is koopklimaat.
-- Reserveer "perfect" voor volledige toepassing van alle stappen. Bij twijfel: "bijna" boven "goed".
-- Geef GEEN techniek als de turn te kort of te generiek is om een concrete techniektoepassing te herkennen.
+HOUDING-REACTIE VERWACHTINGEN (SSOT):
+${houdingReactieMapping}
+
+KWALITEITSNIVEAUS:
+- perfect: techniek correct gekozen én goed uitgevoerd
+- goed: techniek acceptabel gekozen, meeste stappen correct
+- bijna: intentie aanwezig maar verkeerde techniek of onvolledige uitvoering
+- gemist: foute keuze gegeven klanthouding of fase-sequentie, of techniek niet toegepast
+
+EVALUATIELOGICA per seller-turn (drie lagen):
+1. HOUDING CHECK: Kijk naar de vorige klanthouding (zie VORIGE KLANTHOUDING PER SELLER-TURN in de user prompt).
+   Gebruikte de verkoper een techniek uit de HOUDING-REACTIE tabel voor die houding?
+   - Ja → positief voor quality
+   - Nee → vermeld in rationale: "Klant toonde [houding], verwacht: [techniek]. Verkoper deed: [andere techniek]."
+
+2. SEQUENTIE CHECK: Mocht de verkoper deze Fase-N techniek hier gebruiken gegeven de EPIC SEQUENTIE STATUS?
+   Gebruik de EPIC METHODOLOGIE SEQUENTIE en de epicSequenceAudit-flags om te beoordelen.
+   Een Fase-3 techniek zonder voltooide Fase-2 = quality verlaagt (verkoper vertelt i.p.v. te ontdekken).
+   Een Baat/Voordeel-stap zonder traceerbare grondslag in KLANT ONTHULDE = quality "bijna".
+
+3. UITVOERING: Hoe goed werd de techniek technisch uitgevoerd (los van keuze en timing)?
+
+Quality is de combinatie van 1+2+3. Geef max 2 technieken per turn.
+
+OVERIGE REGELS:
+- Actief luisteren vereist MINIMAAL parafraseren/samenvatten. Alleen "Ja", "Oké", "Hmhm" = GEEN techniek.
+- Geef GEEN techniek als de turn te kort of te generiek is.
+- Reserveer "perfect" voor volledige correcte toepassing.
 
 Antwoord als JSON array van evaluaties, één per seller-turn:
 [
   {
     "turnIdx": 0,
-    "techniques": [{"id": "2.1.3", "naam": "Doorvragen", "quality": "goed", "score": 7}],
+    "techniques": [{"id": "...", "naam": "...", "quality": "goed", "score": 7}],
     "overallQuality": "goed",
-    "rationale": "Korte uitleg waarom"
+    "rationale": "Concrete uitleg — houding, sequentie én uitvoering"
   }
-]
-
-Wees concreet en verwijs naar specifieke techniek-IDs.`;
+]`;
 
   // Build narrative context block for the prompt
+  const revelationsText = narrative.customerRevelations?.length > 0
+    ? `KLANT ONTHULDE (voor Baat/Voordeel grondslag-check):\n${narrative.customerRevelations.map((r) => `Turn ${r.turnIdx}: ${r.summary} [${r.type}]`).join("\n")}`
+    : "";
+
+  const auditText = narrative.epicSequenceAudit
+    ? `EPIC SEQUENTIE STATUS:\nExplore: ${narrative.epicSequenceAudit.exploreHappened} | Probe: ${narrative.epicSequenceAudit.probeHappened} | Impact: ${narrative.epicSequenceAudit.impactHappened} | Commitment vóór oplossing: ${narrative.epicSequenceAudit.commitmentBeforeSolution}\nOplossing te vroeg gepresenteerd: ${narrative.epicSequenceAudit.solutionPresentedPrematurely}\nOpmerkingen: ${narrative.epicSequenceAudit.comments}`
+    : "";
+
   const narrativeContext = [
     `GESPREKSSTRUCTUUR (LEES DIT EERST — evalueer turns in deze context):`,
     `${narrative.narrative}`,
@@ -241,7 +358,16 @@ Wees concreet en verwijs naar specifieke techniek-IDs.`;
     narrative.nonTechniqueTurns.length > 0
       ? `TURNS ZONDER TECHNIEK (begroetingen, fillers, small talk, te kort — geef hier NOOIT een techniek):\nTurns: ${narrative.nonTechniqueTurns.join(", ")}`
       : ``,
+    revelationsText,
+    auditText,
   ].filter(Boolean).join("\n");
+
+  // Helper: find the most recent customer signal before a given seller turn
+  const getPreviousCustomerHouding = (sellerTurnIdx: number): CustomerSignalResult | null => {
+    return customerSignals
+      .filter((s) => s.turnIdx < sellerTurnIdx)
+      .sort((a, b) => b.turnIdx - a.turnIdx)[0] ?? null;
+  };
 
   // Pre-fill evaluations for turns the narrative marks as non-technique
   const nonTechSet = new Set(narrative.nonTechniqueTurns);
@@ -277,10 +403,23 @@ Wees concreet en verwijs naar specifieke techniek-IDs.`;
 
     console.log(`[V3 Analysis] Chunk ${chunkNum}/${totalChunks}: evaluating turns ${chunkIdxs[0]}-${chunkIdxs[chunkIdxs.length - 1]}`);
 
+    // Build per-turn klanthouding context for this chunk
+    const turnHoudingContext = chunk
+      .map((t) => {
+        const prev = getPreviousCustomerHouding(t.idx);
+        if (!prev) return `Turn ${t.idx}: geen voorafgaande klanthouding`;
+        const expectedTechs = (prev.recommendedTechniqueIds ?? [])
+          .map((id) => `${getTechniqueName(id) || id} (${id})`)
+          .join(", ");
+        return `Turn ${t.idx}: vorige klanthouding = ${prev.houding} — verwacht: [${expectedTechs || "n.v.t."}]`;
+      })
+      .join("\n");
+
     const result = await callClaude(
       systemPrompt,
-      `${narrativeContext}\n\nTRANSCRIPT:\n${transcriptContext}\n\nEvalueer ALLEEN de volgende seller-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
-      4096
+      `${narrativeContext}\n\nVORIGE KLANTHOUDING PER SELLER-TURN:\n${turnHoudingContext}\n\nTRANSCRIPT:\n${transcriptContext}\n\nEvalueer ALLEEN de volgende seller-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
+      8000,
+      EVALUATION_MODEL
     );
 
     const parsed = parseJSON<TurnEvaluation[]>(result, []);
@@ -396,7 +535,8 @@ Antwoord als JSON array:
     const result = await callClaude(
       systemPrompt,
       `${narrativeContext}\n\nTRANSCRIPT:\n${transcriptContext}\n\nClassificeer ALLEEN deze klant-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
-      4096
+      4096,
+      COACHING_MODEL  // Sonnet volstaat voor houding-classificatie
     );
 
     const parsed = parseJSON<CustomerSignalResult[]>(result, []);
@@ -845,8 +985,9 @@ export async function runFullAnalysisV3(
     console.log(`[V3 Analysis] Evaluating ${turns.length} turns with Claude`);
     // Sequential to avoid concurrent Claude calls hitting rate limits
     // Both functions now receive the narrative for grounded context
-    const evaluations = await evaluateSellerTurnsV3(turns, narrative);
+    // Detect customer signals FIRST so seller evaluation gets klanthouding context
     const signalsWithContext = await detectCustomerSignalsV3(turns, narrative);
+    const evaluations = await evaluateSellerTurnsV3(turns, narrative, signalsWithContext);
 
     // 4. Calculate phase coverage (pure code)
     const phaseCoverage = calculatePhaseCoverage(evaluations, turns);
@@ -1035,8 +1176,9 @@ export async function reAnalyzeFromTranscriptV3(
     console.log(`[V3 Re-Analysis] Analyzing conversation narrative`);
     const narrative = await analyzeConversationNarrative(turns);
 
-    const evaluations = await evaluateSellerTurnsV3(turns, narrative);
+    // Detect customer signals FIRST so seller evaluation gets klanthouding context
     const signalsWithContext = await detectCustomerSignalsV3(turns, narrative);
+    const evaluations = await evaluateSellerTurnsV3(turns, narrative, signalsWithContext);
     const phaseCoverage = calculatePhaseCoverage(evaluations, turns);
 
     const missedOpps = await detectMissedOpportunitiesV3(evaluations, signalsWithContext, turns);

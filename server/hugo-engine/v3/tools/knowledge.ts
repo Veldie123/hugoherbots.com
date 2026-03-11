@@ -132,17 +132,25 @@ export const knowledgeToolDefinitions: Anthropic.Tool[] = [
   {
     name: "navigate_user",
     description:
-      "Stuur de verkoper naar een specifieke pagina in het platform. Gebruik ALLEEN als de actie niet inline in chat kan (bv. video's bekijken, gesprek uploaden, voortgang bekijken). Coaching, rollenspel, uitleg van technieken → altijd inline in chat, nooit navigate_user. Leg altijd eerst kort in tekst uit wat er gaat gebeuren.",
+      "Stuur de verkoper naar een specifieke pagina of item. Gebruik ALLEEN als de actie niet inline kan. Voor video's: eerst suggest_video aanroepen om technique_id te weten, dan navigate_user met itemId. Coaching/rollenspel/uitleg → altijd inline.",
     input_schema: {
       type: "object" as const,
       properties: {
         destination: {
           type: "string",
-          enum: ["videos", "upload-analysis", "dashboard", "settings"],
-          description: "Pagina: 'videos' voor trainingen, 'upload-analysis' om gesprek te uploaden, 'dashboard' voor voortgang, 'settings' voor instellingen.",
+          enum: ["videos", "upload-analysis", "dashboard", "settings", "live"],
+          description: "Pagina: 'videos' voor trainingen, 'upload-analysis' om gesprek te uploaden, 'dashboard' voor voortgang, 'live' voor webinars.",
+        },
+        itemId: {
+          type: "string",
+          description: "Optioneel: specifiek item. Voor videos: technique_id (bv. '2.1'). Voor live: session_id.",
+        },
+        label: {
+          type: "string",
+          description: "Leesbare naam voor de navigatiekaart, bv. 'Video: Probe technieken' of 'Webinar: EPIC Intro'.",
         },
       },
-      required: ["destination"],
+      required: ["destination", "label"],
     },
   },
   {

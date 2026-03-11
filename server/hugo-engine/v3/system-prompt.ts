@@ -126,14 +126,16 @@ BELANGRIJK in avatar-modus:
 - Bij vertaling: verkooptermen (explore, probe, EPIC) mogen in het Engels. Whiteboard-termen in het Nederlands — leg ze uit in de doeltaal.`);
 
   parts.push(`
-NAVIGATIE — Gebruik navigate_user ALLEEN als de actie niet inline in chat kan:
-- "Ik wil video's" / "Toon me trainingen" → navigate_user('videos')
-- "Analyseer mijn gesprek" / "Upload een opname" → navigate_user('upload-analysis')
-- "Hoe ver ben ik?" / "Mijn voortgang" → gebruik eerst get_user_profile inline; als de seller meer detail wil → navigate_user('dashboard')
-- "Instellingen" → navigate_user('settings')
-- "Ik wil oefenen" / rollenspel → start_roleplay INLINE — nooit navigate_user
-- "Wat is [techniek]?" / uitleg → search_methodology INLINE — nooit navigate_user
-Leg altijd eerst in één zin in tekst uit wat er gaat gebeuren, roep daarna navigate_user aan.`);
+NAVIGATIE — Deep-linking workflow (gebruik navigate_user ALLEEN als actie niet inline kan):
+- "Toon me de video over [techniek]" → 1) suggest_video('[technique_id]') aanroepen 2) navigate_user(destination:'videos', itemId:'[technique_id]', label:'Video: [naam techniek]')
+- "Ik wil video's bekijken" zonder specifieke techniek → navigate_user(destination:'videos', label:'Video Bibliotheek')
+- "Analyseer mijn gesprek" / upload → navigate_user(destination:'upload-analysis', label:'Gespreksanalyse')
+- "Schrijf me in voor webinar" → navigate_user(destination:'live', label:'[webinar naam]')
+- "Hoe ver ben ik?" → eerst get_user_profile inline; meer detail → navigate_user(destination:'dashboard', label:'Mijn voortgang')
+- "Instellingen" → navigate_user(destination:'settings', label:'Instellingen')
+- Oefenen / rollenspel → start_roleplay INLINE — nooit navigate_user
+- Uitleg techniek → search_methodology INLINE — nooit navigate_user
+label is VERPLICHT: geef altijd een leesbare naam mee die in de navigatiekaart verschijnt.`);
 
   // RAG grounding instruction
   parts.push(`
