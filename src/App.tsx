@@ -41,7 +41,6 @@ const PrivacyPolicy = lazy(() => import("./components/HH/PrivacyPolicy").then(m 
 const UserNotifications = lazy(() => import("./components/HH/UserNotifications").then(m => ({ default: m.UserNotifications })));
 const SSOValidate = lazy(() => import("./components/HH/SSOValidate").then(m => ({ default: m.SSOValidate })));
 
-const HugoFeedbackWidget = lazy(() => import("./components/HH/HugoFeedbackWidget").then(m => ({ default: m.HugoFeedbackWidget })));
 
 const AdminDashboard = lazy(() => import("./components/HH/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
 const AdminVideoManagement = lazy(() => import("./components/HH/AdminVideoManagement").then(m => ({ default: m.AdminVideoManagement })));
@@ -482,11 +481,6 @@ export default function App() {
           {currentPage === "techniques" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "library" && <Library navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "notifications" && <UserNotifications navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
-        </Suspense>
-      )}
-      {onboardingMode && (
-        <Suspense fallback={null}>
-          <HugoFeedbackWidget currentPage={currentPage} />
         </Suspense>
       )}
     </NotificationProvider>

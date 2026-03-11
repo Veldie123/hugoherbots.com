@@ -108,6 +108,50 @@ async function listVideosInFolder(folderId, accessToken) {
   );
 }
 
+// ─── Fase + techniek afleiding uit mapstructuur ─────────────────────────────
+
+// Load SSOT technique IDs for matching
+const SSOT_TECHNIQUE_IDS = new Set();
+try {
+  const path = require('path');
+  const fs = require('fs');
+  const indexPath = path.join(__dirname, '..', 'config', 'ssot', 'technieken_index.json');
+  const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+  for (const id of Object.keys(index.technieken)) {
+    SSOT_TECHNIQUE_IDS.add(id);
+  }
+  console.log(`[SSOT] ${SSOT_TECHNIQUE_IDS.size} technieken geladen`);
+} catch (e) {
+  console.warn('[SSOT] Kon technieken_index.json niet laden:', e.message);
+}
+
+function deriveFaseFromFolder(folderName) {
+  // "Fase 0 - Pre-contactfase" → "0"
+  // "Fase 4.1 Beslissingsbarrieres" → "4"
+  // "Algemeen Intro" → null
+  const match = (folderName || '').match(/^Fase\s+([\d]+)/i);
+  return match ? match[1] : null;
+}
+
+function deriveTechniqueId(folderName) {
+  // "2.1.1 Feitgerichte vragen" → "2.1.1"
+  // "0.5 One Minute Manager" → "0.5"
+  // Strip trailing dots: "2.1." → "2.1"
+  const match = (folderName || '').match(/^(\d[\d.]*\d)\s/);
+  if (!match) return null;
+  const id = match[1];
+  // Only return if it matches a known SSOT technique
+  if (SSOT_TECHNIQUE_IDS.has(id)) return id;
+  // Try parent ID (e.g., "2.1.1.1" → "2.1.1" → "2.1")
+  const parts = id.split('.');
+  while (parts.length > 1) {
+    parts.pop();
+    const parentId = parts.join('.');
+    if (SSOT_TECHNIQUE_IDS.has(parentId)) return parentId;
+  }
+  return null;
+}
+
 // ─── Titel afleiding van mapnaam ─────────────────────────────────────────────
 
 function cleanFolderTitle(folderName) {
@@ -123,7 +167,7 @@ function cleanFolderTitle(folderName) {
 
 // ─── Recursieve Drive traversal (namen gesorteerd) ────────────────────────────
 
-async function traverseFolder(folderId, folderName, accessToken, depth = 0) {
+async function traverseFolder(folderId, folderName, accessToken, depth = 0, parentFase = null, parentTechId = null) {
   // Archief overslaan
   if (folderId === ARCHIEF_FOLDER_ID) return { videos: [], skipped: true };
   const nameLower = folderName.toLowerCase();
@@ -132,16 +176,24 @@ async function traverseFolder(folderId, folderName, accessToken, depth = 0) {
     return { videos: [], skipped: true };
   }
 
+  // Derive fase + techniek from this folder's name (inherit from parent if not found)
+  const faseHere = deriveFaseFromFolder(folderName) || parentFase;
+  const techHere = deriveTechniqueId(folderName) || parentTechId;
+
   const indent = '  '.repeat(depth);
-  console.log(`${indent}📁 ${folderName || '(root)'}`);
+  const faseTag = faseHere ? ` [F${faseHere}]` : '';
+  const techTag = techHere ? ` [T${techHere}]` : '';
+  console.log(`${indent}📁 ${folderName || '(root)'}${faseTag}${techTag}`);
 
   // Haal eerst de video's op in DEZE map (gesorteerd op naam)
   const videos = await listVideosInFolder(folderId, accessToken);
-  // Attach parent folder info for title derivation
+  // Attach parent folder info for title + fase/techniek derivation
   for (let i = 0; i < videos.length; i++) {
     videos[i].parentFolderName = folderName;
     videos[i].siblingCount = videos.length;
     videos[i].siblingIndex = i;
+    videos[i].faseFromDrive = faseHere;
+    videos[i].techIdFromDrive = techHere;
   }
   if (videos.length > 0) {
     console.log(`${indent}   ${videos.length} video${videos.length !== 1 ? "'s" : ''}: ${videos.map(v => v.name).join(', ').substring(0, 100)}`);
@@ -151,7 +203,7 @@ async function traverseFolder(folderId, folderName, accessToken, depth = 0) {
   const subfolders = await listSubfolders(folderId, accessToken);
   const subResults = [];
   for (const sub of subfolders) {
-    const result = await traverseFolder(sub.id, sub.name, accessToken, depth + 1);
+    const result = await traverseFolder(sub.id, sub.name, accessToken, depth + 1, faseHere, techHere);
     if (!result.skipped) subResults.push(...result.videos);
   }
 
@@ -190,7 +242,7 @@ async function main() {
   console.log('📦  Video\'s laden uit Supabase...');
   const { data: dbVideos, error: dbError } = await sb
     .from('video_ingest_jobs')
-    .select('id, drive_file_id, video_title, drive_file_name, playback_order, is_hidden')
+    .select('id, drive_file_id, video_title, drive_file_name, playback_order, is_hidden, fase, ai_suggested_techniek_id, ai_confidence')
     .neq('status', 'deleted');
 
   if (dbError) { console.error('❌  Supabase fout:', dbError.message); process.exit(1); }
@@ -206,14 +258,14 @@ async function main() {
   const { videos: driveVideos } = await traverseFolder(HUGO_FOLDER_ID, '(root)', accessToken, 0);
   console.log(`\n✓   ${driveVideos.length} video's gevonden in Drive\n`);
 
-  // ── Stap 4: Volgorde + titels opstellen + preview ───────────────────────────
-  console.log('═'.repeat(120));
-  console.log('NIEUWE AFSPEELVOLGORDE + TITELS (afgeleid van mapnaam)');
-  console.log('═'.repeat(120));
-  console.log(` ${'#'.padStart(3)}  ${'Bestand'.padEnd(16)} ${'Oude titel'.padEnd(32)} ${'Nieuwe titel'.padEnd(42)} ${'Oud#'.padStart(4)} → ${'Nw#'.padStart(3)}`);
-  console.log('─'.repeat(120));
+  // ── Stap 4: Volgorde + titels + fase + techniek opstellen + preview ─────────
+  console.log('═'.repeat(150));
+  console.log('NIEUWE AFSPEELVOLGORDE + TITELS + FASE + TECHNIEK (afgeleid van Drive mapstructuur)');
+  console.log('═'.repeat(150));
+  console.log(` ${'#'.padStart(3)}  ${'Bestand'.padEnd(16)} ${'Titel'.padEnd(32)} ${'Fase'.padEnd(6)} ${'Techniek'.padEnd(10)} ${'Oud#'.padStart(4)} → ${'Nw#'.padStart(3)}`);
+  console.log('─'.repeat(150));
 
-  // DRIVE IS AUTHORITY: assign sequential playback_order + title from folder name
+  // DRIVE IS AUTHORITY: assign sequential playback_order + title + fase + techniek from folder structure
   const updates = [];
   let notFound = 0;
   let order = 1;
@@ -232,24 +284,49 @@ async function main() {
       newTitle += ` (deel ${driveFile.siblingIndex + 1})`;
     }
 
+    // Fase + techniek from Drive folder structure
+    const newFase = driveFile.faseFromDrive || null;
+    const newTechId = driveFile.techIdFromDrive || null;
+
     const oldTitle = dbVideo.video_title || dbVideo.drive_file_name || '?';
     const oldOrder = dbVideo.playback_order;
+    const oldFase = dbVideo.fase;
+    const oldTechId = dbVideo.ai_suggested_techniek_id;
+
     const orderChanged = oldOrder !== order;
     const titleChanged = oldTitle !== newTitle;
-    const changed = orderChanged || titleChanged;
+    const faseChanged = (newFase || null) !== (oldFase || null);
+    const techChanged = (newTechId || null) !== (oldTechId || null);
+    const changed = orderChanged || titleChanged || faseChanged || techChanged;
 
-    const marker = changed ? ' ← WIJZIGING' : ' ✓';
-    console.log(` ${String(order).padStart(3)}  ${driveFile.name.substring(0, 14).padEnd(16)} ${oldTitle.substring(0, 30).padEnd(32)} ${newTitle.substring(0, 40).padEnd(42)} ${String(oldOrder ?? '—').padStart(4)} → ${String(order).padStart(3)}${marker}`);
+    const markers = [];
+    if (orderChanged) markers.push('order');
+    if (titleChanged) markers.push('titel');
+    if (faseChanged) markers.push(`fase:${oldFase || '—'}→${newFase || '—'}`);
+    if (techChanged) markers.push(`tech:${oldTechId || '—'}→${newTechId || '—'}`);
+    const marker = markers.length > 0 ? ` ← ${markers.join(', ')}` : ' ✓';
 
-    updates.push({ id: dbVideo.id, playback_order: order, video_title: newTitle, oldTitle, changed, orderChanged, titleChanged });
+    console.log(` ${String(order).padStart(3)}  ${driveFile.name.substring(0, 14).padEnd(16)} ${newTitle.substring(0, 30).padEnd(32)} ${String(newFase || '—').padEnd(6)} ${String(newTechId || '—').padEnd(10)} ${String(oldOrder ?? '—').padStart(4)} → ${String(order).padStart(3)}${marker}`);
+
+    updates.push({
+      id: dbVideo.id,
+      playback_order: order,
+      video_title: newTitle,
+      fase: newFase,
+      ai_suggested_techniek_id: newTechId,
+      ai_confidence: newTechId ? 1.0 : null,
+      oldTitle, changed, orderChanged, titleChanged, faseChanged, techChanged
+    });
     order++;
   }
 
   const orderChanges = updates.filter(u => u.orderChanged).length;
   const titleChanges = updates.filter(u => u.titleChanged).length;
+  const faseChanges = updates.filter(u => u.faseChanged).length;
+  const techChanges = updates.filter(u => u.techChanged).length;
   const totalChanges = updates.filter(u => u.changed).length;
-  console.log('═'.repeat(120));
-  console.log(`\nSamenvatting: ${updates.length} video's, ${orderChanges} volgorde-wijzigingen, ${titleChanges} titel-wijzigingen, ${notFound} niet gevonden in DB`);
+  console.log('═'.repeat(150));
+  console.log(`\nSamenvatting: ${updates.length} video's, ${orderChanges} volgorde, ${titleChanges} titel, ${faseChanges} fase, ${techChanges} techniek wijzigingen, ${notFound} niet gevonden in DB`);
 
   if (DRY_RUN) {
     console.log('\n⏸   Dry-run — niets opgeslagen. Verwijder --dry-run om te updaten.\n');
@@ -261,7 +338,7 @@ async function main() {
     return;
   }
 
-  await confirm(`\nDruk Enter om ${totalChanges} wijzigingen (${orderChanges} volgorde + ${titleChanges} titels) bij te werken in Supabase, of Ctrl+C om te annuleren: `);
+  await confirm(`\nDruk Enter om ${totalChanges} wijzigingen (${orderChanges} volgorde + ${titleChanges} titels + ${faseChanges} fase + ${techChanges} techniek) bij te werken in Supabase, of Ctrl+C om te annuleren: `);
 
   // ── Stap 5: Supabase updaten ──────────────────────────────────────────────
   console.log('\n📝  Supabase updaten...');
@@ -276,7 +353,13 @@ async function main() {
     await Promise.all(chunk.map(async (u) => {
       const { error } = await sb
         .from('video_ingest_jobs')
-        .update({ playback_order: u.playback_order, video_title: u.video_title })
+        .update({
+            playback_order: u.playback_order,
+            video_title: u.video_title,
+            fase: u.fase,
+            ai_suggested_techniek_id: u.ai_suggested_techniek_id,
+            ai_confidence: u.ai_confidence,
+          })
         .eq('id', u.id);
       if (error) {
         console.error(`  ❌  Fout bij ${u.oldTitle}: ${error.message}`);

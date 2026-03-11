@@ -236,13 +236,16 @@ async function getV3Access(email: string): Promise<{ admin_v3: boolean; coaching
       .single();
 
     const access = {
-      admin_v3: data?.admin_v3 || false,
-      coaching_v3: data?.coaching_v3 || false,
+      admin_v3: data?.admin_v3 ?? true,
+      coaching_v3: data?.coaching_v3 ?? true,
     };
     accessCache.set(email, { ...access, ts: Date.now() });
     return access;
   } catch {
-    return { admin_v3: false, coaching_v3: false };
+    // No row found → default to V3 access for all users
+    const defaultAccess = { admin_v3: true, coaching_v3: true };
+    accessCache.set(email, { ...defaultAccess, ts: Date.now() });
+    return defaultAccess;
   }
 }
 

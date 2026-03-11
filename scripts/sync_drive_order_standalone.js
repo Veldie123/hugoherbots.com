@@ -95,6 +95,40 @@ async function listDriveVideosInFolder(folderId, accessToken) {
   return videos.sort((a, b) => a.name.localeCompare(b.name, 'nl', { numeric: true, sensitivity: 'base' }));
 }
 
+// Load SSOT technique IDs for matching
+const SSOT_TECHNIQUE_IDS = new Set();
+try {
+  const path = require('path');
+  const fs = require('fs');
+  const indexPath = path.join(__dirname, '..', 'config', 'ssot', 'technieken_index.json');
+  const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+  for (const id of Object.keys(index.technieken)) {
+    SSOT_TECHNIQUE_IDS.add(id);
+  }
+  console.log(`[SSOT] ${SSOT_TECHNIQUE_IDS.size} technieken geladen`);
+} catch (e) {
+  console.warn('[SSOT] Kon technieken_index.json niet laden:', e.message);
+}
+
+function deriveFaseFromFolder(folderName) {
+  const match = (folderName || '').match(/^Fase\s+([\d]+)/i);
+  return match ? match[1] : null;
+}
+
+function deriveTechniqueId(folderName) {
+  const match = (folderName || '').match(/^(\d[\d.]*\d)\s/);
+  if (!match) return null;
+  const id = match[1];
+  if (SSOT_TECHNIQUE_IDS.has(id)) return id;
+  const parts = id.split('.');
+  while (parts.length > 1) {
+    parts.pop();
+    const parentId = parts.join('.');
+    if (SSOT_TECHNIQUE_IDS.has(parentId)) return parentId;
+  }
+  return null;
+}
+
 function cleanFolderTitle(folderName) {
   let title = folderName || '';
   title = title.replace(/^Fase\s+[\d.]+\s*-\s*/, '');
@@ -103,25 +137,31 @@ function cleanFolderTitle(folderName) {
   return title;
 }
 
-async function scanFolder(folderId, folderName, accessToken, depth = 0) {
+async function scanFolder(folderId, folderName, accessToken, depth = 0, parentFase = null, parentTechId = null) {
   // Skip archief entirely
   if (folderId === ARCHIEF_FOLDER_ID) {
     console.log(`${'  '.repeat(depth)}[Scan] SKIPPING archief folder`);
     return [];
   }
 
+  // Derive fase + techniek from this folder's name (inherit from parent if not found)
+  const faseHere = deriveFaseFromFolder(folderName) || parentFase;
+  const techHere = deriveTechniqueId(folderName) || parentTechId;
+
   const indent = '  '.repeat(depth);
   const videos = await listDriveVideosInFolder(folderId, accessToken);
   const subfolders = await listDriveSubfolders(folderId, accessToken);
 
-  // Attach parent folder info for title derivation
+  // Attach parent folder info for title + fase/techniek derivation
   for (let i = 0; i < videos.length; i++) {
     videos[i].parentFolderName = folderName;
     videos[i].siblingCount = videos.length;
     videos[i].siblingIndex = i;
+    videos[i].faseFromDrive = faseHere;
+    videos[i].techIdFromDrive = techHere;
   }
 
-  console.log(`${indent}[Scan] ${videos.length} videos, ${subfolders.length} subfolders in ${folderName || folderId}`);
+  console.log(`${indent}[Scan] ${videos.length} videos, ${subfolders.length} subfolders in ${folderName || folderId}${faseHere ? ` [F${faseHere}]` : ''}${techHere ? ` [T${techHere}]` : ''}`);
 
   let allVideos = [...videos];
   for (const sf of subfolders) {
@@ -130,7 +170,7 @@ async function scanFolder(folderId, folderName, accessToken, depth = 0) {
       console.log(`${indent}[Scan] SKIPPING archief subfolder: ${sf.name}`);
       continue;
     }
-    const sub = await scanFolder(sf.id, sf.name, accessToken, depth + 1);
+    const sub = await scanFolder(sf.id, sf.name, accessToken, depth + 1, faseHere, techHere);
     allVideos = allVideos.concat(sub);
   }
   return allVideos;
@@ -154,7 +194,7 @@ async function main() {
   // Load existing non-deleted jobs from Supabase, deduplicate by drive_file_id
   const { data: existingJobs, error } = await supabase
     .from('video_ingest_jobs')
-    .select('id, drive_file_id, drive_folder_id, drive_modified_time, status, mux_playback_id, video_title, is_hidden')
+    .select('id, drive_file_id, drive_folder_id, drive_modified_time, status, mux_playback_id, video_title, is_hidden, fase, ai_suggested_techniek_id, ai_confidence')
     .neq('status', 'deleted');
 
   if (error) throw new Error(`Supabase error: ${error.message}`);
@@ -185,8 +225,12 @@ async function main() {
       derivedTitle += ` (deel ${video.siblingIndex + 1})`;
     }
 
+    // Fase + techniek from Drive folder structure
+    const derivedFase = video.faseFromDrive || null;
+    const derivedTechId = video.techIdFromDrive || null;
+
     if (!existing) {
-      // New video — insert at Drive-determined position with folder-derived title
+      // New video — insert at Drive-determined position with folder-derived title + fase + techniek
       const { error: insertError } = await supabase.from('video_ingest_jobs').insert({
         drive_file_id: video.id,
         drive_file_name: video.name,
@@ -196,20 +240,28 @@ async function main() {
         status: 'pending',
         video_title: derivedTitle,
         is_hidden: false,
-        playback_order: order
+        playback_order: order,
+        fase: derivedFase,
+        ai_suggested_techniek_id: derivedTechId,
+        ai_confidence: derivedTechId ? 1.0 : null,
       });
       if (insertError) {
         console.error(`[StandaloneSync] Insert error for ${video.name}:`, insertError.message);
       } else {
         added++;
         newVideos.push(video.name);
-        console.log(`[StandaloneSync] Added: ${video.name} → "${derivedTitle}" (order ${order})`);
+        console.log(`[StandaloneSync] Added: ${video.name} → "${derivedTitle}" F${derivedFase || '—'} T${derivedTechId || '—'} (order ${order})`);
       }
     } else {
-      // Existing video — update playback_order + title to match Drive
+      // Existing video — update playback_order + title + fase + techniek to match Drive
       const updateFields = {};
       if (existing.playback_order !== order) updateFields.playback_order = order;
       if (existing.video_title !== derivedTitle) updateFields.video_title = derivedTitle;
+      if ((derivedFase || null) !== (existing.fase || null)) updateFields.fase = derivedFase;
+      if ((derivedTechId || null) !== (existing.ai_suggested_techniek_id || null)) {
+        updateFields.ai_suggested_techniek_id = derivedTechId;
+        updateFields.ai_confidence = derivedTechId ? 1.0 : null;
+      }
 
       if (Object.keys(updateFields).length > 0) {
         const { error: updateError } = await supabase.from('video_ingest_jobs')

@@ -117,7 +117,7 @@ async function classicSearch(query: string, limit: number): Promise<SearchResult
       for (const v of videos) {
         results.push({
           id: v.id,
-          title: v.ai_attractive_title || v.title,
+          title: v.title,
           content: v.original_filename ? `${v.original_filename}${v.description ? ' · ' + v.description.substring(0, 80) : ''}` : v.description?.substring(0, 100),
           type: 'video',
           techniek_id: v.techniek_id,

@@ -1045,6 +1045,37 @@ async function listDriveVideos(folderId, accessToken, depth = 0) {
 
 // NEW function that scans INCLUDING archief and marks which videos are in archief
 // Returns { activeVideos: [...], archiefVideos: [...] }
+// Load SSOT technique IDs for matching
+const SSOT_TECHNIQUE_IDS = new Set();
+try {
+  const techIndex = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config', 'ssot', 'technieken_index.json'), 'utf8'));
+  for (const id of Object.keys(techIndex.technieken)) {
+    SSOT_TECHNIQUE_IDS.add(id);
+  }
+  console.log(`[SSOT] ${SSOT_TECHNIQUE_IDS.size} technieken geladen voor Drive matching`);
+} catch (e) {
+  console.warn('[SSOT] Kon technieken_index.json niet laden:', e.message);
+}
+
+function deriveFaseFromFolder(folderName) {
+  const match = (folderName || '').match(/^Fase\s+([\d]+)/i);
+  return match ? match[1] : null;
+}
+
+function deriveTechniqueId(folderName) {
+  const match = (folderName || '').match(/^(\d[\d.]*\d)\s/);
+  if (!match) return null;
+  const id = match[1];
+  if (SSOT_TECHNIQUE_IDS.has(id)) return id;
+  const parts = id.split('.');
+  while (parts.length > 1) {
+    parts.pop();
+    const parentId = parts.join('.');
+    if (SSOT_TECHNIQUE_IDS.has(parentId)) return parentId;
+  }
+  return null;
+}
+
 function cleanFolderTitle(folderName) {
   let title = folderName || '';
   title = title.replace(/^Fase\s+[\d.]+\s*-\s*/, '');
@@ -1053,7 +1084,7 @@ function cleanFolderTitle(folderName) {
   return title;
 }
 
-async function listDriveVideosWithArchief(folderId, folderName, accessToken, depth = 0, isInArchief = false) {
+async function listDriveVideosWithArchief(folderId, folderName, accessToken, depth = 0, isInArchief = false, parentFase = null, parentTechId = null) {
   const indent = '  '.repeat(depth);
   const result = { activeVideos: [], archiefVideos: [] };
 
@@ -1064,17 +1095,23 @@ async function listDriveVideosWithArchief(folderId, folderName, accessToken, dep
     return result;
   }
 
-  console.log(`${indent}[Drive] Scanning folder: ${folderName || folderId}`);
+  // Derive fase + techniek from this folder's name (inherit from parent if not found)
+  const faseHere = deriveFaseFromFolder(folderName) || parentFase;
+  const techHere = deriveTechniqueId(folderName) || parentTechId;
+
+  console.log(`${indent}[Drive] Scanning folder: ${folderName || folderId}${faseHere ? ` [F${faseHere}]` : ''}${techHere ? ` [T${techHere}]` : ''}`);
 
   const videos = await listDriveVideosInFolder(folderId, accessToken);
   console.log(`${indent}[Drive] Found ${videos.length} videos in this folder`);
 
-  // Attach parent folder info for title derivation
+  // Attach parent folder info for title + fase/techniek derivation
   for (let i = 0; i < videos.length; i++) {
     videos[i].isArchief = false;
     videos[i].parentFolderName = folderName;
     videos[i].siblingCount = videos.length;
     videos[i].siblingIndex = i;
+    videos[i].faseFromDrive = faseHere;
+    videos[i].techIdFromDrive = techHere;
     result.activeVideos.push(videos[i]);
   }
 
@@ -1090,7 +1127,7 @@ async function listDriveVideosWithArchief(folderId, folderName, accessToken, dep
     }
     console.log(`${indent}[Drive] Recursing into: ${subfolder.name}`);
 
-    const subResult = await listDriveVideosWithArchief(subfolder.id, subfolder.name, accessToken, depth + 1, false);
+    const subResult = await listDriveVideosWithArchief(subfolder.id, subfolder.name, accessToken, depth + 1, false, faseHere, techHere);
     result.activeVideos.push(...subResult.activeVideos);
   }
 
@@ -1165,7 +1202,7 @@ async function syncVideosFromDrive(folderIdOrIds) {
   // Get only active (non-deleted) jobs — deduplicate by drive_file_id keeping the one with mux_playback_id
   const { data: existingJobs, error: fetchError } = await supabaseAdmin
     .from('video_ingest_jobs')
-    .select('id, drive_file_id, drive_folder_id, drive_modified_time, status, mux_playback_id, video_title, is_hidden, playback_order')
+    .select('id, drive_file_id, drive_folder_id, drive_modified_time, status, mux_playback_id, video_title, is_hidden, playback_order, fase, ai_suggested_techniek_id, ai_confidence')
     .neq('status', 'deleted');
   
   if (fetchError) {
@@ -1195,11 +1232,13 @@ async function syncVideosFromDrive(folderIdOrIds) {
     const shouldBeHidden = video.isArchief; // Video in archief = is_hidden true
     
     if (!existing) {
-      // New video - add it with title derived from parent folder name
+      // New video - add it with title + fase + techniek derived from Drive folder structure
       let derivedTitle = cleanFolderTitle(video.parentFolderName || '');
       if (video.siblingCount > 1) {
         derivedTitle += ` (deel ${video.siblingIndex + 1})`;
       }
+      const derivedFase = video.faseFromDrive || null;
+      const derivedTechId = video.techIdFromDrive || null;
       try {
         const { error: insertError } = await supabaseAdmin
           .from('video_ingest_jobs')
@@ -1211,7 +1250,10 @@ async function syncVideosFromDrive(folderIdOrIds) {
             drive_modified_time: video.modifiedTime,
             status: 'pending',
             video_title: derivedTitle || video.name.replace(/\.[^/.]+$/, ''),
-            is_hidden: shouldBeHidden
+            is_hidden: shouldBeHidden,
+            fase: derivedFase,
+            ai_suggested_techniek_id: derivedTechId,
+            ai_confidence: derivedTechId ? 1.0 : null,
           });
         
         if (insertError) throw insertError;
@@ -1305,8 +1347,8 @@ async function syncVideosFromDrive(folderIdOrIds) {
     console.log(`[Sync] Auto-fixed ${unhideCount} incorrectly hidden videos`);
   }
   
-  // DRIVE IS AUTHORITY: assign sequential playback_order + title from folder name
-  console.log(`[Sync] Setting playback_order + titles for ${allActiveVideos.length} active videos (Drive = authority)...`);
+  // DRIVE IS AUTHORITY: assign sequential playback_order + title + fase + techniek from folder structure
+  console.log(`[Sync] Setting playback_order + titles + fase + techniek for ${allActiveVideos.length} active videos (Drive = authority)...`);
 
   const orderUpdates = [];
   let order = 1;
@@ -1321,9 +1363,18 @@ async function syncVideosFromDrive(folderIdOrIds) {
       derivedTitle += ` (deel ${video.siblingIndex + 1})`;
     }
 
+    // Fase + techniek from Drive folder structure
+    const derivedFase = video.faseFromDrive || null;
+    const derivedTechId = video.techIdFromDrive || null;
+
     const updateFields = {};
     if (job.playback_order !== order) updateFields.playback_order = order;
     if (derivedTitle && job.video_title !== derivedTitle) updateFields.video_title = derivedTitle;
+    if ((derivedFase || null) !== (job.fase || null)) updateFields.fase = derivedFase;
+    if ((derivedTechId || null) !== (job.ai_suggested_techniek_id || null)) {
+      updateFields.ai_suggested_techniek_id = derivedTechId;
+      updateFields.ai_confidence = derivedTechId ? 1.0 : null;
+    }
 
     if (Object.keys(updateFields).length > 0) {
       updateFields.updated_at = new Date().toISOString();
@@ -1343,9 +1394,9 @@ async function syncVideosFromDrive(folderIdOrIds) {
           .eq('id', u.id)
       ));
     }
-    console.log(`[Sync] Updated ${orderUpdates.length} videos (playback_order + title from Drive)`);
+    console.log(`[Sync] Updated ${orderUpdates.length} videos (playback_order + title + fase + techniek from Drive)`);
   } else {
-    console.log(`[Sync] All playback_order + titles already match Drive — no changes`);
+    console.log(`[Sync] All playback_order + titles + fase + techniek already match Drive — no changes`);
   }
   result.ordersUpdated = orderUpdates.length;
   
@@ -2330,7 +2381,7 @@ const server = http.createServer((req, res) => {
 
         const mappedPipeline = (pipelineVideos || []).map(job => ({
           id: job.id,
-          title: job.ai_attractive_title || job.video_title || job.drive_file_name,
+          title: job.video_title || job.drive_file_name,
           technique_id: job.techniek_id || null,
           playback_order: pbOrderAvailable && job.playback_order != null ? job.playback_order : null,
           mux_playback_id: job.mux_playback_id,
@@ -2621,8 +2672,14 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // AI-powered video ordering endpoint
+  // AI-powered video ordering endpoint — REMOVED (Drive is sole authority for video order)
   if (pathname === '/api/videos/ai-order' && req.method === 'POST') {
+    res.writeHead(410, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, message: 'AI ordering is verwijderd — Drive is de autoriteit voor video-volgorde.' }));
+    return;
+  }
+
+  if (false) { /* removed AI ordering block */
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -2742,7 +2799,7 @@ Format: ["id1", "id2", "id3", ...]`;
           if (videoMap[id]) {
             order.push({
               id: id,
-              title: videoMap[id].ai_attractive_title || videoMap[id].video_title || videoMap[id].drive_file_name,
+              title: videoMap[id].video_title || videoMap[id].drive_file_name,
               position: position,
             });
             position++;
@@ -2752,7 +2809,7 @@ Format: ["id1", "id2", "id3", ...]`;
         for (const id of Object.keys(videoMap)) {
           order.push({
             id: id,
-            title: videoMap[id].ai_attractive_title || videoMap[id].video_title || videoMap[id].drive_file_name,
+            title: videoMap[id].video_title || videoMap[id].drive_file_name,
             position: position,
           });
           position++;
@@ -2854,8 +2911,8 @@ Format: ["id1", "id2", "id3", ...]`;
           
           return {
             id: job.id,
-            title: job.ai_attractive_title || job.video_title || job.drive_file_name,
-            original_title: job.video_title || job.drive_file_name,
+            title: job.video_title || job.drive_file_name,
+            original_title: job.drive_file_name,
             description: '',
             thumbnail_url: thumbnailUrl,
             mux_asset_id: job.mux_asset_id,
@@ -2882,7 +2939,7 @@ Format: ["id1", "id2", "id3", ...]`;
             playback_order: job.playback_order != null ? job.playback_order : null,
             source: 'pipeline',
             is_hidden: job.is_hidden || false,
-            user_ready: !!(job.mux_playback_id && job.techniek_id && job.ai_attractive_title), // Fully processed for user view
+            user_ready: !!(job.mux_playback_id && job.techniek_id && job.video_title), // Fully processed for user view
             created_at: job.created_at,
             updated_at: job.updated_at
           };
@@ -6911,7 +6968,7 @@ async function regenerateVideoMapping() {
     let userReadyCount = 0;
     for (const v of jobs) {
       const fileName = v.drive_file_name || v.video_title || `video_${v.id}`;
-      const title = v.ai_attractive_title || v.video_title || fileName;
+      const title = v.video_title || fileName;
       // Techniek: prefer explicit id, then join table, then AI suggestion
       const techniek = v.techniek_id || techByVideoId[v.id] || v.ai_suggested_techniek_id || null;
       const hasMux = !!v.mux_playback_id;

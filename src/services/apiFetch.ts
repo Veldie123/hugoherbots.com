@@ -32,7 +32,8 @@ export async function apiFetch(url: string, options?: RequestInit): Promise<Resp
     const { data: { session } } = await supabase.auth.refreshSession();
     if (session?.access_token) {
       headers['Authorization'] = `Bearer ${session.access_token}`;
-      return fetch(url, { ...options, headers });
+      const { signal: _signal, ...retryOptions } = options || {};
+      return fetch(url, { ...retryOptions, headers });
     }
   }
 

@@ -48,9 +48,9 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 - **Font:** Outfit (Google Fonts) — `wght@300;400;600;700`
 - **Body:** `text-[14px]` of `text-[16px]`
 - **Labels/badges:** `text-[11px]` of `text-[12px]` `font-medium`
-- **H2 secties:** `text-[24px] leading-[32px] font-semibold`
-- **H3 cards:** `text-[20px] leading-[28px] font-semibold`
-- **H4 klein:** `text-[18px] leading-[26px] font-semibold`
+- **H2 secties:** `text-[24px] leading-[32px] font-medium`
+- **H3 cards:** `text-[20px] leading-[28px] font-medium`
+- **H4 klein:** `text-[18px] leading-[26px] font-medium`
 
 ### Badges & Tags
 

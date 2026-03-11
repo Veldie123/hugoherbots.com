@@ -1453,9 +1453,9 @@ app.get("/api/sessions/stats", async (req, res) => {
 // Get all sessions list (from Supabase)
 app.get("/api/sessions", async (req, res) => {
   try {
-    // Admins can filter by any userId; regular users only see their own sessions
-    const userId = req.isAdmin && req.query.userId
-      ? (req.query.userId as string)
+    // Admins see all sessions by default; regular users only see their own
+    const userId = req.isAdmin
+      ? (req.query.userId as string | undefined) || null
       : req.userId!;
 
     // Query Supabase for sessions

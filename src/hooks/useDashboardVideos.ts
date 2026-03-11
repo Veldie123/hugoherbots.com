@@ -54,27 +54,8 @@ export function useDashboardVideos() {
           .filter(v => v.mux_playback_id)
           .map(v => {
             const technique = v.technique_id ? getTechniekByNummer(v.technique_id) : null;
-            const aiTitle = (v as any).ai_attractive_title;
-            const aiSummary = (v as any).ai_summary as string | null;
             const techniqueName = technique?.naam || (technique as any)?.name || null;
-            let displayTitle = aiTitle || techniqueName || v.title;
-            if (isRawFilename(displayTitle) && aiSummary) {
-              const firstSentence = aiSummary.split(/[.!?]/)[0]?.trim();
-              if (firstSentence && firstSentence.length > 5) {
-                displayTitle = firstSentence.length > 60 ? firstSentence.substring(0, 57) + '...' : firstSentence;
-              }
-            }
-            if (isRawFilename(displayTitle)) {
-              const faseNames: Record<number, string> = {
-                0: 'Pre-contactfase training',
-                1: 'Openingsfase training',
-                2: 'Ontdekkingsfase training',
-                3: 'Aanbevelingsfase training',
-                4: 'Beslissingsfase training',
-              };
-              const fase = getFaseFromTechnique(v.technique_id);
-              displayTitle = faseNames[fase] || 'Sales Training Video';
-            }
+            let displayTitle = v.title || techniqueName || 'Sales Training Video';
             return {
               id: v.id,
               title: v.title,
