@@ -640,11 +640,13 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
             <div className="relative">
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
-                style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', cursor: 'pointer', border: 'none', background: 'transparent', position: 'relative', padding: 0 }}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors relative"
+                style={{
+                  backgroundColor: notificationsOpen ? 'var(--hh-primary)' : 'transparent',
+                  color: notificationsOpen ? '#ffffff' : 'var(--hh-primary)',
+                }}
               >
-                <span style={{ display: 'inline-flex', width: '24px', height: '24px', color: 'var(--hh-primary)' }}>
-                  <Bell style={{ width: '24px', height: '24px', color: 'var(--hh-primary)', stroke: 'var(--hh-primary)', fill: 'none', strokeWidth: 2, display: 'block' }} />
-                </span>
+                <Bell size={20} />
                 {unreadCount > 0 && (
                   <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '20px', height: '20px', backgroundColor: 'var(--hh-error)', color: 'white', fontSize: '10px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                     {unreadCount}

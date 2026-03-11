@@ -306,7 +306,7 @@ app.use((req, res, next) => {
 // JWT Authentication — applied to all /api/ routes with exemptions
 app.use('/api', (req: Request, res: Response, next: NextFunction) => {
   // Skip auth for health checks, Stripe webhooks, platform sync, V3 status, and voice endpoints
-  const publicPaths = ['/health', '/stripe/webhook', '/v3/status', '/feedback/error', '/v3/voice/health', '/v3/voice/llm', '/v3/voice/chat/completions'];
+  const publicPaths = ['/health', '/stripe/webhook', '/v3/status', '/feedback/error', '/feedback/ui-change-request', '/v3/voice/health', '/v3/voice/llm', '/v3/voice/chat/completions'];
   if (publicPaths.some(p => req.path === p || req.path.startsWith(p))) {
     return next();
   }
@@ -4501,7 +4501,7 @@ async function startServer() {
   });
 
   // POST /api/feedback/ui-change-request — Hugo's UI feedback widget
-  app.post("/api/feedback/ui-change-request", async (req: Request, res: Response) => {
+  app.post("/api/feedback/ui-change-request", optionalAuth, async (req: Request, res: Response) => {
     try {
       const userEmail = (req as any).userEmail || "hugo@hugoherbots.com";
       const { description, pageUrl, elements } = req.body;

@@ -583,13 +583,15 @@ export function AppLayout({
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotifOpen(!notifOpen)}
-                style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', cursor: 'pointer', border: 'none', background: 'transparent', position: 'relative', padding: 0 }}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors relative"
+                style={{
+                  backgroundColor: notifOpen ? 'var(--hh-primary)' : 'transparent',
+                  color: notifOpen ? '#ffffff' : 'var(--hh-primary)',
+                }}
               >
-                <span style={{ display: 'inline-flex', width: '24px', height: '24px' }}>
-                  <Bell style={{ width: '24px', height: '24px', color: resolvedTheme === 'dark' ? 'var(--hh-ui-200)' : 'var(--hh-text)', stroke: resolvedTheme === 'dark' ? 'var(--hh-ui-200)' : 'var(--hh-text)', fill: 'none', strokeWidth: 2, display: 'block' }} />
-                </span>
+                <Bell size={20} />
                 {unreadCount > 0 && (
-                  <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '20px', height: '20px', backgroundColor: 'var(--hh-error)', color: 'var(--hh-bg)', fontSize: '10px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+                  <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '20px', height: '20px', backgroundColor: 'var(--hh-error)', color: '#ffffff', fontSize: '10px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}

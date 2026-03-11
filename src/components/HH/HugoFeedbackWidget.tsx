@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Flag, Crosshair, X, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { apiFetch } from "../../services/apiFetch";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -156,20 +155,26 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
     }
     setSubmitting(true);
     try {
-      const res = await apiFetch("/api/feedback/ui-change-request", {
+      const res = await fetch("/api/feedback/ui-change-request", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           description: description.trim(),
           pageUrl: currentPage || window.location.pathname,
           elements,
         }),
       });
-      if (!res.ok) throw new Error("Verzenden mislukt");
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("[Feedback] Server error:", res.status, text);
+        throw new Error("Verzenden mislukt");
+      }
       toast.success("Feedback verzonden!");
       setDescription("");
       setElements([]);
       setOpen(false);
-    } catch {
+    } catch (err) {
+      console.error("[Feedback] Submit error:", err);
       toast.error("Kon feedback niet verzenden");
     } finally {
       setSubmitting(false);
@@ -180,10 +185,13 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
 
   return (
     <>
-      {/* Selection mode banner */}
+      {/* Selection mode — banner below header */}
       {selecting && (
-        <div className="fixed top-0 left-0 right-0 bg-hh-primary text-white text-center py-2 text-[13px] font-medium z-[70]">
-          Klik op een element om het aan te duiden — <span className="opacity-70">Esc om te annuleren</span>
+        <div
+          className="fixed left-1/2 -translate-x-1/2 top-16 text-white text-center py-2 px-6 text-[13px] font-medium z-[70] rounded-full shadow-lg"
+          style={{ backgroundColor: 'var(--hh-primary)' }}
+        >
+          Klik op een element — <span className="opacity-70">Esc = annuleren</span>
         </div>
       )}
 
@@ -193,10 +201,8 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
           onClick={() => setOpen((prev) => !prev)}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
           style={{
-            backgroundColor: open
-              ? 'var(--hh-purple)'
-              : 'color-mix(in srgb, var(--hh-purple) 15%, transparent)',
-            color: open ? '#ffffff' : 'var(--hh-purple)',
+            backgroundColor: open ? 'var(--hh-primary)' : 'transparent',
+            color: open ? '#ffffff' : 'var(--hh-primary)',
           }}
           aria-label="Feedback geven"
           title="UI Feedback"
@@ -206,41 +212,26 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
 
         {/* Dropdown panel */}
         {open && !selecting && (
-          <div className="absolute right-0 top-11 w-[calc(100vw-32px)] sm:w-80 max-h-[400px] bg-hh-bg rounded-xl shadow-xl border border-hh-border z-50 overflow-hidden flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-hh-border flex-shrink-0">
-              <span className="text-[14px] font-semibold text-hh-text">
-                UI Feedback
-              </span>
-              <button
-                onClick={() => setOpen(false)}
-                className="text-hh-muted hover:text-hh-text transition-colors"
-                aria-label="Sluiten"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            {/* Body */}
-            <div className="p-4 space-y-3 overflow-y-auto">
+          <div className="absolute right-0 top-11 w-[calc(100vw-32px)] sm:w-80 bg-hh-bg rounded-xl shadow-xl border border-hh-border z-50 overflow-hidden flex flex-col">
+            <div className="p-4 space-y-3">
               <textarea
                 ref={textareaRef}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Beschrijf je suggestie..."
-                rows={3}
-                className="w-full resize-none rounded-lg border border-hh-border bg-hh-bg text-hh-text text-[14px] px-3 py-2 placeholder:text-hh-muted focus:outline-none focus:ring-2 focus:ring-hh-primary/40 focus:border-hh-primary"
+                rows={2}
+                className="w-full resize-none rounded-lg border border-hh-border bg-hh-bg text-hh-text text-[13px] px-3 py-2 placeholder:text-hh-muted focus:outline-none focus:ring-1 focus:ring-hh-primary/30 focus:border-hh-primary/50"
               />
 
               {/* Selected elements */}
               {elements.length > 0 && (
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {elements.map((el, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-2 bg-hh-primary/10 border border-hh-primary/20 rounded-lg px-2.5 py-1.5 text-[12px]"
+                      className="flex items-center gap-2 bg-hh-primary/8 border border-hh-primary/15 rounded-lg px-2.5 py-1.5 text-[11px]"
                     >
-                      <Crosshair size={12} className="text-hh-primary flex-shrink-0" />
+                      <Crosshair size={10} className="text-hh-primary flex-shrink-0" />
                       <span className="text-hh-text truncate flex-1">
                         <span className="font-mono text-hh-primary">{`<${el.tagName}>`}</span>{" "}
                         {el.textContent && (
@@ -254,7 +245,7 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
                         className="text-hh-muted hover:text-hh-error flex-shrink-0"
                         aria-label="Verwijderen"
                       >
-                        <Trash2 size={12} />
+                        <Trash2 size={10} />
                       </button>
                     </div>
                   ))}
@@ -262,21 +253,22 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
               )}
 
               {/* Actions */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-end gap-2.5">
                 <button
                   onClick={() => { setSelecting(true); setOpen(false); }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-hh-border text-[13px] text-hh-muted hover:text-hh-primary hover:border-hh-primary/30 transition-colors"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border text-[13px] transition-colors"
+                  style={{ borderColor: 'var(--hh-primary)', color: 'var(--hh-primary)' }}
                 >
-                  <Crosshair size={14} />
+                  <Crosshair size={13} />
                   Aanduiden
                 </button>
-                <div className="flex-1" />
                 <button
                   onClick={handleSubmit}
                   disabled={submitting || !description.trim()}
-                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-hh-primary text-white text-[13px] font-medium hover:bg-hh-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-medium text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: 'var(--hh-primary)' }}
                 >
-                  <Send size={14} />
+                  <Send size={13} />
                   {submitting ? "..." : "Verstuur"}
                 </button>
               </div>
