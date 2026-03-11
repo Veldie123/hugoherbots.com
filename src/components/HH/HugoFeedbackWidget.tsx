@@ -191,11 +191,13 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
         {/* Header button */}
         <button
           onClick={() => setOpen((prev) => !prev)}
-          className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-            open
-              ? "bg-[--hh-purple] text-white"
-              : "bg-[--hh-purple]/15 text-[--hh-purple] hover:bg-[--hh-purple]/25"
-          }`}
+          className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+          style={{
+            backgroundColor: open
+              ? 'var(--hh-purple)'
+              : 'color-mix(in srgb, var(--hh-purple) 15%, transparent)',
+            color: open ? '#ffffff' : 'var(--hh-purple)',
+          }}
           aria-label="Feedback geven"
           title="UI Feedback"
         >

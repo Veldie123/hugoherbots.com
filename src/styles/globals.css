@@ -329,6 +329,9 @@ body.dark:has(.admin-session) [data-radix-portal] {
   color: #1B2A4A;
 }
 
+/* Force-include hh-purple utility classes used in HugoFeedbackWidget */
+@source inline("bg-hh-purple text-hh-purple bg-hh-purple/15 bg-hh-purple/25 hover:bg-hh-purple/25");
+
 @theme inline {
   --color-hh-ink: var(--hh-ink);
   --color-hh-primary: var(--hh-primary);
@@ -348,6 +351,7 @@ body.dark:has(.admin-session) [data-radix-portal] {
   --color-hh-error-100: var(--hh-error-100);
   --color-hh-error-200: var(--hh-error-200);
   --color-hh-error-700: var(--hh-error-700);
+  --color-hh-purple: var(--hh-purple);
   --color-hh-warning: var(--hh-warning);
   --color-hh-warning-50: var(--hh-warning-50);
   --color-hh-warning-100: var(--hh-warning-100);
