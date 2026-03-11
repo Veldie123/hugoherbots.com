@@ -49,6 +49,7 @@ import { getCodeBadgeColors } from "../../utils/phaseColors";
 interface HugoAIOverviewProps {
   navigate?: (page: string, data?: Record<string, any>) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 type SessionType = "ai-audio" | "ai-video" | "ai-chat" | "upload-audio";
@@ -120,7 +121,7 @@ const getQualityBadge = (quality: "excellent" | "good" | "needs-improvement") =>
   }
 };
 
-export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
+export function HugoAIOverview({ navigate, isAdmin, onboardingMode }: HugoAIOverviewProps) {
   const { heroText } = useHeroText("hugo-ai", {
     badge: "AI Sales Coach",
     title: "Oefen met Hugo",
@@ -416,7 +417,7 @@ export function HugoAIOverview({ navigate, isAdmin }: HugoAIOverviewProps) {
   // Always use AppLayout for user view - this is the USER overview page
   // Admin view has its own separate component (AdminSessions)
   const Layout = AppLayout;
-  const layoutProps = { currentPage: "hugo-overview", navigate, isAdmin };
+  const layoutProps = { currentPage: "hugo-overview", navigate, isAdmin, onboardingMode };
 
   if (loading) {
     return (

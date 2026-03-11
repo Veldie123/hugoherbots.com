@@ -49,6 +49,7 @@ import { hideItem, getHiddenIds } from "../../utils/hiddenItems";
 interface AnalysisProps {
   navigate?: (page: string, data?: any) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 interface ConversationRecord {
@@ -69,7 +70,7 @@ interface ConversationRecord {
   } | null;
 }
 
-export function Analysis({ navigate, isAdmin }: AnalysisProps) {
+export function Analysis({ navigate, isAdmin, onboardingMode }: AnalysisProps) {
   const { heroText } = useHeroText("analysis", {
     badge: "Gespreksanalyse",
     title: "Analyseer je verkoopgesprekken",
@@ -318,7 +319,7 @@ export function Analysis({ navigate, isAdmin }: AnalysisProps) {
   }, 0);
 
   return (
-    <AppLayout currentPage="analysis" navigate={navigate} isAdmin={isAdmin}>
+    <AppLayout currentPage="analysis" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
       <div className="p-3 sm:p-4 lg:p-6 space-y-6">
         {/* Header with compact KPI pills */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">

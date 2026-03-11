@@ -45,9 +45,10 @@ type SortDirection = "asc" | "desc";
 interface LibraryProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
-export function Library({ navigate, isAdmin }: LibraryProps) {
+export function Library({ navigate, isAdmin, onboardingMode }: LibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<ContentType>("all");
   const [filterFase, setFilterFase] = useState("all");
@@ -151,7 +152,7 @@ export function Library({ navigate, isAdmin }: LibraryProps) {
   };
 
   return (
-    <AppLayout currentPage="library" navigate={navigate} isAdmin={isAdmin}>
+    <AppLayout currentPage="library" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
       <div className="p-6 space-y-6">
         <div className="flex items-start justify-between">
           <div>

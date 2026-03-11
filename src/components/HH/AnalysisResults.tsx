@@ -55,6 +55,7 @@ interface AnalysisResultsProps {
   isPreview?: boolean;
   isAdmin?: boolean;
   isSuperAdmin?: boolean;
+  onboardingMode?: boolean;
   navigationData?: { conversationId?: string; fromAdmin?: boolean; autoLoadFirst?: boolean };
 }
 
@@ -302,6 +303,7 @@ export function AnalysisResults({
   isPreview = false,
   isAdmin = false,
   isSuperAdmin = false,
+  onboardingMode,
   navigationData,
 }: AnalysisResultsProps) {
   const { theme } = useTheme();
@@ -926,7 +928,7 @@ export function AnalysisResults({
     if (useAdminLayout) {
       return <AdminLayout currentPage="admin-analysis-results" navigate={navigate as (page: string) => void} isSuperAdmin={isSuperAdmin}>{children}</AdminLayout>;
     }
-    return <AppLayout currentPage={fromHugo ? "talk-to-hugo" : "analysis"} navigate={navigate} isAdmin={isAdmin}>{children}</AppLayout>;
+    return <AppLayout currentPage={fromHugo ? "talk-to-hugo" : "analysis"} navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>{children}</AppLayout>;
   };
 
   if (loading || processingStep) {

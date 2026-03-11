@@ -67,13 +67,14 @@ interface TechniqueDetail {
 interface DigitalCoachingProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 type TrainingMode = "roleplay" | "videocursus" | null;
 type RoleplayMode = "chat" | "audio" | "video";
 type VideoOverlay = "chat" | "voice" | "video" | null;
 
-export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingProps) {
+export function DigitalCoaching({ navigate, isAdmin = false, onboardingMode }: DigitalCoachingProps) {
   const [selectedFase, setSelectedFase] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -710,10 +711,11 @@ export function DigitalCoaching({ navigate, isAdmin = false }: DigitalCoachingPr
   };
 
   return (
-    <AppLayout 
-      currentPage="coaching" 
+    <AppLayout
+      currentPage="coaching"
       navigate={navigate}
       isAdmin={isAdmin}
+      onboardingMode={onboardingMode}
     >
       {/* Split Screen Layout - Responsive */}
       <div className="flex h-full">

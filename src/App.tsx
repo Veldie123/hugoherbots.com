@@ -468,16 +468,16 @@ export default function App() {
           {currentPage === "admin-analysis-results" && <AnalysisResults navigate={navigate} isAdmin={true} isSuperAdmin={isSuperAdmin} navigationData={navigationData} />}
           {currentPage === "admin-upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={true} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "sso-validate" && <SSOValidate navigate={navigate} />}
-          {currentPage === "coaching" && <DigitalCoaching navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "analysis" && <Analysis navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "analysis-results" && <AnalysisResults navigate={navigate} isAdmin={isAdmin} navigationData={navigationData} />}
-          {currentPage === "upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "coaching" && <DigitalCoaching navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "analysis" && <Analysis navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "analysis-results" && <AnalysisResults navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} navigationData={navigationData} />}
+          {currentPage === "upload-analysis" && <UploadAnalysis navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "privacy-policy" && <PrivacyPolicy navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "hugo-overview" && <HugoAIOverview navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "hugo-overview" && <HugoAIOverview navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "talk-to-hugo" && <TalkToHugoAI navigate={navigate} isAdmin={isAdmin} isSuperAdmin={isSuperAdmin} onboardingMode={onboardingMode} adminViewMode={viewMode === 'admin'} navigationData={navigationData} />}
           {currentPage === "techniques" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
-          {currentPage === "library" && <Library navigate={navigate} isAdmin={isAdmin} />}
-          {currentPage === "notifications" && <UserNotifications navigate={navigate} isAdmin={isAdmin} />}
+          {currentPage === "library" && <Library navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+          {currentPage === "notifications" && <UserNotifications navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
         </Suspense>
       )}
     </NotificationProvider>

@@ -31,11 +31,12 @@ import React from "react";
 interface UserNotificationsProps {
   navigate?: (page: string, data?: Record<string, any>) => void;
   isAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 type NotificationFilter = "all" | "unread" | "read";
 
-export function UserNotifications({ navigate, isAdmin }: UserNotificationsProps) {
+export function UserNotifications({ navigate, isAdmin, onboardingMode }: UserNotificationsProps) {
   const { notifications, markAsRead, markAllRead, removeNotification } = useNotifications();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filter, setFilter] = React.useState<NotificationFilter>("all");
@@ -80,7 +81,7 @@ export function UserNotifications({ navigate, isAdmin }: UserNotificationsProps)
   }
 
   return (
-    <AppLayout currentPage="notifications" navigate={navigate} isAdmin={isAdmin}>
+    <AppLayout currentPage="notifications" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
       <div className="p-6 space-y-6">
         <div className="flex items-start justify-between">
           <div className="max-w-[50%]">

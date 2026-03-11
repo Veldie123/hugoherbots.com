@@ -27,12 +27,14 @@ interface UploadAnalysisProps {
   isPreview?: boolean;
   isAdmin?: boolean;
   isSuperAdmin?: boolean;
+  onboardingMode?: boolean;
 }
 
 export function UploadAnalysis({
   navigate,
   isPreview = false,
   isAdmin = false,
+  onboardingMode,
 }: UploadAnalysisProps) {
   const { user } = useUser();
   const { addPendingAnalysis } = useNotifications();
@@ -384,7 +386,7 @@ export function UploadAnalysis({
   };
 
   return (
-    <AppLayout currentPage="upload-analysis" navigate={navigate} isAdmin={isAdmin}>
+    <AppLayout currentPage="upload-analysis" navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode}>
       <div className="flex">
         
         <div className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
