@@ -5,7 +5,7 @@
  * Reuses V2's transcription, turn building, and phase calculation (pure code).
  * Used only for superadmin (stephane@hugoherbots.com).
  */
-import { getAnthropicClient, COACHING_MODEL } from "./anthropic-client";
+import { getAnthropicClient, COACHING_MODEL, EVALUATION_MODEL } from "./anthropic-client";
 import { getTechnique, getTechniqueName, getAllTechniqueNummers } from "../ssot-loader";
 import { pool } from "../db";
 import {
@@ -41,11 +41,12 @@ const UPLOAD_DIR = path.join(process.cwd(), "tmp", "uploads");
 async function callClaude(
   systemPrompt: string,
   userPrompt: string,
-  maxTokens = 2000
+  maxTokens = 2000,
+  model: string = COACHING_MODEL
 ): Promise<string> {
   const client = getAnthropicClient();
   const response = await client.messages.create({
-    model: COACHING_MODEL,
+    model,
     max_tokens: maxTokens,
     messages: [{ role: "user", content: userPrompt }],
     system: systemPrompt,
@@ -104,10 +105,86 @@ function buildSSOTTechniqueList(): string {
     .join("\n");
 }
 
+// ── Conversation Narrative ────────────────────────────────────────────────────
+
+interface ConversationNarrative {
+  phases: Array<{
+    phase: number;
+    startTurn: number;
+    endTurn: number;
+    description: string;
+  }>;
+  nonTechniqueTurns: number[];
+  transitions: Array<{
+    turnIdx: number;
+    from: number;
+    to: number;
+    trigger: string;
+  }>;
+  narrative: string;
+}
+
+async function analyzeConversationNarrative(
+  turns: TranscriptTurn[]
+): Promise<ConversationNarrative> {
+  const transcriptContext = turns
+    .map((t) => `[${t.idx}] ${t.speaker === "seller" ? "VERKOPER" : "KLANT"}: ${t.text}`)
+    .join("\n");
+
+  const lastTurnIdx = turns.length > 0 ? turns[turns.length - 1].idx : 0;
+
+  const systemPrompt = `Je bent een expert in de EPIC verkoopmethodologie van Hugo Herbots. Analyseer de structuur van een verkoopgesprek.
+
+EPIC FASES:
+- Fase 1 (Opening): small talk, begroeting, koopklimaat creëren, Gentleman's Agreement, Instapvraag
+- Fase 2 (Ontdekking/EPIC): Explore (feitgerichte vragen), Probe (doorvragen), Impact (gevolgvragen), Commitment
+- Fase 3 (Aanbeveling): OVB presentatie, USP's, mening vragen
+- Fase 4 (Beslissing): bezwaarbehandeling, closing technieken
+
+Antwoord als JSON (geen markdown, geen uitleg buiten het JSON):
+{
+  "phases": [
+    { "phase": 1, "startTurn": 0, "endTurn": 12, "description": "Korte omschrijving" }
+  ],
+  "nonTechniqueTurns": [0, 1, 3, 5],
+  "transitions": [
+    { "turnIdx": 13, "from": 1, "to": 2, "trigger": "Eerste echte EPIC-vraag" }
+  ],
+  "narrative": "2-3 zinnen over het verloop van het gesprek"
+}`;
+
+  const userPrompt = `TRANSCRIPT (${turns.length} turns, indices 0-${lastTurnIdx}):
+${transcriptContext}
+
+Analyseer de structuur van dit gesprek:
+1. Verdeel het gesprek in EPIC-fases (startTurn/endTurn zijn inclusief).
+2. Geef alle turn-indices die puur small talk, begroetingen, fillers of te kort zijn voor enige verkooptechniek (nonTechniqueTurns). Wees ruimhartig — twijfelgevallen horen erbij.
+3. Identificeer de fase-overgangen met de trigger die de overgang markeert.
+4. Schrijf een korte narratief over het gesprek.`;
+
+  const result = await callClaude(systemPrompt, userPrompt, 2048);
+
+  const fallback: ConversationNarrative = {
+    phases: [{ phase: 1, startTurn: 0, endTurn: lastTurnIdx, description: "Volledig gesprek" }],
+    nonTechniqueTurns: [],
+    transitions: [],
+    narrative: "Gespreksstructuur kon niet worden bepaald.",
+  };
+
+  const parsed = parseJSON<ConversationNarrative>(result, fallback);
+
+  // Safety: ensure phases cover all turns with no gaps
+  if (!parsed.phases || parsed.phases.length === 0) return fallback;
+
+  console.log(`[V3 Analysis] Narrative: ${parsed.phases.length} phases, ${parsed.nonTechniqueTurns.length} non-technique turns, narrative: "${parsed.narrative.substring(0, 80)}..."`);
+  return parsed;
+}
+
 // ── V3 Evaluate Seller Turns ─────────────────────────────────────────────────
 
 async function evaluateSellerTurnsV3(
-  turns: TranscriptTurn[]
+  turns: TranscriptTurn[],
+  narrative: ConversationNarrative
 ): Promise<TurnEvaluation[]> {
   const sellerTurns = turns.filter((t) => t.speaker === "seller");
   if (sellerTurns.length === 0) return [];
@@ -153,23 +230,56 @@ Antwoord als JSON array van evaluaties, één per seller-turn:
 
 Wees concreet en verwijs naar specifieke techniek-IDs.`;
 
+  // Build narrative context block for the prompt
+  const narrativeContext = [
+    `GESPREKSSTRUCTUUR (LEES DIT EERST — evalueer turns in deze context):`,
+    `${narrative.narrative}`,
+    ``,
+    `FASE-SEGMENTATIE:`,
+    ...narrative.phases.map((p) => `- Turns ${p.startTurn}-${p.endTurn}: Fase ${p.phase} — ${p.description}`),
+    ``,
+    narrative.nonTechniqueTurns.length > 0
+      ? `TURNS ZONDER TECHNIEK (begroetingen, fillers, small talk, te kort — geef hier NOOIT een techniek):\nTurns: ${narrative.nonTechniqueTurns.join(", ")}`
+      : ``,
+  ].filter(Boolean).join("\n");
+
+  // Pre-fill evaluations for turns the narrative marks as non-technique
+  const nonTechSet = new Set(narrative.nonTechniqueTurns);
+  const turnsToEvaluate = sellerTurns.filter((t) => !nonTechSet.has(t.idx));
+  const skippedCount = sellerTurns.length - turnsToEvaluate.length;
+  if (skippedCount > 0) {
+    console.log(`[V3 Analysis] Skipping ${skippedCount} non-technique turns (from narrative)`);
+  }
+
   // Chunk evaluation to avoid output truncation on long conversations
   const CHUNK_SIZE = 25;
   const allEvaluations: TurnEvaluation[] = [];
 
-  console.log(`[V3 Analysis] Evaluating ${sellerTurns.length} seller turns in chunks of ${CHUNK_SIZE}`);
+  // Add empty evaluations for non-technique turns immediately
+  for (const turn of sellerTurns) {
+    if (nonTechSet.has(turn.idx)) {
+      allEvaluations.push({
+        turnIdx: turn.idx,
+        techniques: [],
+        overallQuality: "gemist",
+        rationale: "Small talk / begroeting / te kort — geen techniek (narratief).",
+      });
+    }
+  }
 
-  for (let i = 0; i < sellerTurns.length; i += CHUNK_SIZE) {
-    const chunk = sellerTurns.slice(i, i + CHUNK_SIZE);
+  console.log(`[V3 Analysis] Evaluating ${turnsToEvaluate.length} seller turns in chunks of ${CHUNK_SIZE}`);
+
+  for (let i = 0; i < turnsToEvaluate.length; i += CHUNK_SIZE) {
+    const chunk = turnsToEvaluate.slice(i, i + CHUNK_SIZE);
     const chunkIdxs = chunk.map((t) => t.idx);
     const chunkNum = Math.floor(i / CHUNK_SIZE) + 1;
-    const totalChunks = Math.ceil(sellerTurns.length / CHUNK_SIZE);
+    const totalChunks = Math.ceil(turnsToEvaluate.length / CHUNK_SIZE);
 
     console.log(`[V3 Analysis] Chunk ${chunkNum}/${totalChunks}: evaluating turns ${chunkIdxs[0]}-${chunkIdxs[chunkIdxs.length - 1]}`);
 
     const result = await callClaude(
       systemPrompt,
-      `TRANSCRIPT:\n${transcriptContext}\n\nEvalueer ALLEEN de volgende seller-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
+      `${narrativeContext}\n\nTRANSCRIPT:\n${transcriptContext}\n\nEvalueer ALLEEN de volgende seller-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
       4096
     );
 
@@ -219,42 +329,44 @@ function buildSSOTHoudingList(currentPhase: number): string {
 
 async function detectCustomerSignalsV3(
   turns: TranscriptTurn[],
-  evaluations: TurnEvaluation[]
+  narrative: ConversationNarrative
 ): Promise<CustomerSignalResult[]> {
   const customerTurns = turns.filter((t) => t.speaker === "customer");
   if (customerTurns.length === 0) return [];
 
-  // Determine current phase from evaluations (require 2+ techniques in a phase before advancing)
-  let currentPhase = 1;
-  const phaseCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
-  for (const evalItem of evaluations) {
-    for (const tech of evalItem.techniques) {
-      const phaseNum = parseInt(tech.id.charAt(0));
-      if (phaseNum >= 1 && phaseNum <= 4) phaseCounts[phaseNum]++;
+  // Phase lookup from narrative (replaces technique-count heuristic)
+  const getPhaseForTurn = (turnIdx: number): number => {
+    for (const p of narrative.phases) {
+      if (turnIdx >= p.startTurn && turnIdx <= p.endTurn) return p.phase;
     }
-  }
-  for (let p = 4; p >= 1; p--) {
-    if (phaseCounts[p] >= 2) { currentPhase = p; break; }
-  }
+    return narrative.phases[narrative.phases.length - 1]?.phase ?? 1;
+  };
+
+  // Overall phase for houdingList: use the highest phase in the narrative
+  const overallPhase = Math.max(...narrative.phases.map((p) => p.phase), 1);
 
   const transcriptContext = turns
-    .map(
-      (t) =>
-        `[${t.idx}] ${t.speaker === "seller" ? "VERKOPER" : "KLANT"}: ${t.text}`
-    )
+    .map((t) => `[${t.idx}] ${t.speaker === "seller" ? "VERKOPER" : "KLANT"}: ${t.text}`)
     .join("\n");
 
-  const houdingList = buildSSOTHoudingList(currentPhase);
+  const houdingList = buildSSOTHoudingList(overallPhase);
+
+  const narrativeContext = [
+    `GESPREKSSTRUCTUUR:`,
+    `${narrative.narrative}`,
+    ``,
+    `FASE-SEGMENTATIE (gebruik dit voor currentPhase per turn — volg deze indeling strikt):`,
+    ...narrative.phases.map((p) => `- Turns ${p.startTurn}-${p.endTurn}: Fase ${p.phase} — ${p.description}`),
+  ].join("\n");
 
   const systemPrompt = `Je classificeert klant-reacties in een verkoopgesprek op basis van de EPIC-methodologie.
 
 KLANTHOUDINGEN (gebruik ALTIJD deze exacte IDs en namen):
 ${houdingList}
 
-FASE-REGELS:
-- Fase-toewijzing is grotendeels voorwaarts. Een enkele korte turn verandert de fase niet.
-- Fase-wisselingen KUNNEN voorkomen (vooral fase 2 ↔ 3), maar vereisen meerdere opeenvolgende turns in de nieuwe fase.
-- Geef bij elke turn de currentPhase die past bij de CONTEXT van het hele gesprek tot nu toe.
+FASE-INSTRUCTIE:
+- De currentPhase per turn ligt vast in de fase-segmentatie die je krijgt. Volg deze — wijk er alleen van af als het gesprek echt al duidelijk is overgegaan naar een andere fase.
+- recommendedTechniqueIds: één of twee technieken die de VERKOPER NU zou moeten toepassen, gegeven de houding van de klant.
 
 Antwoord als JSON array:
 [
@@ -262,12 +374,12 @@ Antwoord als JSON array:
     "turnIdx": 0,
     "houding": "H1: Positief antwoord",
     "confidence": 0.85,
-    "recommendedTechniqueIds": ["2.4"],
-    "currentPhase": 2
+    "recommendedTechniqueIds": ["2.1.1"],
+    "currentPhase": 1
   }
 ]`;
 
-  // Chunk customer turns to avoid JSON output truncation (same pattern as evaluateSellerTurnsV3)
+  // Chunk customer turns to avoid JSON output truncation
   const CHUNK_SIZE = 25;
   const allSignals: CustomerSignalResult[] = [];
 
@@ -283,7 +395,7 @@ Antwoord als JSON array:
 
     const result = await callClaude(
       systemPrompt,
-      `TRANSCRIPT:\n${transcriptContext}\n\nClassificeer ALLEEN deze klant-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
+      `${narrativeContext}\n\nTRANSCRIPT:\n${transcriptContext}\n\nClassificeer ALLEEN deze klant-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
       4096
     );
 
@@ -292,7 +404,7 @@ Antwoord als JSON array:
     allSignals.push(...parsed);
   }
 
-  // Ensure all customer turns have signals (fallback for missed ones)
+  // Ensure all customer turns have signals — fallback uses narrative phase
   const signalledIdxs = new Set(allSignals.map((s) => s.turnIdx));
   for (const turn of customerTurns) {
     if (!signalledIdxs.has(turn.idx)) {
@@ -301,8 +413,17 @@ Antwoord als JSON array:
         houding: "H4: Te algemeen antwoord",
         confidence: 0.5,
         recommendedTechniqueIds: [],
-        currentPhase,
+        currentPhase: getPhaseForTurn(turn.idx),
       });
+    }
+  }
+
+  // Enforce narrative phase — override Claude's currentPhase with narrative where they differ significantly
+  for (const signal of allSignals) {
+    const narrativePhase = getPhaseForTurn(signal.turnIdx);
+    // Only override if Claude jumps more than 1 phase away from narrative
+    if (Math.abs((signal.currentPhase ?? 1) - narrativePhase) > 1) {
+      signal.currentPhase = narrativePhase;
     }
   }
 
@@ -717,13 +838,15 @@ export async function runFullAnalysisV3(
     analysisJobsV3.set(conversationId, { ...job });
     await persistStatus(conversationId, "evaluating");
 
+    console.log(`[V3 Analysis] Analyzing conversation narrative`);
+    // 3a. Narrative analysis — understand the conversation before evaluating turns
+    const narrative = await analyzeConversationNarrative(turns);
+
     console.log(`[V3 Analysis] Evaluating ${turns.length} turns with Claude`);
     // Sequential to avoid concurrent Claude calls hitting rate limits
-    const evaluations = await evaluateSellerTurnsV3(turns);
-    const signals = await detectCustomerSignalsV3(turns, []);
-
-    // Re-detect signals with evaluation context
-    const signalsWithContext = await detectCustomerSignalsV3(turns, evaluations);
+    // Both functions now receive the narrative for grounded context
+    const evaluations = await evaluateSellerTurnsV3(turns, narrative);
+    const signalsWithContext = await detectCustomerSignalsV3(turns, narrative);
 
     // 4. Calculate phase coverage (pure code)
     const phaseCoverage = calculatePhaseCoverage(evaluations, turns);
@@ -909,8 +1032,11 @@ export async function reAnalyzeFromTranscriptV3(
     analysisJobsV3.set(conversationId, { ...job });
     await persistStatus(conversationId, "evaluating");
 
-    const evaluations = await evaluateSellerTurnsV3(turns);
-    const signalsWithContext = await detectCustomerSignalsV3(turns, evaluations);
+    console.log(`[V3 Re-Analysis] Analyzing conversation narrative`);
+    const narrative = await analyzeConversationNarrative(turns);
+
+    const evaluations = await evaluateSellerTurnsV3(turns, narrative);
+    const signalsWithContext = await detectCustomerSignalsV3(turns, narrative);
     const phaseCoverage = calculatePhaseCoverage(evaluations, turns);
 
     const missedOpps = await detectMissedOpportunitiesV3(evaluations, signalsWithContext, turns);
