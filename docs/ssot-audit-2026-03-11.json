@@ -1,0 +1,2344 @@
+{
+  "audit_date": "2026-03-11",
+  "video_count": 47,
+  "ssot_technique_count": 50,
+  "techniques_with_coverage": 31,
+  "techniques_without_coverage": [
+    "0.2",
+    "0.3",
+    "2.1.1.1",
+    "2.1.1.2",
+    "2.1.1.3",
+    "2.1.1.7",
+    "2.1.1.8",
+    "3.1",
+    "3.3",
+    "3.4",
+    "3.5",
+    "3.6",
+    "3.7",
+    "4.2.6",
+    "4.INDIEN",
+    "4.3.1",
+    "4.3.2",
+    "4.3.4",
+    "4.3.5"
+  ],
+  "summary": {
+    "total": 156,
+    "flagged": 0,
+    "needs_review": 136,
+    "ok": 20
+  },
+  "findings": [
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "0.1",
+      "field": "naam",
+      "current_value": "Prospectanalyse",
+      "proposed_value": "Klantanalyse of Gesprekspartneranalyse",
+      "issue_description": "Hugo spreekt consequent over 'klanten' en 'gesprekspartners', niet over 'prospects'. Het transcript gaat over het analyseren van wie de klant is, niet specifiek over prospectanalyse.",
+      "transcript_evidence": [
+        "Nu, wie zijn uw klanten? We praten altijd over de man, maar wie is de man?",
+        "uw gesprekspartner heeft een psychologisch aankoopproces"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "0.1",
+      "field": "wat",
+      "current_value": "Grondige analyse van de prospect vóór het eerste contact: bedrijfsinfo, sector, concurrenten, recente ontwikkelingen.",
+      "proposed_value": "Analyse van wie de gesprekspartner is: identificeren van de persoon met money, autoriteit en needs. Bepalen of het de gebruiker, voorschrijver of beslisser is, en hun positie in het psychologisch aankoopproces.",
+      "issue_description": "Het transcript focust op het identificeren van de juiste persoon (MAN-methode) en hun psychologisch aankoopproces, niet op bedrijfsinfo en sector-analyse.",
+      "transcript_evidence": [
+        "Dat is de persoon, man of vrouw die de money, de autoriteit en de needs kent. Maar dat kan de gebruiker zijn, de voorschrijver of de beslisser zijn",
+        "uw gesprekspartner heeft een psychologisch aankoopproces"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "0.1",
+      "field": "hoe",
+      "current_value": "Onderzoek website, LinkedIn, nieuwsartikelen, jaarverslagen, sociale media van de prospect.",
+      "proposed_value": "Identificeer de persoon met Money, Autoriteit en Needs. Bepaal of het de gebruiker, voorschrijver of beslisser is. Analyseer hun positie in de buying clock (psychologisch aankoopproces).",
+      "issue_description": "Het transcript beschrijft de MAN-methode en buying clock analyse, niet traditioneel desk research.",
+      "transcript_evidence": [
+        "Dat is de persoon, man of vrouw die de money, de autoriteit en de needs kent",
+        "uw gesprekspartner heeft een psychologisch aankoopproces. We noemen dat de buying clock"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "0.2",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 0.2 — SWOT-analyse prospect",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "0.3",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 0.3 — CRM-historiek raadplegen",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "0.5",
+      "field": "naam",
+      "current_value": "Gespreksvoorbereiding",
+      "proposed_value": "Pre-contactfase",
+      "issue_description": "Hugo gebruikt consequent de term 'pre-contactfase' en 'voorbereidende fase' voor deze techniek, niet 'Gespreksvoorbereiding'",
+      "transcript_evidence": [
+        "Zo, we hebben de pre-contactfase",
+        "In mijn voorbereidende fase is ten eerste",
+        "ik herhaal: in uw voorbereidende fase gaan we desktopresearch gaan doen"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "0.5",
+      "field": "wat",
+      "current_value": "Concrete voorbereiding: agenda, materialen, vragen, demo's klaarzetten.",
+      "proposed_value": "Desktop research (prospect- en marktanalyse, SWOT-analyse, CRM-historiek, ChatGPT informatie) en One Minute Manager (mentale voorbereiding)",
+      "issue_description": "Hugo beschrijft specifiek twee componenten: desktop research en One Minute Manager (mentale voorbereiding), niet de generieke materiaalvoorbereiding uit de SSOT",
+      "transcript_evidence": [
+        "wij noemen dat dan desktop research",
+        "Het is belangrijk natuurlijk dat ge een prospect- en marktanalyse doet, een SWOT-analyse maakt",
+        "One Minute Manager. Wat bedoelen we daarmee? Voor u binnenstapt, vooral in het proces, in uw proces en voor u binnenstapt, is het belangrijk dat u zich mentaal voorbereidt"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "0.5",
+      "field": "hoe",
+      "current_value": "Check alle materialen, bereid vragen voor, zorg dat techniek werkt.",
+      "proposed_value": "1. Desktop research: prospect- en marktanalyse, SWOT-analyse, CRM-historiek bekijken, ChatGPT gebruiken voor informatie. 2. One Minute Manager: mentaal voorbereiden, gefocust zijn, attitude en enthousiasme uitstralen",
+      "issue_description": "Hugo geeft specifieke methoden (desktop research en One Minute Manager) die verschillen van de generieke materiaalchecklist in de SSOT",
+      "transcript_evidence": [
+        "Desktop Research. Wat bedoelen we daarmee? Het is belangrijk natuurlijk dat ge een prospect- en marktanalyse doet, een SWOT-analyse maakt. Wat zijn uw sterke punten? Minder sterke punten? Je hebt misschien zo een historiek van CRM dat u kunt gaan bekijken. Je hebt GPD-- euh, ChatGPT",
+        "One Minute Manager. Wat bedoelen we daarmee? Voor u binnenstapt, vooral in het proces, in uw proces en voor u binnenstapt, is het belangrijk dat u zich mentaal voorbereidt. Wees uzelf, hè, gefocust zijn, attitude en enthousiasme uitstralen"
+      ],
+      "confidence": 0.88,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "0.5",
+      "field": "stappenplan",
+      "current_value": "1. Check agenda en locatie\n2. Bereid materialen voor\n3. Formuleer gespreksvragen\n4. Test techniek",
+      "proposed_value": "1. Desktop research doen\n2. One Minute Manager toepassen",
+      "issue_description": "Hugo beschrijft een ander stappenplan gebaseerd op zijn twee hoofdcomponenten in plaats van de generieke checklist",
+      "transcript_evidence": [
+        "in uw voorbereidende fase gaan we desktopresearch gaan doen",
+        "En voor u binnenstapt, is het mentaal belangrijk-- in uw-- is het belangrijk uw mentaal voor te bereiden"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "1.1",
+      "field": "naam",
+      "current_value": "Koopklimaat creëren",
+      "proposed_value": "Creëren van het koopklimaat",
+      "issue_description": "Hugo gebruikt consistent de volledige formulering 'creëren van het koopklimaat' in plaats van de verkorte vorm",
+      "transcript_evidence": [
+        "We gaan daar het creëren van het koopklimaat",
+        "dus in fase één gaan we creëren van het koopklimaat"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "1.2",
+      "field": "wanneer",
+      "current_value": "Altijd na het creëren van koopklimaat.",
+      "proposed_value": "Na het creëren van koopklimaat en het gun-effect.",
+      "issue_description": "Hugo specificeert dat het gentleman's agreement komt na zowel het creëren van koopklimaat als het gun-effect, niet alleen na koopklimaat.",
+      "transcript_evidence": [
+        "Creëren van het koop klimaat? Rint, u nog? Met de bedoeling van het gun-effect te gaan creëren. Het gun-effect people buy people zoals we gezegd hebben en alles afhankelijk van de sociale gedragsstijl. En dan gaan we een gentlemen's agreement gaan formuleren."
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "1.2",
+      "field": "wat",
+      "current_value": "Duidelijke afspraken maken over het verloop van gesprek (gespreksleiding nemen).",
+      "proposed_value": "Een agenda opstellen - een afspraak tussen beide partijen over het verloop van het gesprek.",
+      "issue_description": "Hugo beschrijft het specifiek als het opstellen van een agenda en benadrukt dat het een afspraak tussen beide partijen is, niet alleen gespreksleiding.",
+      "transcript_evidence": [
+        "gentlemen's agreement gaan formuleren. Met andere woorden een agenda, hè, agenda ga opstellen. Hè, gentlemens agreement is een afspraak tussen beide partijen."
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "1.3",
+      "field": "wat",
+      "current_value": "Introduceer Persoon, Organisatie en (kort) Proces, en gebruik een reference story: een algemene (gekende of veronderstelde) behoefte die vergelijkbare klanten hadden, met een algemeen voordeel.",
+      "proposed_value": "Introduceer Persoon, Organisatie en (kort) Proces, en presenteer projectreferenties: een algemene, bekende behoefte/pijnpunt waarom klanten bij je hebben gekocht, met een algemeen voordeel dat daarop antwoordt.",
+      "issue_description": "Hugo spreekt over 'projectreferenties presenteren' en 'waarom hebben klanten bij u gekocht' in plaats van een hypothetische reference story over vergelijkbare klanten.",
+      "transcript_evidence": [
+        "Vervolgens presenteren we uw projectreferenties. Met andere woorden: waarom hebben klanten bij u gekocht en welke factoren spelen hierin?",
+        "Omdat bestaande klanten bij u hebben gekocht. Natuurlijk kent u deze reden."
+      ],
+      "confidence": 0.88,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "1.3",
+      "field": "stappenplan",
+      "current_value": "4. Reference story: 'veel klanten zoals u … (algemene behoefte)'.",
+      "proposed_value": "4. Projectreferenties: omschrijf een algemene, bekende behoefte/pijnpunt waarom klanten bij je hebben gekocht.",
+      "issue_description": "Stap 4 beschrijft een hypothetische reference story over 'klanten zoals u', maar Hugo benadrukt dat het gaat om waarom JOUW bestaande klanten bij je hebben gekocht.",
+      "transcript_evidence": [
+        "Vervolgens beschrijft u de reden waarom klanten bij u hebben gekocht",
+        "U omschrijft een algemene behoefte of pijnpunt. Waarom? Omdat u die heeft ingevuld."
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "1.4",
+      "field": "naam",
+      "current_value": "Instapvraag",
+      "proposed_value": "Algemene behoefte + instapvragen",
+      "issue_description": "Hugo spreekt over meerdere vragen in deze fase, niet alleen één instapvraag. Hij behandelt algemene behoefte formuleren, bron vragen, motivatie vragen en intentie vragen als onderdelen van deze fase.",
+      "transcript_evidence": [
+        "ik kan vragen waar maak ik u situeren",
+        "Laat eens vragen: hoe bent u eigenlijk bij ons terechtgekomen?",
+        "waarom A en waarom B niet?",
+        "mag ik eens vragen, ehm, ik kan ervan uit... dat de intentie de bedoeling is dat u een investering gaat doen"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "1.4",
+      "field": "wat",
+      "current_value": "Open vraag die klant uitnodigt om situatie te beschrijven.",
+      "proposed_value": "Meerdere vragen: algemene behoefte formuleren, situering vragen, bron vragen, motivatie vragen en intentie checken.",
+      "issue_description": "Hugo beschrijft meerdere specifieke vraagtypes in deze fase, niet alleen één open situatievraag.",
+      "transcript_evidence": [
+        "waar mag ik u situeren",
+        "hoe bent u eigenlijk bij ons terechtgekomen",
+        "waarom A en waarom B niet",
+        "de intentie de bedoeling is dat u een investering gaat doen"
+      ],
+      "confidence": 0.88,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "1.4",
+      "field": "voorbeeld",
+      "current_value": "1. Vertel eens, meneer en mevrouw X, hoe mag ik jullie situatie inschatten?",
+      "proposed_value": "Meerdere voorbeelden zoals Hugo geeft",
+      "issue_description": "Hugo geeft heel andere en specifiekere voorbeelden van vragen dan het generieke voorbeeld in de SSOT.",
+      "transcript_evidence": [
+        "waar mag ik u situeren",
+        "hoe bent u eigenlijk bij ons terechtgekomen?",
+        "meneer, waarom vastgoed en waarom bancaire producten niet?",
+        "mag ik eens vragen... dat de intentie de bedoeling is dat u een investering gaat doen"
+      ],
+      "confidence": 0.92,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1",
+      "field": "hoe",
+      "current_value": "Gebruik een mix van feit-, mening- en alternatieve vragen om de situatie te verkennen. Luister actief en speel in op wat de klant zegt.",
+      "proposed_value": "Gebruik een mix van feit-, mening- en alternatieve vragen om de situatie te verkennen. Gebruik ook zijde schuiven en pingpong techniek. Luister actief.",
+      "issue_description": "De SSOT mist twee specifieke technieken die Hugo expliciet noemt als onderdeel van de Explore-fase: 'zijde schuiven' en 'pingpong techniek'",
+      "transcript_evidence": [
+        "feitgericht, meningsrichting, zijdeschuiven, pingpongtechniek, hè, actief luisteren om een duidelijk inzicht te krijgen in zijn manier van werken"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1",
+      "field": "doel",
+      "current_value": "Concrete feiten en cijfers verzamelen om een gepersonaliseerde oplossing te kunnen bouwen.",
+      "proposed_value": "Informatie verzamelen om situationele analyse te kunnen doen",
+      "issue_description": "Hugo beschrijft het doel als 'situationele analyse te kunnen doen', niet specifiek om een gepersonaliseerde oplossing te bouwen",
+      "transcript_evidence": [
+        "Dat is natuurlijk dus de bedoeling om situationele analyse te kunnen doen"
+      ],
+      "confidence": 0.8,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1",
+      "field": "hoe",
+      "current_value": "Stel duidelijke, feitelijke vragen gericht op specifieke details binnen de thema's: Bron, Motivatie, Ervaring, Verwachtingen, Alternatieven, Budget, Timing, Beslissingscriteria.",
+      "proposed_value": "Stel vragen gericht naar bepaalde onderwerpen zoals ervaring, manier van werken, verwachtingen, alternatieven",
+      "issue_description": "Hugo noemt niet alle 8 Discovery-thema's. Hij spreekt over 'ervaring', 'manier van werken', 'verwachtingen', 'alternatieven' en 'stockbeheer', maar noemt geen Bron, Motivatie, Budget, Timing of Beslissingscriteria",
+      "transcript_evidence": [
+        "Dat kan omtrent zijn ervaring zijn, zijn ervaringen, ja, zijn manier van werken",
+        "Dat kan over zijn verwachtingen zijn",
+        "Dat kan over zijn alternatieven zijn",
+        "Over zijn stockbeheer?"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.1",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 2.1.1.1 — Bron",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.2",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 2.1.1.2 — Motivatie",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.3",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 2.1.1.3 — Ervaring",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.4",
+      "field": "doel",
+      "current_value": "Wensen en eisen helder krijgen om je aanbod daarop af te stemmen.",
+      "proposed_value": "Wensen en eisen helder krijgen, prioriteren en betekenis achterhalen om je aanbod daarop af te stemmen.",
+      "issue_description": "Het doel mist het cruciale element van prioriteren en betekenis achterhalen dat Hugo expliciet noemt in zijn uitleg.",
+      "transcript_evidence": [
+        "We gaan zijn verwachtingen listeren en prioriseren",
+        "Dan stellen we meningsgevende vragen zoals: 'Wat verstaat u daaronder?'"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.4",
+      "field": "hoe",
+      "current_value": "Vraag open naar wensen, eisen of ideale situatie.",
+      "proposed_value": "Vraag open naar verwachtingen, laat prioriteren, en vraag betekenis via meningsvragen.",
+      "issue_description": "De 'hoe' beschrijving mist de essentiële stappen van prioriteren en betekenis achterhalen via meningsvragen die Hugo benadrukt.",
+      "transcript_evidence": [
+        "We gaan zijn verwachtingen listeren en prioriseren",
+        "Dan stellen we meningsgevende vragen zoals: 'Wat verstaat u daaronder?' Zo krijgen we veel informatie"
+      ],
+      "confidence": 0.88,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.5",
+      "field": "wat",
+      "current_value": "Feitgerichte vraag om te achterhalen welke andere opties de klant bekijkt of heeft bekeken.",
+      "proposed_value": "Exploratieve, feitgerichte vragen om alternatieven te achterhalen en spanningsvelden te creëren via EPICC-techniek.",
+      "issue_description": "Het transcript toont dat dit niet alleen een feitgerichte vraag is, maar specifiek een exploratieve vraag binnen de EPICC-techniek die ook spanningsvelden moet creëren.",
+      "transcript_evidence": [
+        "We gaan deze alternatieven gaan bevragen via onze EPICC-techniek. We gaan deze alternatieven gaan bevragen via onze exploratievragen. Feitgericht denken",
+        "Dan ga je die spanningsvelden gaan creëren"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.5",
+      "field": "voorbeeld",
+      "current_value": "1. Afgezien van bij wie u het doet: is het de bedoeling om effectief tot [investering/implementatie] over te gaan?\n2. Welke alternatieven heeft u nog op tafel liggen?\n3. Op basis van welke criteria vergelijkt u de opties?",
+      "proposed_value": "1. Welke andere opties of alternatieven overweegt u?\n2. Wat spreekt u aan aan deze alternatieven?\n3. Wat verwacht u van de alternatieven die u bij onze oplossing niet gevonden heeft?",
+      "issue_description": "De voorbeeldvragen in SSOT komen niet overeen met de concrete vragen die Hugo geeft in het transcript.",
+      "transcript_evidence": [
+        "welke andere opties of alternatieven overweegt u?",
+        "wat spreekt u aan aan deze alternatieven?",
+        "wat verwacht u van de alternatieven die u bij onze oplossing niet gevonden heeft?"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.5",
+      "field": "stappenplan",
+      "current_value": "1. Stel eerst een engagement-vraag (micro-commitment): is de intentie om effectief te veranderen/kopen/doen?\n2. Bij 'neen' of twijfel: exploreer alternatieven en de reden waarom die nog open liggen.\n3. Bij 'ja': vraag welke alternatieven/leveranciers ook bekeken worden.\n4. Vraag criteria: op basis waarvan wordt er vergeleken en gekozen?\n5. Noteer concurrenten/alternatieven als input voor latere spanningsvelden (Probe) en baten (Impact).",
+      "proposed_value": "1. Stel exploratieve vragen over alternatieven\n2. Gebruik probing en reverse thinking voor zelfreflectie\n3. Creëer spanningsvelden: 'Stel dat u voor een alternatief kiest, welke van onze oplossingen worden dan minder relevant?'\n4. Vraag naar impact: 'Wat is daar de impact van?'\n5. Vraag commitment via conceptuele lok",
+      "issue_description": "Het stappenplan in SSOT beschrijft een andere aanpak dan wat Hugo uitlegt. Hugo begint niet met een engagement-vraag maar met directe alternatieven-vragen, en gebruikt specifiek probing, reverse thinking en conceptuele lokken.",
+      "transcript_evidence": [
+        "probing, vraagstelling. Vraagstelling. Reverse thinking. Aan zelfreflectie, de klant aan zelfreflectie doen",
+        "stel dat u voor een alternatief, eh, kiest. Ja, welke van onze oplossingen die we vandaag, eh, besproken hebben worden dan minder relevant?",
+        "En een commitment ga ik hier doen door een conceptuele lok"
+      ],
+      "confidence": 0.92,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.6",
+      "field": "voorbeeld",
+      "current_value": "1. Om het goed te kaderen: over welke bandbreedte spreken we?\n2. Is er al een budget voorzien, of moet dat nog vrijgemaakt worden?\n3. Wie moet finaal budget goedkeuren?",
+      "proposed_value": "1. In welke mate is er voor het project dat we besproken hebben aan een budget voorzien?\n2. In welke mate wordt dit met eigen middelen gefinancierd of is dat via externe financiering?",
+      "issue_description": "De voorbeeldvragen in SSOT komen niet overeen met Hugo's concrete voorbeelden in het transcript",
+      "transcript_evidence": [
+        "in welke mate is er voor het project dat we besproken hebben aan een budget voorzien?",
+        "in welke mate wordt dit met eigen middelen gefinancierd of is dat via externe financiering?"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.7",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 2.1.1.7 — Timing",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.1.8",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 2.1.1.8 — Beslissingscriteria",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.2",
+      "field": "hoe",
+      "current_value": "Stel open vragen waarop niet met ja/nee geantwoord kan worden.",
+      "proposed_value": "Stel meningsgerichte vragen om containerbegrippen te verdiepen, zoals 'Hoe bedoelt u?' of 'Wat verstaat u daaronder?'",
+      "issue_description": "Hugo benadrukt specifiek het doorvragen op containerbegrippen en geeft concrete vraagformuleringen, terwijl de SSOT alleen generiek over open vragen spreekt",
+      "transcript_evidence": [
+        "Dan kan ik een meningsgerichte vraag daarop gaan stellen: \"Mijnheer, mag ik u vragen, wat verstaat u daaronder, 'zonder zorgen'?\"",
+        "Of de gouden vraag is altijd: \"Hoe bedoelt u?\"",
+        "\"Wat verstaat u daaronder? Wat maak u daaronder verstaan? Wat ziet u daaronder?\""
+      ],
+      "confidence": 0.88,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.2",
+      "field": "stappenplan",
+      "current_value": "1. Start vanuit een feit: 'U zei net X...' en stel dan een open mening-vraag.",
+      "proposed_value": "1. Start vanuit een feitgerichte vraag en het antwoord daarop, identificeer containerbegrippen en stel dan een meningsgerichte vraag.",
+      "issue_description": "Hugo benadrukt dat je eerst een feitgerichte vraag stelt en dan op het antwoord (vooral containerbegrippen) doorvraagt, niet op een eerder genoemd feit",
+      "transcript_evidence": [
+        "Na mijn feitgerichte vraag in mijn exploratiefase ga ik meningsgerichte vragen stellen",
+        "want ik heb eerst begonnen met een feitgerichte vraag. Bijvoorbeeld: \"Mijnheer, euh, indien u een investering zou doen, bijvoorbeeld, wat verwacht u?\" Dan kunnen we zeggen: \"Zonder zorgen.\" Dat is natuurlijk een containerbegrip. Dat zegt mij gewoonweg niks. Dan kan ik een meningsgerichte vraag daarop gaan stellen"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.3",
+      "field": "doel",
+      "current_value": "Concrete antwoorden verkrijgen van klanten die vaag of niet-communicatief zijn.",
+      "proposed_value": "Richting geven aan het gesprek, misverstanden voorkomen, interpretaties vermijden en waarden van de klant achterhalen om commitment mogelijk te maken.",
+      "issue_description": "Het doel is te beperkt geformuleerd. Hugo benadrukt dat het niet alleen om concrete antwoorden gaat, maar specifiek om richting geven, misverstanden voorkomen en het achterhalen van waarden voor de verkoopdoelstelling.",
+      "transcript_evidence": [
+        "om richting te geven aan het gesprek, om misverstanden te voorkomen, om interpretaties te gaan vermijden",
+        "want ik wil weten waar hij een waarde hecht, want als ik geen waarde kan creëren, kan ik geen commitment vragen"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.3",
+      "field": "hoe",
+      "current_value": "Geef klant expliciete keuze tussen twee opties.",
+      "proposed_value": "Geef klant expliciete keuze tussen twee opties, waarbij je begint met een werkwoord of hulpwerkwoord om richting te geven aan het gesprek.",
+      "issue_description": "Hugo benadrukt specifiek dat je moet beginnen met een werkwoord of hulpwerkwoord, wat een belangrijke technische detail is die ontbreekt in de huidige beschrijving.",
+      "transcript_evidence": [
+        "en hier begin ik wel met een werkwoord of een hulpwerkwoord, want ik wil richting geven aan het gesprek"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.4",
+      "field": "wanneer",
+      "current_value": "Bij vroege bezwaren of vragen over nadelen.",
+      "proposed_value": "Bij te hoge verwachtingen of wanneer gesprekspartner zelf vragen stelt om controle te behouden.",
+      "issue_description": "De SSOT spreekt alleen over bezwaren en vragen over nadelen, maar Hugo beschrijft twee specifieke situaties: te hoge verwachtingen en controlevragen van de gesprekspartner.",
+      "transcript_evidence": [
+        "wanneer uw gesprekspartner op het begin van het gesprek naar aanleiding van uw feit- of meningsrichtende vraag een te hoge verwachting heeft",
+        "Of het zou ook kunnen wanneer hij zelf begint vragen te stellen. Want dat gebeurt natuurlijk ook, dat uw gesprekspartner begint vragen te stellen om de controle over het gesprek te houden"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.4",
+      "field": "voorbeeld",
+      "current_value": "1. Onafgezien de prijs... wat vindt u nog belangrijk?\n2. Goede vraag, hou dat even bij, maar laat mij eerst eens vragen...",
+      "proposed_value": "1. Meneer, maar onafgezien deze verwachting, wat verwacht u nog?\n2. Meneer, interessante vraag, belangrijke vraag, maar houd deze vraag bij. We komen daar uitgebreid later op terug.",
+      "issue_description": "De SSOT voorbeelden komen niet overeen met de specifieke formuleringen die Hugo gebruikt in het transcript.",
+      "transcript_evidence": [
+        "Meneer, maar onafgezien-- onafgezien deze verwachting, wat verwacht u nog?",
+        "Meneer, interessante vraag, belangrijke vraag, maar houd deze vraag bij. We komen daar uitgebreid later op terug"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.5",
+      "field": "doel",
+      "current_value": "De klant vragen teruggeven om hem aan het praten te krijgen.",
+      "proposed_value": "Schijninstemming doorprikken en echte mening/standpunt van klant achterhalen.",
+      "issue_description": "Het transcript focust specifiek op het doorprikken van 'ogenschijnlijk positieve antwoorden' waar klanten geen duidelijk standpunt innemen, niet op het algemeen aan het praten krijgen van klanten.",
+      "transcript_evidence": [
+        "Dikwijls geeft de klant ogenschijnlijk positieve antwoorden, maar uiteindelijk geen duidelijk standpunt",
+        "deze schijn instemming"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.5",
+      "field": "wat",
+      "current_value": "Doorvragen op antwoorden van klant om volledige duidelijkheid te krijgen.",
+      "proposed_value": "Het antwoord van de klant gebruiken als springplank voor een wedervraag om te achterhalen wat hij werkelijk bedoelt.",
+      "issue_description": "Het transcript beschrijft een specifiekere methodiek waarbij het antwoord als 'springplank voor een wedervraag' wordt gebruikt, niet algemeen doorvragen voor duidelijkheid.",
+      "transcript_evidence": [
+        "we het antwoord gaan gebruiken als springplank voor een wedervraag gaan stellen"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.5",
+      "field": "waarom",
+      "current_value": "Om misverstanden of vage antwoorden te vermijden.",
+      "proposed_value": "Om schijninstemming te herkennen en te doorprikken omdat klanten niet altijd zeggen wat ze bedoelen.",
+      "issue_description": "Het transcript benadrukt specifiek het probleem van schijninstemming en het feit dat 'men zegt niet altijd wat men bedoelt', niet algemene misverstanden.",
+      "transcript_evidence": [
+        "Want men zegt niet altijd wat men bedoelt. Men bedoelt niet altijd wat men zegt",
+        "deze schijn instemming niet gehoord hebben"
+      ],
+      "confidence": 0.88,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.6",
+      "field": "hoe",
+      "current_value": "Gebruik technieken als ondersteuning, aansporing, empathie tonen, herhalen/parafraseren.",
+      "proposed_value": "Gebruik technieken als ondersteuning, aansporing, empathie tonen, herhalen/parafraseren, samenvatten en stilte inbouwen.",
+      "issue_description": "Het transcript noemt specifiek 'samenvatten' en 'stilte inbouwen' als belangrijke technieken, die niet expliciet genoemd zijn in de huidige omschrijving.",
+      "transcript_evidence": [
+        "Door gaan samen te vatten van 'dat zijn mijn heren, als ik u goed begrijp. Vindt u dat of dat belangrijk hier?' Het kan ook zijn door, door stilte in te bouwen."
+      ],
+      "confidence": 0.88,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.1.6",
+      "field": "voorbeeld",
+      "current_value": "1. Hm, hoofdknikken, interesse laten blijken\n2. Dus u bedoelt ...\n3. Dat begrijp ik, daar kan ik inkomen.",
+      "proposed_value": "1. Hm, hoofdknikken, interesse laten blijken\n2. Als ik u goed begrijp...\n3. O ja, echt waar\n4. Dat begrijp ik, daar kan ik inkomen.",
+      "issue_description": "Het transcript geeft specifieke voorbeelden die beter aansluiten bij Hugo's exacte bewoordingen, inclusief 'O ja, echt waar' en de specifieke samenvatting-formulering.",
+      "transcript_evidence": [
+        "Door gaan samen te vatten van 'dat zijn mijn heren, als ik u goed begrijp. Vindt u dat of dat belangrijk hier?' Het kan ook zijn door te zeggen 'O ja, echt waar'."
+      ],
+      "confidence": 0.82,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.2",
+      "field": "voorbeeld",
+      "current_value": "1. Indien u met de ervaring die u hebt, die beslissing zou kunnen hernemen, wat zou u anders doen?\n2. Stel dat u voor een vergelijkbare situatie komt te staan, hoe zou u dat aanpakken?",
+      "proposed_value": "1. Indien u met de ervaring die ge hebt die beslissing zou kunnen nemen, wat zou je anders of beter kunnen doen?\n2. Maar indien u de mogelijkheid hebben om nauwkeuriger de metingen te kunnen doen, hè, voor uw cliënteel, huisartsen of ziekenhuizen. Wat zou u of uw cliënteel daarvan kunnen vinden?\n3. Maar stel dat u morgen de vraag krijgt van een hospitaal die nauwkeurig moeten, moeten de metingen hebben van de bloedstalen, wat dan ook.",
+      "issue_description": "De voorbeelden in SSOT komen niet exact overeen met wat Hugo letterlijk zegt in het transcript. Hij gebruikt andere formuleringen en geeft meer concrete voorbeelden.",
+      "transcript_evidence": [
+        "Indien u meneer met de ervaring die ge hebt die beslissing zou kunnen nemen, wat zou je anders of beter kunnen doen?",
+        "Maar indien u de mogelijkheid hebben om nauwkeuriger de metingen te kunnen doen, hè, voor uw cliënteel, huisartsen of ziekenhuizen. Wat zou u of uw cliënteel daarvan kunnen vinden?",
+        "Maar stel dat u morgen de vraag krijgt van een hospitaal die nauwkeurig moeten, moeten de metingen hebben van de bloedstalen, wat dan ook."
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.3",
+      "field": "doel",
+      "current_value": "De klant bewust maken van de gevolgen van zijn huidige situatie of van niet-handelen.",
+      "proposed_value": "De pijnpunten maximaliseren en de impact van mogelijke pijnpunten of nieuwe opportuniteiten concretiseren en personaliseren.",
+      "issue_description": "Hugo beschrijft het doel specifieker als het maximaliseren van pijnpunten en het concretiseren/personaliseren van impact, niet alleen bewustmaking van gevolgen.",
+      "transcript_evidence": [
+        "Dat zijn de vragen die die pijnpunten gaan maximaliseren",
+        "We gaan deze impact van de mogelijke pijnpunten of de het, het verwerven van die nieuwe opportuniteiten gaan maximaliseren, gaan concretiseren",
+        "We gaan de impact gaan personaliseren, er een cijfer op zetten, concretiseren, maximaliseren"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.3",
+      "field": "wat",
+      "current_value": "Vraag naar de consequenties of gevolgen van een situatie voor de klant.",
+      "proposed_value": "Vragen die de impact van pijnpunten of nieuwe opportuniteiten maximaliseren, concretiseren en personaliseren op financieel, operationeel of emotioneel vlak.",
+      "issue_description": "Hugo benadrukt dat het niet alleen om gevolgen vragen gaat, maar om het maximaliseren en concretiseren van impact op verschillende vlakken.",
+      "transcript_evidence": [
+        "Dat zijn de vragen die die pijnpunten gaan maximaliseren",
+        "We gaan de impact gaan personaliseren, er een cijfer op zetten, concretiseren, maximaliseren",
+        "want dat kan op financieel vlak zijn, operationeel vlak, emotioneel vlak"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.3",
+      "field": "waarom",
+      "current_value": "Om de klant bewust te maken van de impact en urgentie te creëren.",
+      "proposed_value": "Om pijnpunten te maximaliseren en impact te concretiseren door de klant zelf te laten reflecteren via reverse thinking, zodat het gepersonaliseerd wordt.",
+      "issue_description": "Hugo legt meer nadruk op maximaliseren van pijnpunten en gepersonaliseerde aanpak via zelfreflectie dan alleen bewustmaking en urgentie.",
+      "transcript_evidence": [
+        "Dat zijn de vragen die die pijnpunten gaan maximaliseren",
+        "Het moet van mijn klant komen naar aanleiding van mijn reverse thinking aan zelfreflectie te gaan doen",
+        "Wij zijn meer voorstander van een gepersonaliseerde, uh, aanpak te doen"
+      ],
+      "confidence": 0.8,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "2.4",
+      "field": "wat",
+      "current_value": "Een controlevraag waarmee je bevestigt of je de visie, verwachtingen of pijnpunten van de klant goed begrepen hebt.",
+      "proposed_value": "Een resumé/herformulering van hetgeen wat je gezien hebt - wat de klant belangrijk vindt om te verwerven en te vermijden.",
+      "issue_description": "Hugo beschrijft commitment specifieker als een resumé maken en herformuleren, niet alleen als controlevraag voor begrip",
+      "transcript_evidence": [
+        "Dat ik een resumé ga maken? Het herformuleren van hetgeen wat we gezien hebben",
+        "U vond het belangrijk om dat te verwerven, om dat te vermijden. Het is een soort van controlevraag die ik ga stellen"
+      ],
+      "confidence": 0.8,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "3.1",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 3.1 — Empathie tonen",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "3.2",
+      "field": "naam",
+      "current_value": "Oplossing presenteren",
+      "proposed_value": "OVB techniek",
+      "issue_description": "Hugo gebruikt consequent de term 'OVB techniek' voor fase 3, niet 'Oplossing presenteren'",
+      "transcript_evidence": [
+        "Via onze OVB techniek, OVB techniek. En dat staat dus voor wat enerzijds de oplossing",
+        "Door onze OVB, onze oplossing naar voor brengen, de voordelen en de baten",
+        "In fase drie heb ik mijn OVB techniek"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "3.2",
+      "field": "wat",
+      "current_value": "Presenteer je oplossing of product als antwoord op de klantbehoefte.",
+      "proposed_value": "Breng je oplossing naar voor met de voordelen en baten, gebaseerd op de impact uit fase 2",
+      "issue_description": "Hugo benadrukt dat de baten komen van de impact uit probing vragen, niet alleen als antwoord op behoefte",
+      "transcript_evidence": [
+        "Door onze OVB, onze oplossing naar voor brengen, de voordelen en de baten. Maar vanwaar komen de baten? De baten komen niet van mij. De baten komen van waar? Van de impact die ik uitgelokt heb naar aanleiding van mijn probing vragen"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "3.2",
+      "field": "waarom",
+      "current_value": "Om de klant te laten zien dat jouw aanbod past bij wat hij zoekt.",
+      "proposed_value": "Om een gepersonaliseerde oplossing te geven gebaseerd op de impact die je hebt gemaximaliseerd",
+      "issue_description": "Hugo benadrukt gepersonaliseerde oplossingen gebaseerd op impact, niet alleen laten zien dat het past",
+      "transcript_evidence": [
+        "Waar wij ons differentiëren is dat we een gepersonaliseerde oplossing geven En die komt van de impact die ik gemaximaliseerd heb geconcretiseerd"
+      ],
+      "confidence": 0.8,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "3.2",
+      "field": "hoe",
+      "current_value": "Verbind je product/dienst aan de behoefte die je hebt geïdentificeerd.",
+      "proposed_value": "Benoem een eigenschap van je oplossing die antwoord geeft op de verwachting uit fase 2, geef het generieke voordeel, en leg de baten uit gebaseerd op de impact",
+      "issue_description": "Hugo beschrijft een specifieke OVB-structuur: eigenschap → voordeel → baten, niet alleen verbinden aan behoefte",
+      "transcript_evidence": [
+        "En u benoemt een eigenschap, een passende eigenschap van die oplossing die een antwoord geeft aan de verwachting die we gedetecteerd hebben in fase twee. Dan gaan we daar het generiek het algemeen voordeel van geven. Hé, want we zeggen wat betekent mijn eigenschap in functie van uw verwachting die we gedetecteerd hebben in fase twee om dan de baten"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "3.3",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 3.3 — Voordeel benoemen",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "3.4",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 3.4 — Baat vertalen",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "3.5",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 3.5 — Mening vragen + standpunt (of koopsignaal) onder alternatieve vorm uitlokken",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "3.6",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 3.6 — Technisch voorrekenen",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "3.7",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 3.7 — Vat baten samen",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.1",
+      "field": "doel",
+      "current_value": "Signalen van twijfel, bezwaar, uitstel of angst tijdig detecteren.",
+      "proposed_value": "Testen of de klant mentaal klaar is voor aankoop en verborgen twijfels/bezwaren naar boven halen.",
+      "issue_description": "Het huidige doel focust op detecteren van signalen, maar Hugo benadrukt dat het primaire doel is testen of de klant mentaal klaar is, en dat eventuele verborgen bezwaren juist naar boven moeten komen.",
+      "transcript_evidence": [
+        "Ik ga een proefafsluiting doen. Een proefafsluiting, een proefafsluiting is niet bedreigend",
+        "Dat betekent dat er onderliggend nog heel wat verdoken, euh, twijfels, bezwaren kunnen zitten die allemaal naar boven kunnen komen"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.1",
+      "field": "hoe",
+      "current_value": "Je stelt een vraag die polst naar de bereidheid tot aankoop, zonder druk te zetten.",
+      "proposed_value": "Je gebruikt altijd indientechniek gecombineerd met een alternatieve afsluiting, wat nooit bedreigend kan zijn.",
+      "issue_description": "Hugo specificeert dat een proefafsluiting altijd met indientechniek plus alternatieve afsluiting wordt gedaan, wat veel specifieker is dan alleen 'een vraag stellen'.",
+      "transcript_evidence": [
+        "Een proefafsluiting is niet bedreigend en is altijd met indientechniek, hè, indientechniek plus een alternatieve afsluiting",
+        "Indien we tot een samenwerking komen, zouden we dat dan zo doen of zo doen?"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2",
+      "field": "wat",
+      "current_value": "Het herkennen en behandelen van de 6 typen klantweerstand die de koop kunnen blokkeren.",
+      "proposed_value": "Het herkennen en behandelen van de 5 typen klantweerstand die de koop kunnen blokkeren.",
+      "issue_description": "Hugo noemt 5 typen weerstand (vragen, twijfels, uitstel, bezwaren, angst), niet 6. Hij noemt geen 'risico' als apart type.",
+      "transcript_evidence": [
+        "hij stelt vragen. Of hij kan zeggen ja, meneer de verkoper, allemaal interessant, maar hij heeft bepaalde twijfels",
+        "hij heeft een uitstelgedrag",
+        "hij heeft bezwaren",
+        "angst om een beslissing te nemen"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2",
+      "field": "voorbeeld",
+      "current_value": "1. Klant vraagt info → 4.2.1 Vragen behandelen\n2. Klant twijfelt → 4.2.2 Twijfels behandelen\n3. Klant wil uitstellen → 4.2.3 Uitstel behandelen\n4. Klant heeft bezwaar → 4.2.4 Bezwaren behandelen\n5. Klant heeft angst → 4.2.5 Angst/bezorgdheden behandelen\n6. Klant weegt risico's → 4.2.6 Risico-inschatting behandelen",
+      "proposed_value": "1. Klant vraagt info → 4.2.1 Vragen behandelen\n2. Klant twijfelt → 4.2.2 Twijfels behandelen\n3. Klant wil uitstellen → 4.2.3 Uitstel behandelen\n4. Klant heeft bezwaar → 4.2.4 Bezwaren behandelen\n5. Klant heeft angst → 4.2.5 Angst/bezorgdheden behandelen",
+      "issue_description": "Het zesde punt over 'risico-inschatting' wordt niet genoemd door Hugo. Hij bespreekt alleen 5 typen afritten.",
+      "transcript_evidence": [
+        "hij stelt vragen",
+        "hij heeft bepaalde twijfels",
+        "hij heeft een uitstelgedrag",
+        "hij heeft bezwaren",
+        "angst om een beslissing te nemen"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.1",
+      "field": "stappenplan",
+      "current_value": "1. Bij meerdere opties: gebruik pingpongtechniek.\n2. Bij één optie: geef antwoord, vraag mening/commitment/proefafsluiting.\n3. Nooit terzijde schuiven in deze fase.",
+      "proposed_value": "1. Bij meerdere opties: stel wedervraag.\n2. Bij één optie: geef info plus standpunt uitlokken, OF info plus proefafsluiting (alternatieve vorm).\n3. Nooit parkeren in deze fase.",
+      "issue_description": "Het stappenplan gebruikt 'pingpongtechniek' terwijl Hugo spreekt over 'wedervraag', en 'terzijde schuiven' terwijl Hugo spreekt over 'parkeren'",
+      "transcript_evidence": [
+        "Ofwel ga ik een wedervraag stellen, een wedervraag",
+        "Ofwel kan ik info geven. Info plus een standpunt die ik kan uitlokken",
+        "ofwel geef ik info plus een proefafsluiting, altijd onder een afsluiting, altijd onder een alternatieve vorm",
+        "Maar ik zit dus in fase vier. Ik kan niet blijven parkeren"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.1",
+      "field": "voorbeeld",
+      "current_value": "1. U vraagt naar de garantie: bedoelt u garantie op onderdelen of op afwerking?\n2. Als u vandaag zou moeten kiezen tussen deze twee opties, wat zou het dan worden?",
+      "proposed_value": "1. Meerdere opties: \"Meneer, welke kleur wenst u?\"\n2. Één optie + standpunt: \"Meneer, ik kan ze leveren in de blauwe kleur. Is dat wat u zoekt? Ligt dat in uw planning?\"\n3. Één optie + proefafsluiting: \"Meneer, wij kunnen ze leveren in de blauwe kleur. Indien u dan beslist voor deze type van blauwe kleur, neemt u ze per zes stuks of twaalf stuks.\"",
+      "issue_description": "De voorbeelden komen niet overeen met Hugo's pennenvoorbeeld uit het transcript",
+      "transcript_evidence": [
+        "Wanneer u alle kleuren hebt, dan zou u kunnen zeggen: \"Meneer, welke kleur wenst u's, hè?\"",
+        "\"Meneer, ik kan ze leveren in de blauwe kleur. Is dat wat u zoekt? Ligt dat in uw planning?\"",
+        "\"Meneer, wij kunnen ze leveren in de blauwe kleur. Indien u dan beslist voor deze type van blauwe kleur, neemt u ze per zes stuks of twaalf stuks.\""
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.2",
+      "field": "doel",
+      "current_value": "De klant helpen zijn onzekerheid te overwinnen.",
+      "proposed_value": "Bepalen of het een oprechte twijfel of een verdoken bezwaar is, en commitment verkrijgen.",
+      "issue_description": "Het doel focust op 'onzekerheid overwinnen' maar Hugo benadrukt dat het primaire doel is om te onderscheiden tussen oprechte twijfels en verdoken bezwaren.",
+      "transcript_evidence": [
+        "Dus in een eerste fase is dan belangrijk om te weten is het een oprechte twijfel of ligt er onderliggend een bezwaar?",
+        "Vooral is belangrijk om te kijken is het een echte bezorgdheid of ligt er onderliggend een bezwaar?"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.2",
+      "field": "wanneer",
+      "current_value": "Zodra klant twijfelt of twijfels uit.",
+      "proposed_value": "In fase 3 (bij OVB) en fase 4 (beslissingsfase).",
+      "issue_description": "De SSOT geeft geen specifieke fases aan, maar Hugo is heel expliciet over wanneer twijfels kunnen optreden.",
+      "transcript_evidence": [
+        "In welke fase kunnen we daarmee geconfronteerd worden? Enkel in fase drie en in fase vier. En waarom in fase drie? Omdat we daar met onze OVB naar voren komen of in fase uh vier."
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.3",
+      "field": "fase",
+      "current_value": "4",
+      "proposed_value": "4 (hesitation fase)",
+      "issue_description": "Hugo specificeert dat uitstelgedrag zich situeert in de hesitation fase tussen 11 en 12 uur op de buying clock, wat bevestigt dat het fase 4 is maar met meer precisie",
+      "transcript_evidence": [
+        "Uitstelgedrag situeert zich wanneer uw gesprekspartner zich situeert op zijn buy-in klok tussen elf uur en twaalf uur",
+        "En tussen elf uur en twaalf uur zit hij in de hesitation fase"
+      ],
+      "confidence": 0.95,
+      "status": "ok",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.3",
+      "field": "stappenplan",
+      "current_value": "1. Check: Is dit een VOORWAARDE of een VOORWENDSEL?\n2. Bij voorwaarde (echt nodig): Empathie tonen en Action Plan maken.\n3. Bij voorwendsel (excuus): Doorvragen 'Onafgezien [uitstelreden], wat zou u beslissing zijn?'\n4. Analyseren: 'Wat houdt u eigenlijk tegen?' - zoek onderliggende angst of bezwaar.\n5. Bij onderliggend bezwaar: Doorverwijzen naar 4.2.4 Bezwaren behandelen.\n6. Bij onderliggende angst: Doorverwijzen naar 4.2.5 Angst behandelen.\n7. Action Plan: Maak concrete follow-up met datum, tijd en wie wat doet.",
+      "proposed_value": "1. Empathie tonen en uitstel analyseren via exploratievragen\n2. Commitment vragen om voorwaarde vs voorwendsel te detecteren\n3. Bij positieve reactie op commitment: vervolgafspraak maken (alternatieve vorm/opschortende voorwaarden/optie)\n4. Bij negatieve reactie op commitment: onderliggende bezwaren behandelen",
+      "issue_description": "Hugo beschrijft een andere volgorde: eerst empathie + exploratievragen, dan commitment vragen, en pas daarna bepalen of het voorwaarde of voorwendsel is op basis van de reactie",
+      "transcript_evidence": [
+        "Tuurlijk begrijp ik dat, ik ga empathie tonen, maar ik ga dat moeten gaan analyseren",
+        "Dan gaan we een commitment vragen",
+        "Door een commitment te vragen. Door te zeggen: meneer, maar onafgezien de mening van die derde partij, op een schaal van tien",
+        "Geeft u me daar een positieve reactie op? Wat doen we dan? Dan ga ik naar een vervolgafspraak",
+        "Zegt hij op mijn commitment een negatieve reactie Wat betekent dat? Ja, dat er onderliggend een bezwaar is"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.4",
+      "field": "stappenplan",
+      "current_value": "1. Empathie: 'Ik begrijp dat dit belangrijk voor u is.' 2. EPIC Analyseren: 'Tegenover wie? Tegenover wat? Hoeveel precies? Over welke periode?' 3. Isoleren: 'Als ik u goed begrijp, is het dus ENKEL een kwestie van [bezwaar] dat u weerhoudt?' 4. Neutraliseren: 'Onafgezien [bezwaar], naar waar zou uw voorkeur uitgaan? Waarom?' 5. Maximaliseren (Pencil Selling): 'Wat betekent [baat A, B, C] voor u?' - voor promotors: verwerven, voor analyseerders: vermijden. 6. Minimaliseren (Afweegtechniek): Bereken bezwaar per maand/jaar. 'Weegt €X per maand op tegen [baten]?' 7. Afsluiten: Ga terug naar proefafsluiting of indien-techniek.",
+      "proposed_value": "1. Analyseren: Het bezwaar bevragen via exploratie (vraagherinning, feitgericht, meningsgericht, pingpongtechniek, actief luisteren) 2. Isoleren: 'Als ik u goed begrijp, is het dus enkel een kwestie van [bezwaar] dat u weerhoudt om nu een beslissing te nemen.' 3. Neutraliseren: 'Onafgezien [bezwaar], naar waar zou uw voorkeur uitgaan? Bij wie ga je dan het vertrouwen geven?' 4. Maximaliseren: 'Wat betekent dat, deze baten van mijn oplossing gedurende [periode] hebben of niet hebben?' 5. Minimaliseren (Afweegtechniek): Visueel voorstellen - ofwel concurrent (goedkoper maar zonder baten) ofwel ons (wel baten maar meer betalen) 6. Psychologische stilte: De persoon die het eerste praat, is verloren",
+      "issue_description": "Het stappenplan mist de empathie-stap die Hugo niet noemt, en de volgorde en formulering wijken af van Hugo's werkelijke aanpak. Hugo begint direct met analyseren/bevragen, niet met empathie.",
+      "transcript_evidence": [
+        "We gaan eerst eens kijken naar: wat gaan we doen wanneer we geconfronteerd worden met een bezwaar? We gaan het bezwaar in een eerste fase gaan analyseren. Analyseren, ja? En wie zegt analyseren, die zegt wat? Bevragen.",
+        "Dan ga ik het bezwaar gaan isoleren. Isoleren, met de bedoeling van het duidelijk af te bakenen, verifiëren ofdat het enige bezwaar bijvoorbeeld prijs is.",
+        "Dan gaan we het gaan neutraliseren.",
+        "Dat ga ik gaan maximaliseren door te zeggen: 'Nee, maar wat betekent dat, deze baten, hè, van mijn oplossing?'",
+        "U houdt een psychologische stilte. Heel belangrijk, want de persoon die het eerste praat, is verloren, zoals wij dat altijd zeggen."
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.5",
+      "field": "hoe",
+      "current_value": "Referentieverhaal, Pro & Contra techniek, Up and Down Stairs techniek.",
+      "proposed_value": "EPICC-techniek: bevragen via exploratievragen (situationele vragen), probingvragen, impact vragen, commitment vragen.",
+      "issue_description": "Hugo beschrijft een compleet andere methodiek dan wat in de SSOT staat. Hij gebruikt de EPICC-techniek met specifieke vraagtypen, niet de genoemde referentieverhalen of Pro & Contra techniek.",
+      "transcript_evidence": [
+        "Altijd inderdaad volgens onze EPICC-techniek",
+        "We gaan deze bezorgdheid gaan bevragen. En wie zegt bevragen is... Via onze exploratie, onze exploratievragen",
+        "Dan gaan we daar een probingvraag omtrent doen",
+        "Dan ga ik daar omtrent de impact van vragen",
+        "om dan een commitment te vragen"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.5",
+      "field": "voorbeeld",
+      "current_value": "1. Ik begrijp uw bezorgdheid. Mag ik u een verhaal vertellen van een andere klant?\n2. Laten we de voor- en nadelen eens op een rijtje zetten.",
+      "proposed_value": "1. Meneer, ik begrijp dat natuurlijk, hè. Ik begrijp uw bezorgdheid, maar mag ik eens vragen, wat zou er volgens u kunnen mislopen?\n2. Maar indien u vandaag zou beslissen, hoe groot acht u de kans dat het niet loopt zoals u het verwacht?\n3. Wat betekent uitstel voor uw spaarcenten op lange termijn met een inflatie van twee à drie procent?\n4. Wat heeft u vandaag nog nodig om de volgende stap te kunnen zetten?",
+      "issue_description": "De voorbeelden in de SSOT komen niet overeen met Hugo's concrete voorbeelden uit het transcript. Hugo geeft geen referentieverhalen maar gebruikt specifieke vragen volgens de EPICC-methode.",
+      "transcript_evidence": [
+        "Meneer, ik begrijp dat natuurlijk, hè. Hè, ik begrijp uw bezorgdheid, maar mag ik eens vragen, wat zou er volgens u kunnen mislopen?",
+        "Maar indien u vandaag zou beslissen, hoe groot acht u de kans, eh, dat het niet loopt zoals u het verwacht?",
+        "wat betekent uitstel voor uw, uw spaarcenten op lange termijn met een inflatie van twee à drie procent?",
+        "wat heeft u vandaag nog nodig om de volgende stap te kunnen zetten"
+      ],
+      "confidence": 0.92,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.5",
+      "field": "stappenplan",
+      "current_value": "1. Referentie Story: Deel een vergelijkbaar succesverhaal van een andere klant.\n2. Pro & Contra techniek: Zet voordelen en nadelen samen op een rijtje.\n3. Up and Down Stairs techniek: Laat klant scenario's zien van wel/niet beslissen.",
+      "proposed_value": "1. Bevraging: Stel exploratievragen om de bezorgdheid te begrijpen\n2. Probing: Stel probingvragen om dieper te gaan\n3. Impact: Vraag naar de impact van uitstel/niet beslissen\n4. Commitment: Vraag wat er nodig is voor de volgende stap",
+      "issue_description": "Het stappenplan in de SSOT beschrijft technieken die Hugo niet noemt. Hij volgt de EPICC-methode met bevraging, probing, impact en commitment.",
+      "transcript_evidence": [
+        "We gaan deze bezorgdheid gaan bevragen",
+        "Dan gaan we daar een probingvraag omtrent doen",
+        "Dan ga ik daar omtrent de impact van vragen",
+        "om dan een commitment te vragen"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.2.6",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 4.2.6 — Risico-inschatting behandelen",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.ABC",
+      "field": "waarom",
+      "current_value": "Je test voortdurend of de klant mee is, stuurt richting beslissing zonder druk, en voorkomt dat je te laat afsluit.",
+      "proposed_value": "Je test voortdurend of de klant mee is, stuurt richting beslissing zonder druk, en voorkomt dat je te laat afsluit. De verkoop begint wanneer de gesprekspartner neen zegt - het is belangrijk dat klanten oprecht ja zeggen en niet alleen ja zeggen terwijl ze neen denken.",
+      "issue_description": "Hugo benadrukt expliciet dat de verkoop pas echt begint bij 'neen' en dat oppervlakkige 'ja' antwoorden waardeloos zijn. Dit belangrijke aspect ontbreekt in de huidige waarom-beschrijving.",
+      "transcript_evidence": [
+        "De verkoop begint wanneer uw gesprekspartner neen zegt. Tuurlijk is het de bedoeling om uw gesprekspartner ja te zeggen. We hebben al deze technieken om hem later ja te zeggen. Maar wat bet-- wat baat het dat hij ja zegt en neen denkt?"
+      ],
+      "confidence": 0.88,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.INDIEN",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 4.INDIEN — Indien-techniek",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.3",
+      "field": "doel",
+      "current_value": "De verkoop definitief afronden.",
+      "proposed_value": "De koop sluiten wanneer alle criteria voldaan zijn",
+      "issue_description": "Hugo benadrukt dat afsluiten alleen mag wanneer alle criteria voldaan zijn, niet alleen definitief afronden",
+      "transcript_evidence": [
+        "Er is maar één moment, het 'nu' moment. Het 'nu' moment wanneer alle criteria voldaan zijn. Anders kan ik natuurlijk niet afsluiten, want dan kom ik agressief over"
+      ],
+      "confidence": 0.8,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.3",
+      "field": "hoe",
+      "current_value": "Samenvatten → Koppelen → CVP bevestigen → Alternatieve keuze → Order schrijven.",
+      "proposed_value": "Mentale attitude (uitgaan van gesloten koop) → Resumé van alle OVB's → Proefafsluiting/Alternatieve afsluiting → Definitieve afsluiting (documenten)",
+      "issue_description": "Hugo beschrijft een andere volgorde: eerst mentale attitude, dan resumé van OVB's, dan alternatieve afsluiting",
+      "transcript_evidence": [
+        "Dan gaan we natuurlijk naar de mentale attitude. Ik ga ervan uit dat de koop gesloten is",
+        "We gaan nog eens een resumé maken van alle OVB's",
+        "En dan vraag ik een afsluiting. Dat kan onder een proefafsluiting zijn Altijd onder een alternatieve vorm"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.3",
+      "field": "stappenplan",
+      "current_value": "1) Samenvatten in klantwoorden (4.3.1) → bevestiging krijgen\n2) Verwachtingen ↔ oplossing koppelen (4.3.2) → logica van keuze tonen\n3) CVP bevestigen: klantwaarde scherp stellen (4.3.3)\n4) Finale alternatieve keuze stellen (4.3.4) (non-threatening)\n5) Order schrijven en concretiseren (4.3.5) ('wie schrijft, die blijft')",
+      "proposed_value": "1) Mentale attitude: uitgaan van gesloten koop\n2) Resumé maken van alle OVB's (gepersonaliseerde baten)\n3) Proefafsluiting of alternatieve afsluiting stellen\n4) Bij akkoord: definitieve afsluiting met documenten",
+      "issue_description": "Het stappenplan komt niet overeen met Hugo's beschreven proces dat begint met mentale attitude en resumé van OVB's",
+      "transcript_evidence": [
+        "Dan gaan we natuurlijk naar de mentale attitude. Ik ga ervan uit dat de koop gesloten is",
+        "We gaan nog eens een resumé maken van alle OVB's, van alle baten die we-- de gepersonaliseerde baten die we besproken hebben. En dan vraag ik een afsluiting"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.3.1",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 4.3.1 — Samenvatten in klantwoorden",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.3.2",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 4.3.2 — Verwachtingen-oplossing koppeling",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.3.3",
+      "field": "naam",
+      "current_value": "CVP bevestigen (Customer Value Proposition)",
+      "proposed_value": "Customer value creëren",
+      "issue_description": "Hugo spreekt over 'customer value gecreëerd hebt' en 'customer value is de perceptie van de klant', niet over het bevestigen van een CVP maar over het creëren ervan",
+      "transcript_evidence": [
+        "het is omdat u geen waarde hebt gecreëerd, customer value gecreëerd hebt",
+        "En wat is customer value? Customer value is de perceptie van de klant over wat uw oplossing oplevert"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.3.3",
+      "field": "doel",
+      "current_value": "De baten nog één keer concreet benoemen voor de finale beslissing.",
+      "proposed_value": "Customer value creëren door gepersonaliseerde oplossingen",
+      "issue_description": "Hugo legt uit dat het doel is om customer value te creëren, niet om baten te benoemen voor een finale beslissing",
+      "transcript_evidence": [
+        "Het wordt gekon-- het wordt gecreëerd door een gepersonaliseerde oplossing"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.3.3",
+      "field": "wat",
+      "current_value": "Bevestig de baten nog één keer: wat de klant concreet wint met jouw oplossing.",
+      "proposed_value": "Customer value creëren door de perceptie van wat je oplossing oplevert versus alternatieven",
+      "issue_description": "Hugo definieert customer value als 'de perceptie van de klant over wat uw oplossing oplevert, versus de mogelijke, eh, alternatieve concurrentie', niet als het bevestigen van baten",
+      "transcript_evidence": [
+        "Customer value is de perceptie van de klant over wat uw oplossing oplevert, versus de mogelijke, eh, alternatieve concurrentie"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.3.4",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 4.3.4 — Alternatieve keuze (finale)",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "technieken_index.json",
+      "item_id": "4.3.5",
+      "field": "transcript_coverage",
+      "current_value": "",
+      "issue_description": "Geen videotranscript gevonden voor techniek 4.3.5 — Order schrijven",
+      "transcript_evidence": [],
+      "confidence": 1,
+      "status": "ok",
+      "no_transcript_coverage": true
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H1",
+      "field": "semantic_markers",
+      "current_value": "offer_fit, matches_offer_criteria, within_thresholds, desired_outcome_present, preference_aligns, dat is exact wat ik zoek, dat is belangrijk voor ons, precies dat, dat past, dat sluit aan, dat helpt, dat lost op, dat is voldoende, dat is oké",
+      "proposed_value": "offer_fit, matches_offer_criteria, within_thresholds, desired_outcome_present, preference_aligns, dat is exact wat ik zoek, dat is belangrijk voor ons, precies dat, dat past, dat sluit aan, dat helpt, dat lost op, dat is voldoende, dat is oké, zonder zorgen, dat is prima",
+      "issue_description": "De semantic_markers missen enkele uitdrukkingen die Hugo expliciet noemt als voorbeelden van klantantwoorden in zijn transcripten",
+      "transcript_evidence": [
+        "Bijvoorbeeld: \"Mijnheer, euh, indien u een investering zou doen, bijvoorbeeld, wat verwacht u?\" Dan kunnen we zeggen: \"Zonder zorgen.\"",
+        "\"3% netto vast is prima, ik hoef geen 6%.\""
+      ],
+      "confidence": 0.75,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H2",
+      "field": "semantic_markers",
+      "current_value": "offer_mismatch, outside_thresholds, expects_more_than_offer, missing_must_have, preference_conflicts, minstens, liefst hoger, dat is te weinig, dat voldoet niet, dat past niet, ik zoek iets anders, ik wil 6%, ik verwacht meer, niet interessant voor ons",
+      "proposed_value": "te hoge verwachting, interventietijd, precisie van meting, binnen vier uur, binnen zes uur, nul komma nul vijf, kan het natuurlijk niet, beperkt is, niet kunnen aandoen, parkeren, terzijdeschuiven",
+      "issue_description": "De huidige semantic_markers bevatten geen enkele term uit Hugo's eigen vocabulaire. Hugo gebruikt specifieke technische termen zoals 'te hoge verwachting', 'parkeren', 'terzijdeschuiven' en concrete B2B-voorbeelden zoals interventietijden en precisie van metingen.",
+      "transcript_evidence": [
+        "wanneer uw gesprekspartner op het begin van het gesprek naar aanleiding van uw feit- of meningsrichtende vraag een te hoge verwachting heeft",
+        "Uw gesprekspartner heeft een verwachting of een situatie waar ik n-niet beter op ben. Wat gaan we dan doen? Dan gaan we dat parkeren",
+        "Dus dat is onze vaardigheid van terzijdeschuiven"
+      ],
+      "confidence": 0.92,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H3",
+      "field": "semantic_markers",
+      "current_value": "surface_agreement, noncommittal_positive, hedging, misschien, zou kunnen, in overweging nemen, hangt ervan af, dat klinkt goed, we zullen zien, lijkt interessant, eventueel",
+      "proposed_value": "surface_agreement, noncommittal_positive, hedging, misschien, zou kunnen, in overweging nemen, hangt ervan af, dat klinkt goed, we zullen zien, lijkt interessant, eventueel, ogenschijnlijk positieve antwoorden",
+      "issue_description": "Hugo gebruikt specifiek de term 'ogenschijnlijk positieve antwoorden' als kernbegrip voor deze houding, dit ontbreekt in de semantic_markers",
+      "transcript_evidence": [
+        "Dikwijls geeft de klant ogenschijnlijk positieve antwoorden, maar uiteindelijk geen duidelijk standpunt",
+        "Heel regelmatig dat de verkopers deze schijn instemming niet gehoord hebben"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H4",
+      "field": "semantic_markers",
+      "current_value": "too_general, non_specific, generic_answer, tja, gewoon, zoals altijd, dat hangt er vanaf, moeilijk te zeggen, we doen maar wat, maakt niet uit, valt mee, oké",
+      "proposed_value": "zonder zorgen, geen probleem, zoals ik zeg, lijkt interessant, we zullen dat in overweging nemen, dat hangt er vanaf, moeilijk te zeggen",
+      "issue_description": "De semantic_markers bevatten veel Nederlandse/informele termen die niet voorkomen in Hugo's transcripten. Hugo gebruikt specifieke voorbeelden zoals 'zonder zorgen', 'geen probleem', 'zoals ik zeg' en 'lijkt interessant, we zullen dat in overweging nemen'",
+      "transcript_evidence": [
+        "Hij kan mij een algemeen containerbegrip geven van te zeggen: \"Zonder zorgen\". Dat zegt me natuurlijk niks.",
+        "Hij zou kunnen zeggen: \"Meneer, wel, zoals ik zeg, geen probleem.\"",
+        "Dat u zegt ja, lijkt interessant meneer de verkoper. We zullen dat in overweging nemen."
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H4",
+      "field": "generation_examples",
+      "current_value": "1. \"Dat is moeilijk te zeggen.\" 2. \"Dat hangt ervan af.\" 3. \"Dat varieert.\" 4. \"Dat is een goede vraag.\" 5. \"Goh, dat is gewoon oké.\" 6. \"Zoals bij iedereen zeker?\" 7. [faciliterend] \"Euh… ja… dat verschilt.\" 8. [controlerend] \"Dat maakt niet zoveel uit.\"",
+      "proposed_value": "Toevoegen van Hugo's specifieke voorbeelden: \"Zonder zorgen.\", \"Wel, zoals ik zeg, geen probleem.\", \"Lijkt interessant meneer de verkoper. We zullen dat in overweging nemen.\"",
+      "issue_description": "De generation_examples missen de specifieke voorbeelden die Hugo letterlijk gebruikt in zijn transcripten. Deze zijn meer representatief voor zijn B2B-salescontext dan de huidige generieke voorbeelden",
+      "transcript_evidence": [
+        "Hij kan mij een algemeen containerbegrip geven van te zeggen: \"Zonder zorgen\"",
+        "Hij zou kunnen zeggen: \"Meneer, wel, zoals ik zeg, geen probleem.\"",
+        "Dat u zegt ja, lijkt interessant meneer de verkoper. We zullen dat in overweging nemen."
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H5",
+      "field": "semantic_markers",
+      "current_value": "question, information_request, clarification, price question, clarification request, terms/conditions, what about, how does it work, Wat kost, Hoe zit dat, Kan u, Mag ik vragen, Wat bedoelt u, Hoeveel, Wanneer, Welke garantie, en dan?, wat als, inbegrepen, looptijd, opzeg",
+      "proposed_value": "Wat kost, Wat brengt dat op, Wanneer wordt dat opgeleverd, In welke kleur kunt u ze mij leveren, Welke kleur wenst u, vraag, wedervraag, informatie, timing, productinfo",
+      "issue_description": "De huidige semantic markers bevatten veel Nederlandse/standaard termen die niet voorkomen in Hugo's transcript. Hugo gebruikt specifieke Belgische uitdrukkingen en voorbeelden.",
+      "transcript_evidence": [
+        "Wat kost dat? Wat brengt dat op? Wanneer wordt dat opgeleverd?",
+        "In welke kleur kunt u ze mij leveren?",
+        "Welke kleur wenst u's, hè?"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H6",
+      "field": "beschrijving",
+      "current_value": "Twijfel = de klant ziet de waarde, maar twijfelt of het in de praktijk ook echt zal lukken / of hij nadien geen spijt krijgt. Belangrijk: twijfel kan oprecht zijn, maar kan ook een 'verpakt bezwaar' zijn (zeker bij bepaalde gedragsstijlen).",
+      "proposed_value": "Twijfel = de klant vindt onze oplossing belangrijk, maar twijfelt dat wij de baten van onze oplossing kunnen leveren. Belangrijk: twijfel kan oprecht zijn (echte bezorgdheid), maar kan ook onderliggend een bezwaar zijn.",
+      "issue_description": "Hugo definieert twijfel specifieker als 'hij vindt onze oplossing belangrijk, maar twijfelt dat wij de baten van onze oplossing kunnen leveren' - dit is preciezer dan de huidige algemene beschrijving over 'waarde zien maar twijfelen of het lukt'.",
+      "transcript_evidence": [
+        "Hij vindt onze oplossing belangrijk, maar hij twijfelt dat wij onze oplossing de baten van onze oplossing kunnen geven",
+        "is zijn twijfel oprecht? Of ligt er onderliggend een bezwaar?",
+        "Is het een echte bezorgdheid of ligt er onderliggend een bezwaar?"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H6",
+      "field": "semantic_markers",
+      "current_value": "hesitation, doubt, uncertainty, ik twijfel, niet zeker, klinkt goed maar, gaat dat wel, zekerheid, spijt, twijfelachtig, onzeker, vertrouwen ontbreekt",
+      "proposed_value": "bezorgdheid, twijfel aan, waarom denkt u dat niet, vanwaar de twijfel, slechte ervaringen, oprecht, onderliggend bezwaar, echte bezorgdheid, normale omstandigheden, bewijsvoering",
+      "issue_description": "Veel van de huidige markers zijn algemene Engelse termen die niet aansluiten bij Hugo's specifieke Belgische vocabulaire. Hugo gebruikt meer concrete termen zoals 'bezorgdheid', 'vanwaar de twijfel', 'slechte ervaringen' en de distinctie tussen 'oprechte twijfel' en 'onderliggend bezwaar'.",
+      "transcript_evidence": [
+        "Maar maak u vragen vanwaar de twijfel?",
+        "het zou kunnen dat hij slechte ervaringen heeft vanuit het verleden",
+        "is zijn twijfel oprecht? Of ligt er onderliggend een bezwaar?",
+        "Is het een echte bezorgdheid of ligt er onderliggend een bezwaar?"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H7",
+      "field": "semantic_markers",
+      "current_value": "objection, counterargument, resistance, ja maar, te duur, prijs, budget, niet geïnteresseerd, concurrentie, alternatief, past niet, te veel, onaanvaardbaar, geen optie",
+      "proposed_value": "te duur, budget, prijs, betalingsmodaliteiten, leveringsmodaliteiten, tegenover wie, tegenover wat, hoeveel, concurrent, ja maar",
+      "issue_description": "De huidige markers bevatten veel Engelse termen (objection, counterargument, resistance) terwijl Hugo uitsluitend Nederlands spreekt. Ook missen specifieke Belgische B2B-termen die Hugo gebruikt.",
+      "transcript_evidence": [
+        "Een bezwaar is een ontdekt nadeel in het oog van de klant omtrent een eigenschap van onze oplossing. Dat kan zijn de prijs, betalingsmodaliteiten, leveringsmodaliteiten",
+        "Hoe bedoelt u 'te duur'? Tegenover wie? Tegenover wat? Hoeveel?"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H7",
+      "field": "beschrijving",
+      "current_value": "Bezwaar = expliciete weerstand tegen een aspect van de oplossing (prijs, timing, scope, vergelijking met alternatief). Hugo kader: een bezwaar is vaak een koopsignaal (niet klaar om 'ja' te zeggen), dus een kans om waarde te verhelderen.",
+      "proposed_value": "Bezwaar = een ontdekt nadeel in het oog van de klant omtrent een eigenschap van onze oplossing (prijs, betalingsmodaliteiten, leveringsmodaliteiten). Hugo kader: een bezwaar is een kans om waarde te verhelderen door analyseren, isoleren, neutraliseren en ontzenuwen.",
+      "issue_description": "Hugo's definitie is specifieker: 'een ontdekt nadeel in het oog van de klant omtrent een eigenschap van onze oplossing' en hij benadrukt betalings- en leveringsmodaliteiten naast prijs.",
+      "transcript_evidence": [
+        "Een bezwaar is een ontdekt nadeel in het oog van de klant omtrent een eigenschap van onze oplossing. Dat kan zijn de prijs, betalingsmodaliteiten, leveringsmodaliteiten"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H8",
+      "field": "semantic_markers",
+      "current_value": "postponement, delay, deferral, later, volgende week, offerte, mail, stuur door, ik moet, bespreken met, nachtje over slapen, terugkomen, agenda",
+      "proposed_value": "bespreken met, directie, partner, concurrentie vergelijken, stuurt mij maar een offerte op, beslissingsproces, financieel aspect, fiscaal aspect, voorwaarde, voorwendsel",
+      "issue_description": "De huidige markers bevatten Engelse termen die Hugo niet gebruikt, en missen veel specifieke Nederlandse termen die hij wel hanteert",
+      "transcript_evidence": [
+        "ik wens dat te bespreken met de directie, met mijn partner",
+        "stuurt mij maar een offerte op",
+        "ik ga nog een keer de concurrentie gaan vergelijken",
+        "is het eerder een financieel aspect of eerder een financieel aspect",
+        "is dat een voorwaarde of is dat een voorwendsel"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H8",
+      "field": "beschrijving",
+      "current_value": "Uitstel = de klant ontwijkt de beslissing door een volgende stap te vragen (offerte, later bellen) of door 'ik moet het bespreken'.\nCruciaal onderscheid: voorwaarde (legitieme stap) vs voorwendsel (smoes).",
+      "proposed_value": "Uitstelgedrag situeert zich wanneer de gesprekspartner zich bevindt tussen elf uur en twaalf uur op zijn buy-in klok (hesitation fase). Hij zegt iets onder de vorm van een poging tot uitstel. Cruciaal onderscheid: voorwaarde (legitieme stap) vs voorwendsel (smoes). Dit moet geanalyseerd worden door exploratievragen en commitment te vragen.",
+      "issue_description": "De beschrijving mist Hugo's specifieke terminologie over de buy-in klok en hesitation fase, en de methodiek om uitstel te analyseren",
+      "transcript_evidence": [
+        "Uitstelgedrag situeert zich wanneer uw gesprekspartner zich situeert op zijn buy-in klok tussen elf uur en twaalf uur",
+        "tussen elf uur en twaalf uur zit hij in de hesitation fase",
+        "We gaan deze pond tot uitstel moeten gaan analyseren",
+        "is dat een voorwaarde of is het een voorwendsel"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "klant_houdingen.json",
+      "item_id": "H9",
+      "field": "semantic_markers",
+      "current_value": "fear, anxiety, concern, risk_aversion, ik ben bang, bezorgd, risico, spijt, wat als, zekerheid, garantie, veiligheid, compliance, faalt, mislukt",
+      "proposed_value": "bezorgdheden, angst, risico's, reputaties, verantwoordelijkheid, mislopen, onvoorziene omstandigheden, wat zou er kunnen mislopen, hoe groot acht u de kans",
+      "issue_description": "De markers bevatten veel Engelse termen die Hugo niet gebruikt. Hugo spreekt over 'bezorgdheden', 'risico's', 'reputaties', 'verantwoordelijkheid' en specifieke vragen zoals 'wat zou er volgens u kunnen mislopen'",
+      "transcript_evidence": [
+        "bezorgdheden, angst en vooral zeker in, in een B2C-omgeving",
+        "bezorgdheid meer zijn omtrent eventuele risico's, maar ook naar reputaties, naar verantwoordelijkheid",
+        "wat zou er volgens u kunnen mislopen?",
+        "hoe groot acht u de kans, eh, dat het niet loopt zoals u het verwacht?"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "0.1",
+      "field": "anchors",
+      "current_value": "prospectanalyse",
+      "proposed_value": "wie zijn uw klanten",
+      "issue_description": "Hugo gebruikt niet de term 'prospectanalyse' maar spreekt over 'wie zijn uw klanten' als openingsvraag voor klantanalyse",
+      "transcript_evidence": [
+        "Nu, wie zijn uw klanten? We praten altijd over de man, maar wie is de man?"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "0.1",
+      "field": "anchors",
+      "current_value": "klantenanalyse",
+      "proposed_value": "de man",
+      "issue_description": "Hugo gebruikt 'de man' als kernbegrip voor klantanalyse, niet de term 'klantenanalyse'",
+      "transcript_evidence": [
+        "We praten altijd over de man, maar wie is de man? Of wat is de afkorting van de man? Dat is de persoon, man of vrouw die de money, de autoriteit en de needs kent."
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "0.1",
+      "field": "anchors",
+      "current_value": "marktanalyse",
+      "proposed_value": "market research",
+      "issue_description": "Hugo spreekt over 'market research' als onderdeel van het aankoopproces, niet over 'marktanalyse' als aparte techniek",
+      "transcript_evidence": [
+        "Dan gaat hij waarschijnlijk naar de markt gaan, market research gaan doen tussen acht uur en elf uur situeert hij zich in de market research en stuurt een lead op."
+      ],
+      "confidence": 0.75,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "0.4",
+      "field": "anchors",
+      "current_value": "one minute manager",
+      "proposed_value": "One Minute Manager",
+      "issue_description": "Hugo gebruikt de exact juiste term maar met hoofdletters. Het concept wordt expliciet benoemd en uitgelegd als mentale voorbereiding.",
+      "transcript_evidence": [
+        "Ten tweede-- Wij noemen dat dan de One Minute Manager. One Minute, One Minute Manager. Wat bedoelen we daarmee? Voor u binnenstapt, vooral in het proces, in uw proces en voor u binnenstapt, is het belangrijk dat u zich mentaal voorbereidt."
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "1.1",
+      "field": "anchors",
+      "current_value": "koop klimaat",
+      "proposed_value": "koopklimaat",
+      "issue_description": "Hugo gebruikt consequent 'koopklimaat' als één woord, niet als twee losse woorden 'koop klimaat'.",
+      "transcript_evidence": [
+        "We gaan daar het creëren van het koopklimaat. Koopklimaat.",
+        "voordat we over het doel van het onderhoud gaan praten, ja, en we willen dat koopklimaat gaan creëren"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "1.1",
+      "field": "anchors",
+      "current_value": "kooplimaat",
+      "proposed_value": "koopklimaat",
+      "issue_description": "Hugo gebruikt 'koopklimaat' (met 'k'), niet 'kooplimaat' (met 'l'). Dit lijkt een typfout in de anchor.",
+      "transcript_evidence": [
+        "We gaan daar het creëren van het koopklimaat. Koopklimaat.",
+        "Met wie van de vier stijlen denkt u dat u het meeste tijd zult spenderen aan het creëren van het koopklimaat?"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "1.2",
+      "field": "anchors",
+      "current_value": "gentlemans agreement",
+      "proposed_value": "gentlemen's agreement",
+      "issue_description": "Hugo gebruikt de correcte vorm 'gentlemen's agreement' met apostrof, niet 'gentlemans agreement'.",
+      "transcript_evidence": [
+        "En dan gaan we een gentlemen's agreement gaan formuleren.",
+        "Ik herhaal na mijn koop klimaat, afhankelijk van, eh, de sociale gedragsstijl en team op. In de facilitaire zal dat iskes meer tijd duren dan met een controleren, hm, dan ga ik een gentleman's agreement, een agenda gaan afspreken"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "1.3",
+      "field": "anchors",
+      "current_value": "reference story",
+      "proposed_value": "projectreferenties",
+      "issue_description": "Hugo gebruikt consequent 'projectreferenties' in plaats van 'reference story' voor het voorstellen van klantvoorbeelden",
+      "transcript_evidence": [
+        "Vervolgens presenteren we uw projectreferenties. Met andere woorden: waarom hebben klanten bij u gekocht en welke factoren spelen hierin?"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "1.4",
+      "field": "anchors",
+      "current_value": "instapvraag",
+      "proposed_value": "laat eens vragen",
+      "issue_description": "Hugo gebruikt 'laat eens vragen' als zijn standaardformulering voor het stellen van openingsvragen",
+      "transcript_evidence": [
+        "Maar laat eens vragen, meneer X, hè. Pu-puur uit nieuwsgierigheid. Laat eens vragen: hoe bent u eigenlijk bij ons terechtgekomen?",
+        "mag ik eens vragen"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.1",
+      "field": "anchors",
+      "current_value": "explore vragen",
+      "proposed_value": "exploratievragen",
+      "issue_description": "Hugo gebruikt consistent 'exploratievragen' (één woord) in plaats van 'explore vragen' (twee woorden)",
+      "transcript_evidence": [
+        "Dus ik ga de situatie analyseren door mijn exploratie en exploratievraagstelling omtrent zijn manier van werken",
+        "ik kan terug een keer naar hier gaan om te zeggen naar de exploratievraag omtrent zijn, eh, assortiment"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.1.1.1",
+      "field": "anchors",
+      "current_value": "hoe bent u bij ons terechtgekomen",
+      "proposed_value": "hoe bent u bij ons terechtgekomen",
+      "issue_description": "Hugo gebruikt exact deze formulering in zijn transcript",
+      "transcript_evidence": [
+        "Hoe bent u bij ons terechtgekomen?"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.1.1.1",
+      "field": "anchors",
+      "current_value": "welke verwachtingen",
+      "proposed_value": "zijn verwachtingen",
+      "issue_description": "Hugo gebruikt consistenter 'zijn verwachtingen' als formulering in plaats van de directe vraagstelling 'welke verwachtingen'",
+      "transcript_evidence": [
+        "we bevragen zijn verwachtingen",
+        "We zijn zijn verwachtingen aan het bevragen",
+        "nu gaan we kijken naar zijn verwachtingen"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.1.1.4",
+      "field": "anchors",
+      "current_value": "wat verwacht u dan",
+      "proposed_value": "wat verwacht u",
+      "issue_description": "Hugo gebruikt de kortere vorm 'wat verwacht u' zonder 'dan'",
+      "transcript_evidence": [
+        "wat verwacht u daarop",
+        "Indien u een investering doet, ongeacht bij ons of niet, wat verwacht u?"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.1.1.5",
+      "field": "anchors",
+      "current_value": "welke alternatieven",
+      "proposed_value": "welke andere opties",
+      "issue_description": "Hugo gebruikt consistent 'welke andere opties' in plaats van 'welke alternatieven' in zijn vraagstelling",
+      "transcript_evidence": [
+        "welke andere opties of alternatieven overweegt u?"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.1.2",
+      "field": "anchors",
+      "current_value": "in welke zin bedoelt u",
+      "proposed_value": "wat maak u daaronder verstaan, wat ziet u daaronder",
+      "issue_description": "Hugo gebruikt 'in welke zin bedoelt u' niet, maar wel gelijkaardige variaties zoals 'wat maak u daaronder verstaan' en 'wat ziet u daaronder' als aanvulling op zijn hoofdvarianten",
+      "transcript_evidence": [
+        "Maar je moet daar een beetje variatie op zetten. \"Wat verstaat u daaronder? Wat maak u daaronder verstaan? Wat ziet u daaronder?\""
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.1.5",
+      "field": "anchors",
+      "current_value": "pingpongtechniek",
+      "proposed_value": "pingpong techniek",
+      "issue_description": "Hugo gebruikt consistent de variant met spatie 'pingpong techniek' in plaats van de samengestelde vorm 'pingpongtechniek'",
+      "transcript_evidence": [
+        "Hebben nu de pingpong en pingpong techniek"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.1.6",
+      "field": "anchors",
+      "current_value": "empathisch luisteren",
+      "proposed_value": "empathie tonen",
+      "issue_description": "Hugo gebruikt niet de term 'empathisch luisteren' maar wel 'empathie tonen' als onderdeel van actief luisteren",
+      "transcript_evidence": [
+        "Empathie tonen is heel belangrijk, hè."
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.2",
+      "field": "anchors",
+      "current_value": "reverse-thinking",
+      "proposed_value": "reverse thinking",
+      "issue_description": "Hugo gebruikt 'reverse thinking' (zonder koppelteken) consistent door het transcript",
+      "transcript_evidence": [
+        "Ik kan dat altijd weer op dezelfde manier doen aan, aan reverse thinking.",
+        "Het moet van mijn klant komen naar aanleiding van mijn reverse thinking aan zelfreflectie te gaan doen."
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.2",
+      "field": "anchors",
+      "current_value": "in welke concreet herkenbare situatie",
+      "proposed_value": "in welke concreet herkenbare situaties",
+      "issue_description": "Hugo gebruikt de meervoudsvorm 'situaties' in plaats van enkelvoud 'situatie'",
+      "transcript_evidence": [
+        "In welke concreet herkenbare situaties ten voordele om het sneller te kunnen doen?"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.1.6",
+      "field": "anchors",
+      "current_value": "impact vraag",
+      "proposed_value": "impactvragen",
+      "issue_description": "Hugo gebruikt consistent 'impactvragen' als samengesteld woord, niet als twee losse woorden",
+      "transcript_evidence": [
+        "Dan hebben we de impactvragen.",
+        "door mijn impactvragen, die we gezegd hebben"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "2.4",
+      "field": "anchors",
+      "current_value": "commitmentvraag",
+      "proposed_value": "commitmentvragen",
+      "issue_description": "Hugo gebruikt consistent de meervoudsvorm 'commitmentvragen' in plaats van enkelvoud",
+      "transcript_evidence": [
+        "Commitmentvragen gaan stellen, commitmentvragen gaan stellen.",
+        "van mijn EPICC-techniek. Zoals je ziet, hè, exploratievragen are probing vragen, impactvragen, commitmentvragen."
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "3.2",
+      "field": "anchors",
+      "current_value": "dat is de reden waarom wij",
+      "proposed_value": "dat is de reden waarom",
+      "issue_description": "Hugo gebruikt 'dat is de reden waarom' zonder 'wij' - hij spreekt meestal in enkelvoud",
+      "transcript_evidence": [
+        "Dat is de reden waarom. En u benoemt een eigenschap, een passende eigenschap van die oplossing"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "3.4",
+      "field": "anchors",
+      "current_value": "baten komen van de impact",
+      "proposed_value": "de baten komen van de impact",
+      "issue_description": "Hugo gebruikt consequent 'de baten komen van' in plaats van 'baten komen van'",
+      "transcript_evidence": [
+        "Maar vanwaar komen de baten? De baten komen niet van mij. De baten komen van waar? Van de impact die ik uitgelokt heb"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "3.4",
+      "field": "anchors",
+      "current_value": "baten komen van",
+      "proposed_value": "de baten komen van",
+      "issue_description": "Hugo gebruikt consequent 'de baten komen van' in plaats van 'baten komen van'",
+      "transcript_evidence": [
+        "De baten komen niet van mij. De baten komen van waar? Van de impact die ik uitgelokt heb"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.1",
+      "field": "anchors",
+      "current_value": "testclose, trial close",
+      "proposed_value": "proefafsluiting",
+      "issue_description": "Hugo gebruikt consequent de Nederlandse term 'proefafsluiting' in plaats van de Engelse termen 'testclose' en 'trial close'",
+      "transcript_evidence": [
+        "Ik ga een proefafsluiting doen. Een proefafsluiting, een proefafsluiting is niet bedreigend en is altijd met indientechniek"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.2",
+      "field": "anchors",
+      "current_value": "hesitation fase, hesitation",
+      "proposed_value": "hesitation fase (behouden - Hugo gebruikt dit expliciet)",
+      "issue_description": "Hugo gebruikt wel degelijk de term 'hesitation fase' expliciet in zijn uitleg over uitstelgedrag",
+      "transcript_evidence": [
+        "tussen elf uur en twaalf uur zit hij in de hesitation fase"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.2.1",
+      "field": "anchors",
+      "current_value": "houd die vraag bij, we komen daar later op terug",
+      "proposed_value": "houdt deze vraag bij, we komen daar later uitgebreid op terug",
+      "issue_description": "Hugo gebruikt een licht verschillende formulering van deze parkeerfrases",
+      "transcript_evidence": [
+        "Meneer houdt deze vraag bij. We komen daar later uitgebreid op terug"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.2.2",
+      "field": "anchors",
+      "current_value": "verdoken bezwaar",
+      "proposed_value": "onderliggend bezwaar",
+      "issue_description": "Hugo gebruikt consistent de term 'onderliggend bezwaar' in plaats van 'verdoken bezwaar'",
+      "transcript_evidence": [
+        "Dat betekent dat er onderliggend een bezwaar is",
+        "Of ligt er onderliggend een bezwaar?",
+        "Ligt er onderliggend een bezwaar? Zo simpel is het"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.2",
+      "field": "anchors",
+      "current_value": "pogen tot uitstel",
+      "proposed_value": "poging tot uitstel",
+      "issue_description": "Hugo gebruikt de term 'poging tot uitstel' in plaats van 'pogen tot uitstel'",
+      "transcript_evidence": [
+        "poging tot uitstel, uitstelgedrag",
+        "Hij zegt iets onder de vorm van een poging tot uitstel"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.2.4",
+      "field": "anchors",
+      "current_value": "pensumstelling",
+      "proposed_value": "afweegtechniek",
+      "issue_description": "Hugo gebruikt niet de term 'pensumstelling' maar spreekt consistent over 'afweegtechniek' voor het visueel tegenover elkaar afwegen van alternatieven",
+      "transcript_evidence": [
+        "En hoe gaan we dat doen? Door onze pencil selling. Onze pencil selling-methode. Geen pennen verkopen, maar het visueel gaan voorstellen en onze afweegtechniek, afweegtechniek.",
+        "Waarom? Omdat u nu de afweegtechniek zult moeten toepassen.",
+        "Het is een of-of-verhaal."
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.2.5",
+      "field": "anchors",
+      "current_value": "beslissingsangst",
+      "proposed_value": "bezorgdheden",
+      "issue_description": "Hugo gebruikt primair 'bezorgdheden' als hoofdterm, met 'angst' als ondersteunend begrip, maar niet specifiek 'beslissingsangst'",
+      "transcript_evidence": [
+        "Zo, onze laatste universele houding waar we kunnen mee geconfronteerd worden, zijn bezorgdheden, angst",
+        "Maar de gemeenschappelijke factor, en zeker in B2C, is angst.",
+        "We gaan deze bezorgdheid gaan bevragen."
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.2.5",
+      "field": "anchors",
+      "current_value": "angst voor de risico's",
+      "proposed_value": "mogelijke risico's",
+      "issue_description": "Hugo spreekt over 'mogelijke risico's' als objectief concept, niet specifiek over 'angst voor de risico's' als emotionele reactie",
+      "transcript_evidence": [
+        "Is ja, dat de mensen zich toch wel bepaalde bezorgdheden hebben omtrent het onbekende, de re-- mogelijke risico's.",
+        "Maar daar zal die bezorgdheid meer zijn omtrent eventuele risico's, maar ook naar reputaties, naar verantwoordelijkheid"
+      ],
+      "confidence": 0.8,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.INDIEN",
+      "field": "anchors",
+      "current_value": "indien-techniek, indien techniek, indien we tot een samenwerking komen, indien moesten",
+      "proposed_value": "indientechniek",
+      "issue_description": "Hugo gebruikt 'indientechniek' als één woord zonder koppelteken of spaties, niet de varianten met koppelteken of meervoudige vormen",
+      "transcript_evidence": [
+        "Dus de indientechniek, dat kan door een indientechniek zijn, indientechniek plus alternatieve afsluiting."
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.3",
+      "field": "anchors",
+      "current_value": "finale closing, definitief afsluiten, order schrijven, de zaak finaliseren, de zaak afronden",
+      "proposed_value": "afsluiting, afsluiten, definitieve afsluiting",
+      "issue_description": "Hugo gebruikt 'afsluiting' en 'afsluiten' als kernterminologie, en 'definitieve afsluiting' voor de finale stap, niet de Engelse term 'closing' of andere genoemde varianten",
+      "transcript_evidence": [
+        "Dan gaan we naar de mentale attitude. Ik ga ervan uit dat de koop gesloten is",
+        "En dan vraag ik een afsluiting",
+        "we kunnen dan naar een definitieve afsluiting gaan"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.3.1",
+      "field": "anchors",
+      "current_value": "samenvatten in klantwoorden, samenvatting in klantwoorden, resumé maken",
+      "proposed_value": "resumé maken",
+      "issue_description": "Hugo gebruikt expliciet 'resumé maken', niet de andere varianten met klantwoorden",
+      "transcript_evidence": [
+        "We gaan nog eens een resumé maken van alle OVB's, van alle baten die we-- de gepersonaliseerde baten die we besproken hebben"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.3.3",
+      "field": "anchors",
+      "current_value": "cvp",
+      "proposed_value": "customer value",
+      "issue_description": "Hugo gebruikt consequent 'customer value' in plaats van de afkorting 'cvp'",
+      "transcript_evidence": [
+        "En wat is customer value? Customer value is de perceptie van de klant over wat uw oplossing oplevert",
+        "het is omdat u geen waarde hebt gecreëerd, customer value gecreëerd hebt"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.3.3",
+      "field": "anchors",
+      "current_value": "customer value proposition",
+      "proposed_value": "klantenwaarde",
+      "issue_description": "Hugo gebruikt het Nederlandse equivalent 'klantenwaarde' naast 'customer value'",
+      "transcript_evidence": [
+        "Eerlijk gezegd, klantenwaarde gaat niet over geld",
+        "price is what you pay, value is what you get"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "rag_heuristics.json",
+      "item_id": "4.3.3",
+      "field": "anchors",
+      "current_value": "customer value proposition",
+      "proposed_value": "gepersonaliseerde oplossing",
+      "issue_description": "Hugo beschrijft het concept als 'gepersonaliseerde oplossing' wat zijn praktische invulling van value proposition is",
+      "transcript_evidence": [
+        "Het wordt gekon-- het wordt gecreëerd door een gepersonaliseerde oplossing"
+      ],
+      "confidence": 0.75,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "0.1",
+      "field": "eval_note",
+      "current_value": "Vergelijk met stappenplan-stappen voor prospectanalyse",
+      "proposed_value": "Check prospectanalyse: identificatie van MAN (money, autoriteit, needs), classificatie suspect/prospect/klant, bepaling vragende/niet-vragende partij, sociale gedragsstijl en psychologisch aankoopproces",
+      "issue_description": "De eval_note is te vaag en dekt niet de specifieke elementen die Hugo onderwijst voor prospectanalyse",
+      "transcript_evidence": [
+        "Dat is de persoon, man of vrouw die de money, de autoriteit en de needs kent. Maar dat kan de gebruiker zijn, de voorschrijver of de beslisser zijn. Z-ze kunnen suspect zijn, prospect, klant zijn. Men kan vragende partij zijn of niet-vragende partij, dat u vragende partij bent. Ze hebben een sociale gedragsstijl en een psychologisch aankoopproces."
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "0.4",
+      "field": "eval_note",
+      "current_value": "Check mentale voorbereiding",
+      "proposed_value": "Check mentale voorbereiding: gefocust zijn, attitude en enthousiasme uitstralen, durven te durven",
+      "issue_description": "De eval_note is te algemeen en mist de specifieke mentale voorbereidingselementen die Hugo onderwijst",
+      "transcript_evidence": [
+        "Voor u binnenstapt, vooral in het proces, in uw proces en voor u binnenstapt, is het belangrijk dat u zich mentaal voorbereidt. Wees uzelf, hè, gefocust zijn, attitude en enthousiasme uitstralen, durven te durven, durven naar een close gaan, durven de juiste vragen te stellen."
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "0.5",
+      "field": "eval_note",
+      "current_value": "Check materiaalvoorbereiding",
+      "proposed_value": "Check desktop research: prospect- en marktanalyse, SWOT-analyse, CRM-historiek, ChatGPT informatie",
+      "issue_description": "De eval_note gebruikt 'materiaalvoorbereiding' terwijl Hugo specifiek over 'desktop research' spreekt met concrete stappen",
+      "transcript_evidence": [
+        "Desktop Research. Wat bedoelen we daarmee? Het is belangrijk natuurlijk dat ge een prospect- en marktanalyse doet, een SWOT-analyse maakt. Wat zijn uw sterke punten? Minder sterke punten? Je hebt misschien zo een historiek van CRM dat u kunt gaan bekijken. Je hebt GPD-- euh, ChatGPT, waar je heel wat informatie kunt gaan be-- opvragen hier."
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "1.3",
+      "field": "eval_note",
+      "current_value": "1.3 Firmavoorstelling vereist dat de verkoper DAADWERKELIJK de firma presenteert met concrete feiten: naam bedrijf, wat ze doen, referenties, resultaten. Alleen het AANKONDIGEN dat men de firma zal voorstellen ('ik stel voor dat ik kort mezelf als ook de firma voorstel') is GEEN firmavoorstelling maar hoort bij 1.2 Gentleman's Agreement. Detecteer 1.3 ALLEEN als de verkoper echte bedrijfsinformatie deelt.",
+      "proposed_value": "1.3 Firmavoorstelling vereist dat de verkoper DAADWERKELIJK de firma presenteert met concrete feiten: naam bedrijf, wat ze doen, referenties, resultaten. Kan gebeuren via notarieel getesteerde brochure (voor betrouwbaarheid - 46% van klanten beoordeelt zo), plus projectreferenties waarbij verkoper algemene behoefte/pijnpunt omschrijft en algemeen voordeel formuleert. Alleen het AANKONDIGEN dat men de firma zal voorstellen is GEEN firmavoorstelling maar hoort bij 1.2 Gentleman's Agreement.",
+      "issue_description": "De eval_note mist Hugo's specifieke instructies over HOE de firmavoorstelling moet gebeuren: via brochure voor betrouwbaarheid én projectreferenties met behoefte/voordeel-structuur.",
+      "transcript_evidence": [
+        "Daarnaast presenteren we ook onze organisatie aan de hand van een notarieel getesteerde brochure. Want 46% van de klanten en prospecten beoordelen de betrouwbaarheid aan de hand van deze mooie brochure.",
+        "Vervolgens presenteren we uw projectreferenties. Met andere woorden: waarom hebben klanten bij u gekocht en welke factoren spelen hierin? In een eerste fase zullen we een algemene, bekende behoefte omschrijven.",
+        "Vervolgens formuleert u een algemeen voordeel. Een algemeen voordeel dat antwoord biedt op die algemene behoefte."
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "2.1.1.4",
+      "field": "eval_note",
+      "current_value": "Thema VERWACHTINGEN: vergelijk met voorbeeld-zinnen",
+      "proposed_value": "Thema VERWACHTINGEN: bevraag verwachtingen via exploratievragen, toets met probing questions om klant bewust te maken van mogelijke pijnpunten, maximaliseer impact en vraag commitment voordat je naar fase 3 gaat",
+      "issue_description": "De eval_note is te oppervlakkig en mist de specifieke methodiek die Hugo uitgebreid onderwijst voor het bevragen van verwachtingen",
+      "transcript_evidence": [
+        "We gaan in een eerste fase exploratievragen stellen. Exploratie betekent dat we vragen: 'Indien u een investering doet, ongeacht bij ons of niet, wat verwacht u?'",
+        "Je kan dan probing questions stellen. Probing questions stellen houdt in dat je de klant tot zelfreflectie aanzet",
+        "Je kunt dat maximaliseren door impactvragen te stellen. Maximaliseren betekent specifiëren en kwantificeren, om dan terug naar commitment te gaan"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "2.1.1.5",
+      "field": "voorbeeld_match",
+      "current_value": "(geen)",
+      "proposed_value": "Hier mag ik eens vragen, meneer X, welke andere opties of alternatieven overweegt u? | wat spreekt u aan aan deze alternatieven? | wat verwacht u van de alternatieven die u bij onze oplossing niet gevonden heeft? | stel dat u voor een alternatief, eh, kiest. Ja, welke van onze oplossingen die we vandaag, eh, besproken hebben worden dan minder relevant? | wat is daar de impact dan van? | als ik u goed begrijp, meneer X of mevrouw, is eigenlijk het alternatief dan toch blijkbaar niet de ideale keuze",
+      "issue_description": "De voorbeeld_match is leeg terwijl Hugo specifieke voorbeeldzinnen geeft voor het bevragen van alternatieven",
+      "transcript_evidence": [
+        "Hier mag ik eens vragen, meneer X, welke andere opties of alternatieven overweegt u?",
+        "wat spreekt u aan aan deze alternatieven?",
+        "wat verwacht u van de alternatieven die u bij onze oplossing niet gevonden heeft?",
+        "stel dat u voor een alternatief, eh, kiest. Ja, welke van onze oplossingen die we vandaag, eh, besproken hebben worden dan minder relevant?",
+        "als ik u goed begrijp, meneer X of mevrouw, is eigenlijk het alternatief dan toch blijkbaar niet de ideale keuze"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "2.1.1.6",
+      "field": "voorbeeld_match",
+      "current_value": "(geen)",
+      "proposed_value": "in welke mate is er voor het project dat we besproken hebben aan een budget voorzien? | in welke mate wordt dit met eigen middelen gefinancierd of is dat via externe financiering?",
+      "issue_description": "De voorbeeld_match is leeg terwijl Hugo specifieke voorbeeldzinnen geeft voor het bevragen van budget",
+      "transcript_evidence": [
+        "in welke mate is er voor het project dat we besproken hebben aan een budget voorzien?",
+        "in welke mate wordt dit met eigen middelen gefinancierd of is dat via externe financiering?"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "2.1.2",
+      "field": "voorbeeld_match",
+      "current_value": "(geen)",
+      "proposed_value": "Wat verstaat u daaronder?; Hoe bedoelt u?; Wat ziet u daaronder?; Wat maakt u daaronder verstaan?",
+      "issue_description": "Transcript bevat concrete voorbeeldzinnen voor meningsgerichte vragen, maar voorbeeld_match is leeg",
+      "transcript_evidence": [
+        "\"Mijnheer, mag ik u vragen, wat verstaat u daaronder, 'zonder zorgen'?\". Dat is dus de bedoeling. Of de gouden vraag is altijd: \"Hoe bedoelt u?\" Dat is natuurlijk een gouden vraag.",
+        "\"Wat verstaat u daaronder? Wat maak u daaronder verstaan? Wat ziet u daaronder?\""
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "2.1.3",
+      "field": "voorbeeld_match",
+      "current_value": "(geen)",
+      "proposed_value": "Is het eerder dit aspect dat u belangrijk vindt of dat aspect?; Is het eerder praktisch of strategisch?; Verstaat u eronder dat u zich niet wilt bezighouden met het beheer of dat u zich niet wil bezighouden met het zoeken van huurders?",
+      "issue_description": "Transcript bevat concrete voorbeeldzinnen voor alternatieve vragen, maar voorbeeld_match is leeg",
+      "transcript_evidence": [
+        "\"Meneer, maar mag, mag ik eens vragen, is het eerder praktisch of strategisch?\"",
+        "\"Meneer, maar is het, eh, verstaat u eronder dat u zich niet wilt bezighouden met het beheer, wanneer ervaring heeft in, in, euh, vastgoed? Of is het in, in de bedoeling dat u zich niet wil bezighouden met het zoeken van huurders?\""
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "2.1.4",
+      "field": "voorbeeld_match",
+      "current_value": "(geen)",
+      "proposed_value": "Maar onafgezien deze verwachting, wat verwacht u nog?; Meneer, interessante vraag, belangrijke vraag, maar houd deze vraag bij. We komen daar uitgebreid later op terug.",
+      "issue_description": "Transcript bevat concrete voorbeeldzinnen voor terzijdeschuiven, maar voorbeeld_match is leeg",
+      "transcript_evidence": [
+        "\"Meneer, maar onafgezien-- onafgezien deze verwachting, wat verwacht u nog?\"",
+        "\"Meneer, interessante vraag, belangrijke vraag, maar houd deze vraag bij. We komen daar uitgebreid later op terug.\""
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "2.1.6",
+      "field": "eval_note",
+      "current_value": "Actief luisteren: vergelijk met voorbeeld-zinnen",
+      "proposed_value": "Actief luisteren: samenvatten ('als ik u goed begrijp'), stilte inbouwen, empathie tonen ('O ja, echt waar'), meer luisteren dan praten",
+      "issue_description": "De eval_note is te vaag en geeft geen concrete technieken weer die Hugo onderwijst voor actief luisteren",
+      "transcript_evidence": [
+        "Door gaan samen te vatten van 'dat zijn mijn heren, als ik u goed begrijp. Vindt u dat of dat belangrijk hier?' Het kan ook zijn door, door stilte in te bouwen. Het kan ook zijn door te zeggen 'O ja, echt waar'. Empathie tonen is heel belangrijk",
+        "allemaal praat minder, vraag meer, maar vooral luister het meest, want daar liggen uw mogelijkheden"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "2.2",
+      "field": "eval_note",
+      "current_value": "Probe: check of verhaal/hypothetisch scenario gebruikt wordt zoals in voorbeeld",
+      "proposed_value": "Probe: zelfreflectie uitlokken met 'wat zou u daarvan kunnen vinden?' of hypothetische scenario's ('stel dat u morgen...'), impact maximaliseren door frequentie en gevolgen te bevragen",
+      "issue_description": "De eval_note mist de kern van Hugo's probing techniek: zelfreflectie uitlokken en impact maximaliseren",
+      "transcript_evidence": [
+        "Maar indien u de mogelijkheid hebben om nauwkeuriger de metingen te kunnen doen, hè, voor uw cliënteel, huisartsen of ziekenhuizen. Wat zou u of uw cliënteel daarvan kunnen vinden?",
+        "Of ik kan zeggen meneer, maar stel dat u morgen de vraag krijgt van een hospitaal",
+        "Dan ga ik dat weer gaan maximaliseren. Hoe vaak is dat al gebeurd?"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "2.3",
+      "field": "eval_note",
+      "current_value": "Impact / Gevolg vragen: vergelijk met voorbeeld-zinnen voor impact-vraag",
+      "proposed_value": "Impact vragen: pijnpunten maximaliseren, concretiseren en personaliseren met cijfers (financieel, operationeel, emotioneel vlak), frequentie bevragen ('hoeveel keren gebeurt dat?')",
+      "issue_description": "De eval_note is te algemeen en mist Hugo's specifieke aanpak van impact maximaliseren en personaliseren",
+      "transcript_evidence": [
+        "Impactvragen. Dat zijn de vragen die die pijnpunten gaan maximaliseren",
+        "We gaan deze impact van de mogelijke pijnpunten of de het, het verwerven van die nieuwe opportuniteiten gaan maximaliseren, gaan concretiseren, want dat kan op financieel vlak zijn, operationeel vlak, emotioneel vlak",
+        "Maar moest je daar een cijfer op zetten Of hoeveel keren gebeurt dat? We gaan dat gaan maximaliseren"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "2.1.6",
+      "field": "eval_note",
+      "current_value": "Commitment: check samenvatting + bevestigingsvraag + wachten op JA",
+      "proposed_value": "Commitment: resumé maken van wat gezien is, herformuleren als controlevraag om klant bewust te maken van noodzaak tot verandering voordat naar fase 3",
+      "issue_description": "De eval_note mist Hugo's specifieke benadering van commitment als resumé en controlevraag",
+      "transcript_evidence": [
+        "Dat ik een resumé ga maken? Het herformuleren van hetgeen wat we gezien hebben",
+        "Het is een soort van controlevraag die ik ga stellen",
+        "En dan alleen wanneer ik een commitment gevraagd heb, dus de klant bewust heb gemaakt van de noodzaak om te veranderen, kan ik maar naar fase drie gaan"
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "3.2",
+      "field": "eval_note",
+      "current_value": "Oplossing presenteren: check stappenplan (verwijs naar behoefte → presenteer oplossing → check reactie)",
+      "proposed_value": "Oplossing presenteren: check OVB-techniek (Oplossing + Voordeel + Baat, waarbij oplossing verwijst naar commitment uit fase 2, voordeel is generieke eigenschap, baat is gepersonaliseerde impact)",
+      "issue_description": "De eval_note beschrijft een generiek stappenplan maar Hugo onderwijst specifiek de OVB-techniek met duidelijke componenten en structuur",
+      "transcript_evidence": [
+        "Via onze OVB techniek, OVB techniek. En dat staat dus voor wat enerzijds de oplossing",
+        "En u benoemt een eigenschap, een passende eigenschap van die oplossing die een antwoord geeft aan de verwachting die we gedetecteerd hebben in fase twee. Dan gaan we daar het generiek het algemeen voordeel van geven",
+        "de baten - en daar gaat het over de baten - de betekenis van mijn oplossing, het verwachte resultaat van de baten van mijn oplossing in functie van hetgeen wat we gedetecteerd hebt"
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "4.1",
+      "field": "eval_note",
+      "current_value": "Proefafsluiting: vergelijk met voorbeeld-zinnen",
+      "proposed_value": "Proefafsluiting: check gebruik van indientechniek + alternatieve afsluiting (bijv. 'Indien we tot een samenwerking komen, zouden we dat dan zo doen of zo doen?')",
+      "issue_description": "De eval_note is te algemeen en mist Hugo's specifieke definitie van proefafsluiting als combinatie van indientechniek plus alternatieve afsluiting",
+      "transcript_evidence": [
+        "Een proefafsluiting, een proefafsluiting is niet bedreigend en is altijd met indientechniek, hè, indientechniek plus een alternatieve afsluiting",
+        "Ik zou zeggen: 'Indien we tot een samenwerking komen--' Kan nooit bedreigend zijn, hè. 'Indien we tot een samenwerking komen, zouden we dat dan zo doen of zo doen?'"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "4.2.1",
+      "field": "eval_note",
+      "current_value": "Vraag behandelen: check stappenplan-stappen",
+      "proposed_value": "Vraag behandelen: volg stappenplan-stappen afhankelijk van productinfo en timing (wedervraag stellen, info plus standpunt uitlokken, of info plus proefafsluiting)",
+      "issue_description": "De eval_note is te vaag en beschrijft niet de concrete stappen die Hugo onderwijst voor vraagbehandeling",
+      "transcript_evidence": [
+        "Hij stelt een vraag. Ik heb verschillende mogelijkheden. Ofwel ga ik een wedervraag stellen, een wedervraag. Een wedervraag. Ofwel kan ik info geven. Info plus een standpunt die ik kan uitlokken. Ja? Ofwel geef ik info plus een proefafsluiting, altijd onder een afsluiting, altijd onder een alternatieve vorm.",
+        "alles is afhankelijk van enerzijds van uw productinformatie. Die kent u Ja Of anderzijds van de timing wanneer hij de vraag stelt."
+      ],
+      "confidence": 0.95,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "4.2.1",
+      "field": "eval_note",
+      "current_value": "Twijfel behandelen: volg stappenplan-stappen in volgorde",
+      "proposed_value": "Twijfel behandelen: volg stappenplan-stappen (Exploreren → Commitment vragen → Bewijsvoering of bezwaarbehandeling)",
+      "issue_description": "De eval_note is te algemeen en specificeert niet de concrete stappen die Hugo onderwijst voor twijfelbehandeling",
+      "transcript_evidence": [
+        "We gaan dat moeten gaan analyseren. En wie zegt analyseren, die zegt natuurlijk exploreren. We gaan een techniek een vraagstelling techniek van de exploratie gaan toepassen.",
+        "En hoe gaan we dat doen? Door een commitment te gaan vragen.",
+        "Zegt hij daarop. Ja, dan kan ik naar een bewijsvoering geven.",
+        "Zegt hij nee. Wat betekent dat? Dat er onderliggend een bezwaar is"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "4.2.1",
+      "field": "eval_note",
+      "current_value": "Uitstel behandelen: volg stappenplan-stappen (Empathie → Analyseren → Neutraliseren → Action Plan)",
+      "proposed_value": "Uitstel behandelen: volg stappenplan-stappen (Empathie → Analyseren → Commitment vragen → Vervolgafspraak of bezwaarbehandeling)",
+      "issue_description": "De eval_note vermeldt 'Neutraliseren → Action Plan' maar Hugo onderwijst 'Commitment vragen' om voorwaarde vs voorwendsel te onderscheiden, gevolgd door vervolgafspraak of bezwaarbehandeling",
+      "transcript_evidence": [
+        "Dan ga ik een commitment gaan vragen. Commitment. Ja. Omtrent zijn beslissingsengagement.",
+        "En hoe ga ik dat kunnen detecteren of het een voorwaarde of voorwendsel is? Door dat uitstelgedrag te gaan neutraliseren onder de vorm van: maar als we, meneer, maar onafgezien de mening van die andere partij Op een schaal van tien, hoe staat u tegenover hetgeen wat we hier besproken hebben?",
+        "Krijg ik hier een positief antwoord, positief antwoord? Hè? Dan gaan we een vervolgafspraak moeten maken",
+        "Zegt hij daaronder een negatief antwoord, negatief antwoord? Wat betekent dat? Een negatieve reactie, hè, op mijn commitment dat ik geformuleerd heb? Dat betekent dat hij wel ja gezegd heeft, maar nee gedacht, omdat er onderliggend bezwaren zijn."
+      ],
+      "confidence": 0.85,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "4.2.5",
+      "field": "eval_note",
+      "current_value": "Angst behandelen: volg stappenplan-stappen",
+      "proposed_value": "Angst en bezorgdheden behandelen via EPICC-techniek: bevragen via exploratie, probing, impact en commitment",
+      "issue_description": "De eval_note is te vaag en noemt het concrete stappenplan (EPICC-techniek) niet dat Hugo uitgebreid uitlegt",
+      "transcript_evidence": [
+        "Hoe gaan we het dan wel doen? Altijd inderdaad volgens onze EPICC-techniek",
+        "We gaan deze bezorgdheid gaan bevragen. En wie zegt bevragen is... Via onze exploratie, onze exploratievragen",
+        "Dan gaan we daar een probingvraag omtrent doen",
+        "Dan ga ik daar omtrent de impact van vragen",
+        "om dan een commitment te vragen"
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    },
+    {
+      "config_file": "evaluator_overlay.json",
+      "item_id": "4.3",
+      "field": "eval_note",
+      "current_value": "Definitieve afsluiting: check gouden regel (HOE niet OF)",
+      "proposed_value": "Definitieve afsluiting: na voldoen aan alle criteria, mentale attitude aannemen dat koop gesloten is, resumé van alle OVB's maken, dan afsluiting vragen (proef/alternatief/indien-techniek)",
+      "issue_description": "De eval_note verwijst naar een 'gouden regel (HOE niet OF)' die niet wordt uitgelegd in het transcript. Hugo beschrijft een uitgebreide aanpak voor definitieve afsluiting maar noemt geen specifieke gouden regel",
+      "transcript_evidence": [
+        "Dus wat gaan we doen wanneer alle criteria voldaan zijn? Dan gaan we natuurlijk naar de mentale attitude. Ik ga ervan uit dat de koop gesloten is omdat uw gesprekspartner overal ja, ja, ja, ja gezegd heeft in fase twee en fase drie. We gaan nog eens een resumé maken van alle OVB's, van alle baten die we-- de gepersonaliseerde baten die we besproken hebben. En dan vraag ik een afsluiting."
+      ],
+      "confidence": 0.9,
+      "status": "needs_review",
+      "no_transcript_coverage": false
+    }
+  ],
+  "metadata": {
+    "model": "claude-sonnet-4-20250514",
+    "script_version": "1.0.0",
+    "config_files_audited": [
+      "technieken_index.json",
+      "klant_houdingen.json",
+      "rag_heuristics.json",
+      "evaluator_overlay.json"
+    ],
+    "run_duration_seconds": 588
+  }
+}

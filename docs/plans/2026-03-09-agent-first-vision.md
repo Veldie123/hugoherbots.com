@@ -235,10 +235,10 @@ Hogere tiers = meer avatar-minuten, proactievere coaching, snellere responses.
 |------------|-------------------|----------------------|
 | Chat (tekst) | ~€0.02 | 98%+ |
 | Audio (TTS + STT) | ~€0.05 | 95%+ |
-| Video (avatar) | ~€0.10 (Tavus) | 90%+ |
+| Video (avatar) | ~€0.29 (Tavus Growth) | 70%+ |
 
-Avatar-kosten zijn de variabele factor. Met Tavus Phoenix-4 op €0.10/min
-kan een Pro-gebruiker 20 uur video-coaching per maand krijgen binnen de marge.
+Avatar-kosten zijn de variabele factor. Met Tavus Phoenix-4 Growth-tier op €0.29/min
+kan een Pro-gebruiker ~4 uur video-coaching per maand krijgen binnen de marge. Video is een premium differentiator — hogere tiers krijgen meer avatar-minuten.
 
 ### Churn-Reductie
 

@@ -21,7 +21,7 @@ Prompt caching is live in `server/hugo-engine/v3/agent.ts`. System prompt en too
 | **Railway** (hosting) | Pro + usage | €50 | 3 processen (main 5001, video 3001, standalone 3002) |
 | **Supabase** (DB + auth) | Pro | €25 | PostgreSQL + session pooler + auth + storage |
 | **ElevenLabs** (Hugo voice clone) | Scale | €330 | Custom voice clone, models: flash_v2_5 + multilingual_v2 |
-| **HeyGen** (streaming avatar) | Business | €150 | Interactive streaming avatar |
+| **Tavus** (streaming avatar) | Growth | €365 | $397/mo, 1250 min incl., Phoenix-4 replica |
 | **Mux** (video hosting) | Starter | €20 | Video assets opslag + playback |
 | **LiveKit** (voice agent) | Cloud | €10 | Voice agent rooms |
 | **Daily.co** (video calls) | Scale | €10 | Live coaching video sessies |
@@ -29,14 +29,14 @@ Prompt caching is live in `server/hugo-engine/v3/agent.ts`. System prompt en too
 | **Domain + DNS** | - | €2 | hugoherbots.com |
 | **GitHub** | Free/Team | €0-4 | Repo + auto-deploy |
 | | | | |
-| **TOTAAL VAST** | | **€602 - €606** | |
+| **TOTAAL VAST** | | **€817 - €821** | |
 
 ### Zonder voice/avatar (text-only):
 
 | Weggelaten | Besparing |
 |------------|-----------|
 | ElevenLabs | -€330 |
-| HeyGen | -€150 |
+| Tavus | -€365 |
 | LiveKit | -€10 |
 | **TOTAAL VAST (text-only)** | **€112 - €116** |
 
@@ -120,11 +120,11 @@ Analyse calls zijn stateless (geen sessie-context) — caching helpt hier niet.
 | Claude analyse | €0.47 | €1.41 | €2.35 |
 | Claude compaction (~1 per 4 sessies) | €0.10 | €0.30 | €0.50 |
 | ElevenLabs TTS | €0.15 | €0.45 | €0.90 |
-| HeyGen avatar | €0.50 | €1.50 | €3.00 |
+| Tavus avatar | €1.45 | €4.35 | €8.70 |
 | Daily.co video | €0.12 | €0.36 | €0.60 |
 | LiveKit voice | €0.04 | €0.12 | €0.24 |
 | | | | |
-| **TOTAAL per user/maand** | **€10.18** | **€30.54** | **€51.59** |
+| **TOTAAL per user/maand** | **€11.13** | **€33.39** | **€57.29** |
 
 ### Kosten per User per Maand (met caching, text-only)
 
@@ -158,30 +158,30 @@ Analyse calls zijn stateless (geen sessie-context) — caching helpt hier niet.
 |--|--------------|--------------------|--------------------------|
 | Revenue | €98.00 | €498.00 | €2.498.00 |
 | Stripe fee | -€1.72 | -€7.72 | -€37.72 |
-| AI + infra kosten (medium, cached) | -€30.54 | -€30.54 | -€51.59 (heavy) |
-| **Netto per user** | **€65.74** | **€459.74** | **€2.408.69** |
-| **Marge** | **67%** | **92%** | **96%** |
+| AI + infra kosten (medium, cached) | -€33.39 | -€33.39 | -€57.29 (heavy) |
+| **Netto per user** | **€62.89** | **€456.89** | **€2.402.99** |
+| **Marge** | **64%** | **92%** | **96%** |
 
 ### Waarschuwing: Pro Tier + Heavy User
 
 | | Pro (€98/mo), heavy user |
 |--|--------------------------|
 | Revenue | €98.00 |
-| Stripe + AI kosten (cached) | -€53.31 |
-| **Netto** | **€44.69** |
-| **Marge** | **46%** |
+| Stripe + AI kosten (cached) | -€59.01 |
+| **Netto** | **€38.99** |
+| **Marge** | **40%** |
 
-Heavy Pro users hebben lage marge. Mitigatie: usage caps of fair use policy op Pro tier.
+Heavy Pro users hebben lage marge. Mitigatie: usage caps of fair use policy op Pro tier. Video-minuten zijn de belangrijkste variabele kost (Tavus Growth: €0,29/min).
 
 ---
 
 ## 6. Break-Even Analyse (met caching)
 
-### Full Features (vaste kosten: €606/maand)
+### Full Features (vaste kosten: €821/maand)
 
 | Situatie | Users nodig |
 |----------|-------------|
-| Break-even (alleen Pro, medium) | **9 Pro users** |
+| Break-even (alleen Pro, medium) | **13 Pro users** |
 | Break-even (6 Pro + 1 Founder) | **7 users** |
 
 ### Text-Only (vaste kosten: €116/maand)
@@ -198,21 +198,21 @@ Heavy Pro users hebben lage marge. Mitigatie: usage caps of fair use policy op P
 
 | Maand | Pro | Founder | Inner Circle | Revenue | Vaste | Variabel | Marketing (15%) | **Winst** |
 |-------|-----|---------|-------------|---------|-------|----------|-----------------|-----------|
-| 1 | 3 | 0 | 0 | €294 | €606 | €92 | €44 | **-€448** |
-| 3 | 8 | 1 | 0 | €1.282 | €606 | €275 | €192 | **€209** |
-| 6 | 20 | 3 | 1 | €6.952 | €606 | €764 | €835 | **€4.747** |
-| 9 | 35 | 5 | 2 | €12.916 | €606 | €1.345 | €1.550 | **€9.415** |
-| 12 | 50 | 8 | 3 | €16.388 | €606 | €1.955 | €1.967 | **€11.860** |
+| 1 | 3 | 0 | 0 | €294 | €821 | €101 | €44 | **-€672** |
+| 3 | 8 | 1 | 0 | €1.282 | €821 | €301 | €192 | **-€32** |
+| 6 | 20 | 3 | 1 | €6.952 | €821 | €832 | €835 | **€4.464** |
+| 9 | 35 | 5 | 2 | €12.916 | €821 | €1.465 | €1.550 | **€9.080** |
+| 12 | 50 | 8 | 3 | €16.388 | €821 | €2.129 | €1.967 | **€11.471** |
 
 ### Premium Scenario (weinig users, hoge ARPU)
 
 | Maand | Pro | Founder | Inner Circle | Revenue | Vaste | Variabel | Marketing (15%) | **Winst** |
 |-------|-----|---------|-------------|---------|-------|----------|-----------------|-----------|
-| 1 | 2 | 1 | 0 | €694 | €606 | €92 | €104 | **-€108** |
-| 3 | 5 | 3 | 1 | €5.482 | €606 | €275 | €822 | **€3.779** |
-| 6 | 10 | 5 | 2 | €8.466 | €606 | €520 | €1.270 | **€6.070** |
-| 9 | 15 | 8 | 3 | €13.948 | €606 | €795 | €2.092 | **€10.455** |
-| 12 | 20 | 10 | 4 | €16.932 | €606 | €1.040 | €2.540 | **€12.746** |
+| 1 | 2 | 1 | 0 | €694 | €821 | €101 | €104 | **-€332** |
+| 3 | 5 | 3 | 1 | €5.482 | €821 | €301 | €822 | **€3.538** |
+| 6 | 10 | 5 | 2 | €8.466 | €821 | €568 | €1.270 | **€5.807** |
+| 9 | 15 | 8 | 3 | €13.948 | €821 | €869 | €2.092 | **€10.166** |
+| 12 | 20 | 10 | 4 | €16.932 | €821 | €1.137 | €2.540 | **€12.434** |
 
 **€10k winst rond maand 9-10** (inclusief marketing spend).
 
@@ -242,9 +242,9 @@ Thinking tokens zijn nu de **dominante kostenpost** (~55% van sessiekosten). Het
 | Claude Sonnet 4 pricing $3/$15 per 1M | Prijsverhoging → output capping als mitigatie |
 | Prompt caching effectief (90% korting) | Cache misses bij pauzes >5 min → hogere kosten |
 | Gemiddeld 10 turns per sessie | Langere sessies → hogere kosten |
-| Medium profiel (12 sessies/mo) | Heavy users (20+) → marge daalt naar 46% bij Pro |
+| Medium profiel (12 sessies/mo) | Heavy users (20+) → marge daalt naar 40% bij Pro |
 | ElevenLabs Scale (€330) volstaat | Character limit bij veel voice users |
-| HeyGen Business (€150) volstaat | Concurrent session limits |
+| Tavus Growth ($397/1250 min) volstaat | Overage bij >50 concurrent video users |
 | Stripe in test mode | Productie onboarding nodig |
 | V3 productie-ready | Nu superadmin-only; stabilisatie nodig |
 | Marketing 15% van revenue werkt | Pre-launch; geen echte conversie data |
@@ -255,14 +255,14 @@ Thinking tokens zijn nu de **dominante kostenpost** (~55% van sessiekosten). Het
 
 | Metric | Zonder caching | **Met caching (huidig)** |
 |--------|---------------|--------------------------|
-| **Vaste kosten (full)** | €606/mo | €606/mo |
+| **Vaste kosten (full)** | €821/mo | €821/mo |
 | **Kost per coaching sessie** | €2.60 | **€2.20** |
 | **Kost per admin sessie** | €1.85 | **€1.36** |
 | **Kost per analyse** | €0.47 | €0.47 (geen caching) |
-| **Variabel/user/maand (medium, full)** | €35.34 | **€30.54** |
-| **Marge Pro user (medium)** | 62% | **67%** |
+| **Variabel/user/maand (medium, full)** | €38.19 | **€33.39** |
+| **Marge Pro user (medium)** | 59% | **64%** |
 | **Marge Founder user** | 91% | **92%** |
-| **Break-even (full, Pro)** | 10 users | **9 users** |
-| **€10k/mo winst (incl. marketing)** | Maand 8-9 | **Maand 9-10** |
+| **Break-even (full, Pro)** | 14 users | **13 users** |
+| **€10k/mo winst (incl. marketing)** | Maand 9-10 | **Maand 9-10** |
 
 **Conclusie:** Met prompt caching zijn de marges verbeterd, maar thinking tokens blijven de dominante kostenpost (~55%). De volgende optimalisatie (thinking budget verlagen) zou de grootste impact hebben. Groeiprojecties zijn nu inclusief 15% marketing spend — realistischer dan het eerdere model zonder marketing kosten.
