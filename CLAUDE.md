@@ -3,7 +3,7 @@
 ## Project Overview
 
 Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
-- **Stack:** React 19 + Vite 6 + Tailwind CSS v4, Express.js backend, Supabase (auth + DB), Daily.co (video)
+- **Stack:** React 18 + Vite 6 + Tailwind CSS v4, Express.js backend, Supabase (auth + DB), Daily.co (video)
 - **Deploy:** Railway — auto-deploy vanuit GitHub push naar `main`
 - **Build:** `npm run build` (Vite frontend + esbuild server bundle)
 
@@ -112,6 +112,7 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 - **Geen `console.log`** in productie code
 - **Build check:** `npm run build` moet slagen voor elke commit
 - **Visuele verificatie:** Bij nieuwe of gewijzigde UI-componenten: neem een screenshot via `npx tsx scripts/screenshot.ts <url> /tmp/screenshot.png` en controleer het resultaat visueel voordat je commit. Doe dit altijd, zonder dat de gebruiker erom hoeft te vragen.
+- **Hergebruik bestaande patronen:** Zoek ALTIJD eerst of een UI-element, flow, of functionaliteit al bestaat in het platform. Kopieer en hergebruik die implementatie — bouw NOOIT van nul als het al bestaat.
 - **Commit message stijl:** Korte imperatief ("Fix X", "Add Y", "Update Z")
 
 ## Local Development Server

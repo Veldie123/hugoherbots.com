@@ -278,7 +278,6 @@ export function TalkToHugoAI({
         const levelData = await hugoApi.getUserLevel();
         setDifficultyLevel(levelData.levelName);
         setAssistanceConfig(levelData.assistance);
-        console.log("[Performance] Loaded user level:", levelData.level, levelData.levelName);
       } catch (error) {
         console.error("[Performance] Failed to load user level:", error);
       }
@@ -348,7 +347,6 @@ export function TalkToHugoAI({
             }
           }
 
-          console.log(`[Hugo] Loaded ${isV3Session ? 'V3' : 'V2'} session:`, session.id);
         } catch (err) {
           setMessages([{
             id: `error-${Date.now()}`,
@@ -500,7 +498,6 @@ export function TalkToHugoAI({
               setIsLoading(false);
             }
           })();
-          console.log("[Hugo] Practice context loaded from analysis:", ctx.practiceLabel, "turns:", turns.length);
           return;
         }
       } catch (e) {
@@ -542,7 +539,6 @@ export function TalkToHugoAI({
         text: welcomeText,
         timestamp: new Date(),
       }]);
-      console.log("[Hugo] Analysis discussion loaded for:", title);
       return;
     }
 
@@ -594,7 +590,6 @@ export function TalkToHugoAI({
             }
           );
           setHasActiveSession(true);
-          console.log("[Hugo] Admin streaming session started");
         } catch (e) {
           console.warn("[Hugo] Failed to start admin session:", e);
           setMessages([{
@@ -616,6 +611,11 @@ export function TalkToHugoAI({
           try {
             setIsLoading(true);
             const res = await apiFetch(`/api/user/sessions/${persistedId}?mode=${sessionMode}`);
+            if (!res.ok) {
+              // Server rejected resume (mode mismatch, expired, etc.) — clear stale ID
+              console.warn(`[Hugo] Resume failed (${res.status}), clearing persisted session`);
+              hugoApi.persistSessionId(null);
+            }
             if (res.ok) {
               const session = await res.json();
               // Mode guard: refuse to resume sessions from wrong mode
@@ -634,7 +634,6 @@ export function TalkToHugoAI({
                 setMessages(historyMessages);
                 hugoApi.persistSessionId(persistedId);
                 setHasActiveSession(true);
-                console.log("[Hugo] V3 session resumed:", persistedId);
                 setIsLoading(false);
                 return;
               }
@@ -681,7 +680,6 @@ export function TalkToHugoAI({
             }
           );
           setHasActiveSession(true);
-          console.log("[Hugo] V3 coaching session started");
         } catch (e: any) {
           console.warn("[Hugo] V3 coaching session failed:", e);
           setMessages([{
@@ -707,7 +705,6 @@ export function TalkToHugoAI({
             text: data.welcomeMessage,
             timestamp: new Date(),
           }]);
-          console.log("[Hugo] User welcome loaded, userId:", user?.id);
           return;
         }
       } catch (e) {
@@ -783,7 +780,6 @@ export function TalkToHugoAI({
       
       // Setup event listeners
       room.on(RoomEvent.ConnectionStateChanged, (state) => {
-        console.log("[LiveKit] Connection state:", state);
         setAudioConnectionState(state);
         if (state === ConnectionState.Connected) {
           setIsAudioConnecting(false);
@@ -791,7 +787,6 @@ export function TalkToHugoAI({
       });
       
       room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
-        console.log("[LiveKit] Track subscribed:", track.kind);
         if (track.kind === Track.Kind.Audio) {
           // Attach audio track
           const audioElement = track.attach();
@@ -814,17 +809,14 @@ export function TalkToHugoAI({
       });
       
       room.on(RoomEvent.Disconnected, () => {
-        console.log("[LiveKit] Disconnected");
         setAudioConnectionState(ConnectionState.Disconnected);
       });
       
       // Connect to room
       await room.connect(url, token);
-      console.log("[LiveKit] Connected to room");
       
       // Enable microphone
       await room.localParticipant.setMicrophoneEnabled(true);
-      console.log("[LiveKit] Microphone enabled");
       
       setLiveKitRoom(room);
       
@@ -1092,7 +1084,6 @@ export function TalkToHugoAI({
       }
 
       const { conversationId } = await response.json();
-      console.log('[Hugo] Inline analysis started:', conversationId);
 
       setMessages(prev => prev.map(m => {
         if (m.id !== analysisMessageId) return m;
@@ -1256,7 +1247,6 @@ export function TalkToHugoAI({
           viewMode: 'user',
         });
         setHasActiveSession(true);
-        console.log("[Hugo] Auto-started coach session");
       } catch (error) {
         console.error("[Hugo] Failed to start session:", error);
       }
