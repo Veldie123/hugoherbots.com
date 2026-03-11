@@ -196,7 +196,7 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
       <div className="p-6 space-y-6">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-[32px] leading-[40px] font-bold text-hh-ink mb-2">
+            <h1 className="text-[32px] leading-[40px] font-medium text-hh-ink mb-2">
               Notificaties
             </h1>
             <p className="text-[16px] leading-[24px] text-hh-muted">

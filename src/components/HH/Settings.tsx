@@ -371,7 +371,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
             <div>
-              <h1 className="mb-2 text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] lg:text-[48px] lg:leading-[56px]">
+              <h1 className="mb-2 text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] lg:text-[48px] lg:leading-[56px] font-medium">
                 Instellingen
               </h1>
               <p className="text-[14px] leading-[22px] sm:text-[16px] sm:leading-[24px] text-hh-muted">
@@ -389,7 +389,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                   <User className="w-5 h-5 text-hh-primary" />
                 </div>
                 <div>
-                  <h2 className="mb-0">Profiel</h2>
+                  <h2 className="mb-0 font-medium">Profiel</h2>
                   <p className="text-[14px] leading-[20px] text-hh-muted">
                     Jouw persoonlijke gegevens en avatar
                   </p>
@@ -535,7 +535,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                   <Monitor className="w-5 h-5 text-hh-primary" />
                 </div>
                 <div>
-                  <h2 className="mb-0">Weergave</h2>
+                  <h2 className="mb-0 font-medium">Weergave</h2>
                   <p className="text-[14px] leading-[20px] text-hh-muted">
                     Kies je thema voorkeur
                   </p>
@@ -594,7 +594,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                   <Bell className="w-5 h-5 text-hh-warn" />
                 </div>
                 <div>
-                  <h2 className="mb-0">Notificaties</h2>
+                  <h2 className="mb-0 font-medium">Notificaties</h2>
                   <p className="text-[14px] leading-[20px] text-hh-muted">
                     Kies welke updates je wilt ontvangen
                   </p>
@@ -703,7 +703,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                   <CreditCard className="w-5 h-5 text-hh-primary" />
                 </div>
                 <div>
-                  <h2 className="mb-0">Abonnement & Betaling</h2>
+                  <h2 className="mb-0 font-medium">Abonnement & Betaling</h2>
                   <p className="text-[14px] leading-[20px] text-hh-muted">
                     Beheer je abonnement en betalingsgegevens
                   </p>
@@ -792,7 +792,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                     <Users className="w-5 h-5 text-hh-primary" />
                   </div>
                   <div>
-                    <h2 className="mb-0">Team</h2>
+                    <h2 className="mb-0 font-medium">Team</h2>
                     <p className="text-[14px] leading-[20px] text-hh-muted">
                       Beheer je teamleden en rollen
                     </p>
@@ -841,7 +841,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                     <Users className="w-5 h-5 text-hh-primary" />
                   </div>
                   <div>
-                    <h2 className="mb-0">Team</h2>
+                    <h2 className="mb-0 font-medium">Team</h2>
                     <p className="text-[14px] leading-[20px] text-hh-muted">
                       Werk samen met je team
                     </p>
@@ -852,7 +852,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                   <div className="w-16 h-16 rounded-full bg-hh-primary/10 flex items-center justify-center mx-auto mb-4">
                     <Crown className="w-8 h-8 text-hh-primary" />
                   </div>
-                  <h3 className="text-[18px] leading-[24px] text-hh-text mb-2">
+                  <h3 className="text-[18px] leading-[24px] font-medium text-hh-text mb-2">
                     Upgrade naar Team
                   </h3>
                   <p className="text-[14px] leading-[20px] text-hh-muted mb-6 max-w-md mx-auto">
@@ -875,7 +875,7 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                   <SettingsIcon className="w-5 h-5 text-hh-muted" />
                 </div>
                 <div>
-                  <h2 className="mb-0">Account</h2>
+                  <h2 className="mb-0 font-medium">Account</h2>
                   <p className="text-[14px] leading-[20px] text-hh-muted">
                     Account instellingen en uitloggen
                   </p>

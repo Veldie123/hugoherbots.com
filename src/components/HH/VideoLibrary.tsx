@@ -639,7 +639,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
         {/* Header with compact KPI cards on the right */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
           <div>
-            <h1 className="text-[24px] sm:text-[28px] lg:text-[32px] leading-[40px] text-hh-text mb-2">
+            <h1 className="text-[24px] sm:text-[28px] lg:text-[32px] leading-[40px] font-medium text-hh-text mb-2">
               Video Bibliotheek
             </h1>
             <p className="text-[16px] leading-[24px] text-hh-muted">

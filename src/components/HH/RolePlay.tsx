@@ -166,7 +166,7 @@ export function RolePlay({ navigate, isAdmin }: RolePlayProps) {
         <div className="px-4 sm:px-6 lg:px-8 pt-6 pb-4 border-b border-hh-border bg-hh-bg flex-shrink-0">
           <div className="flex items-start justify-between gap-4 mb-2">
             <div className="flex-1">
-              <h1 className="text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] lg:text-[48px] lg:leading-[56px] mb-2">
+              <h1 className="text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] lg:text-[48px] lg:leading-[56px] font-medium mb-2">
                 Role-play Video
               </h1>
               <p className="text-[14px] leading-[22px] sm:text-[16px] sm:leading-[24px] text-hh-muted">
@@ -339,7 +339,7 @@ export function RolePlay({ navigate, isAdmin }: RolePlayProps) {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <Lightbulb className="w-4 h-4 text-hh-warn" />
-                        <h3 className="text-[16px] leading-[24px] text-hh-text">
+                        <h3 className="text-[16px] leading-[24px] font-medium text-hh-text">
                           Huidige stap: Feitgerichte vragen onder alternatieve vorm
                         </h3>
                       </div>
@@ -409,7 +409,7 @@ export function RolePlay({ navigate, isAdmin }: RolePlayProps) {
 
             {/* Sub-scores */}
             <div className="space-y-3">
-              <h3 className="text-[18px] leading-[26px] text-hh-text">
+              <h3 className="text-[18px] leading-[26px] font-medium text-hh-text">
                 Scores per onderdeel
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -437,7 +437,7 @@ export function RolePlay({ navigate, isAdmin }: RolePlayProps) {
 
             {/* Highlights */}
             <div className="space-y-3">
-              <h3 className="text-[18px] leading-[26px] text-hh-text">
+              <h3 className="text-[18px] leading-[26px] font-medium text-hh-text">
                 Highlights
               </h3>
               <div className="space-y-2">
@@ -458,7 +458,7 @@ export function RolePlay({ navigate, isAdmin }: RolePlayProps) {
 
             {/* Recommendations */}
             <div className="space-y-3">
-              <h3 className="text-[18px] leading-[26px] text-hh-text">
+              <h3 className="text-[18px] leading-[26px] font-medium text-hh-text">
                 Hugo's advies
               </h3>
               <p className="text-[16px] leading-[24px] text-hh-muted">

@@ -994,7 +994,7 @@ export function AnalysisResults({
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ backgroundColor: accentBg }}>
             <MessageSquare className="w-8 h-8" style={{ color: accentColor }} />
           </div>
-          <h2 className="text-xl font-bold text-hh-text">Oefen verder!</h2>
+          <h2 className="text-xl font-medium text-hh-text">Oefen verder!</h2>
           <p className="text-hh-muted text-sm leading-relaxed">
             {insights.summaryMarkdown}
           </p>
@@ -2245,7 +2245,7 @@ export function AnalysisResults({
                           variant="default"
                         >
                           <div className="space-y-1.5">
-                            <div className="flex flex-wrap items-center gap-1.5">
+                            <div className={`flex flex-wrap items-center gap-1.5 ${turn.speaker === 'seller' ? 'justify-end' : 'justify-start'}`}>
                               {turn.speaker === 'customer' && signal && signal.houding !== 'neutraal' && (() => {
                                 const badgeKey = `signal-${turn.idx}`;
                                 const isConfirmed = feedbackConfirmed.has(badgeKey);

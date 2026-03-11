@@ -41,7 +41,7 @@ export function About({ navigate }: AboutProps) {
             <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 mb-4 text-[12px] sm:text-[14px]">
               40 jaar salestraining
             </Badge>
-            <h1 className="mb-4 text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] lg:text-[48px] lg:leading-[56px]">
+            <h1 className="mb-4 text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] lg:text-[48px] lg:leading-[56px] font-medium">
               Ik ben Hugo Herbots. En dit is mijn laatste hoofdstuk.
             </h1>
             <p className="text-[14px] leading-[22px] sm:text-[16px] sm:leading-[24px] lg:text-[18px] lg:leading-[26px] text-hh-muted mb-4 sm:mb-6">
@@ -117,7 +117,7 @@ export function About({ navigate }: AboutProps) {
       <section className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
         <div className="space-y-8">
           <div>
-            <h2 className="mb-4">Het verhaal</h2>
+            <h2 className="mb-4 font-medium">Het verhaal</h2>
             <p className="text-[18px] leading-[26px] text-hh-muted">
               Mijn carrière begon in de jaren '80. Toen was sales nog een
               ambacht — geen apps, geen CRM's, gewoon jij en de klant. Ik
@@ -141,7 +141,7 @@ export function About({ navigate }: AboutProps) {
           </Card>
 
           <div>
-            <h3 className="mb-3">
+            <h3 className="mb-3 font-medium">
               Van exclusief naar toegankelijk
             </h3>
             <p className="text-[18px] leading-[26px] text-hh-muted mb-4">
@@ -166,7 +166,7 @@ export function About({ navigate }: AboutProps) {
           </div>
 
           <div>
-            <h3 className="mb-3">
+            <h3 className="mb-3 font-medium">
               Waarom nu? Waarom AI?
             </h3>
             <p className="text-[18px] leading-[26px] text-hh-muted mb-4">
@@ -221,7 +221,7 @@ export function About({ navigate }: AboutProps) {
                 <div className="w-12 h-12 rounded-full bg-hh-primary/10 flex items-center justify-center mx-auto mb-4">
                   <item.icon className="w-6 h-6 text-hh-primary" />
                 </div>
-                <h3 className="text-[20px] leading-[28px] text-hh-text mb-2">
+                <h3 className="text-[20px] leading-[28px] font-medium text-hh-text mb-2">
                   {item.title}
                 </h3>
                 <p className="text-[16px] leading-[24px] text-hh-muted">
@@ -386,7 +386,7 @@ export function About({ navigate }: AboutProps) {
               <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 mb-3">
                 {item.phase}
               </Badge>
-              <h3 className="text-[24px] leading-[32px] text-hh-text mb-2">
+              <h3 className="text-[24px] leading-[32px] font-medium text-hh-text mb-2">
                 {item.title}
               </h3>
               <p className="text-[16px] leading-[24px] text-hh-muted mb-4">

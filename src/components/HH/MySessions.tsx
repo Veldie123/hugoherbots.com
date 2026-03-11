@@ -76,7 +76,7 @@ export function MySessions({ navigate }: MySessionsProps) {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="mb-2">Mijn Trainingssessies</h1>
+            <h1 className="mb-2 font-medium">Mijn Trainingssessies</h1>
             <p className="text-hh-muted">
               Je hebt deze week {weekStats.totalSessions} sessies afgerond —
               blijf oefenen, groei is meetbaar.
@@ -234,7 +234,7 @@ export function MySessions({ navigate }: MySessionsProps) {
               <TrendingUp className="w-6 h-6 text-hh-primary" />
             </div>
             <div>
-              <h3 className="text-hh-text mb-2">Hugo's training tip</h3>
+              <h3 className="text-hh-text font-medium mb-2">Hugo's training tip</h3>
               <p className="text-hh-muted mb-4">
                 Je score op discovery calls is consistent hoog (87%), maar bij
                 closing scenario's zakt die naar 68%. Focus deze week op{" "}

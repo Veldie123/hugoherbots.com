@@ -50,7 +50,7 @@ export function EpicSlideCard({ slide }: EpicSlideCardProps) {
       </div>
 
       <div className="px-4 pb-2">
-        <h4 className="text-sm font-bold text-white leading-tight">
+        <h4 className="text-sm font-medium text-white leading-tight">
           {slide.titel}
         </h4>
       </div>

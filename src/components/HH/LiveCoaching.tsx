@@ -195,7 +195,7 @@ function UserProgressCard({ stats, loading }: { stats: UserProgressStats; loadin
                   <item.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${item.color}`} />
                 )}
               </div>
-              <span className="text-[24px] leading-[32px] sm:text-[28px] sm:leading-[36px] font-bold text-hh-text">
+              <span className="text-[24px] leading-[32px] sm:text-[28px] sm:leading-[36px] font-medium text-hh-text">
                 {loading ? "..." : item.value}
               </span>
               <span className="text-[12px] leading-[16px] sm:text-[14px] sm:leading-[20px] text-hh-muted">
