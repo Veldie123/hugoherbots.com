@@ -634,7 +634,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
             </button>
 
             {/* Hugo Feedback Widget */}
-            {isHugo && <HugoFeedbackWidget currentPage={currentPage} />}
+            <HugoFeedbackWidget currentPage={currentPage} />
 
             {/* Notifications Bell - Purple for Admin */}
             <div className="relative">

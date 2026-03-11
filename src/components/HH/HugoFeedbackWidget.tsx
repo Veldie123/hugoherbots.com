@@ -194,9 +194,9 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
           className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
           style={{
             backgroundColor: open
-              ? 'var(--hh-purple)'
-              : 'color-mix(in srgb, var(--hh-purple) 15%, transparent)',
-            color: open ? '#ffffff' : 'var(--hh-purple)',
+              ? 'var(--hh-primary)'
+              : 'color-mix(in srgb, var(--hh-primary) 15%, transparent)',
+            color: open ? '#ffffff' : 'var(--hh-primary)',
           }}
           aria-label="Feedback geven"
           title="UI Feedback"

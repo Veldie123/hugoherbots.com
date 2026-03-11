@@ -578,7 +578,7 @@ export function AppLayout({
             </Button>
 
             {/* Hugo Feedback Widget */}
-            {onboardingMode && <HugoFeedbackWidget currentPage={currentPage} />}
+            <HugoFeedbackWidget currentPage={currentPage} />
 
             <div className="relative" ref={notifRef}>
               <button
