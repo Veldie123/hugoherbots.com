@@ -28,5 +28,11 @@ jobs:
       - name: Config lint
         run: node scripts/config-lint.js
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
       - name: Build
         run: npm run build
