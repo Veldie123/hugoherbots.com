@@ -111,9 +111,37 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 - **Code taal:** Engels (variabelen, functies, comments)
 - **Geen `console.log`** in productie code
 - **Build check:** `npm run build` moet slagen voor elke commit
-- **Visuele verificatie:** Bij nieuwe of gewijzigde UI-componenten: neem een screenshot via `npx tsx scripts/screenshot.ts <url> /tmp/screenshot.png` en controleer het resultaat visueel voordat je commit. Doe dit altijd, zonder dat de gebruiker erom hoeft te vragen.
+- **Visuele verificatie (VERPLICHT — zie sectie hieronder)**
 - **Hergebruik bestaande patronen:** Zoek ALTIJD eerst of een UI-element, flow, of functionaliteit al bestaat in het platform. Kopieer en hergebruik die implementatie — bouw NOOIT van nul als het al bestaat.
 - **Commit message stijl:** Korte imperatief ("Fix X", "Add Y", "Update Z")
+
+## Visuele Verificatie (VERPLICHT)
+
+Na ELKE UI-wijziging, VOOR je commit of resultaat presenteert aan de gebruiker:
+
+1. **Build:** `npm run build` moet slagen
+2. **Server restart:** Kill poorten 5001/3001/3002, dan `unset ANTHROPIC_API_KEY && PORT=5001 node --env-file=.env server/production-server.js`
+3. **Screenshots nemen** van ALLE gewijzigde pagina's:
+   ```bash
+   npx tsx scripts/screenshot.ts http://localhost:5001/<pagina> /tmp/verify-<naam>.png
+   ```
+   Gebruik `--click` parameter als navigatie nodig is om de gewijzigde component te zien.
+4. **Screenshots visueel bekijken** (Read tool op het PNG bestand) en controleer:
+   - Kleuren kloppen (geen zwart/wit waar kleur hoort, juiste hh-* tokens)
+   - Layout intact (geen overflow, geen missende elementen, geen broken spacing)
+   - Tekst leesbaar (contrast, font size, geen afgekapte tekst)
+   - Dark mode werkt (indien relevant, neem ook dark mode screenshot)
+5. **Fix ALLES** wat niet klopt — herhaal stap 3-4 tot het perfect is
+6. **Design token check:** `bash scripts/check-design-tokens.sh` — 0 violations
+7. **Pas dan** presenteren aan gebruiker of committen
+
+**Scripts beschikbaar:**
+- `npx tsx scripts/screenshot.ts <url> [output] [--click "selector"]` — enkele screenshot (auth via SCREENSHOT_EMAIL/PASSWORD in .env)
+- `npm run audit:screenshot` — bulk screenshots van alle pagina's (desktop + mobile)
+- `npm run verify:ui` — geautomatiseerde post-build verificatie (design tokens + routes + screenshots)
+- `npm run baseline:compare` — visuele regressie check tegen opgeslagen baselines
+
+**NOOIT overslaan.** Als je geen screenshots neemt en visueel controleert, worden bugs niet opgemerkt tot de gebruiker ze zelf vindt. Dat is onacceptabel.
 
 ## Local Development Server
 
