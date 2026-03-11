@@ -76,7 +76,7 @@ export function MySessions({ navigate }: MySessionsProps) {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="mb-2 font-medium">Mijn Trainingssessies</h1>
+            <h1 className="mb-2 font-light">Mijn Trainingssessies</h1>
             <p className="text-hh-muted">
               Je hebt deze week {weekStats.totalSessions} sessies afgerond —
               blijf oefenen, groei is meetbaar.

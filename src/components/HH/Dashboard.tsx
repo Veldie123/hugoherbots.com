@@ -556,7 +556,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         {/* Header with streak + E.P.I.C. progress */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h1 className="mb-1 text-[24px] leading-[32px] sm:text-[28px] sm:leading-[36px] lg:text-[32px] lg:leading-[40px] font-medium text-hh-text truncate">
+            <h1 className="mb-1 text-[24px] leading-[32px] sm:text-[28px] sm:leading-[36px] lg:text-[32px] lg:leading-[40px] font-light text-hh-text truncate">
               {displayName ? `Welkom, ${displayName}` : 'Welkom!'}
             </h1>
             <p className="text-[13px] sm:text-[14px] leading-[20px] text-hh-muted line-clamp-2">

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "./Logo";
@@ -7,6 +8,8 @@ interface ComingSoonProps {
 }
 
 export function ComingSoon({ navigate }: ComingSoonProps) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+
   return (
     <div
       className="relative min-h-screen overflow-hidden"
@@ -15,13 +18,14 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
       {/* Hugo photo — full body, right side */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        animate={{ opacity: imgLoaded ? 1 : 0 }}
         transition={{ duration: 1.8, ease: [0.25, 0.4, 0.25, 1] }}
         className="absolute inset-0"
       >
         <img
           src="/images/Hugo-Herbots-WEB-0444.JPG"
           alt="Hugo Herbots"
+          onLoad={() => setImgLoaded(true)}
           className="absolute right-0 top-0 h-full w-auto object-contain object-right"
           style={{ mixBlendMode: "lighten" }}
         />

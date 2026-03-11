@@ -41,7 +41,7 @@ export function About({ navigate }: AboutProps) {
             <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 mb-4 text-[12px] sm:text-[14px]">
               40 jaar salestraining
             </Badge>
-            <h1 className="mb-4 text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] lg:text-[48px] lg:leading-[56px] font-medium">
+            <h1 className="mb-4 text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] lg:text-[48px] lg:leading-[56px] font-light">
               Ik ben Hugo Herbots. En dit is mijn laatste hoofdstuk.
             </h1>
             <p className="text-[14px] leading-[22px] sm:text-[16px] sm:leading-[24px] lg:text-[18px] lg:leading-[26px] text-hh-muted mb-4 sm:mb-6">
