@@ -37,13 +37,14 @@ jobs:
 
       - name: Map changed transcripts to technique IDs
         id: techniques
+        env:
+          CHANGED_FILES: ${{ steps.changed.outputs.changed_files }}
         run: |
           node -e "
             const fs = require('fs');
-            const changedFiles = \`${{ steps.changed.outputs.changed_files }}\`.trim().split('\n').filter(Boolean);
+            const changedFiles = (process.env.CHANGED_FILES || '').trim().split('\n').filter(Boolean);
 
             if (changedFiles.includes('config/video_mapping.json') || changedFiles.length === 0) {
-              // video_mapping itself changed, or no specific transcripts — audit all
               process.stdout.write('ALL');
               process.exit(0);
             }
@@ -53,7 +54,7 @@ jobs:
 
             for (const [filename, v] of Object.entries(vm.videos || {})) {
               if (v.is_hidden) continue;
-              const stem = filename.replace(/\\.MP4$/i, '');
+              const stem = filename.replace(/\\.MP4\$/i, '');
               const transcriptPath = 'data/transcripts/' + stem + '.txt';
               if (changedFiles.includes(transcriptPath)) {
                 techIds.add(v.techniek);
@@ -61,17 +62,17 @@ jobs:
             }
 
             if (techIds.size === 0) {
-              // Changed transcripts don't match any published video
               process.stdout.write('NONE');
             } else {
               process.stdout.write([...techIds].join(','));
             }
           " > /tmp/tech_ids.txt
-          TECH_IDS=$(cat /tmp/tech_ids.txt)
-          echo "tech_ids=$TECH_IDS" >> $GITHUB_OUTPUT
-          echo "Techniques to audit: $TECH_IDS"
+          TECH_IDS=\$(cat /tmp/tech_ids.txt)
+          echo "tech_ids=\$TECH_IDS" >> \$GITHUB_OUTPUT
+          echo "Techniques to audit: \$TECH_IDS"
 
       - name: Run SSOT audit
+        id: audit
         if: steps.techniques.outputs.tech_ids != 'NONE'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -83,6 +84,10 @@ jobs:
             npx tsx scripts/ssot-audit.ts --techniques "$TECH_IDS"
           fi
         continue-on-error: true  # Don't fail the workflow if audit fails (API errors etc)
+
+      - name: Warn on audit failure
+        if: steps.audit.outcome == 'failure' && steps.techniques.outputs.tech_ids != 'NONE'
+        run: echo "::warning::SSOT audit script failed — no drift detection results available. Check the workflow logs."
 
       - name: Check for significant findings
         id: findings
@@ -98,8 +103,8 @@ jobs:
           fi
 
           # Count significant findings: confidence >= 0.75 AND status != ok
-          SIGNIFICANT=$(node -e "
-            const data = JSON.parse(require('fs').readFileSync('$AUDIT_FILE', 'utf-8'));
+          SIGNIFICANT=$(AUDIT_FILE_PATH="$AUDIT_FILE" node -e "
+            const data = JSON.parse(require('fs').readFileSync(process.env.AUDIT_FILE_PATH, 'utf-8'));
             const sig = (data.findings || []).filter(f =>
               f.status !== 'ok' &&
               !f.no_transcript_coverage &&

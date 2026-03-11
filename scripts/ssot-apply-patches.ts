@@ -32,8 +32,8 @@ interface ConfigFileInfo {
   filePath: string;
   /** Top-level key in the JSON that holds the item map (e.g. "technieken") */
   itemsKey: string;
-  /** Alternative key to try if itemsKey is absent (flat structure) */
-  fallbackKey?: string;
+  /** If true, treat the top-level object itself as the item map when itemsKey is absent */
+  flatStructure?: boolean;
 }
 
 const CONFIG_FILE_MAP: Record<AuditFinding["config_file"], ConfigFileInfo> = {
@@ -44,7 +44,7 @@ const CONFIG_FILE_MAP: Record<AuditFinding["config_file"], ConfigFileInfo> = {
   "klant_houdingen.json": {
     filePath: path.join(PROJECT_ROOT, "config", "klant_houdingen.json"),
     itemsKey: "houdingen",
-    fallbackKey: undefined,
+    flatStructure: true,
   },
   "rag_heuristics.json": {
     filePath: path.join(PROJECT_ROOT, "config", "rag_heuristics.json"),
@@ -105,10 +105,13 @@ function loadJsonFile(filePath: string, label: string): unknown {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function writeJsonFile(filePath: string, data: any): void {
+function writeJsonFile(filePath: string, data: unknown): void {
+  const json = JSON.stringify(data, null, 2) + "\n";
+  if (json.length < 10) {
+    throw new Error(`Refusing to write suspiciously small content (${json.length} bytes) to "${filePath}"`);
+  }
   const tmpPath = filePath + ".tmp";
-  fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2) + "\n", "utf-8");
+  fs.writeFileSync(tmpPath, json, "utf-8");
   fs.renameSync(tmpPath, filePath);
 }
 
@@ -142,17 +145,12 @@ interface PatchResult {
  * flat structures ({ "H1": {...} }).
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function resolveItemMap(data: any, info: ConfigFileInfo): Record<string, any> | null {
+function resolveItemMap(data: any, info: { itemsKey: string; flatStructure?: boolean }): Record<string, any> | null {
   if (data && typeof data === "object" && data[info.itemsKey]) {
-    return data[info.itemsKey] as Record<string, unknown>;
+    return data[info.itemsKey] as Record<string, any>;
   }
-  // klant_houdingen can be flat — fall back to top-level object
-  if (info.fallbackKey !== undefined) {
-    return null;
-  }
-  // For klant_houdingen.json specifically: if no "houdingen" key, treat as flat
-  if (info.itemsKey === "houdingen" && data && typeof data === "object") {
-    return data as Record<string, unknown>;
+  if (info.flatStructure && data && typeof data === "object") {
+    return data as Record<string, any>;
   }
   return null;
 }
