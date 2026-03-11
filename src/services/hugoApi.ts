@@ -75,6 +75,8 @@ export interface SendMessageResponse {
   response: string;
   phase: string;
   navigationDestination?: string;
+  navigationItemId?: string;
+  navigationLabel?: string;
   contextData?: {
     sector?: string;
     product?: string;
@@ -363,6 +365,8 @@ class HugoApiService {
       response: data.response?.text || "",
       phase: "COACH_CHAT",
       navigationDestination: data.response?.navigationDestination,
+      navigationItemId: data.response?.navigationItemId,
+      navigationLabel: data.response?.navigationLabel,
     };
   }
 
@@ -372,7 +376,7 @@ class HugoApiService {
     onToken: (token: string) => void,
     onDone?: (debug?: any) => void,
     files?: File[],
-    onNavigate?: (destination: string) => void
+    onNavigate?: (destination: string, itemId?: string, label?: string) => void
   ): Promise<void> {
     if (!this.currentSessionId) {
       throw new Error("No active session. Call startSession first.");
@@ -425,7 +429,11 @@ class HugoApiService {
                 onToken(event.content);
               } else if (event.type === "tool_start" && event.name) {
                 if (event.name === "navigate_user" && event.input?.destination) {
-                  onNavigate?.(event.input.destination as string);
+                  onNavigate?.(
+                    event.input.destination as string,
+                    event.input.itemId as string | undefined,
+                    event.input.label as string | undefined
+                  );
                 } else {
                   onToken(`\n⚡ ${event.name}...\n`);
                 }

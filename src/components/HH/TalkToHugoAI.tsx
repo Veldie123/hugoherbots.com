@@ -44,6 +44,7 @@ import {
   FileAudio,
   Paperclip,
   File,
+  MapPin,
 } from "lucide-react";
 import technieken_index from "../../data/technieken_index";
 import { KLANT_HOUDINGEN } from "../../data/klant_houdingen";
@@ -101,12 +102,13 @@ interface Message {
   transcriptRole?: string;
   richContent?: import("@/types/crossPlatform").RichContent[];
   isThinking?: boolean;
+  navCard?: { destination: string; itemId?: string; label: string };
 }
 
 type ChatMode = "chat" | "audio" | "video";
 
 interface TalkToHugoAIProps {
-  navigate?: (page: string) => void;
+  navigate?: (page: string, data?: Record<string, any>) => void;
   isAdmin?: boolean;
   isSuperAdmin?: boolean;
   navigationData?: Record<string, any>;
@@ -421,7 +423,6 @@ export function TalkToHugoAI({
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   // Active coaching moment for inline practice
   const [activeCoachingMoment, setActiveCoachingMoment] = useState<any>(null);
-  const [navCard, setNavCard] = useState<string | null>(null);
 
   // Hugo starts conversation proactively based on cross-platform activity
   useEffect(() => {
@@ -1257,7 +1258,6 @@ export function TalkToHugoAI({
 
   const processMessageSend = async (messageText: string, v3Files?: File[]) => {
     isProcessingRef.current = true;
-    setNavCard(null);
 
     if (useStreaming) {
       setIsStreaming(true);
@@ -1287,7 +1287,15 @@ export function TalkToHugoAI({
             streamingTextRef.current = "";
           },
           v3Files && v3Files.length > 0 ? v3Files : undefined,
-          (destination) => setNavCard(destination)
+          (destination, itemId, label) => {
+            setMessages(prev => [...prev, {
+              id: `nav-${Date.now()}`,
+              sender: "ai",
+              text: "",
+              timestamp: new Date(),
+              navCard: { destination, itemId, label: label || destination },
+            }]);
+          }
         );
       } catch (error) {
         console.error("Streaming failed, falling back:", error);
@@ -2101,6 +2109,46 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             }
           }
 
+          if (message.navCard) {
+            return (
+              <Fragment key={message.id}>
+                {phaseDivider}
+                <div className="flex justify-start">
+                  <div className="flex items-start gap-3 p-4 rounded-[16px] border border-hh-border bg-hh-ui-50 max-w-sm">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-success) 10%, transparent)' }}>
+                      <MapPin className="w-4 h-4" style={{ color: 'var(--hh-success)' }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] text-hh-muted mb-1">Hugo suggereert</p>
+                      <p className="text-[14px] font-medium text-hh-text mb-3">{message.navCard.label}</p>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          className="rounded-full px-4 text-white"
+                          style={{ backgroundColor: 'var(--hh-success)' }}
+                          onClick={() => {
+                            navigate?.(message.navCard!.destination, message.navCard!.itemId ? { techniqueId: message.navCard!.itemId } : undefined);
+                            setMessages(prev => prev.filter(m => m.id !== message.id));
+                          }}
+                        >
+                          Ga daarheen
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-hh-muted"
+                          onClick={() => setMessages(prev => prev.filter(m => m.id !== message.id))}
+                        >
+                          Nee
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Fragment>
+            );
+          }
+
           return (
           <Fragment key={message.id}>
           {phaseDivider}
@@ -2653,34 +2701,6 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             ))}
           </div>
         )}
-
-        {navCard && (() => {
-          const NAV_LABELS: Record<string, { label: string; page: string }> = {
-            "videos":          { label: "Video's",         page: "videos" },
-            "upload-analysis": { label: "Gespreksanalyse", page: "upload-analysis" },
-            "dashboard":       { label: "Dashboard",       page: "dashboard" },
-            "settings":        { label: "Instellingen",    page: "settings" },
-          };
-          const nav = NAV_LABELS[navCard];
-          if (!nav) return null;
-          return (
-            <div className="flex items-center gap-3 px-4 py-3 border-t border-hh-primary/20 bg-hh-primary/5">
-              <span className="text-hh-text text-[14px] flex-1">
-                Hugo wil je naar <strong>{nav.label}</strong> sturen
-              </span>
-              <Button
-                size="sm"
-                className="bg-hh-primary hover:bg-hh-primary/90 text-white rounded-full px-4"
-                onClick={() => { navigate?.(nav.page); setNavCard(null); }}
-              >
-                Ga daarheen
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => setNavCard(null)}>
-                Nee
-              </Button>
-            </div>
-          );
-        })()}
 
         <div className="p-4 border-t border-hh-border flex gap-2 items-end flex-shrink-0">
           <Button

@@ -480,6 +480,8 @@ router.post(
           text: response.text,
           toolsUsed: response.toolsUsed,
           navigationDestination: response.navigationDestination,
+          navigationItemId: response.navigationItemId,
+          navigationLabel: response.navigationLabel,
           model: response.model,
         },
         usage: {
