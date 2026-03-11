@@ -48,6 +48,11 @@ async function getGoogleDriveAccessToken() {
     }
   }
 
+  // Fix Node.js 24+ (OpenSSL 3.5): literal \n in PEM key must be real newlines
+  if (keyData.private_key) {
+    keyData.private_key = keyData.private_key.replace(/\\n/g, '\n');
+  }
+
   const auth = new google.auth.GoogleAuth({
     credentials: keyData,
     scopes: ['https://www.googleapis.com/auth/drive.readonly'],
@@ -103,6 +108,19 @@ async function listVideosInFolder(folderId, accessToken) {
   );
 }
 
+// ─── Titel afleiding van mapnaam ─────────────────────────────────────────────
+
+function cleanFolderTitle(folderName) {
+  let title = folderName || '';
+  // Strip "Fase X - " prefix (top-level fase folders)
+  title = title.replace(/^Fase\s+[\d.]+\s*-\s*/, '');
+  // Strip numbering prefix (e.g., "A. 1 ", "2.1.3 ", "4.3.0 ")
+  title = title.replace(/^(?:[A-Za-z]\.\s*)?[\d]+[\d.\s]*\s+/, '');
+  // Clean double spaces
+  title = title.replace(/\s{2,}/g, ' ').trim();
+  return title;
+}
+
 // ─── Recursieve Drive traversal (namen gesorteerd) ────────────────────────────
 
 async function traverseFolder(folderId, folderName, accessToken, depth = 0) {
@@ -119,6 +137,12 @@ async function traverseFolder(folderId, folderName, accessToken, depth = 0) {
 
   // Haal eerst de video's op in DEZE map (gesorteerd op naam)
   const videos = await listVideosInFolder(folderId, accessToken);
+  // Attach parent folder info for title derivation
+  for (let i = 0; i < videos.length; i++) {
+    videos[i].parentFolderName = folderName;
+    videos[i].siblingCount = videos.length;
+    videos[i].siblingIndex = i;
+  }
   if (videos.length > 0) {
     console.log(`${indent}   ${videos.length} video${videos.length !== 1 ? "'s" : ''}: ${videos.map(v => v.name).join(', ').substring(0, 100)}`);
   }
@@ -182,16 +206,17 @@ async function main() {
   const { videos: driveVideos } = await traverseFolder(HUGO_FOLDER_ID, '(root)', accessToken, 0);
   console.log(`\n✓   ${driveVideos.length} video's gevonden in Drive\n`);
 
-  // ── Stap 4: Volgorde opstellen + preview ──────────────────────────────────
-  console.log('═'.repeat(90));
-  console.log('NIEUWE AFSPEELVOLGORDE');
-  console.log('═'.repeat(90));
-  console.log(' #    Drive-bestand            DB-titel                              Oud# → Nieuw#');
-  console.log('─'.repeat(90));
+  // ── Stap 4: Volgorde + titels opstellen + preview ───────────────────────────
+  console.log('═'.repeat(120));
+  console.log('NIEUWE AFSPEELVOLGORDE + TITELS (afgeleid van mapnaam)');
+  console.log('═'.repeat(120));
+  console.log(` ${'#'.padStart(3)}  ${'Bestand'.padEnd(16)} ${'Oude titel'.padEnd(32)} ${'Nieuwe titel'.padEnd(42)} ${'Oud#'.padStart(4)} → ${'Nw#'.padStart(3)}`);
+  console.log('─'.repeat(120));
 
+  // DRIVE IS AUTHORITY: assign sequential playback_order + title from folder name
   const updates = [];
-  let order = 1;
   let notFound = 0;
+  let order = 1;
 
   for (const driveFile of driveVideos) {
     const dbVideo = byFileId[driveFile.id];
@@ -201,61 +226,71 @@ async function main() {
       continue;
     }
 
-    const title = (dbVideo.video_title || dbVideo.drive_file_name || '?').substring(0, 30);
-    const oldOrder = dbVideo.playback_order ?? '—';
-    const changed = dbVideo.playback_order !== order ? ' ← GEWIJZIGD' : '';
-    console.log(` ${String(order).padStart(3)}  ${driveFile.name.padEnd(22)} ${title.padEnd(37)} ${String(oldOrder).padStart(4)} → ${String(order).padStart(4)}${changed}`);
+    // Derive title from parent folder name
+    let newTitle = cleanFolderTitle(driveFile.parentFolderName || '');
+    if (driveFile.siblingCount > 1) {
+      newTitle += ` (deel ${driveFile.siblingIndex + 1})`;
+    }
 
-    updates.push({ id: dbVideo.id, playback_order: order, title });
+    const oldTitle = dbVideo.video_title || dbVideo.drive_file_name || '?';
+    const oldOrder = dbVideo.playback_order;
+    const orderChanged = oldOrder !== order;
+    const titleChanged = oldTitle !== newTitle;
+    const changed = orderChanged || titleChanged;
+
+    const marker = changed ? ' ← WIJZIGING' : ' ✓';
+    console.log(` ${String(order).padStart(3)}  ${driveFile.name.substring(0, 14).padEnd(16)} ${oldTitle.substring(0, 30).padEnd(32)} ${newTitle.substring(0, 40).padEnd(42)} ${String(oldOrder ?? '—').padStart(4)} → ${String(order).padStart(3)}${marker}`);
+
+    updates.push({ id: dbVideo.id, playback_order: order, video_title: newTitle, oldTitle, changed, orderChanged, titleChanged });
     order++;
   }
 
-  console.log('═'.repeat(90));
-  const changed = updates.filter((u, i) => {
-    const orig = dbVideos.find(v => v.id === u.id);
-    return orig?.playback_order !== u.playback_order;
-  }).length;
-  console.log(`\nSamenvatting: ${updates.length} video's, ${changed} volgorde-wijzigingen, ${notFound} niet gevonden in DB`);
+  const orderChanges = updates.filter(u => u.orderChanged).length;
+  const titleChanges = updates.filter(u => u.titleChanged).length;
+  const totalChanges = updates.filter(u => u.changed).length;
+  console.log('═'.repeat(120));
+  console.log(`\nSamenvatting: ${updates.length} video's, ${orderChanges} volgorde-wijzigingen, ${titleChanges} titel-wijzigingen, ${notFound} niet gevonden in DB`);
 
   if (DRY_RUN) {
     console.log('\n⏸   Dry-run — niets opgeslagen. Verwijder --dry-run om te updaten.\n');
     return;
   }
 
-  if (changed === 0) {
-    console.log('\n✅  Volgorde is al correct — geen updates nodig.\n');
+  if (totalChanges === 0) {
+    console.log('\n✅  Alles is al correct — geen updates nodig.\n');
     return;
   }
 
-  await confirm(`\nDruk Enter om ${updates.length} playback_order waarden bij te werken in Supabase, of Ctrl+C om te annuleren: `);
+  await confirm(`\nDruk Enter om ${totalChanges} wijzigingen (${orderChanges} volgorde + ${titleChanges} titels) bij te werken in Supabase, of Ctrl+C om te annuleren: `);
 
   // ── Stap 5: Supabase updaten ──────────────────────────────────────────────
   console.log('\n📝  Supabase updaten...');
   let successCount = 0;
   let failCount = 0;
 
-  // Batch updates in chunks van 50
+  // Only update changed rows, in chunks of 50
+  const toUpdate = updates.filter(u => u.changed);
   const CHUNK_SIZE = 50;
-  for (let i = 0; i < updates.length; i += CHUNK_SIZE) {
-    const chunk = updates.slice(i, i + CHUNK_SIZE);
+  for (let i = 0; i < toUpdate.length; i += CHUNK_SIZE) {
+    const chunk = toUpdate.slice(i, i + CHUNK_SIZE);
     await Promise.all(chunk.map(async (u) => {
       const { error } = await sb
         .from('video_ingest_jobs')
-        .update({ playback_order: u.playback_order })
+        .update({ playback_order: u.playback_order, video_title: u.video_title })
         .eq('id', u.id);
       if (error) {
-        console.error(`  ❌  Fout bij ${u.title}: ${error.message}`);
+        console.error(`  ❌  Fout bij ${u.oldTitle}: ${error.message}`);
         failCount++;
       } else {
         successCount++;
       }
     }));
-    process.stdout.write(`\r  ✓  ${successCount}/${updates.length} bijgewerkt...`);
+    process.stdout.write(`\r  ✓  ${successCount}/${toUpdate.length} bijgewerkt...`);
   }
 
   console.log(`\n\n${'═'.repeat(50)}`);
   console.log(`✅  Klaar: ${successCount} bijgewerkt, ${failCount} mislukt`);
-  console.log('\n🔄  Ververs de admin video-pagina om de nieuwe volgorde te zien.\n');
+  console.log('\n🔄  Ververs de admin video-pagina om de nieuwe volgorde en titels te zien.\n');
 }
 
 main().catch((err) => {

@@ -37,6 +37,11 @@ async function getGoogleDriveAccessToken() {
     }
   }
 
+  // Fix Node.js 24+ (OpenSSL 3.5): literal \n in PEM key must be real newlines
+  if (keyData.private_key) {
+    keyData.private_key = keyData.private_key.replace(/\\n/g, '\n');
+  }
+
   const auth = new google.auth.GoogleAuth({
     credentials: keyData,
     scopes: ['https://www.googleapis.com/auth/drive.readonly'],
@@ -90,7 +95,15 @@ async function listDriveVideosInFolder(folderId, accessToken) {
   return videos.sort((a, b) => a.name.localeCompare(b.name, 'nl', { numeric: true, sensitivity: 'base' }));
 }
 
-async function scanFolder(folderId, accessToken, depth = 0) {
+function cleanFolderTitle(folderName) {
+  let title = folderName || '';
+  title = title.replace(/^Fase\s+[\d.]+\s*-\s*/, '');
+  title = title.replace(/^(?:[A-Za-z]\.\s*)?[\d]+[\d.\s]*\s+/, '');
+  title = title.replace(/\s{2,}/g, ' ').trim();
+  return title;
+}
+
+async function scanFolder(folderId, folderName, accessToken, depth = 0) {
   // Skip archief entirely
   if (folderId === ARCHIEF_FOLDER_ID) {
     console.log(`${'  '.repeat(depth)}[Scan] SKIPPING archief folder`);
@@ -101,7 +114,14 @@ async function scanFolder(folderId, accessToken, depth = 0) {
   const videos = await listDriveVideosInFolder(folderId, accessToken);
   const subfolders = await listDriveSubfolders(folderId, accessToken);
 
-  console.log(`${indent}[Scan] ${videos.length} videos, ${subfolders.length} subfolders in ${folderId}`);
+  // Attach parent folder info for title derivation
+  for (let i = 0; i < videos.length; i++) {
+    videos[i].parentFolderName = folderName;
+    videos[i].siblingCount = videos.length;
+    videos[i].siblingIndex = i;
+  }
+
+  console.log(`${indent}[Scan] ${videos.length} videos, ${subfolders.length} subfolders in ${folderName || folderId}`);
 
   let allVideos = [...videos];
   for (const sf of subfolders) {
@@ -110,7 +130,7 @@ async function scanFolder(folderId, accessToken, depth = 0) {
       console.log(`${indent}[Scan] SKIPPING archief subfolder: ${sf.name}`);
       continue;
     }
-    const sub = await scanFolder(sf.id, accessToken, depth + 1);
+    const sub = await scanFolder(sf.id, sf.name, accessToken, depth + 1);
     allVideos = allVideos.concat(sub);
   }
   return allVideos;
@@ -124,7 +144,7 @@ async function main() {
 
   let allActiveVideos = [];
   for (const folderId of ROOT_FOLDER_IDS) {
-    const videos = await scanFolder(folderId, accessToken);
+    const videos = await scanFolder(folderId, '(root)', accessToken);
     allActiveVideos = allActiveVideos.concat(videos);
     console.log(`[StandaloneSync] Folder ${folderId}: ${videos.length} active videos`);
   }
@@ -149,20 +169,24 @@ async function main() {
   }
   console.log(`[StandaloneSync] Loaded ${existingJobs?.length || 0} jobs, deduped to ${existingMap.size} unique`);
 
-  let added = 0, unchanged = 0, ordersUpdated = 0;
+  let added = 0, ordersUpdated = 0;
   const newVideos = [];
 
-  // Process Drive videos: add new ones, update order
-  let orderIndex = 0;
+  // Drive is the authority: assign sequential playback_order based on Drive traversal order
+  let order = 1;
   for (const video of allActiveVideos) {
     if (video.name.startsWith('Kopie van ')) continue;
-    orderIndex++;
 
     const existing = existingMap.get(video.id);
-    const playback_order = orderIndex;
+
+    // Derive title from parent folder name
+    let derivedTitle = cleanFolderTitle(video.parentFolderName || '');
+    if (video.siblingCount > 1) {
+      derivedTitle += ` (deel ${video.siblingIndex + 1})`;
+    }
 
     if (!existing) {
-      // New video
+      // New video — insert at Drive-determined position with folder-derived title
       const { error: insertError } = await supabase.from('video_ingest_jobs').insert({
         drive_file_id: video.id,
         drive_file_name: video.name,
@@ -170,29 +194,35 @@ async function main() {
         drive_file_size: video.size,
         drive_modified_time: video.modifiedTime,
         status: 'pending',
-        video_title: video.name.replace(/\.[^/.]+$/, ''),
+        video_title: derivedTitle,
         is_hidden: false,
-        playback_order
+        playback_order: order
       });
       if (insertError) {
         console.error(`[StandaloneSync] Insert error for ${video.name}:`, insertError.message);
       } else {
         added++;
         newVideos.push(video.name);
-        console.log(`[StandaloneSync] Added: ${video.name} (order ${playback_order})`);
+        console.log(`[StandaloneSync] Added: ${video.name} → "${derivedTitle}" (order ${order})`);
       }
     } else {
-      // Update playback_order
-      const { error: updateError } = await supabase.from('video_ingest_jobs')
-        .update({ playback_order, updated_at: new Date().toISOString() })
-        .eq('id', existing.id);
-      if (updateError) {
-        console.error(`[StandaloneSync] Update error for ${video.name}:`, updateError.message);
-      } else {
-        ordersUpdated++;
-        unchanged++;
+      // Existing video — update playback_order + title to match Drive
+      const updateFields = {};
+      if (existing.playback_order !== order) updateFields.playback_order = order;
+      if (existing.video_title !== derivedTitle) updateFields.video_title = derivedTitle;
+
+      if (Object.keys(updateFields).length > 0) {
+        const { error: updateError } = await supabase.from('video_ingest_jobs')
+          .update(updateFields)
+          .eq('id', existing.id);
+        if (updateError) {
+          console.error(`[StandaloneSync] Update error for ${video.name}:`, updateError.message);
+        } else {
+          ordersUpdated++;
+        }
       }
     }
+    order++;
   }
 
   // Handle deletions: mark videos not in Drive as deleted (only non-hidden active videos)

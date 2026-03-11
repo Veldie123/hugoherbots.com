@@ -914,6 +914,11 @@ async function getGoogleDriveAccessToken() {
     }
   }
 
+  // Fix Node.js 24+ (OpenSSL 3.5): literal \n in PEM key must be real newlines
+  if (keyData.private_key) {
+    keyData.private_key = keyData.private_key.replace(/\\n/g, '\n');
+  }
+
   const auth = new google.auth.GoogleAuth({
     credentials: keyData,
     scopes: ['https://www.googleapis.com/auth/drive.readonly'],
@@ -1040,30 +1045,42 @@ async function listDriveVideos(folderId, accessToken, depth = 0) {
 
 // NEW function that scans INCLUDING archief and marks which videos are in archief
 // Returns { activeVideos: [...], archiefVideos: [...] }
-async function listDriveVideosWithArchief(folderId, accessToken, depth = 0, isInArchief = false) {
+function cleanFolderTitle(folderName) {
+  let title = folderName || '';
+  title = title.replace(/^Fase\s+[\d.]+\s*-\s*/, '');
+  title = title.replace(/^(?:[A-Za-z]\.\s*)?[\d]+[\d.\s]*\s+/, '');
+  title = title.replace(/\s{2,}/g, ' ').trim();
+  return title;
+}
+
+async function listDriveVideosWithArchief(folderId, folderName, accessToken, depth = 0, isInArchief = false) {
   const indent = '  '.repeat(depth);
   const result = { activeVideos: [], archiefVideos: [] };
-  
+
   // Check if this folder IS the archief folder — if so, SKIP entirely (rule: archief nooit verwerken)
   const currentIsArchief = isInArchief || folderId === ARCHIEF_FOLDER_ID;
   if (currentIsArchief) {
     console.log(`${indent}[Drive] SKIPPING archief folder: ${folderId}`);
     return result;
   }
-  
-  console.log(`${indent}[Drive] Scanning folder: ${folderId}`);
-  
+
+  console.log(`${indent}[Drive] Scanning folder: ${folderName || folderId}`);
+
   const videos = await listDriveVideosInFolder(folderId, accessToken);
   console.log(`${indent}[Drive] Found ${videos.length} videos in this folder`);
-  
-  for (const video of videos) {
-    video.isArchief = false;
-    result.activeVideos.push(video);
+
+  // Attach parent folder info for title derivation
+  for (let i = 0; i < videos.length; i++) {
+    videos[i].isArchief = false;
+    videos[i].parentFolderName = folderName;
+    videos[i].siblingCount = videos.length;
+    videos[i].siblingIndex = i;
+    result.activeVideos.push(videos[i]);
   }
-  
+
   const subfolders = await listDriveSubfolders(folderId, accessToken);
   console.log(`${indent}[Drive] Found ${subfolders.length} subfolders`);
-  
+
   for (const subfolder of subfolders) {
     // Skip if this subfolder is archief (by ID or name)
     const subfolderIsArchief = subfolder.id === ARCHIEF_FOLDER_ID || subfolder.name.toLowerCase() === 'archief';
@@ -1072,15 +1089,15 @@ async function listDriveVideosWithArchief(folderId, accessToken, depth = 0, isIn
       continue;
     }
     console.log(`${indent}[Drive] Recursing into: ${subfolder.name}`);
-    
-    const subResult = await listDriveVideosWithArchief(subfolder.id, accessToken, depth + 1, false);
+
+    const subResult = await listDriveVideosWithArchief(subfolder.id, subfolder.name, accessToken, depth + 1, false);
     result.activeVideos.push(...subResult.activeVideos);
   }
-  
+
   if (depth === 0) {
     console.log(`[Drive] Total active videos found: ${result.activeVideos.length}`);
   }
-  
+
   return result;
 }
 
@@ -1131,7 +1148,7 @@ async function syncVideosFromDrive(folderIdOrIds) {
   let allArchiefVideos = [];
   
   for (const folderId of folderIds) {
-    const { activeVideos, archiefVideos } = await listDriveVideosWithArchief(folderId, accessToken);
+    const { activeVideos, archiefVideos } = await listDriveVideosWithArchief(folderId, '(root)', accessToken);
     allActiveVideos.push(...activeVideos);
     allArchiefVideos.push(...archiefVideos);
     console.log(`[Sync] Folder ${folderId}: ${activeVideos.length} active + ${archiefVideos.length} archief`);
@@ -1148,7 +1165,7 @@ async function syncVideosFromDrive(folderIdOrIds) {
   // Get only active (non-deleted) jobs — deduplicate by drive_file_id keeping the one with mux_playback_id
   const { data: existingJobs, error: fetchError } = await supabaseAdmin
     .from('video_ingest_jobs')
-    .select('id, drive_file_id, drive_folder_id, drive_modified_time, status, mux_playback_id, video_title, is_hidden')
+    .select('id, drive_file_id, drive_folder_id, drive_modified_time, status, mux_playback_id, video_title, is_hidden, playback_order')
     .neq('status', 'deleted');
   
   if (fetchError) {
@@ -1178,7 +1195,11 @@ async function syncVideosFromDrive(folderIdOrIds) {
     const shouldBeHidden = video.isArchief; // Video in archief = is_hidden true
     
     if (!existing) {
-      // New video - add it
+      // New video - add it with title derived from parent folder name
+      let derivedTitle = cleanFolderTitle(video.parentFolderName || '');
+      if (video.siblingCount > 1) {
+        derivedTitle += ` (deel ${video.siblingIndex + 1})`;
+      }
       try {
         const { error: insertError } = await supabaseAdmin
           .from('video_ingest_jobs')
@@ -1189,7 +1210,7 @@ async function syncVideosFromDrive(folderIdOrIds) {
             drive_file_size: video.size,
             drive_modified_time: video.modifiedTime,
             status: 'pending',
-            video_title: video.name.replace(/\.[^/.]+$/, ''),
+            video_title: derivedTitle || video.name.replace(/\.[^/.]+$/, ''),
             is_hidden: shouldBeHidden
           });
         
@@ -1284,31 +1305,48 @@ async function syncVideosFromDrive(folderIdOrIds) {
     console.log(`[Sync] Auto-fixed ${unhideCount} incorrectly hidden videos`);
   }
   
-  // AUTO-ASSIGN playback_order based on Drive traversal order (Drive folder structure = correct order)
-  // allActiveVideos is already in Drive folder order (orderBy=name, depth-first traversal)
-  console.log(`[Sync] Assigning playback_order for ${allActiveVideos.length} active videos...`);
+  // DRIVE IS AUTHORITY: assign sequential playback_order + title from folder name
+  console.log(`[Sync] Setting playback_order + titles for ${allActiveVideos.length} active videos (Drive = authority)...`);
+
   const orderUpdates = [];
-  let orderIndex = 0;
+  let order = 1;
   for (const video of allActiveVideos) {
     if (video.name.startsWith('Kopie van ')) continue;
-    orderIndex++;
     const job = existingMap.get(video.id);
-    if (job) {
-      orderUpdates.push({ id: job.id, playback_order: orderIndex, drive_file_name: video.name });
+    if (!job) { order++; continue; }
+
+    // Derive title from parent folder name
+    let derivedTitle = cleanFolderTitle(video.parentFolderName || '');
+    if (video.siblingCount > 1) {
+      derivedTitle += ` (deel ${video.siblingIndex + 1})`;
     }
+
+    const updateFields = {};
+    if (job.playback_order !== order) updateFields.playback_order = order;
+    if (derivedTitle && job.video_title !== derivedTitle) updateFields.video_title = derivedTitle;
+
+    if (Object.keys(updateFields).length > 0) {
+      updateFields.updated_at = new Date().toISOString();
+      orderUpdates.push({ id: job.id, updateFields, drive_file_name: video.name });
+    }
+    order++;
   }
-  
-  // Batch update playback_order in groups of 10
-  const batchSize = 10;
-  for (let i = 0; i < orderUpdates.length; i += batchSize) {
-    const batch = orderUpdates.slice(i, i + batchSize);
-    await Promise.all(batch.map(u =>
-      supabaseAdmin.from('video_ingest_jobs')
-        .update({ playback_order: u.playback_order, updated_at: new Date().toISOString() })
-        .eq('id', u.id)
-    ));
+
+  if (orderUpdates.length > 0) {
+    // Batch update in groups of 10
+    const batchSize = 10;
+    for (let i = 0; i < orderUpdates.length; i += batchSize) {
+      const batch = orderUpdates.slice(i, i + batchSize);
+      await Promise.all(batch.map(u =>
+        supabaseAdmin.from('video_ingest_jobs')
+          .update(u.updateFields)
+          .eq('id', u.id)
+      ));
+    }
+    console.log(`[Sync] Updated ${orderUpdates.length} videos (playback_order + title from Drive)`);
+  } else {
+    console.log(`[Sync] All playback_order + titles already match Drive — no changes`);
   }
-  console.log(`[Sync] playback_order assigned for ${orderUpdates.length} videos`);
   result.ordersUpdated = orderUpdates.length;
   
   // DELETION LOGIC: Mark videos as deleted if they're NOT in Drive AT ALL (not active, not archief)
@@ -1571,7 +1609,7 @@ const server = http.createServer((req, res) => {
         
         for (const folderId of folderIds) {
           // Use the new function that scans including archief
-          const { activeVideos, archiefVideos } = await listDriveVideosWithArchief(folderId, accessToken);
+          const { activeVideos, archiefVideos } = await listDriveVideosWithArchief(folderId, '(root)', accessToken);
           const nonCopyActive = activeVideos.filter(v => !v.name.startsWith('Kopie van '));
           const nonCopyArchief = archiefVideos.filter(v => !v.name.startsWith('Kopie van '));
           allActiveVideos.push(...nonCopyActive);
