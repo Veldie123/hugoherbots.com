@@ -239,7 +239,14 @@ const PHASE_LABELS: Record<number, { name: string; description: string; color: s
   4: { name: 'Fase 4: Beslissing', description: 'Bezwaarbehandeling, Closing', color: 'text-[var(--hh-warning-700)] dark:text-hh-warning', bgColor: 'bg-[var(--hh-warning-50)] dark:bg-hh-warning/10 border-[var(--hh-warning-200)] dark:border-hh-warning/20' },
 };
 
-function VideoRecommendationCard({ video, adminColors }: { video: any; adminColors: boolean }) {
+interface VideoRecommendation {
+  title: string;
+  techniqueName: string;
+  muxPlaybackId?: string;
+  durationSeconds?: number;
+}
+
+function VideoRecommendationCard({ video, adminColors }: { video: VideoRecommendation; adminColors: boolean }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const hasMux = !!video.muxPlaybackId;
 
@@ -734,8 +741,17 @@ export function AnalysisResults({
     window.dispatchEvent(new CustomEvent('sidebar-collapse-request', { detail: { collapsed: open } }));
   };
 
-  const epicTechniquesByPhase: Record<number, any[]> = {};
-  Object.values(technieken_index.technieken).forEach((technique: any) => {
+  interface EpicTechnique {
+    nummer: string;
+    naam: string;
+    fase: string;
+    is_fase?: boolean;
+    doel?: string;
+    tags?: string[];
+  }
+
+  const epicTechniquesByPhase: Record<number, EpicTechnique[]> = {};
+  Object.values(technieken_index.technieken).forEach((technique: EpicTechnique) => {
     const phase = parseInt(technique.fase);
     if (!epicTechniquesByPhase[phase]) {
       epicTechniquesByPhase[phase] = [];
@@ -751,7 +767,7 @@ export function AnalysisResults({
     4: "Beslissingsfase"
   };
 
-  const epicKlantHoudingenArray = Object.entries(KLANT_HOUDINGEN_DATA.houdingen).map(([key, houding]: [string, any]) => ({
+  const epicKlantHoudingenArray = Object.entries(KLANT_HOUDINGEN_DATA.houdingen).map(([key, houding]) => ({
     id: houding.id,
     key: key,
     naam: houding.naam,
@@ -791,15 +807,15 @@ export function AnalysisResults({
 
   const epicGetTopLevelTechniques = (phase: number) => {
     const techniques = epicTechniquesByPhase[phase] || [];
-    return techniques.filter((t: any) => {
+    return techniques.filter((t: EpicTechnique) => {
       const parts = t.nummer.split('.');
       return parts.length === 2;
     });
   };
 
-  const epicHasChildren = (technique: any, phase: number) => {
+  const epicHasChildren = (technique: EpicTechnique, phase: number) => {
     const techniques = epicTechniquesByPhase[phase] || [];
-    return techniques.some((t: any) => {
+    return techniques.some((t: EpicTechnique) => {
       const parts = t.nummer.split('.');
       return parts.length === 3 && t.nummer.startsWith(technique.nummer + '.');
     });
@@ -807,7 +823,7 @@ export function AnalysisResults({
 
   const epicGetChildTechniques = (parentNumber: string, phase: number) => {
     const techniques = epicTechniquesByPhase[phase] || [];
-    return techniques.filter((t: any) => {
+    return techniques.filter((t: EpicTechnique) => {
       const parts = t.nummer.split('.');
       return parts.length === 3 && t.nummer.startsWith(parentNumber + '.');
     });
@@ -1083,7 +1099,7 @@ export function AnalysisResults({
                 toggleHouding={epicToggleHouding}
                 selectedTechnique={selectedTechniqueId || ''}
                 setSelectedTechnique={(name: string) => {
-                  const tech = Object.values(technieken_index.technieken).find((t: any) => t.naam === name) as any;
+                  const tech = Object.values(technieken_index.technieken).find((t: EpicTechnique) => t.naam === name) as EpicTechnique | undefined;
                   if (tech && techniqueSidebarMode === 'select') {
                     setCorrectionValue(tech.nummer);
                     setSelectedTechniqueId(tech.nummer);

@@ -840,10 +840,11 @@ async function execSearchRag(query: string): Promise<string> {
 // 12. get_technique_details
 async function execGetTechniqueDetails(idOrName: string): Promise<string> {
   try {
-    const technieken = loadTechniques();
+    const rawTech = loadTechniques();
+    const technieken = Object.values((rawTech as { technieken?: Record<string, TechniqueEntry> }).technieken || rawTech) as TechniqueEntry[];
     const q = idOrName?.toLowerCase();
     const found = technieken.find(
-      (t: any) =>
+      (t: TechniqueEntry) =>
         t.id?.toLowerCase() === q ||
         t.naam?.toLowerCase().includes(q) ||
         t.title?.toLowerCase().includes(q)
@@ -854,7 +855,7 @@ async function execGetTechniqueDetails(idOrName: string): Promise<string> {
     // Return first 5 as overview when no match
     return JSON.stringify({
       message: `Geen exacte match voor '${idOrName}'. Hier zijn de eerste technieken:`,
-      techniques: technieken.slice(0, 5).map((t: any) => ({
+      techniques: technieken.slice(0, 5).map((t: TechniqueEntry) => ({
         id: t.id || t.nummer,
         naam: t.naam || t.title,
         fase: t.fase,
@@ -1166,7 +1167,7 @@ async function execGetUserDetail(userId: string): Promise<string> {
         .select("*")
         .eq("user_id", userId);
       if (mastery && mastery.length > 0) {
-        detail.mastery = mastery.map((m: any) => ({
+        detail.mastery = mastery.map((m: MasteryEntry) => ({
           technique: m.technique_id,
           score: m.average_score,
           attempts: m.attempt_count,
@@ -1232,9 +1233,10 @@ async function execProposeTechniqueChange(
   input: Record<string, any>
 ): Promise<string> {
   try {
-    const technieken = loadTechniques();
-    const current = technieken.find(
-      (t: any) =>
+    const rawTech = loadTechniques();
+    const techEntries = Object.values((rawTech as { technieken?: Record<string, TechniqueEntry> }).technieken || rawTech) as TechniqueEntry[];
+    const current = techEntries.find(
+      (t: TechniqueEntry) =>
         t.id?.toLowerCase() === input.technique_id?.toLowerCase() ||
         t.nummer?.toLowerCase() === input.technique_id?.toLowerCase()
     );
@@ -1395,8 +1397,8 @@ async function ensureOnboardingSeed(): Promise<void> {
 
   // Seed all techniques
   const techData = loadTechniques();
-  const technieken = techData.technieken || techData;
-  for (const [key, tech] of Object.entries(technieken) as [string, any][]) {
+  const technieken = (techData.technieken || techData) as Record<string, TechniqueEntry>;
+  for (const [key, tech] of Object.entries(technieken) as [string, TechniqueEntry][]) {
     await pool.query(
       `INSERT INTO admin_onboarding_progress (admin_user_id, module, item_key, item_name, status)
        VALUES ($1, 'technieken', $2, $3, 'pending')
@@ -1407,8 +1409,8 @@ async function ensureOnboardingSeed(): Promise<void> {
 
   // Seed all houdingen
   const houdData = loadHoudingen();
-  const houdingen = houdData.houdingen || houdData;
-  for (const [key, houd] of Object.entries(houdingen) as [string, any][]) {
+  const houdingen = (houdData.houdingen || houdData) as Record<string, { naam?: string; [key: string]: unknown }>;
+  for (const [key, houd] of Object.entries(houdingen) as [string, { naam?: string; [key: string]: unknown }][]) {
     await pool.query(
       `INSERT INTO admin_onboarding_progress (admin_user_id, module, item_key, item_name, status)
        VALUES ($1, 'houdingen', $2, $3, 'pending')
@@ -1472,7 +1474,7 @@ async function execGetNextReviewItem(module?: string): Promise<string> {
     let query = `SELECT module, item_key, item_name
        FROM admin_onboarding_progress
        WHERE admin_user_id = $1 AND status = 'pending'`;
-    const params: any[] = [ADMIN_USER_ID];
+    const params: (string | number | boolean | null)[] = [ADMIN_USER_ID];
 
     if (module) {
       query += ` AND module = $2`;
@@ -1491,7 +1493,7 @@ async function execGetNextReviewItem(module?: string): Promise<string> {
     }
 
     const item = rows[0];
-    let itemData: any = null;
+    let itemData: Record<string, unknown> | null = null;
     let itemNumber = 0;
     let totalInModule = 0;
 
@@ -1512,12 +1514,12 @@ async function execGetNextReviewItem(module?: string): Promise<string> {
     // Load item data from config
     if (item.module === "technieken") {
       const techData = loadTechniques();
-      const technieken = techData.technieken || techData;
-      itemData = technieken[item.item_key];
+      const technieken = (techData.technieken || techData) as Record<string, Record<string, unknown>>;
+      itemData = technieken[item.item_key] ?? null;
     } else if (item.module === "houdingen") {
       const houdData = loadHoudingen();
-      const houdingen = houdData.houdingen || houdData;
-      itemData = houdingen[item.item_key];
+      const houdingen = (houdData.houdingen || houdData) as Record<string, Record<string, unknown>>;
+      itemData = houdingen[item.item_key] ?? null;
     }
 
     return JSON.stringify({
