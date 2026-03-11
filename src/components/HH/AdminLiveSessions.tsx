@@ -74,6 +74,7 @@ export function AdminLiveSessions({ navigate, isSuperAdmin }: AdminLiveSessionsP
   const [showAdminCalendar, setShowAdminCalendar] = useState(false);
   const [adminCalendarMonth, setAdminCalendarMonth] = useState(() => new Date());
   const [adminSelectedDate, setAdminSelectedDate] = useState<Date | null>(null);
+  const adminCalendarRef = useRef<HTMLDivElement>(null);
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -868,17 +869,6 @@ ${platformUrl}`;
           </div>
           <div className="flex gap-2">
             <Button
-              variant="outline"
-              className={`gap-2 ${showAdminCalendar ? 'bg-hh-primary text-white hover:bg-hh-primary/90 border-hh-primary' : ''}`}
-              onClick={() => {
-                setShowAdminCalendar(!showAdminCalendar);
-                if (showAdminCalendar) setAdminSelectedDate(null);
-              }}
-            >
-              <CalendarIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">Kalender</span>
-            </Button>
-            <Button
               className="gap-2 bg-hh-primary hover:bg-hh-primary/90 text-white"
               onClick={openCreateModal}
             >
@@ -954,9 +944,45 @@ ${platformUrl}`;
                 <SelectItem value="live">Live</SelectItem>
               </SelectContent>
             </Select>
+            <div className="hidden sm:flex gap-1 flex-shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const wasHidden = !showAdminCalendar;
+                  setShowAdminCalendar(!showAdminCalendar);
+                  if (showAdminCalendar) setAdminSelectedDate(null);
+                  if (wasHidden) {
+                    setTimeout(() => adminCalendarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                  }
+                }}
+                className={`h-9 w-9 p-0 ${showAdminCalendar ? "bg-hh-primary text-white hover:bg-hh-primary/90" : "text-hh-muted hover:text-hh-text hover:bg-hh-ui-50"}`}
+              >
+                <CalendarIcon className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
+          <button
+            className={`sm:hidden flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-[13px] font-medium transition-colors mt-2 ${
+              showAdminCalendar
+                ? 'bg-hh-primary/10 text-hh-primary border border-hh-primary/20'
+                : 'bg-hh-ui-50 text-hh-muted border border-hh-border'
+            }`}
+            onClick={() => {
+              const wasHidden = !showAdminCalendar;
+              setShowAdminCalendar(!showAdminCalendar);
+              if (showAdminCalendar) setAdminSelectedDate(null);
+              if (wasHidden) {
+                setTimeout(() => adminCalendarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+              }
+            }}
+          >
+            <CalendarIcon className="w-4 h-4" />
+            {showAdminCalendar ? 'Toon lijst' : 'Toon kalender'}
+          </button>
         </Card>
 
+        <div ref={adminCalendarRef}>
         {showAdminCalendar && (() => {
           const MONTH_NAMES = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'];
           const DAY_HEADERS = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
@@ -1004,7 +1030,7 @@ ${platformUrl}`;
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
-              <div className="grid gap-1 grid-cols-7">
+              <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
                 {DAY_HEADERS.map(d => (
                   <div key={d} className="text-center text-[11px] font-medium text-hh-muted py-1">{d}</div>
                 ))}
@@ -1067,6 +1093,7 @@ ${platformUrl}`;
             </Card>
           );
         })()}
+        </div>
 
         {view === "upcoming" && (
           <div className="space-y-4">
