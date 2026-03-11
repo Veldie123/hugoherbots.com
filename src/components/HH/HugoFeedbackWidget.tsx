@@ -256,7 +256,7 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
               <div className="flex items-center justify-end gap-2.5">
                 <button
                   onClick={() => { setSelecting(true); setOpen(false); }}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border text-[13px] transition-colors"
+                  className="flex items-center gap-2 px-5 py-2 rounded-lg border text-[13px] transition-colors"
                   style={{ borderColor: 'var(--hh-primary)', color: 'var(--hh-primary)' }}
                 >
                   <Crosshair size={13} />
@@ -265,7 +265,7 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
                 <button
                   onClick={handleSubmit}
                   disabled={submitting || !description.trim()}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-medium text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-5 py-2 rounded-lg text-[13px] font-medium text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ backgroundColor: 'var(--hh-primary)' }}
                 >
                   <Send size={13} />

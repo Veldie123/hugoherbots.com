@@ -88,6 +88,7 @@ interface VideoLibraryProps {
   isAdmin?: boolean;
   onboardingMode?: boolean;
   isPreview?: boolean;
+  navigationData?: Record<string, any>;
 }
 
 interface ActiveVideo {
@@ -114,7 +115,7 @@ const markVideoCompleted = (videoId: string) => {
   localStorage.setItem(COMPLETED_VIDEOS_KEY, JSON.stringify([...completed]));
 };
 
-export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: VideoLibraryProps) {
+export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview, navigationData }: VideoLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterPhase, setFilterPhase] = useState<string>("all");
   const [filterTechniek, setFilterTechniek] = useState<string | null>(null);
@@ -237,6 +238,13 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
     };
     loadVideos();
   }, []);
+
+  // Deep-link from navigate_user tool: auto-play specific technique video
+  useEffect(() => {
+    if (navigationData?.techniqueId) {
+      setAutoPlayTechniek(navigationData.techniqueId);
+    }
+  }, [navigationData?.techniqueId]);
 
   // Auto-play first video when navigating from TechniqueLibrary
   useEffect(() => {
