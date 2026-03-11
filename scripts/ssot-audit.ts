@@ -52,6 +52,21 @@ import {
 const PROJECT_ROOT = path.resolve(__dirname, "..");
 
 // ---------------------------------------------------------------------------
+// JSON file loader with descriptive error handling
+// ---------------------------------------------------------------------------
+
+function loadJsonFile(filePath: string, label: string): unknown {
+  try {
+    const raw = fs.readFileSync(filePath, "utf-8");
+    return JSON.parse(raw);
+  } catch (err) {
+    throw new Error(
+      `[ssot-audit] Failed to load ${label} from "${filePath}": ${String(err)}`
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // CLI argument parsing
 // ---------------------------------------------------------------------------
 
@@ -62,6 +77,8 @@ interface CliArgs {
   output?: string;
   minConfidence: number;
 }
+
+const VALID_CONFIGS = ["technieken", "klant_houdingen", "rag", "evaluator"] as const;
 
 function parseArgs(argv: string[]): CliArgs {
   const args = argv.slice(2); // drop "node" and script path
@@ -81,6 +98,13 @@ function parseArgs(argv: string[]): CliArgs {
       const val = parseFloat(args[++i]);
       if (!isNaN(val)) result.minConfidence = val;
     }
+  }
+
+  if (result.config && !VALID_CONFIGS.includes(result.config as any)) {
+    process.stderr.write(
+      `[ssot-audit] Invalid --config value: "${result.config}". Valid options: ${VALID_CONFIGS.join(", ")}\n`
+    );
+    process.exit(1);
   }
 
   return result;
@@ -237,8 +261,8 @@ async function auditRagHeuristics(
   const entries = Object.entries(heuristics)
     .filter(([id]) => !targetIds || targetIds.includes(id));
 
-  // Process in batches of 8
-  const BATCH_SIZE = 8;
+  // Process in batches of 4 (reduced to avoid context window issues with large transcripts)
+  const BATCH_SIZE = 4;
   for (let i = 0; i < entries.length; i += BATCH_SIZE) {
     const batchEntries = entries.slice(i, i + BATCH_SIZE);
 
@@ -291,8 +315,8 @@ async function auditEvaluatorOverlay(
       return !!entry.eval_note; // skip entries without eval_note
     });
 
-  // Process in batches of 8
-  const BATCH_SIZE = 8;
+  // Process in batches of 4 (reduced to avoid context window issues with large transcripts)
+  const BATCH_SIZE = 4;
   for (let i = 0; i < entries.length; i += BATCH_SIZE) {
     const batchEntries = entries.slice(i, i + BATCH_SIZE);
 
@@ -334,30 +358,43 @@ async function main(): Promise<void> {
   const transcriptMap = loadTranscripts(PROJECT_ROOT);
 
   // Load SSOT config files
-  const techniekenRaw = JSON.parse(
-    fs.readFileSync(path.join(PROJECT_ROOT, "config", "ssot", "technieken_index.json"), "utf-8")
+  const techniekenRaw = loadJsonFile(
+    path.join(PROJECT_ROOT, "config", "ssot", "technieken_index.json"),
+    "technieken_index.json"
   );
-  const houdingRaw = JSON.parse(
-    fs.readFileSync(path.join(PROJECT_ROOT, "config", "klant_houdingen.json"), "utf-8")
+  const houdingRaw = loadJsonFile(
+    path.join(PROJECT_ROOT, "config", "klant_houdingen.json"),
+    "klant_houdingen.json"
   );
-  const ragRaw = JSON.parse(
-    fs.readFileSync(path.join(PROJECT_ROOT, "config", "rag_heuristics.json"), "utf-8")
+  const ragRaw = loadJsonFile(
+    path.join(PROJECT_ROOT, "config", "rag_heuristics.json"),
+    "rag_heuristics.json"
   );
-  const evaluatorRaw = JSON.parse(
-    fs.readFileSync(path.join(PROJECT_ROOT, "config", "ssot", "evaluator_overlay.json"), "utf-8")
+  const evaluatorRaw = loadJsonFile(
+    path.join(PROJECT_ROOT, "config", "ssot", "evaluator_overlay.json"),
+    "evaluator_overlay.json"
   );
 
-  // Extract data structures
-  const techniques: Record<string, TechniqueEntry> = techniekenRaw.technieken ?? {};
+  // Extract data structures (cast to any — loadJsonFile already validated parse)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const techniekenAny = techniekenRaw as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const houdingAny = houdingRaw as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ragAny = ragRaw as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const evaluatorAny = evaluatorRaw as any;
+
+  const techniques: Record<string, TechniqueEntry> = techniekenAny.technieken ?? {};
   // klant_houdingen: nested under "houdingen" or flat
   const houdingen: Record<string, HoudingEntry> =
-    houdingRaw.houdingen ?? houdingRaw;
+    houdingAny.houdingen ?? houdingAny;
   // rag_heuristics: nested under "techniques"
   const ragHeuristics: Record<string, HeuristicEntry> =
-    ragRaw.techniques ?? ragRaw;
+    ragAny.techniques ?? ragAny;
   // evaluator_overlay: nested under "technieken"
   const evalEntries: Record<string, EvaluatorEntry> =
-    evaluatorRaw.technieken ?? evaluatorRaw;
+    evaluatorAny.technieken ?? evaluatorAny;
 
   // Build full list of leaf technique IDs
   const allLeafIds = Object.entries(techniques)
@@ -387,9 +424,9 @@ async function main(): Promise<void> {
     ? allLeafIds.filter((id) => cliArgs.techniques!.includes(id))
     : allLeafIds;
   const houdingCount = Object.keys(houdingen).length;
-  const ragBatches = Math.ceil(Object.keys(ragHeuristics).length / 8);
+  const ragBatches = Math.ceil(Object.keys(ragHeuristics).length / 4);
   const evalBatches = Math.ceil(
-    Object.entries(evalEntries).filter(([, e]) => !!e.eval_note).length / 8
+    Object.entries(evalEntries).filter(([, e]) => !!e.eval_note).length / 4
   );
 
   const estimatedCalls =
@@ -493,8 +530,10 @@ async function main(): Promise<void> {
   // Create output directory if needed
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
-  // Write output file
-  fs.writeFileSync(outputPath, JSON.stringify(report, null, 2) + "\n", "utf-8");
+  // Write output file atomically (tmp → rename) to prevent corruption on interrupt
+  const tmpPath = outputPath + ".tmp";
+  fs.writeFileSync(tmpPath, JSON.stringify(report, null, 2) + "\n", "utf-8");
+  fs.renameSync(tmpPath, outputPath);
 
   // Print summary
   process.stdout.write(`\nSSOT Audit complete\n`);

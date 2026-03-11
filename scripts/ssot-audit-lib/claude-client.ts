@@ -34,7 +34,9 @@ export async function callClaude(systemPrompt: string, userPrompt: string): Prom
   });
 
   if (response.stop_reason === "max_tokens") {
-    process.stderr.write(`[ssot-audit] Warning: Claude response truncated (hit max_tokens). Output may be incomplete.\n`);
+    throw new Error(
+      "[ssot-audit] Claude response truncated (max_tokens reached). Try reducing batch size or transcript length."
+    );
   }
 
   const firstBlock = response.content[0];
