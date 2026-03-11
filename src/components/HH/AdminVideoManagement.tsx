@@ -2079,23 +2079,13 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                               Bekijk video
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              disabled={!((video.status === 'ready' || video.status === 'completed') && !!video.mux_playback_id)}
-                              onSelect={(e: Event) => {
-                                e.preventDefault();
-                                navigate?.("admin-video-detail", { videoId: video.id });
-                              }}
-                            >
-                              <FileText className="w-4 h-4 mr-2" />
-                              Bekijk detail
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
                               onSelect={(e: Event) => {
                                 e.preventDefault();
                                 openDetailsDialog(video);
                               }}
                             >
                               <FileText className="w-4 h-4 mr-2" />
-                              Snelle details
+                              Bekijk detail
                             </DropdownMenuItem>
                             {video.has_transcript && (
                               <DropdownMenuItem
@@ -2405,23 +2395,13 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                                   Bekijk video
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  disabled={!isPlayable}
-                                  onSelect={(e: Event) => {
-                                    e.preventDefault();
-                                    navigate?.("admin-video-detail", { videoId: video.id });
-                                  }}
-                                >
-                                  <FileText className="w-4 h-4 mr-2" />
-                                  Bekijk detail
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
                                   onSelect={(e: Event) => {
                                     e.preventDefault();
                                     openDetailsDialog(video);
                                   }}
                                 >
                                   <FileText className="w-4 h-4 mr-2" />
-                                  Snelle details
+                                  Bekijk detail
                                 </DropdownMenuItem>
                                 {video.has_transcript && (
                                   <DropdownMenuItem onClick={async () => {
@@ -2641,20 +2621,11 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <DropdownMenuItem
                             onSelect={(e: Event) => {
                               e.preventDefault();
-                              navigate?.('admin-video-detail', { videoId: video.id });
-                            }}
-                          >
-                            <Eye className="w-4 h-4 mr-2" />
-                            Bekijk detail
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onSelect={(e: Event) => {
-                              e.preventDefault();
                               openDetailsDialog(video);
                             }}
                           >
                             <FileText className="w-4 h-4 mr-2" />
-                            Snelle details
+                            Bekijk detail
                           </DropdownMenuItem>
                           {video.has_transcript && (
                             <DropdownMenuItem onClick={async () => {
@@ -2814,12 +2785,21 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
           isEditingVideo ? (
             <div className="space-y-2">
               <Input
-                value={editedVideoData.attractiveTitle}
-                onChange={(e) => setEditedVideoData({...editedVideoData, attractiveTitle: e.target.value})}
+                value={editedVideoData.title}
+                onChange={(e) => setEditedVideoData({...editedVideoData, title: e.target.value})}
                 className="text-[20px] font-semibold border-hh-border"
-                placeholder="Commerciële titel (zichtbaar voor gebruikers)"
+                placeholder="Titel (zichtbaar voor gebruikers)"
               />
               <p className="text-[11px] text-hh-muted">Bestandsnaam: {detailsVideo?.original_title}</p>
+              {detailsVideo?.ai_attractive_title && detailsVideo.ai_attractive_title !== editedVideoData.title && (
+                <button
+                  type="button"
+                  onClick={() => setEditedVideoData({...editedVideoData, title: detailsVideo.ai_attractive_title || ''})}
+                  className="text-[11px] text-hh-primary hover:underline text-left"
+                >
+                  AI suggestie: "{detailsVideo.ai_attractive_title}" — klik om over te nemen
+                </button>
+              )}
             </div>
           ) : (
             <div>

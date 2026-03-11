@@ -43,7 +43,7 @@ export function DetailsSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
         side="left" 
-        className="p-0 flex flex-col border-r shadow-xl bg-hh-bg"
+        className={cn("p-0 flex flex-col border-r shadow-xl bg-hh-bg", isAdmin && "admin-session")}
         style={{ width: 'min(500px, 40vw)', maxWidth: '500px' }}
       >
         <SheetHeader 
