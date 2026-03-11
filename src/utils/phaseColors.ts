@@ -6,6 +6,15 @@ export const PHASE_COLORS: Record<string, string> = {
   "4": "#3C9A6E",
 };
 
+// Purple gradient for admin view (matches .admin-session hh-primary override)
+export const ADMIN_PHASE_COLORS: Record<string, string> = {
+  "0": "#a78bba",
+  "1": "#9b6fd4",
+  "2": "#8B5CF6",
+  "3": "#6d3fc4",
+  "4": "#5b2fa0",
+};
+
 export const getCodeBadgeColors = (code: string) => {
   const fase = code.split('.')[0];
   switch (fase) {

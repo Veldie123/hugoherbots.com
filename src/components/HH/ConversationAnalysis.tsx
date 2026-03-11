@@ -337,7 +337,7 @@ export function ConversationAnalysis({
             <div className="absolute inset-0 bg-black/20 pointer-events-none" />
             <div className="relative h-full flex items-center p-6 sm:p-8">
               <div className="text-white space-y-3 max-w-lg">
-                <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: '#4F7396' }}>
+                <Badge className="text-white border-0 text-[12px]" style={{ backgroundColor: 'var(--hh-primary)' }}>
                   <Sparkles className="w-3 h-3 mr-1" />
                   Gespreksanalyse
                 </Badge>

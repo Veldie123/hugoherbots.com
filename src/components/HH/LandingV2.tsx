@@ -430,13 +430,13 @@ function VideoCursusSection({ navigate }: { navigate: (page: Page) => void }) {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                background: "rgba(15,24,38,0.95)",
-                border: "1px solid rgba(255,255,255,0.08)",
+                background: "color-mix(in srgb, var(--hh-ink) 95%, transparent)",
+                border: "1px solid color-mix(in srgb, white 8%, transparent)",
                 boxShadow: "0 24px 48px rgba(0,0,0,0.2)",
               }}
             >
               {/* Window chrome */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+              <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: "color-mix(in srgb, white 6%, transparent)" }}>
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-hh-error/70" />
                   <div className="w-3 h-3 rounded-full bg-hh-warning/70" />
@@ -490,7 +490,7 @@ function VideoCursusSection({ navigate }: { navigate: (page: Page) => void }) {
                           </div>
                         )}
                       </div>
-                      <div className="px-2 py-1.5" style={{ background: "rgba(255,255,255,0.04)" }}>
+                      <div className="px-2 py-1.5" style={{ background: "color-mix(in srgb, white 4%, transparent)" }}>
                         <p className="text-[11px] text-white/80 font-medium truncate">{video.title}</p>
                         <p className="text-[10px] text-white/30">{video.duration}</p>
                         {video.progress > 0 && video.progress < 100 && (

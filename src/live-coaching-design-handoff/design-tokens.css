@@ -52,22 +52,29 @@
 
 /* H1 - Page titles */
 h1 {
-  font-size: 48px;
-  line-height: 56px;
-  font-weight: 700;
+  font-size: 40px;
+  line-height: 48px;
+  font-weight: 600;
+}
+
+@media (max-width: 1280px) {
+  h1 {
+    font-size: 36px;
+    line-height: 44px;
+  }
 }
 
 @media (max-width: 1024px) {
   h1 {
-    font-size: 40px;
-    line-height: 48px;
+    font-size: 32px;
+    line-height: 40px;
   }
 }
 
 @media (max-width: 640px) {
   h1 {
-    font-size: 32px;
-    line-height: 40px;
+    font-size: 28px;
+    line-height: 36px;
   }
 }
 
@@ -75,13 +82,20 @@ h1 {
 h2 {
   font-size: 32px;
   line-height: 40px;
-  font-weight: 700;
+  font-weight: 600;
+}
+
+@media (max-width: 1280px) {
+  h2 {
+    font-size: 28px;
+    line-height: 36px;
+  }
 }
 
 @media (max-width: 640px) {
   h2 {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: 22px;
+    line-height: 30px;
   }
 }
 
@@ -89,13 +103,20 @@ h2 {
 h3 {
   font-size: 24px;
   line-height: 32px;
-  font-weight: 700;
+  font-weight: 600;
+}
+
+@media (max-width: 1280px) {
+  h3 {
+    font-size: 22px;
+    line-height: 30px;
+  }
 }
 
 @media (max-width: 640px) {
   h3 {
-    font-size: 20px;
-    line-height: 28px;
+    font-size: 18px;
+    line-height: 26px;
   }
 }
 

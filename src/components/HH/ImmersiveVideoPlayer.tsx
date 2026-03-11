@@ -177,7 +177,7 @@ export function ImmersiveVideoPlayer({
 
       <div 
         className={`fixed top-0 left-14 right-14 sm:left-16 sm:right-16 flex items-end pt-3 pb-2 transition-opacity duration-300 pointer-events-none ${controlsVisible ? 'opacity-100' : 'opacity-0'}`}
-        style={{ zIndex: 100000, background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)' }}
+        style={{ zIndex: 100000, background: 'linear-gradient(to bottom, color-mix(in srgb, var(--hh-ink) 70%, transparent) 0%, color-mix(in srgb, var(--hh-ink) 30%, transparent) 60%, transparent 100%)' }}
       >
         <div className="min-w-0 px-2">
           <h2 className="text-white text-[15px] sm:text-[17px] font-semibold truncate">
@@ -219,7 +219,7 @@ export function ImmersiveVideoPlayer({
 
       <div 
         className={`fixed bottom-0 left-0 right-0 px-5 py-3 transition-opacity duration-300 pointer-events-none ${controlsVisible && !showNextOverlay ? 'opacity-100' : 'opacity-0'}`}
-        style={{ zIndex: 100000, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)' }}
+        style={{ zIndex: 100000, background: 'linear-gradient(to top, color-mix(in srgb, var(--hh-ink) 80%, transparent) 0%, color-mix(in srgb, var(--hh-ink) 40%, transparent) 50%, transparent 100%)' }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -261,9 +261,9 @@ export function ImmersiveVideoPlayer({
             <div className="flex items-center justify-center gap-3">
               <button
                 className="px-5 py-2.5 rounded-lg border border-white/40 text-white text-[14px] font-medium transition-colors cursor-pointer"
-                style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                style={{ backgroundColor: 'color-mix(in srgb, var(--hh-bg) 10%, transparent)' }}
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--hh-bg)'; e.currentTarget.style.color = 'var(--hh-ink)'; e.currentTarget.style.borderColor = 'var(--hh-bg)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--hh-bg) 10%, transparent)'; e.currentTarget.style.color = 'var(--hh-bg)'; e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--hh-bg) 40%, transparent)'; }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -288,9 +288,9 @@ export function ImmersiveVideoPlayer({
 
       <div 
         className={`fixed top-0 right-0 bottom-0 w-[340px] sm:w-[380px] flex flex-col transition-transform duration-300 ${showPlaylist ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
-        style={{ zIndex: 100003, backgroundColor: '#0d0f14', borderLeft: '1px solid rgba(255,255,255,0.08)', boxShadow: '-12px 0 40px rgba(0,0,0,0.8)' }}
+        style={{ zIndex: 100003, backgroundColor: 'var(--hh-ink)', borderLeft: '1px solid color-mix(in srgb, var(--hh-bg) 8%, transparent)', boxShadow: '-12px 0 40px color-mix(in srgb, var(--hh-ink) 80%, transparent)' }}
       >
-        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid color-mix(in srgb, var(--hh-bg) 10%, transparent)' }}>
           <div>
             <h3 className="text-white font-semibold text-[16px]">Cursus Playlist</h3>
             <p className="text-white/40 text-[12px] mt-0.5">{videos.length} video's · Video {currentIndex + 1} van {videos.length}</p>
@@ -302,7 +302,7 @@ export function ImmersiveVideoPlayer({
             <X className="w-4 h-4" />
           </button>
         </div>
-        <div ref={playlistRef} className="flex-1 overflow-y-auto" style={{ backgroundColor: '#0d0f14' }}>
+        <div ref={playlistRef} className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--hh-ink)' }}>
           {videos.map((video, idx) => {
             const isActive = video.id === activeVideoId;
             const isCompleted = completedVideoIds.has(video.id);
@@ -317,7 +317,7 @@ export function ImmersiveVideoPlayer({
                 style={{
                   backgroundColor: isActive ? 'color-mix(in srgb, var(--hh-success) 12%, transparent)' : undefined,
                   borderLeftColor: isActive ? 'var(--hh-success)' : undefined,
-                  borderBottom: '1px solid rgba(255,255,255,0.05)'
+                  borderBottom: '1px solid color-mix(in srgb, var(--hh-bg) 5%, transparent)'
                 }}
                 onClick={() => goToVideo(video.id)}
               >

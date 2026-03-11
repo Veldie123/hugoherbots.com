@@ -25,7 +25,7 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
       >
         <div
           className="rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ width: 48, height: 48, backgroundColor: "#e2e8f0" }}
+          style={{ width: 48, height: 48, backgroundColor: "var(--hh-ui-200)" }}
         >
           <Play className="w-5 h-5 text-hh-muted" />
         </div>
@@ -52,10 +52,10 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
             autoPlay
             style={{ width: "100%", aspectRatio: "16/9" }}
             streamType="on-demand"
-            accentColor="#3C9A6E"
+            accentColor="var(--hh-success)"
           />
         </div>
-        <div className="px-3 py-2 bg-white">
+        <div className="px-3 py-2 bg-hh-bg">
           <p className="font-medium text-sm text-hh-text">{video.title}</p>
           {video.techniqueId && (
             <p className="text-xs text-hh-muted">Techniek {video.techniqueId}</p>
@@ -68,12 +68,12 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
   return (
     <button
       onClick={() => setIsPlaying(true)}
-      className="rounded-xl border border-hh-border bg-white hover:bg-hh-ui-50 transition-colors p-3 flex items-center gap-3 text-left w-full group"
+      className="rounded-xl border border-hh-border bg-hh-bg hover:bg-hh-ui-50 transition-colors p-3 flex items-center gap-3 text-left w-full group"
       style={{ maxWidth: 480 }}
     >
       <div
         className="rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform"
-        style={{ width: 56, height: 56, backgroundColor: "#3C9A6E" }}
+        style={{ width: 56, height: 56, backgroundColor: "var(--hh-success)" }}
       >
         <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
       </div>
@@ -91,7 +91,7 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
           )}
         </div>
       </div>
-      <span className="text-xs font-medium px-2 py-1 rounded-md" style={{ backgroundColor: "#EBF5F0", color: "#3C9A6E" }}>
+      <span className="text-xs font-medium px-2 py-1 rounded-md" style={{ backgroundColor: "color-mix(in srgb, var(--hh-success) 10%, var(--hh-bg))", color: "var(--hh-success)" }}>
         Afspelen
       </span>
     </button>

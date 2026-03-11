@@ -65,9 +65,9 @@ export function UserNotifications({ navigate, isAdmin, onboardingMode }: UserNot
 
   const getIcon = (type: string) => {
     switch (type) {
-      case "analysis_complete": return { icon: BarChart3, color: "#22c55e", bg: "rgba(34, 197, 94, 0.1)" };
-      case "info": return { icon: AlertCircle, color: "#3b82f6", bg: "rgba(59, 130, 246, 0.1)" };
-      default: return { icon: Bell, color: "#64748b", bg: "rgba(100, 116, 139, 0.1)" };
+      case "analysis_complete": return { icon: BarChart3, color: "var(--hh-success)", bg: "color-mix(in srgb, var(--hh-success) 10%, transparent)" };
+      case "info": return { icon: AlertCircle, color: "var(--hh-primary)", bg: "color-mix(in srgb, var(--hh-primary) 10%, transparent)" };
+      default: return { icon: Bell, color: "var(--hh-muted)", bg: "color-mix(in srgb, var(--hh-muted) 10%, transparent)" };
     }
   };
 

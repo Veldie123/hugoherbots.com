@@ -322,7 +322,7 @@ export function SessionCalendarView({
                                       <Button
                                         size="sm"
                                         className="h-8 text-[12px] text-white gap-1.5"
-                                        style={{ backgroundColor: "#dc2626" }}
+                                        style={{ backgroundColor: "var(--hh-error)" }}
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           onSessionClick?.(session);

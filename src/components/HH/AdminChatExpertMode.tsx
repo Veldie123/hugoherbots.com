@@ -250,8 +250,8 @@ export function AdminChatExpertMode({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   
-  // Engine model selection (V2 default, V3 for superadmin)
-  const [engineModel, setEngineModel] = useState<EngineModel>(isSuperAdmin ? "v3" : "v2");
+  // Engine model selection (V3 default for everyone)
+  const [engineModel, setEngineModel] = useState<EngineModel>("v3");
   const [sessionRestartKey, setSessionRestartKey] = useState(0);
 
   // Thinking mode (Snel/Auto/Diep) — only relevant for V3
@@ -1519,10 +1519,10 @@ export function AdminChatExpertMode({
                 )}
               </div>
               <h3 className="text-white text-[20px] font-semibold mb-1">Hugo Herbots</h3>
-              <p className="text-[16px] mb-2" style={{ color: 'rgba(255,255,255,0.8)' }}>
+              <p className="text-[16px] mb-2 text-white/80">
                 {isAudioConnecting ? "Verbinden..." : audioConnectionState === ConnectionState.Connected ? "Verbonden" : "Audio modus"}
               </p>
-              <p className="text-[22px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>{formatTime(sessionTimer)}</p>
+              <p className="text-[22px] font-mono text-white/60">{formatTime(sessionTimer)}</p>
               
               {/* Waveform visualization - animate when speaking */}
               <div className="flex items-end justify-center gap-1.5 h-16 mt-8">
@@ -1532,7 +1532,7 @@ export function AdminChatExpertMode({
                     className={`rounded-full transition-all duration-150 ${isAgentSpeaking ? 'animate-pulse' : ''}`}
                     style={{
                       width: '6px',
-                      backgroundColor: 'rgba(255,255,255,0.7)',
+                      backgroundColor: 'color-mix(in srgb, var(--hh-bg) 70%, transparent)',
                       height: isAgentSpeaking ? `${Math.sin(Date.now() / 200 + i) * 20 + 35}px` : `${15 + (i % 3) * 10}px`,
                     }}
                   />
@@ -1551,11 +1551,11 @@ export function AdminChatExpertMode({
                     <button 
                       onClick={() => setIsMuted(!isMuted)}
                       className="flex items-center justify-center transition-colors"
-                      style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isMuted ? 'white' : 'rgba(255,255,255,0.2)' }}
+                      style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isMuted ? 'var(--hh-bg)' : 'color-mix(in srgb, var(--hh-bg) 20%, transparent)' }}
                     >
                       {isMuted ? <MicOff className="w-5 h-5 text-teal-700" /> : <Mic className="w-5 h-5 text-white" />}
                     </button>
-                    <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{isMuted ? "Unmute" : "Mute"}</span>
+                    <span className="text-[11px] text-white/70">{isMuted ? "Unmute" : "Mute"}</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
                     <button 
@@ -1564,20 +1564,20 @@ export function AdminChatExpertMode({
                         setChatMode("chat");
                       }}
                       className="flex items-center justify-center shadow-xl"
-                      style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#ef4444' }}
+                      style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'var(--hh-error)' }}
                     >
                       <Phone className="w-6 h-6 text-white" style={{ transform: 'rotate(135deg)' }} />
                     </button>
-                    <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Ophangen</span>
+                    <span className="text-[11px] text-white/70">Ophangen</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
                     <button 
                       className="flex items-center justify-center"
-                      style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.2)' }}
+                      style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'color-mix(in srgb, var(--hh-bg) 20%, transparent)' }}
                     >
                       <Volume2 className="w-5 h-5 text-white" />
                     </button>
-                    <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Speaker</span>
+                    <span className="text-[11px] text-white/70">Speaker</span>
                   </div>
                 </div>
               </div>
@@ -1588,7 +1588,7 @@ export function AdminChatExpertMode({
           {chatMode === "video" && (
             <div className="flex-1 relative flex flex-col" style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%)' }}>
               {/* Top overlay with name and timer */}
-              <div className="absolute top-0 left-0 right-0 p-4 z-10" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)' }}>
+              <div className="absolute top-0 left-0 right-0 p-4 z-10" style={{ background: 'linear-gradient(to bottom, color-mix(in srgb, black 60%, transparent), transparent)' }}>
                 <h3 className="text-white text-[18px] font-semibold">Hugo Herbots</h3>
                 <p className="text-white/70 text-[14px]">{formatTime(sessionTimer)}</p>
               </div>
@@ -1618,7 +1618,7 @@ export function AdminChatExpertMode({
               </div>
 
               {/* Bottom controls - back to chat button */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 z-10" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
+              <div className="absolute bottom-0 left-0 right-0 p-6 z-10" style={{ background: 'linear-gradient(to top, color-mix(in srgb, black 80%, transparent), transparent)' }}>
                 <div className="flex items-center justify-center gap-6">
                   <div className="flex flex-col items-center gap-2">
                     <button 
@@ -1664,12 +1664,12 @@ export function AdminChatExpertMode({
                           ? {
                               opacity: 0.85,
                               backgroundColor: message.sender === 'hugo' ? 'var(--hh-primary)' : 'var(--hh-ui-100)',
-                              color: message.sender === 'hugo' ? '#ffffff' : 'var(--hh-ink)',
+                              color: message.sender === 'hugo' ? 'var(--hh-bg)' : 'var(--hh-ink)',
                             }
                           : message.sender === "hugo"
                             ? {
                                 backgroundColor: 'var(--hh-primary)',
-                                color: '#ffffff',
+                                color: 'var(--hh-bg)',
                               }
                             : undefined
                       }
@@ -1749,7 +1749,7 @@ export function AdminChatExpertMode({
                           <button
                             onClick={() => handleMessageFeedback(message.id, "down")}
                             className="p-1.5 rounded-md transition-colors"
-                            style={message.feedback === "down" ? { color: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)' } : undefined}
+                            style={message.feedback === "down" ? { color: 'var(--hh-error)', backgroundColor: 'color-mix(in srgb, var(--hh-error) 8%, transparent)' } : undefined}
                             title="Correctie toevoegen"
                           >
                             <ThumbsDown className={`w-3.5 h-3.5 ${message.feedback !== "down" ? "text-hh-muted hover:text-hh-muted" : ""}`} />
@@ -2532,8 +2532,8 @@ export function AdminChatExpertMode({
                 onClick={handleDictation}
                 className="p-2 rounded-md transition-colors flex-shrink-0"
                 style={{
-                  color: isRecording ? '#ef4444' : '#94a3b8',
-                  backgroundColor: isRecording ? 'rgba(239,68,68,0.1)' : undefined,
+                  color: isRecording ? 'var(--hh-error)' : 'var(--hh-muted)',
+                  backgroundColor: isRecording ? 'color-mix(in srgb, var(--hh-error) 10%, transparent)' : undefined,
                 }}
                 title={isRecording ? "Opname stoppen" : "Dicteren"}
               >

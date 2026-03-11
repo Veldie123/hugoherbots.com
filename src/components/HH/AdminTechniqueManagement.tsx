@@ -437,10 +437,10 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               >
                 <div className="p-4" onClick={() => setDetailsTechnique(techniek.code)}>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[12px] font-mono font-semibold bg-hh-primary/15" style={{ color: '#3d6080' }}>
+                    <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[12px] font-mono font-semibold bg-hh-primary/15 text-hh-primary">
                       {techniek.code}
                     </span>
-                    <Badge variant="outline" className="text-[10px]" style={techniek.status === 'Actief' ? { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--hh-success)', borderColor: 'rgba(16, 185, 129, 0.2)' } : { backgroundColor: 'rgba(139, 149, 165, 0.1)', color: '#8B95A5' }}>
+                    <Badge variant="outline" className={`text-[10px] ${techniek.status === 'Actief' ? 'bg-hh-success/10 text-hh-success border-hh-success/20' : 'bg-hh-muted/10 text-hh-muted'}`}>
                       {techniek.status}
                     </Badge>
                   </div>

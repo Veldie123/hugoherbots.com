@@ -167,8 +167,8 @@ export function TalkToHugoAI({
     }
   }, []);
 
-  // Engine model selection (V2 default, V3 for superadmin)
-  const [engineModel, setEngineModel] = useState<EngineModel>(isSuperAdmin ? "v3" : "v2");
+  // Engine model selection (V3 default for everyone)
+  const [engineModel, setEngineModel] = useState<EngineModel>("v3");
 
   // Thinking mode (Snel/Auto/Diep) — only relevant for V3
   const [thinkingMode, setThinkingMode] = useState<ThinkingMode>("auto");
@@ -552,7 +552,7 @@ export function TalkToHugoAI({
       hugoApi.setSessionMode(sessionMode);
       hugoApi.clearOppositeSessionMode();
 
-      if (onboardingMode && engineModel === "v3") {
+      if (onboardingMode && engineModel === "v3" && adminViewMode) {
         try {
           setIsLoading(true);
 
@@ -2723,7 +2723,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         <div className="relative mb-6">
           <div 
             className="rounded-full flex items-center justify-center"
-            style={{ width: '180px', height: '180px', backgroundColor: 'rgba(255,255,255,0.25)' }}
+            style={{ width: '180px', height: '180px', backgroundColor: 'color-mix(in srgb, var(--hh-bg) 25%, transparent)' }}
           >
             {isAudioConnecting ? (
               <Loader2 className="w-16 h-16 text-white animate-spin" />
@@ -2735,10 +2735,10 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         </div>
         
         <h3 className="text-white text-[26px] font-bold mb-1">Hugo Herbots <sup className="text-[14px] font-semibold" style={{ verticalAlign: 'super' }}>AI</sup></h3>
-        <p className="text-[16px] mb-2" style={{ color: 'rgba(255,255,255,0.8)' }}>
+        <p className="text-[16px] mb-2" style={{ color: 'color-mix(in srgb, var(--hh-bg) 80%, transparent)' }}>
           {isAudioConnecting ? "Verbinden..." : audioConnectionState === ConnectionState.Connected ? "Verbonden" : "Audio modus"}
         </p>
-        <p className="text-[22px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>{formatTime(sessionTimer)}</p>
+        <p className="text-[22px] font-mono" style={{ color: 'color-mix(in srgb, var(--hh-bg) 60%, transparent)' }}>{formatTime(sessionTimer)}</p>
         
         {/* Waveform visualization - animate when speaking */}
         <div className="flex items-end justify-center gap-1.5 h-16 mt-8">
@@ -2748,7 +2748,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               className={`rounded-full transition-all duration-150 ${isAgentSpeaking ? 'animate-pulse' : ''}`}
               style={{
                 width: '6px',
-                backgroundColor: 'rgba(255,255,255,0.7)',
+                backgroundColor: 'color-mix(in srgb, var(--hh-bg) 70%, transparent)',
                 height: isAgentSpeaking ? `${Math.sin(Date.now() / 200 + i) * 20 + 35}px` : `${15 + (i % 3) * 10}px`,
               }}
             />
@@ -2772,12 +2772,12 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 width: '56px', 
                 height: '56px', 
                 borderRadius: '50%',
-                backgroundColor: isMuted ? 'var(--hh-bg)' : 'rgba(255,255,255,0.2)'
+                backgroundColor: isMuted ? 'var(--hh-bg)' : 'color-mix(in srgb, var(--hh-bg) 20%, transparent)'
               }}
             >
               {isMuted ? <MicOff className="w-5 h-5 text-hh-success" /> : <Mic className="w-5 h-5 text-white" />}
             </button>
-            <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{isMuted ? "Unmute" : "Mute"}</span>
+            <span className="text-[11px]" style={{ color: 'color-mix(in srgb, var(--hh-bg) 70%, transparent)' }}>{isMuted ? "Unmute" : "Mute"}</span>
           </div>
           
           <div className="flex flex-col items-center gap-2">
@@ -2796,7 +2796,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             >
               <Phone className="w-6 h-6 text-white" style={{ transform: 'rotate(135deg)' }} />
             </button>
-            <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Ophangen</span>
+            <span className="text-[11px]" style={{ color: 'color-mix(in srgb, var(--hh-bg) 70%, transparent)' }}>Ophangen</span>
           </div>
           
           <div className="flex flex-col items-center gap-2">
@@ -2806,12 +2806,12 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 width: '56px', 
                 height: '56px', 
                 borderRadius: '50%',
-                backgroundColor: 'rgba(255,255,255,0.2)' 
+                backgroundColor: 'color-mix(in srgb, var(--hh-bg) 20%, transparent)'
               }}
             >
               <Volume2 className="w-5 h-5 text-white" />
             </button>
-            <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Speaker</span>
+            <span className="text-[11px]" style={{ color: 'color-mix(in srgb, var(--hh-bg) 70%, transparent)' }}>Speaker</span>
           </div>
         </div>
       </div>
@@ -2899,7 +2899,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 width: '56px',
                 height: '56px',
                 borderRadius: '50%',
-                backgroundColor: avatar.isMuted ? 'var(--hh-bg)' : 'rgba(255,255,255,0.2)'
+                backgroundColor: avatar.isMuted ? 'var(--hh-bg)' : 'color-mix(in srgb, var(--hh-bg) 20%, transparent)'
               }}
             >
               {avatar.isMuted ? <MicOff className="w-5 h-5 text-hh-text" /> : <Mic className="w-5 h-5 text-white" />}
@@ -2914,7 +2914,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 width: '56px',
                 height: '56px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(255,255,255,0.2)'
+                backgroundColor: 'color-mix(in srgb, var(--hh-bg) 20%, transparent)'
               }}
             >
               <Video className="w-5 h-5 text-white" />

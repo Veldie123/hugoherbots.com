@@ -25,8 +25,8 @@ export function StopRoleplayDialog({
       <DialogContent className="max-w-[400px] p-0 overflow-hidden border-hh-border">
         <DialogHeader className="px-6 pt-6 pb-4">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100">
-              <Square className="w-4 h-4 text-slate-600" />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-ui-100">
+              <Square className="w-4 h-4 text-hh-muted" />
             </div>
             <DialogTitle className="text-[18px] font-semibold text-hh-text">
               Sessie beëindigen?
@@ -37,7 +37,7 @@ export function StopRoleplayDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="px-6 py-4 border-t border-hh-border bg-slate-50 flex gap-3">
+        <DialogFooter className="px-6 py-4 border-t border-hh-border bg-hh-ui-50 flex gap-3">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
@@ -51,7 +51,7 @@ export function StopRoleplayDialog({
               onOpenChange(false);
             }}
             className="flex-1 h-10 text-[14px]"
-            style={{ backgroundColor: '#1E2A3B' }}
+            style={{ backgroundColor: 'var(--hh-ink)' }}
           >
             Stoppen
           </Button>

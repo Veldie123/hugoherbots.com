@@ -16,11 +16,11 @@ export function InlineWebinarCard({ webinar }: InlineWebinarCardProps) {
     >
       <div
         className="rounded-lg flex items-center justify-center flex-shrink-0"
-        style={{ width: 48, height: 48, backgroundColor: webinar.isLive ? "#FEF3C7" : "#EDE9FE" }}
+        style={{ width: 48, height: 48, backgroundColor: webinar.isLive ? "var(--hh-warning-100)" : "var(--hh-primary-100)" }}
       >
         <Radio
           className="w-5 h-5"
-          style={{ color: webinar.isLive ? "#D97706" : "#7C3AED" }}
+          style={{ color: webinar.isLive ? "var(--hh-warning)" : "var(--hh-primary)" }}
         />
       </div>
       <div className="min-w-0 flex-1">

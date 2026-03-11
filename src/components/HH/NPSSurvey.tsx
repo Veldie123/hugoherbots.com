@@ -69,7 +69,7 @@ export function NPSSurvey() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-16 right-4 z-50 w-[340px] bg-white rounded-[16px] shadow-xl border border-hh-border p-4">
+    <div className="fixed bottom-16 right-4 z-50 w-[340px] bg-hh-bg rounded-[16px] shadow-xl border border-hh-border p-4">
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-[14px] font-semibold text-hh-text">Hoe waarschijnlijk beveel je Hugo aan?</h4>
         <button onClick={dismiss} className="text-hh-muted hover:text-hh-text">
@@ -104,7 +104,7 @@ export function NPSSurvey() {
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Optioneel: waarom deze score?"
-            className="w-full h-16 p-2 text-[13px] border border-hh-border rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-hh-primary/30 mb-2"
+            className="w-full h-16 p-2 text-[13px] bg-hh-bg text-hh-text placeholder:text-hh-muted border border-hh-border rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-hh-primary/30 mb-2"
           />
           <div className="flex gap-2">
             <Button

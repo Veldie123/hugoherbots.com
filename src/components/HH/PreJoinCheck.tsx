@@ -393,7 +393,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
     <div className="flex flex-col h-full min-h-[70vh] bg-hh-ink relative">
       {/* Top bar — overlays the video */}
       <div className="absolute top-0 left-0 right-0 z-20 px-4 sm:px-6 py-4 flex items-center justify-between"
-        style={{ background: "linear-gradient(to bottom, rgba(15,24,38,0.8) 0%, transparent 100%)" }}
+        style={{ background: "linear-gradient(to bottom, color-mix(in srgb, var(--hh-ink) 80%, transparent) 0%, transparent 100%)" }}
       >
         <button
           onClick={onCancel}

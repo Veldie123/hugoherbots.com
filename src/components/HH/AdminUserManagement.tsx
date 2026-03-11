@@ -320,8 +320,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +12%
               </Badge>
@@ -336,13 +335,12 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.1)' }}>
-                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#059669' }} />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-hh-success/10">
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-hh-success" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +8%
               </Badge>
@@ -357,13 +355,12 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)' }}>
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#2563eb' }} />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-hh-primary/10">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-hh-primary" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +3.2%
               </Badge>
@@ -378,13 +375,12 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
 
           <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)' }}>
-                <Play className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#2563eb' }} />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-hh-primary/10">
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 text-hh-primary" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +18%
               </Badge>

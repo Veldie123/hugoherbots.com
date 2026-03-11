@@ -75,7 +75,7 @@ const scenarioFlowData: Phase[] = [
   {
     id: 1,
     name: "Openingsfase",
-    color: "#6B7A92",
+    color: "var(--hh-muted)",
     themas: [],
     uitleg: "Volg deze volgorde, tenzij klant spontaan een stap aanbrengt (dan overslaan en terug oppakken waar je zat).",
     steps: [
@@ -88,7 +88,7 @@ const scenarioFlowData: Phase[] = [
   {
     id: 2,
     name: "Ontdekkingsfase",
-    color: "#6B7A92",
+    color: "var(--hh-muted)",
     themas: ["Bron", "Motivatie", "Ervaring", "Verwachtingen", "Alternatieven", "Budget", "Timing", "Beslissingscriteria"],
     uitleg: "Hier breng je systematisch alle klantnoden, wensen en bezwaren in kaart, zodat je straks een relevante oplossing kan voorstellen.",
     steps: [
@@ -105,7 +105,7 @@ const scenarioFlowData: Phase[] = [
   {
     id: 3,
     name: "Aanbevelingsfase",
-    color: "#6B7A92",
+    color: "var(--hh-muted)",
     themas: ["USP's"],
     uitleg: "Nu verbind je wat je geleerd hebt over de klant aan jouw oplossing en USP's. Je toont hoe jouw aanbod past bij hun situatie en vraagt expliciet naar hun mening.",
     steps: [
@@ -119,7 +119,7 @@ const scenarioFlowData: Phase[] = [
   {
     id: 4,
     name: "Beslissingsfase",
-    color: "#6B7A92",
+    color: "var(--hh-muted)",
     themas: ["beslissing"],
     uitleg: "In deze laatste fase stuur je richting een definitieve beslissing door in te spelen op alle resterende vragen, twijfels, bezwaren en eventuele angst. Hier maak je het verschil met je afsluittechniek.",
     steps: [

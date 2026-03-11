@@ -62,7 +62,7 @@ export function ChatBubble({
         </div>
 
         {children && (
-          <div className="mt-1.5">
+          <div className="mt-1.5 w-fit">
             {children}
           </div>
         )}

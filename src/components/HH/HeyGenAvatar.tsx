@@ -36,7 +36,7 @@ export function HeyGenAvatar({ isActive }: HeyGenAvatarProps) {
         width: 200px;
         height: 200px;
         border-radius: 50%;
-        border: 2px solid #fff;
+        border: 2px solid var(--hh-bg);
         box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.12);
         transition: all linear 0.1s;
         overflow: hidden;

@@ -10,7 +10,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
   return (
     <div
       className="relative min-h-screen overflow-hidden"
-      style={{ backgroundColor: "#070707", color: "#fff" }}
+      style={{ backgroundColor: "var(--hh-ink)", color: "var(--hh-bg)" }}
     >
       {/* Hugo photo — full body, right side */}
       <motion.div
@@ -32,7 +32,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
         className="md:hidden absolute inset-0"
         style={{
           background:
-            "linear-gradient(to top, #070707 0%, rgba(7,7,7,0.9) 30%, rgba(7,7,7,0.5) 55%, transparent 75%)",
+            "linear-gradient(to top, var(--hh-ink) 0%, color-mix(in srgb, var(--hh-ink) 90%, transparent) 30%, color-mix(in srgb, var(--hh-ink) 50%, transparent) 55%, transparent 75%)",
           zIndex: 5,
           pointerEvents: "none",
         }}
@@ -54,7 +54,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
             <Logo
               variant="horizontal"
               className="h-8"
-              style={{ color: "rgba(255,255,255,0.9)" }}
+              style={{ color: "color-mix(in srgb, var(--hh-bg) 90%, transparent)" }}
             />
           </div>
         </motion.header>
@@ -78,7 +78,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
                   fontSize: "13px",
                   letterSpacing: "0.3em",
                   textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.45)",
+                  color: "color-mix(in srgb, var(--hh-bg) 45%, transparent)",
                   marginBottom: "24px",
                   fontWeight: 300,
                 }}
@@ -99,7 +99,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
               style={{
                 fontSize: "clamp(44px, 8vw, 80px)",
                 lineHeight: 1.02,
-                color: "#fff",
+                color: "var(--hh-bg)",
                 letterSpacing: "-0.02em",
                 fontWeight: 300,
                 marginBottom: "24px",
@@ -122,7 +122,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
               style={{
                 fontSize: "17px",
                 lineHeight: 1.65,
-                color: "rgba(255,255,255,0.7)",
+                color: "color-mix(in srgb, var(--hh-bg) 70%, transparent)",
                 marginBottom: "40px",
                 maxWidth: "420px",
                 fontWeight: 300,
@@ -154,11 +154,11 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
                   height: "48px",
                   fontSize: "16px",
                   fontWeight: 400,
-                  backgroundColor: "#fff",
-                  color: "#000",
+                  backgroundColor: "var(--hh-bg)",
+                  color: "var(--hh-text)",
                   borderRadius: "16px",
                   textDecoration: "none",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                  boxShadow: "0 8px 24px color-mix(in srgb, var(--hh-ink) 30%, transparent)",
                   transition: "opacity 0.2s",
                 }}
                 onMouseEnter={(e) =>
@@ -182,7 +182,7 @@ export function ComingSoon({ navigate }: ComingSoonProps) {
           className="p-6 md:p-10 flex items-center justify-between"
           style={{
             fontSize: "12px",
-            color: "rgba(255,255,255,0.3)",
+            color: "color-mix(in srgb, var(--hh-bg) 30%, transparent)",
             letterSpacing: "0.15em",
             textTransform: "uppercase",
           }}

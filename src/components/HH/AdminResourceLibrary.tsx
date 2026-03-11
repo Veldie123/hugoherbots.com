@@ -204,8 +204,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +12%
               </Badge>
@@ -218,13 +217,12 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.1)' }}>
-                <Download className="w-5 h-5" style={{ color: '#059669' }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success/10">
+                <Download className="w-5 h-5 text-hh-success" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +34%
               </Badge>
@@ -242,8 +240,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B', borderColor: 'rgba(245, 158, 11, 0.2)' }}
+                className="text-[11px] px-2 py-0.5 bg-hh-warn/10 text-hh-warn border-hh-warn/20"
               >
                 Featured
               </Badge>
@@ -261,8 +258,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', borderColor: 'rgba(37, 99, 235, 0.2)' }}
+                className="text-[11px] px-2 py-0.5 bg-hh-primary/10 text-hh-primary border-hh-primary/20"
               >
                 Deze maand
               </Badge>

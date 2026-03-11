@@ -197,8 +197,7 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +8%
               </Badge>
@@ -211,13 +210,12 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.1)' }}>
-                <CheckCircle2 className="w-5 h-5" style={{ color: '#059669' }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success/10">
+                <CheckCircle2 className="w-5 h-5 text-hh-success" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 Live
               </Badge>
@@ -230,13 +228,12 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)' }}>
-                <Eye className="w-5 h-5" style={{ color: '#2563eb' }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-primary/10">
+                <Eye className="w-5 h-5 text-hh-primary" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +42%
               </Badge>
@@ -249,13 +246,12 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
 
           <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 150, 105, 0.1)' }}>
-                <ThumbsUp className="w-5 h-5" style={{ color: '#059669' }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success/10">
+                <ThumbsUp className="w-5 h-5 text-hh-success" />
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5"
-                style={{ backgroundColor: 'rgba(18, 185, 129, 0.1)', color: '#12B981', borderColor: 'rgba(18, 185, 129, 0.2)' }}
+                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 Excellent
               </Badge>

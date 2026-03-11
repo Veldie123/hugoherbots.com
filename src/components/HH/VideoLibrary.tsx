@@ -201,7 +201,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
               setActiveVideo({
                 id: videoToOpen.id,
                 title: videoToOpen.title,
-                displayTitle: videoToOpen.ai_attractive_title || videoToOpen.title,
+                displayTitle: videoToOpen.title,
                 muxPlaybackId: videoToOpen.mux_playback_id || "",
                 techniqueNumber: techId,
                 technieken: videoToOpen.technieken || [],
@@ -214,7 +214,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
               setActiveVideo({
                 id: firstPlayable.id,
                 title: firstPlayable.title,
-                displayTitle: firstPlayable.ai_attractive_title || firstPlayable.title,
+                displayTitle: firstPlayable.title,
                 muxPlaybackId: firstPlayable.mux_playback_id || "",
                 techniqueNumber: techId,
                 technieken: firstPlayable.technieken || [],
@@ -251,7 +251,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
         setActiveVideo({
           id: firstVideo.id,
           title: firstVideo.title,
-          displayTitle: firstVideo.ai_attractive_title || firstVideo.title,
+          displayTitle: firstVideo.title,
           muxPlaybackId: firstVideo.mux_playback_id || "",
           techniqueNumber: techId,
           technieken: firstVideo.technieken || [],
@@ -326,7 +326,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
     const prevVideo = ordered[idx - 1];
     const prevTechId = prevVideo.ai_suggested_techniek_id || prevVideo.technique_id || '';
     const prevTechnique = prevTechId ? getTechniekByNummer(prevTechId) : null;
-    const prevName = prevVideo.ai_attractive_title || prevVideo.title;
+    const prevName = prevVideo.title;
     return `Bekijk eerst: ${prevName}`;
   };
 
@@ -352,7 +352,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
       id: v.id,
       title: v.title,
       techniqueNumber: techId,
-      displayTitle: v.ai_attractive_title || v.title,
+      displayTitle: v.title,
       fase: getPhaseFromTechnique(techId),
       duration: formatDuration(v.duration),
       views: 0,

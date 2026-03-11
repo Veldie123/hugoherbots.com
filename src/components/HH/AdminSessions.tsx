@@ -552,28 +552,23 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
             <h1 className="text-[24px] sm:text-[32px] leading-[30px] sm:leading-[40px] text-hh-text whitespace-nowrap">
               Talk to Hugo <sup className="text-[14px] sm:text-[18px]">AI</sup>
             </h1>
-            <div className="hidden sm:flex items-center gap-2">
-              <Button variant="outline" className="gap-2 border-hh-primary-200 text-hh-primary hover:bg-hh-primary/5" size="sm" onClick={() => navigate?.("admin-config-review")}>
-                <Settings className="w-4 h-4" />
+            {isSuperAdmin && (
+              <div className="hidden sm:flex items-center gap-2">
+                <Button variant="outline" className="gap-2 border-hh-primary-200 text-hh-primary hover:bg-hh-primary/5" size="sm" onClick={() => navigate?.("admin-config-review")}>
+                  <Settings className="w-4 h-4" />
+                  Config Review
+                </Button>
+              </div>
+            )}
+          </div>
+          {isSuperAdmin && (
+            <div className="flex sm:hidden items-center gap-2 mt-2">
+              <Button variant="outline" size="sm" className="gap-1.5 text-[12px] border-hh-primary-200 text-hh-primary hover:bg-hh-primary/5" onClick={() => navigate?.("admin-config-review")}>
+                <Settings className="w-3.5 h-3.5" />
                 Config Review
               </Button>
-              <Button className="gap-2 text-white bg-hh-primary hover:bg-hh-primary-hover" size="sm" onClick={() => navigate?.("admin-chat-expert")}>
-                <Sparkles className="w-4 h-4" />
-                Talk to Hugo <sup className="text-[10px]">AI</sup>
-              </Button>
             </div>
-          </div>
-          {/* Mobile: buttons row below title */}
-          <div className="flex sm:hidden items-center gap-2 mt-2">
-            <Button variant="outline" size="sm" className="gap-1.5 text-[12px] flex-1 border-hh-primary-200 text-hh-primary hover:bg-hh-primary/5" onClick={() => navigate?.("admin-config-review")}>
-              <Settings className="w-3.5 h-3.5" />
-              Config
-            </Button>
-            <Button className="gap-1.5 text-[12px] text-white flex-1 bg-hh-primary hover:bg-hh-primary-hover" size="sm" onClick={() => navigate?.("admin-chat-expert")}>
-              <Sparkles className="w-3.5 h-3.5" />
-              Myself <sup className="text-[9px]">AI</sup>
-            </Button>
-          </div>
+          )}
           <p className="text-[13px] sm:text-[16px] leading-[18px] sm:leading-[24px] text-hh-muted mt-1.5">
             Alle training sessies: AI roleplay, uploads en live analyses
           </p>

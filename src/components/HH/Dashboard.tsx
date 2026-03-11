@@ -88,7 +88,7 @@ const ContentRow = ({
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
-            className="hidden sm:flex absolute left-0 top-0 bottom-2 z-10 w-10 items-center justify-center bg-gradient-to-r from-white via-white/90 to-transparent opacity-0 group-hover/row:opacity-100 transition-opacity"
+            className="hidden sm:flex absolute left-0 top-0 bottom-2 z-10 w-10 items-center justify-center bg-gradient-to-r from-hh-bg via-hh-bg/90 to-transparent opacity-0 group-hover/row:opacity-100 transition-opacity"
           >
             <ChevronLeft className="w-5 h-5 text-hh-text" />
           </button>
@@ -104,7 +104,7 @@ const ContentRow = ({
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
-            className="hidden sm:flex absolute right-0 top-0 bottom-2 z-10 w-10 items-center justify-center bg-gradient-to-l from-white via-white/90 to-transparent opacity-0 group-hover/row:opacity-100 transition-opacity"
+            className="hidden sm:flex absolute right-0 top-0 bottom-2 z-10 w-10 items-center justify-center bg-gradient-to-l from-hh-bg via-hh-bg/90 to-transparent opacity-0 group-hover/row:opacity-100 transition-opacity"
           >
             <ChevronRight className="w-5 h-5 text-hh-text" />
           </button>
@@ -135,7 +135,7 @@ const VideoCard = ({
     style={{ width: 200, flexShrink: 0 }} className={`dashboard-card group ${locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
     onClick={locked ? undefined : onClick}
   >
-    <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
+    <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-text to-hh-primary/80 aspect-video mb-2">
       {thumbnail ? (
         <img src={thumbnail} alt={title} className={`w-full h-full object-cover ${locked ? 'grayscale' : ''}`} loading="lazy" />
       ) : (
@@ -158,7 +158,7 @@ const VideoCard = ({
       ) : (
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
           <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-            <Play className="w-6 h-6 ml-0.5" style={{ color: '#1e293b' }} />
+            <Play className="w-6 h-6 ml-0.5" style={{ color: 'var(--hh-ink)' }} />
           </div>
         </div>
       )}
@@ -222,7 +222,7 @@ const WebinarCard = ({
         className="absolute inset-0 w-full h-full object-cover object-top"
       />
       {isLive && (
-        <Badge className="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-2 py-0.5 animate-pulse">
+        <Badge className="absolute top-2 right-2 bg-hh-error text-white text-[10px] px-2 py-0.5 animate-pulse">
           LIVE
         </Badge>
       )}
@@ -238,7 +238,7 @@ const WebinarCard = ({
       )}
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
         <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-          <Play className="w-6 h-6 ml-0.5" style={{ color: '#1e293b' }} />
+          <Play className="w-6 h-6 ml-0.5" style={{ color: 'var(--hh-ink)' }} />
         </div>
       </div>
     </div>
@@ -255,8 +255,8 @@ const WebinarCard = ({
       <button
         onClick={(e) => { e.stopPropagation(); onRegister(); }}
         className={`mt-2 w-full text-[11px] font-medium py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-colors ${
-          isRegistered 
-            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default" 
+          isRegistered
+            ? "bg-hh-success/10 text-hh-success cursor-default"
             : "bg-hh-success text-white hover:bg-hh-success/90"
         }`}
       >
@@ -374,7 +374,7 @@ const AnalysisCard = ({
 }) => {
   const isProcessing = status !== 'completed' && status !== 'failed';
   const scoreColor = score !== null
-    ? score >= 80 ? 'text-hh-success' : score >= 50 ? 'text-amber-500' : 'text-hh-error'
+    ? score >= 80 ? 'text-hh-success' : score >= 50 ? 'text-hh-warning' : 'text-hh-error'
     : 'text-hh-muted';
 
   return (
@@ -467,7 +467,7 @@ const SessionCard = ({
         {score !== null && (
           <>
             <span className="text-[11px] text-hh-muted">•</span>
-            <span className={`text-[11px] font-medium ${score >= 80 ? 'text-hh-success' : score >= 50 ? 'text-amber-500' : 'text-hh-error'}`}>{score}%</span>
+            <span className={`text-[11px] font-medium ${score >= 80 ? 'text-hh-success' : score >= 50 ? 'text-hh-warning' : 'text-hh-error'}`}>{score}%</span>
           </>
         )}
         <span className="text-[11px] text-hh-muted">•</span>
@@ -565,9 +565,9 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
             {loginStreak > 0 && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 rounded-full border border-amber-500/20">
+            <div className="flex items-center gap-2 px-3 py-2 bg-hh-warning/10 rounded-full border border-hh-warning/20">
               <span className="text-[16px] sm:text-[18px]">🔥</span>
-              <span className="text-[13px] sm:text-[14px] font-medium text-amber-700 dark:text-amber-400 whitespace-nowrap">{loginStreak} {loginStreak === 1 ? 'dag' : 'dagen'} streak</span>
+              <span className="text-[13px] sm:text-[14px] font-medium text-hh-warning whitespace-nowrap">{loginStreak} {loginStreak === 1 ? 'dag' : 'dagen'} streak</span>
             </div>
             )}
             <div className="flex items-center gap-2.5 px-3 py-2 bg-hh-bg rounded-full border border-hh-border">

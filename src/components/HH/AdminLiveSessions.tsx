@@ -1312,11 +1312,11 @@ ${platformUrl}`;
                       const techniqueNumber = session.topic?.match(/^\d+\.\d+/) ? session.topic.match(/^\d+\.\d+/)?.[0] : `${(idx % 4) + 1}.${idx + 1}`;
                       const phaseNumber = parseInt(techniqueNumber?.split('.')[0] || '1');
                       const phaseColorStyles: Record<number, { bg: string; text: string }> = {
-                        0: { bg: '#94a3b8', text: '#ffffff' },
-                        1: { bg: '#5b8fb9', text: '#ffffff' },
-                        2: { bg: '#1e6b9a', text: '#ffffff' },
-                        3: { bg: '#1e3a5f', text: '#ffffff' },
-                        4: { bg: '#3C9A6E', text: '#ffffff' },
+                        0: { bg: 'var(--hh-muted)', text: 'var(--hh-bg)' },
+                        1: { bg: 'var(--hh-primary)', text: 'var(--hh-bg)' },
+                        2: { bg: 'var(--hh-primary)', text: 'var(--hh-bg)' },
+                        3: { bg: 'var(--hh-primary)', text: 'var(--hh-bg)' },
+                        4: { bg: 'var(--hh-success)', text: 'var(--hh-bg)' },
                       };
                       const phaseNames: Record<number, string> = {
                         0: 'Pre-contactfase',

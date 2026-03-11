@@ -286,21 +286,19 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                     key={content.id}
                     className="flex items-start gap-3 p-3 bg-hh-ui-50 rounded-lg hover:bg-hh-ui-100 transition-colors"
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`} style={{
-                      backgroundColor: content.type === "Video"
-                        ? "var(--hh-primary-100)"
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      content.type === "Video"
+                        ? "bg-hh-primary-100"
                         : content.type === "Live"
-                        ? "rgba(239, 68, 68, 0.1)"
-                        : "rgba(37, 99, 235, 0.1)"
-                    }}>
+                        ? "bg-hh-error/10"
+                        : "bg-hh-primary/10"
+                    }`}>
                       {content.type === "Video" ? (
-                        <Video className={`w-5 h-5`} style={{
-                          color: "var(--hh-primary)"
-                        }} />
+                        <Video className="w-5 h-5 text-hh-primary" />
                       ) : content.type === "Live" ? (
                         <Play className="w-5 h-5 text-hh-error" />
                       ) : (
-                        <Play className="w-5 h-5" style={{ color: "#2563EB" }} />
+                        <Play className="w-5 h-5 text-hh-primary" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">

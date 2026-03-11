@@ -47,12 +47,12 @@ function PhaseBar({ label, score, color }: { label: string; score: number; color
   );
 }
 
-const STATUS_MAP: Record<string, { label: string; icon: React.ReactNode; color: string; rgb: string }> = {
-  transcribing: { label: "Transcriberen...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-primary)", rgb: "var(--hh-primary-rgb)" },
-  analyzing: { label: "Analyseren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-primary)", rgb: "var(--hh-primary-rgb)" },
-  evaluating: { label: "Evalueren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-warning)", rgb: "245,158,11" },
-  generating_report: { label: "Rapport genereren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-success)", rgb: "16,185,129" },
-  failed: { label: "Analyse mislukt", icon: <AlertCircle className="w-4 h-4" />, color: "var(--hh-error)", rgb: "239,68,68" },
+const STATUS_MAP: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
+  transcribing: { label: "Transcriberen...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-primary)" },
+  analyzing: { label: "Analyseren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-primary)" },
+  evaluating: { label: "Evalueren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-warning)" },
+  generating_report: { label: "Rapport genereren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-success)" },
+  failed: { label: "Analyse mislukt", icon: <AlertCircle className="w-4 h-4" />, color: "var(--hh-error)" },
 };
 
 export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardProps) {
@@ -61,10 +61,10 @@ export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardP
     return (
       <div
         className="rounded-xl border-2 bg-card p-4"
-        style={{ maxWidth: 520, borderColor: `rgba(${statusInfo.rgb}, 0.25)` }}
+        style={{ maxWidth: 520, borderColor: `color-mix(in srgb, ${statusInfo.color} 25%, transparent)` }}
       >
         <div className="flex items-center gap-3">
-          <div className="rounded-lg flex items-center justify-center" style={{ width: 40, height: 40, backgroundColor: `rgba(${statusInfo.rgb}, 0.08)`, color: statusInfo.color }}>
+          <div className="rounded-lg flex items-center justify-center" style={{ width: 40, height: 40, backgroundColor: `color-mix(in srgb, ${statusInfo.color} 8%, transparent)`, color: statusInfo.color }}>
             {statusInfo.icon}
           </div>
           <div>

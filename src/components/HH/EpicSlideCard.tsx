@@ -2,12 +2,12 @@ import React from "react";
 import type { EpicSlideContent } from "@/types/crossPlatform";
 
 const PHASE_COLORS: Record<string, { bg: string; border: string; badge: string; badgeText: string; label: string }> = {
-  intro: { bg: '#1A1F2E', border: '#3B4259', badge: '#3B4259', badgeText: '#A8B4CC', label: 'Introductie' },
-  pre: { bg: '#1A1F2E', border: '#3B4259', badge: '#3B4259', badgeText: '#A8B4CC', label: 'Voorbereiding' },
-  E: { bg: '#1B2A3A', border: '#2D6A9F', badge: '#2D6A9F', badgeText: '#FFFFFF', label: 'Explore' },
-  P: { bg: '#1B3A2A', border: '#3C9A6E', badge: '#3C9A6E', badgeText: '#FFFFFF', label: 'Probe' },
-  I: { bg: '#2A1B3A', border: '#7C3AED', badge: '#7C3AED', badgeText: '#FFFFFF', label: 'Impact' },
-  C: { bg: '#3A2A1B', border: '#D97706', badge: '#D97706', badgeText: '#FFFFFF', label: 'Commit' },
+  intro: { bg: 'color-mix(in srgb, var(--hh-ink) 85%, var(--hh-muted))', border: 'color-mix(in srgb, var(--hh-muted) 40%, var(--hh-ink))', badge: 'color-mix(in srgb, var(--hh-muted) 40%, var(--hh-ink))', badgeText: 'var(--hh-muted)', label: 'Introductie' },
+  pre: { bg: 'color-mix(in srgb, var(--hh-ink) 85%, var(--hh-muted))', border: 'color-mix(in srgb, var(--hh-muted) 40%, var(--hh-ink))', badge: 'color-mix(in srgb, var(--hh-muted) 40%, var(--hh-ink))', badgeText: 'var(--hh-muted)', label: 'Voorbereiding' },
+  E: { bg: 'color-mix(in srgb, var(--hh-primary) 15%, var(--hh-ink))', border: 'var(--hh-primary)', badge: 'var(--hh-primary)', badgeText: 'var(--hh-bg)', label: 'Explore' },
+  P: { bg: 'color-mix(in srgb, var(--hh-success) 15%, var(--hh-ink))', border: 'var(--hh-success)', badge: 'var(--hh-success)', badgeText: 'var(--hh-bg)', label: 'Probe' },
+  I: { bg: 'color-mix(in srgb, var(--hh-purple) 15%, var(--hh-ink))', border: 'var(--hh-purple)', badge: 'var(--hh-purple)', badgeText: 'var(--hh-bg)', label: 'Impact' },
+  C: { bg: 'color-mix(in srgb, var(--hh-warning) 15%, var(--hh-ink))', border: 'var(--hh-warning)', badge: 'var(--hh-warning)', badgeText: 'var(--hh-bg)', label: 'Commit' },
 };
 
 function getPhaseStyle(phase: string) {

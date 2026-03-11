@@ -140,7 +140,7 @@ import {
 } from "../ui/tooltip";
 
 interface AdminVideoManagementProps {
-  navigate?: (page: string) => void;
+  navigate?: (page: string, data?: Record<string, any>) => void;
   isSuperAdmin?: boolean;
 }
 
@@ -2051,16 +2051,16 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                       isDragging ? 'opacity-40 bg-hh-primary/10' : ''
                     } ${isDragOver ? 'border-t-2 border-hh-primary' : ''} hover:bg-hh-ui-50`}
                   >
-                    <GripVertical className="w-5 h-5 text-hh-muted flex-shrink-0" />
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0" style={{ backgroundColor: 'var(--hh-primary)' }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-[16px] font-bold text-white flex-shrink-0" style={{ backgroundColor: 'var(--hh-primary)' }}>
                       {index + 1}
                     </div>
+                    <GripVertical className="w-5 h-5 text-hh-muted flex-shrink-0" />
                     {thumbnailUrl ? (
                       <div
                         className="relative w-[80px] h-[45px] flex-shrink-0 group/thumb cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if ((video.status === 'ready' || video.status === 'completed') && video.mux_playback_id) setPreviewVideo(video);
+                          navigate?.('admin-video-detail', { videoId: video.id });
                         }}
                       >
                         <img src={thumbnailUrl} alt="" className="w-full h-full object-cover rounded" />
@@ -2077,10 +2077,10 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="text-[14px] font-medium text-hh-text truncate">
-                        {video.ai_attractive_title || video.title || 'Naamloze video'}
+                        {video.title || 'Naamloze video'}
                       </div>
                       <div className="text-[12px] text-hh-muted truncate">
-                        {video.title}{technique ? ` · #${techId} ${technique.naam} · Fase ${technique.fase}` : ''} · {video.duration ? `${Math.floor(video.duration / 60)}:${String(Math.floor(video.duration % 60)).padStart(2, '0')}` : '--:--'}{video.original_title ? ` · ${video.original_title}` : ''}
+                        {video.original_title || ''}{technique ? ` · #${techId} ${technique.naam} · Fase ${technique.fase}` : ''} · {video.duration ? `${Math.floor(video.duration / 60)}:${String(Math.floor(video.duration % 60)).padStart(2, '0')}` : '--:--'}
                       </div>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
@@ -2121,13 +2121,23 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                               Bekijk video
                             </DropdownMenuItem>
                             <DropdownMenuItem
+                              disabled={!((video.status === 'ready' || video.status === 'completed') && !!video.mux_playback_id)}
+                              onSelect={(e: Event) => {
+                                e.preventDefault();
+                                navigate?.("admin-video-detail", { videoId: video.id });
+                              }}
+                            >
+                              <FileText className="w-4 h-4 mr-2" />
+                              Bekijk detail
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
                               onSelect={(e: Event) => {
                                 e.preventDefault();
                                 openDetailsDialog(video);
                               }}
                             >
                               <FileText className="w-4 h-4 mr-2" />
-                              Details
+                              Snelle details
                             </DropdownMenuItem>
                             {video.has_transcript && (
                               <DropdownMenuItem
@@ -2373,7 +2383,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         <tr 
                           key={video.id} 
                           className="border-t border-hh-border hover:bg-hh-ui-50 transition-colors cursor-pointer"
-                          onClick={() => isPlayable && setPreviewVideo(video)}
+                          onClick={() => navigate?.('admin-video-detail', { videoId: video.id })}
                         >
                           <td className="py-3 px-4">
                             <Badge variant="outline" className="text-[11px] font-mono" style={{ backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' }}>
@@ -2382,7 +2392,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           </td>
                           <td className="py-3 px-4">
                             <p className="text-[14px] leading-[20px] text-hh-text font-medium">
-                              {video.ai_attractive_title || video.title}
+                              {video.title}
                               {video.is_hidden && <EyeOff className="w-3 h-3 text-hh-muted inline ml-1" />}
                               {linkedTech?.confidence && (
                                 <Badge variant="outline" className="text-[9px] px-1 py-0 ml-2" style={{ backgroundColor: 'var(--hh-primary-50)', color: 'var(--hh-primary)', borderColor: 'var(--hh-primary-200)' }}>
@@ -2436,14 +2446,24 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                                   <Eye className="w-4 h-4 mr-2" />
                                   Bekijk video
                                 </DropdownMenuItem>
-                                <DropdownMenuItem 
+                                <DropdownMenuItem
+                                  disabled={!isPlayable}
+                                  onSelect={(e: Event) => {
+                                    e.preventDefault();
+                                    navigate?.("admin-video-detail", { videoId: video.id });
+                                  }}
+                                >
+                                  <FileText className="w-4 h-4 mr-2" />
+                                  Bekijk detail
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
                                   onSelect={(e: Event) => {
                                     e.preventDefault();
                                     openDetailsDialog(video);
                                   }}
                                 >
                                   <FileText className="w-4 h-4 mr-2" />
-                                  Details
+                                  Snelle details
                                 </DropdownMenuItem>
                                 {video.has_transcript && (
                                   <DropdownMenuItem onClick={async () => {
@@ -2597,7 +2617,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 <Card
                   key={video.id}
                   className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden hover:shadow-hh-md transition-all group cursor-pointer"
-                  onClick={() => isPlayable && setPreviewVideo(video)}
+                  onClick={() => navigate?.('admin-video-detail', { videoId: video.id })}
                 >
                   {/* Thumbnail */}
                   <div className="relative aspect-video bg-hh-ui-200 overflow-hidden">
@@ -2615,7 +2635,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     {isPlayable && (
                       <div
                         className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
-                        onClick={() => setPreviewVideo(video)}
+                        onClick={(e) => { e.stopPropagation(); navigate?.('admin-video-detail', { videoId: video.id }); }}
                       >
                         <Button size="icon" className="rounded-full w-12 h-12 bg-hh-primary hover:bg-hh-primary/90">
                           <Play className="w-6 h-6 text-white" />
@@ -2660,14 +2680,23 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                             <Eye className="w-4 h-4 mr-2" />
                             Bekijk video
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
+                            onSelect={(e: Event) => {
+                              e.preventDefault();
+                              navigate?.('admin-video-detail', { videoId: video.id });
+                            }}
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            Bekijk detail
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
                             onSelect={(e: Event) => {
                               e.preventDefault();
                               openDetailsDialog(video);
                             }}
                           >
                             <FileText className="w-4 h-4 mr-2" />
-                            Details
+                            Snelle details
                           </DropdownMenuItem>
                           {video.has_transcript && (
                             <DropdownMenuItem onClick={async () => {
@@ -2744,7 +2773,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     </div>
 
                     <h3 className="text-[16px] leading-[22px] text-hh-text font-medium mb-2 line-clamp-2">
-                      {video.ai_attractive_title || video.title}
+                      {video.title}
                     </h3>
 
                     <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -2785,7 +2814,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         <DialogContent className="max-w-4xl p-0 overflow-hidden max-h-[85vh] overflow-y-auto">
           <DialogHeader className="p-4 pb-0">
             <DialogTitle>
-              {previewVideo?.ai_attractive_title || previewVideo?.title || ''}
+              {previewVideo?.title || ''}
             </DialogTitle>
           </DialogHeader>
           <div className="p-4">
@@ -2832,13 +2861,13 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                 className="text-[20px] font-semibold border-hh-border"
                 placeholder="Commerciële titel (zichtbaar voor gebruikers)"
               />
-              <p className="text-[11px] text-hh-muted">Bestandsnaam: {detailsVideo?.title}</p>
+              <p className="text-[11px] text-hh-muted">Bestandsnaam: {detailsVideo?.original_title}</p>
             </div>
           ) : (
             <div>
-              <span>{detailsVideo?.ai_attractive_title || detailsVideo?.title}</span>
-              {detailsVideo?.ai_attractive_title && (
-                <p className="text-[12px] text-hh-muted font-normal mt-0.5">{detailsVideo?.title}</p>
+              <span>{detailsVideo?.title}</span>
+              {detailsVideo?.original_title && (
+                <p className="text-[12px] text-hh-muted font-normal mt-0.5">{detailsVideo?.original_title}</p>
               )}
             </div>
           )

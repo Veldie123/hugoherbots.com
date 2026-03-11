@@ -127,7 +127,7 @@ export function TechniqueDetailsDialog({
   if (!technique || !technique.nummer) return null;
 
   const displayData = isEditing ? editedData : technique;
-  const phaseColor = PHASE_COLORS[String(technique.fase)] || "#64748b";
+  const phaseColor = PHASE_COLORS[String(technique.fase)] || "var(--hh-muted)";
 
   const accentBtnBg = isAdmin ? "bg-hh-primary hover:bg-hh-primary/90" : "bg-hh-primary hover:bg-hh-primary/90";
 

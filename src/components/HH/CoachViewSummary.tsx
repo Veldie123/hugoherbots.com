@@ -44,9 +44,9 @@ interface CoachViewSummaryProps {
 }
 
 const MOMENT_CONFIG: Record<string, { icon: any; color: string; bg: string; label: string }> = {
-  'big_win': { icon: Trophy, color: '#047857', bg: '#ECFDF5', label: 'Big Win' },
-  'quick_fix': { icon: Wrench, color: '#B45309', bg: '#FFFBEB', label: 'Quick Fix' },
-  'turning_point': { icon: RotateCcw, color: '#BE123C', bg: '#FFF1F2', label: 'Scharnierpunt' },
+  'big_win': { icon: Trophy, color: 'var(--hh-success)', bg: 'color-mix(in srgb, var(--hh-success) 8%, var(--hh-bg))', label: 'Big Win' },
+  'quick_fix': { icon: Wrench, color: 'var(--hh-warning)', bg: 'color-mix(in srgb, var(--hh-warning) 8%, var(--hh-bg))', label: 'Quick Fix' },
+  'turning_point': { icon: RotateCcw, color: 'var(--hh-error)', bg: 'color-mix(in srgb, var(--hh-error) 8%, var(--hh-bg))', label: 'Scharnierpunt' },
 };
 
 export function CoachViewSummary({ insights, title, onMomentClick }: CoachViewSummaryProps) {
@@ -64,11 +64,11 @@ export function CoachViewSummary({ insights, title, onMomentClick }: CoachViewSu
           {/* Score circle */}
           <div className="relative flex-shrink-0" style={{ width: '44px', height: '44px' }}>
             <svg width="44" height="44" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="42" fill="none" stroke="#E5E7EB" strokeWidth="7" />
+              <circle cx="50" cy="50" r="42" fill="none" stroke="var(--hh-border)" strokeWidth="7" />
               <circle
                 cx="50" cy="50" r="42"
                 fill="none"
-                stroke="#3C9A6E"
+                stroke="var(--hh-success)"
                 strokeWidth="7"
                 strokeLinecap="round"
                 strokeDasharray={`${2 * Math.PI * 42}`}

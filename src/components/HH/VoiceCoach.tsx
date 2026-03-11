@@ -158,7 +158,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
       <button
         onClick={endSession}
         className="absolute top-4 right-4 z-20 flex items-center justify-center rounded-full transition-colors hover:bg-white/20"
-        style={{ width: "36px", height: "36px", backgroundColor: "rgba(255,255,255,0.1)" }}
+        style={{ width: "36px", height: "36px", backgroundColor: "color-mix(in srgb, var(--hh-bg) 10%, transparent)" }}
       >
         <X className="w-5 h-5 text-white" />
       </button>
@@ -180,7 +180,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
         <div className="relative mb-6">
           <div
             className="rounded-full flex items-center justify-center"
-            style={{ width: "180px", height: "180px", backgroundColor: "rgba(255,255,255,0.25)" }}
+            style={{ width: "180px", height: "180px", backgroundColor: "color-mix(in srgb, var(--hh-bg) 25%, transparent)" }}
           >
             {isConnecting ? (
               <Loader2 className="w-16 h-16 text-white animate-spin" />
@@ -194,7 +194,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
         <h3 className="text-white text-[26px] font-bold mb-1">
           Hugo Herbots <sup className="text-[14px] font-semibold" style={{ verticalAlign: "super" }}>AI</sup>
         </h3>
-        <p className="text-[16px] mb-2" style={{ color: "rgba(255,255,255,0.8)" }}>
+        <p className="text-[16px] mb-2 text-hh-bg/80">
           {isConnecting
             ? "Verbinden..."
             : isConnected
@@ -207,7 +207,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
 
         {/* Timer */}
         {isConnected && (
-          <p className="text-[22px] font-mono" style={{ color: "rgba(255,255,255,0.6)" }}>
+          <p className="text-[22px] font-mono text-hh-bg/60">
             {formatTime(sessionTimer)}
           </p>
         )}
@@ -220,7 +220,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
               className="rounded-full transition-all duration-100"
               style={{
                 width: "6px",
-                backgroundColor: "rgba(255,255,255,0.7)",
+                backgroundColor: "color-mix(in srgb, var(--hh-bg) 70%, transparent)",
                 height: `${h}px`,
               }}
             />
@@ -250,7 +250,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
                 width: "56px",
                 height: "56px",
                 borderRadius: "50%",
-                backgroundColor: micMuted ? "white" : "rgba(255,255,255,0.2)",
+                backgroundColor: micMuted ? "var(--hh-bg)" : "color-mix(in srgb, var(--hh-bg) 20%, transparent)",
               }}
             >
               {micMuted
@@ -258,7 +258,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
                 : <Mic className="w-5 h-5 text-white" />
               }
             </button>
-            <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.7)" }}>
+            <span className="text-[11px] text-hh-bg/70">
               {micMuted ? "Unmute" : "Mute"}
             </span>
           </div>
@@ -286,13 +286,13 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
                   width: "64px",
                   height: "64px",
                   borderRadius: "50%",
-                  backgroundColor: "#ef4444",
+                  backgroundColor: "var(--hh-error)",
                 }}
               >
                 <Phone className="w-6 h-6 text-white" style={{ transform: "rotate(135deg)" }} />
               </button>
             )}
-            <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.7)" }}>
+            <span className="text-[11px] text-hh-bg/70">
               {error && !isConnected && !isConnecting ? "Opnieuw" : "Ophangen"}
             </span>
           </div>
@@ -305,12 +305,12 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
                 width: "56px",
                 height: "56px",
                 borderRadius: "50%",
-                backgroundColor: "rgba(255,255,255,0.2)",
+                backgroundColor: "color-mix(in srgb, var(--hh-bg) 20%, transparent)",
               }}
             >
               <Volume2 className="w-5 h-5 text-white" />
             </button>
-            <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.7)" }}>Speaker</span>
+            <span className="text-[11px] text-hh-bg/70">Speaker</span>
           </div>
         </div>
       </div>
