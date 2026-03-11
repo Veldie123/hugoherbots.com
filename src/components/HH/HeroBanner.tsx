@@ -77,7 +77,7 @@ export function HeroBanner({
                 {badge.label}
               </Badge>
 
-              <h2 className="text-[24px] sm:text-[32px] font-bold leading-tight">
+              <h2 className="text-[24px] sm:text-[32px] font-medium leading-tight">
                 {title}
               </h2>
 

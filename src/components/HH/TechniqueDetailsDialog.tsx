@@ -198,11 +198,11 @@ export function TechniqueDetailsDialog({
                   onChange={(e) =>
                     setEditedData({ ...editedData, naam: e.target.value })
                   }
-                  className="text-[24px] font-bold mt-2"
+                  className="text-[24px] font-medium mt-2"
                   placeholder="Techniek naam"
                 />
               ) : (
-                <h2 className="text-[22px] leading-[28px] font-bold text-hh-ink mt-1">
+                <h2 className="text-[22px] leading-[28px] font-medium text-hh-ink mt-1">
                   {displayData.naam}
                 </h2>
               )}

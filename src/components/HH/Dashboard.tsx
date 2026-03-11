@@ -596,7 +596,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
           primaryAction={{
             label: "Verder kijken",
             icon: <Play className="w-4 h-4" />,
-            onClick: () => { if (featuredVideo?.id) localStorage.setItem('currentVideoId', featuredVideo.id); navigate?.("videos"); },
+            onClick: () => { const next = continueWatching[0]; if (next?.id) localStorage.setItem('currentVideoId', next.id); navigate?.("videos"); },
           }}
           secondaryAction={{
             label: "Talk to Hugo",

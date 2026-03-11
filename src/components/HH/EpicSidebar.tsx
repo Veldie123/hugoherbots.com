@@ -399,7 +399,7 @@ export function EpicSidebar({
     <div className={className}>
       <div className="bg-hh-card border border-hh-border rounded-xl overflow-hidden w-full">
         <div className="px-3 py-2.5 border-b border-hh-border">
-          <h2 className="text-xs font-bold text-hh-text flex items-center gap-1.5 uppercase tracking-wide">
+          <h2 className="text-xs font-semibold text-hh-text flex items-center gap-1.5 uppercase tracking-wide">
             <BookOpen className="w-3.5 h-3.5" />
             E.P.I.C. TECHNIQUE
           </h2>

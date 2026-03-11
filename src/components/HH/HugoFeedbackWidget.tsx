@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { CircleAlert, Crosshair, X, Send, Trash2 } from "lucide-react";
+import { Flag, Crosshair, X, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch } from "../../services/apiFetch";
 
@@ -194,14 +194,14 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
           className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
           style={{
             backgroundColor: open
-              ? 'var(--hh-primary)'
-              : 'color-mix(in srgb, var(--hh-primary) 15%, transparent)',
-            color: open ? '#ffffff' : 'var(--hh-primary)',
+              ? 'var(--hh-purple)'
+              : 'color-mix(in srgb, var(--hh-purple) 15%, transparent)',
+            color: open ? '#ffffff' : 'var(--hh-purple)',
           }}
           aria-label="Feedback geven"
           title="UI Feedback"
         >
-          <CircleAlert size={20} />
+          <Flag size={20} />
         </button>
 
         {/* Dropdown panel */}
