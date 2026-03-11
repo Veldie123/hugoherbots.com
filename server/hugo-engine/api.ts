@@ -4311,22 +4311,30 @@ app.get("/api/v2/user/welcome", async (req: Request, res: Response) => {
   }
 });
 
-// Health check - now shows FULL engine
-app.get("/api/health", (req, res) => {
-  res.json({ 
-    status: "ok", 
+// Health check — verifies database connectivity + reports runtime status
+app.get("/api/health", async (req, res) => {
+  const start = Date.now();
+  let dbStatus = "ok";
+  try {
+    await pool.query("SELECT 1");
+  } catch {
+    dbStatus = "error";
+  }
+  const mem = process.memoryUsage();
+  const status = dbStatus === "ok" ? "ok" : "degraded";
+  res.status(status === "ok" ? 200 : 503).json({
+    status,
     timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+    db: dbStatus,
+    dbLatencyMs: Date.now() - start,
     activeSessions: sessions.size,
+    memory: {
+      rss: Math.round(mem.rss / 1024 / 1024),
+      heapUsed: Math.round(mem.heapUsed / 1024 / 1024),
+      heapTotal: Math.round(mem.heapTotal / 1024 / 1024),
+    },
     engine: "V2-FULL",
-    features: [
-      "nested-prompts",
-      "rag-grounding",
-      "validation-loop",
-      "hugo-persona-ssot",
-      "detector-patterns",
-      "livekit-audio",
-      "heygen-video"
-    ]
   });
 });
 
@@ -4520,7 +4528,7 @@ async function startServer() {
          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
           "ui_feedback",
-          "UI feedback van Hugo",
+          `UI feedback van ${userEmail}`,
           description.trim().slice(0, 100),
           "platform",
           "info",
