@@ -1,13 +1,20 @@
 import { useState, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
-const ease = [0.25, 0.4, 0.25, 1];
+const ease = [0.25, 0.4, 0.25, 1] as const;
 
 const phases = [
-  { num: 1, name: "Openingsfase", total: 6, done: 6, color: "#00C389", complete: true },
-  { num: 2, name: "Ontdekkingsfase", total: 8, done: 3, color: "#6B7A92", active: true },
-  { num: 3, name: "Aanbevelingsfase", total: 6, done: 0, color: "#D1D5DB" },
-  { num: 4, name: "Beslissingsfase", total: 5, done: 0, color: "#D1D5DB" },
+  { num: 1, name: "Opening", active: false, done: true },
+  { num: 2, name: "Ontdekking", active: true, done: false },
+  { num: 3, name: "Aanbeveling", active: false, done: false },
+  { num: 4, name: "Beslissing", active: false, done: false },
+];
+
+const videoCards = [
+  { title: "Bezwaarherkenning", code: "2.1", duration: "12:34", progress: 100, phase: 2 },
+  { title: "Open vragen stellen", code: "2.2", duration: "8:47", progress: 35, phase: 2 },
+  { title: "Behoeftenanalyse", code: "2.3", duration: "10:22", progress: 0, phase: 2 },
+  { title: "Samenvatten", code: "2.4", duration: "6:15", progress: 0, phase: 2 },
 ];
 
 export function VideoCursusPreview() {
@@ -21,88 +28,119 @@ export function VideoCursusPreview() {
   }, [prefersReduced]);
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-[#E4E4E4] shadow-[0_8px_30px_rgba(0,0,0,0.08)] bg-white">
-      <div className="relative aspect-[16/9] bg-[#1C2535] overflow-hidden">
-        <img
-          src="/images/Hugo-Herbots-WEB-0663.JPG"
-          alt="Hugo Herbots training"
-          className="w-full h-full object-cover opacity-90"
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <motion.div
-            initial={prefersReduced ? { scale: 1 } : { scale: 0.8, opacity: 0 }}
-            animate={animate ? { scale: 1, opacity: 1 } : {}}
-            transition={{ duration: 0.4, delay: 0.3, ease }}
-            className="w-16 h-16 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl cursor-pointer hover:scale-105 transition-transform"
+    <div className="bg-hh-bg">
+      {/* Phase tabs */}
+      <div className="px-4 py-3 border-b border-hh-border flex items-center gap-1 overflow-x-auto">
+        {phases.map((phase, i) => (
+          <motion.button
+            key={phase.num}
+            initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: -4 }}
+            animate={animate ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.3, delay: i * 0.06, ease }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
+              phase.active
+                ? "bg-hh-ink text-white"
+                : phase.done
+                ? "bg-hh-success/10 text-hh-success"
+                : "text-hh-muted hover:text-hh-text"
+            }`}
           >
-            <svg className="w-7 h-7 text-[#1C2535] ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-          </motion.div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-3">
-          <div className="h-1 rounded-full bg-white/20 overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-white/80"
-              initial={{ width: "0%" }}
-              animate={animate ? { width: "35%" } : {}}
-              transition={{ duration: 2, delay: 0.6, ease: "linear" }}
-            />
-          </div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent pt-12 pb-8 px-5" />
-        <div className="absolute bottom-4 left-5 right-5 flex items-center justify-between">
-          <div>
-            <p className="text-white text-[15px] font-semibold">Techniek 9: Bezwaarherkenning</p>
-            <p className="text-white/60 text-[12px] mt-0.5">Fase 2 · Ontdekkingsfase</p>
-          </div>
-          <span className="text-white/70 text-[13px] font-mono">4:12 / 12:34</span>
-        </div>
+            <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ${
+              phase.done
+                ? "bg-hh-success text-white"
+                : phase.active
+                ? "bg-white/20 text-white"
+                : "bg-hh-ui-200 text-hh-muted"
+            }`}>
+              {phase.done ? "✓" : phase.num}
+            </span>
+            {phase.name}
+          </motion.button>
+        ))}
       </div>
 
-      <div className="px-5 py-4">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-[12px] font-semibold text-[#6B7A92] uppercase tracking-wider">Voortgang</p>
-          <p className="text-[13px] text-[#6B7A92]">9 van 25 technieken</p>
+      {/* Progress banner */}
+      <motion.div
+        initial={prefersReduced ? { opacity: 1 } : { opacity: 0 }}
+        animate={animate ? { opacity: 1 } : {}}
+        transition={{ duration: 0.4, delay: 0.15, ease }}
+        className="px-4 py-3 border-b border-hh-border bg-hh-ui-50"
+      >
+        <div className="flex items-center justify-between mb-1.5">
+          <div className="flex items-center gap-2">
+            <span className="text-[12px] font-semibold text-hh-text">Verder kijken</span>
+            <span className="text-[11px] text-hh-muted">·</span>
+            <span className="text-[11px] text-hh-muted">9 van 25 technieken</span>
+          </div>
+          <span className="text-[11px] font-semibold text-hh-success">36%</span>
         </div>
-        <div className="space-y-2.5">
-          {phases.map((phase, i) => (
-            <motion.div
-              key={phase.num}
-              initial={prefersReduced ? { opacity: 1 } : { opacity: 0, x: -12 }}
-              animate={animate ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.4, delay: 0.2 + i * 0.1, ease }}
-              className="flex items-center gap-3"
-            >
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${
-                  phase.complete
-                    ? "bg-[#00C389] text-white"
-                    : phase.active
-                    ? "bg-[#2B3748] text-white"
-                    : "bg-[#F3F4F6] text-[#9CA3AF]"
-                }`}
-              >
-                {phase.complete ? "✓" : phase.num}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                  <span className={`text-[13px] ${phase.active ? "font-semibold text-[#1C2535]" : phase.complete ? "text-[#00C389] font-medium" : "text-[#9CA3AF]"}`}>
-                    {phase.name}
-                  </span>
-                  <span className="text-[11px] text-[#9CA3AF]">{phase.done}/{phase.total}</span>
-                </div>
-                <div className="h-1.5 rounded-full bg-[#F3F4F6] overflow-hidden">
-                  <motion.div
-                    className="h-full rounded-full"
-                    style={{ backgroundColor: phase.complete ? "#00C389" : phase.active ? "#2B3748" : "#E5E7EB" }}
-                    initial={{ width: "0%" }}
-                    animate={animate ? { width: `${(phase.done / phase.total) * 100}%` } : {}}
-                    transition={{ duration: 0.8, delay: 0.4 + i * 0.15, ease }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          ))}
+        <div className="h-1.5 rounded-full bg-hh-ui-200 overflow-hidden">
+          <motion.div
+            className="h-full rounded-full bg-hh-success"
+            initial={{ width: "0%" }}
+            animate={animate ? { width: "36%" } : {}}
+            transition={{ duration: 1, delay: 0.3, ease }}
+          />
         </div>
+      </motion.div>
+
+      {/* Video card grid */}
+      <div className="p-4 grid grid-cols-2 gap-3">
+        {videoCards.map((card, i) => (
+          <motion.div
+            key={i}
+            initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: 12, scale: 0.97 }}
+            animate={animate ? { opacity: 1, y: 0, scale: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.2 + i * 0.1, ease }}
+            className="rounded-xl overflow-hidden border border-hh-border bg-hh-bg group cursor-pointer"
+          >
+            {/* Thumbnail */}
+            <div className="aspect-[16/10] relative overflow-hidden bg-hh-ink">
+              <img
+                src="/images/Hugo-Herbots-WEB-0663.JPG"
+                alt={card.title}
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-90 transition-opacity"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-hh-ink/60 to-transparent" />
+
+              {/* Play button */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
+                  <svg className="w-3.5 h-3.5 text-hh-ink ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                </div>
+              </div>
+
+              {/* Duration */}
+              <span className="absolute bottom-1.5 right-1.5 text-[10px] font-mono text-white bg-hh-ink/70 px-1.5 py-0.5 rounded">
+                {card.duration}
+              </span>
+
+              {/* Progress bar on thumbnail */}
+              {card.progress > 0 && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/20">
+                  <div className="h-full bg-hh-success" style={{ width: `${card.progress}%` }} />
+                </div>
+              )}
+            </div>
+
+            {/* Card info */}
+            <div className="px-3 py-2.5">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-[10px] font-semibold text-hh-muted">{card.code}</span>
+                {card.progress === 100 && (
+                  <span className="text-[9px] bg-hh-success/10 text-hh-success px-1.5 py-0.5 rounded-full font-medium">Voltooid</span>
+                )}
+                {card.progress > 0 && card.progress < 100 && (
+                  <span className="text-[9px] bg-hh-primary/10 text-hh-primary px-1.5 py-0.5 rounded-full font-medium">Bezig</span>
+                )}
+                {card.progress === 0 && (
+                  <span className="text-[9px] text-hh-muted">Nieuw</span>
+                )}
+              </div>
+              <p className="text-[13px] font-semibold text-hh-text leading-[18px] line-clamp-1">{card.title}</p>
+            </div>
+          </motion.div>
+        ))}
       </div>
     </div>
   );

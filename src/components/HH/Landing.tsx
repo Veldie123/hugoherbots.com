@@ -298,23 +298,20 @@ export function Landing({ navigate }: LandingProps) {
         </div>
       </section>
 
-      {/* App Showcase Section - Zo werkt het - WHITE BACKGROUND */}
-      <section className="bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32" id="zo-werkt-het">
-        <AnimatedSection className="text-center mb-16 sm:mb-20">
-          <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 mb-6 text-[14px] sm:text-[16px] px-4 py-1.5">
-            Zo werkt het
-          </Badge>
-          <h2 className="text-[32px] leading-[40px] sm:text-[36px] sm:leading-[44px] lg:text-[40px] lg:leading-[48px] text-hh-text mb-6 px-4">
-            4 modules. 4 manieren om te trainen. 4x100% Hugo Herbots.
-          </h2>
-          <p className="text-[16px] leading-[24px] sm:text-[16px] sm:leading-[26px] lg:text-[18px] lg:leading-[28px] text-hh-muted max-w-3xl mx-auto px-4">
-            AI role-plays, live coaching, video cursus, gespreksanalyse — gebaseerd op 40 jaar praktijk.
-          </p>
-        </AnimatedSection>
+      {/* App Showcase Section - Zo werkt het */}
+      <section id="zo-werkt-het">
+        <div className="bg-white py-20 sm:py-28">
+          <AnimatedSection className="text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-[36px] leading-[44px] sm:text-[44px] sm:leading-[52px] lg:text-[52px] lg:leading-[60px] text-hh-text mb-6 font-semibold">
+              4 modules. 4 manieren om te trainen.
+            </h2>
+            <p className="text-[17px] leading-[26px] sm:text-[18px] sm:leading-[28px] text-hh-muted max-w-2xl mx-auto">
+              AI role-plays, live coaching, video cursus, gespreksanalyse — gebaseerd op 40 jaar praktijk.
+            </p>
+          </AnimatedSection>
+        </div>
 
-        <AnimatedSection delay={0.2}>
-          <ProductShowcase />
-        </AnimatedSection>
+        <ProductShowcase navigate={handleNavigate} />
       </section>
 
       {/* De Methode - 4 Fasen Section - LIGHT GRAY BACKGROUND */}

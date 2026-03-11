@@ -71,7 +71,7 @@ app.post("/make-server-b9a572ea/auth/signup", async (c) => {
   
   try {
     const body = await c.req.json();
-    const { email, password, firstName, lastName } = body;
+    const { email, password, firstName, lastName, company } = body;
     
     if (!email || !password) {
       return formatError(c, 'Missing fields', 'email and password required', 'MISSING_FIELDS', 400);
@@ -94,7 +94,8 @@ app.post("/make-server-b9a572ea/auth/signup", async (c) => {
       email_confirm: true, // Auto-confirm email (no verification needed)
       user_metadata: {
         first_name: firstName || '',
-        last_name: lastName || ''
+        last_name: lastName || '',
+        company: company || ''
       }
     });
     
@@ -118,7 +119,7 @@ app.post("/make-server-b9a572ea/auth/signup", async (c) => {
         return formatError(c, signUpError.message, 'Email adres is ongeldig. Gebruik een geldig email adres (niet .test TLD).', 'INVALID_EMAIL', 400);
       }
       
-      return formatError(c, signUpError.message, 'Failed to create user', 'USER_CREATION_FAILED', 500);
+      return formatError(c, signUpError.message, `Er ging iets mis bij het aanmaken: ${signUpError.message}`, 'USER_CREATION_FAILED', 500);
     }
     
     if (!signUpData.user) {

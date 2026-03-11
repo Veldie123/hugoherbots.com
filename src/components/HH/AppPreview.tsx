@@ -60,6 +60,13 @@ export function AppPreview({ navigate }: AppPreviewProps) {
       return;
     }
 
+    // Talk to Hugo requires auth — show signup modal instead
+    if (page === "talk-to-hugo" || page === "hugo-overview") {
+      setShowSignupModal(true);
+      setModalVariant("first");
+      return;
+    }
+
     // Map page names to preview pages
     const pageMap: Record<string, PreviewPage> = {
       home: "dashboard",
@@ -108,7 +115,7 @@ export function AppPreview({ navigate }: AppPreviewProps) {
           <Button 
             size="sm" 
             variant="default" 
-            className="gap-2 flex-shrink-0 bg-hh-success hover:bg-hh-success/90 text-white"
+            className="gap-2 flex-shrink-0 bg-hh-ink hover:bg-hh-ink/90 text-white"
             onClick={handleSignup}
           >
             Start gratis <ArrowRight className="w-3 h-3" />

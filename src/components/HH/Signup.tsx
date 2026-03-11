@@ -50,7 +50,8 @@ export function Signup({ onLoginClick, onSignupSuccess, navigate }: SignupProps)
             email,
             password,
             firstName,
-            lastName
+            lastName,
+            company
           })
         }
       );

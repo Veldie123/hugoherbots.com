@@ -390,8 +390,8 @@ export default function App() {
           )}
 
           {/* Landing page */}
-          {/* {currentPage === "landing" && <Landing navigate={navigate} />} */}
-          {currentPage === "landing" && <ComingSoon navigate={navigate} />}
+          {currentPage === "landing" && <Landing navigate={navigate} />}
+          {/* {currentPage === "landing" && <ComingSoon navigate={navigate} />} */}
           {currentPage === "landing-v2" && <LandingV2 navigate={navigate} />}
 
           {/* Dev showcase preview */}
