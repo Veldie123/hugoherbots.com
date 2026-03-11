@@ -479,6 +479,7 @@ router.post(
         response: {
           text: response.text,
           toolsUsed: response.toolsUsed,
+          navigationDestination: response.navigationDestination,
           model: response.model,
         },
         usage: {

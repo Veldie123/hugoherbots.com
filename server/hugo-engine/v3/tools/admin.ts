@@ -518,6 +518,23 @@ export const adminToolDefinitions: Anthropic.Tool[] = [
       required: ["user_id", "title", "message"],
     },
   },
+  // ── 32. navigate_user ───────────────────────────────────────────────────────
+  {
+    name: "navigate_user",
+    description:
+      "Stuur Hugo naar een specifieke pagina in het admin-platform. Gebruik ALLEEN als het overzicht echt nodig is. Data opvragen, analyses en acties → altijd inline via tools. Leg altijd eerst kort in tekst uit wat er gaat gebeuren.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        destination: {
+          type: "string",
+          enum: ["users", "sessions", "analytics", "settings"],
+          description: "Pagina: 'users' voor gebruikersbeheer, 'sessions' voor sessie-overzicht, 'analytics' voor statistieken, 'settings' voor instellingen.",
+        },
+      },
+      required: ["destination"],
+    },
+  },
 ];
 
 // ── Tool name registry ───────────────────────────────────────────────────────
@@ -528,21 +545,42 @@ export const ADMIN_TOOLS: Set<string> = new Set(
 
 // ── Cached config loaders ────────────────────────────────────────────────────
 
-let cachedTechniques: any = null;
+interface TechniqueEntry {
+  id?: string;
+  nummer?: string;
+  naam?: string;
+  title?: string;
+  fase?: string;
+  is_fase?: boolean;
+  doel?: string;
+  themas?: string[];
+  tags?: string[];
+  [key: string]: unknown;
+}
 
-function loadTechniques(): any {
+interface MasteryEntry {
+  technique_id: string;
+  average_score: number;
+  attempt_count?: number;
+  trend?: string;
+  [key: string]: unknown;
+}
+
+let cachedTechniques: Record<string, unknown> | null = null;
+
+function loadTechniques(): Record<string, unknown> {
   if (cachedTechniques) return cachedTechniques;
   const techPath = join(process.cwd(), "config/ssot/technieken_index.json");
-  cachedTechniques = JSON.parse(readFileSync(techPath, "utf-8"));
+  cachedTechniques = JSON.parse(readFileSync(techPath, "utf-8")) as Record<string, unknown>;
   return cachedTechniques;
 }
 
-let cachedHoudingen: any = null;
+let cachedHoudingen: Record<string, unknown> | null = null;
 
-function loadHoudingen(): any {
+function loadHoudingen(): Record<string, unknown> {
   if (cachedHoudingen) return cachedHoudingen;
   const houdPath = join(process.cwd(), "config/klant_houdingen.json");
-  cachedHoudingen = JSON.parse(readFileSync(houdPath, "utf-8"));
+  cachedHoudingen = JSON.parse(readFileSync(houdPath, "utf-8")) as Record<string, unknown>;
   return cachedHoudingen;
 }
 
@@ -616,6 +654,8 @@ export async function executeAdminTool(
         return await execCompareAiVsExpected(input.session_id, input.turn_index);
       case "send_user_notification":
         return await execSendUserNotification(input.user_id, input.title, input.message);
+      case "navigate_user":
+        return JSON.stringify({ destination: input.destination, ok: true });
       default:
         return JSON.stringify({ error: `Onbekende admin tool: ${name}` });
     }

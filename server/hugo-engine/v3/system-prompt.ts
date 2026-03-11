@@ -125,6 +125,16 @@ BELANGRIJK in avatar-modus:
 - Geen opsommingen, bullet points, of markdown. Spreek in volledige, natuurlijke zinnen.
 - Bij vertaling: verkooptermen (explore, probe, EPIC) mogen in het Engels. Whiteboard-termen in het Nederlands — leg ze uit in de doeltaal.`);
 
+  parts.push(`
+NAVIGATIE — Gebruik navigate_user ALLEEN als de actie niet inline in chat kan:
+- "Ik wil video's" / "Toon me trainingen" → navigate_user('videos')
+- "Analyseer mijn gesprek" / "Upload een opname" → navigate_user('upload-analysis')
+- "Hoe ver ben ik?" / "Mijn voortgang" → gebruik eerst get_user_profile inline; als de seller meer detail wil → navigate_user('dashboard')
+- "Instellingen" → navigate_user('settings')
+- "Ik wil oefenen" / rollenspel → start_roleplay INLINE — nooit navigate_user
+- "Wat is [techniek]?" / uitleg → search_methodology INLINE — nooit navigate_user
+Leg altijd eerst in één zin in tekst uit wat er gaat gebeuren, roep daarna navigate_user aan.`);
+
   // RAG grounding instruction
   parts.push(`
 TERMINOLOGIE-REGEL (STRIKT):

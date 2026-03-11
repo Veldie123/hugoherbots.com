@@ -422,6 +422,7 @@ export function TalkToHugoAI({
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   // Active coaching moment for inline practice
   const [activeCoachingMoment, setActiveCoachingMoment] = useState<any>(null);
+  const [navCard, setNavCard] = useState<string | null>(null);
 
   // Hugo starts conversation proactively based on cross-platform activity
   useEffect(() => {
@@ -1257,6 +1258,7 @@ export function TalkToHugoAI({
 
   const processMessageSend = async (messageText: string, v3Files?: File[]) => {
     isProcessingRef.current = true;
+    setNavCard(null);
 
     if (useStreaming) {
       setIsStreaming(true);
@@ -1285,7 +1287,8 @@ export function TalkToHugoAI({
             setStreamingText("");
             streamingTextRef.current = "";
           },
-          v3Files && v3Files.length > 0 ? v3Files : undefined
+          v3Files && v3Files.length > 0 ? v3Files : undefined,
+          (destination) => setNavCard(destination)
         );
       } catch (error) {
         console.error("Streaming failed, falling back:", error);
@@ -2651,6 +2654,34 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             ))}
           </div>
         )}
+
+        {navCard && (() => {
+          const NAV_LABELS: Record<string, { label: string; page: string }> = {
+            "videos":          { label: "Video's",         page: "videos" },
+            "upload-analysis": { label: "Gespreksanalyse", page: "upload-analysis" },
+            "dashboard":       { label: "Dashboard",       page: "dashboard" },
+            "settings":        { label: "Instellingen",    page: "settings" },
+          };
+          const nav = NAV_LABELS[navCard];
+          if (!nav) return null;
+          return (
+            <div className="flex items-center gap-3 px-4 py-3 border-t border-hh-primary/20 bg-hh-primary/5">
+              <span className="text-hh-text text-[14px] flex-1">
+                Hugo wil je naar <strong>{nav.label}</strong> sturen
+              </span>
+              <Button
+                size="sm"
+                className="bg-hh-primary hover:bg-hh-primary/90 text-white rounded-full px-4"
+                onClick={() => { navigate?.(nav.page); setNavCard(null); }}
+              >
+                Ga daarheen
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setNavCard(null)}>
+                Nee
+              </Button>
+            </div>
+          );
+        })()}
 
         <div className="p-4 border-t border-hh-border flex gap-2 items-end flex-shrink-0">
           <Button

@@ -74,6 +74,7 @@ export interface LevelTransition {
 export interface SendMessageResponse {
   response: string;
   phase: string;
+  navigationDestination?: string;
   contextData?: {
     sector?: string;
     product?: string;
@@ -105,6 +106,7 @@ interface V3StreamEvent {
   type: "thinking" | "tool_start" | "tool_result" | "token" | "done" | "error";
   content?: string;
   name?: string;
+  input?: Record<string, unknown>;
   usage?: { inputTokens: number; outputTokens: number; thinkingTokens?: number };
   toolsUsed?: string[];
 }
@@ -360,6 +362,7 @@ class HugoApiService {
     return {
       response: data.response?.text || "",
       phase: "COACH_CHAT",
+      navigationDestination: data.response?.navigationDestination,
     };
   }
 
@@ -368,7 +371,8 @@ class HugoApiService {
     isExpert = false,
     onToken: (token: string) => void,
     onDone?: (debug?: any) => void,
-    files?: File[]
+    files?: File[],
+    onNavigate?: (destination: string) => void
   ): Promise<void> {
     if (!this.currentSessionId) {
       throw new Error("No active session. Call startSession first.");
@@ -420,7 +424,11 @@ class HugoApiService {
               if (event.type === "token" && event.content) {
                 onToken(event.content);
               } else if (event.type === "tool_start" && event.name) {
-                onToken(`\n⚡ ${event.name}...\n`);
+                if (event.name === "navigate_user" && event.input?.destination) {
+                  onNavigate?.(event.input.destination as string);
+                } else {
+                  onToken(`\n⚡ ${event.name}...\n`);
+                }
               } else if (event.type === "done") {
                 if (onDone) onDone(event);
               } else if (event.type === "error") {

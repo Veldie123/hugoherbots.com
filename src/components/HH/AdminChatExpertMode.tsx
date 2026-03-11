@@ -188,6 +188,7 @@ export function AdminChatExpertMode({
 }: AdminChatExpertModeProps) {
 
   const [messages, setMessages] = useState<Message[]>([]);
+  const [navCard, setNavCard] = useState<string | null>(null);
   const [inputText, setInputText] = useState("");
   const [selectedTechnique, setSelectedTechnique] = useState<string>(""); // Display name
   const [selectedTechniqueNumber, setSelectedTechniqueNumber] = useState<string>(""); // Actual technique ID
@@ -936,6 +937,7 @@ export function AdminChatExpertMode({
     setMessages(prev => [...prev, userMessage]);
     const messageText = inputText;
     setInputText("");
+    setNavCard(null);
     setIsLoading(true);
 
     const navIntent = detectAdminNavigationIntent(messageText);
@@ -997,7 +999,11 @@ export function AdminChatExpertMode({
         }
       };
       setMessages(prev => [...prev, aiMessage]);
-      
+
+      if (response.navigationDestination) {
+        setNavCard(response.navigationDestination);
+      }
+
       // Handle level transition (invisible auto-adaptive system)
       if (response.levelTransition) {
         const { previousLevel, newLevel, shouldCongratulate } = response.levelTransition;
@@ -2479,6 +2485,35 @@ export function AdminChatExpertMode({
             <div ref={messagesEndRef} />
           </div>
           )}
+
+          {/* Navigation card */}
+          {navCard && (() => {
+            const ADMIN_NAV: Record<string, { label: string; page: string }> = {
+              "users":     { label: "Gebruikers",  page: "admin-users" },
+              "sessions":  { label: "Sessies",     page: "admin-sessions" },
+              "analytics": { label: "Analytics",   page: "admin-analytics" },
+              "settings":  { label: "Instellingen", page: "admin-settings" },
+            };
+            const nav = ADMIN_NAV[navCard];
+            if (!nav) return null;
+            return (
+              <div className="flex items-center gap-3 px-4 py-3 border-t border-hh-primary/20 bg-hh-primary/5">
+                <span className="text-hh-text text-[14px] flex-1">
+                  Hugo wil je naar <strong>{nav.label}</strong> sturen
+                </span>
+                <Button
+                  size="sm"
+                  className="bg-hh-primary hover:bg-hh-primary/90 text-white rounded-full px-4"
+                  onClick={() => { navigate?.(nav.page); setNavCard(null); }}
+                >
+                  Ga daarheen
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setNavCard(null)}>
+                  Nee
+                </Button>
+              </div>
+            );
+          })()}
 
           {/* Input - only show in chat mode */}
           {chatMode === "chat" && (

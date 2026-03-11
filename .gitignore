@@ -76,6 +76,9 @@ DESIGN_AUDIT.md
 service-account*.json
 *-key.json
 
+# Server caches
+server/duration-cache.json
+
 # Claude Code local settings
 .claude/
 .worktrees/

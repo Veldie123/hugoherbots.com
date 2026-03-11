@@ -130,6 +130,22 @@ export const knowledgeToolDefinitions: Anthropic.Tool[] = [
     },
   },
   {
+    name: "navigate_user",
+    description:
+      "Stuur de verkoper naar een specifieke pagina in het platform. Gebruik ALLEEN als de actie niet inline in chat kan (bv. video's bekijken, gesprek uploaden, voortgang bekijken). Coaching, rollenspel, uitleg van technieken → altijd inline in chat, nooit navigate_user. Leg altijd eerst kort in tekst uit wat er gaat gebeuren.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        destination: {
+          type: "string",
+          enum: ["videos", "upload-analysis", "dashboard", "settings"],
+          description: "Pagina: 'videos' voor trainingen, 'upload-analysis' om gesprek te uploaden, 'dashboard' voor voortgang, 'settings' voor instellingen.",
+        },
+      },
+      required: ["destination"],
+    },
+  },
+  {
     name: "save_insight",
     description:
       "Sla een inzicht of observatie op over deze seller. Wordt opgeslagen in episodisch geheugen en is beschikbaar in toekomstige sessies. Gebruik dit na belangrijke observaties, patronen, of persoonlijke context.",
@@ -187,6 +203,8 @@ export async function executeKnowledgeTool(
       return await getTechniqueScript(input.technique_id, input.target_language);
     case "recall_memories":
       return await recallMemories(input.user_id, input.query, input.memory_type);
+    case "navigate_user":
+      return JSON.stringify({ destination: input.destination, ok: true });
     case "save_insight":
       return await saveInsight(input.user_id, input.content, input.memory_type, input.technique_id);
     default:

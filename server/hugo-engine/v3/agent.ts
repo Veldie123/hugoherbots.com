@@ -84,6 +84,7 @@ export interface V3SessionState {
 export interface V3Response {
   text: string;
   toolsUsed: string[];
+  navigationDestination?: string;
   model: string;
   inputTokens: number;
   outputTokens: number;
@@ -94,6 +95,7 @@ export interface V3StreamEvent {
   type: "thinking" | "tool_start" | "tool_result" | "token" | "done" | "error";
   content?: string;
   name?: string;        // tool name
+  input?: Record<string, unknown>;  // tool input (e.g. navigate_user destination)
   usage?: { inputTokens: number; outputTokens: number };
   toolsUsed?: string[];
 }
@@ -190,6 +192,7 @@ const KNOWLEDGE_TOOLS = new Set([
   "get_technique_script",
   "recall_memories",
   "save_insight",
+  "navigate_user",
 ]);
 
 async function executeTool(
@@ -297,6 +300,7 @@ export async function chat(
   if (newSummary) session.messageSummary = newSummary;
 
   const toolsUsed: string[] = [];
+  let navigationDestination: string | undefined;
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
   let totalThinkingTokens = 0;
@@ -356,6 +360,7 @@ export async function chat(
       return {
         text,
         toolsUsed,
+        navigationDestination,
         model,
         inputTokens: totalInputTokens,
         outputTokens: totalOutputTokens,
@@ -371,6 +376,9 @@ export async function chat(
     const toolResults: Anthropic.ToolResultBlockParam[] = [];
     for (const toolUse of toolUseBlocks) {
       toolsUsed.push(toolUse.name);
+      if (toolUse.name === "navigate_user") {
+        navigationDestination = (toolUse.input as any).destination as string;
+      }
 
       let result: string;
       try {
@@ -524,7 +532,7 @@ export async function* chatStream(
     const toolResults: Anthropic.ToolResultBlockParam[] = [];
     for (const toolUse of toolUseBlocks) {
       toolsUsed.push(toolUse.name);
-      yield { type: "tool_start", name: toolUse.name };
+      yield { type: "tool_start", name: toolUse.name, input: toolUse.input as Record<string, unknown> };
 
       let result: string;
       try {
