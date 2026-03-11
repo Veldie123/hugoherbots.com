@@ -26,6 +26,7 @@ const pendingVoiceData = new Map<string, { userId: string; briefing?: UserBriefi
 // Support both casing conventions for the ElevenLabs API key
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || process.env.Elevenlabs_api_key || "";
 const ELEVENLABS_AGENT_ID = process.env.ELEVENLABS_AGENT_ID || "agent_3501kcs7vst6f1jvv85sjm27ba7r";
+const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || process.env.Elevenlabs_Hugo_voice_clone || "sOsTzBXVBqNYMd5L4sCU";
 // Shared secret for ElevenLabs server-to-server calls (set in .env)
 const VOICE_LLM_SECRET = process.env.VOICE_LLM_SECRET || "";
 
@@ -204,7 +205,7 @@ router.post("/signed-url", requireAuth, async (req: Request, res: Response) => {
   }
 
   console.log(`[V3 Voice] signed-url: user=${userId} briefing=${briefing ? "yes" : "no"} (${Date.now() - t0}ms)`);
-  res.json({ agentId: ELEVENLABS_AGENT_ID });
+  res.json({ agentId: ELEVENLABS_AGENT_ID, voiceId: ELEVENLABS_VOICE_ID });
 });
 
 /**
