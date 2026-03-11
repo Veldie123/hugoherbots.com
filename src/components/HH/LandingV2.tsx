@@ -73,7 +73,7 @@ function HeroSection({ navigate }: { navigate: (page: Page) => void }) {
       <div
         className="absolute right-0 top-0 w-[60%] h-full pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at 80% 40%, rgba(79,115,150,0.12) 0%, transparent 60%)",
+          background: "radial-gradient(ellipse at 80% 40%, color-mix(in srgb, var(--hh-primary) 12%, transparent) 0%, transparent 60%)",
         }}
       />
 
@@ -83,8 +83,8 @@ function HeroSection({ navigate }: { navigate: (page: Page) => void }) {
           {/* Left — Copy */}
           <div>
             <FadeIn delay={0}>
-              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold border mb-7"
-                style={{ background: "rgba(79,115,150,0.12)", borderColor: "rgba(79,115,150,0.25)", color: "#7BA7CC" }}>
+              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold border mb-7 bg-hh-primary/12 border-hh-primary/25"
+                style={{ color: "var(--hh-primary-light)" }}>
                 20.000+ verkopers getraind · 40 jaar ervaring
               </div>
             </FadeIn>
@@ -110,10 +110,9 @@ function HeroSection({ navigate }: { navigate: (page: Page) => void }) {
                 <button
                   id="hero-cta"
                   onClick={() => navigate("preview")}
-                  className="inline-flex items-center gap-2.5 px-6 h-12 rounded-2xl text-base font-semibold text-white transition-all hover:opacity-90 hover:scale-[1.02]"
+                  className="inline-flex items-center gap-2.5 px-6 h-12 rounded-2xl text-base font-semibold text-white transition-all hover:opacity-90 hover:scale-[1.02] bg-hh-primary"
                   style={{
-                    background: "#4F7396",
-                    boxShadow: "0 8px 24px rgba(79,115,150,0.35)",
+                    boxShadow: "0 8px 24px rgba(var(--hh-primary-rgb),0.35)",
                   }}
                 >
                   Train met Hugo
@@ -154,7 +153,7 @@ function SocialProofBar() {
   ];
 
   return (
-    <section className="bg-white border-y border-hh-border py-8">
+    <section className="bg-hh-bg border-y border-hh-border py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap justify-center gap-8 lg:gap-0 lg:grid lg:grid-cols-5">
           {stats.map((stat, i) => (
@@ -218,8 +217,7 @@ function AnalyseSection({ navigate }: { navigate: (page: Page) => void }) {
             <FadeIn delay={0.3}>
               <button
                 onClick={() => navigate("preview")}
-                className="inline-flex items-center gap-2 px-5 h-11 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-                style={{ background: "#4F7396" }}
+                className="inline-flex items-center gap-2 px-5 h-11 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 bg-hh-primary"
               >
                 Probeer gratis
                 <ArrowRight className="w-4 h-4" />
@@ -241,7 +239,7 @@ function AnalyseSection({ navigate }: { navigate: (page: Page) => void }) {
 // ─── SECTION 4: AI ROLEPLAY ──────────────────────────────────────────────────
 function RoleplaySection({ navigate }: { navigate: (page: Page) => void }) {
   return (
-    <section className="bg-white py-20 sm:py-32" id="ai-roleplay">
+    <section className="bg-hh-bg py-20 sm:py-32" id="ai-roleplay">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
@@ -314,10 +312,9 @@ function LiveSection({ navigate }: { navigate: (page: Page) => void }) {
           {/* Left — Copy */}
           <div>
             <FadeIn>
-              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold border mb-5"
-                style={{ background: "rgba(239,68,68,0.1)", borderColor: "rgba(239,68,68,0.25)", color: "#F87171" }}>
+              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold border mb-5 bg-hh-error/10 border-hh-error/25 text-hh-error">
                 <motion.div
-                  className="w-2 h-2 rounded-full bg-red-500"
+                  className="w-2 h-2 rounded-full bg-hh-error"
                   animate={{ opacity: [1, 0.3, 1] }}
                   transition={{ repeat: Infinity, duration: 1.5 }}
                 />
@@ -346,7 +343,7 @@ function LiveSection({ navigate }: { navigate: (page: Page) => void }) {
                   "Onmiddellijk herbekijken na de sessie",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-white/60">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-hh-error/70 flex-shrink-0" />
                     <span className="text-sm">{item}</span>
                   </li>
                 ))}
@@ -356,8 +353,7 @@ function LiveSection({ navigate }: { navigate: (page: Page) => void }) {
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => navigate("preview")}
-                  className="inline-flex items-center gap-2 px-5 h-11 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-                  style={{ background: "#4F7396" }}
+                  className="inline-flex items-center gap-2 px-5 h-11 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 bg-hh-primary"
                 >
                   Bekijk Live
                   <ArrowRight className="w-4 h-4" />
@@ -442,9 +438,9 @@ function VideoCursusSection({ navigate }: { navigate: (page: Page) => void }) {
               {/* Window chrome */}
               <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                 <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-500/70" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/70" />
+                  <div className="w-3 h-3 rounded-full bg-hh-error/70" />
+                  <div className="w-3 h-3 rounded-full bg-hh-warning/70" />
+                  <div className="w-3 h-3 rounded-full bg-hh-success/70" />
                 </div>
                 <span className="text-xs text-white/40 ml-2">Video Cursus</span>
               </div>
@@ -459,7 +455,7 @@ function VideoCursusSection({ navigate }: { navigate: (page: Page) => void }) {
                           ? "bg-hh-primary text-white"
                           : "text-white/40 hover:text-white/60"
                       }`}
-                      style={{ background: i === 0 ? "#4F7396" : "rgba(255,255,255,0.05)" }}
+                      style={{ background: i === 0 ? "var(--hh-primary)" : "rgba(255,255,255,0.05)" }}
                     >
                       Fase {i + 1} — {["Openingsfase", "Ontdekkingsfase", "Aanbevelingsfase", "Beslissingsfase"][i]}
                     </div>
@@ -483,11 +479,11 @@ function VideoCursusSection({ navigate }: { navigate: (page: Page) => void }) {
                     >
                       <div
                         className="h-20 flex items-center justify-center relative"
-                        style={{ background: `linear-gradient(135deg, #4F739640, #0b121080)` }}
+                        style={{ background: `linear-gradient(135deg, color-mix(in srgb, var(--hh-primary) 25%, transparent), #0b121080)` }}
                       >
                         <Play className="w-6 h-6 text-white/70" />
                         {video.progress === 100 && (
-                          <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                          <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-hh-success flex items-center justify-center">
                             <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 12 12">
                               <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
@@ -499,7 +495,7 @@ function VideoCursusSection({ navigate }: { navigate: (page: Page) => void }) {
                         <p className="text-[10px] text-white/30">{video.duration}</p>
                         {video.progress > 0 && video.progress < 100 && (
                           <div className="mt-1 h-0.5 rounded-full bg-white/10 overflow-hidden">
-                            <div className="h-full rounded-full bg-emerald-500" style={{ width: `${video.progress}%` }} />
+                            <div className="h-full rounded-full bg-hh-success" style={{ width: `${video.progress}%` }} />
                           </div>
                         )}
                       </div>
@@ -525,7 +521,7 @@ function EpicSection() {
       title: "Openingsfase",
       desc: "Creëer het juiste koopklimaat. Stel de perfecte instapvraag.",
       techniques: ["Koopklimaat", "Gentleman's agreement", "Instapvraag"],
-      color: "#4F7396",
+      color: "var(--hh-primary)",
     },
     {
       num: 2,
@@ -533,7 +529,7 @@ function EpicSection() {
       title: "Ontdekkingsfase",
       desc: "Stel de juiste vragen. Luister actief. Graaf dieper met LEAD.",
       techniques: ["Open vragen", "Actief luisteren", "LEAD questioning"],
-      color: "#64748B",
+      color: "var(--hh-secondary)",
     },
     {
       num: 3,
@@ -541,7 +537,7 @@ function EpicSection() {
       title: "Aanbevelingsfase",
       desc: "Toon empathie. Presenteer oplossing, voordeel en baat.",
       techniques: ["Empathie", "Oplossing → voordeel → baat", "Mening vragen"],
-      color: "#F59E0B",
+      color: "var(--hh-warning)",
     },
     {
       num: 4,
@@ -549,12 +545,12 @@ function EpicSection() {
       title: "Beslissingsfase",
       desc: "Sluit af met vertrouwen. Omarm bezwaren en twijfels.",
       techniques: ["Proefafsluiting", "Bezwaren behandelen", "Twijfels omarmen"],
-      color: "#10B981",
+      color: "var(--hh-success)",
     },
   ];
 
   return (
-    <section className="bg-white py-20 sm:py-32" id="epic-methode">
+    <section className="bg-hh-bg py-20 sm:py-32" id="epic-methode">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <FadeIn className="text-center mb-12 sm:mb-16 max-w-2xl mx-auto">
           <Badge className="bg-hh-primary/10 text-hh-primary border-hh-primary/20 mb-5 text-sm px-4 py-1">
@@ -613,7 +609,7 @@ function EpicSection() {
 
                 {/* Connector arrow (desktop only) */}
                 {i < 3 && (
-                  <div className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full bg-white border border-hh-border items-center justify-center">
+                  <div className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full bg-hh-bg border border-hh-border items-center justify-center">
                     <ArrowRight className="w-3 h-3 text-hh-muted" />
                   </div>
                 )}
@@ -849,10 +845,9 @@ function FooterCTASection({ navigate }: { navigate: (page: Page) => void }) {
         <FadeIn delay={0.2}>
           <button
             onClick={() => navigate("preview")}
-            className="inline-flex items-center gap-2.5 px-8 h-14 rounded-2xl text-lg font-semibold text-white transition-all hover:opacity-90 hover:scale-[1.02]"
+            className="inline-flex items-center gap-2.5 px-8 h-14 rounded-2xl text-lg font-semibold text-white transition-all hover:opacity-90 hover:scale-[1.02] bg-hh-primary"
             style={{
-              background: "#4F7396",
-              boxShadow: "0 12px 32px rgba(79,115,150,0.4)",
+              boxShadow: "0 12px 32px rgba(var(--hh-primary-rgb),0.4)",
             }}
           >
             Train met Hugo

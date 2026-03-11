@@ -41,7 +41,7 @@ export function EpicSlideCard({ slide }: EpicSlideCardProps) {
             {phaseStyle.label}
           </span>
           {slide.techniqueId && (
-            <span className="text-xs font-mono" style={{ color: '#8899AA' }}>
+            <span className="text-xs font-mono" style={{ color: 'var(--hh-muted)' }}>
               {slide.techniqueId}
             </span>
           )}
@@ -50,13 +50,13 @@ export function EpicSlideCard({ slide }: EpicSlideCardProps) {
       </div>
 
       <div className="px-4 pb-2">
-        <h4 className="text-sm font-bold text-white leading-tight">
+        <h4 className="text-sm font-bold text-hh-bg leading-tight">
           {slide.titel}
         </h4>
       </div>
 
       <div className="px-4 pb-3">
-        <p className="text-xs leading-relaxed" style={{ color: '#C4D0DE' }}>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--hh-border)' }}>
           {slide.kernboodschap}
         </p>
       </div>
@@ -74,7 +74,7 @@ export function EpicSlideCard({ slide }: EpicSlideCardProps) {
                     backgroundColor: phaseStyle.border,
                   }}
                 />
-                <span className="text-xs leading-snug" style={{ color: '#A8B4CC' }}>
+                <span className="text-xs leading-snug" style={{ color: 'var(--hh-muted)' }}>
                   {bp}
                 </span>
               </li>
@@ -88,19 +88,19 @@ export function EpicSlideCard({ slide }: EpicSlideCardProps) {
           className="px-4 py-2.5 border-t"
           style={{
             borderColor: phaseStyle.border,
-            backgroundColor: 'rgba(255,255,255,0.03)',
+            backgroundColor: 'rgba(var(--hh-primary-rgb),0.03)',
           }}
         >
-          <p className="text-xs font-medium mb-1.5" style={{ color: phaseStyle.badgeText === '#FFFFFF' ? phaseStyle.border : '#8899AA' }}>
+          <p className="text-xs font-medium mb-1.5" style={{ color: phaseStyle.badgeText === '#FFFFFF' ? phaseStyle.border : 'var(--hh-muted)' }}>
             Jouw context
           </p>
           <div className="space-y-1">
             {Object.entries(slide.personalized_context).map(([key, value]) => (
               <div key={key} className="flex items-start gap-1.5">
-                <span className="text-xs font-medium capitalize" style={{ color: '#8899AA' }}>
+                <span className="text-xs font-medium capitalize" style={{ color: 'var(--hh-muted)' }}>
                   {key.replace(/_/g, ' ')}:
                 </span>
-                <span className="text-xs" style={{ color: '#C4D0DE' }}>
+                <span className="text-xs" style={{ color: 'var(--hh-border)' }}>
                   {value.length > 80 ? value.substring(0, 80) + '...' : value}
                 </span>
               </div>
@@ -113,13 +113,13 @@ export function EpicSlideCard({ slide }: EpicSlideCardProps) {
         className="px-4 py-2 flex items-center gap-1.5"
         style={{
           borderTop: `1px solid ${phaseStyle.border}`,
-          backgroundColor: 'rgba(0,0,0,0.15)',
+          backgroundColor: 'rgba(var(--hh-primary-rgb),0.1)',
         }}
       >
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
           <path d="M8 1L10.5 5.5L15.5 6.5L12 10L12.5 15L8 13L3.5 15L4 10L0.5 6.5L5.5 5.5L8 1Z" fill={phaseStyle.border} />
         </svg>
-        <span className="text-xs" style={{ color: '#8899AA' }}>
+        <span className="text-xs" style={{ color: 'var(--hh-muted)' }}>
           E.P.I.C. TECHNIQUE
         </span>
       </div>
@@ -130,7 +130,7 @@ export function EpicSlideCard({ slide }: EpicSlideCardProps) {
 function EpicLogo() {
   return (
     <svg width="20" height="14" viewBox="0 0 60 20" fill="none">
-      <text x="0" y="15" fontFamily="monospace" fontSize="14" fontWeight="bold" fill="#4F7396">
+      <text x="0" y="15" fontFamily="monospace" fontSize="14" fontWeight="bold" fill="var(--hh-primary)">
         EPIC
       </text>
     </svg>

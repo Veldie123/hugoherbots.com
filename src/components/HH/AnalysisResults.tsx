@@ -236,7 +236,7 @@ const PHASE_LABELS: Record<number, { name: string; description: string; color: s
   1: { name: 'Fase 1: Opening', description: 'Koopklimaat, Gentleman\'s Agreement, Instapvraag', color: 'text-hh-primary', bgColor: 'bg-[var(--hh-primary-50)] border-[var(--hh-primary-200)]' },
   2: { name: 'Fase 2: EPIC', description: 'Explore, Probe, Impact, Commitment', color: 'text-[var(--hh-success-700)]', bgColor: 'bg-[var(--hh-success-50)] border-[var(--hh-success-200)]' },
   3: { name: 'Fase 3: Aanbeveling', description: 'O.V.B., USP\'s, Mening vragen', color: 'text-hh-primary', bgColor: 'bg-[var(--hh-primary-50)] border-[var(--hh-primary-200)]' },
-  4: { name: 'Fase 4: Beslissing', description: 'Bezwaarbehandeling, Closing', color: 'text-amber-700 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800' },
+  4: { name: 'Fase 4: Beslissing', description: 'Bezwaarbehandeling, Closing', color: 'text-[var(--hh-warning-700)] dark:text-hh-warning', bgColor: 'bg-[var(--hh-warning-50)] dark:bg-hh-warning/10 border-[var(--hh-warning-200)] dark:border-hh-warning/20' },
 };
 
 function VideoRecommendationCard({ video, adminColors }: { video: any; adminColors: boolean }) {
@@ -697,10 +697,10 @@ export function AnalysisResults({
 
   const getQualityBadge = (quality: string) => {
     switch (quality) {
-      case 'perfect': return { label: 'Perfect', color: '', style: { backgroundColor: isDark ? '#064E3B' : '#DCFCE7', color: isDark ? '#86EFAC' : '#166534', borderColor: isDark ? '#065F46' : '#BBF7D0' } };
-      case 'goed': return { label: 'Goed', color: '', style: { backgroundColor: isDark ? '#064E3B' : '#DCFCE7', color: isDark ? '#86EFAC' : '#166534', borderColor: isDark ? '#065F46' : '#BBF7D0' } };
-      case 'bijna': return { label: 'Bijna', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FFF7ED', color: isDark ? '#FBBF24' : '#9A3412', borderColor: isDark ? '#92400E' : '#FED7AA' } };
-      case 'gemist': return { label: 'Gemist', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FFF7ED', color: isDark ? '#FBBF24' : '#9A3412', borderColor: isDark ? '#92400E' : '#FED7AA' } };
+      case 'perfect': return { label: 'Perfect', color: '', style: { backgroundColor: 'var(--hh-success-100)', color: 'var(--hh-success-700)', borderColor: 'var(--hh-success-200)' } };
+      case 'goed': return { label: 'Goed', color: '', style: { backgroundColor: 'var(--hh-success-100)', color: 'var(--hh-success-700)', borderColor: 'var(--hh-success-200)' } };
+      case 'bijna': return { label: 'Bijna', color: '', style: { backgroundColor: 'var(--hh-warning-100)', color: 'var(--hh-warning-700)', borderColor: 'var(--hh-warning-200)' } };
+      case 'gemist': return { label: 'Gemist', color: '', style: { backgroundColor: 'var(--hh-warning-100)', color: 'var(--hh-warning-700)', borderColor: 'var(--hh-warning-200)' } };
       default: return { label: quality, color: '', style: { backgroundColor: 'color-mix(in srgb, var(--hh-primary) 10%, transparent)', color: 'var(--hh-primary)', borderColor: 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' } };
     }
   };
@@ -714,16 +714,16 @@ export function AnalysisResults({
 
   const getSignalLabel = (houding: string) => {
     const labels: Record<string, { label: string; color: string; style: React.CSSProperties }> = {
-      'interesse': { label: 'Interesse', color: '', style: { backgroundColor: isDark ? '#064E3B' : '#DCFCE7', color: isDark ? '#86EFAC' : '#166534' } },
-      'akkoord': { label: 'Akkoord', color: '', style: { backgroundColor: isDark ? '#064E3B' : '#DCFCE7', color: isDark ? '#86EFAC' : '#166534' } },
-      'vraag': { label: 'Vraag', color: '', style: { backgroundColor: isDark ? '#1E3A5F' : '#DBEAFE', color: isDark ? '#93C5FD' : '#1D4ED8' } },
-      'twijfel': { label: 'Twijfel', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FEF3C7', color: isDark ? '#FBBF24' : '#92400E' } },
-      'bezwaar': { label: 'Bezwaar', color: '', style: { backgroundColor: isDark ? '#450A0A' : '#FEE2E2', color: isDark ? '#FCA5A5' : '#991B1B' } },
-      'uitstel': { label: 'Uitstel', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FFEDD5', color: isDark ? '#FBBF24' : '#9A3412' } },
-      'negatief': { label: 'Negatief', color: '', style: { backgroundColor: isDark ? '#450A0A' : '#FEE2E2', color: isDark ? '#FCA5A5' : '#991B1B' } },
-      'vaag': { label: 'Vaag', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FEF3C7', color: isDark ? '#FBBF24' : '#92400E' } },
-      'ontwijkend': { label: 'Ontwijkend', color: '', style: { backgroundColor: isDark ? '#78350F' : '#FFEDD5', color: isDark ? '#FBBF24' : '#9A3412' } },
-      'neutraal': { label: 'Neutraal', color: '', style: { backgroundColor: isDark ? '#374151' : '#F3F4F6', color: isDark ? '#9CA3AF' : '#6B7280' } },
+      'interesse': { label: 'Interesse', color: '', style: { backgroundColor: 'var(--hh-success-100)', color: 'var(--hh-success-700)' } },
+      'akkoord': { label: 'Akkoord', color: '', style: { backgroundColor: 'var(--hh-success-100)', color: 'var(--hh-success-700)' } },
+      'vraag': { label: 'Vraag', color: '', style: { backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)' } },
+      'twijfel': { label: 'Twijfel', color: '', style: { backgroundColor: 'var(--hh-warning-100)', color: 'var(--hh-warning-700)' } },
+      'bezwaar': { label: 'Bezwaar', color: '', style: { backgroundColor: 'var(--hh-error-100)', color: 'var(--hh-error-700)' } },
+      'uitstel': { label: 'Uitstel', color: '', style: { backgroundColor: 'var(--hh-warning-100)', color: 'var(--hh-warning-700)' } },
+      'negatief': { label: 'Negatief', color: '', style: { backgroundColor: 'var(--hh-error-100)', color: 'var(--hh-error-700)' } },
+      'vaag': { label: 'Vaag', color: '', style: { backgroundColor: 'var(--hh-warning-100)', color: 'var(--hh-warning-700)' } },
+      'ontwijkend': { label: 'Ontwijkend', color: '', style: { backgroundColor: 'var(--hh-warning-100)', color: 'var(--hh-warning-700)' } },
+      'neutraal': { label: 'Neutraal', color: '', style: { backgroundColor: 'var(--hh-ui-100)', color: 'var(--hh-muted)' } },
     };
     return labels[houding] || labels['neutraal'];
   };
@@ -968,9 +968,9 @@ export function AnalysisResults({
 
   if ((result as any).insufficientTurns) {
     const accentColor = adminColors ? 'var(--hh-primary)' : 'var(--hh-success)';
-    const accentBg = adminColors ? 'rgba(153,16,250,0.15)' : 'rgba(60,154,110,0.15)';
-    const accentBgLight = adminColors ? 'rgba(153,16,250,0.08)' : 'rgba(60,154,110,0.08)';
-    const accentBorder = adminColors ? 'rgba(153,16,250,0.2)' : 'rgba(60,154,110,0.2)';
+    const accentBg = adminColors ? 'color-mix(in srgb, var(--hh-primary) 15%, transparent)' : 'color-mix(in srgb, var(--hh-success) 15%, transparent)';
+    const accentBgLight = adminColors ? 'color-mix(in srgb, var(--hh-primary) 8%, transparent)' : 'color-mix(in srgb, var(--hh-success) 8%, transparent)';
+    const accentBorder = adminColors ? 'color-mix(in srgb, var(--hh-primary) 20%, transparent)' : 'color-mix(in srgb, var(--hh-success) 20%, transparent)';
     return wrapLayout(
       <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 5rem)' }}>
         <div className="text-center space-y-6 max-w-md">
@@ -1063,7 +1063,7 @@ export function AnalysisResults({
               </button>
             </div>
             {techniqueSidebarMode === 'select' && (
-              <div className="px-4 py-2 text-[12px] border-b flex-shrink-0" style={{ color: '#7C3AED', borderColor: 'var(--hh-border)', backgroundColor: 'var(--hh-ui-50)' }}>
+              <div className="px-4 py-2 text-[12px] border-b flex-shrink-0" style={{ color: 'var(--hh-primary)', borderColor: 'var(--hh-border)', backgroundColor: 'var(--hh-ui-50)' }}>
                 Klik op een techniek om deze te selecteren als correctie
               </div>
             )}
@@ -1177,7 +1177,7 @@ export function AnalysisResults({
             <div className="flex flex-col items-center gap-2 flex-shrink-0">
               <div className="relative" style={{ width: '80px', height: '80px' }}>
                 <svg width="80" height="80" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="42" fill="none" stroke={isDark ? '#374151' : '#E5E7EB'} strokeWidth="6" />
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="var(--hh-border)" strokeWidth="6" />
                   <circle
                     cx="50" cy="50" r="42"
                     fill="none"
@@ -1208,7 +1208,7 @@ export function AnalysisResults({
                           fontSize: '11px',
                           padding: '4px 10px',
                           backgroundColor: percentilePeriod === p ? (adminColors ? 'var(--hh-primary)' : 'var(--hh-success)') : 'var(--card)',
-                          color: percentilePeriod === p ? '#FFFFFF' : 'var(--hh-muted)',
+                          color: percentilePeriod === p ? 'var(--hh-bg)' : 'var(--hh-muted)',
                           fontWeight: percentilePeriod === p ? 600 : 500,
                           borderRight: idx < 3 ? '1px solid var(--hh-border)' : 'none',
                         }}
@@ -1236,7 +1236,7 @@ export function AnalysisResults({
               }`}
               style={activeTab === tab.value
                 ? { backgroundColor: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)', color: 'white' }
-                : { color: isDark ? '#9CA3AF' : '#4B5563' }
+                : { color: 'var(--hh-muted)' }
               }
             >
               <tab.icon className="w-4 h-4" />
@@ -1443,8 +1443,8 @@ export function AnalysisResults({
                                   <button
                                     className="inline-flex items-center gap-1.5 text-[12px] h-8 px-4 text-white rounded-lg font-medium transition-all"
                                     style={{ backgroundColor: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }}
-                                    onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? '#7C3AED' : '#2D7F57')}
-                                    onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? 'var(--hh-primary)' : 'var(--hh-success)')}
+                                    onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.opacity = '0.85')}
+                                    onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.opacity = '1')}
                                     onClick={() => navigateToHugoForPractice(moment.recommendedTechniques || [], moment.label, moment.turnIndex)}
                                   >
                                     <Sparkles className="w-3.5 h-3.5" /> Oefen met Hugo
@@ -1513,10 +1513,10 @@ export function AnalysisResults({
             const accentColorBg = adminColors ? 'color-mix(in srgb, var(--hh-primary) 3%, transparent)' : 'color-mix(in srgb, var(--hh-success) 3%, transparent)';
 
             const PHASE_COLORS: Record<number, string> = {
-              1: '#3B82F6',
-              2: '#10B981',
-              3: '#8B5CF6',
-              4: '#F59E0B',
+              1: 'var(--hh-primary)',
+              2: 'var(--hh-success)',
+              3: 'var(--hh-purple)',
+              4: 'var(--hh-warning)',
             };
 
             const phaseDetails: Array<{ phase: number; label: string; sublabel: string; score: number; color: string; details: any[] }> = [
@@ -1665,7 +1665,7 @@ export function AnalysisResults({
                 label: 'Klanthoudingen',
                 sublabel: 'Herkenning & behandeling',
                 score: dm.houdingen.overallScore,
-                color: '#EF4444',
+                color: 'var(--hh-error)',
                 details: [
                   {
                     label: 'Herkenning (Fase 2)',
@@ -1715,7 +1715,7 @@ export function AnalysisResults({
                 label: 'Impact & Baten',
                 sublabel: 'Pijnpunten, voordelen & O.V.B.',
                 score: dm.impact.overallScore,
-                color: '#F97316',
+                color: 'var(--hh-warning)',
                 details: [
                   {
                     label: 'Pijnpunten gevonden',
@@ -1751,7 +1751,7 @@ export function AnalysisResults({
                 label: 'Gespreksbalans',
                 sublabel: 'Spreektijd, perspectief & vragen',
                 score: dm.balance.overallScore,
-                color: '#8B5CF6',
+                color: 'var(--hh-purple)',
                 details: [
                   {
                     label: 'Spreektijd',
@@ -1821,18 +1821,18 @@ export function AnalysisResults({
                   >
                     <div className="flex-shrink-0 mt-0.5">
                       {detail.score >= 70 ? (
-                        <CheckCircle className="w-4 h-4" style={{ color: '#22C55E' }} />
+                        <CheckCircle className="w-4 h-4" style={{ color: 'var(--hh-success)' }} />
                       ) : detail.score >= 30 ? (
-                        <Circle className="w-4 h-4" style={{ color: '#F59E0B' }} />
+                        <Circle className="w-4 h-4" style={{ color: 'var(--hh-warning)' }} />
                       ) : (
-                        <XCircle className="w-4 h-4" style={{ color: '#EF4444' }} />
+                        <XCircle className="w-4 h-4" style={{ color: 'var(--hh-error)' }} />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-0.5">
                         <span className="text-[12px] sm:text-[13px] font-medium text-hh-text">{detail.label}</span>
                         <span className="text-[11px] sm:text-[12px] font-semibold text-right min-w-0 truncate" style={{
-                          color: detail.score >= 70 ? '#22C55E' : detail.score >= 30 ? '#F59E0B' : '#EF4444',
+                          color: detail.score >= 70 ? 'var(--hh-success)' : detail.score >= 30 ? 'var(--hh-warning)' : 'var(--hh-error)',
                           maxWidth: '55%',
                         }}>{detail.value}</span>
                       </div>
@@ -1842,7 +1842,7 @@ export function AnalysisResults({
                       <div className="mt-1.5 h-1 rounded-full bg-hh-ui-100 overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-500" style={{
                           width: `${detail.score}%`,
-                          backgroundColor: detail.score >= 70 ? '#22C55E' : detail.score >= 30 ? '#F59E0B' : '#EF4444'
+                          backgroundColor: detail.score >= 70 ? 'var(--hh-success)' : detail.score >= 30 ? 'var(--hh-warning)' : 'var(--hh-error)'
                         }} />
                       </div>
                     </div>
@@ -1858,16 +1858,16 @@ export function AnalysisResults({
                       <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--hh-border)' }}>
                         <div className="divide-y" style={{ borderColor: 'var(--hh-ui-100)' }}>
                           {detail.checklistItems.map((item: any, cIdx: number) => (
-                            <div key={cIdx} className="flex items-center gap-2.5 px-3 py-2" style={{ backgroundColor: item.found ? (isDark ? '#064E3B' : '#F0FDF4') : (isDark ? '#450A0A' : '#FEF2F2') }}>
+                            <div key={cIdx} className="flex items-center gap-2.5 px-3 py-2" style={{ backgroundColor: item.found ? 'var(--hh-success-50)' : 'var(--hh-error-50)' }}>
                               {item.found ? (
-                                <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22C55E' }} />
+                                <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--hh-success)' }} />
                               ) : (
-                                <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#EF4444' }} />
+                                <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--hh-error)' }} />
                               )}
-                              <span className="text-[12px] font-medium" style={{ color: item.found ? (isDark ? '#86EFAC' : '#166534') : (isDark ? '#FCA5A5' : '#991B1B') }}>
+                              <span className="text-[12px] font-medium" style={{ color: item.found ? 'var(--hh-success-700)' : 'var(--hh-error-700)' }}>
                                 {item.label}
                               </span>
-                              <span className="ml-auto text-[10px] font-medium" style={{ color: item.found ? '#22C55E' : '#EF4444' }}>
+                              <span className="ml-auto text-[10px] font-medium" style={{ color: item.found ? 'var(--hh-success)' : 'var(--hh-error)' }}>
                                 {item.found ? 'Aanwezig' : 'Ontbreekt'}
                               </span>
                             </div>
@@ -1890,14 +1890,14 @@ export function AnalysisResults({
                           ?.sort((a: any, b: any) => a.idx - b.idx) || [];
 
                         return (
-                          <div key={mIdx} className="rounded-xl border overflow-hidden" style={{ borderColor: statusOk ? (isDark ? '#065F46' : '#BBF7D0') : (isDark ? '#7F1D1D' : '#FECACA') }}>
-                            <div className="flex items-center gap-2 px-3 py-2" style={{ backgroundColor: statusOk ? (isDark ? '#064E3B' : '#F0FDF4') : (isDark ? '#450A0A' : '#FEF2F2') }}>
+                          <div key={mIdx} className="rounded-xl border overflow-hidden" style={{ borderColor: statusOk ? 'var(--hh-success-200)' : 'var(--hh-error-200)' }}>
+                            <div className="flex items-center gap-2 px-3 py-2" style={{ backgroundColor: statusOk ? 'var(--hh-success-50)' : 'var(--hh-error-50)' }}>
                               {statusOk ? (
-                                <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22C55E' }} />
+                                <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--hh-success)' }} />
                               ) : (
-                                <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#EF4444' }} />
+                                <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--hh-error)' }} />
                               )}
-                              <span className="text-[11px] font-semibold" style={{ color: statusOk ? (isDark ? '#86EFAC' : '#166534') : (isDark ? '#FCA5A5' : '#991B1B') }}>
+                              <span className="text-[11px] font-semibold" style={{ color: statusOk ? 'var(--hh-success-700)' : 'var(--hh-error-700)' }}>
                                 {statusOk
                                   ? (detail.kind === 'recognition' ? 'Herkend' : 'Behandeld')
                                   : (detail.kind === 'recognition' ? 'Gemist' : 'Niet behandeld')
@@ -1933,10 +1933,10 @@ export function AnalysisResults({
                                         style={{
                                           borderRadius: isSeller ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
                                           backgroundColor: isHighlighted
-                                            ? (statusOk ? (isDark ? '#064E3B' : '#DCFCE7') : (isDark ? '#450A0A' : '#FEE2E2'))
+                                            ? (statusOk ? 'var(--hh-success-100)' : 'var(--hh-error-100)')
                                             : (isSeller ? (adminColors ? 'color-mix(in srgb, var(--hh-primary) 5%, transparent)' : 'var(--hh-ui-100)') : 'var(--card)'),
                                           border: isHighlighted
-                                            ? `1.5px solid ${statusOk ? (isDark ? '#065F46' : '#86EFAC') : (isDark ? '#7F1D1D' : '#FCA5A5')}`
+                                            ? `1.5px solid ${statusOk ? 'var(--hh-success-200)' : 'var(--hh-error-200)'}`
                                             : '1px solid var(--hh-border)',
                                           color: 'var(--hh-ink)',
                                         }}
@@ -1954,8 +1954,8 @@ export function AnalysisResults({
                                 <span className="text-[10px] text-hh-muted">{statusOk ? 'Toegepast:' : 'Aanbevolen:'}</span>
                                 {(statusOk ? match.actualTechniques : match.recommendedTechniques)?.map((tech: string, tIdx: number) => (
                                   <span key={tIdx} className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{
-                                    backgroundColor: statusOk ? (isDark ? '#064E3B' : '#DCFCE7') : (isDark ? '#1E3A5F' : '#DBEAFE'),
-                                    color: statusOk ? (isDark ? '#86EFAC' : '#166534') : (isDark ? '#93C5FD' : '#1E40AF'),
+                                    backgroundColor: statusOk ? 'var(--hh-success-100)' : 'var(--hh-primary-100)',
+                                    color: statusOk ? 'var(--hh-success-700)' : 'var(--hh-primary)',
                                   }}>
                                     {tech}
                                   </span>
@@ -2009,14 +2009,14 @@ export function AnalysisResults({
                               <p className="text-[11px] text-hh-muted">{pd.sublabel}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="text-[16px] font-bold" style={{ color: pd.score >= 60 ? pd.color : pd.score >= 30 ? '#F59E0B' : '#EF4444' }}>{pd.score}%</span>
+                              <span className="text-[16px] font-bold" style={{ color: pd.score >= 60 ? pd.color : pd.score >= 30 ? 'var(--hh-warning)' : 'var(--hh-error)' }}>{pd.score}%</span>
                               <ChevronRight className={`w-4 h-4 text-hh-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                             </div>
                           </div>
                           <div className="h-2 rounded-full bg-hh-ui-100 overflow-hidden">
                             <div className="h-full rounded-full transition-all duration-700" style={{
                               width: `${pd.score}%`,
-                              backgroundColor: pd.score >= 60 ? pd.color : pd.score >= 30 ? '#F59E0B' : '#EF4444'
+                              backgroundColor: pd.score >= 60 ? pd.color : pd.score >= 30 ? 'var(--hh-warning)' : 'var(--hh-error)'
                             }} />
                           </div>
                         </button>
@@ -2080,14 +2080,14 @@ export function AnalysisResults({
                               </div>
                             </div>
                             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                              <span className="text-[16px] font-bold" style={{ color: cat.score >= 60 ? cat.color : cat.score >= 30 ? '#F59E0B' : '#EF4444' }}>{cat.score}%</span>
+                              <span className="text-[16px] font-bold" style={{ color: cat.score >= 60 ? cat.color : cat.score >= 30 ? 'var(--hh-warning)' : 'var(--hh-error)' }}>{cat.score}%</span>
                               <ChevronRight className={`w-4 h-4 text-hh-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                             </div>
                           </div>
                           <div className="h-1.5 rounded-full bg-hh-ui-100 overflow-hidden">
                             <div className="h-full rounded-full transition-all duration-700" style={{
                               width: `${cat.score}%`,
-                              backgroundColor: cat.score >= 60 ? cat.color : cat.score >= 30 ? '#F59E0B' : '#EF4444'
+                              backgroundColor: cat.score >= 60 ? cat.color : cat.score >= 30 ? 'var(--hh-warning)' : 'var(--hh-error)'
                             }} />
                           </div>
                         </button>
@@ -2114,8 +2114,8 @@ export function AnalysisResults({
             <button
               className="inline-flex items-center justify-center gap-2 text-[14px] h-11 px-6 text-white rounded-xl font-medium transition-all shadow-sm"
               style={{ backgroundColor: adminColors ? 'var(--hh-primary)' : 'var(--hh-success)' }}
-              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? '#7C3AED' : '#2D7F57')}
-              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.backgroundColor = adminColors ? 'var(--hh-primary)' : 'var(--hh-success)')}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.opacity = '0.85')}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.opacity = '1')}
               onClick={() => {
                 const analysisContext = {
                   analysisDiscussion: true,
@@ -2193,7 +2193,7 @@ export function AnalysisResults({
                                           }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
                                           style={{ color: 'var(--hh-muted)' }}
-                                          onMouseEnter={(e) => { e.currentTarget.style.color = '#22C55E'; e.currentTarget.style.backgroundColor = 'rgba(34,197,94,0.08)'; }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--hh-success)'; e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--hh-success) 8%, transparent)'; }}
                                           onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--hh-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
                                           title="Klopt"
                                         >
@@ -2202,8 +2202,8 @@ export function AnalysisResults({
                                         <button
                                           onClick={() => { setFeedbackOpen(isFeedbackPanelOpen ? null : badgeKey); setFeedbackText(''); }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
-                                          style={{ color: isFeedbackPanelOpen ? '#EF4444' : 'var(--hh-muted)' }}
-                                          onMouseEnter={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)'; } }}
+                                          style={{ color: isFeedbackPanelOpen ? 'var(--hh-error)' : 'var(--hh-muted)' }}
+                                          onMouseEnter={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = 'var(--hh-error)'; e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--hh-error) 8%, transparent)'; } }}
                                           onMouseLeave={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = 'var(--hh-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; } }}
                                           title="Klopt niet"
                                         >
@@ -2212,7 +2212,7 @@ export function AnalysisResults({
                                       </span>
                                     )}
                                     {isConfirmed && (
-                                      <CheckCircle className="w-3 h-3 ml-1" style={{ color: badgeFeedbackType[badgeKey] === 'negative' ? '#EF4444' : '#22C55E' }} />
+                                      <CheckCircle className="w-3 h-3 ml-1" style={{ color: badgeFeedbackType[badgeKey] === 'negative' ? 'var(--hh-error)' : 'var(--hh-success)' }} />
                                     )}
                                   </span>
                                 );
@@ -2237,7 +2237,7 @@ export function AnalysisResults({
                                           }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
                                           style={{ color: 'var(--hh-muted)' }}
-                                          onMouseEnter={(e) => { e.currentTarget.style.color = '#22C55E'; e.currentTarget.style.backgroundColor = 'rgba(34,197,94,0.08)'; }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--hh-success)'; e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--hh-success) 8%, transparent)'; }}
                                           onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--hh-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
                                           title="Klopt"
                                         >
@@ -2246,8 +2246,8 @@ export function AnalysisResults({
                                         <button
                                           onClick={() => { setFeedbackOpen(isFeedbackPanelOpen ? null : badgeKey); setFeedbackText(''); }}
                                           className="w-5 h-5 rounded flex items-center justify-center transition-colors"
-                                          style={{ color: isFeedbackPanelOpen ? '#EF4444' : 'var(--hh-muted)' }}
-                                          onMouseEnter={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)'; } }}
+                                          style={{ color: isFeedbackPanelOpen ? 'var(--hh-error)' : 'var(--hh-muted)' }}
+                                          onMouseEnter={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = 'var(--hh-error)'; e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--hh-error) 8%, transparent)'; } }}
                                           onMouseLeave={(e) => { if (!isFeedbackPanelOpen) { e.currentTarget.style.color = 'var(--hh-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; } }}
                                           title="Klopt niet"
                                         >
@@ -2256,15 +2256,15 @@ export function AnalysisResults({
                                       </span>
                                     )}
                                     {isConfirmed && (
-                                      <CheckCircle className="w-3 h-3 ml-1" style={{ color: badgeFeedbackType[badgeKey] === 'negative' ? '#EF4444' : '#22C55E' }} />
+                                      <CheckCircle className="w-3 h-3 ml-1" style={{ color: badgeFeedbackType[badgeKey] === 'negative' ? 'var(--hh-error)' : 'var(--hh-success)' }} />
                                     )}
                                   </span>
                                 );
                               })}
                             </div>
                             {useAdminLayout && feedbackOpen && (feedbackOpen === `signal-${turn.idx}` || feedbackOpen?.startsWith(`tech-${turn.idx}-`)) && (
-                              <div className="rounded-lg border p-2.5 mt-1" style={{ backgroundColor: isDark ? '#422006' : '#FEFCE8', borderColor: isDark ? '#92400E' : '#FDE68A' }}>
-                                <p className="text-[10px] font-medium mb-1.5" style={{ color: isDark ? '#FDE68A' : '#92400E' }}>Wat zou het moeten zijn?</p>
+                              <div className="rounded-lg border p-2.5 mt-1" style={{ backgroundColor: 'var(--hh-warning-50)', borderColor: 'var(--hh-warning-200)' }}>
+                                <p className="text-[10px] font-medium mb-1.5" style={{ color: 'var(--hh-warning-700)' }}>Wat zou het moeten zijn?</p>
                                 <div className="flex gap-1.5 items-start">
                                   <input
                                     type="text"
@@ -2338,7 +2338,7 @@ export function AnalysisResults({
                                   title="Kopieer"
                                 >
                                   {copiedTurnIdx === turn.idx ? (
-                                    <Check className="w-3.5 h-3.5" style={{ color: '#22C55E' }} />
+                                    <Check className="w-3.5 h-3.5" style={{ color: 'var(--hh-success)' }} />
                                   ) : (
                                     <Copy className="w-3.5 h-3.5" />
                                   )}
@@ -2350,11 +2350,11 @@ export function AnalysisResults({
                                       ? 'bg-hh-success/5 scale-110'
                                       : 'text-hh-muted hover:text-hh-text hover:bg-hh-ui-100'
                                   }`}
-                                  style={feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx) ? { color: '#22C55E', fill: '#22C55E' } : undefined}
+                                  style={feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx) ? { color: 'var(--hh-success)', fill: 'var(--hh-success)' } : undefined}
                                   title="Markeer als correct — Golden Standard"
                                   disabled={goldenSaved.has(turn.idx) || feedbackGiven[turn.idx] === 'positive'}
                                 >
-                                  <ThumbsUp className={feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx) ? 'w-4 h-4' : 'w-3.5 h-3.5'} style={feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx) ? { fill: '#22C55E' } : undefined} />
+                                  <ThumbsUp className={feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx) ? 'w-4 h-4' : 'w-3.5 h-3.5'} style={feedbackGiven[turn.idx] === 'positive' || goldenSaved.has(turn.idx) ? { fill: 'var(--hh-success)' } : undefined} />
                                 </button>
                                 <button
                                   onClick={() => {
@@ -2370,10 +2370,10 @@ export function AnalysisResults({
                                         ? 'bg-hh-error/5'
                                         : 'text-hh-muted hover:text-hh-text hover:bg-hh-ui-100'
                                   }`}
-                                  style={feedbackGiven[turn.idx] === 'negative' ? { color: '#EF4444', fill: '#EF4444' } : correctionPanelTurn === turn.idx ? { color: '#EF4444' } : undefined}
+                                  style={feedbackGiven[turn.idx] === 'negative' ? { color: 'var(--hh-error)', fill: 'var(--hh-error)' } : correctionPanelTurn === turn.idx ? { color: 'var(--hh-error)' } : undefined}
                                   title="AI tag is fout — Corrigeer"
                                 >
-                                  <ThumbsDown className={feedbackGiven[turn.idx] === 'negative' ? 'w-4 h-4' : 'w-3.5 h-3.5'} style={feedbackGiven[turn.idx] === 'negative' ? { fill: '#EF4444' } : undefined} />
+                                  <ThumbsDown className={feedbackGiven[turn.idx] === 'negative' ? 'w-4 h-4' : 'w-3.5 h-3.5'} style={feedbackGiven[turn.idx] === 'negative' ? { fill: 'var(--hh-error)' } : undefined} />
                                 </button>
                                 <button
                                   onClick={() => {

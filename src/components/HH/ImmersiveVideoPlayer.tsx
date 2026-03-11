@@ -167,7 +167,7 @@ export function ImmersiveVideoPlayer({
 
       <button
         className="fixed top-4 right-4 sm:top-5 sm:right-5 flex items-center gap-2 px-4 py-2.5 rounded-full text-white font-medium text-[14px] transition-all cursor-pointer"
-        style={{ zIndex: 100001, backgroundColor: '#1a1f2e' }}
+        style={{ zIndex: 100001, backgroundColor: 'var(--hh-ink)' }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowPlaylist(!showPlaylist); }}
         aria-label="Playlist"
       >
@@ -224,7 +224,7 @@ export function ImmersiveVideoPlayer({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {currentVideo.techniqueNumber && (
-              <Badge className="bg-teal-500/80 text-white border-0 text-[10px] font-mono">
+              <Badge className="bg-hh-primary/80 text-white border-0 text-[10px] font-mono">
                 #{currentVideo.techniqueNumber}
               </Badge>
             )}
@@ -262,7 +262,7 @@ export function ImmersiveVideoPlayer({
               <button
                 className="px-5 py-2.5 rounded-lg border border-white/40 text-white text-[14px] font-medium transition-colors cursor-pointer"
                 style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#1C2535'; e.currentTarget.style.borderColor = '#ffffff'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--hh-bg)'; e.currentTarget.style.color = 'var(--hh-ink)'; e.currentTarget.style.borderColor = 'var(--hh-bg)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
                 onClick={(e) => {
                   e.preventDefault();
@@ -275,7 +275,7 @@ export function ImmersiveVideoPlayer({
               </button>
               <button
                 className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-white text-[14px] font-medium transition-colors hover:brightness-110 cursor-pointer"
-                style={{ backgroundColor: '#3d9a6e' }}
+                style={{ backgroundColor: 'var(--hh-success)' }}
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); goToVideo(nextVideo.id); }}
               >
                 <SkipForward className="w-4 h-4" />
@@ -314,23 +314,23 @@ export function ImmersiveVideoPlayer({
                 className={`flex items-start gap-3 px-4 py-3 cursor-pointer transition-all ${
                   isActive ? 'border-l-[3px]' : 'border-l-[3px] border-l-transparent hover:bg-white/[0.04]'
                 }`}
-                style={{ 
-                  backgroundColor: isActive ? 'rgba(61,154,110,0.12)' : undefined,
-                  borderLeftColor: isActive ? '#3d9a6e' : undefined,
+                style={{
+                  backgroundColor: isActive ? 'color-mix(in srgb, var(--hh-success) 12%, transparent)' : undefined,
+                  borderLeftColor: isActive ? 'var(--hh-success)' : undefined,
                   borderBottom: '1px solid rgba(255,255,255,0.05)'
                 }}
                 onClick={() => goToVideo(video.id)}
               >
                 <div className="flex-shrink-0 w-6 pt-1 text-center">
                   {isActive ? (
-                    <Play className="w-4 h-4 mx-auto" style={{ color: '#3d9a6e' }} />
+                    <Play className="w-4 h-4 mx-auto" style={{ color: 'var(--hh-success)' }} />
                   ) : isCompleted ? (
-                    <CheckCircle2 className="w-4 h-4 mx-auto" style={{ color: '#3d9a6e' }} />
+                    <CheckCircle2 className="w-4 h-4 mx-auto" style={{ color: 'var(--hh-success)' }} />
                   ) : (
                     <span className="text-white/25 text-[12px] font-mono">{idx + 1}</span>
                   )}
                 </div>
-                <div className="w-[72px] h-[42px] rounded-md overflow-hidden flex-shrink-0" style={{ backgroundColor: '#1a1d24' }}>
+                <div className="w-[72px] h-[42px] rounded-md overflow-hidden flex-shrink-0" style={{ backgroundColor: 'var(--hh-ink)' }}>
                   <img src={video.thumbnail} alt="" className="w-full h-full object-cover" />
                 </div>
                 <div className="min-w-0 flex-1 pt-0.5">

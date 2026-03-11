@@ -120,11 +120,11 @@ export function AdminHugoAgent({ navigate }: Props) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", backgroundColor: "#f8f9fa" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", backgroundColor: "var(--hh-ui-50)" }}>
       <div style={{
         padding: "20px 24px 16px",
-        borderBottom: "1px solid #e5e7eb",
-        backgroundColor: "white",
+        borderBottom: "1px solid var(--hh-border)",
+        backgroundColor: "var(--hh-bg)",
         flexShrink: 0
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -137,11 +137,11 @@ export function AdminHugoAgent({ navigate }: Props) {
             alignItems: "center",
             justifyContent: "center"
           }}>
-            <Bot size={22} color="white" />
+            <Bot size={22} color="var(--hh-bg)" />
           </div>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: "#111827", margin: 0 }}>Talk to Hugo AI</h1>
-            <p style={{ fontSize: 14, color: "#6b7280", margin: 0 }}>Uw persoonlijke platformassistent</p>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--hh-text)", margin: 0 }}>Talk to Hugo AI</h1>
+            <p style={{ fontSize: 14, color: "var(--hh-muted)", margin: 0 }}>Uw persoonlijke platformassistent</p>
           </div>
         </div>
       </div>
@@ -158,9 +158,9 @@ export function AdminHugoAgent({ navigate }: Props) {
               alignItems: "center",
               justifyContent: "center"
             }}>
-              <Loader2 size={26} color="white" style={{ animation: "spin 1s linear infinite" }} />
+              <Loader2 size={26} color="var(--hh-bg)" style={{ animation: "spin 1s linear infinite" }} />
             </div>
-            <p style={{ fontSize: 18, color: "#6b7280", fontWeight: 500 }}>Uw dagelijkse briefing wordt geladen...</p>
+            <p style={{ fontSize: 18, color: "var(--hh-muted)", fontWeight: 500 }}>Uw dagelijkse briefing wordt geladen...</p>
           </div>
         )}
 
@@ -186,28 +186,28 @@ export function AdminHugoAgent({ navigate }: Props) {
                 borderRadius: "50%",
                 flexShrink: 0,
                 background: message.role === "user"
-                  ? "linear-gradient(135deg, #3b82f6, #2563eb)"
+                  ? "linear-gradient(135deg, var(--hh-primary), var(--hh-primary-dark, var(--hh-primary)))"
                   : "linear-gradient(135deg, var(--hh-primary), var(--hh-primary-dark, var(--hh-primary)))",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center"
               }}>
                 {message.role === "user"
-                  ? <User size={18} color="white" />
-                  : <Bot size={18} color="white" />}
+                  ? <User size={18} color="var(--hh-bg)" />
+                  : <Bot size={18} color="var(--hh-bg)" />}
               </div>
 
               <div style={{ maxWidth: "80%", display: "flex", flexDirection: "column", gap: 8 }}>
                 {message.content && (
                   <div style={{
-                    backgroundColor: message.role === "user" ? "#3b82f6" : "white",
-                    color: message.role === "user" ? "white" : "#111827",
+                    backgroundColor: message.role === "user" ? "var(--hh-primary)" : "var(--hh-bg)",
+                    color: message.role === "user" ? "var(--hh-bg)" : "var(--hh-text)",
                     borderRadius: message.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
                     padding: "14px 18px",
                     fontSize: 17,
                     lineHeight: 1.6,
                     boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                    border: message.role === "assistant" ? "1px solid #f3f4f6" : "none",
+                    border: message.role === "assistant" ? "1px solid var(--hh-ui-50)" : "none",
                     whiteSpace: "pre-wrap"
                   }}>
                     {message.content}
@@ -234,9 +234,9 @@ export function AdminHugoAgent({ navigate }: Props) {
                     style={{
                       padding: "10px 16px",
                       borderRadius: 24,
-                      border: "1.5px solid #d1d5db",
-                      backgroundColor: "white",
-                      color: "#374151",
+                      border: "1.5px solid var(--hh-border)",
+                      backgroundColor: "var(--hh-bg)",
+                      color: "var(--hh-text)",
                       fontSize: 15,
                       cursor: isLoading ? "not-allowed" : "pointer",
                       transition: "all 0.15s",
@@ -245,13 +245,13 @@ export function AdminHugoAgent({ navigate }: Props) {
                     }}
                     onMouseEnter={e => {
                       if (!isLoading) {
-                        (e.target as HTMLElement).style.backgroundColor = "#f3f4f6";
-                        (e.target as HTMLElement).style.borderColor = "#9ca3af";
+                        (e.target as HTMLElement).style.backgroundColor = "var(--hh-ui-50)";
+                        (e.target as HTMLElement).style.borderColor = "var(--hh-muted)";
                       }
                     }}
                     onMouseLeave={e => {
-                      (e.target as HTMLElement).style.backgroundColor = "white";
-                      (e.target as HTMLElement).style.borderColor = "#d1d5db";
+                      (e.target as HTMLElement).style.backgroundColor = "var(--hh-bg)";
+                      (e.target as HTMLElement).style.borderColor = "var(--hh-border)";
                     }}
                   >
                     {s}
@@ -269,16 +269,16 @@ export function AdminHugoAgent({ navigate }: Props) {
               background: "linear-gradient(135deg, var(--hh-primary), var(--hh-primary-dark, var(--hh-primary)))",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
             }}>
-              <Loader2 size={18} color="white" style={{ animation: "spin 1s linear infinite" }} />
+              <Loader2 size={18} color="var(--hh-bg)" style={{ animation: "spin 1s linear infinite" }} />
             </div>
             <div style={{
-              backgroundColor: "white", borderRadius: "18px 18px 18px 4px",
+              backgroundColor: "var(--hh-bg)", borderRadius: "18px 18px 18px 4px",
               padding: "16px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-              border: "1px solid #f3f4f6", display: "flex", gap: 6, alignItems: "center"
+              border: "1px solid var(--hh-ui-50)", display: "flex", gap: 6, alignItems: "center"
             }}>
               {[0, 1, 2].map(i => (
                 <div key={i} style={{
-                  width: 8, height: 8, borderRadius: "50%", backgroundColor: "#9ca3af",
+                  width: 8, height: 8, borderRadius: "50%", backgroundColor: "var(--hh-muted)",
                   animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`
                 }} />
               ))}
@@ -291,8 +291,8 @@ export function AdminHugoAgent({ navigate }: Props) {
 
       <div style={{
         padding: "16px 24px 20px",
-        borderTop: "1px solid #e5e7eb",
-        backgroundColor: "white",
+        borderTop: "1px solid var(--hh-border)",
+        backgroundColor: "var(--hh-bg)",
         flexShrink: 0
       }}>
         <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
@@ -308,18 +308,18 @@ export function AdminHugoAgent({ navigate }: Props) {
               flex: 1,
               padding: "14px 18px",
               borderRadius: 16,
-              border: "2px solid #e5e7eb",
+              border: "2px solid var(--hh-border)",
               fontSize: 17,
               resize: "none",
               outline: "none",
               fontFamily: "inherit",
               lineHeight: 1.5,
               transition: "border-color 0.15s",
-              backgroundColor: isLoading ? "#f9fafb" : "white",
-              color: "#111827"
+              backgroundColor: isLoading ? "var(--hh-ui-50)" : "var(--hh-bg)",
+              color: "var(--hh-text)"
             }}
             onFocus={e => { e.target.style.borderColor = "var(--hh-primary)"; }}
-            onBlur={e => { e.target.style.borderColor = "#e5e7eb"; }}
+            onBlur={e => { e.target.style.borderColor = "var(--hh-border)"; }}
           />
           <button
             onClick={handleSubmit}
@@ -329,9 +329,9 @@ export function AdminHugoAgent({ navigate }: Props) {
               borderRadius: 16,
               border: "none",
               background: isLoading || !inputValue.trim()
-                ? "#e5e7eb"
+                ? "var(--hh-border)"
                 : "linear-gradient(135deg, var(--hh-primary), var(--hh-primary-dark, var(--hh-primary)))",
-              color: isLoading || !inputValue.trim() ? "#9ca3af" : "white",
+              color: isLoading || !inputValue.trim() ? "var(--hh-muted)" : "var(--hh-bg)",
               fontSize: 16,
               fontWeight: 600,
               cursor: isLoading || !inputValue.trim() ? "not-allowed" : "pointer",
@@ -347,7 +347,7 @@ export function AdminHugoAgent({ navigate }: Props) {
             Versturen
           </button>
         </div>
-        <p style={{ fontSize: 13, color: "#9ca3af", marginTop: 8, marginBottom: 0 }}>
+        <p style={{ fontSize: 13, color: "var(--hh-muted)", marginTop: 8, marginBottom: 0 }}>
           Druk op Enter om te versturen, Shift+Enter voor een nieuwe regel
         </p>
       </div>
@@ -366,9 +366,9 @@ export function AdminHugoAgent({ navigate }: Props) {
 // ── Urgency Banner ────────────────────────────────────────────────────────────
 function UrgencyBanner({ flag }: { flag: UrgencyFlag }) {
   const colors = {
-    critical: { bg: "#fef2f2", border: "#fecaca", text: "#dc2626", icon: <AlertTriangle size={18} /> },
-    warning: { bg: "#fffbeb", border: "#fcd34d", text: "#d97706", icon: <AlertTriangle size={18} /> },
-    info: { bg: "#eff6ff", border: "#bfdbfe", text: "#2563eb", icon: <Info size={18} /> }
+    critical: { bg: "var(--hh-error-50)", border: "var(--hh-error-200)", text: "var(--hh-error)", icon: <AlertTriangle size={18} /> },
+    warning: { bg: "var(--hh-warning-50)", border: "var(--hh-warning-200)", text: "var(--hh-warning-700)", icon: <AlertTriangle size={18} /> },
+    info: { bg: "var(--hh-primary-50)", border: "var(--hh-primary-200)", text: "var(--hh-primary)", icon: <Info size={18} /> }
   };
   const style = colors[flag.type] || colors.info;
 
@@ -391,7 +391,7 @@ function ToolCard({ result, navigate }: { result: ToolResult; navigate?: (page: 
     return (
       <div style={{
         padding: "12px 16px", borderRadius: 12,
-        backgroundColor: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626", fontSize: 14
+        backgroundColor: "var(--hh-error-50)", border: "1px solid var(--hh-error-200)", color: "var(--hh-error)", fontSize: 14
       }}>
         ⚠️ {result.error}
       </div>
@@ -430,7 +430,7 @@ function WebinarListCard({ data }: { data: any[] }) {
   const [saved, setSaved] = useState<string | null>(null);
 
   if (!sessions.length) return (
-    <div style={{ padding: "16px", backgroundColor: "white", borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 16, color: "#6b7280" }}>
+    <div style={{ padding: "16px", backgroundColor: "var(--hh-bg)", borderRadius: 12, border: "1px solid var(--hh-border)", fontSize: 16, color: "var(--hh-muted)" }}>
       Geen webinars gevonden.
     </div>
   );
@@ -461,16 +461,16 @@ function WebinarListCard({ data }: { data: any[] }) {
   };
 
   return (
-    <div style={{ backgroundColor: "white", borderRadius: 16, border: "1px solid #e5e7eb", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", fontWeight: 700, fontSize: 17, color: "#111827", display: "flex", alignItems: "center", gap: 8 }}>
+    <div style={{ backgroundColor: "var(--hh-bg)", borderRadius: 16, border: "1px solid var(--hh-border)", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--hh-ui-50)", fontWeight: 700, fontSize: 17, color: "var(--hh-text)", display: "flex", alignItems: "center", gap: 8 }}>
         📅 Webinars ({sessions.length})
       </div>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ backgroundColor: "#f9fafb" }}>
+            <tr style={{ backgroundColor: "var(--hh-ui-50)" }}>
               {["Titel", "Datum & Tijd", "Status", "Actie"].map(h => (
-                <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 13, fontWeight: 600, color: "#6b7280", borderBottom: "1px solid #e5e7eb" }}>{h}</th>
+                <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 13, fontWeight: 600, color: "var(--hh-muted)", borderBottom: "1px solid var(--hh-border)" }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -482,7 +482,7 @@ function WebinarListCard({ data }: { data: any[] }) {
               const hasEdits = Object.keys(ed).length > 0;
 
               return (
-                <tr key={session.id} style={{ borderBottom: i < sessions.length - 1 ? "1px solid #f3f4f6" : "none" }}>
+                <tr key={session.id} style={{ borderBottom: i < sessions.length - 1 ? "1px solid var(--hh-ui-50)" : "none" }}>
                   <td style={{ padding: "12px 16px" }}>
                     <input
                       value={ed.title ?? session.title ?? ""}
@@ -491,7 +491,7 @@ function WebinarListCard({ data }: { data: any[] }) {
                         width: "100%", padding: "6px 10px", fontSize: 16,
                         border: ed.title !== undefined ? "1.5px solid var(--hh-primary)" : "1px solid transparent",
                         borderRadius: 8, outline: "none", backgroundColor: ed.title !== undefined ? "var(--hh-primary-50)" : "transparent",
-                        color: "#111827", fontFamily: "inherit"
+                        color: "var(--hh-text)", fontFamily: "inherit"
                       }}
                     />
                   </td>
@@ -504,15 +504,15 @@ function WebinarListCard({ data }: { data: any[] }) {
                         padding: "6px 10px", fontSize: 15,
                         border: ed.scheduled_date !== undefined ? "1.5px solid var(--hh-primary)" : "1px solid transparent",
                         borderRadius: 8, outline: "none", backgroundColor: ed.scheduled_date !== undefined ? "var(--hh-primary-50)" : "transparent",
-                        color: "#111827", fontFamily: "inherit"
+                        color: "var(--hh-text)", fontFamily: "inherit"
                       }}
                     />
                   </td>
                   <td style={{ padding: "12px 16px" }}>
                     <span style={{
                       padding: "4px 10px", borderRadius: 20, fontSize: 13, fontWeight: 600,
-                      backgroundColor: session.status === "live" ? "#dcfce7" : session.status === "scheduled" ? "#eff6ff" : "#f3f4f6",
-                      color: session.status === "live" ? "#16a34a" : session.status === "scheduled" ? "#2563eb" : "#6b7280"
+                      backgroundColor: session.status === "live" ? "var(--hh-success-100)" : session.status === "scheduled" ? "var(--hh-primary-100)" : "var(--hh-ui-50)",
+                      color: session.status === "live" ? "var(--hh-success-700)" : session.status === "scheduled" ? "var(--hh-primary)" : "var(--hh-muted)"
                     }}>
                       {session.status === "live" ? "Live" : session.status === "scheduled" ? "Gepland" : session.status || "—"}
                     </span>
@@ -524,7 +524,7 @@ function WebinarListCard({ data }: { data: any[] }) {
                         disabled={isSaving}
                         style={{
                           padding: "6px 14px", borderRadius: 8, border: "none",
-                          backgroundColor: isSaved ? "var(--hh-success)" : "var(--hh-primary)", color: "white",
+                          backgroundColor: isSaved ? "var(--hh-success)" : "var(--hh-primary)", color: "var(--hh-bg)",
                           fontSize: 14, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6
                         }}
                       >
@@ -579,16 +579,16 @@ function VideoOrderCard({ data }: { data: any[] }) {
   if (!videos.length) return null;
 
   return (
-    <div style={{ backgroundColor: "white", borderRadius: 16, border: "1px solid #e5e7eb", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontWeight: 700, fontSize: 17, color: "#111827" }}>🎬 Video-volgorde ({videos.length})</span>
+    <div style={{ backgroundColor: "var(--hh-bg)", borderRadius: 16, border: "1px solid var(--hh-border)", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--hh-ui-50)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontWeight: 700, fontSize: 17, color: "var(--hh-text)" }}>🎬 Video-volgorde ({videos.length})</span>
         {isDirty && (
           <button
             onClick={handleSave}
             disabled={saving}
             style={{
               padding: "8px 18px", borderRadius: 10, border: "none",
-              backgroundColor: saved ? "var(--hh-success)" : "var(--hh-primary)", color: "white",
+              backgroundColor: saved ? "var(--hh-success)" : "var(--hh-primary)", color: "var(--hh-bg)",
               fontSize: 15, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6
             }}
           >
@@ -602,21 +602,21 @@ function VideoOrderCard({ data }: { data: any[] }) {
           <div key={video.id} style={{
             display: "flex", alignItems: "center", gap: 12,
             padding: "10px 20px",
-            borderBottom: i < videos.length - 1 ? "1px solid #f3f4f6" : "none",
-            backgroundColor: "white"
+            borderBottom: i < videos.length - 1 ? "1px solid var(--hh-ui-50)" : "none",
+            backgroundColor: "var(--hh-bg)"
           }}>
             <span style={{ width: 28, textAlign: "center", fontSize: 16, fontWeight: 700, color: "var(--hh-primary)" }}>{i + 1}</span>
             {video.thumbnail_url && (
               <img src={video.thumbnail_url} alt="" style={{ width: 48, height: 32, objectFit: "cover", borderRadius: 6 }} />
             )}
-            <span style={{ flex: 1, fontSize: 16, color: "#374151", fontWeight: 500 }}>{video.title || video.display_title || "Ongetiteld"}</span>
+            <span style={{ flex: 1, fontSize: 16, color: "var(--hh-text)", fontWeight: 500 }}>{video.title || video.display_title || "Ongetiteld"}</span>
             <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <button onClick={() => move(i, -1)} disabled={i === 0}
-                style={{ padding: "3px 8px", border: "1px solid #e5e7eb", borderRadius: 6, backgroundColor: i === 0 ? "#f9fafb" : "white", cursor: i === 0 ? "not-allowed" : "pointer", color: i === 0 ? "#d1d5db" : "#6b7280" }}>
+                style={{ padding: "3px 8px", border: "1px solid var(--hh-border)", borderRadius: 6, backgroundColor: i === 0 ? "var(--hh-ui-50)" : "var(--hh-bg)", cursor: i === 0 ? "not-allowed" : "pointer", color: i === 0 ? "var(--hh-border)" : "var(--hh-muted)" }}>
                 <ChevronUp size={14} />
               </button>
               <button onClick={() => move(i, 1)} disabled={i === videos.length - 1}
-                style={{ padding: "3px 8px", border: "1px solid #e5e7eb", borderRadius: 6, backgroundColor: i === videos.length - 1 ? "#f9fafb" : "white", cursor: i === videos.length - 1 ? "not-allowed" : "pointer", color: i === videos.length - 1 ? "#d1d5db" : "#6b7280" }}>
+                style={{ padding: "3px 8px", border: "1px solid var(--hh-border)", borderRadius: 6, backgroundColor: i === videos.length - 1 ? "var(--hh-ui-50)" : "var(--hh-bg)", cursor: i === videos.length - 1 ? "not-allowed" : "pointer", color: i === videos.length - 1 ? "var(--hh-border)" : "var(--hh-muted)" }}>
                 <ChevronDown size={14} />
               </button>
             </div>
@@ -634,14 +634,14 @@ function AnalyticsCard({ data, tool }: { data: any; tool: string }) {
   const isPipeline = tool === "get_webinar_pipeline_status";
   if (isPipeline) {
     return (
-      <div style={{ backgroundColor: "white", borderRadius: 16, border: "1px solid #e5e7eb", padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-        <div style={{ fontWeight: 700, fontSize: 17, color: "#111827", marginBottom: 12 }}>📅 Webinar pipeline</div>
+      <div style={{ backgroundColor: "var(--hh-bg)", borderRadius: 16, border: "1px solid var(--hh-border)", padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+        <div style={{ fontWeight: 700, fontSize: 17, color: "var(--hh-text)", marginBottom: 12 }}>📅 Webinar pipeline</div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 40, fontWeight: 800, color: data.warning ? "#d97706" : "#16a34a" }}>{data.upcoming_count}</span>
+          <span style={{ fontSize: 40, fontWeight: 800, color: data.warning ? "var(--hh-warning-700)" : "var(--hh-success-700)" }}>{data.upcoming_count}</span>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: "#374151" }}>webinar(s) gepland</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--hh-text)" }}>webinar(s) gepland</div>
             {data.warning && (
-              <div style={{ fontSize: 15, color: "#d97706", fontWeight: 500, marginTop: 4 }}>⚠️ Plan meer webinars in!</div>
+              <div style={{ fontSize: 15, color: "var(--hh-warning-700)", fontWeight: 500, marginTop: 4 }}>⚠️ Plan meer webinars in!</div>
             )}
           </div>
         </div>
@@ -651,12 +651,12 @@ function AnalyticsCard({ data, tool }: { data: any; tool: string }) {
 
   if (Array.isArray(data) && data.length > 0 && data[0]?.technique) {
     return (
-      <div style={{ backgroundColor: "white", borderRadius: 16, border: "1px solid #e5e7eb", padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-        <div style={{ fontWeight: 700, fontSize: 17, color: "#111827", marginBottom: 12 }}>📊 Lage techniek-scores</div>
+      <div style={{ backgroundColor: "var(--hh-bg)", borderRadius: 16, border: "1px solid var(--hh-border)", padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+        <div style={{ fontWeight: 700, fontSize: 17, color: "var(--hh-text)", marginBottom: 12 }}>📊 Lage techniek-scores</div>
         {data.map((row: any, i: number) => (
-          <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: i < data.length - 1 ? "1px solid #f3f4f6" : "none" }}>
-            <span style={{ fontSize: 16, color: "#374151" }}>{row.technique || "Onbekend"}</span>
-            <span style={{ fontSize: 16, fontWeight: 700, color: Number(row.avg_score) < 40 ? "#dc2626" : "#d97706" }}>
+          <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: i < data.length - 1 ? "1px solid var(--hh-ui-50)" : "none" }}>
+            <span style={{ fontSize: 16, color: "var(--hh-text)" }}>{row.technique || "Onbekend"}</span>
+            <span style={{ fontSize: 16, fontWeight: 700, color: Number(row.avg_score) < 40 ? "var(--hh-error)" : "var(--hh-warning-700)" }}>
               {Number(row.avg_score || 0).toFixed(0)}%
             </span>
           </div>
@@ -670,15 +670,15 @@ function AnalyticsCard({ data, tool }: { data: any; tool: string }) {
   if (!kpis.length) return null;
 
   return (
-    <div style={{ backgroundColor: "white", borderRadius: 16, border: "1px solid #e5e7eb", padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-      <div style={{ fontWeight: 700, fontSize: 17, color: "#111827", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+    <div style={{ backgroundColor: "var(--hh-bg)", borderRadius: 16, border: "1px solid var(--hh-border)", padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ fontWeight: 700, fontSize: 17, color: "var(--hh-text)", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
         <BarChart3 size={20} color="var(--hh-primary)" /> Platform Analytics
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
         {kpis.map(([key, value]) => (
-          <div key={key} style={{ backgroundColor: "#f9fafb", borderRadius: 12, padding: "14px 16px", border: "1px solid #f3f4f6" }}>
-            <div style={{ fontSize: 13, color: "#6b7280", fontWeight: 500, textTransform: "capitalize", marginBottom: 4 }}>{key.replace(/_/g, " ")}</div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#111827" }}>{String(value)}</div>
+          <div key={key} style={{ backgroundColor: "var(--hh-ui-50)", borderRadius: 12, padding: "14px 16px", border: "1px solid var(--hh-ui-50)" }}>
+            <div style={{ fontSize: 13, color: "var(--hh-muted)", fontWeight: 500, textTransform: "capitalize", marginBottom: 4 }}>{key.replace(/_/g, " ")}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "var(--hh-text)" }}>{String(value)}</div>
           </div>
         ))}
       </div>
@@ -708,12 +708,12 @@ function StartWebinarCard({ data, navigate }: { data: any; navigate?: (page: str
 
   return (
     <div style={{
-      backgroundColor: started ? "color-mix(in srgb, var(--hh-success) 5%, white)" : "color-mix(in srgb, var(--hh-primary) 5%, white)",
-      borderRadius: 16, border: `2px solid ${started ? "#86efac" : "#c4b5fd"}`,
+      backgroundColor: started ? "var(--hh-success-50)" : "var(--hh-primary-50)",
+      borderRadius: 16, border: `2px solid ${started ? "var(--hh-success-200)" : "var(--hh-primary-200)"}`,
       padding: "24px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16,
       boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
     }}>
-      <div style={{ fontSize: 18, fontWeight: 700, color: "#374151", textAlign: "center" }}>
+      <div style={{ fontSize: 18, fontWeight: 700, color: "var(--hh-text)", textAlign: "center" }}>
         {started ? "✅ Webinar is gestart!" : `Klaar om te starten: "${data.session_title}"`}
       </div>
       {!started && (
@@ -722,14 +722,14 @@ function StartWebinarCard({ data, navigate }: { data: any; navigate?: (page: str
           disabled={starting}
           style={{
             padding: "16px 32px", borderRadius: 14, border: "none",
-            background: "linear-gradient(135deg, #16a34a, #15803d)",
-            color: "white", fontSize: 20, fontWeight: 700,
+            background: "linear-gradient(135deg, var(--hh-success), var(--hh-success-700))",
+            color: "var(--hh-bg)", fontSize: 20, fontWeight: 700,
             cursor: starting ? "not-allowed" : "pointer",
             display: "flex", alignItems: "center", gap: 10,
-            boxShadow: "0 4px 14px rgba(22,163,74,0.3)"
+            boxShadow: "0 4px 14px rgba(var(--hh-primary-rgb), 0.3)"
           }}
         >
-          {starting ? <Loader2 size={22} style={{ animation: "spin 1s linear infinite" }} /> : <Play size={22} fill="white" />}
+          {starting ? <Loader2 size={22} style={{ animation: "spin 1s linear infinite" }} /> : <Play size={22} fill="var(--hh-bg)" />}
           {starting ? "Starten..." : "▶ Start Webinar"}
         </button>
       )}
@@ -741,32 +741,32 @@ function StartWebinarCard({ data, navigate }: { data: any; navigate?: (page: str
 function ConfigProposalCard({ data, navigate }: { data: any; navigate?: (page: string) => void }) {
   return (
     <div style={{
-      backgroundColor: "#fffbeb", borderRadius: 16, border: "2px solid #fcd34d",
+      backgroundColor: "var(--hh-warning-50)", borderRadius: 16, border: "2px solid var(--hh-warning-200)",
       padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
     }}>
-      <div style={{ fontWeight: 700, fontSize: 17, color: "#92400e", marginBottom: 12 }}>
+      <div style={{ fontWeight: 700, fontSize: 17, color: "var(--hh-warning-700)", marginBottom: 12 }}>
         💡 Wijzigingsvoorstel aangemaakt
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 15 }}>
-        <div><span style={{ fontWeight: 600, color: "#78350f" }}>Type:</span> <span style={{ color: "#374151" }}>{data.type}</span></div>
-        {data.field && <div><span style={{ fontWeight: 600, color: "#78350f" }}>Onderdeel:</span> <span style={{ color: "#374151" }}>{data.field}</span></div>}
+        <div><span style={{ fontWeight: 600, color: "var(--hh-warning-700)" }}>Type:</span> <span style={{ color: "var(--hh-text)" }}>{data.type}</span></div>
+        {data.field && <div><span style={{ fontWeight: 600, color: "var(--hh-warning-700)" }}>Onderdeel:</span> <span style={{ color: "var(--hh-text)" }}>{data.field}</span></div>}
         {data.current_value && (
-          <div style={{ backgroundColor: "#fef3c7", padding: "8px 12px", borderRadius: 8 }}>
-            <span style={{ fontWeight: 600, color: "#78350f" }}>Huidig:</span> <span style={{ color: "#374151" }}>{data.current_value}</span>
+          <div style={{ backgroundColor: "var(--hh-warning-100)", padding: "8px 12px", borderRadius: 8 }}>
+            <span style={{ fontWeight: 600, color: "var(--hh-warning-700)" }}>Huidig:</span> <span style={{ color: "var(--hh-text)" }}>{data.current_value}</span>
           </div>
         )}
-        <div style={{ backgroundColor: "#d1fae5", padding: "8px 12px", borderRadius: 8 }}>
-          <span style={{ fontWeight: 600, color: "#065f46" }}>Nieuw:</span> <span style={{ color: "#374151" }}>{data.proposed_value}</span>
+        <div style={{ backgroundColor: "var(--hh-success-100)", padding: "8px 12px", borderRadius: 8 }}>
+          <span style={{ fontWeight: 600, color: "var(--hh-success-700)" }}>Nieuw:</span> <span style={{ color: "var(--hh-text)" }}>{data.proposed_value}</span>
         </div>
-        {data.reason && <div style={{ color: "#6b7280", fontStyle: "italic" }}>{data.reason}</div>}
+        {data.reason && <div style={{ color: "var(--hh-muted)", fontStyle: "italic" }}>{data.reason}</div>}
       </div>
-      <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 8, color: "#d97706", fontSize: 14 }}>
+      <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 8, color: "var(--hh-warning-700)", fontSize: 14 }}>
         <Clock size={16} />
         Verzonden naar Stéphane ter goedkeuring
         {navigate && (
           <button
             onClick={() => navigate("admin-config-review")}
-            style={{ marginLeft: "auto", padding: "6px 12px", borderRadius: 8, border: "1px solid #fcd34d", backgroundColor: "white", cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", gap: 4, color: "#374151" }}
+            style={{ marginLeft: "auto", padding: "6px 12px", borderRadius: 8, border: "1px solid var(--hh-warning-200)", backgroundColor: "var(--hh-bg)", cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", gap: 4, color: "var(--hh-text)" }}
           >
             <ExternalLink size={13} /> Config Review
           </button>
@@ -779,40 +779,40 @@ function ConfigProposalCard({ data, navigate }: { data: any; navigate?: (page: s
 // ── Analysis List Card ─────────────────────────────────────────────────────────
 function AnalysisListCard({ data, navigate }: { data: any[]; navigate?: (page: string, d?: any) => void }) {
   if (!Array.isArray(data) || !data.length) return (
-    <div style={{ padding: 16, backgroundColor: "white", borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 16, color: "#6b7280" }}>
+    <div style={{ padding: 16, backgroundColor: "var(--hh-bg)", borderRadius: 12, border: "1px solid var(--hh-border)", fontSize: 16, color: "var(--hh-muted)" }}>
       Geen analyses gevonden.
     </div>
   );
 
   return (
-    <div style={{ backgroundColor: "white", borderRadius: 16, border: "1px solid #e5e7eb", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", fontWeight: 700, fontSize: 17, color: "#111827" }}>
+    <div style={{ backgroundColor: "var(--hh-bg)", borderRadius: 16, border: "1px solid var(--hh-border)", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--hh-ui-50)", fontWeight: 700, fontSize: 17, color: "var(--hh-text)" }}>
         🎙️ Gespreksanalyses ({data.length})
       </div>
       {data.map((analysis, i) => (
         <div key={analysis.id} style={{
           display: "flex", alignItems: "center", gap: 14, padding: "12px 20px",
-          borderBottom: i < data.length - 1 ? "1px solid #f3f4f6" : "none",
+          borderBottom: i < data.length - 1 ? "1px solid var(--hh-ui-50)" : "none",
           cursor: navigate ? "pointer" : "default"
         }}
           onClick={() => navigate && navigate("admin-analysis-results", { conversationId: analysis.id, fromAdmin: true })}
         >
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 16, fontWeight: 600, color: "#374151" }}>{analysis.title || "Naamloze analyse"}</div>
-            <div style={{ fontSize: 13, color: "#9ca3af", marginTop: 2 }}>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--hh-text)" }}>{analysis.title || "Naamloze analyse"}</div>
+            <div style={{ fontSize: 13, color: "var(--hh-muted)", marginTop: 2 }}>
               {analysis.created_at ? new Date(analysis.created_at).toLocaleDateString("nl-BE") : "—"}
             </div>
           </div>
           {analysis.score && (
             <span style={{
               padding: "4px 10px", borderRadius: 20, fontSize: 14, fontWeight: 700,
-              backgroundColor: Number(analysis.score) >= 70 ? "#dcfce7" : Number(analysis.score) >= 50 ? "#fef9c3" : "#fef2f2",
-              color: Number(analysis.score) >= 70 ? "#16a34a" : Number(analysis.score) >= 50 ? "#ca8a04" : "#dc2626"
+              backgroundColor: Number(analysis.score) >= 70 ? "var(--hh-success-100)" : Number(analysis.score) >= 50 ? "var(--hh-warning-100)" : "var(--hh-error-100)",
+              color: Number(analysis.score) >= 70 ? "var(--hh-success-700)" : Number(analysis.score) >= 50 ? "var(--hh-warning-700)" : "var(--hh-error)"
             }}>
               {Number(analysis.score).toFixed(0)}%
             </span>
           )}
-          {navigate && <ExternalLink size={16} color="#9ca3af" />}
+          {navigate && <ExternalLink size={16} color="var(--hh-muted)" />}
         </div>
       ))}
     </div>
@@ -825,20 +825,20 @@ function TranscriptCard({ data }: { data: any }) {
   const result = typeof data.result === "string" ? JSON.parse(data.result) : data.result;
 
   return (
-    <div style={{ backgroundColor: "white", borderRadius: 16, border: "1px solid #e5e7eb", padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-      <div style={{ fontWeight: 700, fontSize: 17, color: "#111827", marginBottom: 12 }}>
+    <div style={{ backgroundColor: "var(--hh-bg)", borderRadius: 16, border: "1px solid var(--hh-border)", padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ fontWeight: 700, fontSize: 17, color: "var(--hh-text)", marginBottom: 12 }}>
         📄 {data.title || "Analyse detail"}
       </div>
       {result?.overallScore && (
         <div style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 15, color: "#6b7280" }}>Score:</span>
-          <span style={{ fontSize: 20, fontWeight: 800, color: Number(result.overallScore) >= 70 ? "#16a34a" : "#d97706" }}>
+          <span style={{ fontSize: 15, color: "var(--hh-muted)" }}>Score:</span>
+          <span style={{ fontSize: 20, fontWeight: 800, color: Number(result.overallScore) >= 70 ? "var(--hh-success-700)" : "var(--hh-warning-700)" }}>
             {result.overallScore}%
           </span>
         </div>
       )}
       {result?.summary && (
-        <div style={{ fontSize: 15, color: "#374151", lineHeight: 1.6, backgroundColor: "#f9fafb", padding: 14, borderRadius: 10 }}>
+        <div style={{ fontSize: 15, color: "var(--hh-text)", lineHeight: 1.6, backgroundColor: "var(--hh-ui-50)", padding: 14, borderRadius: 10 }}>
           {result.summary}
         </div>
       )}
@@ -856,23 +856,23 @@ function RagResultsCard({ data, tool }: { data: any; tool: string }) {
   const isTechnique = tool === "get_technique_details";
 
   return (
-    <div style={{ backgroundColor: "white", borderRadius: 16, border: "1px solid #e5e7eb", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", fontWeight: 700, fontSize: 17, color: "#111827" }}>
+    <div style={{ backgroundColor: "var(--hh-bg)", borderRadius: 16, border: "1px solid var(--hh-border)", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--hh-ui-50)", fontWeight: 700, fontSize: 17, color: "var(--hh-text)" }}>
         {isTechnique ? "🎯 EPIC Techniek" : "📚 Kennisbank resultaten"}
       </div>
       <div style={{ maxHeight: 320, overflowY: "auto" }}>
         {items.map((item: any, i: number) => (
-          <div key={i} style={{ padding: "14px 20px", borderBottom: i < items.length - 1 ? "1px solid #f3f4f6" : "none" }}>
-            <div style={{ fontSize: 16, fontWeight: 600, color: "#374151", marginBottom: 4 }}>
+          <div key={i} style={{ padding: "14px 20px", borderBottom: i < items.length - 1 ? "1px solid var(--hh-ui-50)" : "none" }}>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--hh-text)", marginBottom: 4 }}>
               {item.naam || item.title || item.document_title || `Resultaat ${i + 1}`}
             </div>
             {(item.beschrijving || item.description || item.content) && (
-              <div style={{ fontSize: 15, color: "#6b7280", lineHeight: 1.5 }}>
+              <div style={{ fontSize: 15, color: "var(--hh-muted)", lineHeight: 1.5 }}>
                 {(item.beschrijving || item.description || item.content || "").slice(0, 200)}...
               </div>
             )}
             {item.similarity && (
-              <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 4 }}>
+              <div style={{ fontSize: 12, color: "var(--hh-muted)", marginTop: 4 }}>
                 Relevantie: {(item.similarity * 100).toFixed(0)}%
               </div>
             )}
@@ -886,20 +886,20 @@ function RagResultsCard({ data, tool }: { data: any; tool: string }) {
 // ── User List Card ─────────────────────────────────────────────────────────────
 function UserListCard({ data }: { data: any[] }) {
   if (!Array.isArray(data) || !data.length) return (
-    <div style={{ padding: 16, backgroundColor: "white", borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 16, color: "#6b7280" }}>
+    <div style={{ padding: 16, backgroundColor: "var(--hh-bg)", borderRadius: 12, border: "1px solid var(--hh-border)", fontSize: 16, color: "var(--hh-muted)" }}>
       Geen gebruikers gevonden.
     </div>
   );
 
   return (
-    <div style={{ backgroundColor: "white", borderRadius: 16, border: "1px solid #e5e7eb", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", fontWeight: 700, fontSize: 17, color: "#111827" }}>
+    <div style={{ backgroundColor: "var(--hh-bg)", borderRadius: 16, border: "1px solid var(--hh-border)", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--hh-ui-50)", fontWeight: 700, fontSize: 17, color: "var(--hh-text)" }}>
         👥 Gebruikers ({data.length})
       </div>
       {data.map((user, i) => (
         <div key={user.id || i} style={{
           display: "flex", alignItems: "center", gap: 14, padding: "12px 20px",
-          borderBottom: i < data.length - 1 ? "1px solid #f3f4f6" : "none"
+          borderBottom: i < data.length - 1 ? "1px solid var(--hh-ui-50)" : "none"
         }}>
           <div style={{
             width: 36, height: 36, borderRadius: "50%",
@@ -909,8 +909,8 @@ function UserListCard({ data }: { data: any[] }) {
             {(user.full_name || user.email || "?")[0].toUpperCase()}
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 16, fontWeight: 600, color: "#374151" }}>{user.full_name || user.email || "Onbekend"}</div>
-            <div style={{ fontSize: 13, color: "#9ca3af" }}>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--hh-text)" }}>{user.full_name || user.email || "Onbekend"}</div>
+            <div style={{ fontSize: 13, color: "var(--hh-muted)" }}>
               Laatste activiteit: {user.last_seen_at || user.updated_at
                 ? new Date(user.last_seen_at || user.updated_at).toLocaleDateString("nl-BE")
                 : "onbekend"}

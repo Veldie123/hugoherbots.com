@@ -664,8 +664,8 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
               </div>
             </div>
             <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
-              <div className="w-6 h-6 rounded-full bg-[#3d9a6e]/10 flex items-center justify-center">
-                <Eye className="w-3 h-3" style={{ color: '#3d9a6e' }} />
+              <div className="w-6 h-6 rounded-full bg-hh-success/10 flex items-center justify-center">
+                <Eye className="w-3 h-3" style={{ color: 'var(--hh-success)' }} />
               </div>
               <div>
                 <p className="text-[10px] text-hh-muted leading-none">Views</p>
@@ -682,8 +682,8 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
               </div>
             </div>
             <div className="flex items-center gap-2 px-3 py-2 bg-card rounded-lg border border-hh-border shadow-sm">
-              <div className="w-6 h-6 rounded-full bg-[#3d9a6e]/10 flex items-center justify-center">
-                <TrendingUp className="w-3 h-3" style={{ color: '#3d9a6e' }} />
+              <div className="w-6 h-6 rounded-full bg-hh-success/10 flex items-center justify-center">
+                <TrendingUp className="w-3 h-3" style={{ color: 'var(--hh-success)' }} />
               </div>
               <div>
                 <p className="text-[10px] text-hh-muted leading-none">Compl.</p>
@@ -812,7 +812,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                   className={`video-scroll-card group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={() => !locked && handlePlayVideo(video)}
                 >
-                  <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
+                  <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-ink to-hh-primary/80 aspect-video mb-2">
                     <img
                       src={video.thumbnail}
                       alt={video.displayTitle || "Video"}
@@ -825,25 +825,25 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       </div>
                     ) : (
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                          <Play className="w-6 h-6 ml-0.5" style={{ color: '#1e293b' }} />
+                        <div className="w-12 h-12 rounded-full bg-hh-bg/90 flex items-center justify-center">
+                          <Play className="w-6 h-6 ml-0.5" style={{ color: 'var(--hh-ink)' }} />
                         </div>
                       </div>
                     )}
                     {completed && (
-                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[#3d9a6e] flex items-center justify-center">
+                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-hh-success flex items-center justify-center">
                         <CheckCircle2 className="w-4 h-4 text-white" />
                       </div>
                     )}
                     {recentlyAdded && !completed && (
-                      <Badge className="absolute bottom-2 left-2 text-white border-0 text-[9px] px-1.5 py-0.5 font-medium" style={{ backgroundColor: '#3C9A6E' }}>
+                      <Badge className="absolute bottom-2 left-2 text-white border-0 text-[9px] px-1.5 py-0.5 font-medium" style={{ backgroundColor: 'var(--hh-success)' }}>
                         Nieuw
                       </Badge>
                     )}
                     {/* Green progress bar at bottom */}
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
                       <div
-                        className="h-full bg-[#3d9a6e] transition-all duration-300"
+                        className="h-full bg-hh-success transition-all duration-300"
                         style={{ width: completed ? '100%' : `${getVideoProgressPct(video.id)}%` }}
                       />
                     </div>
@@ -859,14 +859,14 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                             if (e.key === 'Enter') handleSaveTitle(video.id);
                             if (e.key === 'Escape') handleCancelEditTitle();
                           }}
-                          className="w-full text-[13px] font-medium text-hh-text bg-hh-bg border border-hh-border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#1e3a5f]"
+                          className="w-full text-[13px] font-medium text-hh-text bg-hh-bg border border-hh-border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-hh-primary"
                           autoFocus
                           disabled={savingTitle}
                         />
-                        <button onClick={() => handleSaveTitle(video.id)} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-[#3d9a6e] hover:text-[#2d7a5e]" disabled={savingTitle}>
+                        <button onClick={() => handleSaveTitle(video.id)} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-success hover:text-hh-success/80" disabled={savingTitle}>
                           <Check className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={handleCancelEditTitle} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-red-500">
+                        <button onClick={handleCancelEditTitle} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-hh-error">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -927,7 +927,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                   className={`group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={() => !locked && handlePlayVideo(video)}
                 >
-                  <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
+                  <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-ink to-hh-primary/80 aspect-video mb-2">
                     <img
                       src={video.thumbnail}
                       alt={video.displayTitle || "Video"}
@@ -940,24 +940,24 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       </div>
                     ) : (
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                          <Play className="w-6 h-6 ml-0.5" style={{ color: '#1e293b' }} />
+                        <div className="w-12 h-12 rounded-full bg-hh-bg/90 flex items-center justify-center">
+                          <Play className="w-6 h-6 ml-0.5" style={{ color: 'var(--hh-ink)' }} />
                         </div>
                       </div>
                     )}
                     {completed && (
-                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[#3d9a6e] flex items-center justify-center">
+                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-hh-success flex items-center justify-center">
                         <CheckCircle2 className="w-4 h-4 text-white" />
                       </div>
                     )}
                     {recentlyAdded && !completed && (
-                      <Badge className="absolute bottom-2 left-2 text-white border-0 text-[9px] px-1.5 py-0.5 font-medium" style={{ backgroundColor: '#3C9A6E' }}>
+                      <Badge className="absolute bottom-2 left-2 text-white border-0 text-[9px] px-1.5 py-0.5 font-medium" style={{ backgroundColor: 'var(--hh-success)' }}>
                         Nieuw
                       </Badge>
                     )}
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
                       <div
-                        className="h-full bg-[#3d9a6e] transition-all duration-300"
+                        className="h-full bg-hh-success transition-all duration-300"
                         style={{ width: completed ? '100%' : `${getVideoProgressPct(video.id)}%` }}
                       />
                     </div>
@@ -973,14 +973,14 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                             if (e.key === 'Enter') handleSaveTitle(video.id);
                             if (e.key === 'Escape') handleCancelEditTitle();
                           }}
-                          className="w-full text-[13px] font-medium text-hh-text bg-hh-bg border border-hh-border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#1e3a5f]"
+                          className="w-full text-[13px] font-medium text-hh-text bg-hh-bg border border-hh-border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-hh-primary"
                           autoFocus
                           disabled={savingTitle}
                         />
-                        <button onClick={() => handleSaveTitle(video.id)} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-[#3d9a6e] hover:text-[#2d7a5e]" disabled={savingTitle}>
+                        <button onClick={() => handleSaveTitle(video.id)} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-success hover:text-hh-success/80" disabled={savingTitle}>
                           <Check className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={handleCancelEditTitle} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-red-500">
+                        <button onClick={handleCancelEditTitle} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-hh-error">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -991,7 +991,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                         </h3>
                         {isAdmin && (
                           <button
-                            className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-[#1e3a5f] opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-hh-primary opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => handleStartEditTitle(video.id, video.displayTitle || video.title, e)}
                             title="Titel bewerken"
                           >
@@ -1038,7 +1038,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                         const lowerFase = fase.toLowerCase();
                         if (lowerFase.includes('pre') || lowerFase.includes('voorbereiding')) return { label: fase, color: 'bg-hh-ui-100 text-hh-muted' };
                         if (lowerFase.includes('opening')) return { label: fase, color: 'bg-sky-500/10 text-sky-600 dark:text-sky-400' };
-                        if (lowerFase.includes('ontdekking')) return { label: fase, color: 'bg-blue-500/10 text-blue-700 dark:text-blue-400' };
+                        if (lowerFase.includes('ontdekking')) return { label: fase, color: 'bg-hh-primary/10 text-hh-primary' };
                         if (lowerFase.includes('aanbeveling')) return { label: fase, color: 'bg-hh-ui-100 text-hh-ink' };
                         if (lowerFase.includes('beslissing')) return { label: fase, color: 'bg-hh-ui-200 text-hh-ink' };
                         return { label: fase, color: 'bg-hh-ui-100 text-hh-muted' };
@@ -1054,13 +1054,13 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2">
                               <span className="text-[12px] font-medium text-hh-text truncate">{video.displayTitle || video.title}</span>
-                              {completed && <CheckCircle2 className="w-4 h-4 text-[#3d9a6e] flex-shrink-0" />}
+                              {completed && <CheckCircle2 className="w-4 h-4 text-hh-success flex-shrink-0" />}
                             </div>
                           </td>
                           <td className="py-3 px-4"><Badge className={`${faseBadge.color} border-0 text-[11px] font-medium px-2 py-0.5 rounded-full`}>{faseBadge.label}</Badge></td>
                           <td className="py-3 px-4 text-right"><span className="text-[12px] text-hh-muted flex items-center justify-end gap-1"><Clock className="w-3 h-3" />{video.duration}</span></td>
                           <td className="py-3 px-4 text-center">
-                            <Button size="sm" variant="ghost" className="rounded-full w-8 h-8 p-0" style={{ color: '#1e3a5f' }}>
+                            <Button size="sm" variant="ghost" className="rounded-full w-8 h-8 p-0" style={{ color: 'var(--hh-primary)' }}>
                               <Play className="w-4 h-4" />
                             </Button>
                           </td>
@@ -1149,11 +1149,11 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                     className="absolute inset-0 w-full h-full object-cover object-top"
                   />
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-hh-bg/90 flex items-center justify-center">
                       <Play className="w-5 h-5 text-hh-ink ml-0.5" />
                     </div>
                   </div>
-                  <Badge className="absolute top-2 right-2 border-0 text-[10px] text-white" style={{ backgroundColor: '#3d9a6e' }}>
+                  <Badge className="absolute top-2 right-2 border-0 text-[10px] text-white" style={{ backgroundColor: 'var(--hh-success)' }}>
                     <CheckCircle2 className="w-3 h-3 mr-0.5" />
                   </Badge>
                 </div>
@@ -1199,7 +1199,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                   className={`video-scroll-card group cursor-pointer ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={() => !locked && handlePlayVideo(video)}
                 >
-                  <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#1e293b] to-hh-primary/80 aspect-video mb-2">
+                  <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-hh-ink to-hh-primary/80 aspect-video mb-2">
                     <img
                       src={video.thumbnail}
                       alt={video.displayTitle || "Video"}
@@ -1212,18 +1212,18 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       </div>
                     ) : (
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                          <Play className="w-6 h-6 ml-0.5" style={{ color: '#1e293b' }} />
+                        <div className="w-12 h-12 rounded-full bg-hh-bg/90 flex items-center justify-center">
+                          <Play className="w-6 h-6 ml-0.5" style={{ color: 'var(--hh-ink)' }} />
                         </div>
                       </div>
                     )}
                     {completed && (
-                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[#3d9a6e] flex items-center justify-center">
+                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-hh-success flex items-center justify-center">
                         <CheckCircle2 className="w-4 h-4 text-white" />
                       </div>
                     )}
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
-                      <div className="h-full bg-[#3d9a6e] transition-all duration-300" style={{ width: completed ? '100%' : `${getVideoProgressPct(video.id)}%` }} />
+                      <div className="h-full bg-hh-success transition-all duration-300" style={{ width: completed ? '100%' : `${getVideoProgressPct(video.id)}%` }} />
                     </div>
                   </div>
                   <h3 className="text-[12px] font-medium text-hh-text leading-tight line-clamp-2 group-hover:text-hh-primary transition-colors">
@@ -1285,7 +1285,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                   {detailsVideo?.techniqueNumber && (
                     <Badge 
                       className="text-[12px] px-2 py-0.5 border-0"
-                      style={{ backgroundColor: '#3d9a6e', color: 'white' }}
+                      style={{ backgroundColor: 'var(--hh-success)', color: 'white' }}
                     >
                       {detailsVideo.techniqueNumber}
                     </Badge>
@@ -1294,7 +1294,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                     <Badge 
                       variant="outline" 
                       className="text-[12px] px-2 py-0.5"
-                      style={{ borderColor: 'rgba(61, 154, 110, 0.3)', color: '#3d9a6e' }}
+                      style={{ borderColor: 'color-mix(in srgb, var(--hh-success) 30%, transparent)', color: 'var(--hh-success)' }}
                     >
                       Fase {technique.fase}
                     </Badge>
@@ -1304,7 +1304,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                       key={idx} 
                       variant="outline" 
                       className="text-[10px] px-2 py-0.5"
-                      style={{ borderColor: 'rgba(61, 154, 110, 0.3)', color: '#3d9a6e' }}
+                      style={{ borderColor: 'color-mix(in srgb, var(--hh-success) 30%, transparent)', color: 'var(--hh-success)' }}
                     >
                       {tag}
                     </Badge>
@@ -1330,9 +1330,9 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                   setDetailsVideo(null);
                 }}
                 className="gap-2"
-                style={{ backgroundColor: '#1e3a5f', color: 'white', borderColor: '#1e3a5f' }}
-                onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#2d4a6f'}
-                onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = '#1e3a5f'}
+                style={{ backgroundColor: 'var(--hh-primary)', color: 'white', borderColor: 'var(--hh-primary)' }}
+                onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = 'var(--hh-primary-hover)'}
+                onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = 'var(--hh-primary)'}
               >
                 <Play className="w-4 h-4" />
                 Bekijken
@@ -1360,9 +1360,9 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
             return (
               <div className="space-y-6">
                 {detailsVideo.aiSummary && (
-                  <div className="rounded-lg border border-hh-border p-4" style={{ backgroundColor: 'rgba(61, 154, 110, 0.04)' }}>
+                  <div className="rounded-lg border border-hh-border p-4" style={{ backgroundColor: 'color-mix(in srgb, var(--hh-success) 4%, transparent)' }}>
                     <h4 className="text-[15px] font-semibold text-hh-text mb-2 flex items-center gap-2">
-                      <FileText className="w-4 h-4" style={{ color: '#3d9a6e' }} />
+                      <FileText className="w-4 h-4" style={{ color: 'var(--hh-success)' }} />
                       Samenvatting
                     </h4>
                     <p className="text-[14px] text-hh-text leading-relaxed">{detailsVideo.aiSummary}</p>

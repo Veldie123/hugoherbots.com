@@ -379,8 +379,8 @@ export function VideoWatchPage({
                   {currentIndex + 1} / {sortedVideos.length} video's
                 </p>
                 {timeline.length > 0 && activeTimelineTechnique && (
-                  <span className="flex items-center gap-1 text-[9px] text-[#2563eb] font-semibold">
-                    <span className="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse" />
+                  <span className="flex items-center gap-1 text-[9px] text-hh-primary font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-hh-primary animate-pulse" />
                     Actief
                   </span>
                 )}
@@ -428,15 +428,15 @@ export function VideoWatchPage({
                       style={{
                         marginLeft: isActive ? undefined : `${8 + indent * 8}px`,
                         ...(isLiveActive ? {
-                          backgroundColor: "rgba(37,99,235,0.08)",
-                          borderLeft: "3px solid #2563eb",
-                          boxShadow: "0 0 8px rgba(37,99,235,0.15)",
+                          backgroundColor: "color-mix(in srgb, var(--hh-primary) 8%, transparent)",
+                          borderLeft: "3px solid var(--hh-primary)",
+                          boxShadow: "0 0 8px color-mix(in srgb, var(--hh-primary) 15%, transparent)",
                         } : isPrimary ? {
-                          backgroundColor: "rgba(30,58,95,0.06)",
-                          borderLeft: "3px solid #1e3a5f",
+                          backgroundColor: "color-mix(in srgb, var(--hh-primary) 6%, transparent)",
+                          borderLeft: "3px solid var(--hh-primary)",
                         } : isHighlighted ? {
-                          backgroundColor: "rgba(30,58,95,0.08)",
-                          borderLeft: "3px solid rgba(30,58,95,0.6)",
+                          backgroundColor: "color-mix(in srgb, var(--hh-primary) 8%, transparent)",
+                          borderLeft: "3px solid color-mix(in srgb, var(--hh-primary) 60%, transparent)",
                         } : {}),
                       }}
                       onClick={() => {
@@ -445,25 +445,25 @@ export function VideoWatchPage({
                     >
                       <div className="flex-shrink-0 w-4">
                         {isLiveActive ? (
-                          <div className="w-3.5 h-3.5 rounded-full animate-pulse" style={{ backgroundColor: "#2563eb" }} />
+                          <div className="w-3.5 h-3.5 rounded-full bg-hh-primary animate-pulse" />
                         ) : isPrimary ? (
-                          <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: "#1e3a5f" }} />
+                          <div className="w-3.5 h-3.5 rounded-full bg-hh-primary" />
                         ) : isHighlighted ? (
-                          <Tag className="w-3 h-3" style={{ color: "#1e3a5f", opacity: 0.85 }} />
+                          <Tag className="w-3 h-3 text-hh-primary opacity-85" />
                         ) : isCompleted ? (
-                          <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "#3d9a6e" }} />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-hh-success" />
                         ) : null}
                       </div>
-                      <span className={`text-[10px] font-mono flex-shrink-0 ${isLiveActive ? "text-[#2563eb] font-bold" : isActive ? "text-[#1e3a5f] font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>
+                      <span className={`text-[10px] font-mono flex-shrink-0 ${isLiveActive ? "text-hh-primary font-bold" : isActive ? "text-hh-primary font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>
                         {tech.nummer}
                       </span>
                       <div className="min-w-0 flex-1">
                         <p
                           className={`text-[11px] leading-tight truncate ${
                             isLiveActive
-                              ? "font-bold text-[#2563eb]"
+                              ? "font-bold text-hh-primary"
                               : isActive
-                              ? "font-semibold text-[#1e3a5f]"
+                              ? "font-semibold text-hh-primary"
                               : hasVideo
                               ? "text-hh-text"
                               : "text-hh-muted"
@@ -473,7 +473,7 @@ export function VideoWatchPage({
                           {tech.naam}
                         </p>
                         {isLiveActive && (
-                          <p className="text-[9px] text-[#2563eb]/70 mt-0.5 truncate" title={timeline.find(s => s.techniek_id === tech.nummer && Math.floor(currentTime) >= s.start_seconds && Math.floor(currentTime) < s.end_seconds)?.label || 'Nu besproken'}>
+                          <p className="text-[9px] text-hh-primary/70 mt-0.5 truncate" title={timeline.find(s => s.techniek_id === tech.nummer && Math.floor(currentTime) >= s.start_seconds && Math.floor(currentTime) < s.end_seconds)?.label || 'Nu besproken'}>
                             {timeline.find(s => s.techniek_id === tech.nummer && Math.floor(currentTime) >= s.start_seconds && Math.floor(currentTime) < s.end_seconds)?.label || 'Nu besproken'}
                           </p>
                         )}
@@ -558,8 +558,8 @@ export function VideoWatchPage({
                                 style={{
                                   marginLeft: isGroupSelfActive ? undefined : "8px",
                                   ...(isGroupSelfActive ? {
-                                    backgroundColor: "rgba(30,58,95,0.06)",
-                                    borderLeft: "3px solid #1e3a5f",
+                                    backgroundColor: "color-mix(in srgb, var(--hh-primary) 6%, transparent)",
+                                    borderLeft: "3px solid var(--hh-primary)",
                                   } : {}),
                                 }}
                                 onClick={() => {
@@ -568,19 +568,19 @@ export function VideoWatchPage({
                               >
                                 <div className="flex-shrink-0 w-4">
                                   {isGroupSelfActive ? (
-                                    <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: "#1e3a5f" }} />
+                                    <div className="w-3.5 h-3.5 rounded-full bg-hh-primary" />
                                   ) : isGroupCompleted ? (
-                                    <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "#3d9a6e" }} />
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-hh-success" />
                                   ) : isGroupExpanded ? (
                                     <ChevronDown className="w-3 h-3 text-hh-muted" />
                                   ) : (
                                     <ChevronRight className="w-3 h-3 text-hh-muted" />
                                   )}
                                 </div>
-                                <span className={`text-[10px] font-mono flex-shrink-0 ${groupHasActive || isGroupSelfActive ? "text-[#1e3a5f] font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>
+                                <span className={`text-[10px] font-mono flex-shrink-0 ${groupHasActive || isGroupSelfActive ? "text-hh-primary font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>
                                   {group.nummer}
                                 </span>
-                                <p className={`text-[11px] leading-tight truncate flex-1 ${groupHasActive || isGroupSelfActive ? "font-semibold text-[#1e3a5f]" : "text-hh-text"}`} title={group.naam}>
+                                <p className={`text-[11px] leading-tight truncate flex-1 ${groupHasActive || isGroupSelfActive ? "font-semibold text-hh-primary" : "text-hh-text"}`} title={group.naam}>
                                   {group.naam}
                                 </p>
                                 <span className="text-[9px] text-hh-muted flex-shrink-0 mr-1">
@@ -616,25 +616,25 @@ export function VideoWatchPage({
                                             }`}
                                             style={{
                                               marginLeft: childIsActive ? undefined : "16px",
-                                              ...(childIsActive ? { backgroundColor: "rgba(30,58,95,0.06)", borderLeft: "3px solid #1e3a5f" } : {}),
+                                              ...(childIsActive ? { backgroundColor: "color-mix(in srgb, var(--hh-primary) 6%, transparent)", borderLeft: "3px solid var(--hh-primary)" } : {}),
                                             }}
                                             onClick={() => toggleSubgroup(child.nummer)}
                                           >
                                             <div className="flex-shrink-0 w-4">
                                               {childIsActive ? (
-                                                <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: "#1e3a5f" }} />
+                                                <div className="w-3.5 h-3.5 rounded-full bg-hh-primary" />
                                               ) : childCompleted ? (
-                                                <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "#3d9a6e" }} />
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-hh-success" />
                                               ) : isSubExpanded ? (
                                                 <ChevronDown className="w-3 h-3 text-hh-muted" />
                                               ) : (
                                                 <ChevronRight className="w-3 h-3 text-hh-muted" />
                                               )}
                                             </div>
-                                            <span className={`text-[10px] font-mono flex-shrink-0 ${subHasActive || childIsActive ? "text-[#1e3a5f] font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>
+                                            <span className={`text-[10px] font-mono flex-shrink-0 ${subHasActive || childIsActive ? "text-hh-primary font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>
                                               {child.nummer}
                                             </span>
-                                            <p className={`text-[11px] leading-tight truncate flex-1 ${subHasActive || childIsActive ? "font-semibold text-[#1e3a5f]" : "text-hh-text"}`} title={child.naam}>
+                                            <p className={`text-[11px] leading-tight truncate flex-1 ${subHasActive || childIsActive ? "font-semibold text-hh-primary" : "text-hh-text"}`} title={child.naam}>
                                               {child.naam}
                                             </p>
                                             <button
@@ -696,7 +696,7 @@ export function VideoWatchPage({
                   </Badge>
                 )}
                 {completedVideoIds.has(video.id) && (
-                  <span className="flex items-center gap-1 text-[11px]" style={{ color: "#3d9a6e" }}>
+                  <span className="flex items-center gap-1 text-[11px] text-hh-success">
                     <CheckCircle2 className="w-3 h-3" />
                     Bekeken
                   </span>
@@ -709,7 +709,7 @@ export function VideoWatchPage({
                   {videoTechniqueList.map((vt) => {
                     const t = getTechniekByNummer(vt.techniek_id);
                     if (!t) return null;
-                    const phaseColor = PHASE_COLORS[String(t.fase)] || "#475569";
+                    const phaseColor = PHASE_COLORS[String(t.fase)] || "var(--hh-muted)";
                     const isPrimary = vt.is_primary;
                     return (
                       <button
@@ -754,8 +754,8 @@ export function VideoWatchPage({
                       {currentIndex + 1} / {sortedVideos.length} video's
                     </p>
                     {timeline.length > 0 && activeTimelineTechnique && (
-                      <span className="flex items-center gap-1 text-[9px] text-[#2563eb] font-semibold">
-                        <span className="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse" />
+                      <span className="flex items-center gap-1 text-[9px] text-hh-primary font-semibold">
+                        <span className="w-2 h-2 rounded-full bg-hh-primary animate-pulse" />
                         Actief
                       </span>
                     )}
@@ -814,30 +814,30 @@ export function VideoWatchPage({
                                   style={{
                                     marginLeft: isActive ? undefined : "8px",
                                     ...(isLiveActive ? {
-                                      backgroundColor: "rgba(37,99,235,0.08)",
-                                      borderLeft: "3px solid #2563eb",
+                                      backgroundColor: "color-mix(in srgb, var(--hh-primary) 8%, transparent)",
+                                      borderLeft: "3px solid var(--hh-primary)",
                                     } : isPrimary ? {
-                                      backgroundColor: "rgba(30,58,95,0.06)",
-                                      borderLeft: "3px solid #1e3a5f",
+                                      backgroundColor: "color-mix(in srgb, var(--hh-primary) 6%, transparent)",
+                                      borderLeft: "3px solid var(--hh-primary)",
                                     } : isHighlighted ? {
-                                      backgroundColor: "rgba(30,58,95,0.03)",
-                                      borderLeft: "2px solid rgba(30,58,95,0.4)",
+                                      backgroundColor: "color-mix(in srgb, var(--hh-primary) 3%, transparent)",
+                                      borderLeft: "2px solid color-mix(in srgb, var(--hh-primary) 40%, transparent)",
                                     } : {}),
                                   }}
                                   onClick={() => setDetailTechnique(tech)}
                                 >
                                   <div className="flex-shrink-0 w-4">
                                     {isLiveActive ? (
-                                      <div className="w-3.5 h-3.5 rounded-full animate-pulse" style={{ backgroundColor: "#2563eb" }} />
+                                      <div className="w-3.5 h-3.5 rounded-full bg-hh-primary animate-pulse" />
                                     ) : isPrimary ? (
-                                      <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: "#1e3a5f" }} />
+                                      <div className="w-3.5 h-3.5 rounded-full bg-hh-primary" />
                                     ) : null}
                                   </div>
-                                  <span className={`text-[10px] font-mono flex-shrink-0 ${isLiveActive ? "text-[#2563eb] font-bold" : isActive ? "text-[#1e3a5f] font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>
+                                  <span className={`text-[10px] font-mono flex-shrink-0 ${isLiveActive ? "text-hh-primary font-bold" : isActive ? "text-hh-primary font-semibold" : "text-hh-muted"}`} style={{ minWidth: "28px" }}>
                                     {tech.nummer}
                                   </span>
                                   <p className={`text-[11px] leading-tight truncate flex-1 ${
-                                    isLiveActive ? "font-bold text-[#2563eb]" : isActive ? "font-semibold text-[#1e3a5f]" : hasVideo ? "text-hh-text" : "text-hh-muted"
+                                    isLiveActive ? "font-bold text-hh-primary" : isActive ? "font-semibold text-hh-primary" : hasVideo ? "text-hh-text" : "text-hh-muted"
                                   }`} title={tech.naam}>
                                     {tech.naam}
                                   </p>
@@ -896,7 +896,7 @@ export function VideoWatchPage({
                         </div>
                         <div className="flex-shrink-0">
                           {isCompleted ? (
-                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "#3d9a6e" }} />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-hh-success" />
                           ) : (
                             <ChevronRight className="w-3.5 h-3.5 text-hh-muted" />
                           )}
@@ -924,7 +924,7 @@ export function VideoWatchPage({
             <Badge
               className="text-white border-0 text-xs"
               style={{
-                backgroundColor: PHASE_COLORS[detailTechnique.fase] || "#6b7280",
+                backgroundColor: PHASE_COLORS[detailTechnique.fase] || "var(--hh-muted)",
               }}
             >
               Fase {detailTechnique.fase}

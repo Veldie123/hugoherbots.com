@@ -10,7 +10,7 @@ function ScoreDonut({ score }: { score: number }) {
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 100) * circumference;
-  const color = score >= 70 ? "#3C9A6E" : score >= 50 ? "#D97706" : "#DC2626";
+  const color = score >= 70 ? "var(--hh-success)" : score >= 50 ? "var(--hh-warning)" : "var(--hh-error)";
 
   return (
     <div className="relative flex-shrink-0" style={{ width: 72, height: 72 }}>
@@ -47,12 +47,12 @@ function PhaseBar({ label, score, color }: { label: string; score: number; color
   );
 }
 
-const STATUS_MAP: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  transcribing: { label: "Transcriberen...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "#3B82F6" },
-  analyzing: { label: "Analyseren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "#8B5CF6" },
-  evaluating: { label: "Evalueren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "#D97706" },
-  generating_report: { label: "Rapport genereren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "#3C9A6E" },
-  failed: { label: "Analyse mislukt", icon: <AlertCircle className="w-4 h-4" />, color: "#DC2626" },
+const STATUS_MAP: Record<string, { label: string; icon: React.ReactNode; color: string; rgb: string }> = {
+  transcribing: { label: "Transcriberen...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-primary)", rgb: "var(--hh-primary-rgb)" },
+  analyzing: { label: "Analyseren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-primary)", rgb: "var(--hh-primary-rgb)" },
+  evaluating: { label: "Evalueren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-warning)", rgb: "245,158,11" },
+  generating_report: { label: "Rapport genereren...", icon: <Loader2 className="w-4 h-4 animate-spin" />, color: "var(--hh-success)", rgb: "16,185,129" },
+  failed: { label: "Analyse mislukt", icon: <AlertCircle className="w-4 h-4" />, color: "var(--hh-error)", rgb: "239,68,68" },
 };
 
 export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardProps) {
@@ -61,10 +61,10 @@ export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardP
     return (
       <div
         className="rounded-xl border-2 bg-card p-4"
-        style={{ maxWidth: 520, borderColor: statusInfo.color + "40" }}
+        style={{ maxWidth: 520, borderColor: `rgba(${statusInfo.rgb}, 0.25)` }}
       >
         <div className="flex items-center gap-3">
-          <div className="rounded-lg flex items-center justify-center" style={{ width: 40, height: 40, backgroundColor: statusInfo.color + "15", color: statusInfo.color }}>
+          <div className="rounded-lg flex items-center justify-center" style={{ width: 40, height: 40, backgroundColor: `rgba(${statusInfo.rgb}, 0.08)`, color: statusInfo.color }}>
             {statusInfo.icon}
           </div>
           <div>
@@ -80,16 +80,16 @@ export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardP
   }
 
   const momentIcons: Record<string, React.ReactNode> = {
-    big_win: <Trophy className="w-3.5 h-3.5 text-amber-500" />,
-    quick_fix: <Zap className="w-3.5 h-3.5 text-orange-500" />,
-    turning_point: <RotateCcw className="w-3.5 h-3.5 text-blue-500" />,
+    big_win: <Trophy className="w-3.5 h-3.5 text-hh-warning" />,
+    quick_fix: <Zap className="w-3.5 h-3.5 text-hh-warning" />,
+    turning_point: <RotateCcw className="w-3.5 h-3.5 text-hh-primary" />,
   };
 
   return (
     <div className="rounded-xl border border-hh-border bg-card overflow-hidden" style={{ maxWidth: 520 }}>
       <div className="px-4 py-3 flex items-center gap-3 border-b border-hh-border">
-        <div className="rounded-lg flex items-center justify-center flex-shrink-0" style={{ width: 36, height: 36, backgroundColor: "#EBF5F0" }}>
-          <BarChart3 className="w-4 h-4" style={{ color: "#3C9A6E" }} />
+        <div className="rounded-lg flex items-center justify-center flex-shrink-0" style={{ width: 36, height: 36, backgroundColor: "var(--hh-success-100)" }}>
+          <BarChart3 className="w-4 h-4" style={{ color: "var(--hh-success)" }} />
         </div>
         <div className="min-w-0 flex-1">
           <p className="font-medium text-sm text-hh-text truncate">{analysis.title}</p>
@@ -104,10 +104,10 @@ export function InlineAnalysisCard({ analysis, onViewFull }: InlineAnalysisCardP
         <div className="flex-1 space-y-1.5 min-w-0">
           {analysis.phaseCoverage && (
             <>
-              <PhaseBar label="F1" score={analysis.phaseCoverage.phase1.score} color="#3B82F6" />
-              <PhaseBar label="F2" score={analysis.phaseCoverage.phase2.overall.score} color="#8B5CF6" />
-              <PhaseBar label="F3" score={analysis.phaseCoverage.phase3.score} color="#D97706" />
-              <PhaseBar label="F4" score={analysis.phaseCoverage.phase4.score} color="#3C9A6E" />
+              <PhaseBar label="F1" score={analysis.phaseCoverage.phase1.score} color="var(--hh-primary)" />
+              <PhaseBar label="F2" score={analysis.phaseCoverage.phase2.overall.score} color="var(--hh-primary)" />
+              <PhaseBar label="F3" score={analysis.phaseCoverage.phase3.score} color="var(--hh-warning)" />
+              <PhaseBar label="F4" score={analysis.phaseCoverage.phase4.score} color="var(--hh-success)" />
             </>
           )}
         </div>

@@ -45,10 +45,10 @@ interface EPICSidebarProps {
 }
 
 const PHASE_CIRCLE_COLORS: Record<number, string> = {
-  0: '#64748B',
-  1: '#475569',
-  2: '#3B82F6',
-  3: '#D97706',
+  0: 'var(--hh-muted)',
+  1: 'var(--hh-text)',
+  2: 'var(--hh-primary)',
+  3: 'var(--hh-warning)',
   4: 'var(--hh-success)',
 };
 
@@ -93,7 +93,7 @@ export function EPICSidebar({
   const ACCENT_BG = isAdminView ? 'rgba(var(--hh-primary-rgb), 0.1)' : undefined;
   
   const isTechniqueLocked = (techniqueNumber: string) => {
-    if (!isUserView) return false;
+    if (!isUserView || isAdminView) return false;
     const phase = parseInt(techniqueNumber.split('.')[0]);
     return phase > currentUnlockedPhase;
   };
@@ -340,14 +340,14 @@ export function EPICSidebar({
               style={{ backgroundColor: houdingenAccordionOpen ? 'var(--hh-ui-50)' : 'transparent' }}
             >
               {houdingenAccordionOpen ? (
-                <ChevronDown className="w-4 h-4" style={{ color: '#94a3b8' }} />
+                <ChevronDown className="w-4 h-4" style={{ color: 'var(--hh-muted)' }} />
               ) : (
-                <ChevronRight className="w-4 h-4" style={{ color: '#94a3b8' }} />
+                <ChevronRight className="w-4 h-4" style={{ color: 'var(--hh-muted)' }} />
               )}
               <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--hh-ink)', flex: 1, textAlign: 'left' }}>
                 Houdingen van de klant
               </h4>
-              <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+              <span style={{ fontSize: '12px', color: 'var(--hh-muted)' }}>
                 {klantHoudingen.length}
               </span>
             </button>
@@ -368,7 +368,7 @@ export function EPICSidebar({
                         }}
                         className="w-full flex items-center gap-2 py-2 px-1 rounded transition-colors"
                         style={{
-                          backgroundColor: isActive ? 'rgba(249, 115, 22, 0.06)' : 'transparent',
+                          backgroundColor: isActive ? 'var(--hh-warning-100)' : 'transparent',
                         }}
                       >
                         <div
@@ -377,8 +377,8 @@ export function EPICSidebar({
                             width: '24px',
                             height: '24px',
                             borderRadius: '50%',
-                            backgroundColor: isActive ? '#f97316' : '#fed7aa',
-                            color: isActive ? 'white' : '#c2410c',
+                            backgroundColor: isActive ? 'var(--hh-warning)' : 'var(--hh-warning-200)',
+                            color: isActive ? 'white' : 'var(--hh-warning-700)',
                             fontSize: '10px',
                             fontWeight: 600,
                           }}
@@ -390,18 +390,18 @@ export function EPICSidebar({
                           style={{
                             fontSize: '13px',
                             fontWeight: isActive ? 600 : 400,
-                            color: isActive ? '#9a3412' : 'var(--hh-ink)',
+                            color: isActive ? 'var(--hh-warning-700)' : 'var(--hh-ink)',
                           }}
                         >
                           {houding.naam}
                         </span>
-                        <span style={{ fontSize: '11px', color: '#94a3b8', marginRight: '4px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--hh-muted)', marginRight: '4px' }}>
                           {houding.recommended_technique_ids?.length || 0}
                         </span>
                         {isExpanded ? (
-                          <ChevronDown className="w-3.5 h-3.5" style={{ color: '#94a3b8' }} />
+                          <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--hh-muted)' }} />
                         ) : (
-                          <ChevronRight className="w-3.5 h-3.5" style={{ color: '#94a3b8' }} />
+                          <ChevronRight className="w-3.5 h-3.5" style={{ color: 'var(--hh-muted)' }} />
                         )}
                       </button>
 
@@ -437,7 +437,7 @@ export function EPICSidebar({
                               );
                             })
                           ) : (
-                            <p style={{ fontSize: '12px', color: '#94a3b8', fontStyle: 'italic', padding: '4px 0' }}>
+                            <p style={{ fontSize: '12px', color: 'var(--hh-muted)', fontStyle: 'italic', padding: '4px 0' }}>
                               Geen aanbevolen technieken
                             </p>
                           )}
@@ -487,33 +487,33 @@ export function EPICSidebar({
               const isCurrent = item.phase === currentUnlockedPhase;
               const isLocked = item.phase > currentUnlockedPhase;
               
-              let barBgStyle = { backgroundColor: '#e2e8f0' };
-              let barFillStyle = { backgroundColor: '#cbd5e1' };
+              let barBgStyle = { backgroundColor: 'var(--hh-ui-200)' };
+              let barFillStyle = { backgroundColor: 'var(--hh-border)' };
               let barWidth = "0%";
-              let numberStyle = { color: '#94a3b8' };
-              let labelStyle = { color: '#94a3b8' };
-              
+              let numberStyle = { color: 'var(--hh-muted)' };
+              let labelStyle = { color: 'var(--hh-muted)' };
+
               if (isCompleted || (item.phase < currentUnlockedPhase && !isLocked)) {
-                barBgStyle = { backgroundColor: 'rgba(79, 115, 150, 0.2)' };
+                barBgStyle = { backgroundColor: 'rgba(var(--hh-primary-rgb), 0.2)' };
                 barFillStyle = { backgroundColor: 'var(--hh-primary)' };
                 barWidth = "100%";
                 numberStyle = { color: 'var(--hh-primary)' };
-                labelStyle = { color: '#475569' };
+                labelStyle = { color: 'var(--hh-text)' };
               } else if (isCurrent) {
                 barBgStyle = { backgroundColor: ACCENT };
                 barFillStyle = { backgroundColor: ACCENT };
                 barWidth = "100%";
                 numberStyle = { color: ACCENT };
-                labelStyle = { color: '#475569' };
+                labelStyle = { color: 'var(--hh-text)' };
               } else if (hasProgress && !isLocked) {
-                barBgStyle = { backgroundColor: '#e2e8f0' };
+                barBgStyle = { backgroundColor: 'var(--hh-ui-200)' };
                 barFillStyle = { backgroundColor: 'var(--hh-primary)' };
                 barWidth = progress.total > 0 ? `${(progress.completed / progress.total) * 100}%` : "0%";
-                numberStyle = { color: '#64748b' };
-                labelStyle = { color: '#64748b' };
+                numberStyle = { color: 'var(--hh-muted)' };
+                labelStyle = { color: 'var(--hh-muted)' };
               } else if (isLocked) {
-                barBgStyle = { backgroundColor: '#f1f5f9' };
-                barFillStyle = { backgroundColor: '#e2e8f0' };
+                barBgStyle = { backgroundColor: 'var(--hh-ui-50)' };
+                barFillStyle = { backgroundColor: 'var(--hh-ui-200)' };
                 barWidth = "0%";
               }
               
@@ -605,12 +605,9 @@ export function EPICSidebar({
                             height: '24px',
                             borderRadius: '50%',
                             ...(isAdminView ? {
-                              backgroundColor: isPhaseCompleted ? '#9910FA' :
-                                phase === 0 ? '#64748B' :
-                                phase === 1 ? '#9910FA' :
-                                phase === 2 ? '#7C3AED' :
-                                phase === 3 ? '#A855F7' :
-                                '#C084FC'
+                              backgroundColor: isPhaseCompleted ? 'var(--hh-primary)' :
+                                phase === 0 ? 'var(--hh-muted)' :
+                                'var(--hh-primary)'
                             } : {})
                           }}
                         >
@@ -1039,7 +1036,7 @@ function UserTechniqueRow({
           style={{
             fontSize: '12px',
             fontFamily: 'monospace',
-            color: isLocked ? '#cbd5e1' : '#94a3b8',
+            color: isLocked ? 'var(--hh-border)' : 'var(--hh-muted)',
             minWidth: '24px',
           }}
         >
@@ -1051,16 +1048,16 @@ function UserTechniqueRow({
         style={{
           fontSize: '13px',
           fontWeight: isSelected ? 500 : 400,
-          color: isSelected ? PRIMARY_COLOR : isLocked ? '#cbd5e1' : 'var(--hh-ink)',
+          color: isSelected ? PRIMARY_COLOR : isLocked ? 'var(--hh-border)' : 'var(--hh-ink)',
         }}
       >
         {technique.naam}
       </span>
       {isParent && (
         isExpandedParent ? (
-          <ChevronDown className="w-3 h-3 flex-shrink-0" style={{ color: '#94a3b8' }} />
+          <ChevronDown className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--hh-muted)' }} />
         ) : (
-          <ChevronRight className="w-3 h-3 flex-shrink-0" style={{ color: '#94a3b8' }} />
+          <ChevronRight className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--hh-muted)' }} />
         )
       )}
       {!isLocked && !isParent && (
@@ -1077,7 +1074,7 @@ function UserTechniqueRow({
           onMouseLeave={(e) => { (e.target as HTMLElement).style.opacity = '0.5'; }}
           title="Bekijk details"
         >
-          <Info className="w-3.5 h-3.5" style={{ color: '#94a3b8' }} />
+          <Info className="w-3.5 h-3.5" style={{ color: 'var(--hh-muted)' }} />
         </button>
       )}
     </div>

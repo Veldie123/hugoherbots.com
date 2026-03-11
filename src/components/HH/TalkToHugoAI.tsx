@@ -2038,7 +2038,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           </div>
           <span className="text-hh-muted text-[11px]">·</span>
           <div className="flex items-center gap-2">
-            <span className="text-[12px] font-medium" style={{ color: '#0284c7' }}>
+            <span className="text-[12px] font-medium" style={{ color: 'var(--hh-info)' }}>
               Houdingen {onboardingStatus.houdingen.reviewed}/{onboardingStatus.houdingen.total}
             </span>
             <div className="w-12 h-1.5 rounded-full bg-hh-ui-100 overflow-hidden">
@@ -2046,7 +2046,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 className="h-full rounded-full transition-all"
                 style={{
                   width: `${onboardingStatus.houdingen.total > 0 ? (onboardingStatus.houdingen.reviewed / onboardingStatus.houdingen.total) * 100 : 0}%`,
-                  backgroundColor: '#0284c7'
+                  backgroundColor: 'var(--hh-info)'
                 }}
               />
             </div>
@@ -2221,7 +2221,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                                   </span>
                                 )}
                                 {!isTech && d.id && (
-                                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md text-white" style={{ backgroundColor: '#0284c7' }}>
+                                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md text-white" style={{ backgroundColor: 'var(--hh-info)' }}>
                                     {d.id}
                                   </span>
                                 )}
@@ -2277,7 +2277,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                                   <p className="font-semibold text-[12px] text-hh-muted uppercase tracking-wide mb-1">Voorbeelden</p>
                                   <div className="space-y-1">
                                     {d.generation_examples.slice(0, 3).map((v: string, vi: number) => (
-                                      <div key={vi} className="pl-3 border-l-2 text-[13px] italic text-hh-muted" style={{ borderColor: '#0284c7' }}>
+                                      <div key={vi} className="pl-3 border-l-2 text-[13px] italic text-hh-muted" style={{ borderColor: 'var(--hh-info)' }}>
                                         {v}
                                       </div>
                                     ))}
@@ -2393,10 +2393,10 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                   <div className="flex flex-wrap gap-1 mt-1 px-1">
                     {evalForTurn?.techniques?.map((tech: any, ti: number) => {
                       const qualityColors: Record<string, { bg: string; text: string }> = {
-                        'perfect': { bg: 'var(--hh-success-bg, #ECFDF5)', text: 'var(--hh-success)' },
-                        'goed': { bg: 'var(--hh-success-bg, #ECFDF5)', text: 'var(--hh-success)' },
-                        'bijna': { bg: 'var(--hh-warning-bg, #FFFBEB)', text: 'var(--hh-warning)' },
-                        'gemist': { bg: 'var(--hh-error-bg, #FFF1F2)', text: 'var(--hh-error)' },
+                        'perfect': { bg: 'var(--hh-success-100)', text: 'var(--hh-success)' },
+                        'goed': { bg: 'var(--hh-success-100)', text: 'var(--hh-success)' },
+                        'bijna': { bg: 'var(--hh-primary-100)', text: 'var(--hh-warning)' },
+                        'gemist': { bg: 'var(--hh-primary-100)', text: 'var(--hh-error)' },
                       };
                       const colors = qualityColors[tech.quality] || qualityColors['bijna'];
                       const qualityIcon = tech.quality === 'perfect' || tech.quality === 'goed' ? '✓' : tech.quality === 'gemist' ? '✗' : '~';
@@ -2413,7 +2413,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     {signalForTurn && (
                       <span
                         className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
-                        style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8' }}
+                        style={{ backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)' }}
                       >
                         {signalForTurn.houding}
                       </span>
@@ -2705,7 +2705,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
   );
 
   const renderAudioInterface = () => (
-    <div className="flex-1 min-h-0 w-full flex flex-col" style={{ background: 'linear-gradient(180deg, var(--hh-success) 0%, #0d9488 50%, #0f766e 100%)' }}>
+    <div className="flex-1 min-h-0 w-full flex flex-col" style={{ background: 'linear-gradient(180deg, var(--hh-success) 0%, var(--hh-teal) 50%, color-mix(in srgb, var(--hh-teal) 80%, black) 100%)' }}>
       {/* Error message */}
       {audioError && (
         <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-10">
@@ -2772,10 +2772,10 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 width: '56px', 
                 height: '56px', 
                 borderRadius: '50%',
-                backgroundColor: isMuted ? 'white' : 'rgba(255,255,255,0.2)' 
+                backgroundColor: isMuted ? 'var(--hh-bg)' : 'rgba(255,255,255,0.2)'
               }}
             >
-              {isMuted ? <MicOff className="w-5 h-5 text-teal-700" /> : <Mic className="w-5 h-5 text-white" />}
+              {isMuted ? <MicOff className="w-5 h-5 text-hh-success" /> : <Mic className="w-5 h-5 text-white" />}
             </button>
             <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{isMuted ? "Unmute" : "Mute"}</span>
           </div>
@@ -2791,7 +2791,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 width: '64px', 
                 height: '64px', 
                 borderRadius: '50%',
-                backgroundColor: '#ef4444' 
+                backgroundColor: 'var(--hh-error)' 
               }}
             >
               <Phone className="w-6 h-6 text-white" style={{ transform: 'rotate(135deg)' }} />
@@ -2819,7 +2819,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
   );
 
   const renderVideoInterface = () => (
-    <div className="flex-1 min-h-0 w-full relative" style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%)' }}>
+    <div className="flex-1 min-h-0 w-full relative" style={{ background: 'linear-gradient(135deg, var(--hh-ink) 0%, var(--hh-ui-500) 50%, var(--hh-ink) 100%)' }}>
       {/* Error message */}
       {avatarError && (
         <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-20">
@@ -2839,7 +2839,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
         {avatar.status !== "connected" && (
           <div
             className="rounded-full flex items-center justify-center absolute"
-            style={{ width: '220px', height: '220px', backgroundColor: '#6B7A92' }}
+            style={{ width: '220px', height: '220px', backgroundColor: 'var(--hh-secondary)' }}
           >
             {isAvatarLoading ? (
               <Loader2 className="w-16 h-16 text-white animate-spin" />
@@ -2878,7 +2878,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
       {/* PiP preview — user camera circle */}
       <div
         className="absolute top-4 right-4 flex items-center justify-center border-2 border-white/30 shadow-xl z-10"
-        style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#475569' }}
+        style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'var(--hh-ui-500)' }}
       >
         <div
           className="flex items-center justify-center"
@@ -2899,7 +2899,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 width: '56px',
                 height: '56px',
                 borderRadius: '50%',
-                backgroundColor: avatar.isMuted ? 'white' : 'rgba(255,255,255,0.2)'
+                backgroundColor: avatar.isMuted ? 'var(--hh-bg)' : 'rgba(255,255,255,0.2)'
               }}
             >
               {avatar.isMuted ? <MicOff className="w-5 h-5 text-hh-text" /> : <Mic className="w-5 h-5 text-white" />}
@@ -2933,7 +2933,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 width: '56px',
                 height: '56px',
                 borderRadius: '50%',
-                backgroundColor: '#ef4444'
+                backgroundColor: 'var(--hh-error)'
               }}
             >
               <X className="w-5 h-5 text-white" />
