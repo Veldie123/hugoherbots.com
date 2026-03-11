@@ -273,7 +273,7 @@ export function RolePlay({ navigate, isAdmin }: RolePlayProps) {
                     <div className="w-px h-5 bg-hh-border" />
 
                     {/* Current Phase Badge */}
-                    <Badge variant="outline" className="text-[11px] sm:text-[12px] px-2 py-0.5 bg-hh-primary/10 text-hh-primary border-hh-primary/20">
+                    <Badge variant="outline" className="text-[11px] sm:text-[12px] px-3 py-1 bg-hh-primary/10 text-hh-primary border-hh-primary/20">
                       Fase 2: Ontdekkingsfase
                     </Badge>
                   </div>

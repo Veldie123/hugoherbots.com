@@ -150,7 +150,7 @@ export function LiveSessionCall({
       <Card className="p-6 bg-red-50 border-red-200">
         <div className="text-center">
           <X className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-red-700 mb-2">
+          <h3 className="text-lg font-medium text-red-700 mb-2">
             Verbindingsfout
           </h3>
           <p className="text-red-600 mb-4">{error}</p>

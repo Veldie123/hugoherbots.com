@@ -495,7 +495,7 @@ export function CustomDailyCall({
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
-          <h3 className="text-xl font-semibold text-hh-text mb-2">
+          <h3 className="text-xl font-medium text-hh-text mb-2">
             Verbindingsfout
           </h3>
           <p className="text-hh-muted mb-6">{error}</p>
@@ -521,7 +521,7 @@ export function CustomDailyCall({
           <div className="w-16 h-16 bg-hh-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <Loader2 className="w-8 h-8 text-hh-primary animate-spin" />
           </div>
-          <h3 className="text-xl font-semibold text-hh-text mb-2">
+          <h3 className="text-xl font-medium text-hh-text mb-2">
             Verbinden met sessie
           </h3>
           <p className="text-hh-muted mb-4">
@@ -616,7 +616,7 @@ export function CustomDailyCall({
               )}
               <span className="text-white/70 text-sm truncate max-w-[200px]">{sessionTitle}</span>
               {isHost && (
-                <span className="bg-white/20 text-white text-[11px] font-medium px-1.5 py-0.5 rounded">HOST</span>
+                <span className="bg-white/20 text-white text-[11px] font-medium px-3 py-1 rounded">HOST</span>
               )}
             </div>
             <div className="flex items-center gap-2">
@@ -624,7 +624,7 @@ export function CustomDailyCall({
                 <Users className="w-3.5 h-3.5" />
                 <span>{participants.size}</span>
               </div>
-              <button onClick={toggleFullscreen} className="p-1.5 rounded-lg hover:bg-white/20 text-white/70 hover:text-white transition-colors">
+              <button onClick={toggleFullscreen} className="p-1.5 rounded-lg hover:bg-white/20 text-white/70 hover:text-white transition-colors" aria-label="Volledig scherm">
                 <Maximize2 className="w-4 h-4" />
               </button>
             </div>
@@ -690,6 +690,7 @@ export function CustomDailyCall({
             onClick={handleToggleMute}
             className="w-12 h-12 rounded-full p-0"
             title={isMuted ? "Microfoon aan" : "Microfoon uit"}
+            aria-label={isMuted ? "Microfoon aan" : "Microfoon uit"}
           >
             {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
           </Button>
@@ -700,6 +701,7 @@ export function CustomDailyCall({
             onClick={handleToggleCamera}
             className="w-12 h-12 rounded-full p-0"
             title={isCameraOff ? "Camera aan" : "Camera uit"}
+            aria-label={isCameraOff ? "Camera aan" : "Camera uit"}
           >
             {isCameraOff ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
           </Button>
@@ -899,6 +901,7 @@ export function CustomDailyCall({
           onClick={isHost && onEndSession ? handleEndSession : handleLeave}
           className="w-12 h-12 rounded-full p-0 bg-red-600 hover:bg-red-700"
           title={isHost ? "Sessie beëindigen" : "Verlaten"}
+          aria-label={isHost ? "Sessie beëindigen" : "Verlaten"}
         >
           <PhoneOff className="w-5 h-5" />
         </Button>

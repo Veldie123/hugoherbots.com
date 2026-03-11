@@ -186,7 +186,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
                 </p>
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={endTraining}>
+            <Button variant="ghost" size="sm" onClick={endTraining} aria-label="Sluiten">
               <X className="w-4 h-4" />
             </Button>
           </div>
@@ -196,8 +196,8 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
             {chatMessages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[70%] p-3 rounded-lg ${
-                  msg.role === "user" 
-                    ? "bg-hh-primary text-white" 
+                  msg.role === "user"
+                    ? "bg-hh-primary text-white"
                     : "bg-card text-hh-text border border-hh-border"
                 }`}>
                   <p className="text-[14px] leading-[20px]">{msg.text}</p>
@@ -216,7 +216,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
                 placeholder="Type je antwoord..."
                 className="flex-1"
               />
-              <Button onClick={sendChatMessage}>
+              <Button onClick={sendChatMessage} aria-label="Versturen">
                 <Send className="w-4 h-4" />
               </Button>
             </div>
@@ -285,7 +285,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
                       )
                     )}
                     {isSpecial && <div className="w-4" />}
-                    <Badge className={`text-[10px] flex-shrink-0 rounded-full px-2 border-0 ${
+                    <Badge className={`text-[10px] flex-shrink-0 rounded-full px-3 py-1 border-0 ${
                       isSpecial ? "bg-hh-primary text-white" : "bg-hh-primary-100 text-hh-primary"
                     }`}>
                       {phase.nummer}
@@ -321,7 +321,7 @@ export function DigitalCoaching({ navigate, isAdmin }: DigitalCoachingProps) {
                           onClick={() => openDetails(child)}
                           className="flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-hh-ui-50 transition-colors"
                         >
-                          <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] flex-shrink-0 rounded-full px-2">
+                          <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] flex-shrink-0 rounded-full px-3 py-1">
                             {child.nummer}
                           </Badge>
                           <span className="text-[12px] text-hh-muted truncate flex-1">

@@ -27,7 +27,7 @@ export function EmptyState({
       <div className="w-16 h-16 rounded-full bg-hh-ui-100 flex items-center justify-center mb-4">
         <Icon className="w-8 h-8 text-hh-muted" />
       </div>
-      <h3 className="text-[24px] leading-[32px] font-semibold text-hh-text mb-2">
+      <h3 className="text-[24px] leading-[32px] font-medium text-hh-text mb-2">
         {title}
       </h3>
       <p className="text-[16px] leading-[24px] text-hh-muted mb-6">{body}</p>

@@ -524,6 +524,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
             onClick={handleToggleCamera}
             className="w-12 h-12 rounded-full p-0"
             title={isCameraOn ? "Camera uit" : "Camera aan"}
+            aria-label={isCameraOn ? "Camera uit" : "Camera aan"}
           >
             {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
           </Button>
@@ -533,6 +534,7 @@ export function PreJoinCheck({ sessionTitle, onJoin, onCancel }: PreJoinCheckPro
             onClick={handleToggleMic}
             className="w-12 h-12 rounded-full p-0"
             title={isMicOn ? "Microfoon uit" : "Microfoon aan"}
+            aria-label={isMicOn ? "Microfoon uit" : "Microfoon aan"}
           >
             {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
           </Button>

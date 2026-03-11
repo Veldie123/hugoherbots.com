@@ -32,7 +32,7 @@ export function EpicSlideCard({ slide }: EpicSlideCardProps) {
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <div className="flex items-center gap-2">
           <span
-            className="text-xs font-semibold px-2 py-0.5 rounded-full"
+            className="text-xs font-semibold px-3 py-1 rounded-full"
             style={{
               backgroundColor: phaseStyle.badge,
               color: phaseStyle.badgeText,

@@ -59,7 +59,7 @@ export function DashboardPreview() {
 
           {/* Badge + title */}
           <div className="absolute top-3 left-4">
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-hh-primary/90 text-white">
+            <span className="text-xs font-medium px-3 py-1 rounded-full bg-hh-primary/90 text-white">
               Aanbevolen voor jou
             </span>
           </div>

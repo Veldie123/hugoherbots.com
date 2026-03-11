@@ -328,7 +328,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +15%
               </Badge>
@@ -348,7 +348,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +8%
               </Badge>
@@ -368,7 +368,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +2.3%
               </Badge>
@@ -388,7 +388,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-error/10 text-hh-error border-hh-error/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-error/10 text-hh-error border-hh-error/20"
               >
                 -5%
               </Badge>
@@ -445,13 +445,13 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
         {/* Bulk Actions — Google Drive style */}
         {selectionMode && (
           <div className="flex items-center gap-4 px-4 py-2 bg-hh-primary/5 border border-hh-primary/20 rounded-lg">
-            <button onClick={() => setSelectedIds([])} className="text-hh-muted hover:text-hh-text transition-colors">
+            <button onClick={() => setSelectedIds([])} className="text-hh-muted hover:text-hh-text transition-colors" aria-label="Selectie wissen">
               <X className="w-4 h-4" />
             </button>
             <span className="text-[13px] text-hh-text font-medium">
               {selectedIds.length} geselecteerd
             </span>
-            <button onClick={handleBulkDelete} className="text-hh-muted hover:text-hh-error transition-colors" title="Verwijderen">
+            <button onClick={handleBulkDelete} className="text-hh-muted hover:text-hh-error transition-colors" title="Verwijderen" aria-label="Verwijderen">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
@@ -604,7 +604,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
                     <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -694,7 +694,7 @@ export function AdminSessionTranscripts({ navigate, isSuperAdmin }: AdminSession
                     <span className="text-[12px] text-hh-muted">{session.date}</span>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Acties">
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>

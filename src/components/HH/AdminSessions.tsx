@@ -535,7 +535,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
         <div className="p-6">
           <Card className="p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-hh-warn mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Fout bij laden</h2>
+            <h2 className="text-xl font-medium mb-2">Fout bij laden</h2>
             <p className="text-hh-muted">{error}</p>
           </Card>
         </div>
@@ -591,7 +591,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${stat.bgClass}`}>
                   <stat.icon className={`w-5 h-5 ${stat.textClass}`} />
                 </div>
-                <span className={`text-[11px] px-2 py-0.5 rounded-full border ${badgeClass}`}>
+                <span className={`text-[11px] px-3 py-1 rounded-full border ${badgeClass}`}>
                   {stat.badge}
                 </span>
               </div>
@@ -645,13 +645,13 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
         {/* Bulk Actions — Google Drive style */}
         {selectionMode && (
           <div className="flex items-center gap-4 px-4 py-2 bg-hh-primary/5 border border-hh-primary/20 rounded-lg">
-            <button onClick={() => setSelectedIds([])} className="text-hh-muted hover:text-hh-text transition-colors">
+            <button onClick={() => setSelectedIds([])} className="text-hh-muted hover:text-hh-text transition-colors" aria-label="Selectie wissen">
               <X className="w-4 h-4" />
             </button>
             <span className="text-[13px] text-hh-text font-medium">
               {selectedIds.length} geselecteerd
             </span>
-            <button onClick={handleBulkDelete} className="text-hh-muted hover:text-hh-error transition-colors" title="Verwijderen">
+            <button onClick={handleBulkDelete} className="text-hh-muted hover:text-hh-error transition-colors" title="Verwijderen" aria-label="Verwijderen">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
@@ -869,7 +869,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                     <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -981,7 +981,7 @@ export function AdminSessions({ navigate, isSuperAdmin }: AdminSessionsProps) {
                     <span className="text-[12px] text-hh-muted">{session.date}</span>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Acties">
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>

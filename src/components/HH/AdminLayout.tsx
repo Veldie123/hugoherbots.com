@@ -49,6 +49,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { useTheme } from "./ThemeProvider";
 import { PageFooter } from "./PageFooter";
+import { HugoFeedbackWidget } from "./HugoFeedbackWidget";
 
 interface HistoryItem {
   id: string;
@@ -95,6 +96,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
   const [adminUserName, setAdminUserName] = useState('Admin');
   const [adminUserRole, setAdminUserRole] = useState('Admin');
   const [adminUserInitials, setAdminUserInitials] = useState('AD');
+  const [isHugo, setIsHugo] = useState(false);
 
   useEffect(() => {
     const loadAdminUser = async () => {
@@ -111,6 +113,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
             ? `${firstName[0]}${lastName[0]}`.toUpperCase()
             : fullName.substring(0, 2).toUpperCase();
           const detectedSuperAdmin = email === 'stephane@hugoherbots.com';
+          setIsHugo(email === 'hugo@hugoherbots.com');
           setAdminUserName(fullName);
           setAdminUserRole(detectedSuperAdmin ? 'Super Admin' : 'Admin');
           setAdminUserInitials(initials);
@@ -231,6 +234,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
       "admin-analysis-results": analysisFromHugo ? "admin-sessions" : "admin-uploads",
       "admin-upload-detail": "admin-uploads",
       "admin-transcript-detail": "admin-uploads",
+      "admin-video-detail": "admin-videos",
     };
     
     return subPageMapping[currentPage] === itemId;
@@ -336,7 +340,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HUGO</span>
                 <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HERBOTS</span>
               </div>
-              <Badge className="bg-hh-primary text-white border-0 text-[10px] px-2 py-0.5 self-start mt-0.5">
+              <Badge className="bg-hh-primary text-white border-0 text-[10px] px-3 py-1 self-start mt-0.5">
                 ADMIN
               </Badge>
             </SheetTitle>
@@ -472,7 +476,7 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HUGO</span>
                 <span className="text-[20px] leading-[24px] tracking-[0.15em] uppercase font-bold text-hh-ink">HERBOTS</span>
               </div>
-              <Badge className="bg-hh-primary text-white border-0 text-[10px] px-2 py-0.5 self-start mt-0.5">
+              <Badge className="bg-hh-primary text-white border-0 text-[10px] px-3 py-1 self-start mt-0.5">
                 ADMIN
               </Badge>
             </div>
@@ -628,6 +632,9 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
                 Talk to Hugo<sup className="text-[10px] ml-0.5">AI</sup>
               </span>
             </button>
+
+            {/* Hugo Feedback Widget */}
+            {isHugo && <HugoFeedbackWidget currentPage={currentPage} />}
 
             {/* Notifications Bell - Purple for Admin */}
             <div className="relative">

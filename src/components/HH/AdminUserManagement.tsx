@@ -320,7 +320,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +12%
               </Badge>
@@ -340,7 +340,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +8%
               </Badge>
@@ -360,7 +360,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +3.2%
               </Badge>
@@ -380,7 +380,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +18%
               </Badge>
@@ -562,7 +562,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                       <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -675,7 +675,7 @@ export function AdminUserManagement({ navigate, isSuperAdmin }: AdminUserManagem
                   <span>{user.joined}</span>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Acties">
                         <MoreVertical className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>

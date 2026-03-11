@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageSquarePlus, Crosshair, X, Send, Trash2 } from "lucide-react";
+import { CircleAlert, Crosshair, X, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch } from "../../services/apiFetch";
 
@@ -106,6 +106,7 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
       };
       setElements((prev) => [...prev, ref]);
       setSelecting(false);
+      setOpen(true);
       setHoveredEl(null);
     },
     []
@@ -190,15 +191,15 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
         {/* Header button */}
         <button
           onClick={() => setOpen((prev) => !prev)}
-          className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
             open
-              ? "bg-hh-primary text-white"
-              : "bg-hh-primary/10 text-hh-primary hover:bg-hh-primary/20"
+              ? "bg-[--hh-purple] text-white"
+              : "bg-[--hh-purple]/15 text-[--hh-purple] hover:bg-[--hh-purple]/25"
           }`}
           aria-label="Feedback geven"
           title="UI Feedback"
         >
-          <MessageSquarePlus size={20} />
+          <CircleAlert size={20} />
         </button>
 
         {/* Dropdown panel */}
@@ -212,6 +213,7 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
               <button
                 onClick={() => setOpen(false)}
                 className="text-hh-muted hover:text-hh-text transition-colors"
+                aria-label="Sluiten"
               >
                 <X size={16} />
               </button>
@@ -248,6 +250,7 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
                           setElements((prev) => prev.filter((_, j) => j !== i))
                         }
                         className="text-hh-muted hover:text-hh-error flex-shrink-0"
+                        aria-label="Verwijderen"
                       >
                         <Trash2 size={12} />
                       </button>

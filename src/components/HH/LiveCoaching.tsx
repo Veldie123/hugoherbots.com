@@ -182,7 +182,7 @@ function UserProgressCard({ stats, loading }: { stats: UserProgressStats; loadin
   return (
     <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden bg-gradient-to-r from-hh-ui-50 to-card">
       <div className="p-5 sm:p-6">
-        <h3 className="text-[18px] leading-[24px] sm:text-[20px] sm:leading-[28px] font-semibold text-hh-text mb-4 text-center">
+        <h3 className="text-[18px] leading-[24px] sm:text-[20px] sm:leading-[28px] font-medium text-hh-text mb-4 text-center">
           Jouw Webinar Reis
         </h3>
         <div className="grid grid-cols-3 gap-3 sm:gap-6">
@@ -946,7 +946,7 @@ export function LiveCoaching({
                                   <span className={`text-[13px] font-medium ${msg.isHost ? "text-hh-primary" : "text-hh-text"}`}>
                                     {msg.userName}
                                   </span>
-                                  {msg.isHost && <Badge className="bg-hh-primary text-white text-[9px] px-1 py-0">HOST</Badge>}
+                                  {msg.isHost && <Badge className="bg-hh-primary text-white text-[9px] px-3 py-1">HOST</Badge>}
                                 </div>
                                 <p className="text-[13px] text-hh-text leading-relaxed">{msg.message}</p>
                               </div>
@@ -972,7 +972,7 @@ export function LiveCoaching({
                           disabled={sendingMessage}
                           maxLength={500}
                         />
-                        <Button onClick={handleSendMessage} disabled={!chatMessage.trim() || sendingMessage} size="icon" className="shrink-0">
+                        <Button onClick={handleSendMessage} disabled={!chatMessage.trim() || sendingMessage} size="icon" className="shrink-0" aria-label="Versturen">
                           {sendingMessage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                         </Button>
                       </div>
@@ -1237,11 +1237,11 @@ export function LiveCoaching({
                 return (
                   <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border mb-6">
                     <div className="flex items-center justify-between mb-4">
-                      <Button variant="ghost" size="sm" onClick={() => setCalendarMonth(new Date(year, month - 1, 1))}>
+                      <Button variant="ghost" size="sm" onClick={() => setCalendarMonth(new Date(year, month - 1, 1))} aria-label="Vorige maand">
                         <ChevronLeft className="w-4 h-4" />
                       </Button>
-                      <h3 className="text-[16px] font-semibold text-hh-text">{MONTH_NAMES[month]} {year}</h3>
-                      <Button variant="ghost" size="sm" onClick={() => setCalendarMonth(new Date(year, month + 1, 1))}>
+                      <h3 className="text-[16px] font-medium text-hh-text">{MONTH_NAMES[month]} {year}</h3>
+                      <Button variant="ghost" size="sm" onClick={() => setCalendarMonth(new Date(year, month + 1, 1))} aria-label="Volgende maand">
                         <ChevronRight className="w-4 h-4" />
                       </Button>
                     </div>
@@ -1375,7 +1375,7 @@ export function LiveCoaching({
                         )}
                       </div>
                       
-                      <h3 className="text-[16px] leading-[22px] text-hh-text font-semibold mb-2">
+                      <h3 className="text-[16px] leading-[22px] text-hh-text font-medium mb-2">
                         {session.title}
                       </h3>
                       
@@ -1592,7 +1592,7 @@ export function LiveCoaching({
                 </div>
                 <div>
                   <div className="flex items-center gap-3">
-                    <h2 className="text-[24px] leading-[32px] text-hh-text font-semibold">
+                    <h2 className="text-[24px] leading-[32px] text-hh-text font-medium">
                       Opgenomen Webinars
                     </h2>
                     <span className="text-[11px] font-medium px-3.5 py-1 rounded-full bg-hh-primary/10 text-hh-primary border border-hh-primary/20">
@@ -1641,7 +1641,7 @@ export function LiveCoaching({
                       </div>
 
                       <div className="absolute top-2 left-2 flex gap-2">
-                        <Badge className="text-[10px] px-2 py-0.5 bg-hh-ink/80 text-white border-none">
+                        <Badge className="text-[10px] px-3 py-1 bg-hh-ink/80 text-white border-none">
                           Webinar Opname
                         </Badge>
                       </div>
@@ -1717,7 +1717,7 @@ export function LiveCoaching({
 
                       {isNew && (
                         <div className="absolute top-2 left-2">
-                          <Badge className="text-[10px] px-2 py-0.5 bg-hh-primary text-white border-none">
+                          <Badge className="text-[10px] px-3 py-1 bg-hh-primary text-white border-none">
                             Nieuw
                           </Badge>
                         </div>
@@ -2014,7 +2014,7 @@ export function LiveCoaching({
               {!registrationSuccess ? (
                 <>
                   <div className="bg-hh-ui-50 rounded-lg p-4">
-                    <h3 className="text-[16px] font-semibold text-hh-text mb-2">
+                    <h3 className="text-[16px] font-medium text-hh-text mb-2">
                       {selectedSessionForRegistration.title}
                     </h3>
                     <div className="space-y-2 text-[14px] text-hh-muted">
@@ -2065,7 +2065,7 @@ export function LiveCoaching({
                     <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-hh-primary">
                       <CheckCircle className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-[18px] font-semibold text-hh-text mb-2">
+                    <h3 className="text-[18px] font-medium text-hh-text mb-2">
                       Inschrijving bevestigd!
                     </h3>
                     <p className="text-[14px] text-hh-muted">
@@ -2112,11 +2112,11 @@ export function LiveCoaching({
         const detailContent = (
           <div className="px-5 pb-5 space-y-4">
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge className="text-[11px] px-2.5 py-0.5 bg-hh-primary text-white border-none">
+              <Badge className="text-[11px] px-3 py-1 bg-hh-primary text-white border-none">
                 Gepland
               </Badge>
               {calendarDetailSession.topic && (
-                <Badge variant="outline" className="text-[11px] px-2.5 py-0.5">
+                <Badge variant="outline" className="text-[11px] px-3 py-1">
                   {calendarDetailSession.topic}
                 </Badge>
               )}
@@ -2183,13 +2183,13 @@ export function LiveCoaching({
               <div className="relative" style={{ aspectRatio: '16/10' }}>
                 <img src={imgSrc} alt={calendarDetailSession.title} className="absolute inset-0 w-full h-full object-cover object-top" />
                 <div className="absolute top-3 right-3">
-                  <Button variant="ghost" size="icon" className="h-9 w-9 bg-card/90 hover:bg-card shadow-sm rounded-full" onClick={() => toggleReminder(calendarDetailSession.id)}>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 bg-card/90 hover:bg-card shadow-sm rounded-full" onClick={() => toggleReminder(calendarDetailSession.id)} aria-label={hasReminder ? "Herinnering uitschakelen" : "Herinnering instellen"}>
                     {hasReminder ? <BellOff className="w-4 h-4 text-hh-primary" /> : <Bell className="w-4 h-4" />}
                   </Button>
                 </div>
               </div>
               <div className="pt-1">
-                <h2 className="text-[20px] leading-[26px] font-semibold text-hh-text px-5 mb-3">
+                <h2 className="text-[20px] leading-[26px] font-medium text-hh-text px-5 mb-3">
                   {calendarDetailSession.title}
                 </h2>
                 {detailContent}

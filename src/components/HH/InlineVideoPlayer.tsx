@@ -91,7 +91,7 @@ export function InlineVideoPlayer({ video }: InlineVideoPlayerProps) {
           )}
         </div>
       </div>
-      <span className="text-xs font-medium px-2 py-1 rounded-md" style={{ backgroundColor: "color-mix(in srgb, var(--hh-success) 10%, var(--hh-bg))", color: "var(--hh-success)" }}>
+      <span className="text-xs font-medium px-3 py-1 rounded-md" style={{ backgroundColor: "color-mix(in srgb, var(--hh-success) 10%, var(--hh-bg))", color: "var(--hh-success)" }}>
         Afspelen
       </span>
     </button>

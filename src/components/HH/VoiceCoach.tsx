@@ -159,6 +159,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
         onClick={endSession}
         className="absolute top-4 right-4 z-20 flex items-center justify-center rounded-full transition-colors hover:bg-white/20"
         style={{ width: "36px", height: "36px", backgroundColor: "color-mix(in srgb, var(--hh-bg) 10%, transparent)" }}
+        aria-label="Sluiten"
       >
         <X className="w-5 h-5 text-white" />
       </button>
@@ -168,7 +169,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
         <div className="absolute top-4 left-4 right-4 bg-hh-error/90 text-white p-3 rounded-lg flex items-center gap-2 z-10">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span className="text-[14px]">{error}</span>
-          <button onClick={() => setError(null)} className="ml-auto">
+          <button onClick={() => setError(null)} className="ml-auto" aria-label="Foutmelding sluiten">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -275,6 +276,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
                   borderRadius: "50%",
                   backgroundColor: "white",
                 }}
+                aria-label="Opnieuw verbinden"
               >
                 <Phone className="w-6 h-6 text-teal-700" />
               </button>
@@ -288,6 +290,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
                   borderRadius: "50%",
                   backgroundColor: "var(--hh-error)",
                 }}
+                aria-label="Ophangen"
               >
                 <Phone className="w-6 h-6 text-white" style={{ transform: "rotate(135deg)" }} />
               </button>
@@ -307,6 +310,7 @@ export function VoiceCoach({ onClose }: VoiceCoachProps) {
                 borderRadius: "50%",
                 backgroundColor: "color-mix(in srgb, var(--hh-bg) 20%, transparent)",
               }}
+              aria-label="Speaker"
             >
               <Volume2 className="w-5 h-5 text-white" />
             </button>

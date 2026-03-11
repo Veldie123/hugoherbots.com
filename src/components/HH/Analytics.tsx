@@ -287,7 +287,7 @@ export function Analytics({ navigate, isAdmin, onboardingMode }: AnalyticsProps)
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +{performanceData.sessionsDelta}
               </Badge>
@@ -307,7 +307,7 @@ export function Analytics({ navigate, isAdmin, onboardingMode }: AnalyticsProps)
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +{performanceData.timeDelta}%
               </Badge>
@@ -327,7 +327,7 @@ export function Analytics({ navigate, isAdmin, onboardingMode }: AnalyticsProps)
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +{performanceData.completionDelta}%
               </Badge>

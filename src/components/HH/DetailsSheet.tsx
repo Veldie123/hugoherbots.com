@@ -55,7 +55,7 @@ export function DetailsSheet({
               {badges}
             </div>
           )}
-          <SheetTitle className="text-xl font-semibold text-hh-text pr-8">
+          <SheetTitle className="text-xl font-medium text-hh-text pr-8">
             {title}
           </SheetTitle>
           {subtitle && (

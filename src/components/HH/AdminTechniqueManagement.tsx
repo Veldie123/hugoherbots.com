@@ -323,7 +323,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-primary-100">
                 <Award className="w-5 h-5 text-hh-primary" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success-100 text-hh-success border-hh-success-200">
+              <Badge variant="outline" className="text-[11px] px-3 py-1 bg-hh-success-100 text-hh-success border-hh-success-200">
                 +5%
               </Badge>
             </div>
@@ -340,7 +340,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success-100">
                 <CheckCircle className="w-5 h-5 text-hh-success" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success-100 text-hh-success border-hh-success-200">
+              <Badge variant="outline" className="text-[11px] px-3 py-1 bg-hh-success-100 text-hh-success border-hh-success-200">
                 +12%
               </Badge>
             </div>
@@ -357,7 +357,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-primary-100">
                 <BarChart3 className="w-5 h-5 text-hh-primary" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success-100 text-hh-success border-hh-success-200">
+              <Badge variant="outline" className="text-[11px] px-3 py-1 bg-hh-success-100 text-hh-success border-hh-success-200">
                 +8%
               </Badge>
             </div>
@@ -374,7 +374,7 @@ export function AdminTechniqueManagement({ navigate, isSuperAdmin = false }: Adm
               <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-success-100">
                 <TrendingUp className="w-5 h-5 text-hh-success" />
               </div>
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-hh-success-100 text-hh-success border-hh-success-200">
+              <Badge variant="outline" className="text-[11px] px-3 py-1 bg-hh-success-100 text-hh-success border-hh-success-200">
                 +4.2%
               </Badge>
             </div>

@@ -204,7 +204,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +12%
               </Badge>
@@ -222,7 +222,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +34%
               </Badge>
@@ -240,7 +240,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5 bg-hh-warn/10 text-hh-warn border-hh-warn/20"
+                className="text-[11px] px-3 py-1 bg-hh-warn/10 text-hh-warn border-hh-warn/20"
               >
                 Featured
               </Badge>
@@ -258,7 +258,7 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5 bg-hh-primary/10 text-hh-primary border-hh-primary/20"
+                className="text-[11px] px-3 py-1 bg-hh-primary/10 text-hh-primary border-hh-primary/20"
               >
                 Deze maand
               </Badge>
@@ -404,12 +404,12 @@ export function AdminResourceLibrary({ navigate, isSuperAdmin }: AdminResourceLi
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Bekijken">
                           <Eye className="w-4 h-4" />
                         </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>

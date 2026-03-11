@@ -552,7 +552,7 @@ export function Analysis({ navigate, isAdmin, onboardingMode }: AnalysisProps) {
                               {conv.techniquesUsed.slice(0, 4).map((tech, idx) => (
                                 <span
                                   key={idx}
-                                  className="bg-hh-primary-100 text-hh-primary inline-flex items-center justify-center min-w-[32px] h-7 px-1.5 rounded-full text-[10px] font-mono font-semibold"
+                                  className="bg-hh-primary-100 text-hh-primary inline-flex items-center justify-center min-w-[32px] h-7 px-3 rounded-full text-[10px] font-mono font-semibold"
                                 >
                                   {tech}
                                 </span>
@@ -591,7 +591,7 @@ export function Analysis({ navigate, isAdmin, onboardingMode }: AnalysisProps) {
                       <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                               <MoreVertical className="w-4 h-4 text-hh-muted" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -680,7 +680,7 @@ export function Analysis({ navigate, isAdmin, onboardingMode }: AnalysisProps) {
                       {conv.techniquesUsed.slice(0, 3).map((tech, idx) => (
                         <span
                           key={idx}
-                          className="bg-hh-primary-100 text-hh-primary inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold"
+                          className="bg-hh-primary-100 text-hh-primary inline-flex items-center justify-center px-3 py-1 rounded-full text-[10px] font-mono font-semibold"
                         >
                           {tech}
                         </span>
@@ -764,7 +764,7 @@ export function Analysis({ navigate, isAdmin, onboardingMode }: AnalysisProps) {
                       {conv.techniquesUsed.slice(0, 3).map((tech, idx) => (
                         <span
                           key={idx}
-                          className="bg-hh-primary-100 text-hh-primary inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold"
+                          className="bg-hh-primary-100 text-hh-primary inline-flex items-center justify-center px-3 py-1 rounded-full text-[10px] font-mono font-semibold"
                         >
                           {tech}
                         </span>

@@ -2206,19 +2206,19 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                             <div className="px-4 py-3 border-b border-hh-border" style={{ backgroundColor: `color-mix(in srgb, ${faseColor} 5%, transparent)` }}>
                               <div className="flex items-center gap-2 mb-1">
                                 {isTech && d.nummer && (
-                                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md text-white" style={{ backgroundColor: faseColor }}>
+                                  <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-md text-white" style={{ backgroundColor: faseColor }}>
                                     {d.nummer}
                                   </span>
                                 )}
                                 {!isTech && d.id && (
-                                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md text-white" style={{ backgroundColor: 'var(--hh-info)' }}>
+                                  <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-md text-white" style={{ backgroundColor: 'var(--hh-info)' }}>
                                     {d.id}
                                   </span>
                                 )}
                                 <h3 className="text-[15px] font-semibold text-hh-text">{d.naam}</h3>
                               </div>
                               {isTech && d.fase && (
-                                <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ backgroundColor: `color-mix(in srgb, ${faseColor} 10%, transparent)`, color: faseColor }}>
+                                <span className="text-[11px] px-3 py-1 rounded-full" style={{ backgroundColor: `color-mix(in srgb, ${faseColor} 10%, transparent)`, color: faseColor }}>
                                   Fase {d.fase}
                                 </span>
                               )}
@@ -2277,7 +2277,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                               {d.tags && d.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-1 pt-1">
                                   {d.tags.map((t: string, ti: number) => (
-                                    <span key={ti} className="text-[10px] px-2 py-0.5 rounded-full border border-hh-border text-hh-muted bg-hh-ui-50">
+                                    <span key={ti} className="text-[10px] px-3 py-1 rounded-full border border-hh-border text-hh-muted bg-hh-ui-50">
                                       {t}
                                     </span>
                                   ))}
@@ -2286,7 +2286,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                               {d.semantic_markers && d.semantic_markers.length > 0 && (
                                 <div className="flex flex-wrap gap-1 pt-1">
                                   {d.semantic_markers.slice(0, 8).map((t: string, ti: number) => (
-                                    <span key={ti} className="text-[10px] px-2 py-0.5 rounded-full border border-hh-border text-hh-muted bg-hh-ui-50">
+                                    <span key={ti} className="text-[10px] px-3 py-1 rounded-full border border-hh-border text-hh-muted bg-hh-ui-50">
                                       {t}
                                     </span>
                                   ))}
@@ -2393,7 +2393,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                       return (
                         <span
                           key={ti}
-                          className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
+                          className="inline-flex items-center gap-1 text-[10px] font-medium px-3 py-1 rounded-full"
                           style={{ backgroundColor: colors.bg, color: colors.text }}
                         >
                           {qualityIcon} {tech.naam}
@@ -2402,7 +2402,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                     })}
                     {signalForTurn && (
                       <span
-                        className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
+                        className="inline-flex items-center gap-1 text-[10px] font-medium px-3 py-1 rounded-full"
                         style={{ backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)' }}
                       >
                         {signalForTurn.houding}
@@ -2512,7 +2512,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
               {activeCoachingMoment.recommendedTechniques?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {activeCoachingMoment.recommendedTechniques.map((t: string, i: number) => (
-                    <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-hh-primary/10 text-hh-primary font-medium">{t}</span>
+                    <span key={i} className="text-[10px] px-3 py-1 rounded-full bg-hh-primary/10 text-hh-primary font-medium">{t}</span>
                   ))}
                 </div>
               )}
@@ -2677,6 +2677,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
             onClick={handleDictation}
             disabled={isStreaming}
             className={`flex-shrink-0 transition-all ${isRecording ? "bg-hh-error border-hh-error text-white shadow-lg shadow-hh-error/30 animate-pulse" : "hover:bg-hh-ui-50"}`}
+            aria-label={isRecording ? "Opname stoppen" : "Dicteren"}
           >
             {isRecording ? <MicOff className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-hh-primary" />}
           </Button>
@@ -2790,14 +2791,15 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           </div>
           
           <div className="flex flex-col items-center gap-2">
-            <button 
+            <button
               className="flex items-center justify-center"
-              style={{ 
-                width: '56px', 
-                height: '56px', 
+              style={{
+                width: '56px',
+                height: '56px',
                 borderRadius: '50%',
                 backgroundColor: 'color-mix(in srgb, var(--hh-bg) 20%, transparent)'
               }}
+              aria-label="Speaker"
             >
               <Volume2 className="w-5 h-5 text-white" />
             </button>
@@ -2846,7 +2848,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           <div className="flex items-center gap-2">
             <h3 className="text-white text-[18px] font-semibold">Hugo Herbots</h3>
             {isAvatarSpeaking && (
-              <span className="bg-hh-success text-white text-[10px] px-2 py-0.5 rounded-full">Spreekt</span>
+              <span className="bg-hh-success text-white text-[10px] px-3 py-1 rounded-full">Spreekt</span>
             )}
             {/* A/B platform toggle — superadmin only */}
             {isSuperAdmin && avatar.status !== "connected" && (
@@ -2891,6 +2893,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 borderRadius: '50%',
                 backgroundColor: avatar.isMuted ? 'var(--hh-bg)' : 'color-mix(in srgb, var(--hh-bg) 20%, transparent)'
               }}
+              aria-label={avatar.isMuted ? "Microfoon aan" : "Microfoon uit"}
             >
               {avatar.isMuted ? <MicOff className="w-5 h-5 text-hh-text" /> : <Mic className="w-5 h-5 text-white" />}
             </button>
@@ -2906,6 +2909,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 borderRadius: '50%',
                 backgroundColor: 'color-mix(in srgb, var(--hh-bg) 20%, transparent)'
               }}
+              aria-label="Camera"
             >
               <Video className="w-5 h-5 text-white" />
             </button>
@@ -2925,6 +2929,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                 borderRadius: '50%',
                 backgroundColor: 'var(--hh-error)'
               }}
+              aria-label="Ophangen"
             >
               <X className="w-5 h-5 text-white" />
             </button>

@@ -62,7 +62,7 @@ export function SSOValidate({ navigate, onSSOLogin }: SSOValidateProps) {
         {status === "validating" && (
           <>
             <div className="w-16 h-16 border-4 border-hh-ocean-blue border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <h1 className="text-xl font-semibold text-hh-ink mb-2">Bezig met inloggen...</h1>
+            <h1 className="text-xl font-medium text-hh-ink mb-2">Bezig met inloggen...</h1>
             <p className="text-hh-muted">Even geduld, je wordt doorgestuurd.</p>
           </>
         )}
@@ -74,7 +74,7 @@ export function SSOValidate({ navigate, onSSOLogin }: SSOValidateProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 className="text-xl font-semibold text-hh-ink mb-2">Ingelogd!</h1>
+            <h1 className="text-xl font-medium text-hh-ink mb-2">Ingelogd!</h1>
             <p className="text-hh-muted">Je wordt doorgestuurd naar Hugo...</p>
           </>
         )}
@@ -86,7 +86,7 @@ export function SSOValidate({ navigate, onSSOLogin }: SSOValidateProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <h1 className="text-xl font-semibold text-hh-ink mb-2">Inloggen mislukt</h1>
+            <h1 className="text-xl font-medium text-hh-ink mb-2">Inloggen mislukt</h1>
             <p className="text-hh-muted mb-6">{errorMessage}</p>
             <button
               onClick={() => navigate("login")}

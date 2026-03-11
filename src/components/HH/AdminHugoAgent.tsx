@@ -611,11 +611,11 @@ function VideoOrderCard({ data }: { data: any[] }) {
             )}
             <span style={{ flex: 1, fontSize: 16, color: "var(--hh-text)", fontWeight: 500 }}>{video.title || video.display_title || "Ongetiteld"}</span>
             <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <button onClick={() => move(i, -1)} disabled={i === 0}
+              <button onClick={() => move(i, -1)} disabled={i === 0} aria-label="Omhoog verplaatsen"
                 style={{ padding: "3px 8px", border: "1px solid var(--hh-border)", borderRadius: 6, backgroundColor: i === 0 ? "var(--hh-ui-50)" : "var(--hh-bg)", cursor: i === 0 ? "not-allowed" : "pointer", color: i === 0 ? "var(--hh-border)" : "var(--hh-muted)" }}>
                 <ChevronUp size={14} />
               </button>
-              <button onClick={() => move(i, 1)} disabled={i === videos.length - 1}
+              <button onClick={() => move(i, 1)} disabled={i === videos.length - 1} aria-label="Omlaag verplaatsen"
                 style={{ padding: "3px 8px", border: "1px solid var(--hh-border)", borderRadius: 6, backgroundColor: i === videos.length - 1 ? "var(--hh-ui-50)" : "var(--hh-bg)", cursor: i === videos.length - 1 ? "not-allowed" : "pointer", color: i === videos.length - 1 ? "var(--hh-border)" : "var(--hh-muted)" }}>
                 <ChevronDown size={14} />
               </button>

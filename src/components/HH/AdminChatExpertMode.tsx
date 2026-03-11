@@ -1571,9 +1571,10 @@ export function AdminChatExpertMode({
                     <span className="text-[11px] text-white/70">Ophangen</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <button 
+                    <button
                       className="flex items-center justify-center"
                       style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'color-mix(in srgb, var(--hh-bg) 20%, transparent)' }}
+                      aria-label="Speaker"
                     >
                       <Volume2 className="w-5 h-5 text-white" />
                     </button>
@@ -2536,6 +2537,7 @@ export function AdminChatExpertMode({
                   backgroundColor: isRecording ? 'color-mix(in srgb, var(--hh-error) 10%, transparent)' : undefined,
                 }}
                 title={isRecording ? "Opname stoppen" : "Dicteren"}
+                aria-label={isRecording ? "Opname stoppen" : "Dicteren"}
               >
                 {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
               </button>

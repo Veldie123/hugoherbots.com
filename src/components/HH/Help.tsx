@@ -295,7 +295,7 @@ export function Help({ navigate, isAdmin }: HelpProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* FAQ List - Takes 2 columns */}
           <div className="lg:col-span-2 space-y-3">
-            <h2 className="text-[18px] leading-[24px] text-hh-text font-semibold mb-4">
+            <h2 className="text-[18px] leading-[24px] text-hh-text font-medium mb-4">
               Veelgestelde vragen ({filteredFAQs.length})
             </h2>
             
@@ -359,7 +359,7 @@ export function Help({ navigate, isAdmin }: HelpProps) {
           <div className="space-y-6">
             {/* Quick Links */}
             <Card className="p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-              <h3 className="text-[16px] leading-[22px] text-hh-text font-semibold mb-4">
+              <h3 className="text-[16px] leading-[22px] text-hh-text font-medium mb-4">
                 Snelle links
               </h3>
               <div className="space-y-2">
@@ -391,7 +391,7 @@ export function Help({ navigate, isAdmin }: HelpProps) {
                   <Headphones className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-[16px] leading-[22px] text-hh-text font-semibold">
+                  <h3 className="text-[16px] leading-[22px] text-hh-text font-medium">
                     Hulp nodig?
                   </h3>
                   <p className="text-[13px] leading-[18px] text-hh-muted">

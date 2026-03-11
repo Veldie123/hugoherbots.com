@@ -460,7 +460,7 @@ export function EPICSidebar({
     <div className="h-full bg-hh-ui-50/30 border-r border-hh-border overflow-y-auto">
       <div className="p-4 space-y-4">
         <div className="pb-3 border-b border-hh-border">
-          <h3 className="text-[18px] leading-[24px] font-semibold text-hh-text mb-1">
+          <h3 className="text-[18px] leading-[24px] font-medium text-hh-text mb-1">
             Talk to Hugo AI
           </h3>
           <p className="text-[13px] leading-[18px] text-hh-muted mb-3">

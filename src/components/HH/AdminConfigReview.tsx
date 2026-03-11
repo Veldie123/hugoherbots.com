@@ -256,25 +256,25 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
     switch (severity) {
       case "HIGH":
         return (
-          <Badge className="bg-hh-error text-white border-0 text-[10px] px-2 py-0.5">
+          <Badge className="bg-hh-error text-white border-0 text-[10px] px-3 py-1">
             HIGH
           </Badge>
         );
       case "MEDIUM":
         return (
-          <Badge className="bg-orange-500 text-white border-0 text-[10px] px-2 py-0.5">
+          <Badge className="bg-orange-500 text-white border-0 text-[10px] px-3 py-1">
             MEDIUM
           </Badge>
         );
       case "ACTION":
         return (
-          <Badge className="bg-hh-primary text-white border-0 text-[10px] px-2 py-0.5">
+          <Badge className="bg-hh-primary text-white border-0 text-[10px] px-3 py-1">
             ACTIE
           </Badge>
         );
       case "LOW":
         return (
-          <Badge className="bg-hh-primary text-white border-0 text-[10px] px-2 py-0.5">
+          <Badge className="bg-hh-primary text-white border-0 text-[10px] px-3 py-1">
             LOW
           </Badge>
         );
@@ -520,7 +520,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                       ) : (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Acties">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -715,7 +715,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                             <div onClick={(e) => e.stopPropagation()}>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Acties">
                                     <MoreVertical className="w-4 h-4" />
                                   </Button>
                                 </DropdownMenuTrigger>

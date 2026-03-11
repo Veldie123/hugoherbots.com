@@ -216,7 +216,7 @@ export function AdminAnalytics({ navigate, isSuperAdmin }: AdminAnalyticsProps) 
                   </div>
                   {metric.change ? (
                     <span
-                      className={`text-[11px] px-2 py-0.5 rounded-full border ${
+                      className={`text-[11px] px-3 py-1 rounded-full border ${
                         metric.trend === "up"
                           ? "bg-hh-success-100 text-hh-success border-hh-success-200"
                           : "bg-hh-error-100 text-hh-error border-hh-error-200"

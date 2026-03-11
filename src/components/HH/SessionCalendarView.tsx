@@ -64,7 +64,7 @@ function getStatusColor(status: string): { bg: string; text: string; border: str
 function getStatusBadge(status: string) {
   const { bg, text, label } = getStatusColor(status);
   return (
-    <Badge className={`${bg} ${text} border-0 text-[11px] font-medium px-2 py-0.5`}>
+    <Badge className={`${bg} ${text} border-0 text-[11px] font-medium px-3 py-1`}>
       {status?.toLowerCase() === "live" && <Radio className="w-3 h-3 mr-1 animate-pulse" />}
       {status?.toLowerCase() === "ended" && <CheckCircle className="w-3 h-3 mr-1" />}
       {label}
@@ -143,13 +143,13 @@ export function SessionCalendarView({
       <Card className="rounded-[16px] shadow-hh-sm border-hh-border overflow-hidden">
         <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-hh-border bg-hh-bg">
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToPrevWeek}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToPrevWeek} aria-label="Vorige week">
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <h3 className="text-[15px] sm:text-[16px] font-semibold text-hh-text min-w-[140px] sm:min-w-[180px] text-center">
+            <h3 className="text-[15px] sm:text-[16px] font-medium text-hh-text min-w-[140px] sm:min-w-[180px] text-center">
               {monthLabel}
             </h3>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToNextWeek}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goToNextWeek} aria-label="Volgende week">
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
@@ -230,7 +230,7 @@ export function SessionCalendarView({
                         {day.getDate()}
                       </span>
                       {isToday && (
-                        <Badge className="bg-hh-primary/10 text-hh-primary border-0 text-[10px] px-1.5 py-0">
+                        <Badge className="bg-hh-primary/10 text-hh-primary border-0 text-[10px] px-3 py-1">
                           Vandaag
                         </Badge>
                       )}

@@ -375,6 +375,7 @@ export function AnalysisResults({
   const [epicExpandedParents, setEpicExpandedParents] = useState<string[]>([]);
   const [epicExpandedHoudingen, setEpicExpandedHoudingen] = useState<string[]>([]);
   const [epicCurrentPhase, setEpicCurrentPhase] = useState(1);
+  const [koopklimaatExpanded, setKoopklimaatExpanded] = useState(false);
 
   const [resolvedConversationId, setResolvedConversationId] = useState<string | null>(
     navigationData?.conversationId || sessionStorage.getItem('analysisId') || null
@@ -1125,7 +1126,7 @@ export function AnalysisResults({
           <div className="flex items-center justify-between gap-6 sm:gap-8">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-[26px] leading-[32px] sm:text-[30px] sm:leading-[38px] font-semibold text-hh-text tracking-tight">
+                <h1 className="text-[26px] leading-[32px] sm:text-[30px] sm:leading-[38px] font-medium text-hh-text tracking-tight">
                   {conversation.title}
                 </h1>
                 {useAdminLayout && (
@@ -1417,7 +1418,7 @@ export function AnalysisResults({
                               {moment.recommendedTechniques.length > 0 && (
                                 <div className="flex gap-1.5 flex-wrap">
                                   {moment.recommendedTechniques.map((t, i) => (
-                                    <span key={i} className="text-[10px] px-2 py-0.5 rounded-full border font-medium"
+                                    <span key={i} className="text-[10px] px-3 py-1 rounded-full border font-medium"
                                       style={{ color: adminColors ? 'var(--hh-primary)' : 'var(--hh-primary)', borderColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 12%, transparent)' : 'color-mix(in srgb, var(--hh-primary) 12%, transparent)', backgroundColor: adminColors ? 'color-mix(in srgb, var(--hh-primary) 3%, transparent)' : 'color-mix(in srgb, var(--hh-primary) 3%, transparent)' }}
                                       title={t}
                                     >
@@ -1903,7 +1904,7 @@ export function AnalysisResults({
                                   : (detail.kind === 'recognition' ? 'Gemist' : 'Niet behandeld')
                                 }
                               </span>
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ backgroundColor: 'var(--hh-ui-100)', color: 'var(--hh-muted)' }}>
+                              <span className="text-[10px] px-3 py-1 rounded-full font-medium" style={{ backgroundColor: 'var(--hh-ui-100)', color: 'var(--hh-muted)' }}>
                                 {match.houding || match.type || ''}
                               </span>
                               {matchTurn && (
@@ -1953,7 +1954,7 @@ export function AnalysisResults({
                               <div className="px-3 py-2 flex flex-wrap gap-1 items-center" style={{ backgroundColor: 'var(--hh-ui-50)', borderTop: '1px solid var(--hh-ui-100)' }}>
                                 <span className="text-[10px] text-hh-muted">{statusOk ? 'Toegepast:' : 'Aanbevolen:'}</span>
                                 {(statusOk ? match.actualTechniques : match.recommendedTechniques)?.map((tech: string, tIdx: number) => (
-                                  <span key={tIdx} className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{
+                                  <span key={tIdx} className="text-[10px] px-3 py-1 rounded-full font-medium" style={{
                                     backgroundColor: statusOk ? 'var(--hh-success-100)' : 'var(--hh-primary-100)',
                                     color: statusOk ? 'var(--hh-success-700)' : 'var(--hh-primary)',
                                   }}>
@@ -1985,7 +1986,7 @@ export function AnalysisResults({
 
             return (
               <div id="detailed-metrics" className="space-y-6 mb-8 sm:mb-12">
-                <h3 className="text-[16px] font-semibold text-hh-text">Waar is nog werk?</h3>
+                <h3 className="text-[16px] font-medium text-hh-text">Waar is nog werk?</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {phaseDetails.map((pd) => {
@@ -2144,17 +2145,72 @@ export function AnalysisResults({
 
               <div className="space-y-3">
                 {(() => {
-                  let lastPhase: number | null = null;
+                  const firstTechniqueTurnIdx = evaluations.length > 0
+                    ? evaluations.filter(e => e.techniques && e.techniques.length > 0).reduce((min, e) => Math.min(min, e.turnIdx), Infinity)
+                    : -1;
+                  const hasKoopklimaat = firstTechniqueTurnIdx > 0 && firstTechniqueTurnIdx !== Infinity;
+                  let lastPhase: number | null = hasKoopklimaat ? 1 : null;
 
-                  return transcript.map((turn) => {
-                    const evaluation = evaluations.find(e => e.turnIdx === turn.idx);
-                    const signal = signals.find(s => s.turnIdx === turn.idx);
-                    const currentPhase = determinePhaseForTurn(turn.idx);
-                    const showPhaseDivider = currentPhase !== null && currentPhase !== lastPhase;
-                    if (currentPhase !== null) lastPhase = currentPhase;
+                  return (
+                    <>
+                      {hasKoopklimaat && (
+                        <>
+                          <div className="flex items-center gap-3 my-4">
+                            <div className="flex-1 h-px bg-hh-border" />
+                            <span className={`text-[12px] font-semibold px-3 py-1 rounded-full border ${PHASE_LABELS[1].bgColor} ${PHASE_LABELS[1].color}`}>
+                              {PHASE_LABELS[1].name}
+                            </span>
+                            <span className="text-[11px] text-hh-muted hidden sm:inline">{PHASE_LABELS[1].description}</span>
+                            <div className="flex-1 h-px bg-hh-border" />
+                          </div>
+                          <button
+                            onClick={() => setKoopklimaatExpanded(!koopklimaatExpanded)}
+                            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors hover:bg-hh-ui-50"
+                          >
+                            <ChevronRight className={`w-4 h-4 text-hh-muted transition-transform ${koopklimaatExpanded ? 'rotate-90' : ''}`} />
+                            <span className="text-[13px] text-hh-muted">
+                              Koopklimaat — {firstTechniqueTurnIdx} berichten
+                            </span>
+                            <span className="text-[11px] text-hh-muted/60 ml-auto">
+                              {formatTime(transcript[0]?.startMs)} – {formatTime(transcript[firstTechniqueTurnIdx - 1]?.endMs || transcript[firstTechniqueTurnIdx - 1]?.startMs)}
+                            </span>
+                          </button>
+                          {koopklimaatExpanded && (
+                            <div className="space-y-3 mt-2">
+                              {transcript.filter(t => t.idx < firstTechniqueTurnIdx).map(turn => {
+                                const signal = signals.find(s => s.turnIdx === turn.idx);
+                                return (
+                                  <ChatBubble
+                                    key={turn.idx}
+                                    speaker={turn.speaker === 'seller' ? 'seller' : 'customer'}
+                                    text={turn.text}
+                                    timestamp={formatTime(turn.startMs)}
+                                    adminColors={adminColors}
+                                    variant="faded"
+                                  >
+                                    {turn.speaker === 'customer' && signal && signal.houding !== 'neutraal' && (
+                                      <span className="inline-flex items-center text-[10px] px-3 py-1 rounded-full font-semibold" style={getSignalLabel(signal.houding).style}>
+                                        {getSignalLabel(signal.houding).label}
+                                      </span>
+                                    )}
+                                  </ChatBubble>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </>
+                      )}
+                      {transcript.map((turn) => {
+                        if (hasKoopklimaat && turn.idx < firstTechniqueTurnIdx) return null;
 
-                    return (
-                      <div key={turn.idx}>
+                        const evaluation = evaluations.find(e => e.turnIdx === turn.idx);
+                        const signal = signals.find(s => s.turnIdx === turn.idx);
+                        const currentPhase = determinePhaseForTurn(turn.idx);
+                        const showPhaseDivider = currentPhase !== null && currentPhase !== lastPhase;
+                        if (currentPhase !== null) lastPhase = currentPhase;
+
+                        return (
+                          <div key={turn.idx}>
                         {showPhaseDivider && currentPhase && (
                           <div className="flex items-center gap-3 my-4">
                             <div className="flex-1 h-px bg-hh-border" />
@@ -2180,7 +2236,7 @@ export function AnalysisResults({
                                 const isFeedbackPanelOpen = feedbackOpen === badgeKey;
                                 return (
                                   <span className="relative inline-flex items-center group/badge">
-                                    <span className="inline-flex items-center text-[10px] px-2 py-0.5 rounded-full font-semibold" style={getSignalLabel(signal.houding).style}>
+                                    <span className="inline-flex items-center text-[10px] px-3 py-1 rounded-full font-semibold" style={getSignalLabel(signal.houding).style}>
                                       {getSignalLabel(signal.houding).label}
                                     </span>
                                     {useAdminLayout && !isConfirmed && (
@@ -2224,7 +2280,7 @@ export function AnalysisResults({
                                 const isFeedbackPanelOpen = feedbackOpen === badgeKey;
                                 return (
                                   <span key={i} className="relative inline-flex items-center group/badge">
-                                    <Badge variant="outline" className="text-[10px] px-2.5 py-0.5 rounded-full font-medium border" style={badge.style}>
+                                    <Badge variant="outline" className="text-[10px] px-3 py-1 rounded-full font-medium border" style={badge.style}>
                                       {tech.quality === 'gemist' ? '✗' : '✓'} {tech.naam || tech.id}
                                     </Badge>
                                     {useAdminLayout && !isConfirmed && (
@@ -2512,7 +2568,9 @@ export function AnalysisResults({
                         </ChatBubble>
                       </div>
                     );
-                  });
+                  })}
+                    </>
+                  );
                 })()}
               </div>
             </Card>

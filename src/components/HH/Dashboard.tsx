@@ -71,7 +71,7 @@ const ContentRow = ({
       <div className="flex items-center justify-between gap-2 px-1">
         <div className="flex items-center gap-2 min-w-0">
           {Icon && <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-hh-muted flex-shrink-0" />}
-          <h2 className="text-[16px] sm:text-[18px] font-semibold text-hh-text truncate">{title}</h2>
+          <h2 className="text-[16px] sm:text-[18px] font-medium text-hh-text truncate">{title}</h2>
         </div>
         {onSeeAll && (
           <button
@@ -222,12 +222,12 @@ const WebinarCard = ({
         className="absolute inset-0 w-full h-full object-cover object-top"
       />
       {isLive && (
-        <Badge className="absolute top-2 right-2 bg-hh-error text-white text-[10px] px-2 py-0.5 animate-pulse">
+        <Badge className="absolute top-2 right-2 bg-hh-error text-white text-[10px] px-3 py-1 animate-pulse">
           LIVE
         </Badge>
       )}
       {isReplay && (
-        <Badge className="absolute top-2 right-2 bg-hh-ink/80 text-white text-[10px] px-1.5 py-0.5">
+        <Badge className="absolute top-2 right-2 bg-hh-ink/80 text-white text-[10px] px-3 py-1">
           Opname
         </Badge>
       )}
@@ -310,7 +310,7 @@ const HugoTrainingCard = ({
           className="absolute inset-0 w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-black/20" />
-        <Badge className={`absolute top-2 right-2 ${faseColors.bg} ${faseColors.text} text-[10px] px-1.5 py-0.5`}>
+        <Badge className={`absolute top-2 right-2 ${faseColors.bg} ${faseColors.text} text-[10px] px-3 py-1`}>
           Fase {fase}
         </Badge>
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -556,7 +556,7 @@ export function Dashboard({ hasData: hasDataProp, navigate, isAdmin = false, isP
         {/* Header with streak + E.P.I.C. progress */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h1 className="mb-1 text-[24px] leading-[32px] sm:text-[28px] sm:leading-[36px] lg:text-[32px] lg:leading-[40px] font-semibold text-hh-text truncate">
+            <h1 className="mb-1 text-[24px] leading-[32px] sm:text-[28px] sm:leading-[36px] lg:text-[32px] lg:leading-[40px] font-medium text-hh-text truncate">
               {displayName ? `Welkom, ${displayName}` : 'Welkom!'}
             </h1>
             <p className="text-[13px] sm:text-[14px] leading-[20px] text-hh-muted line-clamp-2">

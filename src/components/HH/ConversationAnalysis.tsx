@@ -481,7 +481,7 @@ export function ConversationAnalysis({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card className="p-6 rounded-[16px] border-hh-border hover:border-hh-primary/40 hover:shadow-lg hover:bg-hh-ui-50/30 transition-all">
             <div className="mb-5">
-              <h2 className="text-[24px] leading-[30px] text-hh-text font-semibold mb-2">
+              <h2 className="text-[24px] leading-[30px] text-hh-text font-medium mb-2">
                 Upload Rollenspel
               </h2>
               <p className="text-[14px] leading-[20px] text-hh-muted">

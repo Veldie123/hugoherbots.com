@@ -191,7 +191,7 @@ export function RolePlayOverview({ navigate, isAdmin }: RolePlayOverviewProps) {
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +12
               </Badge>
@@ -211,7 +211,7 @@ export function RolePlayOverview({ navigate, isAdmin }: RolePlayOverviewProps) {
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +234
               </Badge>
@@ -231,7 +231,7 @@ export function RolePlayOverview({ navigate, isAdmin }: RolePlayOverviewProps) {
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +5%
               </Badge>
@@ -350,7 +350,7 @@ export function RolePlayOverview({ navigate, isAdmin }: RolePlayOverviewProps) {
                   </div>
 
                   <div>
-                    <h3 className="text-[18px] leading-[24px] text-hh-text font-semibold mb-2">
+                    <h3 className="text-[18px] leading-[24px] text-hh-text font-medium mb-2">
                       {scenario.title}
                     </h3>
                     <p className="text-[14px] leading-[20px] text-hh-muted line-clamp-2">
@@ -388,7 +388,7 @@ export function RolePlayOverview({ navigate, isAdmin }: RolePlayOverviewProps) {
                   <div className="flex justify-end">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -504,7 +504,7 @@ export function RolePlayOverview({ navigate, isAdmin }: RolePlayOverviewProps) {
                       <td className="py-3 px-4 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>

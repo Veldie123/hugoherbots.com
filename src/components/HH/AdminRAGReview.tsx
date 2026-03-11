@@ -231,7 +231,7 @@ export function AdminRAGReview({ navigate, isSuperAdmin, currentPage = "admin-ra
       <div className="space-y-6 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-hh-ink">
+            <h1 className="text-2xl font-medium text-hh-ink">
               RAG Techniek Review
             </h1>
             <p className="text-sm text-hh-muted mt-1">

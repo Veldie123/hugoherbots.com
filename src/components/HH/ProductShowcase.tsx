@@ -104,7 +104,7 @@ function ModuleSection({ module, index, navigate }: { module: Module; index: num
                 <module.icon className="w-4 h-4" />
                 {module.tab}
               </div>
-              <h3 className={`${textColor} text-[28px] leading-[36px] sm:text-[34px] sm:leading-[42px] font-semibold`}>
+              <h3 className={`${textColor} text-[28px] leading-[36px] sm:text-[34px] sm:leading-[42px] font-medium`}>
                 {module.title}
               </h3>
               <p className={`${mutedColor} text-[16px] leading-[26px] sm:text-[17px] sm:leading-[28px]`}>

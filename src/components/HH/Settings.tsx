@@ -932,11 +932,11 @@ export function Settings({ navigate, initialSection = "profile", isAdmin, onboar
                     <div className="flex items-center justify-between mb-2">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="text-[18px] leading-[24px] text-hh-text font-semibold">
+                          <p className="text-[18px] leading-[24px] text-hh-text font-medium">
                             {plan.name}
                           </p>
                           {isCurrent && (
-                            <span className="px-2 py-0.5 bg-hh-primary text-white text-[10px] rounded">
+                            <span className="px-3 py-1 bg-hh-primary text-white text-[10px] rounded">
                               HUIDIG
                             </span>
                           )}

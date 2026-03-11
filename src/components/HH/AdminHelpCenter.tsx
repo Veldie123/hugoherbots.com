@@ -197,7 +197,7 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +8%
               </Badge>
@@ -215,7 +215,7 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 Live
               </Badge>
@@ -233,7 +233,7 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +42%
               </Badge>
@@ -251,7 +251,7 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
               </div>
               <Badge
                 variant="outline"
-                className="text-[11px] px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 Excellent
               </Badge>
@@ -411,12 +411,12 @@ export function AdminHelpCenter({ navigate, isSuperAdmin }: AdminHelpCenterProps
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Bekijken">
                           <Eye className="w-4 h-4" />
                         </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>

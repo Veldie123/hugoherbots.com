@@ -438,7 +438,7 @@ export function HugoAIOverview({ navigate, isAdmin, onboardingMode }: HugoAIOver
         <div className="p-6">
           <Card className="p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Fout bij laden</h2>
+            <h2 className="text-xl font-medium mb-2">Fout bij laden</h2>
             <p className="text-hh-muted">{error}</p>
           </Card>
         </div>
@@ -687,7 +687,7 @@ export function HugoAIOverview({ navigate, isAdmin, onboardingMode }: HugoAIOver
                       <td className="py-3 px-4">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                               <MoreVertical className="w-4 h-4 text-hh-muted" />
                             </Button>
                           </DropdownMenuTrigger>

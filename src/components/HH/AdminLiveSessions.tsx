@@ -658,7 +658,7 @@ ${platformUrl}`;
                                     {msg.userName}
                                   </span>
                                   {msg.isHost && (
-                                    <Badge className="bg-hh-primary/15 text-hh-primary border-hh-primary/30 text-[10px] px-1.5 py-0">
+                                    <Badge className="bg-hh-primary/15 text-hh-primary border-hh-primary/30 text-[10px] px-3 py-1">
                                       HOST
                                     </Badge>
                                   )}
@@ -698,6 +698,7 @@ ${platformUrl}`;
                           disabled={!chatMessage.trim() || sendingMessage}
                           size="icon"
                           className="bg-hh-primary hover:bg-hh-primary/90 text-white"
+                          aria-label="Versturen"
                         >
                           {sendingMessage ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -907,7 +908,7 @@ ${platformUrl}`;
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${stat.bgClass}`}>
                   <stat.icon className={`w-5 h-5 ${stat.textClass}`} />
                 </div>
-                <span className={`text-[11px] px-2 py-0.5 rounded-full border ${badgeClass}`}>
+                <span className={`text-[11px] px-3 py-1 rounded-full border ${badgeClass}`}>
                   {stat.badge}
                 </span>
               </div>
@@ -998,7 +999,7 @@ ${platformUrl}`;
                 <Button variant="ghost" size="sm" onClick={() => setAdminCalendarMonth(new Date(year, month - 1, 1))}>
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
-                <h3 className="text-[16px] font-semibold text-hh-text">{MONTH_NAMES[month]} {year}</h3>
+                <h3 className="text-[16px] font-medium text-hh-text">{MONTH_NAMES[month]} {year}</h3>
                 <Button variant="ghost" size="sm" onClick={() => setAdminCalendarMonth(new Date(year, month + 1, 1))}>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
@@ -1094,7 +1095,7 @@ ${platformUrl}`;
                       {getStatusBadge(session.status)}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -1397,7 +1398,7 @@ ${platformUrl}`;
                           <td className="py-3 px-4 text-right">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                                   <MoreVertical className="w-4 h-4" />
                                 </Button>
                               </DropdownMenuTrigger>

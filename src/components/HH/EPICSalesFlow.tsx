@@ -355,7 +355,7 @@ export function EPICSalesFlow(props: EPICSalesFlowProps) {
                                     </p>
                                     <div className="flex items-center gap-2 mt-0.5">
                                       {step.nummer && (
-                                        <span className="inline-flex items-center justify-center bg-hh-primary-100 text-hh-primary text-[10px] font-semibold rounded-full px-1.5 py-0.5">
+                                        <span className="inline-flex items-center justify-center bg-hh-primary-100 text-hh-primary text-[10px] font-semibold rounded-full px-3 py-1">
                                           {step.nummer}
                                         </span>
                                       )}

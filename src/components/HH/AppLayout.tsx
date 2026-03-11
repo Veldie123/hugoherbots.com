@@ -560,7 +560,7 @@ export function AppLayout({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button variant="ghost" size="icon" className="hidden sm:flex lg:hidden">
+            <Button variant="ghost" size="icon" className="hidden sm:flex lg:hidden" aria-label="Zoeken">
               <Search className="w-5 h-5" />
             </Button>
 

@@ -19,7 +19,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
             <ChevronLeft className="w-4 h-4" />
             <span className="text-[14px]">Terug</span>
           </button>
-          <h1 className="text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] font-semibold text-hh-text mb-2">
+          <h1 className="text-[32px] leading-[40px] sm:text-[40px] sm:leading-[48px] font-medium text-hh-text mb-2">
             Privacy Beleid
           </h1>
           <p className="text-[14px] leading-[22px] text-hh-muted">
@@ -33,7 +33,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
               <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
                 <Shield className="w-5 h-5 text-hh-primary" />
               </div>
-              <h2 className="text-[20px] leading-[28px] font-semibold text-hh-text">
+              <h2 className="text-[20px] leading-[28px] font-medium text-hh-text">
                 1. Inleiding
               </h2>
             </div>
@@ -50,7 +50,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
               <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
                 <FileText className="w-5 h-5 text-emerald-600" />
               </div>
-              <h2 className="text-[20px] leading-[28px] font-semibold text-hh-text">
+              <h2 className="text-[20px] leading-[28px] font-medium text-hh-text">
                 2. Gegevens die wij verzamelen
               </h2>
             </div>
@@ -67,7 +67,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                 <Eye className="w-5 h-5 text-blue-600" />
               </div>
-              <h2 className="text-[20px] leading-[28px] font-semibold text-hh-text">
+              <h2 className="text-[20px] leading-[28px] font-medium text-hh-text">
                 3. Hoe wij gegevens gebruiken
               </h2>
             </div>
@@ -87,7 +87,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
               <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
                 <Users className="w-5 h-5 text-hh-primary" />
               </div>
-              <h2 className="text-[20px] leading-[28px] font-semibold text-hh-text">
+              <h2 className="text-[20px] leading-[28px] font-medium text-hh-text">
                 4. Toestemming van derden
               </h2>
             </div>
@@ -111,7 +111,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
               <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center">
                 <Lock className="w-5 h-5 text-teal-600" />
               </div>
-              <h2 className="text-[20px] leading-[28px] font-semibold text-hh-text">
+              <h2 className="text-[20px] leading-[28px] font-medium text-hh-text">
                 5. Beveiliging
               </h2>
             </div>
@@ -131,7 +131,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
               <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
                 <Clock className="w-5 h-5 text-orange-600" />
               </div>
-              <h2 className="text-[20px] leading-[28px] font-semibold text-hh-text">
+              <h2 className="text-[20px] leading-[28px] font-medium text-hh-text">
                 6. Bewaartermijn
               </h2>
             </div>
@@ -147,7 +147,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
               <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                 <FileText className="w-5 h-5 text-gray-600" />
               </div>
-              <h2 className="text-[20px] leading-[28px] font-semibold text-hh-text">
+              <h2 className="text-[20px] leading-[28px] font-medium text-hh-text">
                 7. Uw rechten
               </h2>
             </div>
@@ -168,7 +168,7 @@ export function PrivacyPolicy({ navigate, isAdmin }: PrivacyPolicyProps) {
               <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
                 <Mail className="w-5 h-5 text-hh-primary" />
               </div>
-              <h2 className="text-[20px] leading-[28px] font-semibold text-hh-text">
+              <h2 className="text-[20px] leading-[28px] font-medium text-hh-text">
                 8. Contact
               </h2>
             </div>

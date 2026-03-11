@@ -213,7 +213,7 @@ export function TechniqueDetailsDialog({
                     <Badge
                       key={index}
                       variant="outline"
-                      className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
+                      className="text-[11px] font-medium px-3 py-1 rounded-full"
                       style={{
                         backgroundColor: isAdmin ? `rgba(var(--hh-primary-rgb), 0.08)` : `${phaseColor}12`,
                         color: isAdmin ? 'var(--hh-primary)' : phaseColor,
@@ -225,6 +225,7 @@ export function TechniqueDetailsDialog({
                         <button
                           onClick={() => handleRemoveTag(tag)}
                           className="ml-1.5 hover:text-hh-error"
+                          aria-label={`Tag "${tag}" verwijderen`}
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -396,7 +397,7 @@ export function TechniqueDetailsDialog({
                           {slide.visual_type && (
                             <Badge
                               variant="outline"
-                              className="text-xs px-2 py-0 rounded-full shrink-0"
+                              className="text-xs px-3 py-1 rounded-full shrink-0"
                             >
                               {VISUAL_TYPE_LABELS[slide.visual_type] || slide.visual_type}
                             </Badge>

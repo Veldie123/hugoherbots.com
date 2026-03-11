@@ -584,7 +584,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${stat.bgClass}`}>
                   <stat.icon className={`w-5 h-5 ${stat.textClass}`} />
                 </div>
-                <span className={`text-[11px] px-2 py-0.5 rounded-full border ${badgeClass}`}>
+                <span className={`text-[11px] px-3 py-1 rounded-full border ${badgeClass}`}>
                   {stat.badge}
                 </span>
               </div>
@@ -823,6 +823,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
+                              aria-label="Acties"
                             >
                               <MoreVertical className="w-4 h-4" />
                             </Button>
@@ -868,7 +869,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                 >
                   <div className="flex items-start justify-between mb-3">
                     {(analysis.techniquesFound || []).length > 0 ? (
-                      <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[10px] font-mono px-1.5 py-0">
+                      <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[10px] font-mono px-3 py-1">
                         {analysis.techniquesFound[0]}
                       </Badge>
                     ) : (
@@ -878,7 +879,7 @@ export function AdminUploads({ navigate, isSuperAdmin }: AdminUploadsProps) {
                       {getStatusBadge(analysis.status)}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Acties">
                             <MoreVertical className="w-3.5 h-3.5" />
                           </Button>
                         </DropdownMenuTrigger>

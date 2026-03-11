@@ -85,7 +85,7 @@ export function LiveAnalysePanel() {
       <div className="mb-5">
         <div className="flex items-center gap-2 mb-2">
           <Sparkles className="w-5 h-5 text-hh-primary" />
-          <h2 className="text-[24px] leading-[30px] text-hh-text font-semibold">
+          <h2 className="text-[24px] leading-[30px] text-hh-text font-medium">
             Live Analyse
           </h2>
         </div>
@@ -99,7 +99,7 @@ export function LiveAnalysePanel() {
         <div className="text-[13px] leading-[18px] text-hh-muted mb-2">
           Status
         </div>
-        <div className="text-[18px] leading-[24px] text-hh-text font-semibold mb-1">
+        <div className="text-[18px] leading-[24px] text-hh-text font-medium mb-1">
           {isActive ? "Live aan het luisteren" : "Klaar om te starten"}
         </div>
         <div className="text-[13px] leading-[18px] text-hh-muted">

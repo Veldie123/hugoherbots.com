@@ -671,7 +671,7 @@ export function Landing({ navigate }: LandingProps) {
             ].map((item, idx) => (
               <AnimatedSection key={idx} delay={idx * 0.05}>
                 <Card className="p-6 rounded-[16px] shadow-hh-sm border-hh-border">
-                  <h3 className="text-[18px] leading-[26px] font-semibold text-hh-text mb-2">
+                  <h3 className="text-[18px] leading-[26px] font-medium text-hh-text mb-2">
                     {item.q}
                   </h3>
                   <p className="text-[16px] leading-[24px] text-hh-muted">

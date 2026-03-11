@@ -68,6 +68,7 @@ export function HistorySidebar({ type, items, onSelectItem, onOpenFullView }: Hi
           onClick={onOpenFullView}
           className="w-10 h-10 rounded-lg hover:bg-hh-ui-100 flex items-center justify-center text-hh-muted mt-auto"
           title="Bekijk volledige historiek"
+          aria-label="Bekijk volledige historiek"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -154,7 +155,7 @@ export function HistorySidebar({ type, items, onSelectItem, onOpenFullView }: Hi
                   className="w-full p-3 text-left hover:bg-hh-ui-50 border-b border-hh-border/30 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="inline-flex items-center justify-center min-w-[42px] h-8 px-2 rounded-md bg-hh-primary/10 text-hh-primary text-sm font-semibold">
+                    <span className="inline-flex items-center justify-center min-w-[42px] h-8 px-3 rounded-md bg-hh-primary/10 text-hh-primary text-sm font-semibold">
                       {item.techniqueNumber}
                     </span>
                     <div className="flex-1 min-w-0">

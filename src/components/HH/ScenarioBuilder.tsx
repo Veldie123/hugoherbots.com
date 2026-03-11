@@ -375,7 +375,7 @@ export function ScenarioBuilder({ navigate, isAdmin = false }: ScenarioBuilderPr
           {selectedNode ? (
             <>
               <div>
-                <h2 className="text-[20px] leading-[28px] font-semibold text-hh-text mb-4">
+                <h2 className="text-[20px] leading-[28px] font-medium text-hh-text mb-4">
                   Node eigenschappen
                 </h2>
                 <p className="text-[14px] leading-[20px] text-hh-muted mb-4">

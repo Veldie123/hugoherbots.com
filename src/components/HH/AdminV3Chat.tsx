@@ -191,7 +191,7 @@ export function AdminV3Chat({ navigate, isSuperAdmin }: Props) {
               <Bot size={20} className="text-white" />
             </div>
             <div>
-              <h1 className="text-[18px] font-semibold text-hh-text leading-tight">
+              <h1 className="text-[18px] font-medium text-hh-text leading-tight">
                 HugoClaw <span className="text-[12px] text-hh-muted font-normal">V3</span>
               </h1>
               <p className="text-[12px] text-hh-muted">
@@ -273,7 +273,7 @@ export function AdminV3Chat({ navigate, isSuperAdmin }: Props) {
                 {msg.toolsUsed && msg.toolsUsed.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {msg.toolsUsed.map((tool, ti) => (
-                      <span key={ti} className="text-[10px] font-mono bg-hh-primary/10 text-hh-primary px-2 py-0.5 rounded-full border border-hh-primary/20">
+                      <span key={ti} className="text-[10px] font-mono bg-hh-primary/10 text-hh-primary px-3 py-1 rounded-full border border-hh-primary/20">
                         {tool}
                       </span>
                     ))}
@@ -318,6 +318,7 @@ export function AdminV3Chat({ navigate, isSuperAdmin }: Props) {
               onClick={handleSubmit}
               disabled={isLoading || !inputValue.trim() || !sessionId}
               className="h-[48px] px-5 rounded-[12px] bg-hh-primary text-white font-semibold text-[14px] flex items-center gap-2 transition-colors hover:bg-hh-primary/90 disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+              aria-label="Versturen"
             >
               {isLoading
                 ? <Loader2 size={18} className="animate-spin" />

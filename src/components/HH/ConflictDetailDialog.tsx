@@ -155,7 +155,7 @@ export function ConflictDetailDialog({
 
           {/* Suggested Fix Section */}
           <div>
-            <h4 className="text-[16px] font-semibold text-hh-ink mb-3">
+            <h4 className="text-[16px] font-medium text-hh-ink mb-3">
               Voorgestelde aanpassing
             </h4>
             <div className="bg-hh-ui-50 border border-hh-border rounded-xl overflow-hidden">
@@ -179,7 +179,7 @@ export function ConflictDetailDialog({
           {/* Transcript Section (if available) */}
           {conflict.transcriptExcerpt && (
             <div>
-              <h4 className="text-[16px] font-semibold text-hh-ink mb-3 flex items-center gap-2">
+              <h4 className="text-[16px] font-medium text-hh-ink mb-3 flex items-center gap-2">
                 <MessageSquare className="w-5 h-5" />
                 Rollenspel Transcript
               </h4>

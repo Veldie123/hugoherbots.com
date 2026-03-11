@@ -691,7 +691,7 @@ export function VideoWatchPage({
                   {video.duration}
                 </span>
                 {technique && (
-                  <Badge variant="outline" className="text-[10px] text-hh-muted border-hh-border px-1.5 py-0">
+                  <Badge variant="outline" className="text-[10px] text-hh-muted border-hh-border px-3 py-1">
                     {getFaseNaam(technique.fase)}
                   </Badge>
                 )}
@@ -715,7 +715,7 @@ export function VideoWatchPage({
                       <button
                         key={t.nummer}
                         onClick={() => setDetailTechnique(t)}
-                        className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full transition-colors hover:opacity-90 cursor-pointer"
+                        className="inline-flex items-center gap-1 text-[10px] font-medium px-3 py-1 rounded-full transition-colors hover:opacity-90 cursor-pointer"
                         style={{
                           backgroundColor: `${phaseColor}${isPrimary ? '20' : '10'}`,
                           color: phaseColor,

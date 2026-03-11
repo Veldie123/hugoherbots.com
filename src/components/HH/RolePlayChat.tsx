@@ -325,7 +325,7 @@ export function RolePlayChat({ navigate, isAdmin }: RolePlayChatProps) {
                     </Button>
                     <Button onClick={startVideoSession} size="lg" variant="outline" className="gap-2 w-full">
                       <Video className="w-4 h-4" /> Video-call met Hugo
-                      <Badge className="bg-hh-warn text-white border-0 text-[10px] px-2 py-0.5 ml-1">
+                      <Badge className="bg-hh-warn text-white border-0 text-[10px] px-3 py-1 ml-1">
                         Beta
                       </Badge>
                     </Button>

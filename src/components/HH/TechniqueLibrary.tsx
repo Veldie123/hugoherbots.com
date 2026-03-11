@@ -471,7 +471,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                       <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -618,7 +618,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
                   </Badge>
                   
                   {techniek.videos > 0 && (
-                    <Badge className="absolute top-3 right-3 bg-black/60 text-white border-0 text-[10px] px-2 py-0.5 z-10">
+                    <Badge className="absolute top-3 right-3 bg-black/60 text-white border-0 text-[10px] px-3 py-1 z-10">
                       {techniek.videos} video's
                     </Badge>
                   )}

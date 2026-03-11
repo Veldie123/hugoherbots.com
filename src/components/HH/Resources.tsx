@@ -164,7 +164,7 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +2
               </Badge>
@@ -184,7 +184,7 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success/10 text-hh-success border-hh-success/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success/10 text-hh-success border-hh-success/20"
               >
                 +15%
               </Badge>
@@ -368,7 +368,7 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                                 <MoreVertical className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -416,7 +416,7 @@ export function Resources({ navigate, isAdmin, onboardingMode }: ResourcesProps)
                       )}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Acties">
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>

@@ -49,7 +49,6 @@ import {
   Plus,
   GripVertical,
   FolderOpen,
-  Sparkles,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { AdminLayout } from "./AdminLayout";
@@ -1010,38 +1009,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
   };
 
   const [isDriveOrdering, setIsDriveOrdering] = useState(false);
-  const [isAiOrdering, setIsAiOrdering] = useState(false);
   const [driveTotalCount, setDriveTotalCount] = useState<number | null>(null);
-
-  const handleAiOrder = async () => {
-    setIsAiOrdering(true);
-    try {
-      toast.loading("AI analyseert video's voor optimale volgorde...", { id: 'ai-order' });
-      const response = await apiFetch('/api/admin-video/videos/ai-order', {
-        method: 'POST',
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || 'AI volgorde mislukt');
-
-      if (result.order && result.order.length > 0) {
-        const orderMap = new Map(result.order.map((item: { id: string; position: number }) => [item.id, item.position]));
-        const sorted = [...reorderVideos].sort((a, b) => {
-          const posA = orderMap.get(a.id) ?? 9999;
-          const posB = orderMap.get(b.id) ?? 9999;
-          return (posA as number) - (posB as number);
-        });
-        setReorderVideos(sorted);
-        setReorderDirty(true);
-        toast.success(`AI volgorde toegepast op ${result.total} video's. Klik "Opslaan" om te bevestigen.`, { id: 'ai-order' });
-      } else {
-        toast.error('Geen volgorde ontvangen van AI', { id: 'ai-order' });
-      }
-    } catch (err: any) {
-      toast.error(`AI volgorde fout: ${err.message}`, { id: 'ai-order' });
-    } finally {
-      setIsAiOrdering(false);
-    }
-  };
 
   const handleDriveOrder = async (dryRun = false) => {
     setIsDriveOrdering(true);
@@ -1748,7 +1716,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           </TooltipContent>
                         </Tooltip>
                       )}
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${badgeClass}`}>
+                      <span className={`text-[10px] px-3 py-1 rounded-full border ${badgeClass}`}>
                         {badgeText}
                       </span>
                     </div>
@@ -1778,7 +1746,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         </Tooltip>
                       )}
                       {step.stats.pending > 0 && (
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                        <span className={`text-[10px] px-3 py-1 rounded ${
                           step.stats.pending >= 100 ? 'bg-hh-error-100 text-hh-error' :
                           step.stats.pending >= 50 ? 'bg-hh-warning-100 text-hh-warning' :
                           'bg-hh-ui-100 text-hh-muted'
@@ -1841,7 +1809,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step.bgClass}`}>
                       <Icon className={`w-4 h-4 ${isProcessing ? 'animate-spin' : ''} ${step.textClass}`} />
                     </div>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
+                    <span className={`text-[10px] px-3 py-1 rounded-full border ${
                       isProcessing
                         ? 'bg-hh-primary-100 text-hh-primary border-hh-primary-200'
                         : 'bg-hh-success-100 text-hh-success border-hh-success-200'
@@ -1987,20 +1955,10 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
                   <ArrowUpDown className="w-5 h-5" style={{ color: 'var(--hh-primary)' }} />
-                  <h3 className="text-[16px] font-semibold text-hh-text">Afspeelvolgorde</h3>
+                  <h3 className="text-[16px] font-medium text-hh-text">Afspeelvolgorde</h3>
                   <Badge variant="secondary" className="text-xs">{searchQuery ? reorderVideos.filter(v => matchesSearch(v, searchQuery)).length : reorderVideos.length} video's</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAiOrder}
-                    disabled={isAiOrdering || isSavingOrder}
-                    className="border-hh-primary/30 text-hh-primary hover:bg-hh-primary/10"
-                  >
-                    {isAiOrdering ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
-                    AI Volgorde
-                  </Button>
                   {reorderDirty && (
                     <Button
                       size="sm"
@@ -2105,7 +2063,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                       <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onDragStart={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0" aria-label="Acties">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -2431,7 +2389,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                           <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Acties">
                                   <MoreVertical className="w-4 h-4" />
                                 </Button>
                               </DropdownMenuTrigger>
@@ -2637,7 +2595,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                         className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
                         onClick={(e) => { e.stopPropagation(); navigate?.('admin-video-detail', { videoId: video.id }); }}
                       >
-                        <Button size="icon" className="rounded-full w-12 h-12 bg-hh-primary hover:bg-hh-primary/90">
+                        <Button size="icon" className="rounded-full w-12 h-12 bg-hh-primary hover:bg-hh-primary/90" aria-label="Afspelen">
                           <Play className="w-6 h-6 text-white" />
                         </Button>
                       </div>
@@ -2665,7 +2623,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                       </Badge>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                          <Button type="button" variant="ghost" size="icon" className="h-8 w-8 relative z-10">
+                          <Button type="button" variant="ghost" size="icon" className="h-8 w-8 relative z-10" aria-label="Acties">
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -2777,21 +2735,21 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     </h3>
 
                     <div className="flex items-center gap-2 mb-3 flex-wrap">
-                      <Badge variant="outline" className={`text-[10px] px-2 py-0 ${getStatusColor(video.status)}`}>
+                      <Badge variant="outline" className={`text-[10px] px-3 py-1 ${getStatusColor(video.status)}`}>
                         {getStatusLabel(video.status)}
                       </Badge>
                       {video.is_hidden && (
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-hh-ui-100 text-hh-muted border-hh-border gap-1">
+                        <Badge variant="outline" className="text-[10px] px-3 py-1 bg-hh-ui-100 text-hh-muted border-hh-border gap-1">
                           <EyeOff className="w-3 h-3" />Verborgen
                         </Badge>
                       )}
                       {video.course_module && (
-                        <Badge variant="outline" className="text-[10px] px-2 py-0">
+                        <Badge variant="outline" className="text-[10px] px-3 py-1">
                           {video.course_module}
                         </Badge>
                       )}
                       {video.has_transcript && (
-                        <Badge variant="outline" className="text-[10px] px-2 py-0 border-hh-success/20 text-hh-success gap-1">
+                        <Badge variant="outline" className="text-[10px] px-3 py-1 border-hh-success/20 text-hh-success gap-1">
                           <FileText className="w-3 h-3" />
                           Transcript
                         </Badge>
@@ -2838,7 +2796,7 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
         badges={
           <>
             {selectedTechniqueId && (
-              <Badge className="text-[12px] px-2.5 py-0.5 rounded-full font-mono" style={{ backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)' }}>
+              <Badge className="text-[12px] px-3 py-1 rounded-full font-mono" style={{ backgroundColor: 'var(--hh-primary-100)', color: 'var(--hh-primary)' }}>
                 {selectedTechniqueId}
               </Badge>
             )}

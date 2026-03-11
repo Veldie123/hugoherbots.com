@@ -670,7 +670,7 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] flex-shrink-0 rounded-full px-2">
+                        <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] flex-shrink-0 rounded-full px-3 py-1">
                           {technique.nummer}
                         </Badge>
                         <Badge
@@ -828,7 +828,7 @@ export function OverviewProgress({ navigate, isAdmin = false }: OverviewProgress
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] rounded-full px-2">
+                      <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] rounded-full px-3 py-1">
                         {selectedTechnique.nummer}
                       </Badge>
                       <Badge variant="secondary" className="text-[10px] bg-hh-ui-100">

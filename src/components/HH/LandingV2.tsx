@@ -588,14 +588,14 @@ function EpicSection() {
                   {phase.letter}
                 </div>
 
-                <h3 className="text-base font-semibold text-hh-text mb-2">{phase.title}</h3>
+                <h3 className="text-base font-medium text-hh-text mb-2">{phase.title}</h3>
                 <p className="text-sm text-hh-muted leading-relaxed mb-4">{phase.desc}</p>
 
                 <div className="flex flex-wrap gap-1.5">
                   {phase.techniques.map((t) => (
                     <span
                       key={t}
-                      className="text-xs px-2 py-0.5 rounded-full border"
+                      className="text-xs px-3 py-1 rounded-full border"
                       style={{
                         color: phase.color,
                         borderColor: `${phase.color}30`,

@@ -329,7 +329,7 @@ export function DigitalCoaching({ navigate, isAdmin = false, onboardingMode }: D
         <div className="p-3 sm:p-4 border-b border-hh-border bg-hh-bg">
           <div className="flex items-center justify-between mb-2 sm:mb-3">
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-              <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[9px] sm:text-[10px] flex-shrink-0 rounded-full px-2">{activeTechnique.nummer}</Badge>
+              <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[9px] sm:text-[10px] flex-shrink-0 rounded-full px-3 py-1">{activeTechnique.nummer}</Badge>
               <h3 className="text-[14px] sm:text-[16px] leading-[20px] sm:leading-[24px] text-hh-text truncate">{activeTechnique.name}</h3>
             </div>
             
@@ -456,17 +456,18 @@ export function DigitalCoaching({ navigate, isAdmin = false, onboardingMode }: D
                   />
                   {/* Show mic button when empty, send button when typing */}
                   {chatInput.trim() ? (
-                    <Button onClick={sendChatMessage} className="flex-shrink-0">
+                    <Button onClick={sendChatMessage} className="flex-shrink-0" aria-label="Versturen">
                       <Send className="w-4 h-4" />
                     </Button>
                   ) : (
-                    <Button 
+                    <Button
                       variant="outline"
                       onClick={() => {
                         // Toggle voice recording
                         setIsRecording(!isRecording);
                       }}
                       className={`flex-shrink-0 ${isRecording ? 'bg-red-50 border-red-500 text-red-600' : ''}`}
+                      aria-label={isRecording ? "Opname stoppen" : "Dicteren"}
                     >
                       {isRecording ? (
                         <MicOff className="w-4 h-4" />
@@ -562,6 +563,7 @@ export function DigitalCoaching({ navigate, isAdmin = false, onboardingMode }: D
                   <div className="text-center">
                     <button
                       className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors flex items-center justify-center mb-2"
+                      aria-label="Speaker"
                     >
                       <Volume2 className="w-6 h-6 text-white" />
                     </button>
@@ -573,6 +575,7 @@ export function DigitalCoaching({ navigate, isAdmin = false, onboardingMode }: D
                     <button
                       onClick={closeTraining}
                       className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 transition-colors flex items-center justify-center mb-2 shadow-xl"
+                      aria-label="Ophangen"
                     >
                       <Phone className="w-6 h-6 text-white rotate-[135deg]" />
                     </button>
@@ -659,6 +662,7 @@ export function DigitalCoaching({ navigate, isAdmin = false, onboardingMode }: D
                   {/* Switch camera (placeholder) */}
                   <button
                     className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors flex items-center justify-center"
+                    aria-label="Camera wisselen"
                   >
                     <VideoIcon className="w-6 h-6 text-white" />
                   </button>
@@ -667,6 +671,7 @@ export function DigitalCoaching({ navigate, isAdmin = false, onboardingMode }: D
                   <button
                     onClick={closeTraining}
                     className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 transition-colors flex items-center justify-center shadow-xl"
+                    aria-label="Ophangen"
                   >
                     <X className="w-6 h-6 text-white" />
                   </button>
@@ -970,7 +975,7 @@ export function DigitalCoaching({ navigate, isAdmin = false, onboardingMode }: D
                             {/* Title */}
                             <div className="mb-2">
                               <div className="flex items-center gap-2 mb-1">
-                                <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] flex-shrink-0 rounded-full px-2">
+                                <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] flex-shrink-0 rounded-full px-3 py-1">
                                   {technique.nummer}
                                 </Badge>
                                 <Badge
@@ -1127,7 +1132,7 @@ export function DigitalCoaching({ navigate, isAdmin = false, onboardingMode }: D
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] rounded-full px-2">
+                        <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[10px] rounded-full px-3 py-1">
                           {selectedTechnique.nummer}
                         </Badge>
                         <Badge variant="secondary" className="text-[10px] bg-hh-ui-100">
@@ -1460,7 +1465,7 @@ export function DigitalCoaching({ navigate, isAdmin = false, onboardingMode }: D
                     {getStatusIcon(technique.status)}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[9px] rounded-full px-2">
+                        <Badge className="bg-hh-primary-100 text-hh-primary border-0 text-[9px] rounded-full px-3 py-1">
                           {technique.nummer}
                         </Badge>
                         <h4 className="text-[14px] text-hh-text truncate">

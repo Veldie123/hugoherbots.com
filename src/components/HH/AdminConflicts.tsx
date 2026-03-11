@@ -39,7 +39,7 @@ export function AdminConflicts({ navigate, isSuperAdmin }: AdminConflictsProps) 
 
         <Card className="p-8 text-center border-dashed border-2 border-hh-border">
           <AlertTriangle className="w-12 h-12 text-hh-warning mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Nog niet geïmplementeerd</h2>
+          <h2 className="text-xl font-medium mb-2">Nog niet geïmplementeerd</h2>
           <p className="text-hh-muted">
             Deze pagina wordt actief wanneer de API endpoints voor config conflicts zijn toegevoegd.
           </p>

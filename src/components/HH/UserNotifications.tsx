@@ -202,7 +202,7 @@ export function UserNotifications({ navigate, isAdmin, onboardingMode }: UserNot
                           </span>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" aria-label="Acties">
                                 <MoreVertical className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -228,7 +228,7 @@ export function UserNotifications({ navigate, isAdmin, onboardingMode }: UserNot
                           {notification.type === "analysis_complete" ? "Analyse" : "Systeem"}
                         </Badge>
                         {!notification.read && (
-                          <Badge className="text-[10px] px-1.5 py-0.5 bg-hh-primary text-white">
+                          <Badge className="text-[10px] px-3 py-1 bg-hh-primary text-white">
                             Nieuw
                           </Badge>
                         )}

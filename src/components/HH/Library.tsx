@@ -188,7 +188,7 @@ export function Library({ navigate, isAdmin, onboardingMode }: LibraryProps) {
                   </div>
                   <Badge
                     variant="outline"
-                    className={`text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 ${trendColor}`}
+                    className={`text-[10px] sm:text-[11px] px-3 py-1 ${trendColor}`}
                   >
                     <TrendingUp className="w-3 h-3 mr-0.5" />
                     {stat.change}
@@ -297,7 +297,7 @@ export function Library({ navigate, isAdmin, onboardingMode }: LibraryProps) {
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" aria-label="Acties">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -315,7 +315,7 @@ export function Library({ navigate, isAdmin, onboardingMode }: LibraryProps) {
                       </div>
 
                       <div>
-                        <h3 className="text-[16px] leading-[22px] text-hh-text font-semibold mb-1">
+                        <h3 className="text-[16px] leading-[22px] text-hh-text font-medium mb-1">
                           {content.title}
                         </h3>
                         <div className="flex items-center gap-2">
@@ -468,7 +468,7 @@ export function Library({ navigate, isAdmin, onboardingMode }: LibraryProps) {
                       <td className="px-4 py-3 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>

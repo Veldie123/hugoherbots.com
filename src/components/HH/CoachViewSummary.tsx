@@ -91,7 +91,7 @@ export function CoachViewSummary({ insights, title, onMomentClick }: CoachViewSu
                 return (
                   <Badge
                     key={m.id}
-                    className="text-[10px] px-2 py-0.5 rounded-full font-medium border-0"
+                    className="text-[10px] px-3 py-1 rounded-full font-medium border-0"
                     style={{ backgroundColor: config.bg, color: config.color }}
                   >
                     {config.label}

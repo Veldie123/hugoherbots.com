@@ -729,7 +729,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
           <div className="flex items-center justify-between gap-2 px-1">
             <div className="flex items-center gap-2 min-w-0">
               <Play className="w-4 h-4 sm:w-5 sm:h-5 text-hh-muted flex-shrink-0" />
-              <h2 className="text-[16px] sm:text-[18px] font-semibold text-hh-text whitespace-nowrap">Vervolg video training</h2>
+              <h2 className="text-[16px] sm:text-[18px] font-medium text-hh-text whitespace-nowrap">Vervolg video training</h2>
             </div>
             <button 
               onClick={() => { setShowAllVideos(!showAllVideos); if (showAllVideos) { setSearchQuery(''); setFilterPhase('all'); } }}
@@ -863,10 +863,10 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                           autoFocus
                           disabled={savingTitle}
                         />
-                        <button onClick={() => handleSaveTitle(video.id)} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-success hover:text-hh-success/80" disabled={savingTitle}>
+                        <button onClick={() => handleSaveTitle(video.id)} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-success hover:text-hh-success/80" disabled={savingTitle} aria-label="Opslaan">
                           <Check className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={handleCancelEditTitle} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-hh-error">
+                        <button onClick={handleCancelEditTitle} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-hh-error" aria-label="Annuleren">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -880,6 +880,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                         <button
                           className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full text-hh-muted hover:text-hh-text hover:bg-hh-ui-100 transition-colors opacity-0 group-hover:opacity-100"
                           onClick={(e) => e.stopPropagation()}
+                          aria-label="Acties"
                         >
                           <MoreVertical className="w-3.5 h-3.5" />
                         </button>
@@ -977,10 +978,10 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                           autoFocus
                           disabled={savingTitle}
                         />
-                        <button onClick={() => handleSaveTitle(video.id)} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-success hover:text-hh-success/80" disabled={savingTitle}>
+                        <button onClick={() => handleSaveTitle(video.id)} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-success hover:text-hh-success/80" disabled={savingTitle} aria-label="Opslaan">
                           <Check className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={handleCancelEditTitle} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-hh-error">
+                        <button onClick={handleCancelEditTitle} className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-hh-error" aria-label="Annuleren">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -994,6 +995,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                             className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-hh-primary opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => handleStartEditTitle(video.id, video.displayTitle || video.title, e)}
                             title="Titel bewerken"
+                            aria-label="Titel bewerken"
                           >
                             <Pencil className="w-3 h-3" />
                           </button>
@@ -1057,10 +1059,10 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                               {completed && <CheckCircle2 className="w-4 h-4 text-hh-success flex-shrink-0" />}
                             </div>
                           </td>
-                          <td className="py-3 px-4"><Badge className={`${faseBadge.color} border-0 text-[11px] font-medium px-2 py-0.5 rounded-full`}>{faseBadge.label}</Badge></td>
+                          <td className="py-3 px-4"><Badge className={`${faseBadge.color} border-0 text-[11px] font-medium px-3 py-1 rounded-full`}>{faseBadge.label}</Badge></td>
                           <td className="py-3 px-4 text-right"><span className="text-[12px] text-hh-muted flex items-center justify-end gap-1"><Clock className="w-3 h-3" />{video.duration}</span></td>
                           <td className="py-3 px-4 text-center">
-                            <Button size="sm" variant="ghost" className="rounded-full w-8 h-8 p-0" style={{ color: 'var(--hh-primary)' }}>
+                            <Button size="sm" variant="ghost" className="rounded-full w-8 h-8 p-0" style={{ color: 'var(--hh-primary)' }} aria-label="Afspelen">
                               <Play className="w-4 h-4" />
                             </Button>
                           </td>
@@ -1080,7 +1082,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
           <div className="flex items-center justify-between gap-2 px-1">
             <div className="flex items-center gap-2 min-w-0">
               <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-hh-muted flex-shrink-0" />
-              <h2 className="text-[16px] sm:text-[18px] font-semibold text-hh-text truncate">Shorts</h2>
+              <h2 className="text-[16px] sm:text-[18px] font-medium text-hh-text truncate">Shorts</h2>
             </div>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -1119,7 +1121,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
           <div className="flex items-center justify-between gap-2 px-1">
             <div className="flex items-center gap-2 min-w-0">
               <Radio className="w-4 h-4 sm:w-5 sm:h-5 text-hh-muted flex-shrink-0" />
-              <h2 className="text-[16px] sm:text-[18px] font-semibold text-hh-text truncate">Webinars herbekijken</h2>
+              <h2 className="text-[16px] sm:text-[18px] font-medium text-hh-text truncate">Webinars herbekijken</h2>
             </div>
             <button 
               onClick={() => navigate?.("live")}
@@ -1171,7 +1173,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
           <div className="flex items-center justify-between gap-2 px-1">
             <div className="flex items-center gap-2 min-w-0">
               <VideoIcon className="w-4 h-4 sm:w-5 sm:h-5 text-hh-muted flex-shrink-0" />
-              <h2 className="text-[16px] sm:text-[18px] font-semibold text-hh-text whitespace-nowrap">Alle video's</h2>
+              <h2 className="text-[16px] sm:text-[18px] font-medium text-hh-text whitespace-nowrap">Alle video's</h2>
             </div>
             <button 
               onClick={() => { setShowAllVideos(true); }}
@@ -1284,7 +1286,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                 <>
                   {detailsVideo?.techniqueNumber && (
                     <Badge 
-                      className="text-[12px] px-2 py-0.5 border-0"
+                      className="text-[12px] px-3 py-1 border-0"
                       style={{ backgroundColor: 'var(--hh-success)', color: 'white' }}
                     >
                       {detailsVideo.techniqueNumber}
@@ -1293,7 +1295,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                   {technique?.fase && (
                     <Badge 
                       variant="outline" 
-                      className="text-[12px] px-2 py-0.5"
+                      className="text-[12px] px-3 py-1"
                       style={{ borderColor: 'color-mix(in srgb, var(--hh-success) 30%, transparent)', color: 'var(--hh-success)' }}
                     >
                       Fase {technique.fase}
@@ -1303,7 +1305,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview }: V
                     <Badge 
                       key={idx} 
                       variant="outline" 
-                      className="text-[10px] px-2 py-0.5"
+                      className="text-[10px] px-3 py-1"
                       style={{ borderColor: 'color-mix(in srgb, var(--hh-success) 30%, transparent)', color: 'var(--hh-success)' }}
                     >
                       {tag}

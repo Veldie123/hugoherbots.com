@@ -183,11 +183,11 @@ export function AdminNotifications({ navigate, isSuperAdmin }: AdminNotification
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
       case "critical":
-        return <Badge className="bg-hh-error text-white border-0 text-[10px] px-2 py-0.5">Kritiek</Badge>;
+        return <Badge className="bg-hh-error text-white border-0 text-[10px] px-3 py-1">Kritiek</Badge>;
       case "warning":
-        return <Badge className="bg-orange-500 text-white border-0 text-[10px] px-2 py-0.5">Waarschuwing</Badge>;
+        return <Badge className="bg-orange-500 text-white border-0 text-[10px] px-3 py-1">Waarschuwing</Badge>;
       default:
-        return <Badge className="bg-hh-primary text-white border-0 text-[10px] px-2 py-0.5">Info</Badge>;
+        return <Badge className="bg-hh-primary text-white border-0 text-[10px] px-3 py-1">Info</Badge>;
     }
   };
 

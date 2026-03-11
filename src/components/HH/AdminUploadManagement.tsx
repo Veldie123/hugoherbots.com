@@ -345,7 +345,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
               <Download className="w-4 h-4" />
               Export Data
             </Button>
-            <Button variant="outline" size="icon" className="sm:hidden">
+            <Button variant="outline" size="icon" className="sm:hidden" aria-label="Export data">
               <Download className="w-4 h-4" />
             </Button>
           </div>
@@ -361,7 +361,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
               <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
                 <UploadIcon className="w-5 h-5 text-hh-primary" />
               </div>
-              <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px] px-2">
+              <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px] px-3 py-1">
                 +24%
               </Badge>
             </div>
@@ -373,7 +373,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
               <div className="w-10 h-10 rounded-full bg-hh-success/10 flex items-center justify-center">
                 <CheckCircle2 className="w-5 h-5 text-hh-success" />
               </div>
-              <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px] px-2">
+              <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px] px-3 py-1">
                 43%
               </Badge>
             </div>
@@ -385,7 +385,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
               <div className="w-10 h-10 rounded-full bg-hh-primary/10 flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 text-hh-primary" />
               </div>
-              <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px] px-2">
+              <Badge className="bg-hh-success/10 text-hh-success border-hh-success/20 text-[11px] px-3 py-1">
                 +5%
               </Badge>
             </div>
@@ -397,7 +397,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
               <div className="w-10 h-10 rounded-full bg-hh-warn/10 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-hh-warn" />
               </div>
-              <Badge className="bg-hh-error/10 text-hh-error border-hh-error/20 text-[11px] px-2">
+              <Badge className="bg-hh-error/10 text-hh-error border-hh-error/20 text-[11px] px-3 py-1">
                 15%
               </Badge>
             </div>
@@ -490,7 +490,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                 <span>{upload.date}</span>
                 <span>{upload.duration}</span>
                 {upload.techniquesFound.length > 0 && (
-                  <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[10px] font-mono px-1.5 py-0">
+                  <Badge className="bg-hh-primary-100 text-hh-primary border-hh-primary-200 text-[10px] font-mono px-3 py-1">
                     {upload.techniquesFound[0]}
                   </Badge>
                 )}
@@ -682,7 +682,7 @@ export function AdminUploadManagement({ navigate }: AdminUploadManagementProps) 
                     <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acties">
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>

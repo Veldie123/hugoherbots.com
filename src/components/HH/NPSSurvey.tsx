@@ -72,7 +72,7 @@ export function NPSSurvey() {
     <div className="fixed bottom-16 right-4 z-50 w-[340px] bg-hh-bg rounded-[16px] shadow-xl border border-hh-border p-4">
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-[14px] font-semibold text-hh-text">Hoe waarschijnlijk beveel je Hugo aan?</h4>
-        <button onClick={dismiss} className="text-hh-muted hover:text-hh-text">
+        <button onClick={dismiss} className="text-hh-muted hover:text-hh-text" aria-label="Sluiten">
           <X className="w-4 h-4" />
         </button>
       </div>

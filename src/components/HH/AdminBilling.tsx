@@ -205,7 +205,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success-100 text-hh-success-700 border-hh-success-200"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success-100 text-hh-success-700 border-hh-success-200"
               >
                 +18%
               </Badge>
@@ -225,7 +225,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-blue-600/10 text-blue-600 border-blue-600/20"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-blue-600/10 text-blue-600 border-blue-600/20"
               >
                 {invoices.filter(i => i.status === "pending").length}
               </Badge>
@@ -245,7 +245,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-error-100 text-hh-error-700 border-hh-error-200"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-error-100 text-hh-error-700 border-hh-error-200"
               >
                 {invoices.filter(i => i.status === "overdue").length}
               </Badge>
@@ -265,7 +265,7 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
               </div>
               <Badge
                 variant="outline"
-                className="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 bg-hh-success-100 text-hh-success-700 border-hh-success-200"
+                className="text-[10px] sm:text-[11px] px-3 py-1 bg-hh-success-100 text-hh-success-700 border-hh-success-200"
               >
                 +5%
               </Badge>
@@ -401,10 +401,10 @@ export function AdminBilling({ navigate }: AdminBillingProps) {
                       <td className="py-3 px-4">{getStatusBadge(invoice.status)}</td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Bekijken">
                             <Eye className="w-4 h-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Downloaden">
                             <Download className="w-4 h-4" />
                           </Button>
                         </div>

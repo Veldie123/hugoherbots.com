@@ -28,7 +28,7 @@ export function StopRoleplayDialog({
             <div className="w-10 h-10 rounded-full flex items-center justify-center bg-hh-ui-100">
               <Square className="w-4 h-4 text-hh-muted" />
             </div>
-            <DialogTitle className="text-[18px] font-semibold text-hh-text">
+            <DialogTitle className="text-[18px] font-medium text-hh-text">
               Sessie beëindigen?
             </DialogTitle>
           </div>

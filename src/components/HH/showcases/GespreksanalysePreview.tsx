@@ -125,7 +125,7 @@ export function GespreksanalysePreview() {
           </p>
           <p className="text-[13px] text-hh-text leading-[20px]">
             <span className="text-hh-muted font-medium">Jij:</span> "Prima, ik stuur het door."
-            <span className="ml-2 text-[10px] bg-hh-warning/15 text-hh-warning px-2 py-0.5 rounded-full font-medium">Gemiste kans</span>
+            <span className="ml-2 text-[10px] bg-hh-warning/15 text-hh-warning px-3 py-1 rounded-full font-medium">Gemiste kans</span>
           </p>
         </div>
       </motion.div>

@@ -111,7 +111,7 @@ export function VideoCursusPreview() {
               </div>
 
               {/* Duration */}
-              <span className="absolute bottom-1.5 right-1.5 text-[10px] font-mono text-white bg-hh-ink/70 px-1.5 py-0.5 rounded">
+              <span className="absolute bottom-1.5 right-1.5 text-[10px] font-mono text-white bg-hh-ink/70 px-2 py-0.5 rounded">
                 {card.duration}
               </span>
 
@@ -128,10 +128,10 @@ export function VideoCursusPreview() {
               <div className="flex items-center gap-1.5 mb-1">
                 <span className="text-[10px] font-semibold text-hh-muted">{card.code}</span>
                 {card.progress === 100 && (
-                  <span className="text-[9px] bg-hh-success/10 text-hh-success px-1.5 py-0.5 rounded-full font-medium">Voltooid</span>
+                  <span className="text-[9px] bg-hh-success/10 text-hh-success px-3 py-1 rounded-full font-medium">Voltooid</span>
                 )}
                 {card.progress > 0 && card.progress < 100 && (
-                  <span className="text-[9px] bg-hh-primary/10 text-hh-primary px-1.5 py-0.5 rounded-full font-medium">Bezig</span>
+                  <span className="text-[9px] bg-hh-primary/10 text-hh-primary px-3 py-1 rounded-full font-medium">Bezig</span>
                 )}
                 {card.progress === 0 && (
                   <span className="text-[9px] text-hh-muted">Nieuw</span>

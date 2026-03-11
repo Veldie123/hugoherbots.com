@@ -180,7 +180,7 @@ export function ImmersiveVideoPlayer({
         style={{ zIndex: 100000, background: 'linear-gradient(to bottom, color-mix(in srgb, var(--hh-ink) 70%, transparent) 0%, color-mix(in srgb, var(--hh-ink) 30%, transparent) 60%, transparent 100%)' }}
       >
         <div className="min-w-0 px-2">
-          <h2 className="text-white text-[15px] sm:text-[17px] font-semibold truncate">
+          <h2 className="text-white text-[15px] sm:text-[17px] font-medium truncate">
             {currentVideo.displayTitle || currentVideo.title}
           </h2>
           <p className="text-white/60 text-[12px]">
@@ -292,7 +292,7 @@ export function ImmersiveVideoPlayer({
       >
         <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid color-mix(in srgb, var(--hh-bg) 10%, transparent)' }}>
           <div>
-            <h3 className="text-white font-semibold text-[16px]">Cursus Playlist</h3>
+            <h3 className="text-white font-medium text-[16px]">Cursus Playlist</h3>
             <p className="text-white/40 text-[12px] mt-0.5">{videos.length} video's · Video {currentIndex + 1} van {videos.length}</p>
           </div>
           <button
