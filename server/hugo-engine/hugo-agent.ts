@@ -383,18 +383,29 @@ async function executeTool(name: string, args: any): Promise<{ data: any; displa
       }
 
       case "propose_config_change": {
-        const propResult = await pool.query(
-          `INSERT INTO admin_corrections (type, field, original_value, new_value, context, submitted_by, source, status)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-           RETURNING id`,
-          [args.type || "config_change", args.field || "", args.current_value || "", args.proposed_value, args.reason || "", "Hugo (AI)", "hugo_agent_proposal", "pending"]
-        );
-        const propId = propResult.rows[0]?.id;
-        await pool.query(
-          `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          ["config_proposal", `Config voorstel: ${args.field || args.type}`, args.reason || "", "content", "medium", propId, "admin-config-review"]
-        );
+        const client = await pool.connect();
+        let propId: number;
+        try {
+          await client.query('BEGIN');
+          const propResult = await client.query(
+            `INSERT INTO admin_corrections (type, field, original_value, new_value, context, submitted_by, source, status)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+             RETURNING id`,
+            [args.type || "config_change", args.field || "", args.current_value || "", args.proposed_value, args.reason || "", "Hugo (AI)", "hugo_agent_proposal", "pending"]
+          );
+          propId = propResult.rows[0]?.id;
+          await client.query(
+            `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            ["config_proposal", `Config voorstel: ${args.field || args.type}`, args.reason || "", "content", "medium", propId, "admin-config-review"]
+          );
+          await client.query('COMMIT');
+        } catch (txErr) {
+          await client.query('ROLLBACK');
+          throw txErr;
+        } finally {
+          client.release();
+        }
         return {
           data: {
             type: args.type,

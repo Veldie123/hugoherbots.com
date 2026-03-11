@@ -609,45 +609,58 @@ Interpreteer Hugo's feedback. Antwoord ALLEEN in valid JSON:
       }
 
       const corrType = module === 'technieken' ? 'technique_edit' : 'attitude_edit';
-      const corrResult = await pool.query(
-        `INSERT INTO admin_corrections (type, field, original_value, new_value, context, submitted_by, source, target_file, target_key, original_json, new_json, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-         RETURNING *`,
-        [
-          corrType,
-          originalData.naam || itemKey,
-          JSON.stringify(originalData),
-          JSON.stringify(proposedJson),
-          feedbackText,
-          adminUserId,
-          'onboarding_review',
-          targetFile,
-          targetKey,
-          JSON.stringify(originalData),
-          JSON.stringify(proposedJson),
-          'pending'
-        ]
-      );
-      const correction = corrResult.rows[0];
+      const client = await pool.connect();
+      let correction: any;
+      try {
+        await client.query('BEGIN');
 
-      await pool.query(
-        `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        [
-          'onboarding_feedback',
-          `Onboarding feedback: ${originalData.naam || itemKey}`,
-          `Hugo gaf feedback op ${module === 'technieken' ? 'techniek' : 'klanthouding'} "${originalData.naam || itemKey}": "${feedbackText}"`,
-          'content',
-          'warning',
-          correction.id,
-          'admin-config-review'
-        ]
-      );
+        const corrResult = await client.query(
+          `INSERT INTO admin_corrections (type, field, original_value, new_value, context, submitted_by, source, target_file, target_key, original_json, new_json, status)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+           RETURNING *`,
+          [
+            corrType,
+            originalData.naam || itemKey,
+            JSON.stringify(originalData),
+            JSON.stringify(proposedJson),
+            feedbackText,
+            adminUserId,
+            'onboarding_review',
+            targetFile,
+            targetKey,
+            JSON.stringify(originalData),
+            JSON.stringify(proposedJson),
+            'pending'
+          ]
+        );
+        correction = corrResult.rows[0];
 
-      await pool.query(
-        `UPDATE admin_onboarding_progress SET status = 'feedback_given', feedback_text = $1, correction_id = $2, reviewed_at = NOW() WHERE admin_user_id = $3 AND module = $4 AND item_key = $5`,
-        [feedbackText, correction.id, adminUserId, module, itemKey]
-      );
+        await client.query(
+          `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [
+            'onboarding_feedback',
+            `Onboarding feedback: ${originalData.naam || itemKey}`,
+            `Hugo gaf feedback op ${module === 'technieken' ? 'techniek' : 'klanthouding'} "${originalData.naam || itemKey}": "${feedbackText}"`,
+            'content',
+            'warning',
+            correction.id,
+            'admin-config-review'
+          ]
+        );
+
+        await client.query(
+          `UPDATE admin_onboarding_progress SET status = 'feedback_given', feedback_text = $1, correction_id = $2, reviewed_at = NOW() WHERE admin_user_id = $3 AND module = $4 AND item_key = $5`,
+          [feedbackText, correction.id, adminUserId, module, itemKey]
+        );
+
+        await client.query('COMMIT');
+      } catch (txErr) {
+        await client.query('ROLLBACK');
+        throw txErr;
+      } finally {
+        client.release();
+      }
 
       res.json({
         success: true,
