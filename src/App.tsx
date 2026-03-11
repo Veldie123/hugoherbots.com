@@ -159,7 +159,11 @@ export default function App() {
           // Restore page from URL on refresh (if valid)
           const rawPath = window.location.pathname.replace(/^\//, '');
 
-          if (isHugoOnboarding) {
+          // Allow landing preview regardless of auth status
+          const landingPreviewPages = new Set(['landing-v2', 'landing']);
+          if (landingPreviewPages.has(rawPath)) {
+            setCurrentPage(rawPath as Page);
+          } else if (isHugoOnboarding) {
             localStorage.setItem('hugo_onboarding_mode', 'true');
             setViewMode('admin');
             setCurrentPage("talk-to-hugo");
@@ -193,7 +197,7 @@ export default function App() {
           }
         } else {
           setIsAdmin(false);
-          const publicPages: Page[] = ["pricing", "about", "login", "signup", "privacy-policy"];
+          const publicPages: Page[] = ["pricing", "about", "login", "signup", "privacy-policy", "landing-v2"];
           const pathPage = window.location.pathname.replace('/', '') as Page;
           if (publicPages.includes(pathPage)) {
             setCurrentPage(pathPage);

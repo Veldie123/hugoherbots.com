@@ -132,9 +132,12 @@ export function AppLayout({
     : effectivePreview
       ? mainNavItems.filter(item => !PREVIEW_HIDDEN_MAIN.has(item.id))
       : mainNavItems;
+  const PREVIEW_HIDDEN_BOTTOM = new Set(['resources']);
   const visibleBottomNavItems = onboardingMode
     ? bottomNavItems.filter(item => !HUGO_HIDDEN_BOTTOM.has(item.id))
-    : bottomNavItems;
+    : effectivePreview
+      ? bottomNavItems.filter(item => !PREVIEW_HIDDEN_BOTTOM.has(item.id))
+      : bottomNavItems;
 
   useEffect(() => {
     setCollapsed(shouldAutoCollapse);
