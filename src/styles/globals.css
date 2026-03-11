@@ -187,20 +187,21 @@
   --hh-warning-200: #4a3618;
 }
 
-/* Admin/host webinar session — fuchsia purple accent instead of steel blue */
+/* Admin/host session — purple accent instead of steel blue */
 .admin-session {
-  --hh-primary: #9910FA;           /* fuchsia — admin accent */
-  --hh-primary-hover: #7B0DD4;     /* darker fuchsia — hover */
-  --hh-primary-dark: #5C09A0;      /* deep fuchsia — gradient endpoint */
-  --hh-primary-light: #B44DFF;     /* lighter fuchsia */
-  --hh-primary-50: #FBF5FF;        /* ultra-light fuchsia bg */
-  --hh-primary-100: #F3E5FF;       /* light fuchsia — badge bg */
-  --hh-primary-200: #E2C6FF;       /* medium-light fuchsia — borders */
-  --hh-primary-rgb: 153, 16, 250;
+  --hh-primary: #7e22ce;
+  --hh-primary-hover: #6b21a8;
+  --hh-primary-dark: #581c87;
+  --hh-primary-light: #9333ea;
+  --hh-primary-50: #FAF5FF;
+  --hh-primary-100: #F3E8FF;
+  --hh-primary-200: #E9D5FF;
+  --hh-primary-rgb: 126, 34, 206;
 }
 
-/* Dark mode admin — "Warm Dusk" palette: warm brown-gray base + purple accent
-   Applied at :root level via :has() so <body> background also gets warm tones */
+/* Dark mode admin — "Warm Dusk" palette: warm brown-gray base + purple accent.
+   :has() propagates tokens to <html> so <body> background also gets warm tones.
+   MUST be last dark mode block — wins via specificity (0,2,0) AND source order. */
 .dark:has(.admin-session),
 .dark .admin-session {
   /* Warm neutral backgrounds (brown-gray, no blue tint) */
@@ -215,8 +216,20 @@
   --hh-ui-300: #433E38;
   --hh-ui-400: #6B6358;
   --hh-ui-500: #9E948A;
+  --hh-platinum: #302C28;
+  --hh-french-gray: #9E948A;
+  --hh-slate-50: #1A1715;
+  --hh-slate-100: #211E1B;
+  --hh-slate-200: #302C28;
   --input-background: #211E1B;
   --switch-background: #433E38;
+
+  /* Softer purple for warm dark backgrounds */
+  --hh-primary: #A855F7;
+  --hh-primary-hover: #9333EA;
+  --hh-primary-dark: #7C3AED;
+  --hh-primary-light: #C084FC;
+  --hh-primary-rgb: 168, 85, 247;
 
   /* Purple shades on warm background */
   --hh-primary-50: #1e1838;
@@ -227,12 +240,15 @@
   --hh-success-50: #131f18;
   --hh-success-100: #152a1c;
   --hh-success-200: #1c3a28;
+  --hh-success-700: #6ee7b7;
   --hh-error-50: #1f1414;
   --hh-error-100: #2e1818;
   --hh-error-200: #401f20;
+  --hh-error-700: #fca5a5;
   --hh-warning-50: #1e1a10;
   --hh-warning-100: #2a2210;
   --hh-warning-200: #3a3018;
+  --hh-warning-700: #fcd34d;
 
   /* Shadcn token overrides for warm background */
   --background: var(--hh-bg);
@@ -241,19 +257,37 @@
   --card-foreground: var(--hh-text);
   --popover: var(--hh-ui-100);
   --popover-foreground: var(--hh-text);
+  --primary: var(--hh-primary);
+  --primary-foreground: #fff;
   --secondary: var(--hh-ui-100);
   --secondary-foreground: var(--hh-text);
   --muted: var(--hh-ui-100);
   --muted-foreground: var(--hh-ui-400);
   --accent: var(--hh-ui-100);
   --accent-foreground: var(--hh-text);
+  --destructive: #d4183d;
+  --destructive-foreground: #fff;
   --border: var(--hh-border);
   --input: var(--hh-ui-100);
+  --input-background: var(--hh-ui-50);
+  --ring: var(--hh-primary);
+  --font-weight-medium: 600;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-normal: 400;
+  --chart-1: var(--hh-primary);
+  --chart-2: var(--hh-success);
+  --chart-3: var(--hh-warn);
+  --chart-4: #9d4edd;
+  --chart-5: #ff6b9d;
   --sidebar: var(--hh-bg);
   --sidebar-foreground: var(--hh-text);
+  --sidebar-primary: var(--hh-primary);
+  --sidebar-primary-foreground: #fff;
   --sidebar-accent: var(--hh-ui-100);
   --sidebar-accent-foreground: var(--hh-text);
   --sidebar-border: var(--hh-border);
+  --sidebar-ring: var(--hh-primary);
 }
 
 /* Dashboard card sizing — bypasses Tailwind v4 JIT not generating base w-[160px] */
@@ -329,8 +363,8 @@ body.dark:has(.admin-session) [data-radix-portal] {
   color: #1B2A4A;
 }
 
-/* Force-include hh-purple utility classes used in HugoFeedbackWidget */
-@source inline("bg-hh-purple text-hh-purple bg-hh-purple/15 bg-hh-purple/25 hover:bg-hh-purple/25");
+/* Force-include utility classes for feedback widget selected elements */
+@source inline("bg-hh-primary/8 bg-hh-primary/15 border-hh-primary/15 border-hh-primary/50");
 
 @theme inline {
   --color-hh-ink: var(--hh-ink);

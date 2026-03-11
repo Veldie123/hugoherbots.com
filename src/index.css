@@ -6404,107 +6404,15 @@ body {
   --sidebar-ring: var(--hh-primary);
 }
 
-/* Admin/host session — purple accent instead of steel blue */
-.admin-session {
-  --hh-primary: #7e22ce;
-  --hh-primary-hover: #6b21a8;
-  --hh-primary-dark: #581c87;
-  --hh-primary-light: #9333ea;
-  --hh-primary-50: #FAF5FF;
-  --hh-primary-100: #F3E8FF;
-  --hh-primary-200: #E9D5FF;
-  --hh-primary-rgb: 126, 34, 206;
-}
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK MODE & ADMIN THEME — CASCADE ORDER MATTERS!
+   1. .dark (cold blue-black — base dark mode, lowest specificity)
+   2. .admin-session (purple accent — light mode admin override)
+   3. .dark:has(.admin-session) (Warm Dusk — MUST come last, highest specificity)
+   Never reorder these blocks — warm dusk MUST be last to guarantee it wins.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Dark mode admin — "Warm Dusk" palette: warm brown-gray base + purple accent.
-   :has() propagates tokens to <html> so <body> background also gets warm tones. */
-.dark:has(.admin-session),
-.dark .admin-session {
-  /* Warm neutral backgrounds (brown-gray, no blue tint) */
-  --hh-bg: #12100F;
-  --hh-ink: #E8E0D8;
-  --hh-text: #F5F0EB;
-  --hh-muted: #9E948A;
-  --hh-border: #2E2A25;
-  --hh-ui-50: #1A1715;
-  --hh-ui-100: #211E1B;
-  --hh-ui-200: #302C28;
-  --hh-ui-300: #433E38;
-  --hh-ui-400: #6B6358;
-  --hh-ui-500: #9E948A;
-  --input-background: #211E1B;
-  --switch-background: #433E38;
-
-  /* Softer purple for warm dark backgrounds */
-  --hh-primary: #A855F7;
-  --hh-primary-hover: #9333EA;
-  --hh-primary-dark: #7C3AED;
-  --hh-primary-light: #C084FC;
-  --hh-primary-rgb: 168, 85, 247;
-
-  /* Purple shades on warm background */
-  --hh-primary-50: #1e1838;
-  --hh-primary-100: #2f1f4a;
-  --hh-primary-200: #452d62;
-
-  /* Feedback shades on warm background */
-  --hh-success-50: #131f18;
-  --hh-success-100: #152a1c;
-  --hh-success-200: #1c3a28;
-  --hh-error-50: #1f1414;
-  --hh-error-100: #2e1818;
-  --hh-error-200: #401f20;
-  --hh-warning-50: #1e1a10;
-  --hh-warning-100: #2a2210;
-  --hh-warning-200: #3a3018;
-
-  /* Shadcn token overrides */
-  --background: var(--hh-bg);
-  --foreground: var(--hh-text);
-  --card: var(--hh-ui-100);
-  --card-foreground: var(--hh-text);
-  --popover: var(--hh-ui-100);
-  --popover-foreground: var(--hh-text);
-  --secondary: var(--hh-ui-100);
-  --secondary-foreground: var(--hh-text);
-  --muted: var(--hh-ui-100);
-  --muted-foreground: var(--hh-ui-400);
-  --accent: var(--hh-ui-100);
-  --accent-foreground: var(--hh-text);
-  --border: var(--hh-border);
-  --input: var(--hh-ui-100);
-  --sidebar: var(--hh-bg);
-  --sidebar-foreground: var(--hh-text);
-  --sidebar-accent: var(--hh-ui-100);
-  --sidebar-accent-foreground: var(--hh-text);
-  --sidebar-border: var(--hh-border);
-}
-
-/* HH Design Token Light Shades — custom utility classes */
-.bg-hh-primary-50 { background-color: var(--hh-primary-50); }
-.bg-hh-primary-100 { background-color: var(--hh-primary-100); }
-.text-hh-primary-dark { color: var(--hh-primary-dark); }
-.text-hh-primary-light { color: var(--hh-primary-light); }
-.border-hh-primary-200 { border-color: var(--hh-primary-200); }
-
-/* Success shades */
-.bg-hh-success-50 { background-color: var(--hh-success-50); }
-.bg-hh-success-100 { background-color: var(--hh-success-100); }
-.text-hh-success-700 { color: var(--hh-success-700); }
-.border-hh-success-200 { border-color: var(--hh-success-200); }
-
-/* Error shades */
-.bg-hh-error-50 { background-color: var(--hh-error-50); }
-.bg-hh-error-100 { background-color: var(--hh-error-100); }
-.text-hh-error-700 { color: var(--hh-error-700); }
-.border-hh-error-200 { border-color: var(--hh-error-200); }
-
-/* Warning shades */
-.bg-hh-warning-50 { background-color: var(--hh-warning-50); }
-.bg-hh-warning-100 { background-color: var(--hh-warning-100); }
-.text-hh-warning-700 { color: var(--hh-warning-700); }
-.border-hh-warning-200 { border-color: var(--hh-warning-200); }
-
+/* 1. Base dark mode — cold blue-black palette (user view) */
 .dark {
   --hh-bg: #0b0f19;
   --hh-text: #f7f9fc;
@@ -6564,8 +6472,6 @@ body {
   --hh-primary-50: #1a2332;
   --hh-primary-100: #1e2d42;
   --hh-primary-200: #2a3f5c;
-  --hh-primary-dark: #7BA3C4;
-  --hh-primary-light: #8FB8D4;
   --hh-success-50: #0d2818;
   --hh-success-100: #0f3321;
   --hh-success-200: #164430;
@@ -6578,6 +6484,134 @@ body {
   --hh-warning-100: #352810;
   --hh-warning-200: #4a3618;
   --hh-warning-700: #fcd34d;
+}
+
+/* HH Design Token Light Shades — custom utility classes */
+.bg-hh-primary-50 { background-color: var(--hh-primary-50); }
+.bg-hh-primary-100 { background-color: var(--hh-primary-100); }
+.text-hh-primary-dark { color: var(--hh-primary-dark); }
+.text-hh-primary-light { color: var(--hh-primary-light); }
+.border-hh-primary-200 { border-color: var(--hh-primary-200); }
+
+/* Success shades */
+.bg-hh-success-50 { background-color: var(--hh-success-50); }
+.bg-hh-success-100 { background-color: var(--hh-success-100); }
+.text-hh-success-700 { color: var(--hh-success-700); }
+.border-hh-success-200 { border-color: var(--hh-success-200); }
+
+/* Error shades */
+.bg-hh-error-50 { background-color: var(--hh-error-50); }
+.bg-hh-error-100 { background-color: var(--hh-error-100); }
+.text-hh-error-700 { color: var(--hh-error-700); }
+.border-hh-error-200 { border-color: var(--hh-error-200); }
+
+/* Warning shades */
+.bg-hh-warning-50 { background-color: var(--hh-warning-50); }
+.bg-hh-warning-100 { background-color: var(--hh-warning-100); }
+.text-hh-warning-700 { color: var(--hh-warning-700); }
+.border-hh-warning-200 { border-color: var(--hh-warning-200); }
+
+/* 2. Admin/host session — purple accent instead of steel blue (light mode) */
+.admin-session {
+  --hh-primary: #7e22ce;
+  --hh-primary-hover: #6b21a8;
+  --hh-primary-dark: #581c87;
+  --hh-primary-light: #9333ea;
+  --hh-primary-50: #FAF5FF;
+  --hh-primary-100: #F3E8FF;
+  --hh-primary-200: #E9D5FF;
+  --hh-primary-rgb: 126, 34, 206;
+}
+
+/* 3. Dark mode admin — "Warm Dusk" palette: warm brown-gray base + purple accent.
+   :has() propagates tokens to <html> so <body> background also gets warm tones.
+   MUST be last dark mode block — wins via specificity (0,2,0) AND source order. */
+.dark:has(.admin-session),
+.dark .admin-session {
+  /* Warm neutral backgrounds (brown-gray, no blue tint) */
+  --hh-bg: #12100F;
+  --hh-ink: #E8E0D8;
+  --hh-text: #F5F0EB;
+  --hh-muted: #9E948A;
+  --hh-border: #2E2A25;
+  --hh-ui-50: #1A1715;
+  --hh-ui-100: #211E1B;
+  --hh-ui-200: #302C28;
+  --hh-ui-300: #433E38;
+  --hh-ui-400: #6B6358;
+  --hh-ui-500: #9E948A;
+  --hh-platinum: #302C28;
+  --hh-french-gray: #9E948A;
+  --hh-slate-50: #1A1715;
+  --hh-slate-100: #211E1B;
+  --hh-slate-200: #302C28;
+  --input-background: #211E1B;
+  --switch-background: #433E38;
+
+  /* Softer purple for warm dark backgrounds */
+  --hh-primary: #A855F7;
+  --hh-primary-hover: #9333EA;
+  --hh-primary-dark: #7C3AED;
+  --hh-primary-light: #C084FC;
+  --hh-primary-rgb: 168, 85, 247;
+
+  /* Purple shades on warm background */
+  --hh-primary-50: #1e1838;
+  --hh-primary-100: #2f1f4a;
+  --hh-primary-200: #452d62;
+
+  /* Feedback shades on warm background */
+  --hh-success-50: #131f18;
+  --hh-success-100: #152a1c;
+  --hh-success-200: #1c3a28;
+  --hh-success-700: #6ee7b7;
+  --hh-error-50: #1f1414;
+  --hh-error-100: #2e1818;
+  --hh-error-200: #401f20;
+  --hh-error-700: #fca5a5;
+  --hh-warning-50: #1e1a10;
+  --hh-warning-100: #2a2210;
+  --hh-warning-200: #3a3018;
+  --hh-warning-700: #fcd34d;
+
+  /* Shadcn token overrides */
+  --background: var(--hh-bg);
+  --foreground: var(--hh-text);
+  --card: var(--hh-ui-100);
+  --card-foreground: var(--hh-text);
+  --popover: var(--hh-ui-100);
+  --popover-foreground: var(--hh-text);
+  --primary: var(--hh-primary);
+  --primary-foreground: #fff;
+  --secondary: var(--hh-ui-100);
+  --secondary-foreground: var(--hh-text);
+  --muted: var(--hh-ui-100);
+  --muted-foreground: var(--hh-ui-400);
+  --accent: var(--hh-ui-100);
+  --accent-foreground: var(--hh-text);
+  --destructive: #d4183d;
+  --destructive-foreground: #fff;
+  --border: var(--hh-border);
+  --input: var(--hh-ui-100);
+  --input-background: var(--hh-ui-50);
+  --ring: var(--hh-primary);
+  --font-weight-medium: 600;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-normal: 400;
+  --chart-1: var(--hh-primary);
+  --chart-2: var(--hh-success);
+  --chart-3: var(--hh-warn);
+  --chart-4: #9d4edd;
+  --chart-5: #ff6b9d;
+  --sidebar: var(--hh-bg);
+  --sidebar-foreground: var(--hh-text);
+  --sidebar-primary: var(--hh-primary);
+  --sidebar-primary-foreground: #fff;
+  --sidebar-accent: var(--hh-ui-100);
+  --sidebar-accent-foreground: var(--hh-text);
+  --sidebar-border: var(--hh-border);
+  --sidebar-ring: var(--hh-primary);
 }
 
 [data-theme="light"] {
