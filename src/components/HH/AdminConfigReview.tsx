@@ -93,16 +93,25 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             'ssot_edit': 'SSOT Bewerking',
             'coach_debrief': 'Debrief Correctie',
             'moment': 'Moment Correctie',
+            'ai_interpreted_technique': 'Hugo Feedback → Techniek',
+            'ai_interpreted_houding': 'Hugo Feedback → Houding',
+            'ai_interpreted_other': 'Hugo Feedback → Overig',
+            'transcript_feedback': 'Hugo Feedback (AI)',
+            'ui_feedback': 'UI Feedback',
+            'feedback_widget': 'UI Feedback',
           };
           const sourceOrType = c.source || c.type;
           const isGeneralFeedback = c.field === 'general_feedback';
+          const isUiFeedback = sourceOrType === 'feedback_widget' || c.type === 'ui_feedback';
           const severity = ['technique_edit', 'ssot_edit'].includes(sourceOrType)
             ? 'HIGH'
             : sourceOrType === 'video_edit'
               ? 'MEDIUM'
               : isGeneralFeedback
                 ? 'ACTION'
-                : 'LOW';
+                : isUiFeedback
+                  ? 'ACTION'
+                  : 'LOW';
           const techNum = c.field?.match(/\d+\.\d+/)?.[0] || c.type?.charAt(0)?.toUpperCase() || '—';
           const timeAgo = getTimeAgo(new Date(c.created_at));
 
@@ -115,6 +124,26 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             if (c.new_json) newJson = typeof c.new_json === 'string' ? JSON.parse(c.new_json) : c.new_json;
           } catch {}
 
+          // Build readable description for UI feedback or AI-interpreted corrections
+          let description = c.context || `${c.original_value} → ${c.new_value}`;
+          if (c.source === 'feedback_widget' || c.type === 'ui_feedback') {
+            let elemInfo = '';
+            try {
+              const els = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
+              if (Array.isArray(els) && els.length > 0) {
+                elemInfo = els.map((e: any) => `<${e.tagName}> "${e.textContent}"`).join(', ');
+              }
+            } catch {}
+            description = c.new_value + (elemInfo ? ` — Elementen: ${elemInfo}` : '') + (c.field ? ` — Pagina: ${c.field}` : '');
+          } else if (c.source === 'transcript_feedback' && c.context) {
+            try {
+              const ctx = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
+              if (ctx.expertFeedback && ctx.aiInterpretation) {
+                description = `Hugo: "${ctx.expertFeedback}" — AI (${Math.round(ctx.aiInterpretation.confidence * 100)}%): ${ctx.aiInterpretation.reasoning}`;
+              }
+            } catch {}
+          }
+
           return {
             id: String(c.id),
             techniqueNumber: techNum,
@@ -122,7 +151,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             type: typeMap[sourceOrType] || typeMap[c.type] || sourceOrType,
             source: c.source || c.type || '',
             severity,
-            description: c.context || `${c.original_value} → ${c.new_value}`,
+            description,
             status: c.status,
             detectedAt: timeAgo,
             context: c.context,
@@ -382,6 +411,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                 <SelectItem value="chat_correction">Chat Correctie</SelectItem>
                 <SelectItem value="analysis_correction">Analyse Correctie</SelectItem>
                 <SelectItem value="ssot_edit">SSOT Bewerking</SelectItem>
+                <SelectItem value="transcript_feedback">Hugo Feedback (AI)</SelectItem>
               </SelectContent>
             </Select>
           </div>

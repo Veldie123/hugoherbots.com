@@ -41,6 +41,8 @@ const PrivacyPolicy = lazy(() => import("./components/HH/PrivacyPolicy").then(m 
 const UserNotifications = lazy(() => import("./components/HH/UserNotifications").then(m => ({ default: m.UserNotifications })));
 const SSOValidate = lazy(() => import("./components/HH/SSOValidate").then(m => ({ default: m.SSOValidate })));
 
+const HugoFeedbackWidget = lazy(() => import("./components/HH/HugoFeedbackWidget").then(m => ({ default: m.HugoFeedbackWidget })));
+
 const AdminDashboard = lazy(() => import("./components/HH/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
 const AdminVideoManagement = lazy(() => import("./components/HH/AdminVideoManagement").then(m => ({ default: m.AdminVideoManagement })));
 const AdminLiveSessions = lazy(() => import("./components/HH/AdminLiveSessions").then(m => ({ default: m.AdminLiveSessions })));
@@ -61,7 +63,8 @@ const AdminChatExpertMode = lazy(() => import("./components/HH/AdminChatExpertMo
 const AdminRAGReview = lazy(() => import("./components/HH/AdminRAGReview").then(m => ({ default: m.AdminRAGReview })));
 const AdminConflicts = lazy(() => import("./components/HH/AdminConflicts").then(m => ({ default: m.AdminConflicts })));
 const AdminV3Chat = lazy(() => import("./components/HH/AdminV3Chat").then(m => ({ default: m.AdminV3Chat })));
-const PAGES = ["landing", "landing-v2", "pricing", "about", "login", "signup", "authcallback", "preview", "onboarding", "dashboard", "technieken", "techniques", "coaching", "roleplay", "roleplays", "roleplaychat", "roleplays-chat", "overviewprogress", "builder", "videos", "live", "team", "analytics", "settings", "analysis", "analysis-results", "upload-analysis", "privacy-policy", "help", "resources", "hugo-overview", "talk-to-hugo", "library", "notifications", "admin-dashboard", "admin-videos", "admin-live", "admin-progress", "admin-users", "admin-techniques", "admin-transcripts", "admin-uploads", "admin-content", "admin-analytics", "admin-settings", "admin-help", "admin-resources", "admin-sessions", "admin-config-review", "admin-notifications", "admin-chat-expert", "admin-rag-review", "admin-conflicts", "admin-analysis-results", "admin-upload-analysis", "admin-hugo-agent", "admin-v3-chat", "sso-validate", "showcase", "showcase-video", "showcase-roleplay", "showcase-analysis"] as const;
+const AdminVideoWatchPage = lazy(() => import("./components/HH/AdminVideoWatchPage").then(m => ({ default: m.AdminVideoWatchPage })));
+const PAGES = ["landing", "landing-v2", "pricing", "about", "login", "signup", "authcallback", "preview", "onboarding", "dashboard", "technieken", "techniques", "coaching", "roleplay", "roleplays", "roleplaychat", "roleplays-chat", "overviewprogress", "builder", "videos", "live", "team", "analytics", "settings", "analysis", "analysis-results", "upload-analysis", "privacy-policy", "help", "resources", "hugo-overview", "talk-to-hugo", "library", "notifications", "admin-dashboard", "admin-videos", "admin-video-detail", "admin-live", "admin-progress", "admin-users", "admin-techniques", "admin-transcripts", "admin-uploads", "admin-content", "admin-analytics", "admin-settings", "admin-help", "admin-resources", "admin-sessions", "admin-config-review", "admin-notifications", "admin-chat-expert", "admin-rag-review", "admin-conflicts", "admin-analysis-results", "admin-upload-analysis", "admin-hugo-agent", "admin-v3-chat", "sso-validate", "showcase", "showcase-video", "showcase-roleplay", "showcase-analysis"] as const;
 type Page = (typeof PAGES)[number];
 const PAGE_SET: Set<string> = new Set(PAGES);
 
@@ -390,8 +393,8 @@ export default function App() {
           )}
 
           {/* Landing page */}
-          {currentPage === "landing" && <Landing navigate={navigate} />}
-          {/* {currentPage === "landing" && <ComingSoon navigate={navigate} />} */}
+          {/* {currentPage === "landing" && <Landing navigate={navigate} />} */}
+          {currentPage === "landing" && <ComingSoon navigate={navigate} />}
           {currentPage === "landing-v2" && <LandingV2 navigate={navigate} />}
 
           {/* Dev showcase preview */}
@@ -446,6 +449,7 @@ export default function App() {
           {currentPage === "resources" && <Resources navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "admin-dashboard" && <AdminDashboard navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-videos" && <AdminVideoManagement navigate={navigate} isSuperAdmin={isSuperAdmin} />}
+          {currentPage === "admin-video-detail" && <AdminVideoWatchPage navigate={navigate} isSuperAdmin={isSuperAdmin} navigationData={navigationData} />}
           {currentPage === "admin-live" && <AdminLiveSessions navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-progress" && <AdminProgress navigate={navigate} isSuperAdmin={isSuperAdmin} />}
           {currentPage === "admin-users" && <AdminUserManagement navigate={navigate} isSuperAdmin={isSuperAdmin} />}
@@ -478,6 +482,11 @@ export default function App() {
           {currentPage === "techniques" && <TechniqueLibrary navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "library" && <Library navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "notifications" && <UserNotifications navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
+        </Suspense>
+      )}
+      {onboardingMode && (
+        <Suspense fallback={null}>
+          <HugoFeedbackWidget currentPage={currentPage} />
         </Suspense>
       )}
     </NotificationProvider>
