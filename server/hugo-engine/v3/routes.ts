@@ -747,10 +747,10 @@ router.post("/preflight", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
-// Audio analysis: 50MB limit, audio files only
+// Audio analysis: 200MB multer limit (real cap enforced in handler: 24MB for Whisper)
 const audioUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 200 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype.startsWith("audio/") || file.mimetype.startsWith("video/")) {
       cb(null, true);
@@ -767,6 +767,13 @@ router.post("/analyze-audio", requireAuth, audioUpload.single("audio"), async (r
 
   const file = (req as any).file as (Express.Multer.File | undefined);
   if (!file) return res.status(400).json({ error: "Geen audiobestand meegestuurd." });
+
+  if (file.size > 24 * 1024 * 1024) {
+    return res.status(400).json({
+      error: "FILE_TOO_LARGE",
+      message: "Audiobestand is te groot (max 24 MB). Stuur een kortere opname of comprimeer het bestand.",
+    });
+  }
 
   try {
     const { uploadAndStore } = await import("../v2/analysis-service.js") as any;

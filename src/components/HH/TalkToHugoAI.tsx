@@ -54,6 +54,7 @@ import { InlineVideoPlayer } from "./InlineVideoPlayer";
 import { InlineWebinarCard } from "./InlineWebinarCard";
 import { InlineAnalysisCard } from "./InlineAnalysisCard";
 import type { EpicSlideContent, VideoEmbed, WebinarLink, AnalysisResultEmbed, RichContent } from "@/types/crossPlatform";
+import { toast } from "sonner";
 import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
 import { apiFetch } from "../../services/apiFetch";
 import { CoachViewSummary } from "./CoachViewSummary";
@@ -213,6 +214,7 @@ export function TalkToHugoAI({
   const [attachedFiles, setAttachedFiles] = useState<FileAttachment[]>([]);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -1729,8 +1731,16 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     }
   };
 
+  const AUDIO_MAX_BYTES = 24 * 1024 * 1024;
+
   const processFiles = (files: FileList | File[]) => {
-    const newAttachments: FileAttachment[] = Array.from(files).map((file) => {
+    const newAttachments: FileAttachment[] = [];
+    for (const file of Array.from(files)) {
+      const isAudio = file.type.startsWith("audio/") || file.type.startsWith("video/");
+      if (isAudio && file.size > AUDIO_MAX_BYTES) {
+        toast.error(`${file.name} is te groot (max 24 MB voor audio-analyse). Comprimeer of stuur een kortere opname.`);
+        continue;
+      }
       const attachment: FileAttachment = {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         file,
@@ -1741,9 +1751,12 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
       if (file.type.startsWith("image/")) {
         attachment.preview = URL.createObjectURL(file);
       }
-      return attachment;
-    });
-    setAttachedFiles((prev) => [...prev, ...newAttachments]);
+      newAttachments.push(attachment);
+    }
+    if (newAttachments.length > 0) {
+      setAttachedFiles((prev) => [...prev, ...newAttachments]);
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -2738,7 +2751,7 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
 
       
 
-      <div className="border-t border-hh-border bg-hh-bg flex-shrink-0">
+      <div className="p-3 bg-hh-bg flex-shrink-0">
         <input
           ref={fileInputRef}
           type="file"
@@ -2747,73 +2760,82 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
           onChange={handleFileInputChange}
         />
 
-        {attachedFiles.length > 0 && (
-          <div className="px-4 pt-3 pb-1 flex gap-2 flex-wrap">
-            {attachedFiles.map((file) => (
-              <div
-                key={file.id}
-                className="group relative flex items-center gap-2 bg-hh-ui-50 border border-hh-border rounded-lg px-3 py-2 max-w-[220px]"
-              >
-                {file.preview ? (
-                  <img src={file.preview} alt={file.name} className="w-8 h-8 rounded object-cover flex-shrink-0" />
-                ) : (
-                  <div className="w-8 h-8 rounded bg-hh-primary/10 flex items-center justify-center flex-shrink-0 text-hh-primary">
-                    {getFileIcon(file.type)}
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="text-[12px] font-medium text-hh-text truncate">{file.name}</p>
-                  <p className="text-[11px] text-hh-muted">{formatFileSize(file.size)}</p>
-                </div>
-                <button
-                  onClick={() => removeAttachedFile(file.id)}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-hh-ink text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+        <div className="border border-hh-border rounded-2xl bg-hh-bg overflow-hidden">
+          {attachedFiles.length > 0 && (
+            <div className="px-3 pt-3 pb-2 flex gap-2 flex-wrap border-b border-hh-border">
+              {attachedFiles.map((file) => (
+                <div
+                  key={file.id}
+                  className="relative flex items-center gap-2 bg-hh-ui-50 border border-hh-border rounded-lg px-3 py-2 max-w-[220px]"
                 >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+                  {file.preview ? (
+                    <img src={file.preview} alt={file.name} className="w-8 h-8 rounded object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-8 h-8 rounded bg-hh-primary/10 flex items-center justify-center flex-shrink-0 text-hh-primary">
+                      {getFileIcon(file.type)}
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[12px] font-medium text-hh-text truncate">{file.name}</p>
+                    <p className="text-[11px] text-hh-muted">{formatFileSize(file.size)}</p>
+                  </div>
+                  <button
+                    onClick={() => removeAttachedFile(file.id)}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-hh-ink text-white flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-        <div className="p-4 border-t border-hh-border flex gap-2 items-end flex-shrink-0">
-          <Button
-            variant="outline"
-            size="icon"
-            disabled={isStreaming}
-            className="flex-shrink-0 rounded-full w-9 h-9 border-hh-border hover:bg-hh-ui-50 text-hh-primary"
-            title="Bestand toevoegen"
-            onClick={() => handleFileSelect("*")}
-          >
-            <Paperclip className="w-4 h-4" />
-          </Button>
-          <Input
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder={isRecording ? "Luistert... spreek nu" : "Typ je bericht..."}
-            className={`flex-1 ${isRecording ? "border-hh-error/30 bg-hh-error/5" : ""}`}
-            disabled={isStreaming}
-          />
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleDictation}
-            disabled={isStreaming}
-            className={`flex-shrink-0 transition-all ${isRecording ? "bg-hh-error border-hh-error text-white shadow-lg shadow-hh-error/30 animate-pulse" : "hover:bg-hh-ui-50"}`}
-            aria-label={isRecording ? "Opname stoppen" : "Dicteren"}
-          >
-            {isRecording ? <MicOff className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-hh-primary" />}
-          </Button>
-          <Button
-            onClick={handleSendMessage}
-            disabled={(!inputText.trim() && attachedFiles.length === 0) || (isLoading && !hasActiveSession)}
-            variant="ghost"
-            className="gap-2 px-3 sm:px-4 text-white rounded-md hover:text-white bg-hh-success hover:bg-hh-success/90"
-          >
-            <Send className="w-4 h-4 text-white" />
-            <span className="text-white hidden sm:inline">Verzend</span>
-          </Button>
+          <div className="flex gap-2 items-end p-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isStreaming}
+              className="flex-shrink-0 rounded-full w-9 h-9 hover:bg-hh-ui-50 text-hh-muted hover:text-hh-primary"
+              title="Bestand toevoegen"
+              onClick={() => handleFileSelect("*")}
+            >
+              <Paperclip className="w-4 h-4" />
+            </Button>
+            <Input
+              ref={inputRef}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+              placeholder={
+                isRecording
+                  ? "Luistert... spreek nu"
+                  : attachedFiles.length > 0
+                  ? "Voeg een bericht toe, of klik Verzend..."
+                  : "Typ je bericht..."
+              }
+              className={`flex-1 border-0 shadow-none focus-visible:ring-0 bg-transparent ${isRecording ? "text-hh-error" : ""}`}
+              disabled={isStreaming}
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleDictation}
+              disabled={isStreaming}
+              className={`flex-shrink-0 transition-all ${isRecording ? "bg-hh-error border-hh-error text-white shadow-lg shadow-hh-error/30 animate-pulse" : "hover:bg-hh-ui-50"}`}
+              aria-label={isRecording ? "Opname stoppen" : "Dicteren"}
+            >
+              {isRecording ? <MicOff className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-hh-muted" />}
+            </Button>
+            <Button
+              onClick={handleSendMessage}
+              disabled={(!inputText.trim() && attachedFiles.length === 0) || (isLoading && !hasActiveSession)}
+              variant="ghost"
+              className="gap-2 px-3 sm:px-4 text-white rounded-xl hover:text-white bg-hh-success hover:bg-hh-success/90"
+            >
+              <Send className="w-4 h-4 text-white" />
+              <span className="text-white hidden sm:inline">Verzend</span>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
