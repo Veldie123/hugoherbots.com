@@ -203,7 +203,7 @@ Interpreteer Hugo's feedback. Antwoord ALLEEN in valid JSON:
         queryText += ' WHERE status = $1';
         params.push(status);
       }
-      queryText += ' ORDER BY created_at DESC LIMIT 100';
+      queryText += ' ORDER BY created_at DESC LIMIT 1000';
       const { rows } = await pool.query(queryText, params);
       res.json({ corrections: rows || [] });
     } catch (err: any) {
