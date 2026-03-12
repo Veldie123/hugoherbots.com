@@ -790,8 +790,8 @@ export function AdminLayout({ children, currentPage, navigate, isSuperAdmin: isS
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="focus:outline-none focus:ring-2 focus:ring-hh-primary rounded-full">
-                  <Avatar className="w-8 h-8 cursor-pointer hover:ring-2 hover:ring-hh-ui-200 transition-all">
-                    <AvatarFallback className="bg-hh-primary text-white text-[12px]">
+                  <Avatar className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-hh-ui-200 transition-all">
+                    <AvatarFallback className="bg-hh-primary text-white text-[13px]">
                       {adminUserInitials}
                     </AvatarFallback>
                   </Avatar>

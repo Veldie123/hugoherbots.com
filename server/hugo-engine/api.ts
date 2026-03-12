@@ -4501,42 +4501,75 @@ async function startServer() {
   });
 
   // POST /api/feedback/ui-change-request — Hugo's UI feedback widget
-  app.post("/api/feedback/ui-change-request", optionalAuth, async (req: Request, res: Response) => {
+  // Accepts multipart/form-data (with screenshot) or JSON
+  const feedbackUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+  app.post("/api/feedback/ui-change-request", feedbackUpload.single("screenshot"), optionalAuth, async (req: Request, res: Response) => {
     try {
       const userEmail = (req as any).userEmail || "hugo@hugoherbots.com";
-      const { description, pageUrl, elements } = req.body;
-      if (!description?.trim()) {
+      const description = (req.body.description || "").trim();
+      const pageUrl = req.body.pageUrl || "";
+      let parsedElements: any[] = [];
+      try {
+        parsedElements = typeof req.body.elements === "string" ? JSON.parse(req.body.elements) : (req.body.elements || []);
+      } catch { parsedElements = []; }
+
+      if (!description) {
         return res.status(400).json({ success: false, message: "Beschrijving is verplicht" });
       }
+
+      // Upload screenshot to Supabase storage if present
+      let screenshotUrl: string | null = null;
+      if (req.file) {
+        const ext = req.file.mimetype === "image/jpeg" ? "jpg" : "png";
+        const filename = `feedback_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from("ui-feedback-screenshots")
+          .upload(filename, req.file.buffer, { contentType: req.file.mimetype || "image/jpeg", upsert: false });
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from("ui-feedback-screenshots").getPublicUrl(filename);
+          screenshotUrl = urlData.publicUrl;
+        } else {
+          console.warn("[Feedback] Screenshot upload failed:", uploadError.message);
+        }
+      }
+
+      const context = JSON.stringify({
+        elements: parsedElements,
+        screenshotUrl,
+        viewport: req.body.viewportWidth ? { width: Number(req.body.viewportWidth), height: Number(req.body.viewportHeight) } : null,
+      });
+
       const result = await pool.query(
         `INSERT INTO admin_corrections (type, field, new_value, context, submitted_by, source, status)
          VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-        [
-          "ui_feedback",
-          pageUrl || "",
-          description.trim(),
-          JSON.stringify(elements || []),
-          userEmail,
-          "feedback_widget",
-          "pending",
-        ]
+        ["ui_feedback", pageUrl, description, context, userEmail, "feedback_widget", "pending"]
       );
       const correctionId = result.rows[0]?.id;
+
       // Notify superadmin
       await pool.query(
         `INSERT INTO admin_notifications (type, title, message, category, severity, related_id, related_page)
          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        [
-          "ui_feedback",
-          `UI feedback van ${userEmail}`,
-          description.trim().slice(0, 100),
-          "platform",
-          "info",
-          correctionId,
-          "admin-config-review",
-        ]
+        ["ui_feedback", `UI feedback van ${userEmail}`, description.slice(0, 100), "platform", "info", correctionId, "admin-config-review"]
       );
+
+      // Respond immediately, then generate plan in background
       res.json({ success: true, id: correctionId });
+
+      // Fire-and-forget: auto-generate plan via Claude API
+      import("./feedback-planner").then(({ generateFeedbackPlan }) => {
+        generateFeedbackPlan({ id: correctionId, description, pageUrl, elements: parsedElements, screenshotUrl: screenshotUrl || undefined })
+          .then(async (plan) => {
+            await pool.query("UPDATE admin_corrections SET target_file = $1 WHERE id = $2", [plan, correctionId]);
+            await pool.query(
+              `UPDATE admin_notifications SET message = $1 WHERE related_id = $2 AND type = 'ui_feedback'`,
+              [`Plan klaar: ${description.slice(0, 80)}`, correctionId]
+            );
+            console.log(`[Feedback] Plan generated for correction #${correctionId}`);
+          })
+          .catch((err) => console.error("[Feedback] Plan generation failed:", (err as Error).message));
+      }).catch((err) => console.error("[Feedback] Could not load feedback-planner:", (err as Error).message));
+
     } catch (err: any) {
       console.error("[Feedback] UI change request error:", err);
       res.status(500).json({ success: false, message: err.message });

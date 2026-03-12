@@ -399,9 +399,9 @@ export function VideoWatchPage({
 
                 const renderTechItem = (tech: Techniek, indent: number = 0) => {
                   const isPrimary = tech.nummer === video.techniqueNumber;
-                  const isHighlighted = videoTechniqueIds.has(tech.nummer);
+
                   const isLiveActive = activeTimelineTechnique === tech.nummer;
-                  const isActive = isPrimary || isHighlighted || isLiveActive;
+                  const isActive = isPrimary || isLiveActive;
                   const hasVideo = sortedVideos.some(
                     (v) => v.techniqueNumber === tech.nummer
                   );
@@ -434,9 +434,6 @@ export function VideoWatchPage({
                         } : isPrimary ? {
                           backgroundColor: "color-mix(in srgb, var(--hh-primary) 6%, transparent)",
                           borderLeft: "3px solid var(--hh-primary)",
-                        } : isHighlighted ? {
-                          backgroundColor: "color-mix(in srgb, var(--hh-primary) 8%, transparent)",
-                          borderLeft: "3px solid color-mix(in srgb, var(--hh-primary) 60%, transparent)",
                         } : {}),
                       }}
                       onClick={() => {
@@ -448,8 +445,6 @@ export function VideoWatchPage({
                           <div className="w-3.5 h-3.5 rounded-full bg-hh-primary animate-pulse" />
                         ) : isPrimary ? (
                           <div className="w-3.5 h-3.5 rounded-full bg-hh-primary" />
-                        ) : isHighlighted ? (
-                          <Tag className="w-3 h-3 text-hh-primary opacity-85" />
                         ) : isCompleted ? (
                           <CheckCircle2 className="w-3.5 h-3.5 text-hh-success" />
                         ) : null}
@@ -800,9 +795,9 @@ export function VideoWatchPage({
                           <div className="pb-1">
                             {techniques.map((tech) => {
                               const isPrimary = tech.nummer === video.techniqueNumber;
-                              const isHighlighted = videoTechniqueIds.has(tech.nummer);
+            
                               const isLiveActive = activeTimelineTechnique === tech.nummer;
-                              const isActive = isPrimary || isHighlighted || isLiveActive;
+                              const isActive = isPrimary || isLiveActive;
                               const hasVideo = sortedVideos.some((v) => v.techniqueNumber === tech.nummer);
 
                               return (
@@ -819,9 +814,6 @@ export function VideoWatchPage({
                                     } : isPrimary ? {
                                       backgroundColor: "color-mix(in srgb, var(--hh-primary) 6%, transparent)",
                                       borderLeft: "3px solid var(--hh-primary)",
-                                    } : isHighlighted ? {
-                                      backgroundColor: "color-mix(in srgb, var(--hh-primary) 3%, transparent)",
-                                      borderLeft: "2px solid color-mix(in srgb, var(--hh-primary) 40%, transparent)",
                                     } : {}),
                                   }}
                                   onClick={() => setDetailTechnique(tech)}

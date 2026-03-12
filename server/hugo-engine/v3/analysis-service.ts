@@ -59,7 +59,14 @@ async function callClaude(
   const MAX_RETRIES = 3;
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      const response = await client.messages.create(createParams);
+      let response;
+      if (thinkingBudget) {
+        // Streaming required for large max_tokens + thinking budget combinations
+        const stream = client.messages.stream(createParams as any);
+        response = await stream.finalMessage();
+      } else {
+        response = await client.messages.create(createParams);
+      }
       const textBlocks = response.content.filter(
         (b): b is { type: "text"; text: string } => b.type === "text"
       );

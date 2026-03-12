@@ -20,6 +20,12 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import {
   Search,
   Clock,
   CheckCircle2,
@@ -34,6 +40,8 @@ import {
   Database,
   ChevronDown,
   ChevronUp,
+  Image,
+  FileText,
 } from "lucide-react";
 import { getCodeBadgeColors } from "../../utils/phaseColors";
 import { toast } from "sonner";
@@ -61,6 +69,8 @@ interface ConfigConflict {
   submittedBy?: string;
   targetFile?: string;
   targetKey?: string;
+  screenshotUrl?: string;
+  plan?: string;
 }
 
 export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewProps) {
@@ -71,6 +81,8 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
   const [conflicts, setConflicts] = useState<ConfigConflict[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [planDialogId, setPlanDialogId] = useState<string | null>(null);
+  const [screenshotDialogUrl, setScreenshotDialogUrl] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCorrections();
@@ -126,13 +138,17 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
 
           // Build readable description for UI feedback or AI-interpreted corrections
           let description = c.context || `${c.original_value} → ${c.new_value}`;
+          let screenshotUrl: string | undefined;
           if (c.source === 'feedback_widget' || c.type === 'ui_feedback') {
             let elemInfo = '';
             try {
-              const els = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
+              const ctx = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
+              // New format: { elements: [], screenshotUrl, viewport }
+              const els = Array.isArray(ctx) ? ctx : (ctx?.elements || []);
               if (Array.isArray(els) && els.length > 0) {
                 elemInfo = els.map((e: any) => `<${e.tagName}> "${e.textContent}"`).join(', ');
               }
+              if (ctx?.screenshotUrl) screenshotUrl = ctx.screenshotUrl;
             } catch {}
             description = c.new_value + (elemInfo ? ` — Elementen: ${elemInfo}` : '') + (c.field ? ` — Pagina: ${c.field}` : '');
           } else if (c.source === 'transcript_feedback' && c.context) {
@@ -162,6 +178,8 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             submittedBy: c.submitted_by || c.reviewed_by || undefined,
             targetFile: c.target_file || undefined,
             targetKey: c.target_key || undefined,
+            screenshotUrl,
+            plan: (c.source === 'feedback_widget' || c.type === 'ui_feedback') ? c.target_file : undefined,
           };
         });
         setConflicts(mapped);
@@ -678,6 +696,35 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                                 {conflict.description}
                               </p>
                             )}
+                            {/* Screenshot thumbnail + Plan button for UI feedback */}
+                            {(conflict.screenshotUrl || conflict.plan) && (
+                              <div className="flex items-center gap-2 mt-2">
+                                {conflict.screenshotUrl && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); setScreenshotDialogUrl(conflict.screenshotUrl!); }}
+                                    className="flex items-center gap-1 text-[11px] text-hh-primary hover:underline"
+                                  >
+                                    <Image className="w-3 h-3" />
+                                    Screenshot
+                                  </button>
+                                )}
+                                {conflict.plan && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); setPlanDialogId(conflict.id); }}
+                                    className="flex items-center gap-1 text-[11px] text-hh-success hover:underline"
+                                  >
+                                    <FileText className="w-3 h-3" />
+                                    Plan bekijken
+                                  </button>
+                                )}
+                                {!conflict.plan && conflict.screenshotUrl && (
+                                  <span className="flex items-center gap-1 text-[11px] text-hh-muted">
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                    Plan wordt gegenereerd...
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </td>
                         <td className="p-4">{getStatusBadge(conflict.status)}</td>
@@ -783,6 +830,69 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
           </div>
         </Card>
       </div>
+      {/* Screenshot Dialog */}
+      <Dialog open={!!screenshotDialogUrl} onOpenChange={() => setScreenshotDialogUrl(null)}>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Feedback Screenshot</DialogTitle>
+          </DialogHeader>
+          {screenshotDialogUrl && (
+            <img
+              src={screenshotDialogUrl}
+              alt="Feedback screenshot"
+              className="w-full max-h-[70vh] object-contain rounded-lg border border-hh-border"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Plan Dialog */}
+      <Dialog open={!!planDialogId} onOpenChange={() => setPlanDialogId(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Gegenereerd Plan</DialogTitle>
+          </DialogHeader>
+          {planDialogId && (() => {
+            const conflict = conflicts.find(c => c.id === planDialogId);
+            if (!conflict?.plan) return null;
+            return (
+              <div className="space-y-4">
+                {conflict.screenshotUrl && (
+                  <img
+                    src={conflict.screenshotUrl}
+                    alt="Feedback screenshot"
+                    className="w-full rounded-lg border border-hh-border max-h-48 object-contain"
+                  />
+                )}
+                <div className="bg-hh-ui-50 rounded-lg p-4 text-[13px] text-hh-text whitespace-pre-wrap font-mono leading-relaxed">
+                  {conflict.plan}
+                </div>
+                {conflict.status === 'pending' && (
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-hh-border">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-hh-error border-hh-error hover:bg-hh-error/10"
+                      onClick={() => { handleReject(conflict.id); setPlanDialogId(null); }}
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      Afwijzen
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-hh-success hover:bg-hh-success/90 text-white"
+                      onClick={() => { handleApprove(conflict.id); setPlanDialogId(null); }}
+                    >
+                      <Check className="w-4 h-4 mr-1" />
+                      Plan goedkeuren
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

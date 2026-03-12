@@ -2188,8 +2188,8 @@ export function LiveCoaching({
                   </Button>
                 </div>
               </div>
-              <div className="pt-1">
-                <h2 className="text-[20px] leading-[26px] font-medium text-hh-text px-5 mb-3">
+              <div className="pt-4">
+                <h2 className="text-[20px] leading-[26px] font-medium text-hh-text px-5 mb-2">
                   {calendarDetailSession.title}
                 </h2>
                 {detailContent}

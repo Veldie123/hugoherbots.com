@@ -160,7 +160,7 @@ export default function App() {
           const rawPath = window.location.pathname.replace(/^\//, '');
 
           // Allow landing preview regardless of auth status
-          const landingPreviewPages = new Set(['landing-v2', 'landing']);
+          const landingPreviewPages = new Set(['landing-v2', 'landing', 'landing-original']);
           if (landingPreviewPages.has(rawPath)) {
             setCurrentPage(rawPath as Page);
           } else if (isHugoOnboarding) {
@@ -398,6 +398,7 @@ export default function App() {
           {/* Landing page */}
           {/* {currentPage === "landing" && <Landing navigate={navigate} />} */}
           {currentPage === "landing" && <ComingSoon navigate={navigate} />}
+          {currentPage === "landing-original" && <Landing navigate={navigate} />}
           {currentPage === "landing-v2" && <LandingV2 navigate={navigate} />}
 
           {/* Dev showcase preview */}
