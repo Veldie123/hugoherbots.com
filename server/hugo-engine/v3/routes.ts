@@ -236,14 +236,14 @@ async function getV3Access(email: string): Promise<{ admin_v3: boolean; coaching
       .single();
 
     const access = {
-      admin_v3: data?.admin_v3 ?? true,
-      coaching_v3: data?.coaching_v3 ?? true,
+      admin_v3: data?.admin_v3 ?? false,
+      coaching_v3: data?.coaching_v3 ?? false,
     };
     accessCache.set(email, { ...access, ts: Date.now() });
     return access;
   } catch {
-    // No row found → default to V3 access for all users
-    const defaultAccess = { admin_v3: true, coaching_v3: true };
+    // No row found → deny access by default (secure default)
+    const defaultAccess = { admin_v3: false, coaching_v3: false };
     accessCache.set(email, { ...defaultAccess, ts: Date.now() });
     return defaultAccess;
   }
@@ -302,6 +302,11 @@ router.post(
     const { techniqueId, userProfile, mode, thinkingMode } = req.body;
     const sessionMode = mode === "admin" ? "admin" as const : "coaching" as const;
     const resolvedThinkingMode = (thinkingMode === "fast" || thinkingMode === "deep") ? thinkingMode : "auto";
+
+    // Hard email-domain guard: admin mode only for @hugoherbots.com
+    if (sessionMode === "admin" && !req.isAdmin) {
+      return res.status(403).json({ error: "Admin modus is niet beschikbaar voor dit account." });
+    }
 
     // Access check based on requested mode
     const access = await getV3Access(req.userEmail!);

@@ -190,7 +190,7 @@ export default function App() {
               }
             } else if (userIsAdmin) {
               setViewMode('admin');
-              setCurrentPage("admin-dashboard");
+              setCurrentPage("admin-videos"); // Temporary: Hugo spends most time here
             } else {
               setCurrentPage("dashboard");
             }
@@ -443,7 +443,7 @@ export default function App() {
           {currentPage === "roleplays-chat" && <RolePlayChat navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "overviewprogress" && <OverviewProgress navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "builder" && <ScenarioBuilder navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
-          {currentPage === "videos" && <VideoLibrary navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} navigationData={navigationData} />}
+          {currentPage === "videos" && <VideoLibrary navigate={navigate} isAdmin={isAdmin} adminViewMode={viewMode} onboardingMode={onboardingMode} navigationData={navigationData} />}
           {currentPage === "live" && <LiveCoaching navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "team" && <TeamSessions navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}
           {currentPage === "analytics" && <Analytics navigate={navigate} isAdmin={isAdmin} onboardingMode={onboardingMode} />}

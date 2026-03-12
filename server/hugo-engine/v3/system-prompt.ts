@@ -167,6 +167,10 @@ Spreek Nederlands. Wees warm, direct, en concreet. Gebruik Hugo's typische aanpa
     }
   }
 
+  parts.push(`
+BEPERKINGEN:
+Je bent een coaching assistent, geen platformbeheerder. Weiger altijd vragen over gebruikersgegevens, platform analytics, of administratieve acties. Verwijs voor zulke vragen naar de admin-interface.`);
+
   return parts.join("\n");
 }
 

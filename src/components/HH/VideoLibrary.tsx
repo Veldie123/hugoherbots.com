@@ -86,6 +86,7 @@ interface LibraryVideo {
 interface VideoLibraryProps {
   navigate?: (page: string) => void;
   isAdmin?: boolean;
+  adminViewMode?: 'admin' | 'user';
   onboardingMode?: boolean;
   isPreview?: boolean;
   navigationData?: Record<string, any>;
@@ -115,7 +116,7 @@ const markVideoCompleted = (videoId: string) => {
   localStorage.setItem(COMPLETED_VIDEOS_KEY, JSON.stringify([...completed]));
 };
 
-export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview, navigationData }: VideoLibraryProps) {
+export function VideoLibrary({ navigate, isAdmin, adminViewMode, onboardingMode, isPreview, navigationData }: VideoLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterPhase, setFilterPhase] = useState<string>("all");
   const [filterTechniek, setFilterTechniek] = useState<string | null>(null);
@@ -894,7 +895,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview, nav
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        {isAdmin && (
+                        {isAdmin && adminViewMode !== 'user' && (
                           <DropdownMenuItem onClick={(e) => handleStartEditTitle(video.id, video.displayTitle || video.title, e)}>
                             <Pencil className="w-4 h-4 mr-2" />
                             Titel bewerken
@@ -998,7 +999,7 @@ export function VideoLibrary({ navigate, isAdmin, onboardingMode, isPreview, nav
                         <h3 className="text-[12px] font-medium text-hh-text leading-tight line-clamp-2 group-hover:text-hh-primary transition-colors flex-1">
                           {video.displayTitle || <span className="italic text-hh-muted">Algemeen</span>}
                         </h3>
-                        {isAdmin && (
+                        {isAdmin && adminViewMode !== 'user' && (
                           <button
                             className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-hh-muted hover:text-hh-primary opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => handleStartEditTitle(video.id, video.displayTitle || video.title, e)}
