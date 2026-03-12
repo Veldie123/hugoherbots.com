@@ -1,0 +1,160 @@
+name: SSOT Drift Detection
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/transcripts/**'
+      - 'config/video_mapping.json'
+
+jobs:
+  ssot-drift-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need parent commit for git diff
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Detect changed transcript files
+        id: changed
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'data/transcripts/*.txt' 'config/video_mapping.json' 2>/dev/null || echo "")
+          echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Map changed transcripts to technique IDs
+        id: techniques
+        env:
+          CHANGED_FILES: ${{ steps.changed.outputs.changed_files }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const changedFiles = (process.env.CHANGED_FILES || '').trim().split('\n').filter(Boolean);
+
+            if (changedFiles.includes('config/video_mapping.json') || changedFiles.length === 0) {
+              process.stdout.write('ALL');
+              process.exit(0);
+            }
+
+            const vm = JSON.parse(fs.readFileSync('config/video_mapping.json', 'utf-8'));
+            const techIds = new Set();
+
+            for (const [filename, v] of Object.entries(vm.videos || {})) {
+              if (v.is_hidden) continue;
+              const stem = filename.replace(/\\.MP4\$/i, '');
+              const transcriptPath = 'data/transcripts/' + stem + '.txt';
+              if (changedFiles.includes(transcriptPath)) {
+                techIds.add(v.techniek);
+              }
+            }
+
+            if (techIds.size === 0) {
+              process.stdout.write('NONE');
+            } else {
+              process.stdout.write([...techIds].join(','));
+            }
+          " > /tmp/tech_ids.txt
+          TECH_IDS=\$(cat /tmp/tech_ids.txt)
+          echo "tech_ids=\$TECH_IDS" >> \$GITHUB_OUTPUT
+          echo "Techniques to audit: \$TECH_IDS"
+
+      - name: Run SSOT audit
+        id: audit
+        if: steps.techniques.outputs.tech_ids != 'NONE'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          TECH_IDS="${{ steps.techniques.outputs.tech_ids }}"
+          if [ "$TECH_IDS" = "ALL" ]; then
+            npx tsx scripts/ssot-audit.ts
+          else
+            npx tsx scripts/ssot-audit.ts --techniques "$TECH_IDS"
+          fi
+        continue-on-error: true  # Don't fail the workflow if audit fails (API errors etc)
+
+      - name: Warn on audit failure
+        if: steps.audit.outcome == 'failure' && steps.techniques.outputs.tech_ids != 'NONE'
+        run: echo "::warning::SSOT audit script failed — no drift detection results available. Check the workflow logs."
+
+      - name: Check for significant findings
+        id: findings
+        if: steps.techniques.outputs.tech_ids != 'NONE'
+        run: |
+          # Find the most recent audit file
+          AUDIT_FILE=$(ls -t docs/ssot-audit-*.json 2>/dev/null | head -1)
+
+          if [ -z "$AUDIT_FILE" ]; then
+            echo "has_findings=false" >> $GITHUB_OUTPUT
+            echo "No audit file found"
+            exit 0
+          fi
+
+          # Count significant findings: confidence >= 0.75 AND status != ok
+          SIGNIFICANT=$(AUDIT_FILE_PATH="$AUDIT_FILE" node -e "
+            const data = JSON.parse(require('fs').readFileSync(process.env.AUDIT_FILE_PATH, 'utf-8'));
+            const sig = (data.findings || []).filter(f =>
+              f.status !== 'ok' &&
+              !f.no_transcript_coverage &&
+              (f.confidence || 0) >= 0.75
+            ).length;
+            console.log(sig);
+          ")
+
+          echo "significant_count=$SIGNIFICANT" >> $GITHUB_OUTPUT
+          echo "audit_file=$AUDIT_FILE" >> $GITHUB_OUTPUT
+          echo "Significant findings: $SIGNIFICANT"
+
+          if [ "$SIGNIFICANT" -gt "0" ]; then
+            echo "has_findings=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_findings=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create PR with audit results
+        if: steps.findings.outputs.has_findings == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "ssot-audit: drift detected (${{ github.event.head_commit.timestamp }})"
+          branch: ssot-drift/${{ github.sha }}
+          delete-branch: true
+          title: "SSOT drift: ${{ steps.findings.outputs.significant_count }} findings (confidence ≥ 0.75)"
+          body: |
+            ## SSOT Drift Detected
+
+            The SSOT audit found **${{ steps.findings.outputs.significant_count }}** significant findings
+            (confidence ≥ 0.75, status: needs_review or flagged).
+
+            **Audit file:** `${{ steps.findings.outputs.audit_file }}`
+            **Triggered by:** `${{ github.event.head_commit.message }}`
+
+            ### How to review and apply
+
+            1. Review findings in the audit JSON file in this PR
+            2. Set `"approved": true` on findings you want to apply
+            3. Run: `npm run ssot:apply -- --input ${{ steps.findings.outputs.audit_file }}`
+            4. Verify the changes, commit, and merge
+
+            ### Scripts available
+            - `npm run ssot:audit` — Run full audit
+            - `npm run ssot:audit -- --techniques 2.1.1,2.1.2` — Targeted audit
+            - `npm run ssot:apply -- --input <file>` — Apply approved patches
+            - `npm run ssot:apply -- --input <file> --dry-run` — Preview patches
+
+            ---
+            *Generated by [SSOT Drift Detection](.github/workflows/ssot-drift-detection.yml)*
+          add-paths: |
+            docs/ssot-audit-*.json

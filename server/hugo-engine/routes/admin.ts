@@ -203,7 +203,7 @@ Interpreteer Hugo's feedback. Antwoord ALLEEN in valid JSON:
         queryText += ' WHERE status = $1';
         params.push(status);
       }
-      queryText += ' ORDER BY created_at DESC LIMIT 100';
+      queryText += ' ORDER BY created_at DESC LIMIT 1000';
       const { rows } = await pool.query(queryText, params);
       res.json({ corrections: rows || [] });
     } catch (err: any) {
@@ -275,6 +275,44 @@ Interpreteer Hugo's feedback. Antwoord ALLEEN in valid JSON:
             }
           } catch (videoEditErr: any) {
             console.error('[Admin] Failed to process video_edit approval:', videoEditErr.message);
+          }
+        }
+
+        if (correction.source === 'ssot_audit' && correction.target_key && correction.new_json && correction.target_file) {
+          try {
+            const fullPath = path.join(process.cwd(), correction.target_file);
+            const parsedNewJson = typeof correction.new_json === 'string' ? JSON.parse(correction.new_json) : correction.new_json;
+            const data = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
+
+            let itemContainer: Record<string, any> | null = null;
+            if (correction.target_file.includes('technieken_index.json')) itemContainer = data.technieken ?? data;
+            else if (correction.target_file.includes('klant_houdingen.json')) itemContainer = data;
+            else if (correction.target_file.includes('rag_heuristics.json')) itemContainer = data.techniques ?? data;
+            else if (correction.target_file.includes('evaluator_overlay.json')) itemContainer = data.technieken ?? data;
+
+            const item = itemContainer?.[correction.target_key];
+            if (item) {
+              Object.assign(item, parsedNewJson);
+              const tmp = fullPath + '.tmp';
+              fs.writeFileSync(tmp, JSON.stringify(data, null, 2) + '\n', 'utf-8');
+              fs.renameSync(tmp, fullPath);
+              console.log(`[Admin] Applied ssot_audit: ${correction.target_file}[${correction.target_key}]`);
+
+              if (correction.target_file.includes('technieken_index.json')) {
+                try {
+                  const srcPath = path.join(process.cwd(), 'src/data/technieken_index.json');
+                  fs.writeFileSync(srcPath, JSON.stringify(data, null, 2), 'utf-8');
+                } catch (copyErr: any) {
+                  console.error('[Admin] Failed to copy to src/data:', copyErr.message);
+                }
+              }
+
+              ssotUpdated = true;
+            } else {
+              console.warn(`[Admin] ssot_audit: item ${correction.target_key} not found in ${correction.target_file}`);
+            }
+          } catch (auditErr: any) {
+            console.error('[Admin] Failed to apply ssot_audit correction:', auditErr.message);
           }
         }
 

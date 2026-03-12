@@ -111,20 +111,36 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             'transcript_feedback': 'Hugo Feedback (AI)',
             'ui_feedback': 'UI Feedback',
             'feedback_widget': 'UI Feedback',
+            'ssot_audit': 'SSOT Audit',
           };
           const sourceOrType = c.source || c.type;
           const isGeneralFeedback = c.field === 'general_feedback';
           const isUiFeedback = sourceOrType === 'feedback_widget' || c.type === 'ui_feedback';
-          const severity = ['technique_edit', 'ssot_edit'].includes(sourceOrType)
-            ? 'HIGH'
-            : sourceOrType === 'video_edit'
-              ? 'MEDIUM'
-              : isGeneralFeedback
-                ? 'ACTION'
-                : isUiFeedback
+
+          let severity: 'HIGH' | 'MEDIUM' | 'LOW' | 'ACTION';
+          if (sourceOrType === 'ssot_audit') {
+            try {
+              const ctx = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
+              severity = ctx?.audit_status === 'flagged' ? 'HIGH' : 'MEDIUM';
+            } catch {
+              severity = 'MEDIUM';
+            }
+          } else {
+            severity = ['technique_edit', 'ssot_edit'].includes(sourceOrType)
+              ? 'HIGH'
+              : sourceOrType === 'video_edit'
+                ? 'MEDIUM'
+                : isGeneralFeedback
                   ? 'ACTION'
-                  : 'LOW';
-          const techNum = c.field?.match(/\d+\.\d+/)?.[0] || c.type?.charAt(0)?.toUpperCase() || '—';
+                  : isUiFeedback
+                    ? 'ACTION'
+                    : 'LOW';
+          }
+
+          // For ssot_audit: extract item_id from field key (format: "2.1.1::hoe")
+          const techNum = sourceOrType === 'ssot_audit'
+            ? (c.field?.split('::')?.[0] || '—')
+            : (c.field?.match(/\d+\.\d+/)?.[0] || c.type?.charAt(0)?.toUpperCase() || '—');
           const timeAgo = getTimeAgo(new Date(c.created_at));
 
           let originalJson = null;
@@ -151,6 +167,13 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
               if (ctx?.screenshotUrl) screenshotUrl = ctx.screenshotUrl;
             } catch {}
             description = c.new_value + (elemInfo ? ` — Elementen: ${elemInfo}` : '') + (c.field ? ` — Pagina: ${c.field}` : '');
+          } else if (c.source === 'ssot_audit' && c.context) {
+            try {
+              const ctx = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
+              const fieldLabel = ctx.fieldName ? ` [${ctx.fieldName}]` : '';
+              const conf = ctx.confidence ? ` (${Math.round(ctx.confidence * 100)}%)` : '';
+              description = `${ctx.issue_description || `${c.original_value} → ${c.new_value}`}${fieldLabel}${conf}`;
+            } catch {}
           } else if (c.source === 'transcript_feedback' && c.context) {
             try {
               const ctx = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
@@ -160,10 +183,24 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             } catch {}
           }
 
+          // For ssot_audit: derive techniqueName from context.naam if available, fallback to "id — field"
+          let techniqueName = c.field || c.type;
+          if (sourceOrType === 'ssot_audit' && c.context) {
+            try {
+              const ctx = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
+              const targetKey = c.target_key || techNum;
+              if (ctx.naam) {
+                techniqueName = `${ctx.naam} (${targetKey})`;
+              } else if (ctx.fieldName && targetKey) {
+                techniqueName = `${targetKey} — ${ctx.fieldName}`;
+              }
+            } catch {}
+          }
+
           return {
             id: String(c.id),
             techniqueNumber: techNum,
-            techniqueName: c.field || c.type,
+            techniqueName,
             type: typeMap[sourceOrType] || typeMap[c.type] || sourceOrType,
             source: c.source || c.type || '',
             severity,
@@ -429,6 +466,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                 <SelectItem value="chat_correction">Chat Correctie</SelectItem>
                 <SelectItem value="analysis_correction">Analyse Correctie</SelectItem>
                 <SelectItem value="ssot_edit">SSOT Bewerking</SelectItem>
+                <SelectItem value="ssot_audit">SSOT Audit</SelectItem>
                 <SelectItem value="transcript_feedback">Hugo Feedback (AI)</SelectItem>
               </SelectContent>
             </Select>
@@ -590,6 +628,23 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                         ))}
                       </div>
                     </div>
+                    {conflict.source === 'ssot_audit' && (() => {
+                      try {
+                        const ctx = typeof conflict.context === 'string' ? JSON.parse(conflict.context) : conflict.context;
+                        const evidence: string[] = ctx?.transcript_evidence ?? [];
+                        if (evidence.length === 0) return null;
+                        return (
+                          <div>
+                            <p className="text-[12px] font-medium text-hh-primary mb-2">Transcriptbewijs</p>
+                            <div className="bg-hh-primary/5 dark:bg-hh-primary/10 rounded-lg p-3 space-y-1">
+                              {evidence.map((quote, i) => (
+                                <p key={i} className="text-[12px] text-hh-text italic">"{quote}"</p>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      } catch { return null; }
+                    })()}
                     <p className="text-[11px] text-hh-muted">
                       Ingediend door: {conflict.submittedBy || 'admin'} | Target: {conflict.targetFile || '—'} → {conflict.targetKey || '—'}
                     </p>
@@ -816,6 +871,23 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                                 </div>
                               </div>
                             </div>
+                            {conflict.source === 'ssot_audit' && (() => {
+                              try {
+                                const ctx = typeof conflict.context === 'string' ? JSON.parse(conflict.context) : conflict.context;
+                                const evidence: string[] = ctx?.transcript_evidence ?? [];
+                                if (evidence.length === 0) return null;
+                                return (
+                                  <div className="mt-3">
+                                    <p className="text-[12px] font-medium text-hh-primary mb-2">Transcriptbewijs</p>
+                                    <div className="bg-hh-primary/5 dark:bg-hh-primary/10 rounded-lg p-3 space-y-1">
+                                      {evidence.map((quote, i) => (
+                                        <p key={i} className="text-[12px] text-hh-text italic">"{quote}"</p>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              } catch { return null; }
+                            })()}
                             <p className="text-[11px] text-hh-muted mt-2">
                               Ingediend door: {conflict.submittedBy || 'admin'} | Target: {conflict.targetFile || '—'} → {conflict.targetKey || '—'}
                             </p>
