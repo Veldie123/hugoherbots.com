@@ -73,6 +73,11 @@ Sales coaching platform voor Hugo Herbots (82 jaar, Belgische sales coach).
 - **CTA (user):** `bg-hh-success hover:bg-hh-success/90 text-white rounded-full`
 - **CTA (admin):** `bg-hh-primary hover:bg-hh-primary/90 text-white`
 - **Destructive:** alleen voor camera uit, mic uit, sessie verlaten
+- **UX Feedback (VERPLICHT):** Elke button die een async actie triggert MOET een loading state tonen:
+  - Vervang het icoon door `<Loader2 className="animate-spin" />` (uit lucide-react)
+  - Verander de tekst (bijv. "Verstuur" → "Verzenden...")
+  - Zet `disabled` op de button tijdens de actie
+  - Gebruik `active:scale-95` voor directe click feedback op alle interactieve buttons
 
 ### Dark Mode
 

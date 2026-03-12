@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { Flag, Crosshair, Send, Trash2, Plus } from "lucide-react";
+import { Flag, Crosshair, Send, Trash2, Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import html2canvas from "html2canvas";
+import { apiFetch } from "@/services/apiFetch";
+import { toCanvas } from "html-to-image";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -17,7 +18,7 @@ interface HugoFeedbackWidgetProps {
   currentPage?: string | null;
 }
 
-// ── CSS path generator ───────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 function getCSSPath(el: HTMLElement): string {
   const parts: string[] = [];
@@ -55,6 +56,43 @@ function getTextPreview(el: HTMLElement): string {
   return text.length > 60 ? text.slice(0, 57) + "..." : text;
 }
 
+/** Build flag cursor SVG data URI with dynamic color */
+function buildFlagCursor(hexColor: string): string {
+  const encoded = hexColor.replace("#", "%23");
+  return `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='${encoded}' stroke='${encoded}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z'/%3E%3Cline x1='4' y1='22' x2='4' y2='15'/%3E%3C/svg%3E") 4 4, crosshair`;
+}
+
+/** Draw highlight rectangles on canvas for selected elements */
+function drawElementHighlights(canvas: HTMLCanvasElement, elRefs: ElementRef[]) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx || elRefs.length === 0) return;
+  for (const ref of elRefs) {
+    try {
+      const target = document.querySelector(ref.selector);
+      if (!target) continue;
+      const rect = (target as HTMLElement).getBoundingClientRect();
+      // Canvas coordinates match viewport coordinates (html2canvas x/y = scrollX/Y)
+      const x = rect.left;
+      const y = rect.top;
+      // Red dashed outline
+      ctx.strokeStyle = "#EF4444";
+      ctx.lineWidth = 3;
+      ctx.setLineDash([8, 4]);
+      ctx.strokeRect(x, y, rect.width, rect.height);
+      // Label background
+      const label = `\u{1F6A9} <${ref.tagName}>`;
+      ctx.font = "bold 12px sans-serif";
+      const textW = ctx.measureText(label).width;
+      ctx.fillStyle = "rgba(239, 68, 68, 0.85)";
+      ctx.fillRect(x, y - 20, textW + 8, 18);
+      // Label text
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillText(label, x + 4, y - 6);
+      ctx.setLineDash([]);
+    } catch { /* selector might not match */ }
+  }
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
@@ -66,6 +104,18 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
   const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | null>(null);
   const popupRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Detect admin context (portal exits .admin-session CSS scope)
+  const [isAdminContext, setIsAdminContext] = useState(false);
+  useEffect(() => {
+    setIsAdminContext(!!document.querySelector(".admin-session"));
+  }, []);
+
+  // Resolve primary color dynamically (admin = purple, user = steel blue)
+  const getPrimaryHex = useCallback(() => {
+    const src = document.querySelector(".admin-session") || document.documentElement;
+    return getComputedStyle(src).getPropertyValue("--hh-primary").trim() || "#4F7396";
+  }, []);
 
   const isPopupOpen = popupPosition !== null;
 
@@ -91,6 +141,25 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isPopupOpen]);
+
+  // ── Reposition popup when it overflows viewport ────────────────────────────
+
+  useEffect(() => {
+    if (!popupRef.current || !popupPosition) return;
+    // Wait one frame for DOM to settle after element list change
+    requestAnimationFrame(() => {
+      if (!popupRef.current || !popupPosition) return;
+      const rect = popupRef.current.getBoundingClientRect();
+      const maxY = window.innerHeight - rect.height - 16;
+      const maxX = window.innerWidth - rect.width - 16;
+      if (popupPosition.y > maxY || popupPosition.x > maxX) {
+        setPopupPosition({
+          x: Math.max(16, Math.min(popupPosition.x, maxX)),
+          y: Math.max(16, Math.min(popupPosition.y, maxY)),
+        });
+      }
+    });
+  }, [elements.length, popupPosition]);
 
   // ── Element selection handlers ───────────────────────────────────────────
 
@@ -137,7 +206,8 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
       document.addEventListener("mousemove", handleMouseMove, true);
       document.addEventListener("click", handleClick, true);
       document.addEventListener("keydown", handleKeyDown, true);
-      document.body.style.cursor = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%234F7396' stroke='%234F7396' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z'/%3E%3Cline x1='4' y1='22' x2='4' y2='15'/%3E%3C/svg%3E") 4 4, crosshair`;
+      // Dynamic flag cursor color (purple in admin, steel blue in user view)
+      document.body.style.cursor = buildFlagCursor(getPrimaryHex());
       return () => {
         document.removeEventListener("mousemove", handleMouseMove, true);
         document.removeEventListener("click", handleClick, true);
@@ -145,7 +215,7 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
         document.body.style.cursor = "";
       };
     }
-  }, [selecting, handleMouseMove, handleClick, handleKeyDown]);
+  }, [selecting, handleMouseMove, handleClick, handleKeyDown, getPrimaryHex]);
 
   // Highlight hovered element
   useEffect(() => {
@@ -172,24 +242,28 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
       formData.append("viewportWidth", String(window.innerWidth));
       formData.append("viewportHeight", String(window.innerHeight));
 
-      // Hide popup via CSS for clean screenshot (faster than React state)
-      if (popupRef.current) popupRef.current.style.display = "none";
-
+      // Screenshot capture via html-to-image (supports modern CSS like oklab)
       let screenshotOk = false;
       try {
-        const canvas = await html2canvas(document.body, {
-          scale: 1,
-          useCORS: true,
-          allowTaint: true,
-          logging: false,
-          width: window.innerWidth,
-          height: window.innerHeight,
-          x: window.scrollX,
-          y: window.scrollY,
-          ignoreElements: (el) => el.hasAttribute("data-feedback-widget"),
-        });
+        const canvas = await Promise.race([
+          toCanvas(document.body, {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            pixelRatio: 1,
+            filter: (el: Node) => {
+              if (el instanceof HTMLElement && el.hasAttribute("data-feedback-widget")) return false;
+              return true;
+            },
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("screenshot timeout")), 10000)
+          ),
+        ]);
 
-        // Try toBlob with 5s timeout
+        // Draw element highlights on the captured canvas
+        drawElementHighlights(canvas, elements);
+
+        // Convert to JPEG blob with 5s timeout
         let blob: Blob | null = null;
         try {
           blob = await new Promise<Blob | null>((resolve) => {
@@ -200,7 +274,6 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
             );
           });
         } catch {
-          // SecurityError on tainted canvas — fallback to dataURL
           try {
             const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
             const dataRes = await fetch(dataUrl);
@@ -218,9 +291,6 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
         console.warn("[Feedback] Screenshot failed:", screenshotErr);
       }
 
-      // Restore popup visibility
-      if (popupRef.current) popupRef.current.style.display = "";
-
       if (!screenshotOk) {
         toast.info("Screenshot kon niet gemaakt worden — feedback wordt zonder verzonden");
       }
@@ -229,14 +299,14 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
       formData.append("pageUrl", currentPage || window.location.pathname);
       formData.append("elements", JSON.stringify(elements));
 
-      const res = await fetch("/api/feedback/ui-change-request", {
+      const res = await apiFetch("/api/feedback/ui-change-request", {
         method: "POST",
         body: formData,
       });
       if (!res.ok) {
         const text = await res.text();
         console.error("[Feedback] Server error:", res.status, text);
-        throw new Error("Verzenden mislukt");
+        throw new Error(`Server ${res.status}`);
       }
       toast.success("Feedback verzonden! Plan wordt automatisch gegenereerd.");
       setDescription("");
@@ -250,19 +320,27 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
     }
   };
 
+  // ── Portal wrapper: inherits admin-session class for correct hh-primary ──
+
+  const portalWrap = (children: React.ReactNode) => (
+    <div className={isAdminContext ? "admin-session" : ""} data-feedback-widget="true">
+      {children}
+    </div>
+  );
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <>
       {/* Selection mode banner — portal to body for z-index safety */}
       {selecting && createPortal(
-        <div
-          data-feedback-widget="true"
-          className="fixed left-1/2 -translate-x-1/2 top-16 text-white text-center py-2 px-6 text-[13px] font-medium z-[70] rounded-full shadow-lg"
-          style={{ backgroundColor: 'var(--hh-primary)' }}
-        >
-          Klik op een element — <span className="opacity-70">Esc = annuleren</span>
-        </div>,
+        portalWrap(
+          <div
+            className="fixed left-1/2 -translate-x-1/2 top-16 text-white text-center py-2 px-6 text-[13px] font-medium z-[70] rounded-full shadow-lg bg-hh-primary"
+          >
+            Klik op een element — <span className="opacity-70">Esc = annuleren</span>
+          </div>
+        ),
         document.body
       )}
 
@@ -283,7 +361,9 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
           }}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
           style={{
-            backgroundColor: (selecting || isPopupOpen) ? 'var(--hh-primary)' : 'transparent',
+            backgroundColor: (selecting || isPopupOpen)
+              ? 'var(--hh-primary)'
+              : 'color-mix(in srgb, var(--hh-primary) 12%, transparent)',
             color: (selecting || isPopupOpen) ? '#ffffff' : 'var(--hh-primary)',
           }}
           aria-label="Feedback geven"
@@ -293,77 +373,78 @@ export function HugoFeedbackWidget({ currentPage }: HugoFeedbackWidgetProps) {
         </button>
       </div>
 
-      {/* Popup — portal to body to avoid stacking context issues */}
+      {/* Popup — portal to body, wrapped in admin-session for correct tokens */}
       {isPopupOpen && !selecting && createPortal(
-        <div
-          ref={popupRef}
-          data-feedback-widget="true"
-          className="fixed w-[calc(100vw-32px)] sm:w-80 bg-popover text-popover-foreground rounded-xl shadow-xl border border-hh-border z-[60] overflow-hidden flex flex-col"
-          style={{
-            top: `${popupPosition.y}px`,
-            left: `${popupPosition.x}px`,
-          }}
-        >
-          <div className="p-4 space-y-3">
-            <textarea
-              ref={textareaRef}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Beschrijf je suggestie..."
-              rows={2}
-              className="w-full resize-none rounded-lg border border-hh-border bg-popover text-popover-foreground text-[13px] px-3 py-2 placeholder:text-hh-muted focus:outline-none focus:ring-1 focus:ring-hh-primary/30 focus:border-hh-primary/50"
-            />
+        portalWrap(
+          <div
+            ref={popupRef}
+            className="fixed w-[calc(100vw-32px)] sm:w-80 bg-popover text-popover-foreground rounded-xl shadow-xl border border-hh-border z-[60] overflow-hidden flex flex-col"
+            style={{
+              top: `${popupPosition.y}px`,
+              left: `${popupPosition.x}px`,
+            }}
+          >
+            <div className="p-4 space-y-3">
+              <textarea
+                ref={textareaRef}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Beschrijf je suggestie..."
+                rows={2}
+                className="w-full resize-none rounded-lg border border-hh-border bg-popover text-popover-foreground text-[13px] px-3 py-2 placeholder:text-hh-muted focus:outline-none focus:ring-1 focus:ring-hh-primary/30 focus:border-hh-primary/50"
+              />
 
-            {/* Selected elements */}
-            {elements.length > 0 && (
-              <div className="space-y-1">
-                {elements.map((el, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-2 bg-hh-primary/8 border border-hh-primary/15 rounded-lg px-2.5 py-1.5 text-[11px]"
-                  >
-                    <Crosshair size={10} className="text-hh-primary flex-shrink-0" />
-                    <span className="text-hh-text truncate flex-1">
-                      <span className="font-mono text-hh-primary">{`<${el.tagName}>`}</span>{" "}
-                      {el.textContent && (
-                        <span className="text-hh-muted">"{el.textContent}"</span>
-                      )}
-                    </span>
-                    <button
-                      onClick={() =>
-                        setElements((prev) => prev.filter((_, j) => j !== i))
-                      }
-                      className="text-hh-muted hover:text-hh-error flex-shrink-0"
-                      aria-label="Verwijderen"
+              {/* Selected elements — scrollable when many */}
+              {elements.length > 0 && (
+                <div className="space-y-1 max-h-[120px] overflow-y-auto">
+                  {elements.map((el, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 bg-hh-primary/8 border border-hh-primary/15 rounded-lg px-2.5 py-1.5 text-[11px]"
                     >
-                      <Trash2 size={10} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+                      <Crosshair size={10} className="text-hh-primary flex-shrink-0" />
+                      <span className="text-hh-text truncate flex-1">
+                        <span className="font-mono text-hh-primary">{`<${el.tagName}>`}</span>{" "}
+                        {el.textContent && (
+                          <span className="text-hh-muted">"{el.textContent}"</span>
+                        )}
+                      </span>
+                      <button
+                        onClick={() =>
+                          setElements((prev) => prev.filter((_, j) => j !== i))
+                        }
+                        className="text-hh-muted hover:text-hh-error flex-shrink-0"
+                        aria-label="Verwijderen"
+                      >
+                        <Trash2 size={10} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-            {/* Actions */}
-            <div className="flex items-center justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => { setSelecting(true); setPopupPosition(null); }}
-                className="rounded-full text-[13px] text-hh-primary border-hh-primary hover:bg-hh-primary/10"
-              >
-                <Plus size={13} />
-                Nog een element
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={submitting || !description.trim()}
-                className="rounded-full text-[13px] bg-hh-primary hover:bg-hh-primary/90 text-white"
-              >
-                <Send size={13} />
-                {submitting ? "..." : "Verstuur"}
-              </Button>
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => { setSelecting(true); setPopupPosition(null); }}
+                  className="rounded-full text-[13px] text-hh-primary border-hh-primary hover:bg-hh-primary/10"
+                >
+                  <Plus size={13} />
+                  Nog een element
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={submitting || !description.trim()}
+                  className="rounded-full text-[13px] bg-hh-primary hover:bg-hh-primary/90 text-white"
+                >
+                  {submitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+                  {submitting ? "Verzenden..." : "Verstuur"}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>,
+        ),
         document.body
       )}
     </>

@@ -26,14 +26,14 @@ export async function apiFetch(url: string, options?: RequestInit): Promise<Resp
     ...(options?.headers as Record<string, string> || {}),
   };
 
-  const res = await fetch(url, { ...options, headers });
+  const { signal, ...restOpts } = options || {};
+  const res = await fetch(url, { ...restOpts, headers, ...(signal ? { signal } : {}) });
 
   if (res.status === 401) {
     const { data: { session } } = await supabase.auth.refreshSession();
     if (session?.access_token) {
       headers['Authorization'] = `Bearer ${session.access_token}`;
-      const { signal: _signal, ...retryOptions } = options || {};
-      return fetch(url, { ...retryOptions, headers });
+      return fetch(url, { ...restOpts, headers });
     }
   }
 

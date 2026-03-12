@@ -135,6 +135,8 @@ const SUPERADMIN_EMAIL = "stephane@hugoherbots.com";
 
 // Only 1 V3 analysis at a time to prevent Anthropic rate limit exhaustion
 const v3AnalysisLimit = pLimit(1);
+// Max 5 V2 analyses at a time (~150 concurrent OpenAI calls, within rate limits)
+const v2AnalysisLimit = pLimit(5);
 
 /** Sanitize 500 errors: show details only in dev, generic message in production */
 function sendError(res: Response, err: any, fallback = 'Er ging iets mis') {
@@ -155,7 +157,7 @@ function runAnalysisForUser(
     console.log(`[Analysis] Queuing V3 (Claude) for superadmin: ${conversationId}`);
     v3AnalysisLimit(() => runFullAnalysisV3(conversationId, storageKey, userId, title));
   } else {
-    runFullAnalysis(conversationId, storageKey, userId, title);
+    v2AnalysisLimit(() => runFullAnalysis(conversationId, storageKey, userId, title));
   }
 }
 import { hugoAgentRouter } from "./hugo-agent";
@@ -265,6 +267,7 @@ const globalLimiter = rateLimit({
   legacyHeaders: false,
   keyGenerator: (req) => req.userId || req.ip || 'unknown',
   message: { error: 'Too many requests, try again later' },
+  skip: (req) => req.path.startsWith('/feedback/'), // Feedback has own limit
 });
 app.use('/api', globalLimiter);
 
@@ -4505,7 +4508,7 @@ async function startServer() {
   const feedbackUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
   app.post("/api/feedback/ui-change-request", feedbackUpload.single("screenshot"), optionalAuth, async (req: Request, res: Response) => {
     try {
-      const userEmail = (req as any).userEmail || "hugo@hugoherbots.com";
+      const userEmail = (req as any).userEmail || "anonymous";
       const description = (req.body.description || "").trim();
       const pageUrl = req.body.pageUrl || "";
       let parsedElements: any[] = [];

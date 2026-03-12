@@ -985,7 +985,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
       </div>
       {/* Screenshot Dialog */}
       <Dialog open={!!screenshotDialogUrl} onOpenChange={() => setScreenshotDialogUrl(null)}>
-        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-[90vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Feedback Screenshot</DialogTitle>
           </DialogHeader>
@@ -993,7 +993,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             <img
               src={screenshotDialogUrl}
               alt="Feedback screenshot"
-              className="w-full max-h-[70vh] object-contain rounded-lg border border-hh-border"
+              className="w-full max-h-[85vh] object-contain rounded-lg border border-hh-border"
             />
           )}
         </DialogContent>
