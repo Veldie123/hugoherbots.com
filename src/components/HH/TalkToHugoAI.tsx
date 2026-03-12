@@ -54,7 +54,6 @@ import { InlineVideoPlayer } from "./InlineVideoPlayer";
 import { InlineWebinarCard } from "./InlineWebinarCard";
 import { InlineAnalysisCard } from "./InlineAnalysisCard";
 import type { EpicSlideContent, VideoEmbed, WebinarLink, AnalysisResultEmbed, RichContent } from "@/types/crossPlatform";
-import { toast } from "sonner";
 import { hugoApi, type AssistanceConfig } from "../../services/hugoApi";
 import { apiFetch } from "../../services/apiFetch";
 import { CoachViewSummary } from "./CoachViewSummary";
@@ -1731,16 +1730,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
     }
   };
 
-  const AUDIO_MAX_BYTES = 24 * 1024 * 1024;
-
   const processFiles = (files: FileList | File[]) => {
-    const newAttachments: FileAttachment[] = [];
-    for (const file of Array.from(files)) {
-      const isAudio = file.type.startsWith("audio/") || file.type.startsWith("video/");
-      if (isAudio && file.size > AUDIO_MAX_BYTES) {
-        toast.error(`${file.name} is te groot (max 24 MB voor audio-analyse). Comprimeer of stuur een kortere opname.`);
-        continue;
-      }
+    const newAttachments: FileAttachment[] = Array.from(files).map((file) => {
       const attachment: FileAttachment = {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         file,
@@ -1751,8 +1742,8 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
       if (file.type.startsWith("image/")) {
         attachment.preview = URL.createObjectURL(file);
       }
-      newAttachments.push(attachment);
-    }
+      return attachment;
+    });
     if (newAttachments.length > 0) {
       setAttachedFiles((prev) => [...prev, ...newAttachments]);
       setTimeout(() => inputRef.current?.focus(), 50);

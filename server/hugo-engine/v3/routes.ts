@@ -768,20 +768,17 @@ router.post("/analyze-audio", requireAuth, audioUpload.single("audio"), async (r
   const file = (req as any).file as (Express.Multer.File | undefined);
   if (!file) return res.status(400).json({ error: "Geen audiobestand meegestuurd." });
 
-  if (file.size > 24 * 1024 * 1024) {
-    return res.status(400).json({
-      error: "FILE_TOO_LARGE",
-      message: "Audiobestand is te groot (max 24 MB). Stuur een kortere opname of comprimeer het bestand.",
-    });
-  }
-
   try {
     const { uploadAndStore } = await import("../v2/analysis-service.js") as any;
+    const { compressAudioIfNeeded } = await import("../v2/audio-compressor.js") as any;
     const { runFullAnalysisV3 } = await import("./analysis-service.js");
 
     const conversationId = randomUUID();
     const title = (req.body.title as string | undefined) || `Analyse ${new Date().toLocaleDateString("nl-BE")}`;
-    const storageKey = await uploadAndStore(file.buffer, file.originalname, file.mimetype, user.id);
+
+    // Compress to <24MB if needed (same as V2 Gespreksanalyse flow)
+    const compressed = await compressAudioIfNeeded(file.buffer, file.originalname, file.mimetype);
+    const storageKey = await uploadAndStore(compressed.buffer, compressed.originalName, compressed.mimetype, user.id);
 
     // Fire-and-forget: analysis runs in background
     runFullAnalysisV3(conversationId, storageKey, user.id, title).catch((err: Error) => {
