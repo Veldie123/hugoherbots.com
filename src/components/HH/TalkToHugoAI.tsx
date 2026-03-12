@@ -1264,6 +1264,9 @@ export function TalkToHugoAI({
       setStreamingText("");
       streamingTextRef.current = "";
 
+      // Buffer navCard until after text message is committed (Fix 1: ordering)
+      let pendingNav: { destination: string; itemId?: string; label: string } | null = null;
+
       try {
         await hugoApi.sendMessageStream(
           messageText,
@@ -1285,16 +1288,21 @@ export function TalkToHugoAI({
             }
             setStreamingText("");
             streamingTextRef.current = "";
+            // Add navCard AFTER text message
+            if (pendingNav) {
+              const nav = pendingNav;
+              setMessages(prev => [...prev, {
+                id: `nav-${Date.now()}`,
+                sender: "ai",
+                text: "",
+                timestamp: new Date(),
+                navCard: { destination: nav.destination, itemId: nav.itemId, label: nav.label },
+              }]);
+            }
           },
           v3Files && v3Files.length > 0 ? v3Files : undefined,
           (destination, itemId, label) => {
-            setMessages(prev => [...prev, {
-              id: `nav-${Date.now()}`,
-              sender: "ai",
-              text: "",
-              timestamp: new Date(),
-              navCard: { destination, itemId, label: label || destination },
-            }]);
+            pendingNav = { destination, itemId, label: label || destination };
           }
         );
       } catch (error) {
@@ -2128,7 +2136,6 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                           style={{ backgroundColor: 'var(--hh-success)' }}
                           onClick={() => {
                             navigate?.(message.navCard!.destination, message.navCard!.itemId ? { techniqueId: message.navCard!.itemId } : undefined);
-                            setMessages(prev => prev.filter(m => m.id !== message.id));
                           }}
                         >
                           Ga daarheen

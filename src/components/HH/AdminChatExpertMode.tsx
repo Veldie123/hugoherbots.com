@@ -1679,7 +1679,6 @@ export function AdminChatExpertMode({
                             style={{ backgroundColor: 'var(--hh-success)' }}
                             onClick={() => {
                               navigate?.(message.navCard!.destination, message.navCard!.itemId ? { techniqueId: message.navCard!.itemId } : undefined);
-                              setMessages(prev => prev.filter(m => m.id !== message.id));
                             }}
                           >
                             Ga daarheen

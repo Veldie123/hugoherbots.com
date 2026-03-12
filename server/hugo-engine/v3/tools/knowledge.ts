@@ -130,6 +130,16 @@ export const knowledgeToolDefinitions: Anthropic.Tool[] = [
     },
   },
   {
+    name: "get_upcoming_webinars",
+    description:
+      "Haal aankomende live sessies en webinars op. Gebruik dit als de seller vraagt naar het eerstkomende webinar, beschikbare live sessies, of zich wil inschrijven.",
+    input_schema: {
+      type: "object" as const,
+      properties: {},
+      required: [],
+    },
+  },
+  {
     name: "navigate_user",
     description:
       "Stuur de verkoper naar een specifieke pagina of item. Gebruik ALLEEN als de actie niet inline kan. Voor video's: eerst suggest_video aanroepen om technique_id te weten, dan navigate_user met itemId. Coaching/rollenspel/uitleg → altijd inline.",
@@ -211,6 +221,19 @@ export async function executeKnowledgeTool(
       return await getTechniqueScript(input.technique_id, input.target_language);
     case "recall_memories":
       return await recallMemories(input.user_id, input.query, input.memory_type);
+    case "get_upcoming_webinars": {
+      const result = await pool.query(`
+        SELECT id, title, description, scheduled_at, max_participants,
+          (SELECT COUNT(*) FROM live_session_registrations WHERE session_id = live_sessions.id) AS registered
+        FROM live_sessions
+        WHERE scheduled_at > NOW() AND status = 'scheduled'
+        ORDER BY scheduled_at ASC LIMIT 5
+      `);
+      if (result.rows.length === 0) {
+        return JSON.stringify({ webinars: [], message: "Geen aankomende webinars gepland." });
+      }
+      return JSON.stringify({ webinars: result.rows });
+    }
     case "navigate_user":
       return JSON.stringify({ destination: input.destination, ok: true });
     case "save_insight":
