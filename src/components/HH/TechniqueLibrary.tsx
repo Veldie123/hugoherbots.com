@@ -248,8 +248,8 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
 
         {/* Search, View Toggle & Filters Card */}
         <Card className="p-4 sm:p-5 rounded-[16px] shadow-hh-sm border-hh-border">
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <div className="flex-1 relative">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-3">
+            <div className="flex-1 min-w-[180px] relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-hh-muted" />
               <Input
                 placeholder="Zoek technieken..."
@@ -259,7 +259,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
               />
             </div>
             <Select value={activeFase} onValueChange={setActiveFase}>
-              <SelectTrigger className="w-full sm:w-[160px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue placeholder="Alle Fases" />
               </SelectTrigger>
               <SelectContent>
@@ -272,7 +272,7 @@ export function TechniqueLibrary({ navigate, isAdmin, onboardingMode }: Techniqu
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-[160px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue placeholder="Alle Status" />
               </SelectTrigger>
               <SelectContent>

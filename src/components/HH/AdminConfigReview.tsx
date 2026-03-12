@@ -46,6 +46,46 @@ import {
 import { getCodeBadgeColors } from "../../utils/phaseColors";
 import { toast } from "sonner";
 
+function parseBold(text: string): React.ReactNode {
+  const parts = text.split(/\*\*(.*?)\*\*/g);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? <strong key={i} className="font-semibold">{part}</strong> : part
+  );
+}
+
+function renderMarkdown(text: string): React.ReactNode {
+  const lines = text.split('\n');
+  const nodes: React.ReactNode[] = [];
+  let listBuffer: React.ReactNode[] = [];
+
+  const flushList = () => {
+    if (listBuffer.length > 0) {
+      nodes.push(<ul key={`ul-${nodes.length}`} className="ml-4 space-y-0.5 list-disc">{listBuffer}</ul>);
+      listBuffer = [];
+    }
+  };
+
+  lines.forEach((line, i) => {
+    if (line.startsWith('### ')) {
+      flushList();
+      nodes.push(<h3 key={i} className="text-[15px] font-semibold text-hh-text mt-4 mb-1">{parseBold(line.slice(4))}</h3>);
+    } else if (line.startsWith('## ')) {
+      flushList();
+      nodes.push(<h2 key={i} className="text-[16px] font-semibold text-hh-text mt-5 mb-2">{parseBold(line.slice(3))}</h2>);
+    } else if (line.startsWith('- ') || line.startsWith('* ')) {
+      listBuffer.push(<li key={i} className="text-[13px] text-hh-text leading-relaxed">{parseBold(line.slice(2))}</li>);
+    } else if (line.trim() === '') {
+      flushList();
+      nodes.push(<div key={i} className="h-2" />);
+    } else {
+      flushList();
+      nodes.push(<p key={i} className="text-[13px] text-hh-text leading-relaxed">{parseBold(line)}</p>);
+    }
+  });
+  flushList();
+  return nodes;
+}
+
 interface AdminConfigReviewProps {
   navigate?: (page: string) => void;
   isSuperAdmin?: boolean;
@@ -71,6 +111,7 @@ interface ConfigConflict {
   targetKey?: string;
   screenshotUrl?: string;
   plan?: string;
+  fieldName?: string;
 }
 
 export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewProps) {
@@ -83,6 +124,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [planDialogId, setPlanDialogId] = useState<string | null>(null);
   const [screenshotDialogUrl, setScreenshotDialogUrl] = useState<string | null>(null);
+  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchCorrections();
@@ -190,7 +232,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
               const ctx = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
               const targetKey = c.target_key || techNum;
               if (ctx.naam) {
-                techniqueName = `${ctx.naam} (${targetKey})`;
+                techniqueName = ctx.naam;
               } else if (ctx.fieldName && targetKey) {
                 techniqueName = `${targetKey} — ${ctx.fieldName}`;
               }
@@ -217,6 +259,13 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             targetKey: c.target_key || undefined,
             screenshotUrl,
             plan: (c.source === 'feedback_widget' || c.type === 'ui_feedback') ? c.target_file : undefined,
+            fieldName: (() => {
+              if (c.source !== 'ssot_audit') return undefined;
+              try {
+                const ctx = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
+                return ctx?.fieldName || undefined;
+              } catch { return undefined; }
+            })(),
           };
         });
         setConflicts(mapped);
@@ -254,6 +303,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
   const rejectedCount = conflicts.filter((c) => c.status === "rejected").length;
 
   const handleApprove = async (id: string) => {
+    setProcessingIds(prev => new Set(prev).add(id));
     try {
       const response = await apiFetch(`/api/v2/admin/corrections/${id}`, {
         method: 'PATCH',
@@ -270,10 +320,13 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
       }
     } catch (err) {
       toast.error('Fout bij goedkeuren');
+    } finally {
+      setProcessingIds(prev => { const s = new Set(prev); s.delete(id); return s; });
     }
   };
 
   const handleReject = async (id: string) => {
+    setProcessingIds(prev => new Set(prev).add(id));
     try {
       const response = await apiFetch(`/api/v2/admin/corrections/${id}`, {
         method: 'PATCH',
@@ -287,6 +340,8 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
       }
     } catch (err) {
       toast.error('Fout bij afwijzen');
+    } finally {
+      setProcessingIds(prev => { const s = new Set(prev); s.delete(id); return s; });
     }
   };
 
@@ -418,11 +473,11 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
         </div>
 
         <Card className="p-4 rounded-[16px] shadow-hh-sm border-hh-border">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex-1 relative">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
+            <div className="flex-1 min-w-[180px] relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-hh-muted" />
               <Input
-                placeholder="Zoek technieken, types, beschrijving..."
+                placeholder="Zoek..."
                 className="pl-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -430,7 +485,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             </div>
 
             <Select value={severityFilter} onValueChange={setSeverityFilter}>
-              <SelectTrigger className="w-full sm:w-[160px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue placeholder="Alle Severity" />
               </SelectTrigger>
               <SelectContent>
@@ -443,7 +498,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             </Select>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-[160px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue placeholder="Alle Status" />
               </SelectTrigger>
               <SelectContent>
@@ -455,7 +510,7 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             </Select>
 
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
-              <SelectTrigger className="w-full sm:w-[160px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue placeholder="Alle Bronnen" />
               </SelectTrigger>
               <SelectContent>
@@ -535,12 +590,19 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                       </div>
                     )}
                     {conflict.originalValue || conflict.newValue ? (
-                      <TrackChange
-                        original={conflict.originalValue}
-                        proposed={conflict.newValue}
-                        label={conflict.techniqueName}
-                        compact
-                      />
+                      <>
+                        {conflict.fieldName && (
+                          <span className="text-[11px] font-medium text-hh-muted block mb-1">
+                            Veld: {conflict.fieldName}
+                          </span>
+                        )}
+                        <TrackChange
+                          original={conflict.originalValue}
+                          proposed={conflict.newValue}
+                          label={conflict.techniqueName}
+                          compact
+                        />
+                      </>
                     ) : (
                       <p className="text-[13px] text-hh-text line-clamp-3">
                         {conflict.description}
@@ -560,17 +622,23 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                             variant="ghost"
                             size="sm"
                             className="h-8 w-8 p-0 hover:bg-hh-success/10 hover:text-hh-success"
+                            disabled={processingIds.has(conflict.id)}
                             onClick={() => handleApprove(conflict.id)}
                           >
-                            <Check className="w-4 h-4" />
+                            {processingIds.has(conflict.id)
+                              ? <Loader2 className="w-4 h-4 animate-spin" />
+                              : <Check className="w-4 h-4" />}
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             className="h-8 w-8 p-0 hover:bg-hh-error/10 hover:text-hh-error"
+                            disabled={processingIds.has(conflict.id)}
                             onClick={() => handleReject(conflict.id)}
                           >
-                            <X className="w-4 h-4" />
+                            {processingIds.has(conflict.id)
+                              ? <Loader2 className="w-4 h-4 animate-spin" />
+                              : <X className="w-4 h-4" />}
                           </Button>
                         </>
                       ) : (
@@ -678,10 +746,10 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                   <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
                     Gedetecteerd
                   </th>
-                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted hidden lg:table-cell">
                     Ingediend door
                   </th>
-                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted">
+                  <th className="text-left p-4 text-[13px] leading-[18px] font-medium text-hh-muted sticky right-0 bg-hh-ui-50 z-10">
                     Acties
                   </th>
                 </tr>
@@ -740,12 +808,19 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                               </div>
                             )}
                             {conflict.originalValue || conflict.newValue ? (
-                              <TrackChange
-                                original={conflict.originalValue}
-                                proposed={conflict.newValue}
-                                label={conflict.techniqueName}
-                                compact
-                              />
+                              <>
+                                {conflict.fieldName && (
+                                  <span className="text-[11px] font-medium text-hh-muted block mb-1">
+                                    Veld: {conflict.fieldName}
+                                  </span>
+                                )}
+                                <TrackChange
+                                  original={conflict.originalValue}
+                                  proposed={conflict.newValue}
+                                  label={conflict.techniqueName}
+                                  compact
+                                />
+                              </>
                             ) : (
                               <p className="text-[13px] text-hh-text">
                                 {conflict.description}
@@ -788,33 +863,39 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                             {conflict.detectedAt}
                           </span>
                         </td>
-                        <td className="p-4">
+                        <td className="p-4 hidden lg:table-cell">
                           <span className="text-[13px] text-hh-muted">
                             {conflict.submittedBy || '—'}
                           </span>
                         </td>
-                        <td className="p-4">
+                        <td className="p-4 sticky right-0 bg-hh-bg z-10">
                           {conflict.status === "pending" ? (
                             <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 className="h-8 w-8 p-0 hover:bg-hh-success/10 hover:text-hh-success"
+                                disabled={processingIds.has(conflict.id)}
                                 onClick={() => handleApprove(conflict.id)}
                               >
-                                <Check className="w-4 h-4" />
+                                {processingIds.has(conflict.id)
+                                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                                  : <Check className="w-4 h-4" />}
                               </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 className="h-8 w-8 p-0 hover:bg-hh-error/10 hover:text-hh-error"
+                                disabled={processingIds.has(conflict.id)}
                                 onClick={() => handleReject(conflict.id)}
                               >
-                                <X className="w-4 h-4" />
+                                {processingIds.has(conflict.id)
+                                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                                  : <X className="w-4 h-4" />}
                               </Button>
                             </div>
                           ) : (
-                            <div onClick={(e) => e.stopPropagation()}>
+                            <div className="sticky right-0 bg-hh-bg" onClick={(e) => e.stopPropagation()}>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Acties">
@@ -936,8 +1017,8 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
                     className="w-full rounded-lg border border-hh-border max-h-48 object-contain"
                   />
                 )}
-                <div className="bg-hh-ui-50 rounded-lg p-4 text-[13px] text-hh-text whitespace-pre-wrap font-mono leading-relaxed">
-                  {conflict.plan}
+                <div className="bg-hh-ui-50 rounded-lg p-4 space-y-0.5">
+                  {renderMarkdown(conflict.plan)}
                 </div>
                 {conflict.status === 'pending' && (
                   <div className="flex items-center justify-end gap-2 pt-2 border-t border-hh-border">
