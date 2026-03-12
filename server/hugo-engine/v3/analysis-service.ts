@@ -400,37 +400,45 @@ Antwoord als JSON array van evaluaties, één per seller-turn:
     }
   }
 
-  console.log(`[V3 Analysis] Evaluating ${turnsToEvaluate.length} seller turns in chunks of ${CHUNK_SIZE}`);
+  const totalChunks = Math.ceil(turnsToEvaluate.length / CHUNK_SIZE);
+  console.log(`[V3 Analysis] Evaluating ${turnsToEvaluate.length} seller turns in ${totalChunks} parallel chunks of ${CHUNK_SIZE}`);
 
+  const evalChunks: TranscriptTurn[][] = [];
   for (let i = 0; i < turnsToEvaluate.length; i += CHUNK_SIZE) {
-    const chunk = turnsToEvaluate.slice(i, i + CHUNK_SIZE);
-    const chunkIdxs = chunk.map((t) => t.idx);
-    const chunkNum = Math.floor(i / CHUNK_SIZE) + 1;
-    const totalChunks = Math.ceil(turnsToEvaluate.length / CHUNK_SIZE);
+    evalChunks.push(turnsToEvaluate.slice(i, i + CHUNK_SIZE));
+  }
 
-    console.log(`[V3 Analysis] Chunk ${chunkNum}/${totalChunks}: evaluating turns ${chunkIdxs[0]}-${chunkIdxs[chunkIdxs.length - 1]}`);
+  const chunkResults = await Promise.all(
+    evalChunks.map((chunk, chunkIdx) => {
+      const chunkIdxs = chunk.map((t) => t.idx);
+      const chunkNum = chunkIdx + 1;
+      console.log(`[V3 Analysis] Chunk ${chunkNum}/${totalChunks}: evaluating turns ${chunkIdxs[0]}-${chunkIdxs[chunkIdxs.length - 1]}`);
 
-    // Build per-turn klanthouding context for this chunk
-    const turnHoudingContext = chunk
-      .map((t) => {
-        const prev = getPreviousCustomerHouding(t.idx);
-        if (!prev) return `Turn ${t.idx}: geen voorafgaande klanthouding`;
-        const expectedTechs = (prev.recommendedTechniqueIds ?? [])
-          .map((id) => `${getTechniqueName(id) || id} (${id})`)
-          .join(", ");
-        return `Turn ${t.idx}: vorige klanthouding = ${prev.houding} — verwacht: [${expectedTechs || "n.v.t."}]`;
-      })
-      .join("\n");
+      const turnHoudingContext = chunk
+        .map((t) => {
+          const prev = getPreviousCustomerHouding(t.idx);
+          if (!prev) return `Turn ${t.idx}: geen voorafgaande klanthouding`;
+          const expectedTechs = (prev.recommendedTechniqueIds ?? [])
+            .map((id) => `${getTechniqueName(id) || id} (${id})`)
+            .join(", ");
+          return `Turn ${t.idx}: vorige klanthouding = ${prev.houding} — verwacht: [${expectedTechs || "n.v.t."}]`;
+        })
+        .join("\n");
 
-    const result = await callClaude(
-      systemPrompt,
-      `${narrativeContext}\n\nVORIGE KLANTHOUDING PER SELLER-TURN:\n${turnHoudingContext}\n\nTRANSCRIPT:\n${transcriptContext}\n\nEvalueer ALLEEN de volgende seller-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
-      8000,
-      EVALUATION_MODEL
-    );
+      return callClaude(
+        systemPrompt,
+        `${narrativeContext}\n\nVORIGE KLANTHOUDING PER SELLER-TURN:\n${turnHoudingContext}\n\nTRANSCRIPT:\n${transcriptContext}\n\nEvalueer ALLEEN de volgende seller-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
+        8000,
+        EVALUATION_MODEL
+      ).then((result) => {
+        const parsed = parseJSON<TurnEvaluation[]>(result, []);
+        console.log(`[V3 Analysis] Chunk ${chunkNum}: ${parsed.length} evaluations returned`);
+        return parsed;
+      });
+    })
+  );
 
-    const parsed = parseJSON<TurnEvaluation[]>(result, []);
-    console.log(`[V3 Analysis] Chunk ${chunkNum}: ${parsed.length} evaluations returned`);
+  for (const parsed of chunkResults) {
     allEvaluations.push(...parsed);
   }
 
@@ -529,25 +537,34 @@ Antwoord als JSON array:
   const CHUNK_SIZE = 25;
   const allSignals: CustomerSignalResult[] = [];
 
-  console.log(`[V3 Analysis] Classifying ${customerTurns.length} customer turns in chunks of ${CHUNK_SIZE}`);
+  const totalSignalChunks = Math.ceil(customerTurns.length / CHUNK_SIZE);
+  console.log(`[V3 Analysis] Classifying ${customerTurns.length} customer turns in ${totalSignalChunks} parallel chunks of ${CHUNK_SIZE}`);
 
+  const signalChunks: TranscriptTurn[][] = [];
   for (let i = 0; i < customerTurns.length; i += CHUNK_SIZE) {
-    const chunk = customerTurns.slice(i, i + CHUNK_SIZE);
-    const chunkIdxs = chunk.map((t) => t.idx);
-    const chunkNum = Math.floor(i / CHUNK_SIZE) + 1;
-    const totalChunks = Math.ceil(customerTurns.length / CHUNK_SIZE);
+    signalChunks.push(customerTurns.slice(i, i + CHUNK_SIZE));
+  }
 
-    console.log(`[V3 Analysis] Signal chunk ${chunkNum}/${totalChunks}: turns ${chunkIdxs[0]}-${chunkIdxs[chunkIdxs.length - 1]}`);
+  const signalChunkResults = await Promise.all(
+    signalChunks.map((chunk, chunkIdx) => {
+      const chunkIdxs = chunk.map((t) => t.idx);
+      const chunkNum = chunkIdx + 1;
+      console.log(`[V3 Analysis] Signal chunk ${chunkNum}/${totalSignalChunks}: turns ${chunkIdxs[0]}-${chunkIdxs[chunkIdxs.length - 1]}`);
 
-    const result = await callClaude(
-      systemPrompt,
-      `${narrativeContext}\n\nTRANSCRIPT:\n${transcriptContext}\n\nClassificeer ALLEEN deze klant-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
-      4096,
-      COACHING_MODEL  // Sonnet volstaat voor houding-classificatie
-    );
+      return callClaude(
+        systemPrompt,
+        `${narrativeContext}\n\nTRANSCRIPT:\n${transcriptContext}\n\nClassificeer ALLEEN deze klant-turns: ${chunkIdxs.join(", ")}. Negeer alle andere turns in je output.`,
+        4096,
+        COACHING_MODEL  // Sonnet volstaat voor houding-classificatie
+      ).then((result) => {
+        const parsed = parseJSON<CustomerSignalResult[]>(result, []);
+        console.log(`[V3 Analysis] Signal chunk ${chunkNum}: ${parsed.length} signals returned`);
+        return parsed;
+      });
+    })
+  );
 
-    const parsed = parseJSON<CustomerSignalResult[]>(result, []);
-    console.log(`[V3 Analysis] Signal chunk ${chunkNum}: ${parsed.length} signals returned`);
+  for (const parsed of signalChunkResults) {
     allSignals.push(...parsed);
   }
 

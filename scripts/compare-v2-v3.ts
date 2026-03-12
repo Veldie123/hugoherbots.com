@@ -110,18 +110,19 @@ async function fetchFullResult(conversationId: string): Promise<any> {
 async function pollUntilDone(id: string, label: string, timeoutMs = 10 * 60 * 1000): Promise<void> {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
-    const res = await dbPool.query("SELECT status, error FROM conversation_analyses WHERE id = $1", [id]);
+    const res = await dbPool.query("SELECT status, error, result FROM conversation_analyses WHERE id = $1", [id]);
     const row = res.rows[0];
     if (!row) {
       process.stdout.write(`\r  [${label}] wachten op DB-entry...`);
-    } else if (row.status === "completed") {
+    } else if (row.status === "completed" && row.result !== null) {
       process.stdout.write(`\n`);
       return;
     } else if (row.status === "failed") {
       throw new Error(`[${label}] Analyse mislukt: ${row.error || "onbekende fout"}`);
     } else {
       const elapsed = Math.round((Date.now() - start) / 1000);
-      process.stdout.write(`\r  [${label}] ${row.status} (${elapsed}s)...`);
+      const statusLabel = row.status === "completed" && row.result === null ? "wachten op result..." : row.status;
+      process.stdout.write(`\r  [${label}] ${statusLabel} (${elapsed}s)...`);
     }
     await new Promise((r) => setTimeout(r, 5000));
   }
@@ -343,13 +344,26 @@ async function main() {
   if (!transcript || transcript.length === 0) throw new Error("Geen transcript gevonden in het bron-resultaat.");
 
   console.log("\n[4/7] V2 re-analyse starten op hetzelfde transcript...");
-  const v2Id = randomUUID();
 
-  // Dynamically import analysis functions AFTER env is loaded
+  // Import FIRST — module's startup auto-recovery marks all non-completed rows as failed.
   const { reAnalyzeFromTranscriptV2 } = await import("../server/hugo-engine/v2/analysis-service.js") as any;
+  // Wait for all async startup tasks (table creation, auto-recovery) to complete
+  await new Promise((r) => setTimeout(r, 8000));
 
-  // Fire-and-forget — function persists status to DB
-  reAnalyzeFromTranscriptV2(v2Id, transcript, userId, `${sourceTitle} [V2-vergelijking]`)
+  const v2Id = randomUUID();
+  const v2Title = `${sourceTitle} [V2-vergelijking]`;
+
+  // Pre-insert with 'completed' + null result — auto-recovery skips completed rows.
+  // reAnalyzeFromTranscriptV2 will UPDATE status to 'evaluating' as it runs, then
+  // back to 'completed' with a non-null result when done. Poll checks both.
+  await dbPool.query(
+    `INSERT INTO conversation_analyses (id, user_id, title, status, created_at, result)
+     VALUES ($1, $2, $3, 'completed', NOW(), NULL) ON CONFLICT DO NOTHING`,
+    [v2Id, userId, v2Title]
+  );
+
+  // Fire-and-forget — function updates status + result in DB
+  reAnalyzeFromTranscriptV2(v2Id, transcript, userId, v2Title)
     .catch((err: Error) => console.error(`\n  V2 mislukt: ${err.message}`));
 
   console.log(`  V2 ID: ${v2Id}`);
