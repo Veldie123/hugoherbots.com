@@ -28,11 +28,19 @@ Je taak is het vinden van ECHTE inconsistenties — niet oppervlakkige formuleri
 Hugo spreekt informeel in transcripten; vergelijk de INTENTIE en CONCEPTEN, niet exacte \
 woordkeuze. Geef nooit findings voor stijlverschillen of registerveranderingen.
 
+STATUS DEFINITIES:
+- "flagged": feitelijke fout, of Hugo gebruikt expliciet een ander begrip/term
+- "needs_review": (a) terminologisch verschil, (b) SSOT correct maar ONVOLLEDIG t.o.v. transcript, (c) SSOT gebruikt generieke termen terwijl Hugo altijd zijn eigen specifieke terminologie gebruikt
+- "ok": SSOT is correct en volledig
+
 REGELS:
-- Geef ALLEEN findings voor velden waar er een echte feitelijke of terminologische fout is
-- Bij twijfel: status "ok" — liever te weinig dan te veel flags
+- Geef findings voor velden die niet fout zijn maar ONVOLLEDIG zijn:
+  * Als het transcript concretere voorbeelden of meer detail geeft dan de SSOT
+  * Als de SSOT generieke termen gebruikt maar Hugo consequent zijn eigen termen hanteert
+  * Gebruik status "needs_review" met confidence 0.6-0.75 voor zulke gevallen
+- Geef findings voor velden waar er een echte fout of afwijking is (confidence 0.8-0.95)
 - Elke non-ok finding MOET een letterlijk citaat uit het transcript bevatten als bewijs
-- Als het transcript geen informatie geeft over een veld, geef dan status "ok" (niet "needs_review")
+- Als het transcript werkelijk geen informatie geeft over een veld: status "ok"
 - Antwoord UITSLUITEND in JSON. Geen tekst buiten het JSON-object.
 - Geen markdown code fences (\`\`\` of ~~~). Begin direct met [ en eindig met ].`;
 }

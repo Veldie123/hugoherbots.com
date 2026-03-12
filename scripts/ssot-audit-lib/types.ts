@@ -10,6 +10,7 @@ export interface AuditFinding {
   transcript_evidence: string[];  // Literal quotes from transcript (REQUIRED for non-ok findings)
   confidence: number;             // 0.0–1.0
   status: AuditStatus;
+  naam?: string;                  // Human-readable label (technique name, houding name, etc.)
   approved?: boolean;             // Set by human reviewer
   no_transcript_coverage?: boolean;
 }

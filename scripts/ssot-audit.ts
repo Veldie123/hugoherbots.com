@@ -117,7 +117,8 @@ function parseArgs(argv: string[]): CliArgs {
 function parseFindings(
   rawResponse: string,
   configFile: AuditFinding["config_file"],
-  fallbackItemId: string
+  fallbackItemId: string,
+  naam?: string
 ): AuditFinding[] {
   try {
     const parsed = JSON.parse(rawResponse);
@@ -136,6 +137,7 @@ function parseFindings(
         status: (["ok", "needs_review", "flagged"] as const).includes(f.status)
           ? f.status
           : "needs_review",
+        naam,
         no_transcript_coverage: false,
       } as AuditFinding))
       // Safety: downgrade non-ok findings with no evidence
@@ -181,6 +183,7 @@ async function auditTechnieken(
         transcript_evidence: [],
         confidence: 1.0,
         status: "ok",
+        naam: technique.naam,
         no_transcript_coverage: true,
       });
       continue;
@@ -190,7 +193,7 @@ async function auditTechnieken(
     const raw = await withRetry(() => callClaude(systemPrompt, userPrompt));
     await sleep(BASE_DELAY_MS);
 
-    const batchFindings = parseFindings(raw, "technieken_index.json", id).map((f) => ({
+    const batchFindings = parseFindings(raw, "technieken_index.json", id, technique.naam).map((f) => ({
       ...f,
       item_id: f.item_id || id,
     }));
@@ -235,7 +238,7 @@ async function auditKlantHoudingen(
     const raw = await withRetry(() => callClaude(systemPrompt, userPrompt));
     await sleep(BASE_DELAY_MS);
 
-    const batchFindings = parseFindings(raw, "klant_houdingen.json", houdingId).map((f) => ({
+    const batchFindings = parseFindings(raw, "klant_houdingen.json", houdingId, houding.naam).map((f) => ({
       ...f,
       item_id: f.item_id || houdingId,
     }));
@@ -289,7 +292,9 @@ async function auditRagHeuristics(
     await sleep(BASE_DELAY_MS);
 
     // Parse batch response — item_id comes from techniqueId field in response
-    const batchFindings = parseFindings(raw, "rag_heuristics.json", batchEntries[0][0]);
+    const ragNameMap = new Map(batchEntries.map(([id, entry]) => [id, entry.naam]));
+    const batchFindings = parseFindings(raw, "rag_heuristics.json", batchEntries[0][0])
+      .map((f) => ({ ...f, naam: ragNameMap.get(f.item_id) ?? f.naam }));
     findings.push(...batchFindings);
   }
 
@@ -303,7 +308,8 @@ async function auditRagHeuristics(
 async function auditEvaluatorOverlay(
   evalEntries: Record<string, EvaluatorEntry>,
   transcriptMap: TranscriptMap,
-  targetIds?: string[]
+  targetIds?: string[],
+  techniques?: Record<string, TechniqueEntry>
 ): Promise<AuditFinding[]> {
   const findings: AuditFinding[] = [];
   const systemPrompt = buildEvaluatorSystemPrompt();
@@ -331,7 +337,8 @@ async function auditEvaluatorOverlay(
     await sleep(BASE_DELAY_MS);
 
     // Parse batch response — item_id comes from techniqueId field in response
-    const batchFindings = parseFindings(raw, "evaluator_overlay.json", batchEntries[0][0]);
+    const batchFindings = parseFindings(raw, "evaluator_overlay.json", batchEntries[0][0])
+      .map((f) => ({ ...f, naam: techniques?.[f.item_id]?.naam ?? f.naam }));
     findings.push(...batchFindings);
   }
 
@@ -482,7 +489,7 @@ async function main(): Promise<void> {
 
   if (runEvaluator) {
     process.stdout.write(`[ssot-audit] Auditing evaluator_overlay.json (~${evalBatches} batches)...\n`);
-    const f = await auditEvaluatorOverlay(evalEntries, transcriptMap, cliArgs.techniques);
+    const f = await auditEvaluatorOverlay(evalEntries, transcriptMap, cliArgs.techniques, techniques);
     process.stdout.write(`[ssot-audit]   → ${f.length} findings\n`);
     allFindings.push(...f);
   }
