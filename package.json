@@ -57,6 +57,7 @@
             "framer-motion": "^11.15.0",
             "googleapis": "^169.0.0",
             "helmet": "^8.1.0",
+            "html2canvas": "^1.4.1",
             "langwatch": "0.16.1",
             "livekit-client": "^2.17.2",
             "livekit-server-sdk": "^2.15.0",
@@ -131,6 +132,7 @@
             "baseline:save": "tsx scripts/visual-regression.ts save",
             "baseline:compare": "tsx scripts/visual-regression.ts compare",
             "baseline:update": "tsx scripts/visual-regression.ts update",
+            "visual:qa": "node visual-qa.mjs",
             "dev:video-processor": "node --env-file=.env server/video-processor.js",
             "dev:backend": "npx tsx --env-file=.env server/hugo-engine/standalone.ts",
             "dev:local": "concurrently \"npm run dev\" \"npm run dev:video-processor\" \"npm run dev:backend\""

@@ -82,3 +82,10 @@ server/duration-cache.json
 # Claude Code local settings
 .claude/
 .worktrees/
+
+# Batch analyse output (grote bestanden + gegenereerde rapporten)
+gesprekanalyse/batch-progress.json
+gesprekanalyse/meta-analysis-*.md
+
+# Visual QA output
+.visual-qa/
