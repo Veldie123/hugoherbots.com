@@ -237,13 +237,13 @@ async function getV3Access(email: string): Promise<{ admin_v3: boolean; coaching
 
     const access = {
       admin_v3: data?.admin_v3 ?? false,
-      coaching_v3: data?.coaching_v3 ?? false,
+      coaching_v3: data?.coaching_v3 ?? true,
     };
     accessCache.set(email, { ...access, ts: Date.now() });
     return access;
   } catch {
-    // No row found → deny access by default (secure default)
-    const defaultAccess = { admin_v3: false, coaching_v3: false };
+    // No row found → coaching open to all, admin denied by default
+    const defaultAccess = { admin_v3: false, coaching_v3: true };
     accessCache.set(email, { ...defaultAccess, ts: Date.now() });
     return defaultAccess;
   }
