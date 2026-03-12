@@ -167,12 +167,17 @@ export function AdminConfigReview({ navigate, isSuperAdmin }: AdminConfigReviewP
             } catch {}
           }
 
-          // For ssot_audit: derive techniqueName from context.naam if available
+          // For ssot_audit: derive techniqueName from context.naam if available, fallback to "id — field"
           let techniqueName = c.field || c.type;
           if (sourceOrType === 'ssot_audit' && c.context) {
             try {
               const ctx = typeof c.context === 'string' ? JSON.parse(c.context) : c.context;
-              if (ctx.naam) techniqueName = `${ctx.naam} (${c.target_key || techNum})`;
+              const targetKey = c.target_key || techNum;
+              if (ctx.naam) {
+                techniqueName = `${ctx.naam} (${targetKey})`;
+              } else if (ctx.fieldName && targetKey) {
+                techniqueName = `${targetKey} — ${ctx.fieldName}`;
+              }
             } catch {}
           }
 

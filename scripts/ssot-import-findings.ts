@@ -94,16 +94,24 @@ async function main(): Promise<void> {
 
   const report: AuditReport = JSON.parse(fs.readFileSync(inputPath, "utf-8"));
 
+  const USELESS_PATTERNS = [
+    "geen informatie beschikbaar",
+    "no transcript coverage",
+    "no information available",
+  ];
+
   // Filter to importable findings only
-  const importable = report.findings.filter(
-    (f) =>
-      f.status !== "ok" &&
-      !f.no_transcript_coverage &&
-      f.proposed_value !== undefined &&
-      f.proposed_value !== null &&
-      f.proposed_value !== "" &&
-      (!statusFilter || f.status === statusFilter)
-  );
+  const importable = report.findings.filter((f) => {
+    if (f.status === "ok") return false;
+    if (f.no_transcript_coverage) return false;
+    if (f.proposed_value === undefined || f.proposed_value === null || f.proposed_value === "") return false;
+    if (statusFilter && f.status !== statusFilter) return false;
+    const newVal = Array.isArray(f.proposed_value)
+      ? f.proposed_value.join(" ").toLowerCase()
+      : String(f.proposed_value).toLowerCase();
+    if (USELESS_PATTERNS.some((p) => newVal.includes(p))) return false;
+    return true;
+  });
 
   const flaggedCount = importable.filter((f) => f.status === "flagged").length;
   const reviewCount = importable.filter((f) => f.status === "needs_review").length;
