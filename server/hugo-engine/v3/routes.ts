@@ -747,6 +747,47 @@ router.post("/preflight", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// Audio analysis: 50MB limit, audio files only
+const audioUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith("audio/") || file.mimetype.startsWith("video/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Alleen audiobestanden toegestaan."));
+    }
+  },
+});
+
+// POST /api/v3/analyze-audio — upload audio and trigger V3 analysis pipeline
+router.post("/analyze-audio", requireAuth, audioUpload.single("audio"), async (req: Request, res: Response) => {
+  const user = (req as any).user;
+  if (!user) return res.status(401).json({ error: "Unauthorized" });
+
+  const file = (req as any).file as (Express.Multer.File | undefined);
+  if (!file) return res.status(400).json({ error: "Geen audiobestand meegestuurd." });
+
+  try {
+    const { uploadAndStore } = await import("../v2/analysis-service.js") as any;
+    const { runFullAnalysisV3 } = await import("./analysis-service.js");
+
+    const conversationId = randomUUID();
+    const title = (req.body.title as string | undefined) || `Analyse ${new Date().toLocaleDateString("nl-BE")}`;
+    const storageKey = await uploadAndStore(file.buffer, file.originalname, file.mimetype, user.id);
+
+    // Fire-and-forget: analysis runs in background
+    runFullAnalysisV3(conversationId, storageKey, user.id, title).catch((err: Error) => {
+      console.error("[V3] Audio analysis failed:", err.message);
+    });
+
+    res.json({ conversationId, title, status: "processing" });
+  } catch (err: any) {
+    console.error("[V3] Audio upload error:", err.message);
+    res.status(500).json({ error: "Fout bij verwerken van audiobestand." });
+  }
+});
+
 // Mount voice routes at /api/v3/voice/*
 router.use("/voice", voiceRoutes);
 

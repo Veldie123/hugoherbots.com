@@ -1181,6 +1181,63 @@ export function TalkToHugoAI({
     }
   };
 
+  // V3 audio analysis: upload → runFullAnalysisV3 → navCard to results page
+  const handleV3AudioAnalysis = async (audioFiles: FileAttachment[]) => {
+    const file = audioFiles[0];
+    const title = file.name.replace(/\.[^/.]+$/, "");
+    const progressMsgId = `analysis-${Date.now()}`;
+
+    setMessages(prev => [...prev, {
+      id: progressMsgId,
+      sender: "ai",
+      text: `Ik analyseer **${file.name}** voor je. Even geduld — transcriptie + evaluatie duurt 1–2 minuten.`,
+      timestamp: new Date(),
+    }]);
+
+    try {
+      const formData = new FormData();
+      formData.append("audio", file.file, file.name);
+      formData.append("title", title);
+
+      const response = await apiFetch("/api/v3/analyze-audio", { method: "POST", body: formData });
+      if (!response.ok) throw new Error("Upload mislukt");
+      const { conversationId } = await response.json();
+
+      // Poll status, then show navCard when done
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await apiFetch(`/api/v2/analysis/status/${conversationId}`);
+          const { status } = await statusRes.json();
+          if (status === "completed") {
+            clearInterval(pollInterval);
+            setMessages(prev => [
+              ...prev.map(m => m.id === progressMsgId
+                ? { ...m, text: `Analyse van **${title}** is klaar!` }
+                : m),
+              {
+                id: `nav-${Date.now()}`,
+                sender: "ai" as const,
+                text: "",
+                timestamp: new Date(),
+                navCard: { destination: "analysis-results", itemId: conversationId, label: `Analyse: ${title}` },
+              },
+            ]);
+          } else if (status === "failed") {
+            clearInterval(pollInterval);
+            setMessages(prev => prev.map(m => m.id === progressMsgId
+              ? { ...m, text: `De analyse van **${title}** is mislukt. Probeer het opnieuw.` }
+              : m));
+          }
+        } catch { /* ignore poll errors */ }
+      }, 4000);
+      setTimeout(() => clearInterval(pollInterval), 5 * 60 * 1000);
+    } catch (error: any) {
+      setMessages(prev => prev.map(m => m.id === progressMsgId
+        ? { ...m, text: `Sorry, er ging iets mis bij het uploaden van **${file.name}**. Probeer het opnieuw.` }
+        : m));
+    }
+  };
+
   const handleSendMessage = async () => {
     const hasFiles = attachedFiles.length > 0;
     if (!inputText.trim() && !hasFiles) return;
@@ -1228,7 +1285,12 @@ export function TalkToHugoAI({
     setAttachedFiles([]);
 
     if (isAnalyseIntent && filesToAnalyze.length > 0) {
-      await handleInlineAnalysis(filesToAnalyze);
+      // V3 uses full narrative pipeline + navCard to results page
+      if (engineModel === "v3") {
+        await handleV3AudioAnalysis(filesToAnalyze);
+      } else {
+        await handleInlineAnalysis(filesToAnalyze);
+      }
       return;
     }
 
@@ -2135,7 +2197,12 @@ ${evaluation.nextSteps.map(s => `- ${s}`).join('\n')}`;
                           className="rounded-full px-4 text-white"
                           style={{ backgroundColor: 'var(--hh-success)' }}
                           onClick={() => {
-                            navigate?.(message.navCard!.destination, message.navCard!.itemId ? { techniqueId: message.navCard!.itemId } : undefined);
+                            const dest = message.navCard!.destination;
+                            const id = message.navCard!.itemId;
+                            const navData = id
+                              ? dest === "analysis-results" ? { conversationId: id } : { techniqueId: id }
+                              : undefined;
+                            navigate?.(dest, navData);
                           }}
                         >
                           Ga daarheen

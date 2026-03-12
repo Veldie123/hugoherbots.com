@@ -1678,7 +1678,12 @@ export function AdminChatExpertMode({
                             className="rounded-full px-4 text-white"
                             style={{ backgroundColor: 'var(--hh-success)' }}
                             onClick={() => {
-                              navigate?.(message.navCard!.destination, message.navCard!.itemId ? { techniqueId: message.navCard!.itemId } : undefined);
+                              const dest = message.navCard!.destination;
+                              const id = message.navCard!.itemId;
+                              const navData = id
+                                ? dest === "analysis-results" ? { conversationId: id } : { techniqueId: id }
+                                : undefined;
+                              navigate?.(dest, navData);
                             }}
                           >
                             Ga daarheen
