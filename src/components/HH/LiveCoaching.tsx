@@ -2144,7 +2144,7 @@ export function LiveCoaching({
                   {" "}• {calendarDetailSession.durationMinutes || 60} min
                 </span>
               </div>
-              {calendarDetailSession.viewerCount && calendarDetailSession.viewerCount > 0 && (
+              {(calendarDetailSession.viewerCount ?? 0) > 0 && (
                 <div className="flex items-center gap-2.5 text-[14px] text-hh-primary">
                   <Users className="w-4 h-4 flex-shrink-0" />
                   <span>{calendarDetailSession.viewerCount} verkopers nemen deel</span>

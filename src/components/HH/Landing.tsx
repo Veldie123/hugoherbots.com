@@ -70,7 +70,7 @@ export function Landing({ navigate }: LandingProps) {
         <StickyHeader currentPage="landing" navigate={handleNavigate} />
 
         {/* Hero - Large Background Photo with Text Overlay */}
-        <section className="relative overflow-hidden" style={{ minHeight: 'calc(100vh - 80px)' }}>
+        <section className="relative overflow-hidden" style={{ minHeight: '100vh' }}>
           {/* Background Video - Hugo Writing */}
           <div className="absolute inset-0">
             <video
@@ -90,7 +90,7 @@ export function Landing({ navigate }: LandingProps) {
           </div>
 
           {/* Content */}
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-end" style={{ minHeight: 'calc(100vh - 80px)', paddingTop: '15vh' }}>
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-end" style={{ minHeight: '100vh', paddingTop: '15vh' }}>
             <div className="w-full pb-8 sm:pb-16 lg:pb-20">
               <div className="space-y-5 sm:space-y-6 max-w-[580px]">
                 {/* Headline - dominant element */}
@@ -114,9 +114,9 @@ export function Landing({ navigate }: LandingProps) {
                   <button
                     id="hero-cta"
                     onClick={() => handleNavigate("preview")}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 h-[48px] text-[16px] leading-[24px] font-[400] bg-hh-ink text-white rounded-2xl transition-all duration-200 hover:opacity-90"
-                    style={{ 
-                      boxShadow: '0 8px 24px rgba(27,42,74,0.45)',
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 h-[48px] text-[16px] leading-[24px] font-[400] bg-hh-success text-white rounded-2xl transition-all duration-200 hover:bg-hh-success/90"
+                    style={{
+                      boxShadow: '0 8px 24px rgba(16,185,129,0.35)',
                     }}
                   >
                     Platform Tour <ArrowRight className="w-6 h-6" />
@@ -694,10 +694,9 @@ export function Landing({ navigate }: LandingProps) {
             <p className="text-[16px] leading-[26px] sm:text-[18px] sm:leading-[28px] text-hh-ui-300 mb-10 max-w-2xl mx-auto">
               Sales is mensenwerk. 'People buy people' — en de psychologie leer je hier.
             </p>
-            <Button 
-              size="lg" 
-              variant="ink" 
-              className="text-[18px] h-14 px-8"
+            <Button
+              size="lg"
+              className="text-[18px] h-14 px-8 bg-hh-success text-white hover:bg-hh-success/90"
               onClick={() => handleNavigate("preview")}
             >
               Platform Tour <ArrowRight className="w-5 h-5 ml-2" />

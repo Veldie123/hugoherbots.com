@@ -265,9 +265,8 @@ export function EpicSidebar({
 
   const renderTechItem = (tech: Techniek, indent: number = 0) => {
     const isPrimary = tech.nummer === primaryTechniqueNumber;
-    const isHighlighted = videoTechniqueIds.has(tech.nummer);
     const isLiveActive = activeTimelineTechnique === tech.nummer;
-    const isActive = isPrimary || isHighlighted || isLiveActive;
+    const isActive = isPrimary || isLiveActive;
     const hasVideo = allVideos.some((v) => v.techniqueNumber === tech.nummer);
     const videoForTech = allVideos.find(
       (v) => v.techniqueNumber === tech.nummer
@@ -301,11 +300,6 @@ export function EpicSidebar({
                 backgroundColor: "rgba(var(--hh-primary-rgb),0.06)",
                 borderLeft: "3px solid var(--hh-primary)",
               }
-            : isHighlighted
-            ? {
-                backgroundColor: "rgba(var(--hh-primary-rgb),0.08)",
-                borderLeft: "3px solid rgba(var(--hh-primary-rgb),0.6)",
-              }
             : {}),
         }}
         onClick={() => onTechniqueClick(tech)}
@@ -320,11 +314,6 @@ export function EpicSidebar({
             <div
               className="w-3.5 h-3.5 rounded-full"
               style={{ backgroundColor: "var(--hh-primary)" }}
-            />
-          ) : isHighlighted ? (
-            <Tag
-              className="w-3 h-3"
-              style={{ color: "var(--hh-primary)", opacity: 0.85 }}
             />
           ) : isCompleted ? (
             <CheckCircle2

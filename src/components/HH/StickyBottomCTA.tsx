@@ -56,7 +56,7 @@ export function StickyBottomCTA({ navigate, heroButtonId = "hero-cta" }: StickyB
     <div className="md:hidden fixed bottom-4 left-4 right-4 z-50">
       <Button
         size="lg"
-        className="w-full gap-2 h-14 text-[16px] font-[600] shadow-lg"
+        className="w-full gap-2 h-14 text-[16px] font-[600] shadow-lg bg-hh-success text-white hover:bg-hh-success/90"
         onClick={() => navigate?.("preview")}
       >
         Platform Tour <ArrowRight className="w-5 h-5" />

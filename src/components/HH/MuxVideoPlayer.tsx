@@ -129,7 +129,7 @@ export function MuxVideoPlayer({
         minResolution="720p"
         maxResolution="2160p"
         primaryColor="#ffffff"
-        accentColor="#3b82f6"
+        accentColor="#8B5CF6"
         style={{ 
           width: "100%", 
           height: "100%",

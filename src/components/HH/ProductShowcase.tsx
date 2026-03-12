@@ -137,11 +137,7 @@ function ModuleSection({ module, index, navigate }: { module: Module; index: num
             >
               <button
                 onClick={() => navigate?.("preview")}
-                className={`inline-flex items-center gap-2 px-6 py-3 rounded-full text-[15px] font-medium transition-all duration-200 ${
-                  module.dark
-                    ? "bg-white text-hh-ink hover:bg-white/90"
-                    : "bg-hh-ink text-white hover:bg-hh-ink/90"
-                }`}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[15px] font-medium transition-all duration-200 bg-hh-success text-white hover:bg-hh-success/90"
               >
                 Platform Tour
                 <ArrowRight className="w-4 h-4" />

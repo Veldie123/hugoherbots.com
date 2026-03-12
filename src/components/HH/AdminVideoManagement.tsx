@@ -2005,7 +2005,8 @@ export function AdminVideoManagement({ navigate, isSuperAdmin = false }: AdminVi
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragEnd={() => { setDraggedIndex(null); setDragOverIndex(null); }}
                     onDrop={() => handleDrop(index)}
-                    className={`flex items-center gap-3 p-3 cursor-grab active:cursor-grabbing transition-all ${
+                    onClick={() => navigate?.('admin-video-detail', { videoId: video.id })}
+                    className={`flex items-center gap-3 p-3 cursor-pointer transition-all ${
                       isDragging ? 'opacity-40 bg-hh-primary/10' : ''
                     } ${isDragOver ? 'border-t-2 border-hh-primary' : ''} hover:bg-hh-ui-50`}
                   >

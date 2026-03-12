@@ -585,7 +585,11 @@ export function AppLayout({
                 onClick={() => setNotifOpen(!notifOpen)}
                 className="w-10 h-10 rounded-full flex items-center justify-center transition-colors relative"
                 style={{
-                  backgroundColor: notifOpen ? 'var(--hh-primary)' : 'transparent',
+                  backgroundColor: notifOpen
+                    ? 'var(--hh-primary)'
+                    : unreadCount > 0
+                      ? 'color-mix(in srgb, var(--hh-primary) 15%, transparent)'
+                      : 'transparent',
                   color: notifOpen ? '#ffffff' : 'var(--hh-primary)',
                 }}
               >

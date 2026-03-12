@@ -120,7 +120,7 @@ export function StickyHeader({ currentPage = "landing", navigate }: StickyHeader
               </button>
               <button
                 onClick={() => navigate("preview")}
-                className="px-6 h-[48px] text-[16px] leading-[24px] font-[400] bg-hh-ink text-hh-bg rounded-2xl hover:bg-hh-ui-700 transition-colors shadow-hh-md"
+                className="px-6 h-[48px] text-[16px] leading-[24px] font-[400] bg-hh-ink text-hh-bg rounded-2xl hover:bg-hh-ink/90 transition-colors shadow-hh-md"
               >
                 Platform Tour
               </button>
@@ -184,7 +184,7 @@ export function StickyHeader({ currentPage = "landing", navigate }: StickyHeader
                     navigate("preview");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full px-6 py-4 bg-hh-ink text-white rounded-2xl hover:bg-hh-ink/90 transition-all shadow-hh-md text-[16px] leading-[24px] font-[600]"
+                  className="w-full px-6 py-4 bg-hh-success text-white rounded-2xl hover:bg-hh-success/90 transition-all shadow-hh-md text-[16px] leading-[24px] font-[600]"
                 >
                   Platform Tour
                 </button>
